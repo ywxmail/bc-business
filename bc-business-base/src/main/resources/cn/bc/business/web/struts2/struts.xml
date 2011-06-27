@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<!-- bc-business使用通配符的默认配置 -->
+	<package name="bc-business" extends="bc" namespace="/bc-business">
+		<!-- 新建表单 -->
+		<action name="/*/create" class="{1}Action" method="create">
+			<result name="form">/bc-business/{1}/form.jsp</result>
+		</action>
+		<!-- 可编辑表单 -->
+		<action name="/*/edit" class="{1}Action" method="edit">
+			<result name="form">/bc-business/{1}/form.jsp</result>
+		</action>
+		<!-- 只读表单 -->
+		<action name="/*/read" class="{1}Action" method="edit">
+			<result name="form">/bc-business/{1}/formr.jsp</result>
+		</action>
+	</package>
+</struts>

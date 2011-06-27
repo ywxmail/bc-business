@@ -11,8 +11,9 @@
 	<packaging>pom</packaging>
 	<name>bc-business</name>
 	<modules>
+		<module>bc-business-base</module>
 		<module>bc-business-parent</module>
-		<module>bcbusiness-car</module>
+		<module>bc-business-car</module>
 	</modules>
 	<scm>
 		<connection>scm:git:git://localhost/bc-business.git</connection>

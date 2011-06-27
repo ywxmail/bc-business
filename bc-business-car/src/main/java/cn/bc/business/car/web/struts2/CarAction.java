@@ -3,7 +3,6 @@
  */
 package cn.bc.business.car.web.struts2;
 
-import java.util.Calendar;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,17 +12,15 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
 import cn.bc.business.car.domain.Car;
+import cn.bc.business.web.struts2.CrudAction;
 import cn.bc.core.query.condition.Condition;
 import cn.bc.core.query.condition.Direction;
 import cn.bc.core.query.condition.impl.EqualsCondition;
 import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.core.service.CrudService;
-import cn.bc.docs.service.AttachService;
 import cn.bc.docs.web.ui.html.AttachWidget;
-import cn.bc.identity.service.IdGeneratorService;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.web.formater.CalendarFormater;
-import cn.bc.web.struts2.CrudAction;
 import cn.bc.web.ui.html.grid.Column;
 import cn.bc.web.ui.html.grid.GridData;
 import cn.bc.web.ui.html.grid.TextColumn;
@@ -42,9 +39,7 @@ import cn.bc.web.ui.html.toolbar.Toolbar;
 public class CarAction extends CrudAction<Long, Car> {
 	// private static Log logger = LogFactory.getLog(BulletinAction.class);
 	private static final long serialVersionUID = 1L;
-	private IdGeneratorService idGeneratorService;
-	private AttachService attachService;
-	private String MANAGER_KEY = "R_MANAGER_CAR";// 管理角色的编码
+	private String MANAGER_KEY = "R_MANAGER_BUSINESS";// 管理角色的编码
 	public boolean isManager;
 
 	@Autowired
@@ -53,31 +48,10 @@ public class CarAction extends CrudAction<Long, Car> {
 		this.setCrudService(crudService);
 	}
 
-	@Autowired
-	public void setAttachService(AttachService attachService) {
-		this.attachService = attachService;
-	}
-
-	@Autowired
-	public void setIdGeneratorService(IdGeneratorService idGeneratorService) {
-		this.idGeneratorService = idGeneratorService;
-	}
-
 	@Override
 	public String create() throws Exception {
 		this.readonly = false;
-		SystemContext context = (SystemContext) this.getContext();
 		Car e = this.getCrudService().create();
-		e.setFileDate(Calendar.getInstance());
-		e.setAuthor(context.getUser());
-		e.setDepartId(context.getBelong().getId());
-		e.setDepartName(context.getBelong().getName());
-		e.setUnitId(context.getUnit().getId());
-		e.setUnitName(context.getUnit().getName());
-
-		e.setStatus(Car.STATUS_ENABLED);
-
-		e.setUid(this.idGeneratorService.next("car.uid"));
 		this.setE(e);
 
 		// 构建附件控件
@@ -126,44 +100,36 @@ public class CarAction extends CrudAction<Long, Car> {
 	private AttachWidget buildAttachsUI(boolean isNew) {
 		isManager = isManager();
 		// 构建附件控件
-		String ptype = "car.main";
-		AttachWidget attachsUI = new AttachWidget();
-		attachsUI.setFlashUpload(this.isFlashUpload());
-		attachsUI.addClazz("formAttachs");
-		if (!isNew)
-			attachsUI.addAttach(this.attachService.findByPtype(ptype, this
-					.getE().getUid()));
-		attachsUI.setPuid(this.getE().getUid()).setPtype(ptype);
-
-		// 上传附件的限制
-		attachsUI.addExtension(getText("app.attachs.extensions"))
-				.setMaxCount(Integer.parseInt(getText("app.attachs.maxCount")))
-				.setMaxSize(Integer.parseInt(getText("app.attachs.maxSize")));
-		attachsUI.setReadOnly(!this.getE().isNew());
+//		String ptype = "car.main";
+//		AttachWidget attachsUI = new AttachWidget();
+//		attachsUI.setFlashUpload(this.isFlashUpload());
+//		attachsUI.addClazz("formAttachs");
+//		if (!isNew)
+//			attachsUI.addAttach(this.attachService.findByPtype(ptype, this
+//					.getE().getUid()));
+//		attachsUI.setPuid(this.getE().getUid()).setPtype(ptype);
+//
+//		// 上传附件的限制
+//		attachsUI.addExtension(getText("app.attachs.extensions"))
+//				.setMaxCount(Integer.parseInt(getText("app.attachs.maxCount")))
+//				.setMaxSize(Integer.parseInt(getText("app.attachs.maxSize")));
+//		attachsUI.setReadOnly(!this.getE().isNew());
 		return attachsUI;
 	}
 
 	@Override
 	protected GridData buildGridData(List<Column> columns) {
-		return super.buildGridData(columns).setRowLabelExpression("subject");
+		return super.buildGridData(columns).setRowLabelExpression("name");
 	}
 
 	@Override
 	protected OrderCondition getDefaultOrderCondition() {
-		return new OrderCondition("fileDate", Direction.Desc);
+		return null;// new OrderCondition("fileDate", Direction.Desc);
 	}
 
 	@Override
 	protected Condition getSpecalCondition() {
-		SystemContext context = (SystemContext) this.getContext();
-		// 是否本模块管理员
-		isManager = isManager();
-
-		if (isManager) {// 本模块管理员看全部
-			return null;
-		} else {// 普通用户仅看自己提交的
-			return new EqualsCondition("author.id", context.getUser().getId());
-		}
+		return null;
 	}
 
 	// 设置页面的尺寸
@@ -200,7 +166,7 @@ public class CarAction extends CrudAction<Long, Car> {
 
 	@Override
 	protected String[] getSearchFields() {
-		return new String[] { "subject", "description" };
+		return new String[] { "name", "description" };
 	}
 
 	@Override
@@ -209,11 +175,8 @@ public class CarAction extends CrudAction<Long, Car> {
 		isManager = isManager();
 
 		List<Column> columns = super.buildGridColumns();
-		columns.add(new TextColumn("subject", getText("label.subject"))
+		columns.add(new TextColumn("name", getText("label.subject"))
 				.setSortable(true).setUseTitleFromLabel(true));
-		columns.add(new TextColumn("fileDate", getText("label.fileDate"), 120)
-				.setSortable(true).setDir(Direction.Desc)
-				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
 		return columns;
 	}
 

@@ -13,39 +13,10 @@
 	<name>bc-business-parent</name>
 	<description>营运管理子系统各模块的parent</description>
 	<dependencies>
-		<!-- core -->
+		<!-- base -->
 		<dependency>
-			<groupId>javax.persistence</groupId>
-			<artifactId>persistence-api</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>cn.bc</groupId>
-			<artifactId>bc-identity</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>cn.bc</groupId>
-			<artifactId>bc-orm-hibernate</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		
-		<!-- web -->
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>servlet-api</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>cn.bc</groupId>
-			<artifactId>bc-web-struts2</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		
-		<!-- 附件 -->
-		<dependency>
-			<groupId>cn.bc</groupId>
-			<artifactId>bc-docs</artifactId>
+			<groupId>cn.bc.business</groupId>
+			<artifactId>bc-business-base</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
