@@ -11,7 +11,7 @@
 	<packaging>pom</packaging>
 	<version>0.3-SNAPSHOT</version>
 	<name>bc-business-parent</name>
-	<description>钀ヨ繍绠＄悊瀛愮郴缁熷悇妯″潡鐨刾arent</description>
+	<description>营运管理子系统各模块的parent</description>
 	<dependencies>
 		<!-- base -->
 		<dependency>

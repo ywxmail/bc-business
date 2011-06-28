@@ -10,7 +10,7 @@ import javax.persistence.Table;
 import cn.bc.core.EntityImpl;
 
 /**
- * 杞﹁締
+ * 车辆
  * 
  * @author dragon
  */
@@ -19,9 +19,9 @@ import cn.bc.core.EntityImpl;
 public class Car extends EntityImpl {
 	private static final long serialVersionUID = 1L;
 
-	private String name;// 杞﹀悕
+	private String name;// 车名
 
-	private String description;// 澶囨敞
+	private String description;// 备注
 
 	public String getName() {
 		return name;

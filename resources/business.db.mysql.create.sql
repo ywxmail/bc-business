@@ -1,11 +1,11 @@
--- bc钀ヨ繍绠＄悊瀛愮郴缁熺殑寤鸿〃鑴氭湰,鎵�鏈夎〃鍚嶉』闄勫甫鍓嶇紑"BS_"
--- 杩愯姝よ剼鏈箣鍓嶉渶鍏堣繍琛屽钩鍙扮殑寤鸿〃鑴氭湰framework.db.mysql.create.sql
+-- bc营运管理子系统的建表脚本,所有表名须附带前缀"BS_"
+-- 运行此脚本之前需先运行平台的建表脚本framework.db.mysql.create.sql
 
--- 杞﹁締
+-- 车辆
 create table BS_CAR (
     ID int NOT NULL auto_increment,
-    UNIT_ID int COMMENT '鎵�灞炲崟浣岻D',
-    NAME varchar(500) NOT NULL COMMENT '鍚嶇О',
-    DESC_ text COMMENT '澶囨敞',
+    UNIT_ID int COMMENT '所属单位ID',
+    NAME varchar(500) NOT NULL COMMENT '名称',
+    DESC_ text COMMENT '备注',
     primary key (ID)
-) COMMENT='杞﹁締';
+) COMMENT='车辆';

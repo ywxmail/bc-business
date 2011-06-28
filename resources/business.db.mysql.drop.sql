@@ -1,5 +1,5 @@
--- bc钀ヨ繍绠＄悊瀛愮郴缁熺殑鍒犺〃鑴氭湰
--- 杩愯姝よ剼鏈箣鍚庡啀杩愯骞冲彴鐨勫垹琛ㄨ剼鏈琭ramework.db.mysql.drop.sql
+-- bc营运管理子系统的删表脚本
+-- 运行此脚本之后再运行平台的删表脚本framework.db.mysql.drop.sql
 
--- 杞﹁締
+-- 车辆
 drop table if exists BS_CAR;
