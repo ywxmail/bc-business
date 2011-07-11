@@ -7,11 +7,6 @@
 		<version>0.1-SNAPSHOT</version>
 		<relativePath>../../bc-framework/bc-parent/pom.xml</relativePath>
 	</parent>
-	<groupId>cn.bc.business</groupId>
 	<artifactId>bc-business-base</artifactId>
 	<description>营运管理子系统的基类包</description>
-	
-	<dependencies>
-
-	</dependencies>
 </project>

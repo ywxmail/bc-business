@@ -7,7 +7,6 @@
 		<version>0.1-SNAPSHOT</version>
 		<relativePath>bc-business-parent/pom.xml</relativePath>
 	</parent>
-	<groupId>cn.bc.business</groupId>
 	<artifactId>bc-business</artifactId>
 	<packaging>pom</packaging>
 	<name>bc-business</name>
