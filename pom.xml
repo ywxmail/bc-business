@@ -4,15 +4,16 @@
 	<parent>
 		<groupId>cn.bc.business</groupId>
 		<artifactId>bc-business-parent</artifactId>
-		<version>0.3-SNAPSHOT</version>
+		<version>0.1-SNAPSHOT</version>
 		<relativePath>bc-business-parent/pom.xml</relativePath>
 	</parent>
+	<groupId>cn.bc.business</groupId>
 	<artifactId>bc-business</artifactId>
 	<packaging>pom</packaging>
 	<name>bc-business</name>
 	<modules>
-		<module>bc-business-base</module>
 		<module>bc-business-parent</module>
+		<module>bc-business-base</module>
 		<module>bc-business-car</module>
 	</modules>
 	<scm>

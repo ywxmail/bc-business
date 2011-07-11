@@ -14,13 +14,10 @@ import org.springframework.stereotype.Controller;
 import cn.bc.business.car.domain.Car;
 import cn.bc.business.web.struts2.CrudAction;
 import cn.bc.core.query.condition.Condition;
-import cn.bc.core.query.condition.Direction;
-import cn.bc.core.query.condition.impl.EqualsCondition;
 import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.core.service.CrudService;
 import cn.bc.docs.web.ui.html.AttachWidget;
 import cn.bc.identity.web.SystemContext;
-import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.ui.html.grid.Column;
 import cn.bc.web.ui.html.grid.GridData;
 import cn.bc.web.ui.html.grid.TextColumn;
@@ -29,7 +26,7 @@ import cn.bc.web.ui.html.page.PageOption;
 import cn.bc.web.ui.html.toolbar.Toolbar;
 
 /**
- * ³µÁ¾Action
+ * è½¦è¾†Action
  * 
  * @author dragon
  * 
@@ -39,7 +36,7 @@ import cn.bc.web.ui.html.toolbar.Toolbar;
 public class CarAction extends CrudAction<Long, Car> {
 	// private static Log logger = LogFactory.getLog(BulletinAction.class);
 	private static final long serialVersionUID = 1L;
-	private String MANAGER_KEY = "R_MANAGER_BUSINESS";// ¹ÜÀí½ÇÉ«µÄ±àÂë
+	private String MANAGER_KEY = "R_MANAGER_BUSINESS";// ç®¡ç†è§’è‰²çš„ç¼–ç 
 	public boolean isManager;
 
 	@Autowired
@@ -54,10 +51,10 @@ public class CarAction extends CrudAction<Long, Car> {
 		Car e = this.getCrudService().create();
 		this.setE(e);
 
-		// ¹¹½¨¸½¼ş¿Ø¼ş
+		// æ„å»ºé™„ä»¶æ§ä»¶
 		attachsUI = buildAttachsUI(true);
 
-		// ¹¹½¨¶Ô»°¿ò²ÎÊı
+		// æ„å»ºå¯¹è¯æ¡†å‚æ•°
 		this.formPageOption = buildFormPageOption();
 
 		return "form";
@@ -73,7 +70,7 @@ public class CarAction extends CrudAction<Long, Car> {
 		return option;
 	}
 
-	// Ìá½»·´À¡
+	// æäº¤åé¦ˆ
 	@Override
 	public String save() throws Exception {
 		Car e = this.getE();
@@ -89,17 +86,17 @@ public class CarAction extends CrudAction<Long, Car> {
 		this.setE(this.getCrudService().load(this.getId()));
 		this.formPageOption = buildFormPageOption();
 
-		// ¹¹½¨¸½¼ş¿Ø¼ş
+		// æ„å»ºé™„ä»¶æ§ä»¶
 		attachsUI = buildAttachsUI(false);
 
-		// TODO »ñÈ¡»Ø¸´ĞÅÏ¢ÁĞ±í
+		// TODO è·å–å›å¤ä¿¡æ¯åˆ—è¡¨
 
 		return "form";
 	}
 
 	private AttachWidget buildAttachsUI(boolean isNew) {
 		isManager = isManager();
-		// ¹¹½¨¸½¼ş¿Ø¼ş
+		// æ„å»ºé™„ä»¶æ§ä»¶
 //		String ptype = "car.main";
 //		AttachWidget attachsUI = new AttachWidget();
 //		attachsUI.setFlashUpload(this.isFlashUpload());
@@ -109,7 +106,7 @@ public class CarAction extends CrudAction<Long, Car> {
 //					.getE().getUid()));
 //		attachsUI.setPuid(this.getE().getUid()).setPtype(ptype);
 //
-//		// ÉÏ´«¸½¼şµÄÏŞÖÆ
+//		// ä¸Šä¼ é™„ä»¶çš„é™åˆ¶
 //		attachsUI.addExtension(getText("app.attachs.extensions"))
 //				.setMaxCount(Integer.parseInt(getText("app.attachs.maxCount")))
 //				.setMaxSize(Integer.parseInt(getText("app.attachs.maxSize")));
@@ -132,7 +129,7 @@ public class CarAction extends CrudAction<Long, Car> {
 		return null;
 	}
 
-	// ÉèÖÃÒ³ÃæµÄ³ß´ç
+	// è®¾ç½®é¡µé¢çš„å°ºå¯¸
 	@Override
 	protected PageOption buildListPageOption() {
 		return super.buildListPageOption().setWidth(800).setMinWidth(300)
@@ -145,20 +142,20 @@ public class CarAction extends CrudAction<Long, Car> {
 		Toolbar tb = new Toolbar();
 		
 		if (isManager) {
-			// ĞÂ½¨°´Å¥
+			// æ–°å»ºæŒ‰é’®
 			tb.addButton(getDefaultCreateToolbarButton());
 			
-			// ±à¼­°´Å¥
+			// ç¼–è¾‘æŒ‰é’®
 			tb.addButton(getDefaultEditToolbarButton());
 			
-			// É¾³ı°´Å¥
+			// åˆ é™¤æŒ‰é’®
 			tb.addButton(getDefaultDeleteToolbarButton());
-		} else {// ÆÕÍ¨ÓÃ»§
-			// ²é¿´°´Å¥
+		} else {// æ™®é€šç”¨æˆ·
+			// æŸ¥çœ‹æŒ‰é’®
 			tb.addButton(getDefaultOpenToolbarButton());
 		}
 
-		// ËÑË÷°´Å¥
+		// æœç´¢æŒ‰é’®
 		tb.addButton(getDefaultSearchToolbarButton());
 
 		return tb;
@@ -171,7 +168,7 @@ public class CarAction extends CrudAction<Long, Car> {
 
 	@Override
 	protected List<Column> buildGridColumns() {
-		// ÊÇ·ñ±¾Ä£¿é¹ÜÀíÔ±
+		// æ˜¯å¦æœ¬æ¨¡å—ç®¡ç†å‘˜
 		isManager = isManager();
 
 		List<Column> columns = super.buildGridColumns();
@@ -180,7 +177,7 @@ public class CarAction extends CrudAction<Long, Car> {
 		return columns;
 	}
 
-	// ÅĞ¶Ïµ±Ç°ÓÃ»§ÊÇ·ñÊÇ±¾Ä£¿é¹ÜÀíÔ±
+	// åˆ¤æ–­å½“å‰ç”¨æˆ·æ˜¯å¦æ˜¯æœ¬æ¨¡å—ç®¡ç†å‘˜
 	private boolean isManager() {
 		return ((SystemContext) this.getContext()).hasAnyRole(MANAGER_KEY);
 	}

@@ -2,49 +2,16 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>cn.bc</groupId>
-		<artifactId>bc-parent</artifactId>
-		<version>0.3-SNAPSHOT</version>
+		<groupId>cn.bc.business</groupId>
+		<artifactId>bc-business-parent</artifactId>
+		<version>0.1-SNAPSHOT</version>
 		<relativePath>../../bc-framework/bc-parent/pom.xml</relativePath>
 	</parent>
 	<groupId>cn.bc.business</groupId>
 	<artifactId>bc-business-base</artifactId>
 	<description>营运管理子系统的基类包</description>
+	
 	<dependencies>
-		<!-- core -->
-		<dependency>
-			<groupId>javax.persistence</groupId>
-			<artifactId>persistence-api</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>cn.bc</groupId>
-			<artifactId>bc-identity</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>cn.bc</groupId>
-			<artifactId>bc-orm-hibernate</artifactId>
-			<version>${project.version}</version>
-		</dependency>
 
-		<!-- web -->
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>servlet-api</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>cn.bc</groupId>
-			<artifactId>bc-web-struts2</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-
-		<!-- 附件 -->
-		<dependency>
-			<groupId>cn.bc</groupId>
-			<artifactId>bc-docs</artifactId>
-			<version>${project.version}</version>
-		</dependency>
 	</dependencies>
 </project>

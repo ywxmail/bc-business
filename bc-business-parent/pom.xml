@@ -3,21 +3,61 @@
 	<parent>
 		<groupId>cn.bc</groupId>
 		<artifactId>bc-parent</artifactId>
-		<version>0.3-SNAPSHOT</version>
+		<version>0.4-SNAPSHOT</version>
 		<relativePath>../../bc-framework/bc-parent/pom.xml</relativePath>
 	</parent>
 	<groupId>cn.bc.business</groupId>
 	<artifactId>bc-business-parent</artifactId>
 	<packaging>pom</packaging>
-	<version>0.3-SNAPSHOT</version>
+	<version>0.1-SNAPSHOT</version>
 	<name>bc-business-parent</name>
-	<description>Ӫ�˹�����ϵͳ��ģ���parent</description>
+	<description>营运管理子系统各模块的parent</description>
+	
+	<properties>
+		<!-- 平台的版本号 -->
+		<framework.version>0.4-SNAPSHOT</framework.version>
+	</properties>
+	
 	<dependencies>
-		<!-- base -->
+		<!-- 本子系统的公共模块 -->
 		<dependency>
 			<groupId>cn.bc.business</groupId>
 			<artifactId>bc-business-base</artifactId>
 			<version>${project.version}</version>
+		</dependency>
+		
+		<!-- 平台模块 -->
+		<dependency>
+			<groupId>cn.bc</groupId>
+			<artifactId>bc-identity</artifactId>
+			<version>${framework.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>cn.bc</groupId>
+			<artifactId>bc-orm-hibernate</artifactId>
+			<version>${framework.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>cn.bc</groupId>
+			<artifactId>bc-web-struts2</artifactId>
+			<version>${framework.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>cn.bc</groupId>
+			<artifactId>bc-docs</artifactId>
+			<version>${framework.version}</version>
+		</dependency>
+		
+		<!-- provided -->
+		<dependency>
+			<groupId>javax.persistence</groupId>
+			<artifactId>persistence-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
+			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 </project>
