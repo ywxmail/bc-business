@@ -29,8 +29,8 @@ public class Motorcade extends RichFileEntityImpl   {
 	
 	
 	private String code;//编码
-	private String addrevation;//简称
-	private String benelux;//全称
+	private String name;//简称
+	private String fullName;//全称
 	private String company;//公司
 	private String colour;//颜色
 	private String address;//地址
@@ -39,24 +39,24 @@ public class Motorcade extends RichFileEntityImpl   {
 	private String fax;//传真
 	private Date payment_date;//缴费日期
 	private String description;// 备注
-	private Date lastupdated_date;//最近更新
 	public String getCode() {
 		return code;
 	}
 	public void setCode(String code) {
 		this.code = code;
 	}
-	public String getAddrevation() {
-		return addrevation;
+	
+	public String getName() {
+		return name;
 	}
-	public void setAddrevation(String addrevation) {
-		this.addrevation = addrevation;
+	public void setName(String name) {
+		this.name = name;
 	}
-	public String getBenelux() {
-		return benelux;
+	public String getFullName() {
+		return fullName;
 	}
-	public void setBenelux(String benelux) {
-		this.benelux = benelux;
+	public void setFullName(String fullName) {
+		this.fullName = fullName;
 	}
 	public String getCompany() {
 		return company;
@@ -88,12 +88,7 @@ public class Motorcade extends RichFileEntityImpl   {
 	public void setPayment_date(Date payment_date) {
 		this.payment_date = payment_date;
 	}
-	public Date getLastupdated_date() {
-		return lastupdated_date;
-	}
-	public void setLastupdated_date(Date lastupdated_date) {
-		this.lastupdated_date = lastupdated_date;
-	}
+	
 	public String getPhone() {
 		return phone;
 	}

@@ -67,7 +67,7 @@ public class MotorcadeAction extends CrudAction<Long, Motorcade> {
 
 	@Override
 	protected GridData buildGridData(List<Column> columns) {
-		return super.buildGridData(columns).setRowLabelExpression("addrevation");
+		return super.buildGridData(columns).setRowLabelExpression("name");
 	}
 
 	@Override
@@ -114,7 +114,7 @@ public class MotorcadeAction extends CrudAction<Long, Motorcade> {
 
 	@Override
 	protected String[] getSearchFields() {
-		return new String[] { "code", "addrevation","benelux" };
+		return new String[] { "code", "name","fullName" };
 	}
 
 	@Override
@@ -125,9 +125,9 @@ public class MotorcadeAction extends CrudAction<Long, Motorcade> {
 		List<Column> columns = super.buildGridColumns();
 		columns.add(new TextColumn("code", getText("label.code"),130).setSortable(true)
 				.setUseTitleFromLabel(true));
-		columns.add(new TextColumn("addrevation", getText("motorcade.addrevation"),130)
+		columns.add(new TextColumn("name", getText("motorcade.name"),130)
 				.setSortable(true).setUseTitleFromLabel(true));
-		columns.add(new TextColumn("benelux", getText("motorcade.benelux"),400).setSortable(
+		columns.add(new TextColumn("fullName", getText("motorcade.fullName"),400).setSortable(
 				true).setUseTitleFromLabel(true));
 		columns.add(new TextColumn("status", getText("label.status"), 130)
 				.setSortable(true).setValueFormater(
