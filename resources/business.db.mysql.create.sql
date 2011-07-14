@@ -55,3 +55,5 @@ MONTH varchar(255) NOT NULL COMMENT '月份',
 CARQUANTITY varchar(255) NOT NULL COMMENT '车辆数'
 primary key (ID)
 )COMMENT='查看历史车辆数';
+
+
