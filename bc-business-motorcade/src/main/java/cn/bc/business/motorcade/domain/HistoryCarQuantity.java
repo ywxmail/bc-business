@@ -3,9 +3,12 @@ package cn.bc.business.motorcade.domain;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import cn.bc.identity.domain.RichFileEntityImpl;
 
-import cn.bc.core.EntityImpl;
 
 /**
  * 车辆
@@ -14,12 +17,14 @@ import cn.bc.core.EntityImpl;
  */
 @Entity
 @Table(name = "BS_HISTORY_CAR_QUANTITY")
-public class HistoryCarQuantity extends EntityImpl {
+public class HistoryCarQuantity extends RichFileEntityImpl {
 	private static final long serialVersionUID = 1L;
 
 	private String year;//年份
 	private String month;//月份
-	private String carquantity;//车辆数
+	private Long carquantity;//车辆数
+	private Motorcade motorcade;//车队
+	
 	public String getYear() {
 		return year;
 	}
@@ -32,11 +37,32 @@ public class HistoryCarQuantity extends EntityImpl {
 	public void setMonth(String month) {
 		this.month = month;
 	}
-	public String getCarquantity() {
+	
+	public Long getCarquantity() {
 		return carquantity;
 	}
-	public void setCarquantity(String carquantity) {
+	public void setCarquantity(Long carquantity) {
 		this.carquantity = carquantity;
+	}
+	@ManyToOne(fetch = FetchType.EAGER, optional = false, targetEntity = Motorcade.class)
+	@JoinColumn(name = "MOTORCADE_ID", referencedColumnName = "ID")
+	public Motorcade getMotorcade() {
+		return motorcade;
+	}
+	public void setMotorcade(Motorcade motorcade) {
+		this.motorcade = motorcade;
+	}
+	
+	@Column(name = "MOTORCADE_NAME")
+	public String getMotorcadeName() {
+		if (this.motorcade != null) {
+			return this.motorcade.getName();
+		} else {
+			return null;
+		}
+	}
+	public void setMotorcadeName(String motorcadeName) {
+		// do nothing
 	}
 	
 }

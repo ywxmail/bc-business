@@ -1,13 +1,11 @@
 package cn.bc.business.motorcade.domain;
 
-import java.util.Date;
+import java.util.Calendar;
+
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
-
-import cn.bc.core.EntityImpl;
-import cn.bc.identity.domain.RichFileEntity;
 import cn.bc.identity.domain.RichFileEntityImpl;
 
 /**
@@ -37,7 +35,7 @@ public class Motorcade extends RichFileEntityImpl   {
 	private String principal;//负责人
 	private String phone;//电话
 	private String fax;//传真
-	private Date payment_date;//缴费日期
+	private Calendar paymentDate;//缴费日期
 	private String description;// 备注
 	public String getCode() {
 		return code;
@@ -82,13 +80,13 @@ public class Motorcade extends RichFileEntityImpl   {
 	public void setPrincipal(String principal) {
 		this.principal = principal;
 	}
-	public Date getPayment_date() {
-		return payment_date;
+	@Column(name = "PAYMENT_DATE")
+	public Calendar getPaymentDate() {
+		return paymentDate;
 	}
-	public void setPayment_date(Date payment_date) {
-		this.payment_date = payment_date;
+	public void setPaymentDate(Calendar paymentDate) {
+		this.paymentDate = paymentDate;
 	}
-	
 	public String getPhone() {
 		return phone;
 	}

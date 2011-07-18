@@ -8,13 +8,11 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
-
 import cn.bc.business.motorcade.domain.Motorcade;
 import cn.bc.business.web.struts2.CrudAction;
 import cn.bc.core.query.condition.Condition;
 import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.core.service.CrudService;
-import cn.bc.docs.web.ui.html.AttachWidget;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.web.formater.KeyValueFormater;
 import cn.bc.web.ui.html.grid.Column;
@@ -64,6 +62,20 @@ public class MotorcadeAction extends CrudAction<Long, Motorcade> {
 	}
 
 	
+
+	@Override
+	protected PageOption buildFormPageOption() {
+		PageOption option = new PageOption().setWidth(620).setMinWidth(250)
+				.setMinHeight(250).setModal(false);
+		if (!this.getE().isNew()) {
+			option.addButton(new ButtonOption(getText("motorcade.historicalInformation"),
+					null,"bc.business.motorcadeForm.check"));
+			option.addButton(new ButtonOption(getText("label.save"), "save"));
+		}else{
+			option.addButton(new ButtonOption(getText("label.save"), "save"));
+		}
+		return option;
+	}
 
 	@Override
 	protected GridData buildGridData(List<Column> columns) {
