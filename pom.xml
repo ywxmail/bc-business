@@ -14,6 +14,7 @@
 		<module>bc-business-parent</module>
 		<module>bc-business-base</module>
 		<module>bc-business-car</module>
+		<module>bc-business-motorcade</module>
 	</modules>
 	<scm>
 		<connection>scm:git:git://localhost/bc-business.git</connection>
