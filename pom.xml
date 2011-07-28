@@ -14,6 +14,8 @@
 		<module>bc-business-parent</module>
 		<module>bc-business-base</module>
 		<module>bc-business-car</module>
+		<module>bc-business-cert</module>
+		<module>bc-business-carman</module>
 		<module>bc-business-motorcade</module>
 	</modules>
 	<scm>
