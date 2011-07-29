@@ -16,6 +16,11 @@ drop table if exists BS_CARMAN_CERT;
 -- 证件
 drop table if exists BS_CERT_IDENTITY;
 drop table if exists BS_CERT_DRIVING;
+drop table if exists BS_CERT_CYZG;
+drop table if exists BS_CERT_FWZG;
+drop table if exists BS_CERT_JSPX;
+drop table if exists BS_CERT_ROADTRANSPORT;
+drop table if exists BS_CERT_VEHICELICENSE;
 drop table if exists BS_CERT;
 
 -- 司机责任人
