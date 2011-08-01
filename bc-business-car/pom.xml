@@ -17,5 +17,11 @@
 			<artifactId>bc-business-base</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<!-- 证件模块 -->
+		<dependency>
+			<groupId>cn.bc.business</groupId>
+			<artifactId>bc-business-cert</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 	</dependencies>
 </project>
