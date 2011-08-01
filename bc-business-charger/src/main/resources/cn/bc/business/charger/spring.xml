@@ -14,22 +14,12 @@
 
 	<!-- 需要在主配置文件配置entityManagerFactory和transactionManager的实现 -->
 
-	<!--motorcade -->
-	<bean id="motorcadeDao"
-		class="cn.bc.business.motorcade.dao.hibernate.jpa.MotorcadeDaoImpl"
-		p:entityClass="cn.bc.business.motorcade.domain.Motorcade"
+	<!--charger-->
+	<bean id="chargerDao" class="cn.bc.orm.hibernate.jpa.HibernateCrudJpaDao"
+		p:entityClass="cn.bc.business.charger.domain.Charger"
 		p:entityManagerFactory-ref="entityManagerFactory" />
-	<bean id="motorcadeService" class="cn.bc.business.motorcade.service.MotorcadeServiceImpl"
-		p:entityClass="cn.bc.business.motorcade.domain.Motorcade"
-		p:motorcadeDao-ref="motorcadeDao" p:historyCarQuantityDao-ref="historyCarQuantityDao" />
-
-	<!-- historyCarQuantity -->
-	<bean id="historyCarQuantityDao"
-		class="cn.bc.business.motorcade.dao.hibernate.jpa.HistoryCarQuantityDaoImpl"
-		p:entityClass="cn.bc.business.motorcade.domain.HistoryCarQuantity"
-		p:entityManagerFactory-ref="entityManagerFactory" />
-	<bean id="historyCarQuantityService" 
-		class="cn.bc.business.motorcade.service.HistoryCarQuantityServiceImpl"
-		p:entityClass="cn.bc.business.motorcade.domain.HistoryCarQuantity"
-		p:historyCarQuantityDao-ref="historyCarQuantityDao" />
+	<bean id="chargerService" class="cn.bc.core.service.DefaultCrudService"
+		p:entityClass="cn.bc.business.charger.domain.Charger" p:crudDao-ref="chargerDao" />
+		
+	
 </beans>

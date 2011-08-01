@@ -1,66 +1,76 @@
-package cn.bc.business.motorcade.web.struts2;
+package cn.bc.business.charger.web.struts2;
 
 import java.util.Calendar;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
-import cn.bc.business.motorcade.domain.Motorcade;
-import cn.bc.business.motorcade.service.MotorcadeService;
+import cn.bc.business.charger.domain.Charger;
 import cn.bc.business.web.struts2.CrudAction;
 import cn.bc.core.query.condition.Condition;
+import cn.bc.core.query.condition.Direction;
 import cn.bc.core.query.condition.impl.OrderCondition;
+import cn.bc.core.service.CrudService;
+import cn.bc.docs.service.AttachService;
+import cn.bc.identity.service.IdGeneratorService;
 import cn.bc.identity.web.SystemContext;
-import cn.bc.web.formater.KeyValueFormater;
+
+import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.ui.html.grid.Column;
 import cn.bc.web.ui.html.grid.GridData;
 import cn.bc.web.ui.html.grid.TextColumn;
-import cn.bc.web.ui.html.page.ButtonOption;
 import cn.bc.web.ui.html.page.PageOption;
 import cn.bc.web.ui.html.toolbar.Toolbar;
 
 /**
- * 车队信息Action
+ * 负责人Action
  * 
  * @author dragon
  * 
  */
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 @Controller
-public class MotorcadeAction extends CrudAction<Long, Motorcade> {
+public class ChargerAction extends CrudAction<Long, Charger> {
 	// private static Log logger = LogFactory.getLog(BulletinAction.class);
 	private static final long serialVersionUID = 1L;
 	private String MANAGER_KEY = "R_MANAGER_BUSINESS";// 管理角色的编码
-	private MotorcadeService motorcadeService;
 	public boolean isManager;
 
 	@Autowired
-	public void setMotorcadeService(MotorcadeService motorcadeService) {
-		this.motorcadeService = motorcadeService;
-		this.setCrudService(motorcadeService);
+	public void setChargerService(
+			@Qualifier(value = "chargerService") CrudService<Charger> crudService) {
+		this.setCrudService(crudService);
 	}
 
-	public MotorcadeService getMotorcadeService() {
-		return motorcadeService;
+	@Autowired
+	public void setIdGeneratorService(IdGeneratorService idGeneratorService) {
+		this.idGeneratorService = idGeneratorService;
+	}
+
+	@Autowired
+	public void setAttachService(AttachService attachService) {
+		this.attachService = attachService;
 	}
 
 	@Override
 	public String create() throws Exception {
 		this.readonly = false;
 		SystemContext context = (SystemContext) this.getContext();
-		Motorcade e = this.getMotorcadeService().create();
+		Charger e = this.getCrudService().create();
 		e.setFileDate(Calendar.getInstance());
 		e.setAuthor(context.getUser());
 		e.setDepartId(context.getBelong().getId());
 		e.setDepartName(context.getBelong().getName());
 		e.setUnitId(context.getUnit().getId());
 		e.setUnitName(context.getUnit().getName());
+		e.setUid(this.idGeneratorService.next("charger.uid"));
 		e.setModifiedDate(Calendar.getInstance());
 		e.setModifierName(context.getUser().getName());
-		e.setModifierId(context.getUser().getId());
+		e.setSex("不设置");
 		this.setE(e);
 
 		// 构建对话框参数
@@ -70,28 +80,13 @@ public class MotorcadeAction extends CrudAction<Long, Motorcade> {
 	}
 
 	@Override
-	protected PageOption buildFormPageOption() {
-		PageOption option = new PageOption().setWidth(620).setMinWidth(250)
-				.setMinHeight(250).setModal(false);
-		if (!this.getE().isNew()) {
-			option.addButton(new ButtonOption(
-					getText("motorcade.historicalInformation"), null,
-					"bc.business.motorcadeForm.check"));
-			option.addButton(new ButtonOption(getText("label.save"), "save"));
-		} else {
-			option.addButton(new ButtonOption(getText("label.save"), "save"));
-		}
-		return option;
-	}
-
-	@Override
 	protected GridData buildGridData(List<Column> columns) {
 		return super.buildGridData(columns).setRowLabelExpression("name");
 	}
 
 	@Override
 	protected OrderCondition getDefaultOrderCondition() {
-		return null;// new OrderCondition("fileDate", Direction.Desc);
+		return new OrderCondition("orderId", Direction.Asc);
 	}
 
 	@Override
@@ -102,7 +97,7 @@ public class MotorcadeAction extends CrudAction<Long, Motorcade> {
 	// 设置页面的尺寸
 	@Override
 	protected PageOption buildListPageOption() {
-		return super.buildListPageOption().setWidth(840).setMinWidth(300)
+		return super.buildListPageOption().setWidth(1200).setMinWidth(300)
 				.setHeight(400).setMinHeight(300);
 	}
 
@@ -133,7 +128,7 @@ public class MotorcadeAction extends CrudAction<Long, Motorcade> {
 
 	@Override
 	protected String[] getSearchFields() {
-		return new String[] { "code", "name", "fullName" };
+		return new String[] { "orderId", "name", "card" };
 	}
 
 	@Override
@@ -142,15 +137,32 @@ public class MotorcadeAction extends CrudAction<Long, Motorcade> {
 		isManager = isManager();
 
 		List<Column> columns = super.buildGridColumns();
-		columns.add(new TextColumn("code", getText("label.code"), 130)
+		columns.add(new TextColumn("orderId", getText("charger.orderId"), 70)
 				.setSortable(true).setUseTitleFromLabel(true));
-		columns.add(new TextColumn("name", getText("motorcade.name"), 130)
+		columns.add(new TextColumn("name", getText("charger.name"), 70)
 				.setSortable(true).setUseTitleFromLabel(true));
-		columns.add(new TextColumn("fullName", getText("motorcade.fullName"),
-				300).setSortable(true).setUseTitleFromLabel(true));
-		columns.add(new TextColumn("status", getText("label.status"), 130)
-				.setSortable(true).setValueFormater(
-						new KeyValueFormater(getEntityStatuses())));
+		columns.add(new TextColumn("sex", getText("charger.sex"), 70)
+				.setSortable(true).setUseTitleFromLabel(true));
+		columns.add(new TextColumn("card", getText("charger.card"), 140)
+				.setSortable(true).setUseTitleFromLabel(true));
+		columns.add(new TextColumn("TWIC", getText("charger.TWIC"), 70)
+				.setSortable(true).setUseTitleFromLabel(true));
+		columns.add(new TextColumn("brithdate", getText("charger.brithdate"),
+				150).setSortable(true).setDir(Direction.Desc)
+				.setValueFormater(new CalendarFormater("yyyy-MM-dd ")));
+		columns.add(new TextColumn("area", getText("charger.area"), 70)
+				.setSortable(true).setUseTitleFromLabel(true));
+		columns.add(new TextColumn("nativePlace",
+				getText("charger.nativePlace"), 70).setSortable(true)
+				.setUseTitleFromLabel(true));
+		columns.add(new TextColumn("phone", getText("label.phone"), 140)
+				.setSortable(true).setUseTitleFromLabel(true));
+		columns.add(new TextColumn("idAddress", getText("charger.idAddress"),
+				140).setSortable(true).setUseTitleFromLabel(true));
+		columns.add(new TextColumn("temporaryAddress",
+				getText("charger.temporaryAddress"), 140).setSortable(true)
+				.setUseTitleFromLabel(true));
+
 		return columns;
 	}
 

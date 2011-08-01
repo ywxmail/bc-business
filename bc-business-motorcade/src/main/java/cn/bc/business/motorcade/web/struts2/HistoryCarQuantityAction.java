@@ -4,27 +4,29 @@ import java.util.Calendar;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
 import cn.bc.business.motorcade.domain.HistoryCarQuantity;
 import cn.bc.business.motorcade.domain.Motorcade;
+import cn.bc.business.motorcade.service.HistoryCarQuantityService;
+import cn.bc.business.motorcade.service.MotorcadeService;
 import cn.bc.business.web.struts2.CrudAction;
 import cn.bc.core.query.condition.Condition;
 import cn.bc.core.query.condition.impl.EqualsCondition;
 import cn.bc.core.query.condition.impl.OrderCondition;
-import cn.bc.core.service.CrudService;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.web.ui.html.grid.Column;
 import cn.bc.web.ui.html.grid.GridData;
 import cn.bc.web.ui.html.grid.TextColumn;
+import cn.bc.web.ui.html.page.HtmlPage;
 import cn.bc.web.ui.html.page.PageOption;
 import cn.bc.web.ui.html.toolbar.Toolbar;
+import cn.bc.web.ui.json.Json;
 
 /**
- * 车辆Action
+ * 查看历史车辆数Action
  * 
  * @author dragon
  * 
@@ -37,29 +39,36 @@ public class HistoryCarQuantityAction extends
 	private static final long serialVersionUID = 1L;
 	private String MANAGER_KEY = "R_MANAGER_BUSINESS";// 管理角色的编码
 	public boolean isManager;
-	public CrudService<Motorcade> motorcadeService;
+	public MotorcadeService motorcadeService;
 	public Long pid;
+	private HistoryCarQuantityService historyCarQuantityService;
 
 	@Autowired
 	public void setHistoryCarQuantityService(
-			@Qualifier(value = "historyCarQuantityService") CrudService<HistoryCarQuantity> crudService) {
-		this.setCrudService(crudService);
+			HistoryCarQuantityService historyCarQuantityService) {
+		this.historyCarQuantityService = historyCarQuantityService;
+		this.setCrudService(historyCarQuantityService);
 	}
 
+	
+	public HistoryCarQuantityService getHistoryCarQuantityService() {
+		return historyCarQuantityService;
+	}
+
+
 	@Autowired
-	public void setMotorcadeService(
-			@Qualifier(value = "motorcadeService") CrudService<Motorcade> service) {
-		this.motorcadeService = service;
+	public void setMotorcadeService(MotorcadeService motorcadeService) {
+		this.motorcadeService = motorcadeService;
 	}
 
 	@Override
 	public String create() throws Exception {
 		this.readonly = false;
-		HistoryCarQuantity e = this.getCrudService().create();
-		Motorcade motorcade	= this.motorcadeService.load(pid);
+		HistoryCarQuantity e = this.getHistoryCarQuantityService().create();
+		Motorcade motorcade = this.motorcadeService.load(pid);
 		SystemContext context = (SystemContext) this.getContext();
 		e.setMotorcade(motorcade);
-		
+
 		e.setFileDate(Calendar.getInstance());
 		e.setAuthor(context.getUser());
 		e.setDepartId(context.getBelong().getId());
@@ -67,7 +76,7 @@ public class HistoryCarQuantityAction extends
 		e.setUnitId(context.getUnit().getId());
 		e.setUnitName(context.getUnit().getName());
 		this.setE(e);
-		
+
 		// 构建对话框参数
 		this.formPageOption = buildFormPageOption();
 
@@ -76,7 +85,8 @@ public class HistoryCarQuantityAction extends
 
 	@Override
 	protected GridData buildGridData(List<Column> columns) {
-		return super.buildGridData(columns).setRowLabelExpression("motorcade.name");
+		return super.buildGridData(columns).setRowLabelExpression(
+				"motorcade.name");
 	}
 
 	@Override
@@ -111,17 +121,17 @@ public class HistoryCarQuantityAction extends
 		}
 
 		// 搜索按钮
-		tb.addButton(getDefaultSearchToolbarButton());
+		// tb.addButton(getDefaultSearchToolbarButton());
 
 		return tb;
 	}
 
 	@Override
 	protected String[] getSearchFields() {
-		return new String[] { "year", "month" ,"carquantity"};
+		return new String[] { "year", "month", "carquantity" };
 	}
 
-	//视图条件
+	// 视图特殊条件
 	@Override
 	protected Condition getSpecalCondition() {
 		return new EqualsCondition("motorcade.id", pid);
@@ -133,12 +143,13 @@ public class HistoryCarQuantityAction extends
 		isManager = isManager();
 
 		List<Column> columns = super.buildGridColumns();
-		columns.add(new TextColumn("year", getText("historyCarQuantity.year"),80)
-		.setSortable(true).setUseTitleFromLabel(true));
+		columns.add(new TextColumn("year", getText("historyCarQuantity.year"),
+				80).setSortable(true).setUseTitleFromLabel(true));
 		columns.add(new TextColumn("month", getText("historyCarQuantity.month"))
 				.setSortable(true).setUseTitleFromLabel(true));
-		columns.add(new TextColumn("carquantity", getText("historyCarQuantity.carquantity"))
-				.setSortable(true).setUseTitleFromLabel(true));
+		columns.add(new TextColumn("carquantity",
+				getText("historyCarQuantity.carquantity")).setSortable(true)
+				.setUseTitleFromLabel(true));
 		return columns;
 	}
 
@@ -149,7 +160,21 @@ public class HistoryCarQuantityAction extends
 
 	/** 新建的url */
 	protected String getCreateUrl() {
-		return getPageNamespace() + "/create?pid="+pid;
+		return getPageNamespace() + "/create?pid=" + pid;
+	}
+
+	@Override
+	public String list() throws Exception {
+		// TODO Auto-generated method stub
+		return super.list();
+	}
+
+	@Override
+	protected HtmlPage buildHtml4Paging() {
+		HtmlPage page = super.buildHtml4Paging();
+		if (pid != null)
+			page.setAttr("data-extras", new Json().put("pid", pid).toString());
+		return page;
 	}
 
 }

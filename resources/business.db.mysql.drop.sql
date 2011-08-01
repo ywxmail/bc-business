@@ -6,7 +6,8 @@ drop table if exists BS_CAR;
 
 -- 查看历史车辆数
 drop table if exists BS_HISTORY_CAR_QUANTITY;
-
+-- 车队负责人
+drop table if exists BS_CHARGER;
 -- 车队信息
 drop table if exists BS_MOTORCADE;
 
