@@ -17,6 +17,7 @@ import javax.persistence.OrderBy;
 import javax.persistence.Table;
 
 import cn.bc.business.cert.domain.Cert;
+import cn.bc.business.motorcade.domain.Motorcade;
 import cn.bc.identity.domain.Actor;
 import cn.bc.identity.domain.RichFileEntityImpl;
 
@@ -30,8 +31,9 @@ import cn.bc.identity.domain.RichFileEntityImpl;
 public class Car extends RichFileEntityImpl {
 	private static final long serialVersionUID = 1L;
 
-	// private Motorcade motorcade;// 所属车队
-	private Actor manageUnit;// 车属单位
+	private Motorcade motorcade;// 所属车队
+	private Actor belongUnit;// 所属单位
+	private Actor manageUnit;// 分管单位
 	private String businessType;// 营运性质
 
 	private String code;// 自编号
@@ -69,7 +71,7 @@ public class Car extends RichFileEntityImpl {
 	private int accessWeight;// 核定承载量，单位kg
 	private int accessCount;// 载客人数
 
-	private Float originalValue;// 固定资产原值
+	private float originalValue;// 固定资产原值
 	private String invoiceNo1;// 购车发票号
 	private String invoiceNo2;// 购置税发票号
 	private String paymentType;// 缴费日
@@ -86,6 +88,16 @@ public class Car extends RichFileEntityImpl {
 	private String desc3;// 备注3
 	
 	private Set<Cert> certs;//拥有的证件
+
+	@ManyToOne(fetch = FetchType.EAGER, optional = false)
+	@JoinColumn(name = "MOTORCADE_ID", referencedColumnName = "ID")
+	public Motorcade getMotorcade() {
+		return motorcade;
+	}
+
+	public void setMotorcade(Motorcade motorcade) {
+		this.motorcade = motorcade;
+	}
 
 	@OneToMany(fetch=FetchType.LAZY)
     @JoinTable(name="BS_CAR_CERT",
@@ -104,7 +116,17 @@ public class Car extends RichFileEntityImpl {
 	}
 
 	@ManyToOne(fetch = FetchType.EAGER, optional = false)
-	@JoinColumn(name = "MUNIT_ID", referencedColumnName = "ID")
+	@JoinColumn(name = "BELONG_UNITID", referencedColumnName = "ID")
+	public Actor getBelongUnit() {
+		return belongUnit;
+	}
+
+	public void setBelongUnit(Actor belongUnit) {
+		this.belongUnit = belongUnit;
+	}
+
+	@ManyToOne(fetch = FetchType.EAGER, optional = true)
+	@JoinColumn(name = "MANAGE_UNITID", referencedColumnName = "ID")
 	public Actor getManageUnit() {
 		return manageUnit;
 	}
@@ -174,7 +196,7 @@ public class Car extends RichFileEntityImpl {
 		this.factoryType = factoryType;
 	}
 
-	@Column(name = "FACTORY_MOFEL")
+	@Column(name = "FACTORY_MODEL")
 	public String getFactoryModel() {
 		return factoryModel;
 	}
@@ -397,11 +419,11 @@ public class Car extends RichFileEntityImpl {
 	}
 
 	@Column(name = "ORIGINAL_VALUE")
-	public Float getOriginalValue() {
+	public float getOriginalValue() {
 		return originalValue;
 	}
 
-	public void setOriginalValue(Float originalValue) {
+	public void setOriginalValue(float originalValue) {
 		this.originalValue = originalValue;
 	}
 

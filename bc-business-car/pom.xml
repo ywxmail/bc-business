@@ -23,5 +23,16 @@
 			<artifactId>bc-business-cert</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<!-- 车队模块 -->
+		<dependency>
+			<groupId>cn.bc.business</groupId>
+			<artifactId>bc-business-motorcade</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>cn.bc.business</groupId>
+			<artifactId>bc-business-charger</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 	</dependencies>
 </project>

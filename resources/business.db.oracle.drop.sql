@@ -1,13 +1,16 @@
 -- ##bc营运管理子系统的 oracle 删表脚本##
 -- ##运行此脚本之后再运行平台的删表脚本framework.db.oracle.drop.sql##
 
+-- 车辆与证件的关联
+CALL DROP_USER_TABLE('BS_CAR_CERT');
+
 -- 车辆
 CALL DROP_USER_TABLE('BS_CAR');
 
--- 查看历史车辆数
-CALL DROP_USER_TABLE('BS_HISTORY_CAR_QUANTITY');
+-- 车队历史车辆数
+CALL DROP_USER_TABLE('BS_MOTORCADE_CARQUANTITY');
 
--- 车队信息
+-- 车队
 CALL DROP_USER_TABLE('BS_MOTORCADE');
 
 -- 司机责任人与证件的关联

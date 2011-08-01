@@ -1,84 +1,60 @@
 -- bc营运管理子系统的建表脚本,所有表名须附带前缀"BS_"
 -- 运行此脚本之前需先运行平台的建表脚本framework.db.mysql.create.sql
 
--- 车辆 
-create table BS_CAR (
-    ID int NOT NULL auto_increment,
-    UNIT_ID int COMMENT '所属单位ID',
-    NAME varchar(500) NOT NULL COMMENT '名称',
-    DESC_ text COMMENT '备注',
-    primary key (ID)
-) COMMENT='车辆';
 -- 车队信息
-create table BS_MOTORCADE (
-    ID int NOT NULL auto_increment,
-    UID_ varchar(36)  COMMENT '关联附件的标识号',
-   
-    FILE_DATE datetime NOT NULL COMMENT '创建时间',
+CREATE TABLE BS_MOTORCADE(
+   ID                   INT NOT NULL auto_increment,
+   UID_                 VARCHAR(36),
+   CODE                 VARCHAR(255) COMMENT '编码',
+   NAME                 VARCHAR(255) NOT NULL COMMENT '简称',
+   FULLNAME             VARCHAR(255) COMMENT '全称',
+   PAYMENT_DATE         DATETIME COMMENT '缴费日期',
+   COMPANY              VARCHAR(255) COMMENT '公司',
+   COLOR                VARCHAR(255) COMMENT '颜色',
+   ADDRESS              VARCHAR(255) COMMENT '地址',
+   PRINCIPAL            VARCHAR(500) COMMENT '负责人',
+   PHONE                VARCHAR(255) COMMENT '电话',
+   FAX                  VARCHAR(255) COMMENT '传真',
+   DESC_                VARCHAR(4000) COMMENT '备注',
+   STATUS_              INT(1) NOT NULL COMMENT '状态：0-已禁用,1-启用中,2-已删除',
+   FILE_DATE            DATETIME NOT NULL COMMENT '创建时间',
+   AUTHOR_ID            INT NOT NULL COMMENT '创建人ID',
+   AUTHOR_NAME          VARCHAR(100) NOT NULL COMMENT '创建人姓名',
+   AUTHOR_DEPART_ID     INT COMMENT '创建人所在部门ID',
+   AUTHOR_DEPART_NAME   VARCHAR(255) COMMENT '创建人所在部门名称',
+   AUTHOR_UNIT_ID       INT NOT NULL COMMENT '创建人所在单位ID',
+   AUTHOR_UNIT_NAME     VARCHAR(255) NOT NULL COMMENT '创建人所在单位名称',
+   MODIFIER_ID          INT COMMENT '最后修改人ID',
+   MODIFIER_NAME        VARCHAR(255) COMMENT '最后修改人名称',
+   MODIFIED_DATE        DATETIME COMMENT '最后修改时间',
+   PRIMARY KEY (ID)
+) COMMENT '车队';
+ALTER TABLE BS_MOTORCADE ADD CONSTRAINT BSFK_MOTORCADE_AUTHORID FOREIGN KEY (AUTHOR_ID)
+      REFERENCES BC_IDENTITY_ACTOR (ID);
 
-    AUTHOR_ID int NOT NULL COMMENT '创建人ID',
-    AUTHOR_NAME varchar(100) NOT NULL COMMENT '创建人姓名',
-    DEPART_ID int COMMENT '创建人所在部门ID，如果用户直接隶属于单位，则为null',
-    DEPART_NAME varchar(255) COMMENT '创建人所在部门名称，如果用户直接隶属于单位，则为null',
-    UNIT_ID int NOT NULL COMMENT '创建人所在单位ID',
-    UNIT_NAME varchar(255) NOT NULL COMMENT '创建人所在单位名称',
-
-    CODE varchar(100) NOT NULL COMMENT '编码',
-    NAME varchar(255) NOT NULL COMMENT '简称',
-    FULLNAME varchar(255) NOT NULL COMMENT '全称',
-    STATUS_ int(1) NOT NULL COMMENT '状态：0-已禁用,1-启用中,2-已删除',
-    PAYMENT_DATE datetime NOT NULL COMMENT '缴费日期',
-    COMPANY varchar(255) NOT NULL COMMENT '公司',
-    COLOUR varchar(255)  COMMENT '颜色',
-    ADDRESS varchar(255)  COMMENT '地址',
-    PRINCIPAL varchar(255) NOT NULL COMMENT '负责人',
-    PHONE varchar(255)  COMMENT '电话',
-    FAX varchar(255)  COMMENT '传真',
-    DESC_ text COMMENT '备注',
-   
-    MODIFIER_ID int COMMENT '最后修改人ID',
-    MODIFIER_NAME varchar(255) COMMENT '最后修改人名称',
-    MODIFIED_DATE datetime COMMENT '最后修改时间',
-    
-    primary key (ID)
-) COMMENT='车队信息';
-ALTER TABLE BS_MOTORCADE ADD CONSTRAINT BS_MOTORCADE_AUTHOR FOREIGN KEY (AUTHOR_ID) 
-	REFERENCES BC_IDENTITY_ACTOR (ID);
-	
-	
--- 查看历史车辆数
-create table BS_HISTORY_CAR_QUANTITY(
-    ID int NOT NULL auto_increment,
-    
-    UID_ varchar(36)  COMMENT '关联附件的标识号',
-   
-    FILE_DATE datetime NOT NULL COMMENT '创建时间',
-
-    AUTHOR_ID int NOT NULL COMMENT '创建人ID',
-    AUTHOR_NAME varchar(100) NOT NULL COMMENT '创建人姓名',
-    DEPART_ID int COMMENT '创建人所在部门ID，如果用户直接隶属于单位，则为null',
-    DEPART_NAME varchar(255) COMMENT '创建人所在部门名称，如果用户直接隶属于单位，则为null',
-    UNIT_ID int NOT NULL COMMENT '创建人所在单位ID',
-    UNIT_NAME varchar(255) NOT NULL COMMENT '创建人所在单位名称',
-
-    MOTORCADE_ID int NOT NULL COMMENT '车队ID',
-    MOTORCADE_NAME varchar(100) NOT NULL COMMENT '车队名',
-
-    YEAR int(4) NOT NULL COMMENT '年份',
-    MONTH int(2) NOT NULL COMMENT '月份',
-    CARQUANTITY int(4) NOT NULL COMMENT '车辆数',
-    
-    MODIFIER_ID int COMMENT '最后修改人ID',
-    MODIFIER_NAME varchar(255) COMMENT '最后修改人名称',
-    MODIFIED_DATE datetime COMMENT '最后修改时间',
-    STATUS_ int(1)  COMMENT '状态：0-已禁用,1-启用中,2-已删除',
-    
-    primary key (ID)
-)COMMENT='查看历史车辆数';
-ALTER TABLE BS_HISTORY_CAR_QUANTITY ADD CONSTRAINT BS_HISTORY_CAR_QUANTITY_MOTORCADE FOREIGN KEY (MOTORCADE_ID) 
-	REFERENCES BS_MOTORCADE (ID);
-ALTER TABLE BS_HISTORY_CAR_QUANTITY ADD CONSTRAINT BS_HISTORY_CAR_QUANTITY_AUTHOR FOREIGN KEY (AUTHOR_ID) 
-	REFERENCES BC_IDENTITY_ACTOR (ID);
+-- 车队历史车辆数
+CREATE TABLE BS_MOTORCADE_CARQUANTITY(
+   ID                   INT NOT NULL auto_increment,
+   MOTORCADE_ID         INT NOT NULL COMMENT '所属车队ID',
+   YEAR_                NUMERIC(4,0) NOT NULL COMMENT '年份',
+   MONTH_               NUMERIC(2,0) NOT NULL COMMENT '月份',
+   QUANTITY             INT NOT NULL COMMENT '车辆数',
+   FILE_DATE            DATETIME NOT NULL COMMENT '创建时间',
+   AUTHOR_ID            INT NOT NULL COMMENT '创建人ID',
+   AUTHOR_NAME          VARCHAR(100) NOT NULL COMMENT '创建人姓名',
+   AUTHOR_DEPART_ID     INT COMMENT '创建人所在部门ID',
+   AUTHOR_DEPART_NAME   VARCHAR(255) COMMENT '创建人所在部门名称',
+   AUTHOR_UNIT_ID       INT NOT NULL COMMENT '创建人所在单位ID',
+   AUTHOR_UNIT_NAME     VARCHAR(255) NOT NULL COMMENT '创建人所在单位名称',
+   MODIFIER_ID          INT COMMENT '最后修改人ID',
+   MODIFIER_NAME        VARCHAR(255) COMMENT '最后修改人名称',
+   MODIFIED_DATE        DATETIME COMMENT '最后修改时间',
+   PRIMARY KEY (ID)
+) COMMENT '车队历史车辆数';
+ALTER TABLE BS_MOTORCADE_CARQUANTITY ADD CONSTRAINT BSFK_CARQUANTITY_AUTHORID FOREIGN KEY (AUTHOR_ID)
+      REFERENCES BC_IDENTITY_ACTOR (ID);
+ALTER TABLE BS_MOTORCADE_CARQUANTITY ADD CONSTRAINT BSFK_CARQUANTITY_MOTORCADE FOREIGN KEY (MOTORCADE_ID)
+      REFERENCES BS_MOTORCADE (ID);
 
 
 -- 车队负责人信息
@@ -90,10 +66,10 @@ create table BS_CHARGER (
 
     AUTHOR_ID int NOT NULL COMMENT '创建人ID',
     AUTHOR_NAME varchar(100) NOT NULL COMMENT '创建人姓名',
-    DEPART_ID int COMMENT '创建人所在部门ID，如果用户直接隶属于单位，则为null',
-    DEPART_NAME varchar(255) COMMENT '创建人所在部门名称，如果用户直接隶属于单位，则为null',
-    UNIT_ID int NOT NULL COMMENT '创建人所在单位ID',
-    UNIT_NAME varchar(255) NOT NULL COMMENT '创建人所在单位名称',
+    AUTHOR_DEPART_ID int COMMENT '创建人所在部门ID，如果用户直接隶属于单位，则为null',
+    AUTHOR_DEPART_NAME varchar(255) COMMENT '创建人所在部门名称，如果用户直接隶属于单位，则为null',
+    AUTHOR_UNIT_ID int NOT NULL COMMENT '创建人所在单位ID',
+    AUTHOR_UNIT_NAME varchar(255) NOT NULL COMMENT '创建人所在单位名称',
 
    
     CARD varchar(255)  COMMENT '身份证',
@@ -120,8 +96,6 @@ create table BS_CHARGER (
 ALTER TABLE BS_CHARGER ADD CONSTRAINT BS_CHARGER_AUTHOR FOREIGN KEY (AUTHOR_ID) 
 	REFERENCES BC_IDENTITY_ACTOR (ID);
 	
-	
-	
 
 -- 证件
 create table BS_CERT (
@@ -145,10 +119,10 @@ create table BS_CERT (
     FILE_DATE datetime NOT NULL COMMENT '创建时间',
     AUTHOR_ID int NOT NULL COMMENT '创建人ID',
     AUTHOR_NAME varchar(100) NOT NULL COMMENT '创建人姓名',
-    DEPART_ID int COMMENT '创建人所在部门ID，如果用户直接隶属于单位，则为null',
-    DEPART_NAME varchar(255) COMMENT '创建人所在部门名称，如果用户直接隶属于单位，则为null',
-    UNIT_ID int NOT NULL COMMENT '创建人所在单位ID',
-    UNIT_NAME varchar(255) NOT NULL COMMENT '创建人所在单位名称',
+    AUTHOR_DEPART_ID int COMMENT '创建人所在部门ID，如果用户直接隶属于单位，则为null',
+    AUTHOR_DEPART_NAME varchar(255) COMMENT '创建人所在部门名称，如果用户直接隶属于单位，则为null',
+    AUTHOR_UNIT_ID int NOT NULL COMMENT '创建人所在单位ID',
+    AUTHOR_UNIT_NAME varchar(255) NOT NULL COMMENT '创建人所在单位名称',
     MODIFIER_ID int COMMENT '最后修改人ID',
     MODIFIER_NAME varchar(255) COMMENT '最后修改人名称',
     MODIFIED_DATE datetime COMMENT '最后修改时间',
@@ -267,7 +241,7 @@ CREATE TABLE BS_CERT_VEHICELICENSE(
 ALTER TABLE BS_CERT_VEHICELICENSE ADD CONSTRAINT BSFK_CERT4VEHICELICENSE_CERT FOREIGN KEY (ID)
       REFERENCES BS_CERT (ID);
 	  
--- 证件：机动车行驶证
+-- 证件：道路运输证
 CREATE TABLE BS_CERT_ROADTRANSPORT(
    ID                   int NOT NULL,
    FACTORY              VARCHAR(255) COMMENT '品牌型号，如“桑塔纳SVW7182QQD”',
@@ -300,6 +274,7 @@ create table BS_CARMAN (
     ORIGIN               varchar(255) comment '籍贯',
     REGION_              varchar(255) comment '区域',
     HOUSE_TYPE           varchar(255) comment '户口类型',
+    BIRTHDATE datetime comment '出生日期',
     FORMER_UNIT          varchar(255) comment '入职原单位',
     ADDRESS              varchar(500) comment '身份证住址',
     ADDRESS1             varchar(500) comment '暂住地址',
@@ -308,10 +283,10 @@ create table BS_CARMAN (
     FILE_DATE datetime NOT NULL COMMENT '创建时间',
     AUTHOR_ID int NOT NULL COMMENT '创建人ID',
     AUTHOR_NAME varchar(100) NOT NULL COMMENT '创建人姓名',
-    DEPART_ID int COMMENT '创建人所在部门ID，如果用户直接隶属于单位，则为null',
-    DEPART_NAME varchar(255) COMMENT '创建人所在部门名称，如果用户直接隶属于单位，则为null',
-    UNIT_ID int NOT NULL COMMENT '创建人所在单位ID',
-    UNIT_NAME varchar(255) NOT NULL COMMENT '创建人所在单位名称',
+    AUTHOR_DEPART_ID int COMMENT '创建人所在部门ID，如果用户直接隶属于单位，则为null',
+    AUTHOR_DEPART_NAME varchar(255) COMMENT '创建人所在部门名称，如果用户直接隶属于单位，则为null',
+    AUTHOR_UNIT_ID int NOT NULL COMMENT '创建人所在单位ID',
+    AUTHOR_UNIT_NAME varchar(255) NOT NULL COMMENT '创建人所在单位名称',
     MODIFIER_ID int COMMENT '最后修改人ID',
     MODIFIER_NAME varchar(255) COMMENT '最后修改人名称',
     MODIFIED_DATE datetime COMMENT '最后修改时间',
@@ -330,3 +305,88 @@ ALTER TABLE BS_CARMAN_CERT ADD CONSTRAINT BSFK_CARMANCERT_MAN FOREIGN KEY (MAN_I
 	REFERENCES BS_CARMAN (ID);
 ALTER TABLE BS_CARMAN_CERT ADD CONSTRAINT BSFK_CARMANCERT_CERT FOREIGN KEY (CERT_ID) 
 	REFERENCES BS_CERT (ID);
+    
+-- 车辆
+CREATE TABLE BS_CAR(
+   ID                   INT NOT NULL auto_increment,
+   UID_                 VARCHAR(36) NOT NULL,
+   STATUS_              INT(1) NOT NULL COMMENT '状态：0-已禁用,1-启用中,2-已删除',
+   BELONG_UNITID        INT NOT NULL COMMENT '所属单位ID',
+   MANAGE_UNITID        INT COMMENT '分管单位ID',
+   MOTORCADE_ID         INT NOT NULL COMMENT '所属车队ID',
+   BS_TYPE              VARCHAR(255) COMMENT '营运性质',
+   CODE                 VARCHAR(255) COMMENT '自编号',
+   ORIGIN_NO            VARCHAR(255) COMMENT '原车号',
+   PLATE_TYPE           VARCHAR(255) COMMENT '车牌归属，如“粤A”',
+   PLATE_NO             VARCHAR(255) COMMENT '车牌号码，如“C4X74”',
+   VIN                  VARCHAR(255) COMMENT '车辆识别代号',
+   FACTORY_TYPE         VARCHAR(255) COMMENT '厂牌类型，如“桑塔纳”',
+   FACTORY_MODEL        VARCHAR(255) COMMENT '厂牌型号，如“SVW7182QQD”',
+   REDISTER_DATE        VARCHAR(255) COMMENT '登记日期',
+   OPERATE_DATE         VARCHAR(255) COMMENT '投产日期',
+   SCRAP_DATE           VARCHAR(255) COMMENT '报废日期',
+   FACTORY_DATE         VARCHAR(255) COMMENT '出厂日期',
+   REDISTER_NO          VARCHAR(255) COMMENT '机动车登记编号',
+   LEVEL_               VARCHAR(255) COMMENT '车辆定级',
+   COLOR                VARCHAR(255) COMMENT '颜色',
+   RNGINE_NO            VARCHAR(255) COMMENT '发动机号码',
+   RNGINE_TYPE          VARCHAR(255) COMMENT '发动机类型',
+   FUEL_TYPE            VARCHAR(255) COMMENT '燃料类型，如“汽油”',
+   DISPLACEMENT         INT COMMENT '排量，单位ML',
+   POWER                NUMERIC(19,2) COMMENT '功率，单位KW',
+   TURN_TYPE            VARCHAR(255) COMMENT '转向方式，如“方向盘”',
+   TIRE_COUNT           INT COMMENT '轮胎数',
+   TIRE_STANDARD        VARCHAR(255) COMMENT '轮胎规格',
+   AXIS_DISTANCE        INT COMMENT '轴距',
+   AXIS_COUNT           INT COMMENT '轴数',
+   PIECE_COUNT          INT COMMENT '后轴钢板弹簧片数',
+   DIM_LEN              INT COMMENT '外廓尺寸：长，单位MM',
+   DIM_WIDTH            INT COMMENT '外廓尺寸：宽，单位MM',
+   DIM_HEIGHT           INT COMMENT '外廓尺寸：高，单位MM',
+   TOTAL_WEIGHT         INT COMMENT '总质量，单位KG',
+   ACCESS_WEIGHT        INT COMMENT '核定载质量，单位KG',
+   ACCESS_COUNT         INT COMMENT '核定载人数',
+   ORIGINAL_VALUE       NUMERIC(19,2) COMMENT '固定资产原值，单位元',
+   INVOICE_NO1          VARCHAR(255) COMMENT '购车发票号',
+   INVOICE_NO2          VARCHAR(255) COMMENT '购置税发票号',
+   PAYMENT_TYPE         VARCHAR(255) COMMENT '缴费日',
+   CERT_NO1             VARCHAR(255) COMMENT '购置税证号',
+   CERT_NO2             VARCHAR(255) COMMENT '经营权使用证号',
+   CERT_NO3             VARCHAR(255) COMMENT '强检证号',
+   TAXIMETER_FACTORY    VARCHAR(255) COMMENT '计价器制造厂',
+   TAXIMETER_TYPE       VARCHAR(255) COMMENT '计价器型号',
+   TAXIMETER_NO         VARCHAR(255) COMMENT '计价器出厂编号',
+   DESC1                VARCHAR(4000) COMMENT '备注1',
+   DESC2                VARCHAR(4000) COMMENT '备注2',
+   DESC3                VARCHAR(4000) COMMENT '备注3',
+   FILE_DATE            DATETIME NOT NULL COMMENT '创建时间',
+   AUTHOR_ID            INT COMMENT '创建人ID',
+   AUTHOR_NAME          VARCHAR(100) NOT NULL COMMENT '创建人姓名',
+   AUTHOR_DEPART_ID     INT COMMENT '创建人所在部门ID',
+   AUTHOR_DEPART_NAME   VARCHAR(255) COMMENT '创建人所在部门名称',
+   AUTHOR_UNIT_ID       INT NOT NULL COMMENT '创建人所在单位ID',
+   AUTHOR_UNIT_NAME     VARCHAR(255) NOT NULL COMMENT '创建人所在单位名称',
+   MODIFIER_ID          INT COMMENT '最后修改人ID',
+   MODIFIER_NAME        VARCHAR(255) COMMENT '最后修改人名称',
+   MODIFIED_DATE        DATETIME COMMENT '最后修改时间',
+   PRIMARY KEY (ID)
+) COMMENT '车辆';
+ALTER TABLE BS_CAR ADD CONSTRAINT BSFK_CAR_AUTHORID FOREIGN KEY (AUTHOR_ID)
+      REFERENCES BC_IDENTITY_ACTOR (ID) ON DELETE RESTRICT ON UPDATE RESTRICT;
+ALTER TABLE BS_CAR ADD CONSTRAINT BSFK_CAR_MANAGEUNITID FOREIGN KEY (MANAGE_UNITID)
+      REFERENCES BC_IDENTITY_ACTOR (ID) ON DELETE RESTRICT ON UPDATE RESTRICT;
+ALTER TABLE BS_CAR ADD CONSTRAINT BSFK_CAR_MOTORCADEID FOREIGN KEY (MOTORCADE_ID)
+      REFERENCES BS_MOTORCADE (ID) ON DELETE RESTRICT ON UPDATE RESTRICT;
+ALTER TABLE BS_CAR ADD CONSTRAINT BSFK_CAR_UNITID FOREIGN KEY (BELONG_UNITID)
+      REFERENCES BC_IDENTITY_ACTOR (ID) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+-- 车辆与证件的关联
+CREATE TABLE BS_CAR_CERT(
+   CAR_ID               INT NOT NULL COMMENT '车辆ID',
+   CERT_ID              INT NOT NULL COMMENT '证件ID',
+   PRIMARY KEY (CAR_ID, CERT_ID)
+) COMMENT '车辆与证件的关联';
+ALTER TABLE BS_CAR_CERT ADD CONSTRAINT BSFK_CAR_CERT_CARID FOREIGN KEY (CAR_ID)
+      REFERENCES BS_CAR (ID) ON DELETE RESTRICT ON UPDATE RESTRICT;
+ALTER TABLE BS_CAR_CERT ADD CONSTRAINT BSFK_CAR_CERT_CERTID FOREIGN KEY (CERT_ID)
+      REFERENCES BS_CERT (ID) ON DELETE RESTRICT ON UPDATE RESTRICT;

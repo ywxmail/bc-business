@@ -15,9 +15,8 @@
 	<!-- 需要在主配置文件配置entityManagerFactory和transactionManager的实现 -->
 
 	<!-- car -->
-	<bean id="carDao" class="cn.bc.orm.hibernate.jpa.HibernateCrudJpaDao"
-		p:entityClass="cn.bc.business.car.domain.Car"
+	<bean id="carDao" class="cn.bc.business.car.dao.hibernate.jpa.CarDaoImpl"
 		p:entityManagerFactory-ref="entityManagerFactory" />
-	<bean id="carService" class="cn.bc.core.service.DefaultCrudService"
-		p:entityClass="cn.bc.business.car.domain.Car" p:crudDao-ref="carDao" />
+	<bean id="carService" class="cn.bc.business.car.service.CarServiceImpl"
+		p:carDao-ref="carDao" />
 </beans>

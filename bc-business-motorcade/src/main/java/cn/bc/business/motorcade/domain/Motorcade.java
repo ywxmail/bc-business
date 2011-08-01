@@ -22,7 +22,7 @@ public class Motorcade extends RichFileEntityImpl   {
 	private String name;//简称
 	private String fullName;//全称
 	private String company;//公司
-	private String colour;//颜色
+	private String color;//颜色
 	private String address;//地址
 	private String principal;//负责人
 	private String phone;//电话
@@ -54,11 +54,11 @@ public class Motorcade extends RichFileEntityImpl   {
 	public void setCompany(String company) {
 		this.company = company;
 	}
-	public String getColour() {
-		return colour;
+	public String getColor() {
+		return color;
 	}
-	public void setColour(String colour) {
-		this.colour = colour;
+	public void setColor(String color) {
+		this.color = color;
 	}
 	public String getAddress() {
 		return address;

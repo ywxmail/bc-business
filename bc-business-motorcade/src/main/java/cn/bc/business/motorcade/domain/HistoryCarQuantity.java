@@ -1,14 +1,13 @@
 package cn.bc.business.motorcade.domain;
 
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import cn.bc.identity.domain.RichFileEntityImpl;
 
+import cn.bc.identity.domain.FileEntityImpl;
 
 /**
  * 车辆
@@ -16,52 +15,49 @@ import cn.bc.identity.domain.RichFileEntityImpl;
  * @author dragon
  */
 @Entity
-@Table(name = "BS_HISTORY_CAR_QUANTITY")
-public class HistoryCarQuantity extends RichFileEntityImpl {
+@Table(name = "BS_MOTORCADE_CARQUANTITY")
+public class HistoryCarQuantity extends FileEntityImpl {
 	private static final long serialVersionUID = 1L;
 
-	private Long year;//年份
-	private Long month;//月份
-	private Long carquantity;//车辆数
-	private Motorcade motorcade;//车队
-	
-	public Long getYear() {
+	private int year;// 年份
+	private int month;// 月份
+	private int quantity;// 车辆数
+	private Motorcade motorcade;// 所属车队
+
+	@Column(name = "YEAR_")
+	public int getYear() {
 		return year;
 	}
-	public void setYear(Long year) {
+
+	public void setYear(int year) {
 		this.year = year;
 	}
-	public Long getMonth() {
+
+	@Column(name = "MONTH_")
+	public int getMonth() {
 		return month;
 	}
-	public void setMonth(Long month) {
+
+	public void setMonth(int month) {
 		this.month = month;
 	}
-	public Long getCarquantity() {
-		return carquantity;
+
+	@Column(name = "QUANTITY")
+	public int getQuantity() {
+		return quantity;
 	}
-	public void setCarquantity(Long carquantity) {
-		this.carquantity = carquantity;
+
+	public void setQuantity(int quantity) {
+		this.quantity = quantity;
 	}
-	@ManyToOne(fetch = FetchType.EAGER, optional = false, targetEntity = Motorcade.class)
+
+	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@JoinColumn(name = "MOTORCADE_ID", referencedColumnName = "ID")
 	public Motorcade getMotorcade() {
 		return motorcade;
 	}
+
 	public void setMotorcade(Motorcade motorcade) {
 		this.motorcade = motorcade;
 	}
-	
-	@Column(name = "MOTORCADE_NAME")
-	public String getMotorcadeName() {
-		if (this.motorcade != null) {
-			return this.motorcade.getName();
-		} else {
-			return null;
-		}
-	}
-	public void setMotorcadeName(String motorcadeName) {
-		// do nothing
-	}
-	
 }
