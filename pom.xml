@@ -17,6 +17,7 @@
 		<module>bc-business-cert</module>
 		<module>bc-business-carman</module>
 		<module>bc-business-motorcade</module>
+		<module>bc-business-charger</module>
 	</modules>
 	<scm>
 		<connection>scm:git:git://localhost/bc-business.git</connection>
