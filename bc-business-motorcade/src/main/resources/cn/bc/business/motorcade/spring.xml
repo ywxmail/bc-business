@@ -14,17 +14,22 @@
 
 	<!-- 需要在主配置文件配置entityManagerFactory和transactionManager的实现 -->
 
-	<!--motorcade-->
-	<bean id="motorcadeDao" class="cn.bc.orm.hibernate.jpa.HibernateCrudJpaDao"
+	<!--motorcade -->
+	<bean id="motorcadeDao"
+		class="cn.bc.business.motorcade.dao.hibernate.jpa.MotorcadeDaoImpl"
 		p:entityClass="cn.bc.business.motorcade.domain.Motorcade"
 		p:entityManagerFactory-ref="entityManagerFactory" />
-	<bean id="motorcadeService" class="cn.bc.core.service.DefaultCrudService"
-		p:entityClass="cn.bc.business.motorcade.domain.Motorcade" p:crudDao-ref="motorcadeDao" />
-		
-		<!-- historyCarQuantity -->
-	<bean id="historyCarQuantityDao" class="cn.bc.orm.hibernate.jpa.HibernateCrudJpaDao"
+	<bean id="motorcadeService" class="cn.bc.business.motorcade.service.MotorcadeServiceImpl"
+		p:entityClass="cn.bc.business.motorcade.domain.Motorcade"
+		p:motorcadeDao-ref="motorcadeDao" p:historyCarQuantityDao-ref="historyCarQuantityDao" />
+
+	<!-- historyCarQuantity -->
+	<bean id="historyCarQuantityDao"
+		class="cn.bc.business.motorcade.dao.hibernate.jpa.HistoryCarQuantityDaoImpl"
 		p:entityClass="cn.bc.business.motorcade.domain.HistoryCarQuantity"
 		p:entityManagerFactory-ref="entityManagerFactory" />
-	<bean id="historyCarQuantityService" class="cn.bc.core.service.DefaultCrudService"
-		p:entityClass="cn.bc.business.motorcade.domain.HistoryCarQuantity" p:crudDao-ref="historyCarQuantityDao" />
+	<bean id="historyCarQuantityService" 
+		class="cn.bc.business.motorcade.service.HistoryCarQuantityServiceImpl"
+		p:entityClass="cn.bc.business.motorcade.domain.HistoryCarQuantity"
+		p:historyCarQuantityDao-ref="historyCarQuantityDao" />
 </beans>

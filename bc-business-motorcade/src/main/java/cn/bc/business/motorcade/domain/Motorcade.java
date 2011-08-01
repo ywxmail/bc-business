@@ -17,14 +17,6 @@ import cn.bc.identity.domain.RichFileEntityImpl;
 @Table(name = "BS_MOTORCADE")
 public class Motorcade extends RichFileEntityImpl   {
 	private static final long serialVersionUID = 1L;
-
-	/** 状态：已禁用 *//*
-	public static final int STATUS_FORBIDDEN = 0;
-	*//** 状态：启用中*//*
-	public static final int STATUS_START = 1;
-	*//** 状态：已删除*//*
-	public static final int STATUS_DELETED = 2;*/
-	
 	
 	private String code;//编码
 	private String name;//简称

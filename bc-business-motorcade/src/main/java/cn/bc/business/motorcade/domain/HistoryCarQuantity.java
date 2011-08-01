@@ -20,24 +20,23 @@ import cn.bc.identity.domain.RichFileEntityImpl;
 public class HistoryCarQuantity extends RichFileEntityImpl {
 	private static final long serialVersionUID = 1L;
 
-	private String year;//年份
-	private String month;//月份
+	private Long year;//年份
+	private Long month;//月份
 	private Long carquantity;//车辆数
 	private Motorcade motorcade;//车队
 	
-	public String getYear() {
+	public Long getYear() {
 		return year;
 	}
-	public void setYear(String year) {
+	public void setYear(Long year) {
 		this.year = year;
 	}
-	public String getMonth() {
+	public Long getMonth() {
 		return month;
 	}
-	public void setMonth(String month) {
+	public void setMonth(Long month) {
 		this.month = month;
 	}
-	
 	public Long getCarquantity() {
 		return carquantity;
 	}
