@@ -49,8 +49,34 @@ public class CarMan extends RichFileEntityImpl {
 	private String address1;// 暂住地址
 	private String phone;// 电话1
 	private String phone1;// 电话2
+	private String description;// 备注
+	
+	//历史遗留
+	private String model;// 准驾车型
+	private String cert4Indentity;// 身份证号
+	private String cert4Driving;// 驾驶证号
+	private Calendar cert4DrivingFirstDate;// 初次领驾驶证日期
+	private Calendar cert4DrivingStartDate;// 驾驶证起效日期
+	private Calendar cert4DrivingEndDate;// 驾驶证过期日期
+	private String cert4DrivingArchive;// 驾驶证档案号
+	private String cert4FWZG;// 服务资格证号
+	private String cert4CYZG;// 从业资格证号
+	private String drivingStatus;// 驾驶状态
+	private String extFZJG;// 分支机构：用于历史数据的保存
+	private String extZRR;// 责任人：用于历史数据的保存
+	private boolean gz;// 驾驶证是否广州:0-否,1-是
+	private String accessCerts;// 已考取证件：历史数据保存
 	
 	private Set<Cert> certs;//拥有的证件
+
+	@Column(name = "DESC_")
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
 
 	@OneToMany(fetch=FetchType.LAZY)
     @JoinTable(name="BS_CARMAN_CERT",
@@ -184,5 +210,130 @@ public class CarMan extends RichFileEntityImpl {
 
 	public Integer getSex() {
 		return sex;
+	}
+
+	@Column(name = "MODEL_")
+	public String getModel() {
+		return model;
+	}
+
+	public void setModel(String model) {
+		this.model = model;
+	}
+
+	@Column(name = "CERT_IDENTITY")
+	public String getCert4Indentity() {
+		return cert4Indentity;
+	}
+
+	public void setCert4Indentity(String cert4Indentity) {
+		this.cert4Indentity = cert4Indentity;
+	}
+
+	@Column(name = "CERT_DRIVING")
+	public String getCert4Driving() {
+		return cert4Driving;
+	}
+
+	public void setCert4Driving(String cert4Driving) {
+		this.cert4Driving = cert4Driving;
+	}
+
+	@Column(name = "CERT_DRIVING_FIRST_DATE")
+	public Calendar getCert4DrivingFirstDate() {
+		return cert4DrivingFirstDate;
+	}
+
+	public void setCert4DrivingFirstDate(Calendar cert4DrivingFirstDate) {
+		this.cert4DrivingFirstDate = cert4DrivingFirstDate;
+	}
+
+	@Column(name = "CERT_DRIVING_START_DATE")
+	public Calendar getCert4DrivingStartDate() {
+		return cert4DrivingStartDate;
+	}
+
+	public void setCert4DrivingStartDate(Calendar cert4DrivingStartDate) {
+		this.cert4DrivingStartDate = cert4DrivingStartDate;
+	}
+
+	@Column(name = "CERT_DRIVING_END_DATE")
+	public Calendar getCert4DrivingEndDate() {
+		return cert4DrivingEndDate;
+	}
+
+	public void setCert4DrivingEndDate(Calendar cert4DrivingEndDate) {
+		this.cert4DrivingEndDate = cert4DrivingEndDate;
+	}
+
+	@Column(name = "CERT_DRIVING_ARCHIVE")
+	public String getCert4DrivingArchive() {
+		return cert4DrivingArchive;
+	}
+
+	public void setCert4DrivingArchive(String cert4DrivingArchive) {
+		this.cert4DrivingArchive = cert4DrivingArchive;
+	}
+
+	@Column(name = "CERT_FWZG")
+	public String getCert4FWZG() {
+		return cert4FWZG;
+	}
+
+	public void setCert4FWZG(String cert4fwzg) {
+		cert4FWZG = cert4fwzg;
+	}
+
+	@Column(name = "CERT_CYZG")
+	public String getCert4CYZG() {
+		return cert4CYZG;
+	}
+
+	public void setCert4CYZG(String cert4cyzg) {
+		cert4CYZG = cert4cyzg;
+	}
+
+	@Column(name = "DRIVING_STATUS")
+	public String getDrivingStatus() {
+		return drivingStatus;
+	}
+
+	public void setDrivingStatus(String drivingStatus) {
+		this.drivingStatus = drivingStatus;
+	}
+
+	@Column(name = "EXT_FZJG")
+	public String getExtFZJG() {
+		return extFZJG;
+	}
+
+	public void setExtFZJG(String extFZJG) {
+		this.extFZJG = extFZJG;
+	}
+
+	@Column(name = "EXT_ZRR")
+	public String getExtZRR() {
+		return extZRR;
+	}
+
+	public void setExtZRR(String extZRR) {
+		this.extZRR = extZRR;
+	}
+
+	public boolean isGz() {
+		return gz;
+	}
+
+	public void setGz(boolean gz) {
+		this.gz = gz;
+	}
+
+	@Column(name = "ACCESS_CERTS")
+	public String getAccessCerts() {
+		return accessCerts;
+	}
+
+	public void setAccessCerts(String accessCerts) {
+		this.accessCerts = accessCerts;
 	}
 }

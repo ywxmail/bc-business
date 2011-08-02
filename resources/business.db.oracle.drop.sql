@@ -1,6 +1,12 @@
 -- ##bc营运管理子系统的 oracle 删表脚本##
 -- ##运行此脚本之后再运行平台的删表脚本framework.db.oracle.drop.sql##
 
+-- 合同
+CALL DROP_USER_TABLE('BS_CARMAN_CONTRACT');
+CALL DROP_USER_TABLE('BS_CONTRACT_LABOUR');
+CALL DROP_USER_TABLE('BS_CONTRACT_CHARGER');
+CALL DROP_USER_TABLE('BS_CONTRACT');
+
 -- 车辆与证件的关联
 CALL DROP_USER_TABLE('BS_CAR_CERT');
 

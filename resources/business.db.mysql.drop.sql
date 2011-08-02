@@ -1,6 +1,12 @@
 -- bc营运管理子系统的删表脚本
 -- 运行此脚本之后再运行平台的删表脚本framework.db.mysql.drop.sql
 
+-- 合同
+drop table if exists BS_CARMAN_CONTRACT;
+drop table if exists BS_CONTRACT_LABOUR;
+drop table if exists BS_CONTRACT_CHARGER;
+drop table if exists BS_CONTRACT;
+
 -- 车辆与证件的关联
 drop table if exists BS_CAR_CERT;
 

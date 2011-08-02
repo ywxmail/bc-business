@@ -7,9 +7,9 @@
 		<version>0.1-SNAPSHOT</version>
 		<relativePath>../bc-business-parent/pom.xml</relativePath>
 	</parent>
-	<artifactId>bc-business-car</artifactId>
-	<description>车辆管理</description>
-	
+	<artifactId>bc-business-contract</artifactId>
+	<description>合同</description>
+
 	<dependencies>
 		<!-- 本子系统的公共模块 -->
 		<dependency>
@@ -17,16 +17,16 @@
 			<artifactId>bc-business-base</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<!-- 证件模块 -->
+		<!-- 司机责任人 -->
 		<dependency>
 			<groupId>cn.bc.business</groupId>
-			<artifactId>bc-business-cert</artifactId>
+			<artifactId>bc-business-carman</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<!-- 车队模块 -->
+		<!-- 车辆 -->
 		<dependency>
 			<groupId>cn.bc.business</groupId>
-			<artifactId>bc-business-motorcade</artifactId>
+			<artifactId>bc-business-car</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
