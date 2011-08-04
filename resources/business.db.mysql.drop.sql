@@ -7,6 +7,9 @@ drop table if exists BS_CONTRACT_LABOUR;
 drop table if exists BS_CONTRACT_CHARGER;
 drop table if exists BS_CONTRACT;
 
+-- 司机营运车辆
+drop table if exists BS_CAR_DRIVER;
+
 -- 车辆与证件的关联
 drop table if exists BS_CAR_CERT;
 

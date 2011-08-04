@@ -49,8 +49,7 @@ public class CrudAction<K extends Serializable, E extends Entity<K>>
 		if (e instanceof FileEntity) {
 			//设置最后更新人的信息
 			FileEntity<K> fe = (FileEntity<K>)e;
-			fe.setModifierId(context.getUser().getId());
-			fe.setModifierName(context.getUser().getName());
+			fe.setModifier(context.getUserHistory());
 			fe.setModifiedDate(Calendar.getInstance());
 		}
 

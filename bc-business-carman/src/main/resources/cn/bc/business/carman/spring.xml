@@ -19,4 +19,10 @@
 		p:entityManagerFactory-ref="entityManagerFactory" />
 	<bean id="carManService" class="cn.bc.business.carman.service.CarManServiceImpl"
 		p:carManDao-ref="carManDao" />
+		
+	<!-- carByDriver -->
+	<bean id="carByDriverDao" class="cn.bc.business.carman.dao.hibernate.jpa.CarByDriverDaoImpl"
+		p:entityManagerFactory-ref="entityManagerFactory" />
+	<bean id="carByDriverService" class="cn.bc.business.carman.service.CarByDriverServiceImpl"
+		p:carByDriverDao-ref="carByDriverDao" />
 </beans>

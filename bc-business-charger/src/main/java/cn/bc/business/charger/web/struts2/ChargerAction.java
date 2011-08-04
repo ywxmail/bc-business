@@ -62,14 +62,8 @@ public class ChargerAction extends CrudAction<Long, Charger> {
 		SystemContext context = (SystemContext) this.getContext();
 		Charger e = this.getCrudService().create();
 		e.setFileDate(Calendar.getInstance());
-		e.setAuthor(context.getUser());
-		e.setAuthorDepartId(context.getBelong().getId());
-		e.setAuthorDepartName(context.getBelong().getName());
-		e.setAuthorUnitId(context.getUnit().getId());
-		e.setAuthorUnitName(context.getUnit().getName());
+		e.setAuthor(context.getUserHistory());
 		e.setUid(this.idGeneratorService.next("charger.uid"));
-		e.setModifiedDate(Calendar.getInstance());
-		e.setModifierName(context.getUser().getName());
 		e.setSex("不设置");
 		this.setE(e);
 
@@ -175,8 +169,7 @@ public class ChargerAction extends CrudAction<Long, Charger> {
 	public String save() throws Exception {
 		SystemContext context = (SystemContext) this.getContext();
 		this.getE().setModifiedDate(Calendar.getInstance());
-		this.getE().setModifierName(context.getUser().getName());
-		this.getE().setModifierId(context.getUser().getId());
+		this.getE().setModifier(context.getUserHistory());
 		this.getCrudService().save(this.getE());
 		return "saveSuccess";
 	}

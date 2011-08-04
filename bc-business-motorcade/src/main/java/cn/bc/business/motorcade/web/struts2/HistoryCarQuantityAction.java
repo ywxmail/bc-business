@@ -70,11 +70,7 @@ public class HistoryCarQuantityAction extends
 		e.setMotorcade(motorcade);
 
 		e.setFileDate(Calendar.getInstance());
-		e.setAuthor(context.getUser());
-		e.setAuthorDepartId(context.getBelong().getId());
-		e.setAuthorDepartName(context.getBelong().getName());
-		e.setAuthorUnitId(context.getUnit().getId());
-		e.setAuthorUnitName(context.getUnit().getName());
+		e.setAuthor(context.getUserHistory());
 		this.setE(e);
 
 		// 构建对话框参数

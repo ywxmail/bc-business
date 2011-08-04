@@ -20,7 +20,6 @@ public class Motorcade extends RichFileEntityImpl   {
 	
 	private String code;//编码
 	private String name;//简称
-	private String fullName;//全称
 	private String company;//公司
 	private String color;//颜色
 	private String address;//地址
@@ -41,12 +40,6 @@ public class Motorcade extends RichFileEntityImpl   {
 	}
 	public void setName(String name) {
 		this.name = name;
-	}
-	public String getFullName() {
-		return fullName;
-	}
-	public void setFullName(String fullName) {
-		this.fullName = fullName;
 	}
 	public String getCompany() {
 		return company;

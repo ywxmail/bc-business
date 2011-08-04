@@ -23,5 +23,11 @@
 			<artifactId>bc-business-cert</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<!-- 车辆 -->
+		<dependency>
+			<groupId>cn.bc.business</groupId>
+			<artifactId>bc-business-car</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 	</dependencies>
 </project>

@@ -53,14 +53,9 @@ public class MotorcadeAction extends CrudAction<Long, Motorcade> {
 		SystemContext context = (SystemContext) this.getContext();
 		Motorcade e = this.getMotorcadeService().create();
 		e.setFileDate(Calendar.getInstance());
-		e.setAuthor(context.getUser());
-		e.setAuthorDepartId(context.getBelong().getId());
-		e.setAuthorDepartName(context.getBelong().getName());
-		e.setAuthorUnitId(context.getUnit().getId());
-		e.setAuthorUnitName(context.getUnit().getName());
+		e.setAuthor(context.getUserHistory());
 		e.setModifiedDate(Calendar.getInstance());
-		e.setModifierName(context.getUser().getName());
-		e.setModifierId(context.getUser().getId());
+		e.setModifier(context.getUserHistory());
 		this.setE(e);
 
 		// 构建对话框参数
@@ -163,8 +158,7 @@ public class MotorcadeAction extends CrudAction<Long, Motorcade> {
 	public String save() throws Exception {
 		SystemContext context = (SystemContext) this.getContext();
 		this.getE().setModifiedDate(Calendar.getInstance());
-		this.getE().setModifierName(context.getUser().getName());
-		this.getE().setModifierId(context.getUser().getId());
+		this.getE().setModifier(context.getUserHistory());
 		this.getCrudService().save(this.getE());
 		return "saveSuccess";
 	}
