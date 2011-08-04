@@ -7,6 +7,9 @@ drop table if exists BS_CONTRACT_LABOUR;
 drop table if exists BS_CONTRACT_CHARGER;
 drop table if exists BS_CONTRACT;
 
+-- 司机迁移历史
+drop table if exists BS_CARMAN_HISTORY;
+
 -- 司机营运车辆
 drop table if exists BS_CAR_DRIVER;
 

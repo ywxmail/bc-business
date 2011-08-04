@@ -32,19 +32,18 @@ public class CarByDriver extends FileEntityImpl {
 	/** 营运类型：顶班 */
 	public static final int TYPE_DINGBAN = 2;
 
-	private int type;// 营运类型
+	private String classes;// 营运班次:如正班、副班、顶班
 	private Calendar startDate;// 开始时段
 	private Calendar endDate;// 结束时段
 	private Car car;// 营运的车辆
 	private CarMan driver;// 营运的司机
 
-	@Column(name = "TYPE_")
-	public int getType() {
-		return type;
+	public String getClasses() {
+		return classes;
 	}
 
-	public void setType(int type) {
-		this.type = type;
+	public void setClasses(String classes) {
+		this.classes = classes;
 	}
 
 	@Column(name = "START_DATE")
