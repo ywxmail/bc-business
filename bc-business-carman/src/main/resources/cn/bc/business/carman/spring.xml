@@ -16,18 +16,20 @@
 
 	<!-- carMan -->
 	<bean id="carManDao" class="cn.bc.business.carman.dao.hibernate.jpa.CarManDaoImpl"
-		p:entityManagerFactory-ref="entityManagerFactory" />
+		p:entityManagerFactory-ref="entityManagerFactory" p:certDao-ref="certDao" />
 	<bean id="carManService" class="cn.bc.business.carman.service.CarManServiceImpl"
 		p:carManDao-ref="carManDao" />
-		
+
 	<!-- carByDriver -->
-	<bean id="carByDriverDao" class="cn.bc.business.carman.dao.hibernate.jpa.CarByDriverDaoImpl"
+	<bean id="carByDriverDao"
+		class="cn.bc.business.carman.dao.hibernate.jpa.CarByDriverDaoImpl"
 		p:entityManagerFactory-ref="entityManagerFactory" />
 	<bean id="carByDriverService" class="cn.bc.business.carman.service.CarByDriverServiceImpl"
 		p:carByDriverDao-ref="carByDriverDao" />
-		
+
 	<!-- carManHistory -->
-	<bean id="carManHistoryDao" class="cn.bc.business.carman.dao.hibernate.jpa.CarManHistoryDaoImpl"
+	<bean id="carManHistoryDao"
+		class="cn.bc.business.carman.dao.hibernate.jpa.CarManHistoryDaoImpl"
 		p:entityManagerFactory-ref="entityManagerFactory" />
 	<bean id="carManHistoryService" class="cn.bc.business.carman.service.CarManHistoryServiceImpl"
 		p:carManHistoryDao-ref="carManHistoryDao" />
