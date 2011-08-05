@@ -10,7 +10,7 @@ import org.springframework.stereotype.Controller;
 
 import cn.bc.business.motorcade.domain.Motorcade;
 import cn.bc.business.motorcade.service.MotorcadeService;
-import cn.bc.business.web.struts2.CrudAction;
+import cn.bc.business.web.struts2.FileEntityAction;
 import cn.bc.core.query.condition.Condition;
 import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.identity.web.SystemContext;
@@ -30,7 +30,7 @@ import cn.bc.web.ui.html.toolbar.Toolbar;
  */
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 @Controller
-public class MotorcadeAction extends CrudAction<Long, Motorcade> {
+public class MotorcadeAction extends FileEntityAction<Long, Motorcade> {
 	// private static Log logger = LogFactory.getLog(BulletinAction.class);
 	private static final long serialVersionUID = 1L;
 	private String MANAGER_KEY = "R_MANAGER_BUSINESS";// 管理角色的编码

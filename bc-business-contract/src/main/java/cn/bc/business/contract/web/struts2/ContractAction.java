@@ -12,7 +12,7 @@ import org.springframework.stereotype.Controller;
 
 import cn.bc.business.contract.domain.Contract;
 import cn.bc.business.contract.service.ContractService;
-import cn.bc.business.web.struts2.CrudAction;
+import cn.bc.business.web.struts2.FileEntityAction;
 import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.web.ui.html.grid.Column;
 import cn.bc.web.ui.html.grid.GridData;
@@ -28,7 +28,7 @@ import cn.bc.web.ui.html.page.PageOption;
  */
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 @Controller
-public class ContractAction extends CrudAction<Long, Contract> {
+public class ContractAction extends FileEntityAction<Long, Contract> {
 	// private static Log logger = LogFactory.getLog(ContractAction.class);
 	private static final long serialVersionUID = 1L;
 	public ContractService contractService;

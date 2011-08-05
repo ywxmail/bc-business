@@ -12,7 +12,7 @@ import org.springframework.stereotype.Controller;
 
 import cn.bc.business.cert.domain.Cert;
 import cn.bc.business.cert.service.CertService;
-import cn.bc.business.web.struts2.CrudAction;
+import cn.bc.business.web.struts2.FileEntityAction;
 import cn.bc.core.query.condition.Condition;
 import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.docs.web.ui.html.AttachWidget;
@@ -32,7 +32,7 @@ import cn.bc.web.ui.html.toolbar.Toolbar;
  */
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 @Controller
-public class CertAction extends CrudAction<Long, Cert> {
+public class CertAction extends FileEntityAction<Long, Cert> {
 	// private static Log logger = LogFactory.getLog(BulletinAction.class);
 	private static final long serialVersionUID = 1L;
 	private String MANAGER_KEY = "R_MANAGER_BUSINESS";// 管理角色的编码

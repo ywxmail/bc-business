@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
 import cn.bc.business.charger.domain.Charger;
-import cn.bc.business.web.struts2.CrudAction;
+import cn.bc.business.web.struts2.FileEntityAction;
 import cn.bc.core.query.condition.Condition;
 import cn.bc.core.service.CrudService;
 import cn.bc.docs.util.ImageUtils;
@@ -27,7 +27,7 @@ import cn.bc.web.ui.json.Json;
  */
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 @Controller
-public class ModifyPhotoAction extends CrudAction<Long, Charger> {
+public class ModifyPhotoAction extends FileEntityAction<Long, Charger> {
 	// private static Log logger = LogFactory.getLog(BulletinAction.class);
 	protected final Log logger = LogFactory.getLog(getClass());
 	private static final long serialVersionUID = 1L;

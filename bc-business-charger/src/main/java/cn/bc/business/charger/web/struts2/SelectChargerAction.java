@@ -10,7 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
 
 import cn.bc.business.charger.domain.Charger;
-import cn.bc.business.web.struts2.CrudAction;
+import cn.bc.business.web.struts2.FileEntityAction;
 import cn.bc.core.query.condition.Condition;
 import cn.bc.core.query.condition.Direction;
 import cn.bc.core.query.condition.impl.OrderCondition;
@@ -33,7 +33,7 @@ import cn.bc.web.ui.html.toolbar.Toolbar;
  */
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 @Controller
-public class SelectChargerAction extends CrudAction<Long, Charger> {
+public class SelectChargerAction extends FileEntityAction<Long, Charger> {
 	// private static Log logger = LogFactory.getLog(BulletinAction.class);
 	private static final long serialVersionUID = 1L;
 	private String MANAGER_KEY = "R_MANAGER_BUSINESS";// 管理角色的编码

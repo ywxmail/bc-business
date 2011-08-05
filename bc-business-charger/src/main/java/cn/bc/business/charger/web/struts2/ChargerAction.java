@@ -10,15 +10,12 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
 import cn.bc.business.charger.domain.Charger;
-import cn.bc.business.web.struts2.CrudAction;
+import cn.bc.business.web.struts2.FileEntityAction;
 import cn.bc.core.query.condition.Condition;
 import cn.bc.core.query.condition.Direction;
 import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.core.service.CrudService;
-import cn.bc.docs.service.AttachService;
-import cn.bc.identity.service.IdGeneratorService;
 import cn.bc.identity.web.SystemContext;
-
 import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.ui.html.grid.Column;
 import cn.bc.web.ui.html.grid.GridData;
@@ -34,7 +31,7 @@ import cn.bc.web.ui.html.toolbar.Toolbar;
  */
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 @Controller
-public class ChargerAction extends CrudAction<Long, Charger> {
+public class ChargerAction extends FileEntityAction<Long, Charger> {
 	// private static Log logger = LogFactory.getLog(BulletinAction.class);
 	private static final long serialVersionUID = 1L;
 	private String MANAGER_KEY = "R_MANAGER_BUSINESS";// 管理角色的编码
@@ -46,16 +43,6 @@ public class ChargerAction extends CrudAction<Long, Charger> {
 		this.setCrudService(crudService);
 	}
 
-	@Autowired
-	public void setIdGeneratorService(IdGeneratorService idGeneratorService) {
-		this.idGeneratorService = idGeneratorService;
-	}
-
-	@Autowired
-	public void setAttachService(AttachService attachService) {
-		this.attachService = attachService;
-	}
-
 	@Override
 	public String create() throws Exception {
 		this.readonly = false;
@@ -63,7 +50,7 @@ public class ChargerAction extends CrudAction<Long, Charger> {
 		Charger e = this.getCrudService().create();
 		e.setFileDate(Calendar.getInstance());
 		e.setAuthor(context.getUserHistory());
-		e.setUid(this.idGeneratorService.next("charger.uid"));
+		e.setUid(this.getIdGeneratorService().next("charger.uid"));
 		e.setSex("不设置");
 		this.setE(e);
 

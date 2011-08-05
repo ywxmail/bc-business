@@ -27,17 +27,17 @@ import cn.bc.identity.domain.RichFileEntityImpl;
 @Table(name = "BS_CARMAN")
 public class CarMan extends RichFileEntityImpl {
 	private static final long serialVersionUID = 1L;
-	/**类别：司机*/
-	public static final Integer TYPE_DRIVER = 0;
+	public static final String KEY_UID = CarMan.class.getSimpleName();
+	public static final int TYPE_DRIVER = 0;
 	/**类别：责任人*/
-	public static final Integer TYPE_CHARGER = 1;
+	public static final int TYPE_CHARGER = 1;
 	/**类别：司机和责任人*/
-	public static final Integer TYPE_DRIVER_AND_CHARGER = 2;
+	public static final int TYPE_DRIVER_AND_CHARGER = 2;
 
-	private Integer type;// 类别
+	private int type;// 类别
 	private String orderNo;// 排序号
 	private String name;// 姓名
-	private Integer sex;// 性别：参考ActorDetail类中SEX_*常数的定义
+	private int sex;// 性别：参考ActorDetail类中SEX_*常数的定义
 	private String origin;// 籍贯
 	private String region;// 区域
 	private String houseType;// 户口类型
@@ -195,20 +195,20 @@ public class CarMan extends RichFileEntityImpl {
 		this.phone1 = phone1;
 	}
 
-	public void setType(Integer type) {
+	public void setType(int type) {
 		this.type = type;
 	}
 
-	public void setSex(Integer sex) {
+	public void setSex(int sex) {
 		this.sex = sex;
 	}
 
 	@Column(name = "TYPE_")
-	public Integer getType() {
+	public int getType() {
 		return type;
 	}
 
-	public Integer getSex() {
+	public int getSex() {
 		return sex;
 	}
 

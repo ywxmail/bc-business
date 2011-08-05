@@ -12,7 +12,7 @@ import cn.bc.business.motorcade.domain.HistoryCarQuantity;
 import cn.bc.business.motorcade.domain.Motorcade;
 import cn.bc.business.motorcade.service.HistoryCarQuantityService;
 import cn.bc.business.motorcade.service.MotorcadeService;
-import cn.bc.business.web.struts2.CrudAction;
+import cn.bc.business.web.struts2.FileEntityAction;
 import cn.bc.core.query.condition.Condition;
 import cn.bc.core.query.condition.impl.EqualsCondition;
 import cn.bc.core.query.condition.impl.OrderCondition;
@@ -34,7 +34,7 @@ import cn.bc.web.ui.json.Json;
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 @Controller
 public class HistoryCarQuantityAction extends
-		CrudAction<Long, HistoryCarQuantity> {
+		FileEntityAction<Long, HistoryCarQuantity> {
 	// private static Log logger = LogFactory.getLog(BulletinAction.class);
 	private static final long serialVersionUID = 1L;
 	private String MANAGER_KEY = "R_MANAGER_BUSINESS";// 管理角色的编码
