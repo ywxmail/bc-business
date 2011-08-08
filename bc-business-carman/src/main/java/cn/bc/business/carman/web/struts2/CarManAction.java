@@ -37,7 +37,7 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 	private static final long serialVersionUID = 1L;
 	private String MANAGER_KEY = "R_ADMIN";// 管理角色的编码
 	public boolean isManager;
-	public CarManService carManService;
+	private CarManService carManService;
 	public String portrait;
 
 	@Autowired
