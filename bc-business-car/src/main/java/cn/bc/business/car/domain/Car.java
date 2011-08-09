@@ -32,8 +32,7 @@ public class Car extends RichFileEntityImpl {
 	private static final long serialVersionUID = 1L;
 
 	private Motorcade motorcade;// 所属车队
-	private Actor belongUnit;// 所属单位
-	private Actor manageUnit;// 分管单位
+	private Actor unit;// 所属单位
 	private String businessType;// 营运性质
 
 	private String code;// 自编号
@@ -116,23 +115,13 @@ public class Car extends RichFileEntityImpl {
 	}
 
 	@ManyToOne(fetch = FetchType.EAGER, optional = false)
-	@JoinColumn(name = "BELONG_UNITID", referencedColumnName = "ID")
-	public Actor getBelongUnit() {
-		return belongUnit;
+	@JoinColumn(name = "UNIT_ID", referencedColumnName = "ID")
+	public Actor getUnit() {
+		return unit;
 	}
 
-	public void setBelongUnit(Actor belongUnit) {
-		this.belongUnit = belongUnit;
-	}
-
-	@ManyToOne(fetch = FetchType.EAGER, optional = true)
-	@JoinColumn(name = "MANAGE_UNITID", referencedColumnName = "ID")
-	public Actor getManageUnit() {
-		return manageUnit;
-	}
-
-	public void setManageUnit(Actor manageUnit) {
-		this.manageUnit = manageUnit;
+	public void setUnit(Actor belongUnit) {
+		this.unit = belongUnit;
 	}
 
 	@Column(name = "BS_TYPE")
