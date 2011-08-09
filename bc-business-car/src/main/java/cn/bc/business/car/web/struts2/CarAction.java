@@ -133,7 +133,7 @@ public class CarAction extends FileEntityAction<Long, Car> {
 				}));
 		columns.add(new TextColumn("motorcade.name", getText("car.motorcade"))
 				.setSortable(true));
-		columns.add(new TextColumn("manageUnit.name", getText("car.manageUnit"))
+		columns.add(new TextColumn("unit.name", getText("car.unit"))
 				.setSortable(true));
 		columns.add(new TextColumn("registerDate", getText("car.registerDate"))
 				.setSortable(true).setValueFormater(new CalendarFormater()));
