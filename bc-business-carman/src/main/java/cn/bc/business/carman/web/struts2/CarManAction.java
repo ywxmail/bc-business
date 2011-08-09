@@ -3,7 +3,9 @@
  */
 package cn.bc.business.carman.web.struts2;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -17,6 +19,7 @@ import cn.bc.core.query.condition.Condition;
 import cn.bc.core.query.condition.Direction;
 import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.identity.web.SystemContext;
+import cn.bc.web.formater.KeyValueFormater;
 import cn.bc.web.ui.html.grid.Column;
 import cn.bc.web.ui.html.grid.GridData;
 import cn.bc.web.ui.html.grid.TextColumn;
@@ -37,7 +40,7 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 	private static final long serialVersionUID = 1L;
 	private String MANAGER_KEY = "R_ADMIN";// 管理角色的编码
 	public boolean isManager;
-	private CarManService carManService;
+	public CarManService carManService;
 	public String portrait;
 
 	@Autowired
@@ -49,7 +52,8 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 	@Override
 	public String create() throws Exception {
 		String result = super.create();
-
+		this.getE().setStatus(1);
+		this.getE().setSex(1);
 		// 获取相片的连接
 		portrait = "/bc/libs/themes/default/images/portrait/1in110x140.png";
 
@@ -61,7 +65,7 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 		String result = super.open();
 
 		// 获取相片的连接
-		portrait = "/bc/libs/themes/default/images/portrait/1in110x140.png";
+		//portrait = "/bc/libs/themes/default/images/portrait/1in110x140.png";
 
 		return result;
 	}
@@ -145,7 +149,8 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 
 		List<Column> columns = super.buildGridColumns();
 		columns.add(new TextColumn("type", getText("carMan.type"))
-				.setSortable(true));
+				.setSortable(true).setValueFormater(
+						new KeyValueFormater(getType())));
 		columns.add(new TextColumn("name", getText("carMan.name"))
 				.setSortable(true));
 		columns.add(new TextColumn("origin", getText("carMan.origin"))
@@ -156,5 +161,22 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 	// 判断当前用户是否是本模块管理员
 	private boolean isManager() {
 		return ((SystemContext) this.getContext()).hasAnyRole(MANAGER_KEY);
+	}
+	
+	/**
+	 * 获取分类值转换列表
+	 * 
+	 * @return
+	 */
+	protected Map<String, String> getType() {
+		Map<String, String> type = new HashMap<String, String>();
+		type = new HashMap<String, String>();
+		type.put(String.valueOf(CarMan.TYPE_DRIVER),
+				getText("carMan.type.driver"));
+		type.put(String.valueOf(CarMan.TYPE_CHARGER),
+				getText("carMan.type.charger"));
+		type.put(String.valueOf(CarMan.TYPE_DRIVER_AND_CHARGER),
+				getText("carMan.type.driverAndCharger"));
+		return type;
 	}
 }

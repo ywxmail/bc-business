@@ -261,6 +261,7 @@ create table BS_CARMAN (
     PHONE                varchar(500) comment '电话',
     PHONE1               varchar(500) comment '电话1',
     MODEL_               varchar(255) comment '准驾车型',
+	LEVEL_               VARCHAR(255) COMMENT '司机等级',
     CERT_IDENTITY        varchar(255) comment '身份证号',
     CERT_DRIVING         varchar(255) comment '驾驶证号',
     CERT_DRIVING_ARCHIVE varchar(255) comment '驾驶证档案号',
