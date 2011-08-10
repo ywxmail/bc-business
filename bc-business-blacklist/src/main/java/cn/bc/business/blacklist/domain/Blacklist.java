@@ -32,9 +32,10 @@ import cn.bc.identity.domain.FileEntityImpl;
 public class Blacklist extends FileEntityImpl {
 	private static final long serialVersionUID = 1L;
 
+	private String subject;// 主题
 	private String type;// 类型，如提醒、限制一切业务
 	private String level;// 等级
-	private String subject;// 主题
+	private String code;// 编号
 	private String lockReason;// 锁定原因
 	private String unlockReason;// 解锁原因
 	private ActorHistory locker;// 锁定人
@@ -47,6 +48,14 @@ public class Blacklist extends FileEntityImpl {
 	private Motorcade motorcade;// 车队
 	private Car car;// 车辆
 	private CarMan driver;// 司机
+
+	public String getCode() {
+		return code;
+	}
+
+	public void setCode(String code) {
+		this.code = code;
+	}
 
 	@Column(name = "TYPE_")
 	public String getType() {
