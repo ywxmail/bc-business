@@ -15,6 +15,8 @@ import org.springframework.stereotype.Controller;
 import cn.bc.business.carman.domain.CarMan;
 import cn.bc.business.carman.service.CarManService;
 import cn.bc.business.web.struts2.FileEntityAction;
+import cn.bc.core.RichEntity;
+import cn.bc.core.exception.CoreException;
 import cn.bc.core.query.condition.Condition;
 import cn.bc.core.query.condition.Direction;
 import cn.bc.core.query.condition.impl.OrderCondition;
@@ -42,7 +44,8 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 	public boolean isManager;
 	public CarManService carManService;
 	public String portrait;
-
+	public Map statusesValue;
+ 
 	@Autowired
 	public void setCarManService(CarManService carManService) {
 		this.carManService = carManService;
@@ -52,7 +55,9 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 	@Override
 	public String create() throws Exception {
 		String result = super.create();
-		this.getE().setStatus(1);
+		this.getE().setStatus(RichEntity.STATUS_ENABLED);
+		statusesValue=this.getEntityStatuses();
+		
 		this.getE().setSex(1);
 		// 获取相片的连接
 		portrait = "/bc/libs/themes/default/images/portrait/1in110x140.png";
@@ -73,7 +78,7 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 	@Override
 	public String edit() throws Exception {
 		String result = super.edit();
-
+		statusesValue=this.getEntityStatuses();
 		// 获取相片的连接
 		portrait = "/bc/libs/themes/default/images/portrait/1in110x140.png";
 
@@ -148,6 +153,9 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 		isManager = isManager();
 
 		List<Column> columns = super.buildGridColumns();
+		columns.add(new TextColumn("status", getText("carMan.status"))
+		.setSortable(true).setValueFormater(
+				new KeyValueFormater(getEntityStatuses())));
 		columns.add(new TextColumn("type", getText("carMan.type"))
 				.setSortable(true).setValueFormater(
 						new KeyValueFormater(getType())));
@@ -179,4 +187,27 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 				getText("carMan.type.driverAndCharger"));
 		return type;
 	}
+	
+	// 删除
+		public String delete() throws Exception {
+			
+			if (this.getId() != null) {// 删除一条
+				Map<String,Object> attrs = new HashMap<String,Object>();
+				attrs.put("status", RichEntity.STATUS_DELETED);
+				this.getCrudService().update(this.getId(), attrs);
+			} else {// 删除一批
+				if (this.getIds() != null && this.getIds().length() > 0) {
+					Long[] ids = cn.bc.core.util.StringUtils
+							.stringArray2LongArray(this.getIds().split(","));
+					
+					Map<String,Object> attrs = new HashMap<String,Object>();
+					attrs.put("status", RichEntity.STATUS_DELETED);
+					this.getCrudService().update(ids, attrs);
+				} else {
+					throw new CoreException("must set property id or ids");
+				}
+			}
+			return "deleteSuccess";
+		}
+	
 }

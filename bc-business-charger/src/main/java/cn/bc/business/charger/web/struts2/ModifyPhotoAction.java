@@ -1,6 +1,15 @@
 package cn.bc.business.charger.web.struts2;
 
+import java.awt.image.BufferedImage;
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+
+import javax.imageio.ImageIO;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -17,7 +26,6 @@ import cn.bc.core.service.CrudService;
 import cn.bc.docs.util.ImageUtils;
 import cn.bc.web.ui.html.grid.Column;
 import cn.bc.web.ui.html.grid.GridData;
-import cn.bc.web.ui.json.Json;
 
 /**
  * 相片处理Action
@@ -37,6 +45,16 @@ public class ModifyPhotoAction extends FileEntityAction<Long, Charger> {
     public int w;
     public int h;
     public ImageUtils imageUils;
+    public String photoUrl;
+    
+	public String getPhotoUrl() {
+		return photoUrl;
+	}
+
+	public void setPhotoUrl(String photoUrl) {
+		this.photoUrl = photoUrl;
+	}
+
 	@Autowired
 	public void setChargerService(
 			@Qualifier(value = "chargerService") CrudService<Charger> crudService) {
@@ -60,12 +78,18 @@ public class ModifyPhotoAction extends FileEntityAction<Long, Charger> {
 	}
 
 	
-    public String modify(){
-    	
-    	
-    	Json j=new Json();
-    	j.put("url", "bc-business/modifyPhoto/img/1.jpg");
-    	return "json";
+    public String modify() throws IOException{
+        FileInputStream inputFile=new FileInputStream(new File("src/main/webapp/"+photoUrl));
+        DataInputStream dis=new DataInputStream(inputFile);
+    	String extension = "jpg";
+    	 Date date=new Date();
+    	String dateString=String.valueOf(date.getTime());
+    	    String path=photoUrl.substring(0,28);
+    	    photoUrl=path+dateString +".jpg";
+		BufferedImage newImg = ImageUtils.crop(dis, x1, y1, w,h);
+		ImageIO.write(newImg, extension, new File("src/main/webapp/"+photoUrl));
+		this.setPhotoUrl(photoUrl);
+    	return "modify";
     }
-	
+    
 }
