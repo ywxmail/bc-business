@@ -20,6 +20,7 @@ import cn.bc.core.exception.CoreException;
 import cn.bc.core.query.condition.Condition;
 import cn.bc.core.query.condition.Direction;
 import cn.bc.core.query.condition.impl.OrderCondition;
+import cn.bc.identity.service.IdGeneratorService;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.web.formater.KeyValueFormater;
 import cn.bc.web.ui.html.grid.Column;
@@ -40,12 +41,21 @@ import cn.bc.web.ui.html.toolbar.Toolbar;
 public class CarManAction extends FileEntityAction<Long, CarMan> {
 	// private static Log logger = LogFactory.getLog(BulletinAction.class);
 	private static final long serialVersionUID = 1L;
+	private IdGeneratorService idGeneratorService;
 	private String MANAGER_KEY = "R_ADMIN";// 管理角色的编码
 	public boolean isManager;
 	public CarManService carManService;
 	public String portrait;
 	public Map statusesValue;
- 
+    
+	public IdGeneratorService getIdGeneratorService() {  
+        return idGeneratorService;  
+    }  
+  
+    @Autowired  
+    public void setIdGeneratorService(IdGeneratorService idGeneratorService) {  
+        this.idGeneratorService = idGeneratorService;  
+    }  
 	@Autowired
 	public void setCarManService(CarManService carManService) {
 		this.carManService = carManService;
@@ -57,7 +67,7 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 		String result = super.create();
 		this.getE().setStatus(RichEntity.STATUS_ENABLED);
 		statusesValue=this.getEntityStatuses();
-		
+		this.getE().setUid(this.getIdGeneratorService().next(CarMan.KEY_UID));
 		this.getE().setSex(1);
 		// 获取相片的连接
 		portrait = "/bc/libs/themes/default/images/portrait/1in110x140.png";
