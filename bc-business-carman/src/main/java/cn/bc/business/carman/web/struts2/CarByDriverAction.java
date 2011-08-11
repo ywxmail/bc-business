@@ -3,7 +3,7 @@
  */
 package cn.bc.business.carman.web.struts2;
 
-import java.util.HashMap;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
@@ -13,17 +13,15 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
 import cn.bc.business.carman.domain.CarByDriver;
-import cn.bc.business.carman.domain.CarMan;
 import cn.bc.business.carman.service.CarByDriverService;
-import cn.bc.business.carman.service.CarManService;
 import cn.bc.business.web.struts2.FileEntityAction;
-import cn.bc.core.RichEntity;
-import cn.bc.core.exception.CoreException;
 import cn.bc.core.query.condition.Condition;
-import cn.bc.core.query.condition.Direction;
-import cn.bc.core.query.condition.impl.OrderCondition;
+import cn.bc.core.query.condition.impl.EqualsCondition;
 import cn.bc.identity.web.SystemContext;
-import cn.bc.web.formater.KeyValueFormater;
+import cn.bc.option.OptionConstants;
+import cn.bc.option.domain.OptionItem;
+import cn.bc.option.service.OptionService;
+import cn.bc.web.formater.CalendarRangeFormater;
 import cn.bc.web.ui.html.grid.Column;
 import cn.bc.web.ui.html.grid.GridData;
 import cn.bc.web.ui.html.grid.TextColumn;
@@ -46,41 +44,54 @@ public class CarByDriverAction extends FileEntityAction<Long, CarByDriver> {
 	public boolean isManager;
 	public CarByDriverService carByDriverService;
 	public String portrait;
-	public Map statusesValue;
- 
+	public Map<String, String> statusesValue;
+	public OptionService optionService;
+	public List<OptionItem> driverClasses;
+	public OptionConstants optionConstants;
+	public Long carManId;
+
+	@Autowired
+	public void setOptionService(OptionService optionService) {
+		this.optionService = optionService;
+	}
+
 	@Autowired
 	public void setCarByDriverService(CarByDriverService carByDriverService) {
 		this.carByDriverService = carByDriverService;
 		this.setCrudService(carByDriverService);
 	}
 
-	/*@Override
+	@Override
 	public String create() throws Exception {
 		String result = super.create();
-		
-		return result;
-	}*/
-
-	/*@Override
-	public String open() throws Exception {
-		String result = super.open();
-
-		// 获取相片的连接
-		//portrait = "/bc/libs/themes/default/images/portrait/1in110x140.png";
-
+		//driverClasses = this.optionService
+				//.findOptionItemByGroupKey(optionConstants.DRIVER_CLASSES);
 		return result;
 	}
 
+	/*
+	 * @Override public String open() throws Exception { String result =
+	 * super.open();
+	 * 
+	 * // 获取相片的连接 //portrait =
+	 * "/bc/libs/themes/default/images/portrait/1in110x140.png";
+	 * 
+	 * return result; }
+	 * 
+	 * @Override public String edit() throws Exception { String result =
+	 * super.edit(); statusesValue=this.getEntityStatuses(); // 获取相片的连接 portrait
+	 * = "/bc/libs/themes/default/images/portrait/1in110x140.png";
+	 * 
+	 * return result; }
+	 */
+
+	// 视图特殊条件
 	@Override
-	public String edit() throws Exception {
-		String result = super.edit();
-		statusesValue=this.getEntityStatuses();
-		// 获取相片的连接
-		portrait = "/bc/libs/themes/default/images/portrait/1in110x140.png";
+	protected Condition getSpecalCondition() {
+		return new EqualsCondition("motorcade.id", carManId);
+	}
 
-		return result;
-	}*/
-
+	
 	@Override
 	protected PageOption buildFormPageOption() {
 		PageOption option = new PageOption().setWidth(500).setMinWidth(250)
@@ -96,22 +107,20 @@ public class CarByDriverAction extends FileEntityAction<Long, CarByDriver> {
 		return super.buildGridData(columns).setRowLabelExpression("name");
 	}
 
-	/*@Override
-	protected OrderCondition getDefaultOrderCondition() {
-		return new OrderCondition("orderNo", Direction.Desc);
-	}*/
+	/*
+	 * @Override protected OrderCondition getDefaultOrderCondition() { return
+	 * new OrderCondition("orderNo", Direction.Desc); }
+	 */
 
-	@Override
-	protected Condition getSpecalCondition() {
-		return null;
-	}
+	
 
-	/*// 设置页面的尺寸
-	@Override
-	protected PageOption buildListPageOption() {
-		return super.buildListPageOption().setWidth(500).setMinWidth(300)
-				.setHeight(500).setMinHeight(100);
-	}*/
+	/*
+	 * // 设置页面的尺寸
+	 * 
+	 * @Override protected PageOption buildListPageOption() { return
+	 * super.buildListPageOption().setWidth(500).setMinWidth(300)
+	 * .setHeight(500).setMinHeight(100); }
+	 */
 
 	@Override
 	protected Toolbar buildToolbar() {
@@ -146,12 +155,19 @@ public class CarByDriverAction extends FileEntityAction<Long, CarByDriver> {
 		isManager = isManager();
 
 		List<Column> columns = super.buildGridColumns();
-		columns.add(new TextColumn("car.plateNo", getText("carByDriver.car.plateNo"))
-		.setSortable(true));
+		columns.add(new TextColumn("e.car.plateNo",
+				getText("carByDriver.car.plateNo")).setSortable(true));
 		columns.add(new TextColumn("classes", getText("carByDriver.classes"))
 				.setSortable(true));
-		columns.add(new TextColumn("startDate"+"~"+"endDate", getText("carByDriver.timeInterva"))
-				.setSortable(true));
+		columns.add(new TextColumn("startDate",
+				getText("carByDriver.timeInterva")).setSortable(true)
+				.setValueFormater(new CalendarRangeFormater() {
+					@Override
+					public Calendar getToDate(Object context, Object value) {
+						CarByDriver carByDriver = (CarByDriver) context;
+						return carByDriver.getEndDate();
+					}
+				}));
 		return columns;
 	}
 
@@ -159,44 +175,36 @@ public class CarByDriverAction extends FileEntityAction<Long, CarByDriver> {
 	private boolean isManager() {
 		return ((SystemContext) this.getContext()).hasAnyRole(MANAGER_KEY);
 	}
-	
+
 	/**
 	 * 获取分类值转换列表
 	 * 
 	 * @return
-	 *//*
-	protected Map<String, String> getType() {
-		Map<String, String> type = new HashMap<String, String>();
-		type = new HashMap<String, String>();
-		type.put(String.valueOf(CarMan.TYPE_DRIVER),
-				getText("carMan.type.driver"));
-		type.put(String.valueOf(CarMan.TYPE_CHARGER),
-				getText("carMan.type.charger"));
-		type.put(String.valueOf(CarMan.TYPE_DRIVER_AND_CHARGER),
-				getText("carMan.type.driverAndCharger"));
-		return type;
-	}
-	
-	// 删除
-		public String delete() throws Exception {
-			
-			if (this.getId() != null) {// 删除一条
-				Map<String,Object> attrs = new HashMap<String,Object>();
-				attrs.put("status", RichEntity.STATUS_DELETED);
-				this.getCrudService().update(this.getId(), attrs);
-			} else {// 删除一批
-				if (this.getIds() != null && this.getIds().length() > 0) {
-					Long[] ids = cn.bc.core.util.StringUtils
-							.stringArray2LongArray(this.getIds().split(","));
-					
-					Map<String,Object> attrs = new HashMap<String,Object>();
-					attrs.put("status", RichEntity.STATUS_DELETED);
-					this.getCrudService().update(ids, attrs);
-				} else {
-					throw new CoreException("must set property id or ids");
-				}
-			}
-			return "deleteSuccess";
-		}*/
-	
+	 */
+	/*
+	 * protected Map<String, String> getType() { Map<String, String> type = new
+	 * HashMap<String, String>(); type = new HashMap<String, String>();
+	 * type.put(String.valueOf(CarMan.TYPE_DRIVER),
+	 * getText("carMan.type.driver"));
+	 * type.put(String.valueOf(CarMan.TYPE_CHARGER),
+	 * getText("carMan.type.charger"));
+	 * type.put(String.valueOf(CarMan.TYPE_DRIVER_AND_CHARGER),
+	 * getText("carMan.type.driverAndCharger")); return type; }
+	 * 
+	 * // 删除 public String delete() throws Exception {
+	 * 
+	 * if (this.getId() != null) {// 删除一条 Map<String,Object> attrs = new
+	 * HashMap<String,Object>(); attrs.put("status", RichEntity.STATUS_DELETED);
+	 * this.getCrudService().update(this.getId(), attrs); } else {// 删除一批 if
+	 * (this.getIds() != null && this.getIds().length() > 0) { Long[] ids =
+	 * cn.bc.core.util.StringUtils
+	 * .stringArray2LongArray(this.getIds().split(","));
+	 * 
+	 * Map<String,Object> attrs = new HashMap<String,Object>();
+	 * attrs.put("status", RichEntity.STATUS_DELETED);
+	 * this.getCrudService().update(ids, attrs); } else { throw new
+	 * CoreException("must set property id or ids"); } } return "deleteSuccess";
+	 * }
+	 */
+
 }
