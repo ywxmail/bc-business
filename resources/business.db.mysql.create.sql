@@ -458,7 +458,6 @@ ALTER TABLE BS_CARMAN_CONTRACT ADD CONSTRAINT BSFK_CARMANCONTRACT_CONTRACT FOREI
 CREATE TABLE BS_CAR_DRIVER(
    ID                   BIGINT NOT NULL auto_increment,
    DRIVER_ID            BIGINT NOT NULL COMMENT '司机ID',
-   SUBJECT              VARCHAR(1000) COMMENT '其他',
    CAR_ID               BIGINT NOT NULL COMMENT '车辆ID',
    CLASSES                VARCHAR(255) NOT NULL COMMENT '营运班次:如正班、副班、顶班',
    START_DATE           DATETIME COMMENT '起始时段',
@@ -483,6 +482,7 @@ CREATE TABLE BS_CARMAN_HISTORY (
    ID                   BIGINT NOT NULL auto_increment,
    TYPE_                VARCHAR(255) NOT NULL COMMENT '迁移属性，如新入职',
    DRIVER_ID            BIGINT NOT NULL COMMENT '司机ID',
+   SUBJECT              VARCHAR(1000) COMMENT '其他',
    FROM_CARID           BIGINT COMMENT '迁自车辆ID',
    TO_CARID             BIGINT NOT NULL COMMENT '迁往车辆ID',
    FROM_CLASSES         VARCHAR(255) COMMENT '原营运班次:如正班、副班、顶班',
