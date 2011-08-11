@@ -4,18 +4,25 @@
 package cn.bc.business.car.web.struts2;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
+
+import cn.bc.business.OptionConstants;
 import cn.bc.business.car.domain.Car;
 import cn.bc.business.car.service.CarService;
+import cn.bc.business.motorcade.domain.Motorcade;
+import cn.bc.business.motorcade.service.MotorcadeService;
 import cn.bc.business.web.struts2.FileEntityAction;
 import cn.bc.core.query.condition.Direction;
 import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.identity.web.SystemContext;
+import cn.bc.option.domain.OptionItem;
+import cn.bc.option.service.OptionService;
 import cn.bc.web.formater.AbstractFormater;
 import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.ui.html.grid.Column;
@@ -35,16 +42,39 @@ import cn.bc.web.ui.html.toolbar.Toolbar;
 @Controller
 public class CarAction extends FileEntityAction<Long, Car> {
 	// private static Log logger = LogFactory.getLog(CarAction.class);
-	private static final long serialVersionUID = 1L;
-	private String MANAGER_KEY = "R_ADMIN";// 管理角色的编码
-	public boolean isManager;
-	private CarService carService;
+	private static 	final long 		serialVersionUID 	= 1L;
+	private String 					MANAGER_KEY 		= "R_ADMIN";// 管理角色的编码
+	public 	boolean 				isManager;
+	@SuppressWarnings("unused")
+	private CarService 				carService;
+	private MotorcadeService	 	motorcadeService;
+	private OptionService			optionService;
+	
+
+	public 	List<Motorcade> 		motorcadeList;					// 可选车队列表
+	public  List<OptionItem>		businessTypeList;				// 可选营运性质列表
+	public  List<OptionItem>		levelList;						// 可选车辆定级列表
+	
+	public 	Map<String,String> 		statusesValue;
+
 
 	@Autowired
 	public void setCarService(CarService carService) {
 		this.carService = carService;
 		this.setCrudService(carService);
 	}
+	
+	@Autowired
+	public void setMotorcadeService(MotorcadeService motorcadeService) {
+		this.motorcadeService = motorcadeService;
+	}
+	
+	@Autowired
+	public void setOptionService(OptionService optionService) {
+		this.optionService = optionService;
+	}
+
+
 
 	@Override
 	protected PageOption buildFormPageOption() {
@@ -131,12 +161,14 @@ public class CarAction extends FileEntityAction<Long, Car> {
 								+ car.getFactoryModel();
 					}
 				}));
+		columns.add(new TextColumn("vin", getText("car.vin")));
+		columns.add(new TextColumn("businessType", getText("car.businessType")));
 		columns.add(new TextColumn("motorcade.name", getText("car.motorcade"))
 				.setSortable(true));
 		columns.add(new TextColumn("unit.name", getText("car.unit"))
 				.setSortable(true));
 		columns.add(new TextColumn("registerDate", getText("car.registerDate"))
-				.setSortable(true).setValueFormater(new CalendarFormater()));
+				.setSortable(true).setValueFormater(new CalendarFormater("yyyy-MM-dd")));
 		columns.add(new TextColumn("originNo", getText("car.originNo"))
 				.setSortable(true));
 		return columns;
@@ -146,4 +178,45 @@ public class CarAction extends FileEntityAction<Long, Car> {
 	private boolean isManager() {
 		return ((SystemContext) this.getContext()).hasAnyRole(MANAGER_KEY);
 	}
+	
+	@SuppressWarnings("static-access")
+	@Override
+	public String create() throws Exception {
+		String r = super.create();
+		this.getE().setUnit(this.getSystyemContext().getUnit());
+		this.getE().setUid(this.getIdGeneratorService().next(this.getE().KEY_UID));
+		
+		// 初始化车辆的状态
+		this.getE().setStatus(0);
+		
+		// 表单可选项的加载
+		initSelects();
+		
+		return r; 
+	}
+	
+	@Override
+	public String edit() throws Exception {
+		this.setE(this.getCrudService().load(this.getId()));
+		// 表单可选项的加载
+		this.formPageOption = 	buildFormPageOption();
+		statusesValue		=	this.getEntityStatuses();
+		
+		initSelects();
+		return "form";
+	}
+	
+	
+	
+	// 表单可选项的加载
+	public void initSelects(){
+		// 加载可选车队列表
+		this.motorcadeList 		= 	this.motorcadeService.createQuery().list();
+		// 加载可选营运性质列表
+		this.businessTypeList	=	this.optionService.findOptionItemByGroupKey(OptionConstants.CAR_BUSINESS_NATURE);
+		// 加载可选营运性质列表
+		this.levelList			=	this.optionService.findOptionItemByGroupKey(OptionConstants.CAR_RANK);
+	}
+	
+	
 }
