@@ -3,9 +3,14 @@
  */
 package cn.bc.business.carman.service;
 
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
+
 import cn.bc.business.carman.dao.CarManDao;
 import cn.bc.business.carman.domain.CarMan;
 import cn.bc.business.cert.domain.Cert;
+import cn.bc.core.RichEntity;
 import cn.bc.core.service.DefaultCrudService;
 
 /**
@@ -33,4 +38,22 @@ public class CarManServiceImpl extends DefaultCrudService<CarMan> implements
 	public CarMan saveCertRelationship(Long carManId, Long certId) {
 		return this.carManDao.saveCertRelationship(carManId, certId);
 	}
+    //将删除方法改为更新方法
+	@Override
+	public void delete(Serializable id) {
+		// TODO Auto-generated method stub
+		Map<String,Object> attrs = new HashMap<String,Object>();
+		attrs.put("status", RichEntity.STATUS_DELETED);
+		super.update(id, attrs);
+	}
+	//将删除方法改为更新方法
+	@Override
+	public void delete(Serializable[] ids) {
+		// TODO Auto-generated method stub
+		Map<String,Object> attrs = new HashMap<String,Object>();
+		attrs.put("status", RichEntity.STATUS_DELETED);
+		super.update(ids, attrs);
+	}
+	
+	
 }

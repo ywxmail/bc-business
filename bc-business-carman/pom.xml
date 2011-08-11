@@ -29,11 +29,5 @@
 			<artifactId>bc-business-car</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<!-- 选项分组 -->
-		<dependency>
-			<groupId>cn.bc</groupId>
-			<artifactId>bc-option</artifactId>
-			<version>${framework.version}</version>
-		</dependency>
 	</dependencies>
 </project>

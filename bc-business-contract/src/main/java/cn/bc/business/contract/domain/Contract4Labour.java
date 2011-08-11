@@ -32,9 +32,18 @@ public class Contract4Labour extends Contract4Car {
 	private boolean preIndustryType;// 前身工种行业:0-非特殊,1-特殊
 	private boolean hiringProcedure;// 招用工手续:0-未办,1-已办
 	private boolean dole;// 下岗失业补贴:0-已发,1-未发
-
+	private boolean filing;// 是否已备案
+	
 	public Contract4Labour() {
 		this.setCode("劳动合同");
+	}
+
+	public boolean isFiling() {
+		return filing;
+	}
+
+	public void setFiling(boolean filing) {
+		this.filing = filing;
 	}
 
 	@ManyToOne(fetch = FetchType.EAGER, optional = false)

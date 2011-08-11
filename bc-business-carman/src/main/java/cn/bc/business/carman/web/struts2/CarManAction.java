@@ -188,26 +188,5 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 		return type;
 	}
 	
-	// 删除
-		public String delete() throws Exception {
-			
-			if (this.getId() != null) {// 删除一条
-				Map<String,Object> attrs = new HashMap<String,Object>();
-				attrs.put("status", RichEntity.STATUS_DELETED);
-				this.getCrudService().update(this.getId(), attrs);
-			} else {// 删除一批
-				if (this.getIds() != null && this.getIds().length() > 0) {
-					Long[] ids = cn.bc.core.util.StringUtils
-							.stringArray2LongArray(this.getIds().split(","));
-					
-					Map<String,Object> attrs = new HashMap<String,Object>();
-					attrs.put("status", RichEntity.STATUS_DELETED);
-					this.getCrudService().update(ids, attrs);
-				} else {
-					throw new CoreException("must set property id or ids");
-				}
-			}
-			return "deleteSuccess";
-		}
 	
 }

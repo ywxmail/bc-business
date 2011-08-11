@@ -28,6 +28,7 @@ public class CarManHistory extends FileEntityImpl {
 
 	private CarMan driver;// 司机
 	private String type;// 迁移属性，如新入职
+	private String subject;// 其他
 	private Calendar shiftDate;// 迁移日期
 	private Car toCar;// 原车辆
 	private Car fromCar;// 迁往车辆
@@ -35,6 +36,14 @@ public class CarManHistory extends FileEntityImpl {
 	private Motorcade toMotorcade;// 迁往车队
 	private String fromClasses;// 原营运班次:如正班、副班、顶班
 	private String toClasses;// 新营运班次
+
+	public String getSubject() {
+		return subject;
+	}
+
+	public void setSubject(String subject) {
+		this.subject = subject;
+	}
 
 	@Column(name = "TYPE_")
 	public String getType() {
