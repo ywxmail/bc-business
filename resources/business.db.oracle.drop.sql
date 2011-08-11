@@ -1,6 +1,9 @@
 -- ##bc营运管理子系统的 oracle 删表脚本##
 -- ##运行此脚本之后再运行平台的删表脚本framework.db.oracle.drop.sql##
 
+-- 黑名单
+CALL DROP_USER_TABLE('BS_BLACKLIST');
+
 -- 合同
 CALL DROP_USER_TABLE('BS_CARMAN_CONTRACT');
 CALL DROP_USER_TABLE('BS_CONTRACT_LABOUR');
