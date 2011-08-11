@@ -3,7 +3,9 @@
  */
 package cn.bc.business.carman.web.struts2;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -13,10 +15,13 @@ import org.springframework.stereotype.Controller;
 import cn.bc.business.carman.domain.CarMan;
 import cn.bc.business.carman.service.CarManService;
 import cn.bc.business.web.struts2.FileEntityAction;
+import cn.bc.core.RichEntity;
+import cn.bc.core.exception.CoreException;
 import cn.bc.core.query.condition.Condition;
 import cn.bc.core.query.condition.Direction;
 import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.identity.web.SystemContext;
+import cn.bc.web.formater.KeyValueFormater;
 import cn.bc.web.ui.html.grid.Column;
 import cn.bc.web.ui.html.grid.GridData;
 import cn.bc.web.ui.html.grid.TextColumn;
@@ -37,9 +42,10 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 	private static final long serialVersionUID = 1L;
 	private String MANAGER_KEY = "R_ADMIN";// 管理角色的编码
 	public boolean isManager;
-	private CarManService carManService;
+	public CarManService carManService;
 	public String portrait;
-
+	public Map statusesValue;
+ 
 	@Autowired
 	public void setCarManService(CarManService carManService) {
 		this.carManService = carManService;
@@ -49,7 +55,10 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 	@Override
 	public String create() throws Exception {
 		String result = super.create();
-
+		this.getE().setStatus(RichEntity.STATUS_ENABLED);
+		statusesValue=this.getEntityStatuses();
+		
+		this.getE().setSex(1);
 		// 获取相片的连接
 		portrait = "/bc/libs/themes/default/images/portrait/1in110x140.png";
 
@@ -61,7 +70,7 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 		String result = super.open();
 
 		// 获取相片的连接
-		portrait = "/bc/libs/themes/default/images/portrait/1in110x140.png";
+		//portrait = "/bc/libs/themes/default/images/portrait/1in110x140.png";
 
 		return result;
 	}
@@ -69,7 +78,7 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 	@Override
 	public String edit() throws Exception {
 		String result = super.edit();
-
+		statusesValue=this.getEntityStatuses();
 		// 获取相片的连接
 		portrait = "/bc/libs/themes/default/images/portrait/1in110x140.png";
 
@@ -144,8 +153,12 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 		isManager = isManager();
 
 		List<Column> columns = super.buildGridColumns();
+		columns.add(new TextColumn("status", getText("carMan.status"))
+		.setSortable(true).setValueFormater(
+				new KeyValueFormater(getEntityStatuses())));
 		columns.add(new TextColumn("type", getText("carMan.type"))
-				.setSortable(true));
+				.setSortable(true).setValueFormater(
+						new KeyValueFormater(getType())));
 		columns.add(new TextColumn("name", getText("carMan.name"))
 				.setSortable(true));
 		columns.add(new TextColumn("origin", getText("carMan.origin"))
@@ -157,4 +170,44 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 	private boolean isManager() {
 		return ((SystemContext) this.getContext()).hasAnyRole(MANAGER_KEY);
 	}
+	
+	/**
+	 * 获取分类值转换列表
+	 * 
+	 * @return
+	 */
+	protected Map<String, String> getType() {
+		Map<String, String> type = new HashMap<String, String>();
+		type = new HashMap<String, String>();
+		type.put(String.valueOf(CarMan.TYPE_DRIVER),
+				getText("carMan.type.driver"));
+		type.put(String.valueOf(CarMan.TYPE_CHARGER),
+				getText("carMan.type.charger"));
+		type.put(String.valueOf(CarMan.TYPE_DRIVER_AND_CHARGER),
+				getText("carMan.type.driverAndCharger"));
+		return type;
+	}
+	
+	// 删除
+		public String delete() throws Exception {
+			
+			if (this.getId() != null) {// 删除一条
+				Map<String,Object> attrs = new HashMap<String,Object>();
+				attrs.put("status", RichEntity.STATUS_DELETED);
+				this.getCrudService().update(this.getId(), attrs);
+			} else {// 删除一批
+				if (this.getIds() != null && this.getIds().length() > 0) {
+					Long[] ids = cn.bc.core.util.StringUtils
+							.stringArray2LongArray(this.getIds().split(","));
+					
+					Map<String,Object> attrs = new HashMap<String,Object>();
+					attrs.put("status", RichEntity.STATUS_DELETED);
+					this.getCrudService().update(ids, attrs);
+				} else {
+					throw new CoreException("must set property id or ids");
+				}
+			}
+			return "deleteSuccess";
+		}
+	
 }

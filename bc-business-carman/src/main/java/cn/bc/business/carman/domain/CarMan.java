@@ -40,7 +40,7 @@ public class CarMan extends RichFileEntityImpl {
 	private int sex;// 性别：参考ActorDetail类中SEX_*常数的定义
 	private String origin;// 籍贯
 	private String region;// 区域
-	private String houseType;// 户口类型
+	private String houseType;// 户口性质
 	
 	private Calendar birthdate;// 出生日期
 	private Calendar workDate;// 入职日期
@@ -50,6 +50,7 @@ public class CarMan extends RichFileEntityImpl {
 	private String phone;// 电话1
 	private String phone1;// 电话2
 	private String description;// 备注
+	private String level;//等级
 	
 	//历史遗留
 	private String model;// 准驾车型
@@ -64,7 +65,7 @@ public class CarMan extends RichFileEntityImpl {
 	private String drivingStatus;// 驾驶状态
 	private String extFZJG;// 分支机构：用于历史数据的保存
 	private String extZRR;// 责任人：用于历史数据的保存
-	private boolean gz;// 驾驶证是否广州:0-否,1-是
+	private boolean  gz;// 驾驶证是否广州:0-否,1-是
 	private String accessCerts;// 已考取证件：历史数据保存
 	
 	private Set<Cert> certs;//拥有的证件
@@ -336,4 +337,14 @@ public class CarMan extends RichFileEntityImpl {
 	public void setAccessCerts(String accessCerts) {
 		this.accessCerts = accessCerts;
 	}
+
+	@Column(name = "LEVEL_")
+	public String getLevel() {
+		return level;
+	}
+
+	public void setLevel(String level) {
+		this.level = level;
+	}
+	
 }
