@@ -8,7 +8,7 @@ import cn.bc.core.service.CrudService;
 
 
 /**
- * 证件Service
+ * 合同Service
  * 
  * @author dragon
  */
