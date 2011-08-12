@@ -18,5 +18,6 @@
 	<bean id="carDao" class="cn.bc.business.car.dao.hibernate.jpa.CarDaoImpl"
 		p:entityManagerFactory-ref="entityManagerFactory" />
 	<bean id="carService" class="cn.bc.business.car.service.CarServiceImpl"
-		p:carDao-ref="carDao" />
+		p:carDao-ref="carDao"	 />
+		
 </beans>
