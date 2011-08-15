@@ -25,6 +25,7 @@ import cn.bc.option.domain.OptionItem;
 import cn.bc.option.service.OptionService;
 import cn.bc.web.formater.AbstractFormater;
 import cn.bc.web.formater.CalendarFormater;
+import cn.bc.web.formater.EntityStatusFormater;
 import cn.bc.web.ui.html.grid.Column;
 import cn.bc.web.ui.html.grid.GridData;
 import cn.bc.web.ui.html.grid.TextColumn;
@@ -52,8 +53,14 @@ public class CarAction extends FileEntityAction<Long, Car> {
 	
 
 	public 	List<Motorcade> 		motorcadeList;					// 可选车队列表
+	
 	public  List<OptionItem>		businessTypeList;				// 可选营运性质列表
-	public  List<OptionItem>		levelList;						// 可选车辆定级列表
+	public  List<OptionItem>		levelTypeList;					// 可选车辆定级列表
+	public  List<OptionItem>		factoryTypeList;				// 可选厂牌类型列表
+	public  List<OptionItem>		fuelTypeList;					// 可选燃料类型列表
+	public  List<OptionItem>		colorTypeList;					// 可选颜色类型列表
+	public  List<OptionItem>		taximeterFactoryTypeList;		// 可选计价器制造厂列表
+	
 	
 	public 	Map<String,String> 		statusesValue;
 
@@ -139,11 +146,11 @@ public class CarAction extends FileEntityAction<Long, Car> {
 		isManager = isManager();
 
 		List<Column> columns = super.buildGridColumns();
-		columns.add(new TextColumn("status", getText("car.status"))
+		columns.add(new TextColumn("status",getText("car.status"),		40)
+				.setSortable(true).setValueFormater(new EntityStatusFormater(getEntityStatuses())));
+		columns.add(new TextColumn("code",	getText("car.code"))
 				.setSortable(true));
-		columns.add(new TextColumn("code", getText("car.code"))
-				.setSortable(true));
-		columns.add(new TextColumn("plate", getText("car.plate"))
+		columns.add(new TextColumn("plate", getText("car.plate"),		100)
 				.setValueFormater(new AbstractFormater() {
 					@Override
 					public String format(Object context, Object value) {
@@ -151,25 +158,33 @@ public class CarAction extends FileEntityAction<Long, Car> {
 						return car.getPlateType() + " " + car.getPlateNo();
 					}
 				}));
-		columns.add(new TextColumn("carMan", getText("car.carMan")));
-		columns.add(new TextColumn("factory", getText("car.factory"))
+		columns.add(new TextColumn("carMan", getText("car.carMan"),		100));
+		columns.add(new TextColumn("factory", getText("car.factory"),	140)
 				.setValueFormater(new AbstractFormater() {
 					@Override
 					public String format(Object context, Object value) {
 						Car car = (Car) context;
-						return car.getFactoryType() + " "
-								+ car.getFactoryModel();
+						if(car.getFactoryType() != null && car.getFactoryModel() !=null){
+							return car.getFactoryType() + " " +
+							car.getFactoryModel();
+						}else if(car.getFactoryModel() != null){
+							return car.getFactoryModel();
+						}else if(car.getFactoryType() != null){
+							return car.getFactoryType() + " ";
+						}else{
+							return "";
+						}
 					}
 				}));
-		columns.add(new TextColumn("vin", getText("car.vin")));
-		columns.add(new TextColumn("businessType", getText("car.businessType")));
+		columns.add(new TextColumn("vin", getText("car.vin"),			120));
+		columns.add(new TextColumn("businessType", getText("car.businessType"),	100));
 		columns.add(new TextColumn("motorcade.name", getText("car.motorcade"))
 				.setSortable(true));
 		columns.add(new TextColumn("unit.name", getText("car.unit"))
 				.setSortable(true));
-		columns.add(new TextColumn("registerDate", getText("car.registerDate"))
+		columns.add(new TextColumn("registerDate", getText("car.registerDate"),	100)
 				.setSortable(true).setValueFormater(new CalendarFormater("yyyy-MM-dd")));
-		columns.add(new TextColumn("originNo", getText("car.originNo"))
+		columns.add(new TextColumn("originNo", getText("car.originNo"),			100)
 				.setSortable(true));
 		return columns;
 	}
@@ -211,11 +226,19 @@ public class CarAction extends FileEntityAction<Long, Car> {
 	// 表单可选项的加载
 	public void initSelects(){
 		// 加载可选车队列表
-		this.motorcadeList 		= 	this.motorcadeService.createQuery().list();
+		this.motorcadeList 				= 	this.motorcadeService.createQuery().list();
 		// 加载可选营运性质列表
-		this.businessTypeList	=	this.optionService.findOptionItemByGroupKey(OptionConstants.CAR_BUSINESS_NATURE);
+		this.businessTypeList			=	this.optionService.findOptionItemByGroupKey(OptionConstants.CAR_BUSINESS_NATURE);
 		// 加载可选营运性质列表
-		this.levelList			=	this.optionService.findOptionItemByGroupKey(OptionConstants.CAR_RANK);
+		this.levelTypeList				=	this.optionService.findOptionItemByGroupKey(OptionConstants.CAR_RANK);
+		// 加载可选厂牌类型列表
+		this.factoryTypeList			=	this.optionService.findOptionItemByGroupKey(OptionConstants.CAR_BRAND);
+		// 加载可选燃料类型列表
+		this.fuelTypeList				=	this.optionService.findOptionItemByGroupKey(OptionConstants.CAR_FUEL_TYPE);
+		// 加载可选颜色类型列表
+		this.colorTypeList				=	this.optionService.findOptionItemByGroupKey(OptionConstants.CAR_COLOR);
+		// 加载可选 计价器制造厂列表
+		this.taximeterFactoryTypeList	=	this.optionService.findOptionItemByGroupKey(OptionConstants.CAR_TAXIMETERFACTORY);
 	}
 	
 	
