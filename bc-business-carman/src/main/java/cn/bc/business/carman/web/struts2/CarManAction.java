@@ -16,7 +16,6 @@ import cn.bc.business.carman.domain.CarMan;
 import cn.bc.business.carman.service.CarManService;
 import cn.bc.business.web.struts2.FileEntityAction;
 import cn.bc.core.RichEntity;
-import cn.bc.core.exception.CoreException;
 import cn.bc.core.query.condition.Condition;
 import cn.bc.core.query.condition.Direction;
 import cn.bc.core.query.condition.impl.OrderCondition;
@@ -46,7 +45,7 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 	public boolean isManager;
 	public CarManService carManService;
 	public String portrait;
-	public Map statusesValue;
+	public Map <String,String>statusesValue;
     
 	public IdGeneratorService getIdGeneratorService() {  
         return idGeneratorService;  
