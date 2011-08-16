@@ -28,6 +28,7 @@ import cn.bc.option.domain.OptionItem;
 import cn.bc.option.service.OptionService;
 import cn.bc.web.formater.AbstractFormater;
 import cn.bc.web.formater.CalendarRangeFormater;
+import cn.bc.web.formater.KeyValueFormater;
 import cn.bc.web.ui.html.grid.Column;
 import cn.bc.web.ui.html.grid.GridData;
 import cn.bc.web.ui.html.grid.TextColumn;
@@ -52,10 +53,10 @@ public class CarByDriverAction extends FileEntityAction<Long, CarByDriver> {
 	public boolean isManager;
 	public CarByDriverService carByDriverService;
 	public String portrait;
-	public Map<String, String> statusesValue;
+	public Map<String, String> statusesValueList;// 状态列表
 	public OptionService optionService;
 	public CarManService carManService;
-	public List<OptionItem> driverClasses;
+	public List<OptionItem> driverClassesList;// 营运班次列表
 	public OptionConstants optionConstants;
 	public Long carManId;
 
@@ -75,37 +76,38 @@ public class CarByDriverAction extends FileEntityAction<Long, CarByDriver> {
 		this.setCrudService(carByDriverService);
 	}
 
-	/** 新建的url */
-	protected String getCreateUrl() {
-		return getPageNamespace() + "/create?carManId=" + carManId;
-	}
-
 	@Override
 	public String create() throws Exception {
 		String result = super.create();
-		driverClasses = this.optionService
+		driverClassesList = this.optionService
 				.findOptionItemByGroupKey(optionConstants.DRIVER_CLASSES);
 		this.getE().setStatus(RichEntity.STATUS_ENABLED);
-		statusesValue = this.getEntityStatuses();
-		CarMan driver = this.carManService.load(carManId);
-		this.getE().setDriver(driver);
+		statusesValueList = this.getEntityStatuses();
+		if (carManId != null) {
+			CarMan driver = this.carManService.load(carManId);
+			this.getE().setDriver(driver);
+		}
 		return result;
 	}
 
 	@Override
 	public String edit() throws Exception {
 		String result = super.edit();
-		statusesValue = this.getEntityStatuses();
-		driverClasses = this.optionService
+		statusesValueList = this.getEntityStatuses();
+		driverClassesList = this.optionService
 				.findOptionItemByGroupKey(optionConstants.DRIVER_CLASSES);
-		
+
 		return result;
 	}
 
 	// 视图特殊条件
 	@Override
 	protected Condition getSpecalCondition() {
-		return new EqualsCondition("driver.id", carManId);
+		if (carManId != null) {
+			return new EqualsCondition("driver.id", carManId);
+		} else {
+			return null;
+		}
 	}
 
 	@Override
@@ -120,21 +122,21 @@ public class CarByDriverAction extends FileEntityAction<Long, CarByDriver> {
 
 	@Override
 	protected GridData buildGridData(List<Column> columns) {
-		return super.buildGridData(columns).setRowLabelExpression("driver.name");
+		return super.buildGridData(columns)
+				.setRowLabelExpression("driver.name");
 	}
 
-	
 	@Override
-	protected OrderCondition getDefaultOrderCondition() { return
-	  new OrderCondition("fileDate", Direction.Desc); }
-	 
+	protected OrderCondition getDefaultOrderCondition() {
+		return new OrderCondition("fileDate", Direction.Desc);
+	}
 
 	// 设置页面的尺寸
 
 	@Override
 	protected PageOption buildListPageOption() {
 		return super.buildListPageOption().setWidth(800).setMinWidth(300)
-				.setHeight(500).setMinHeight(100);
+				.setHeight(400).setMinHeight(100);
 	}
 
 	@Override
@@ -155,7 +157,10 @@ public class CarByDriverAction extends FileEntityAction<Long, CarByDriver> {
 			// 查看按钮
 			tb.addButton(getDefaultOpenToolbarButton());
 		}
-
+		if(carManId==null){
+		// 搜索按钮
+		tb.addButton(getDefaultSearchToolbarButton());
+		}
 		return tb;
 	}
 
@@ -165,20 +170,55 @@ public class CarByDriverAction extends FileEntityAction<Long, CarByDriver> {
 		isManager = isManager();
 
 		List<Column> columns = super.buildGridColumns();
-		columns.add(new TextColumn("car.plateNo",
-				getText("carByDriver.car.plateNo"),200)
-				.setValueFormater(new AbstractFormater() {
-					@Override
-					public String format(Object context, Object value) {
-						CarByDriver carByDriver = (CarByDriver) context;
-						return carByDriver.getCar().getPlateType() + " "
-								+ carByDriver.getCar().getPlateNo();
-					}
-				}));
-		columns.add(new TextColumn("classes", getText("carByDriver.classes"),200)
-				.setSortable(true));
+
+		if (carManId == null) {
+			columns.add(new TextColumn("status",
+					getText("carByDriver.statuses"), 100)
+					.setSortable(true)
+					.setValueFormater(new KeyValueFormater(getEntityStatuses())));
+			columns.add(new TextColumn("car.plateNo",
+					getText("carByDriver.car.plateNo"), 150)
+					.setValueFormater(new AbstractFormater() {
+						@Override
+						public String format(Object context, Object value) {
+							CarByDriver carByDriver = (CarByDriver) context;
+							return carByDriver.getCar().getPlateType() + " "
+									+ carByDriver.getCar().getPlateNo();
+						}
+					}));
+			columns.add(new TextColumn("driver.name",
+					getText("carByDriver.driver"), 100)
+					.setValueFormater(new AbstractFormater() {
+						@Override
+						public String format(Object context, Object value) {
+							CarByDriver carByDriver = (CarByDriver) context;
+							return carByDriver.getDriver().getName();
+						}
+					}));
+			columns.add(new TextColumn("classes",
+					getText("carByDriver.classes"), 100).setSortable(true));
+		} else {
+			columns.add(new TextColumn("status",
+					getText("carByDriver.statuses"), 150)
+					.setSortable(true)
+					.setValueFormater(new KeyValueFormater(getEntityStatuses())));
+			columns.add(new TextColumn("car.plateNo",
+					getText("carByDriver.car.plateNo"), 150)
+					.setValueFormater(new AbstractFormater() {
+						@Override
+						public String format(Object context, Object value) {
+							CarByDriver carByDriver = (CarByDriver) context;
+							return carByDriver.getCar().getPlateType() + " "
+									+ carByDriver.getCar().getPlateNo();
+						}
+					}));
+			columns.add(new TextColumn("classes",
+					getText("carByDriver.classes"), 150).setSortable(true));
+
+		}
+
 		columns.add(new TextColumn("startDate",
-				getText("carByDriver.timeInterva"),320).setSortable(true)
+				getText("carByDriver.timeInterva"), 270).setSortable(true)
 				.setValueFormater(new CalendarRangeFormater() {
 					@Override
 					public Calendar getToDate(Object context, Object value) {
@@ -202,6 +242,10 @@ public class CarByDriverAction extends FileEntityAction<Long, CarByDriver> {
 					.toString());
 		return page;
 	}
-	
+
+	@Override
+	protected String[] getSearchFields() {
+		return new String[] { "car.plateType", "car.plateNo","driver.name","classes" };
+	}
 
 }
