@@ -21,7 +21,7 @@ import cn.bc.web.ui.html.page.ButtonOption;
 import cn.bc.web.ui.html.page.PageOption;
 
 /**
- * 合同Action
+ * 黑名单Action
  * 
  * @author dragon
  * 
