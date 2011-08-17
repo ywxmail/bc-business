@@ -14,6 +14,7 @@ import javax.persistence.Table;
 
 import cn.bc.business.car.domain.Car;
 import cn.bc.identity.domain.FileEntityImpl;
+import cn.bc.identity.domain.RichFileEntity;
 
 /**
  * 司机营运车辆
@@ -31,13 +32,24 @@ public class CarByDriver extends FileEntityImpl {
 	public static final int TYPE_FUBAN = 1;
 	/** 营运类型：顶班 */
 	public static final int TYPE_DINGBAN = 2;
+	private int status = RichFileEntity.STATUS_ENABLED;//状态
 
 	private String classes;// 营运班次:如正班、副班、顶班
 	private Calendar startDate;// 开始时段
 	private Calendar endDate;// 结束时段
 	private Car car;// 营运的车辆
 	private CarMan driver;// 营运的司机
+	private String description;// 备注
+	
+	
+	@Column(name = "DESC_")
+	public String getDescription() {
+		return description;
+	}
 
+	public void setDescription(String description) {
+		this.description = description;
+	}
 	public String getClasses() {
 		return classes;
 	}
@@ -82,5 +94,13 @@ public class CarByDriver extends FileEntityImpl {
 
 	public void setDriver(CarMan driver) {
 		this.driver = driver;
+	}
+	@Column(name = "STATUS_")
+	public int getStatus() {
+		return status;
+	}
+
+	public void setStatus(int status) {
+		this.status = status;
 	}
 }
