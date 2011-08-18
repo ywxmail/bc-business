@@ -195,7 +195,7 @@ public class Car extends RichFileEntityImpl {
 		this.factoryModel = factoryModel;
 	}
 
-	@Column(name = "REDISTER_DATE")
+	@Column(name = "REGISTER_DATE")
 	public Calendar getRegisterDate() {
 		return registerDate;
 	}
@@ -231,7 +231,7 @@ public class Car extends RichFileEntityImpl {
 		this.factoryDate = factoryDate;
 	}
 
-	@Column(name = "REDISTER_NO")
+	@Column(name = "REGISTER_NO")
 	public String getRegisterNo() {
 		return registerNo;
 	}

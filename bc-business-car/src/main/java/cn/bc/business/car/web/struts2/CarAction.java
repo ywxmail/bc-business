@@ -3,6 +3,7 @@
  */
 package cn.bc.business.car.web.struts2;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -18,8 +19,7 @@ import cn.bc.business.car.service.CarService;
 import cn.bc.business.motorcade.domain.Motorcade;
 import cn.bc.business.motorcade.service.MotorcadeService;
 import cn.bc.business.web.struts2.FileEntityAction;
-import cn.bc.core.query.condition.Direction;
-import cn.bc.core.query.condition.impl.OrderCondition;
+import cn.bc.core.Page;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.option.domain.OptionItem;
 import cn.bc.option.service.OptionService;
@@ -46,7 +46,7 @@ public class CarAction extends FileEntityAction<Long, Car> {
 	private static 	final long 		serialVersionUID 	= 1L;
 	private String 					MANAGER_KEY 		= "R_ADMIN";// 管理角色的编码
 	public 	boolean 				isManager;
-	@SuppressWarnings("unused")
+	
 	private CarService 				carService;
 	private MotorcadeService	 	motorcadeService;
 	private OptionService			optionService;
@@ -95,12 +95,7 @@ public class CarAction extends FileEntityAction<Long, Car> {
 
 	@Override
 	protected GridData buildGridData(List<Column> columns) {
-		return super.buildGridData(columns).setRowLabelExpression("plateNo");
-	}
-
-	@Override
-	protected OrderCondition getDefaultOrderCondition() {
-		return new OrderCondition("registerDate", Direction.Desc);
+		return super.buildGridData(columns).setRowLabelExpression("['plateNo']");
 	}
 
 	// 设置页面的尺寸
@@ -135,57 +130,74 @@ public class CarAction extends FileEntityAction<Long, Car> {
 		return tb;
 	}
 
+	//搜索条件
 	@Override
 	protected String[] getSearchFields() {
-		return new String[] { "plateType", "plateNo" };
+		return new String[] { "plateType", "plateNo", "factoryType" };
 	}
-
+	
+	
+	@SuppressWarnings("rawtypes")
 	@Override
 	protected List<Column> buildGridColumns() {
 		// 是否本模块管理员
 		isManager = isManager();
 
-		List<Column> columns = super.buildGridColumns();
-		columns.add(new TextColumn("status",getText("car.status"),		40)
+		//List<Column> columns = super.buildGridColumns();
+		List<Column> columns = new ArrayList<Column>();
+		columns.add(new TextColumn("['id']","ID",	40));
+		columns.add(new TextColumn("['status']",getText("car.status"),		50)
 				.setSortable(true).setValueFormater(new EntityStatusFormater(getEntityStatuses())));
-		columns.add(new TextColumn("code",	getText("car.code"))
+		columns.add(new TextColumn("['code']",	getText("car.code"))
 				.setSortable(true));
-		columns.add(new TextColumn("plate", getText("car.plate"),		100)
+		columns.add(new TextColumn("['plateType']", getText("car.plate"),		100)
 				.setValueFormater(new AbstractFormater() {
 					@Override
 					public String format(Object context, Object value) {
-						Car car = (Car) context;
-						return car.getPlateType() + " " + car.getPlateNo();
+						Map car = (Map) context;
+						return car.get("plateType") + " "+ car.get("plateNo");
 					}
 				}));
-		columns.add(new TextColumn("carMan", getText("car.carMan"),		100));
-		columns.add(new TextColumn("factory", getText("car.factory"),	140)
-				.setValueFormater(new AbstractFormater() {
+		columns.add(new TextColumn("['name']", getText("car.carMan"),		100).
+				setUseTitleFromLabel(true).setValueFormater(new AbstractFormater() {
 					@Override
 					public String format(Object context, Object value) {
-						Car car = (Car) context;
-						if(car.getFactoryType() != null && car.getFactoryModel() !=null){
-							return car.getFactoryType() + " " +
-							car.getFactoryModel();
-						}else if(car.getFactoryModel() != null){
-							return car.getFactoryModel();
-						}else if(car.getFactoryType() != null){
-							return car.getFactoryType() + " ";
+						Map car = (Map) context;
+						if(car.get("name") != null){
+							return car.get("name") + "("+getText("car.by.driver.classes")+")";
 						}else{
 							return "";
 						}
 					}
 				}));
-		columns.add(new TextColumn("vin", getText("car.vin"),			120));
-		columns.add(new TextColumn("businessType", getText("car.businessType"),	100));
-		columns.add(new TextColumn("motorcade.name", getText("car.motorcade"))
+		columns.add(new TextColumn("['factoryType']", getText("car.factory"),	140)
+				.setValueFormater(new AbstractFormater() {
+					@Override
+					public String format(Object context, Object value) {
+						//从上下文取出元素Map
+						Map car = (Map) context;
+						if(car.get("factoryType") != null && car.get("factoryModel") !=null){
+							return car.get("factoryType") + " " +
+							car.get("factoryModel");
+						}else if(car.get("factoryModel") != null){
+							return car.get("factoryModel").toString();
+						}else if(car.get("factoryType") != null){
+							return car.get("factoryType") + " ";
+						}else{
+							return "";
+						}
+					}
+				}));
+		columns.add(new TextColumn("['businessType']", getText("car.businessType"),	100));
+		columns.add(new TextColumn("['motorcade']", getText("car.motorcade"))
 				.setSortable(true));
-		columns.add(new TextColumn("unit.name", getText("car.unit"))
+		columns.add(new TextColumn("['unit']", getText("car.unit"))
 				.setSortable(true));
-		columns.add(new TextColumn("registerDate", getText("car.registerDate"),	100)
+		columns.add(new TextColumn("['registerDate']", getText("car.registerDate"),	100)
 				.setSortable(true).setValueFormater(new CalendarFormater("yyyy-MM-dd")));
-		columns.add(new TextColumn("originNo", getText("car.originNo"),			100)
+		columns.add(new TextColumn("['originNo']", getText("car.originNo"),			100)
 				.setSortable(true));
+		columns.add(new TextColumn("['vin']", getText("car.vin"),			120));
 		return columns;
 	}
 
@@ -223,6 +235,29 @@ public class CarAction extends FileEntityAction<Long, Car> {
 	
 	
 	
+	/**
+	 * 根据请求的条件查找非分页信息对象
+	 * 
+	 * @return
+	 */
+	@Override
+	protected List<? extends Object> findList() {
+		return this.carService.list(this.getCondition());
+	}
+	
+	
+	/**
+	 * 根据请求的条件查找分页信息对象
+	 * 
+	 * @return
+	 */
+	protected Page<? extends Object> findPage() {
+		return this.carService.page(
+					this.getCondition(),this.getPage().getPageNo(), 
+					this.getPage().getPageSize());
+	}
+	
+
 	// 表单可选项的加载
 	public void initSelects(){
 		// 加载可选车队列表
