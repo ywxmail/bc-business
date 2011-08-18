@@ -13,6 +13,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
 
+
 import cn.bc.business.OptionConstants;
 import cn.bc.business.car.domain.Car;
 import cn.bc.business.car.service.CarService;
@@ -20,6 +21,7 @@ import cn.bc.business.motorcade.domain.Motorcade;
 import cn.bc.business.motorcade.service.MotorcadeService;
 import cn.bc.business.web.struts2.FileEntityAction;
 import cn.bc.core.Page;
+import cn.bc.core.RichEntityImpl;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.option.domain.OptionItem;
 import cn.bc.option.service.OptionService;
@@ -214,7 +216,7 @@ public class CarAction extends FileEntityAction<Long, Car> {
 		this.getE().setUid(this.getIdGeneratorService().next(this.getE().KEY_UID));
 		
 		// 初始化车辆的状态
-		this.getE().setStatus(0);
+		this.getE().setStatus(RichEntityImpl.STATUS_DISABLED);
 		
 		// 表单可选项的加载
 		initSelects();
