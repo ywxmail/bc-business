@@ -2,6 +2,7 @@
 -- ##运行此脚本之后再运行平台的删表脚本framework.db.oracle.drop.sql##
 
 -- 用于生成数据转换 id的序列
+CALL DROP_USER_SEQUENCE('CORE_SEQUENCE');
 CALL DROP_USER_SEQUENCE('DC_SEQUENCE');
 
 -- 数据转换记录

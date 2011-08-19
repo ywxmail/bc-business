@@ -1,7 +1,14 @@
--- 创建数据转换用的序列，开始于10000
+-- 创建Identity用的序列，开始于1
+CREATE sequence CORE_SEQUENCE
+    minvalue 1
+    start with 1000
+    increment by 1
+    cache 20;
+
+-- 创建数据转换用的序列，开始于100000
 CREATE sequence DC_SEQUENCE
     minvalue 1
-    start with 10000
+    start with 100000
     increment by 1
     cache 20;
 
