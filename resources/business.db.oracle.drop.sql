@@ -1,6 +1,13 @@
 -- ##bc营运管理子系统的 oracle 删表脚本##
 -- ##运行此脚本之后再运行平台的删表脚本framework.db.oracle.drop.sql##
 
+-- 用于生成数据转换 id的序列
+CALL DROP_USER_SEQUENCE('CORE_SEQUENCE');
+CALL DROP_USER_SEQUENCE('DC_SEQUENCE');
+
+-- 数据转换记录
+CALL DROP_USER_TABLE('DC_RECORD');
+
 -- 黑名单
 CALL DROP_USER_TABLE('BS_BLACKLIST');
 
