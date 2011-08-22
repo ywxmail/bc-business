@@ -3,7 +3,12 @@
  */
 package cn.bc.business.car.service;
 
+import java.util.List;
+import java.util.Map;
+
 import cn.bc.business.car.domain.Car;
+import cn.bc.core.Page;
+import cn.bc.core.query.condition.Condition;
 import cn.bc.core.service.CrudService;
 
 
@@ -13,5 +18,22 @@ import cn.bc.core.service.CrudService;
  * @author dragon
  */
 public interface CarService extends CrudService<Car> {
+
+
+
+	/**
+	 * 查找汽车列表
+	 * @parma condition 
+	 * @return
+	 */
+	List<Map<String,Object>> list(Condition condition);
+	
+	/**
+	 * 查找汽车分页
+	 * @parma condition 
+	 * @parma Page 
+	 * @return
+	 */
+	Page<? extends Object> page(Condition condition,int pageNo, int pageSize);
 
 }
