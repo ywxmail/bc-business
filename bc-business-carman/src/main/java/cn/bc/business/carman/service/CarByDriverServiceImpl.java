@@ -3,6 +3,9 @@
  */
 package cn.bc.business.carman.service;
 
+import java.io.Serializable;
+
+import cn.bc.business.car.domain.Car;
 import cn.bc.business.carman.dao.CarByDriverDao;
 import cn.bc.business.carman.domain.CarByDriver;
 import cn.bc.core.service.DefaultCrudService;
@@ -23,5 +26,11 @@ public class CarByDriverServiceImpl extends DefaultCrudService<CarByDriver>
 	public void setCarByDriverDao(CarByDriverDao carByDriverDao) {
 		this.carByDriverDao = carByDriverDao;
 		this.setCrudDao(carByDriverDao);
+	}
+
+	public Car selectCarByCarManId(Long id) {
+		// TODO Auto-generated method stub
+		return (this.carByDriverDao.findBycarManId(id));
+		
 	}
 }

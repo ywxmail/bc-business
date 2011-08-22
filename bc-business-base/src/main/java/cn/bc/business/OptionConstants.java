@@ -31,6 +31,8 @@ public class OptionConstants extends cn.bc.option.OptionConstants {
 	public final static String CARMAN_LEVEL = "carMan.level";
 	/** 司机责任人准驾车型 */
 	public final static String CARMAN_MODEL = "carMan.model";
+	/** 黑名单限制项目*/
+	public final static String BLACKLIST_TYPE = "blacklist.type";
 	
 	/**  */
 	public final static String CAR_TAXIMETERFACTORY = "car.taximeterFactory";

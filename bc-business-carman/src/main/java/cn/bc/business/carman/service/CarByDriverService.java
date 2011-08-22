@@ -3,6 +3,9 @@
  */
 package cn.bc.business.carman.service;
 
+import java.io.Serializable;
+
+import cn.bc.business.car.domain.Car;
 import cn.bc.business.carman.domain.CarByDriver;
 import cn.bc.core.service.CrudService;
 
@@ -14,4 +17,6 @@ import cn.bc.core.service.CrudService;
  */
 public interface CarByDriverService extends CrudService<CarByDriver> {
 
+	//根据司机ID查找返回相关正班车辆信息
+	Car selectCarByCarManId(Long id);
 }
