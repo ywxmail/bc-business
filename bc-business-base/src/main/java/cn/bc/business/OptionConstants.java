@@ -34,6 +34,6 @@ public class OptionConstants extends cn.bc.option.OptionConstants {
 	/** 黑名单限制项目*/
 	public final static String BLACKLIST_TYPE = "blacklist.type";
 	
-	/**  */
+	/** 计价器制造厂  */
 	public final static String CAR_TAXIMETERFACTORY = "car.taximeterFactory";
 }
