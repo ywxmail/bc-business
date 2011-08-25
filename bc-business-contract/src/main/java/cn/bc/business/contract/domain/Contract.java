@@ -28,9 +28,13 @@ import cn.bc.identity.domain.RichFileEntityImpl;
 public class Contract extends RichFileEntityImpl {
 	private static final long serialVersionUID = 1L;
 	public static final String ATTACH_TYPE = Contract.class.getSimpleName();
+	/**合同类型：司机劳动合同*/
+	public static final int TYPE_LABOUR 	= 1;
+	/**合同类型：责任人合同*/
+	public static final int TYPE_CHARGER 	= 2;
 
 	private String code;// 合同编号
-	private String type;// 合同类型：如劳动合同、承包合同等
+	private int    type;// 合同类型：如劳动合同、承包合同等
 	private String wordNo;// 文书号
 	private Actor transactor;// 经办人
 
@@ -64,11 +68,11 @@ public class Contract extends RichFileEntityImpl {
 	}
 
 	@Column(name = "TYPE_")
-	public String getType() {
+	public int getType() {
 		return type;
 	}
 
-	public void setType(String type) {
+	public void setType(int type) {
 		this.type = type;
 	}
 
