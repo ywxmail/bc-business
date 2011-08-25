@@ -51,11 +51,9 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 	public Map <String,String>statusesValue;
 	public OptionService optionService;
 	public OptionConstants optionConstants;
-	public List<OptionItem> carManRegionList;//司机责任人区域 列表
 	public List<OptionItem> carManHouseTypeList;//司机责任人户口性质列表
 	public List<OptionItem> carManLevelList;//司机责任人等级列表
 	public List<OptionItem> carManModelList;//司机责任人准驾车型列表
-	public List<OptionItem> driverClassesList;//司机责任人驾驶状态列表
     
 	public IdGeneratorService getIdGeneratorService() {  
         return idGeneratorService;  
@@ -85,16 +83,12 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 		statusesValue=this.getEntityStatuses();
 		this.getE().setUid(this.getIdGeneratorService().next(CarMan.KEY_UID));
 		this.getE().setSex(1);
-		carManRegionList = this.optionService
-				.findOptionItemByGroupKey(optionConstants.CARMAN_REGION);
 		carManHouseTypeList = this.optionService
 				.findOptionItemByGroupKey(optionConstants.CARMAN_HOUSETYPE);
 		carManLevelList = this.optionService
 				.findOptionItemByGroupKey(optionConstants.CARMAN_LEVEL);
 		carManModelList = this.optionService
 				.findOptionItemByGroupKey(optionConstants.CARMAN_MODEL);
-		driverClassesList = this.optionService
-				.findOptionItemByGroupKey(optionConstants.DRIVER_CLASSES);
 		// 获取相片的连接
 		portrait = "/bc/libs/themes/default/images/portrait/1in110x140.png";
 
@@ -115,16 +109,12 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 	public String edit() throws Exception {
 		String result = super.edit();
 		statusesValue=this.getEntityStatuses();
-		carManRegionList = this.optionService
-				.findOptionItemByGroupKey(optionConstants.CARMAN_REGION);
 		carManHouseTypeList = this.optionService
-				.findOptionItemByGroupKey(optionConstants.CARMAN_HOUSETYPE);
+		        .findOptionItemByGroupKeyWithCurrent(optionConstants.CARMAN_HOUSETYPE,null,this.getE().getHouseType()); 
 		carManLevelList = this.optionService
 				.findOptionItemByGroupKey(optionConstants.CARMAN_LEVEL);
 		carManModelList = this.optionService
 				.findOptionItemByGroupKey(optionConstants.CARMAN_MODEL);
-		driverClassesList = this.optionService
-				.findOptionItemByGroupKey(optionConstants.DRIVER_CLASSES);
 		// 获取相片的连接
 		portrait = "/bc/libs/themes/default/images/portrait/1in110x140.png";
 

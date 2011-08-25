@@ -33,13 +33,16 @@ public class CarMan extends RichFileEntityImpl {
 	public static final int TYPE_CHARGER = 1;
 	/**类别：司机和责任人*/
 	public static final int TYPE_DRIVER_AND_CHARGER = 2;
+	
+	
+	
 
 	private int type;// 类别
 	private String orderNo;// 排序号
 	private String name;// 姓名
 	private int sex;// 性别：参考ActorDetail类中SEX_*常数的定义
 	private String origin;// 籍贯
-	private String region;// 区域
+	private int region;// 区域
 	private String houseType;// 户口性质
 	
 	private Calendar birthdate;// 出生日期
@@ -62,7 +65,7 @@ public class CarMan extends RichFileEntityImpl {
 	private String cert4DrivingArchive;// 驾驶证档案号
 	private String cert4FWZG;// 服务资格证号
 	private String cert4CYZG;// 从业资格证号
-	private String drivingStatus;// 驾驶状态
+	private int drivingStatus;// 驾驶状态
 	private String extFZJG;// 分支机构：用于历史数据的保存
 	private String extZRR;// 责任人：用于历史数据的保存
 	private boolean  gz;// 驾驶证是否广州:0-否,1-是
@@ -130,11 +133,11 @@ public class CarMan extends RichFileEntityImpl {
 	}
 
 	@Column(name = "REGION_")
-	public String getRegion() {
+	public int getRegion() {
 		return region;
 	}
 
-	public void setRegion(String region) {
+	public void setRegion(int region) {
 		this.region = region;
 	}
 
@@ -295,11 +298,11 @@ public class CarMan extends RichFileEntityImpl {
 	}
 
 	@Column(name = "DRIVING_STATUS")
-	public String getDrivingStatus() {
+	public int getDrivingStatus() {
 		return drivingStatus;
 	}
 
-	public void setDrivingStatus(String drivingStatus) {
+	public void setDrivingStatus(int drivingStatus) {
 		this.drivingStatus = drivingStatus;
 	}
 
