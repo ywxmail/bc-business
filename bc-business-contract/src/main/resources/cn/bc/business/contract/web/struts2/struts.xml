@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<package name="contract" extends="bc-default" namespace="/bc-business">
+		<action name="contract/create" class="contractAction" method="create">
+			<result name="showdialog" >/bc-business/contract/select.jsp</result>
+		</action>
+	</package>
+	
+	<package name="contractLabour" extends="bc-default" namespace="/bc-business">
+		<action name="contractLabour/create" class="contractLabourAction" method="create">
+			<result name="form">/bc-business/contractLabour/form.jsp</result>
+		</action>
+		<action name="contractLabour/carManMess" class="contractLabourAction" method="carManMess">
+		</action>
+	</package>
+</struts>

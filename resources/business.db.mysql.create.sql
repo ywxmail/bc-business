@@ -383,7 +383,7 @@ CREATE TABLE BS_CONTRACT(
    STATUS_              INT(1) NOT NULL COMMENT '状态：0-已禁用,1-启用中,2-已删除',
    WORD_NO              VARCHAR(255) COMMENT '文书号',
    CODE                 VARCHAR(255) NOT NULL COMMENT '合同号',
-   TYPE_                VARCHAR(255) NOT NULL COMMENT '合同类型：如劳动合同、承包合同等',
+   TYPE_                INT(1) NOT NULL COMMENT '合同类型：如劳动合同、承包合同等',
    TRANSACTOR_ID        BIGINT NOT NULL COMMENT '经办人ID',
    SIGN_DATE            DATETIME NOT NULL COMMENT '签订日期',
    START_DATE           DATETIME NOT NULL COMMENT '生效日期',

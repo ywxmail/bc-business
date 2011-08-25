@@ -19,4 +19,11 @@
 		p:entityManagerFactory-ref="entityManagerFactory" />
 	<bean id="contractService" class="cn.bc.business.contract.service.ContractServiceImpl"
 		p:contractDao-ref="contractDao" />
+		
+	<!-- contractLabour -->
+	<bean id="contractLabourDao" class="cn.bc.business.contract.dao.hibernate.jpa.ContractLabourDaoImpl"
+		p:entityManagerFactory-ref="entityManagerFactory" />
+	<bean id="contractLabourService" class="cn.bc.business.contract.service.ContractLabourServiceImpl"
+		p:contractLabourDao-ref="contractLabourDao" />	
+	
 </beans>

@@ -24,7 +24,7 @@ import cn.bc.business.carman.domain.CarMan;
 @Inheritance(strategy = InheritanceType.JOINED)
 public class Contract4Labour extends Contract4Car {
 	private static final long serialVersionUID = 1L;
-	public static final String ATTACH_TYPE = Contract4Labour.class.getSimpleName();
+	public static final String KEY_UID = Contract4Labour.class.getSimpleName();
 	private CarMan driver;// 司机
 	private String certNo;// 资格证号
 	private boolean additionProtocol;// 补充协议:0-无,1-有
