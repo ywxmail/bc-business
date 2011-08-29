@@ -14,4 +14,5 @@ import cn.bc.core.dao.CrudDao;
  */
 public interface CertDao extends CrudDao<Cert> {
 
+	Cert findCertByCarManId(Long carManId);
 }
