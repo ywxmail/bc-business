@@ -1,10 +1,3 @@
--- 创建Identity用的序列，开始于1
-CREATE sequence CORE_SEQUENCE
-    minvalue 1
-    start with 1000
-    increment by 1
-    cache 20;
-
 -- 创建数据转换用的序列，开始于100000
 CREATE sequence DC_SEQUENCE
     minvalue 1
@@ -32,7 +25,7 @@ COMMENT ON COLUMN DC_RECORD.TO_TABLE IS '新数据表名';
 COMMENT ON COLUMN DC_RECORD.CREATE_DATE IS '创建时间';
 COMMENT ON COLUMN DC_RECORD.REMARK IS '备注说明';
 COMMENT ON COLUMN DC_RECORD.MODIFIED_DATE IS '最后修改时间';
-ALTER TABLE DC_RECORD ADD CONSTRAINT UK_RECORD UNIQUE (TYPE_, FROM_ID);
+ALTER TABLE DC_RECORD ADD CONSTRAINT BSUK_RECORD UNIQUE (TYPE_, FROM_ID);
 
 -- bc营运管理子系统的建表脚本,所有表名须附带前缀"BS_"
 -- 运行此脚本之前需先运行平台的建表脚本framework.db.mysql.CREATE.sql
