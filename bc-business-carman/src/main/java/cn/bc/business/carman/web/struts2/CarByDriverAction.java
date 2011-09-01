@@ -4,6 +4,7 @@
 package cn.bc.business.carman.web.struts2;
 
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -54,16 +55,8 @@ public class CarByDriverAction extends FileEntityAction<Long, CarByDriver> {
 	public CarByDriverService carByDriverService;
 	public String portrait;
 	public Map<String, String> statusesValueList;// 状态列表
-	public OptionService optionService;
 	public CarManService carManService;
-	public List<OptionItem> driverClassesList;// 营运班次列表
-	public OptionConstants optionConstants;
 	public Long carManId;
-
-	@Autowired
-	public void setOptionService(OptionService optionService) {
-		this.optionService = optionService;
-	}
 
 	@Autowired
 	public void setCarManService(CarManService carManService) {
@@ -79,8 +72,6 @@ public class CarByDriverAction extends FileEntityAction<Long, CarByDriver> {
 	@Override
 	public String create() throws Exception {
 		String result = super.create();
-		driverClassesList = this.optionService
-				.findOptionItemByGroupKey(optionConstants.DRIVER_CLASSES);
 		this.getE().setStatus(RichEntity.STATUS_ENABLED);
 		statusesValueList = this.getEntityStatuses();
 		if (carManId != null) {
@@ -94,9 +85,6 @@ public class CarByDriverAction extends FileEntityAction<Long, CarByDriver> {
 	public String edit() throws Exception {
 		String result = super.edit();
 		statusesValueList = this.getEntityStatuses();
-		driverClassesList = this.optionService
-				.findOptionItemByGroupKey(optionConstants.DRIVER_CLASSES);
-
 		return result;
 	}
 
@@ -157,9 +145,9 @@ public class CarByDriverAction extends FileEntityAction<Long, CarByDriver> {
 			// 查看按钮
 			tb.addButton(getDefaultOpenToolbarButton());
 		}
-		if(carManId==null){
-		// 搜索按钮
-		tb.addButton(getDefaultSearchToolbarButton());
+		if (carManId == null) {
+			// 搜索按钮
+			tb.addButton(getDefaultSearchToolbarButton());
 		}
 		return tb;
 	}
@@ -196,7 +184,8 @@ public class CarByDriverAction extends FileEntityAction<Long, CarByDriver> {
 						}
 					}));
 			columns.add(new TextColumn("classes",
-					getText("carByDriver.classes"), 100).setSortable(true));
+					getText("carByDriver.classes"), 100).setSortable(true)
+					.setValueFormater(new KeyValueFormater(getType())));
 		} else {
 			columns.add(new TextColumn("status",
 					getText("carByDriver.statuses"), 150)
@@ -213,8 +202,8 @@ public class CarByDriverAction extends FileEntityAction<Long, CarByDriver> {
 						}
 					}));
 			columns.add(new TextColumn("classes",
-					getText("carByDriver.classes"), 150).setSortable(true));
-
+					getText("carByDriver.classes"), 150).setSortable(true)
+					.setValueFormater(new KeyValueFormater(getType())));
 		}
 
 		columns.add(new TextColumn("startDate",
@@ -245,7 +234,27 @@ public class CarByDriverAction extends FileEntityAction<Long, CarByDriver> {
 
 	@Override
 	protected String[] getSearchFields() {
-		return new String[] { "car.plateType", "car.plateNo","driver.name","classes" };
+		return new String[] { "car.plateType", "car.plateNo", "driver.name",
+				"classes" };
+	}
+
+	/**
+	 * 获取营运班次值转换列表
+	 * 
+	 * @return
+	 */
+	protected Map<String, String> getType() {
+		Map<String, String> type = new HashMap<String, String>();
+		type = new HashMap<String, String>();
+		type.put(String.valueOf(CarByDriver.TYPE_WEIDINGYI),
+				getText("carByDriver.weidingyi"));
+		type.put(String.valueOf(CarByDriver.TYPE_ZHENGBAN),
+				getText("carByDriver.zhengban"));
+		type.put(String.valueOf(CarByDriver.TYPE_FUBAN),
+				getText("carByDriver.fuban"));
+		type.put(String.valueOf(CarByDriver.TYPE_DINGBAN),
+				getText("carByDriver.dingban"));
+		return type;
 	}
 
 }

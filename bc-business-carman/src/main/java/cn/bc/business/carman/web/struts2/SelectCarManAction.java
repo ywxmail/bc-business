@@ -129,7 +129,7 @@ public class SelectCarManAction extends FileEntityAction<Long, CarMan> {
 
 	/** 页面需要另外加载的js文件，逗号连接多个文件 */
 	protected String getJs() {
-		return " /bc-business/carMan/selectCarMan.js";
+		return  this.getContextPath()+"/bc-business/carMan/selectCarMan.js";
 	}
 	@Override
 	protected Toolbar buildToolbar() {
