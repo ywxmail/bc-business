@@ -475,7 +475,7 @@ CREATE TABLE BS_CAR_DRIVER(
    STATUS_ int(1) NOT NULL COMMENT '状态：0-已禁用,1-启用中,2-已删除',
    DRIVER_ID            BIGINT NOT NULL COMMENT '司机ID',
    CAR_ID               BIGINT NOT NULL COMMENT '车辆ID',
-   CLASSES                VARCHAR(255) NOT NULL COMMENT '营运班次:如正班、副班、顶班',
+   CLASSES              int(1) NOT NULL COMMENT '营运班次:如0-未定义，1-正班、2-副班、3-顶班',
    START_DATE           DATETIME COMMENT '起始时段',
    END_DATE             DATETIME COMMENT '结束时段',
    FILE_DATE            DATETIME NOT NULL COMMENT '创建时间',

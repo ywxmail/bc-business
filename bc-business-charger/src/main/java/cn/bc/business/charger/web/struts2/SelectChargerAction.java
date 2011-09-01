@@ -77,7 +77,7 @@ public class SelectChargerAction extends FileEntityAction<Long, Charger> {
 
 	/** 页面需要另外加载的js文件，逗号连接多个文件 */
 	protected String getJs() {
-		return " /bc-business/charger/selectCharger.js";
+		return  this.getContextPath()+"/bc-business/charger/selectCharger.js";
 	}
 
 	@Override

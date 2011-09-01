@@ -28,7 +28,7 @@ import cn.bc.web.ui.html.page.PageOption;
 import cn.bc.web.ui.html.toolbar.Toolbar;
 
 /**
- * 选择司机Action
+ * 选择司机、责任人Action
  * 
  * @author dragon
  * 
@@ -36,15 +36,13 @@ import cn.bc.web.ui.html.toolbar.Toolbar;
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 @Controller
 public class SelectCarManAction extends FileEntityAction<Long, CarMan> {
-	// private static Log logger = LogFactory.getLog(BulletinAction.class);
+	// private static Log logger = LogFactory.getLog(SelectCarManAction.class);
 	private static final long serialVersionUID = 1L;
 	private String MANAGER_KEY = "R_ADMIN";// 管理角色的编码
 	public boolean isManager;
 	public CarManService carManService;
 	public String portrait;
 	public Long typeId;
-	
-
 
 	@Autowired
 	public void setCarManService(CarManService carManService) {
@@ -52,7 +50,6 @@ public class SelectCarManAction extends FileEntityAction<Long, CarMan> {
 		this.setCrudService(carManService);
 	}
 
-	
 	@Override
 	protected GridData buildGridData(List<Column> columns) {
 		return super.buildGridData(columns).setRowLabelExpression("name");
@@ -63,11 +60,9 @@ public class SelectCarManAction extends FileEntityAction<Long, CarMan> {
 		return new OrderCondition("orderNo", Direction.Desc);
 	}
 
-	/*@Override
-	protected Condition getSpecalCondition() {
-		return null;
-	}
-*/
+	/*
+	 * @Override protected Condition getSpecalCondition() { return null; }
+	 */
 	@Override
 	protected String[] getSearchFields() {
 		return new String[] { "name" };
@@ -89,7 +84,6 @@ public class SelectCarManAction extends FileEntityAction<Long, CarMan> {
 	private boolean isManager() {
 		return ((SystemContext) this.getContext()).hasAnyRole(MANAGER_KEY);
 	}
-
 
 	/** 构建视图页面的表格 */
 	protected Grid buildGrid() {
@@ -129,30 +123,34 @@ public class SelectCarManAction extends FileEntityAction<Long, CarMan> {
 
 	/** 页面需要另外加载的js文件，逗号连接多个文件 */
 	protected String getJs() {
-		return " /bc-business/carMan/selectCarMan.js";
+		return this.getContextPath() + "/bc-business/carMan/selectCarMan.js";
 	}
+
 	@Override
 	protected Toolbar buildToolbar() {
 		isManager = isManager();
 		Toolbar tb = new Toolbar();
 		tb.addStyle("height", "30px");
-		
+
 		// 搜索按钮
 		tb.addButton(getDefaultSearchToolbarButton());
 
 		return tb;
 	}
-	 //获取Action名
+
+	// 获取Action名
 	protected String getEntityConfigName() {
 		return "SelectCarMan";
 	}
+
 	// 视图特殊条件
-		@Override
-		protected Condition getSpecalCondition() {
-			if (typeId != null) {
-				return new InCondition("type",new Integer[]{CarMan.TYPE_DRIVER,CarMan.TYPE_DRIVER_AND_CHARGER});
-			} else {
-				return null;
-			}
+	@Override
+	protected Condition getSpecalCondition() {
+		if (typeId != null) {
+			return new InCondition("type", new Integer[] { CarMan.TYPE_DRIVER,
+					CarMan.TYPE_DRIVER_AND_CHARGER });
+		} else {
+			return null;
 		}
+	}
 }
