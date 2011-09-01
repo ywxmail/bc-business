@@ -26,15 +26,17 @@ import cn.bc.identity.domain.RichFileEntity;
 @Table(name = "BS_CAR_DRIVER")
 public class CarByDriver extends FileEntityImpl {
 	private static final long serialVersionUID = 1L;
+	/** 营运类型：示定义 */
+	public static final int TYPE_WEIDINGYI = 0;
 	/** 营运类型：正班 */
-	public static final int TYPE_ZHENGBAN = 0;
+	public static final int TYPE_ZHENGBAN = 1;
 	/** 营运类型：副班 */
-	public static final int TYPE_FUBAN = 1;
+	public static final int TYPE_FUBAN = 2;
 	/** 营运类型：顶班 */
-	public static final int TYPE_DINGBAN = 2;
+	public static final int TYPE_DINGBAN = 3;
 	private int status = RichFileEntity.STATUS_ENABLED;//状态
 
-	private String classes;// 营运班次:如正班、副班、顶班
+	private int classes;// 营运班次:如正班、副班、顶班
 	private Calendar startDate;// 开始时段
 	private Calendar endDate;// 结束时段
 	private Car car;// 营运的车辆
@@ -50,11 +52,12 @@ public class CarByDriver extends FileEntityImpl {
 	public void setDescription(String description) {
 		this.description = description;
 	}
-	public String getClasses() {
+    
+	public int getClasses() {
 		return classes;
 	}
 
-	public void setClasses(String classes) {
+	public void setClasses(int classes) {
 		this.classes = classes;
 	}
 

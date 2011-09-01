@@ -50,7 +50,7 @@ public class SelectCarAction extends  FileEntityAction<Long, Car> {
 		
 		/** 页面需要另外加载的js文件，逗号连接多个文件 */
 		protected String getJs() {
-			return " /bc-business/car/selectCar.js";
+			return  this.getContextPath()+"/bc-business/car/selectCar.js";
 		}
 
 

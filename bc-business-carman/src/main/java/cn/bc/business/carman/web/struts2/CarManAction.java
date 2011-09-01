@@ -149,7 +149,7 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 	// 设置页面的尺寸
 	@Override
 	protected PageOption buildListPageOption() {
-		return super.buildListPageOption().setWidth(800).setMinWidth(300)
+		return super.buildListPageOption().setWidth(500).setMinWidth(400)
 				.setHeight(400).setMinHeight(300);
 	}
 
@@ -180,7 +180,7 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 
 	@Override
 	protected String[] getSearchFields() {
-		return new String[] { "name", "origin","type" };
+		return new String[] {  "name",  "origin" };
 	}
 
 	@Override
@@ -189,13 +189,13 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 		isManager = isManager();
 
 		List<Column> columns = super.buildGridColumns();
-		columns.add(new TextColumn("status", getText("carMan.status"))
+		columns.add(new TextColumn("status", getText("carMan.status"),80)
 		.setSortable(true).setValueFormater(
 				new KeyValueFormater(getEntityStatuses())));
-		columns.add(new TextColumn("type", getText("carMan.type"))
+		columns.add(new TextColumn("type", getText("carMan.type"),80)
 				.setSortable(true).setValueFormater(
 						new KeyValueFormater(getType())));
-		columns.add(new TextColumn("name", getText("carMan.name"))
+		columns.add(new TextColumn("name", getText("carMan.name"),80)
 				.setSortable(true));
 		columns.add(new TextColumn("origin", getText("carMan.origin"))
 				.setSortable(true));
