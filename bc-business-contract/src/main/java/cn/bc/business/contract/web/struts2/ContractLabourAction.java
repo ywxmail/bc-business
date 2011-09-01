@@ -11,6 +11,7 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
+import cn.bc.business.cert.domain.Cert;
 import cn.bc.business.cert.service.CertService;
 import cn.bc.business.contract.domain.Contract;
 import cn.bc.business.contract.domain.Contract4Labour;
@@ -45,6 +46,7 @@ public class ContractLabourAction extends FileEntityAction<Long, Contract4Labour
 	private String					MANAGER_KEY 				= "R_ADMIN";// 管理角色的编码
 	public 	boolean 	   			isManager;
 	public	Long 					carManId;
+	public  String 					certCode;
 	public 	AttachWidget 			attachsUI;
 	public 	Map<String,String>		statusesValue;
 	
@@ -140,7 +142,7 @@ public class ContractLabourAction extends FileEntityAction<Long, Contract4Labour
 
 	@Override
 	protected String[] getSearchFields() {
-		return new String[] { "name", "description" };
+		return new String[] { "code", "wordNo" };
 	}
 	
 	
@@ -150,8 +152,14 @@ public class ContractLabourAction extends FileEntityAction<Long, Contract4Labour
 	}
 	
 	public Json json;
-	public String carManMess(){
-		//CarMan carMan = this.certService;
+	public String certMess(){
+		Cert cert = this.certService.findCertByCarManId(carManId);
+		json = new Json();
+		if(cert != null && cert.getCertCode().length() > 0){
+			certCode = cert.getCertCode();
+			json.put("certCode", certCode);
+		}
+		
 		return "json";
 	}
 	
