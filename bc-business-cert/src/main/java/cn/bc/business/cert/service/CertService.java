@@ -14,4 +14,5 @@ import cn.bc.core.service.CrudService;
  */
 public interface CertService extends CrudService<Cert> {
 
+	Cert findCertByCarManId(Long carManId);
 }

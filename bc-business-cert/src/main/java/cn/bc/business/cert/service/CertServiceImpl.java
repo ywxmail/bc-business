@@ -24,4 +24,9 @@ public class CertServiceImpl extends DefaultCrudService<Cert> implements
 		this.certDao = certDao;
 		this.setCrudDao(certDao);
 	}
+
+	public Cert findCertByCarManId(Long carManId) {
+		Cert cert = this.certDao.findCertByCarManId(carManId);
+		return cert;
+	}
 }

@@ -83,7 +83,7 @@ public class ContractAction extends FileEntityAction<Long, Contract> {
 	@Override
 	protected GridData buildGridData(List<Column> columns) {
 		
-		return super.buildGridData(columns).setRowLabelExpression("name");
+		return super.buildGridData(columns).setRowLabelExpression("type");
 	}
 
 	@Override
@@ -99,7 +99,7 @@ public class ContractAction extends FileEntityAction<Long, Contract> {
 
 	@Override
 	protected String[] getSearchFields() {
-		return new String[] { "name", "description" };
+		return new String[] { "code", "wordNo" };
 	}
 
 	@Override
