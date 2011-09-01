@@ -87,7 +87,7 @@ public class CarAction extends FileEntityAction<Long, Car> {
 
 	@Override
 	protected PageOption buildFormPageOption() {
-		PageOption option = new PageOption().setWidth(810).setMinWidth(250)
+		PageOption option = new PageOption().setWidth(870).setMinWidth(250)
 				.setMinHeight(200).setModal(false);
 		if (isManager()) {
 			option.addButton(new ButtonOption(getText("label.save"), "save"));
