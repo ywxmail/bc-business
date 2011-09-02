@@ -35,6 +35,7 @@ public class Contract4Charger extends Contract4Car {
 	private String oldContent;// 旧合同内容
 	private boolean takebackOrigin;// 已经收回原件:0-未1-已
 	private boolean includeCost;// 包含检审费用:0-不包含,1-包含
+	private String businessType;// 合同性质
 
 	public Contract4Charger() {
 		this.setCode("[责任人合同]");
@@ -98,5 +99,14 @@ public class Contract4Charger extends Contract4Car {
 
 	public void setIncludeCost(boolean hiringProcedure) {
 		this.includeCost = hiringProcedure;
+	}
+	
+	@Column(name = "BS_TYPE")
+	public String getBusinessType() {
+		return businessType;
+	}
+
+	public void setBusinessType(String businessType) {
+		this.businessType = businessType;
 	}
 }

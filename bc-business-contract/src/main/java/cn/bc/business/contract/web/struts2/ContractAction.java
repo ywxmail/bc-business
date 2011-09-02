@@ -82,8 +82,7 @@ public class ContractAction extends FileEntityAction<Long, Contract> {
 
 	@Override
 	protected GridData buildGridData(List<Column> columns) {
-		
-		return super.buildGridData(columns).setRowLabelExpression("type");
+		return super.buildGridData(columns).setRowLabelExpression("code");
 	}
 
 	@Override
