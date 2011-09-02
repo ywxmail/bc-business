@@ -13,12 +13,14 @@ import org.springframework.stereotype.Controller;
 import cn.bc.business.BSConstants;
 import cn.bc.business.carman.service.CarManService;
 import cn.bc.core.CrudOperations;
-import cn.bc.web.struts2.AbstractGridPageAction;
+import cn.bc.core.query.condition.Condition;
+import cn.bc.core.query.condition.impl.InCondition;
+import cn.bc.core.util.StringUtils;
+import cn.bc.web.struts2.AbstractSelectPageAction;
 import cn.bc.web.ui.html.grid.Column;
 import cn.bc.web.ui.html.grid.TextColumn;
-import cn.bc.web.ui.html.page.ButtonOption;
 import cn.bc.web.ui.html.page.PageOption;
-import cn.bc.web.ui.html.toolbar.Toolbar;
+import cn.bc.web.ui.json.Json;
 
 /**
  * 选择司机、责任人Action
@@ -28,10 +30,10 @@ import cn.bc.web.ui.html.toolbar.Toolbar;
  */
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 @Controller
-public class SelectCarManAction extends AbstractGridPageAction {
+public class SelectCarManAction extends AbstractSelectPageAction {
 	private static final long serialVersionUID = 1L;
 	public CarManService carManService;
-	private String clickOkMethod = "bs.carManSelectDialog.clickOk";
+	public String types; // 类型控制
 
 	@Autowired
 	public void setCarManService(CarManService carManService) {
@@ -45,57 +47,12 @@ public class SelectCarManAction extends AbstractGridPageAction {
 
 	@Override
 	protected String getHtmlPageNamespace() {
-		return BSConstants.NAMESPACE;
+		return this.getContextPath() + BSConstants.NAMESPACE + "/selectCarMan";
 	}
 
 	@Override
-	protected String getHtmlPageTitle() {
-		return this.getText("carMan.title");
-	}
-
-	@Override
-	protected String getGridRowLabelExpression() {
-		return "name";
-	}
-
-	@Override
-	protected String[] getGridSearchFields() {
-		return new String[] { "name" };
-	}
-
-	@Override
-	protected String getGridDblRowMethod() {
-		return clickOkMethod;
-	}
-
-	@Override
-	protected PageOption getHtmlPageOption() {
-		return super
-				.getHtmlPageOption()
-				.setWidth(300)
-				.setMinWidth(260)
-				.setHeight(400)
-				.setMinHeight(220)
-				.setModal(true)
-				.addButton(
-						new ButtonOption(getText("label.ok"), null,
-								clickOkMethod));
-	}
-
-	@Override
-	protected String getHtmlPageJs() {
-		return this.getContextPath() + "/bc-business/carMan/select.js";
-	}
-
-	@Override
-	protected Toolbar getHtmlPageToolbar() {
-		Toolbar tb = new Toolbar();
-
-		// 添加搜索按钮
-		tb.addButton(Toolbar
-				.getDefaultSearchToolbarButton(getText("title.click2search")));
-
-		return tb;
+	protected String getClickOkMethod() {
+		return "bs.carManSelectDialog.clickOk";
 	}
 
 	@Override
@@ -104,5 +61,61 @@ public class SelectCarManAction extends AbstractGridPageAction {
 		columns.add(new TextColumn("name", getText("carMan.name"))
 				.setSortable(true));
 		return columns;
+	}
+
+	@Override
+	protected PageOption getHtmlPageOption() {
+		return super.getHtmlPageOption().setWidth(400).setHeight(450);
+	}
+
+	@Override
+	protected String getHtmlPageJs() {
+		return this.getContextPath() + BSConstants.NAMESPACE
+				+ "/carMan/select.js";
+	}
+
+	@Override
+	protected String[] getGridSearchFields() {
+		return new String[] { "name" };
+	}
+
+	@Override
+	protected String getGridRowLabelExpression() {
+		return "name";
+	}
+
+	@Override
+	protected String getHtmlPageTitle() {
+		if ("0,2".equals(this.types))
+			return this.getText("carMan.title.selectDriver");
+		else if ("0,1".equals(this.types))
+			return this.getText("carMan.title.selectCharger");
+		else
+			return this.getText("carMan.title.selectCarMan");
+	}
+
+	@Override
+	protected Condition getGridSpecalCondition() {
+		if (this.types == null || this.types.length() == 0)
+			return null;
+
+		// 用空格分隔多个查询条件的值的处理
+		String[] values = this.types.split(",");
+		Integer[] _values = StringUtils.stringArray2IntegerArray(values);
+
+		// 添加查询条件
+		InCondition in = new InCondition("type", _values);
+		return in;
+	}
+
+	@Override
+	protected Json getGridExtrasData() {
+		if (this.types == null || this.types.length() == 0) {
+			return null;
+		} else {
+			Json json = new Json();
+			json.put("types", types);
+			return json;
+		}
 	}
 }
