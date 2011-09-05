@@ -22,6 +22,8 @@ import cn.bc.business.motorcade.service.MotorcadeService;
 import cn.bc.business.web.struts2.FileEntityAction;
 import cn.bc.core.Page;
 import cn.bc.core.RichEntityImpl;
+import cn.bc.core.query.condition.Direction;
+import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.option.domain.OptionItem;
 import cn.bc.option.service.OptionService;
@@ -83,7 +85,10 @@ public class CarAction extends FileEntityAction<Long, Car> {
 		this.optionService = optionService;
 	}
 
-
+	@Override
+	protected OrderCondition getDefaultOrderCondition() {
+		return new OrderCondition("fileDate", Direction.Desc);
+	}
 
 	@Override
 	protected PageOption buildFormPageOption() {

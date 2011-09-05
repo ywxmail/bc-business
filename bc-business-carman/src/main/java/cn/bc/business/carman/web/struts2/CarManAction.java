@@ -138,9 +138,9 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 
 	@Override
 	protected OrderCondition getDefaultOrderCondition() {
-		return new OrderCondition("orderNo", Direction.Desc);
+		return new OrderCondition("fileDate", Direction.Desc);
 	}
-
+	
 	@Override
 	protected Condition getSpecalCondition() {
 		return null;

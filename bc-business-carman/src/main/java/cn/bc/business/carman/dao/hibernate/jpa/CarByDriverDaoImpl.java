@@ -11,7 +11,6 @@ import org.apache.commons.logging.LogFactory;
 import cn.bc.business.car.domain.Car;
 import cn.bc.business.carman.dao.CarByDriverDao;
 import cn.bc.business.carman.domain.CarByDriver;
-import cn.bc.core.exception.CoreException;
 import cn.bc.orm.hibernate.jpa.HibernateCrudJpaDao;
 
 /**
@@ -27,7 +26,7 @@ public class CarByDriverDaoImpl extends HibernateCrudJpaDao<CarByDriver>
 		Car car = null;
 		String hql = "select c.car from CarByDriver c where c.driver.id=? and c.classes=?";
 		List list = this.getJpaTemplate().find(hql,
-				new Object[] { carManId, "正班" });
+				new Object[] { carManId,new Integer( CarByDriver.TYPE_ZHENGBAN )});
 		if (list.size() == 1) {
 			car = (Car) list.get(0);
 			return car;

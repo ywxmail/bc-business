@@ -8,13 +8,17 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceException;
 import javax.persistence.Query;
+
 import org.springframework.orm.jpa.JpaCallback;
 import org.springframework.util.StringUtils;
+
 import cn.bc.business.car.dao.CarDao;
 import cn.bc.business.car.domain.Car;
+import cn.bc.business.carman.domain.CarByDriver;
 import cn.bc.core.Page;
 import cn.bc.core.RichEntity;
 import cn.bc.core.query.condition.Condition;
@@ -54,12 +58,12 @@ public class CarDaoImpl extends HibernateCrudJpaDao<Car> implements CarDao{
 		ArrayList<Object> args 	= new ArrayList<Object>();
 		StringBuffer hql = new StringBuffer();
 		hql.append("select car.id,car.status,car.code,car.plateType,car.plateNo,")
-		   .append("(select m.driver.name from CarByDriver m where m.car.id = car.id and m.classes='正班'),")
+		   .append("(select m.driver.name from CarByDriver m where m.car.id = car.id and m.classes=?),")
 		   .append("car.factoryType,car.factoryModel,car.businessType,car.motorcade.name,car.unit.name,car.registerDate,car.originNo,car.vin FROM Car car ");
 
 		//组合查询条件
+		args.add(new Integer(CarByDriver.TYPE_ZHENGBAN));
 		setWhere(condition,args,hql);
-		
 		// 排序
 		hql.append(" order by car.id");
 		if (logger.isDebugEnabled()) {
@@ -116,7 +120,7 @@ public class CarDaoImpl extends HibernateCrudJpaDao<Car> implements CarDao{
 		final StringBuffer hql = new StringBuffer();
 		
 		hql.append("select car.id,car.status,car.code,car.plateType,car.plateNo,")
-		   .append("(select m.driver.name from CarByDriver m where m.car.id = car.id and m.classes='正班'),")
+		   .append("(select m.driver.id from CarByDriver m where m.car.id = car.id and m.classes=2),")
 		   .append("car.factoryType,car.factoryModel,car.businessType,car.motorcade.name,car.unit.name,car.registerDate,car.originNo,car.vin ");
 		
 		//方便统计记录数
@@ -125,6 +129,7 @@ public class CarDaoImpl extends HibernateCrudJpaDao<Car> implements CarDao{
 		hql.append(sqlStr);
 		
 		//组合查询条件
+		//args.add(CarByDriver.TYPE_ZHENGBAN);
 		setWhere(condition,args,hql);
 		
 		//排序
