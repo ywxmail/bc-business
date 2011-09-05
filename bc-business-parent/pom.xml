@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>cn.bc</groupId>
 		<artifactId>bc-parent</artifactId>
-		<version>0.4-SNAPSHOT</version>
+		<version>0.5-SNAPSHOT</version>
 		<relativePath>../../bc-framework/bc-parent/pom.xml</relativePath>
 	</parent>
 	<groupId>cn.bc.business</groupId>
@@ -15,7 +15,7 @@
 	
 	<properties>
 		<!-- 平台的版本号 -->
-		<framework.version>0.4-SNAPSHOT</framework.version>
+		<framework.version>0.5-SNAPSHOT</framework.version>
 	</properties>
 	
 	<dependencies>

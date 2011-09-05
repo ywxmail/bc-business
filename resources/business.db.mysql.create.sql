@@ -1,3 +1,17 @@
+-- 数据转换记录
+CREATE TABLE DC_RECORD(
+  TYPE_         VARCHAR(255) NOT NULL COMMENT '类型',
+  FROM_ID       BIGINT NOT NULL COMMENT '旧表数据ID',
+  TO_ID         BIGINT NOT NULL COMMENT '新表数据的ID',
+  FROM_TABLE    VARCHAR(255) COMMENT '旧数据表名',
+  TO_TABLE      VARCHAR(255) COMMENT '新数据表名',
+  CREATE_DATE   DATETIME NOT NULL COMMENT '创建时间',
+  REMARK        VARCHAR(4000) COMMENT '备注说明',
+  MODIFIED_DATE DATETIME COMMENT '最后修改时间'
+) COMMENT '数据转换记录';
+ALTER TABLE DC_RECORD ADD CONSTRAINT BSUK_RECORD UNIQUE (TYPE_, FROM_ID);
+
+
 -- bc营运管理子系统的建表脚本,所有表名须附带前缀"BS_"
 -- 运行此脚本之前需先运行平台的建表脚本framework.db.mysql.create.sql
 

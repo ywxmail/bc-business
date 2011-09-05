@@ -1,6 +1,9 @@
 -- bc营运管理子系统的删表脚本
 -- 运行此脚本之后再运行平台的删表脚本framework.db.mysql.drop.sql
 
+-- 数据转换记录
+drop table if exists DC_RECORD;
+
 -- 黑名单
 drop table if exists BS_BLACKLIST;
 

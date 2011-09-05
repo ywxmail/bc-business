@@ -9,11 +9,19 @@
 		</action>
 	</package>
 	
+	<!-- 司机劳动合同 -->
 	<package name="contractLabour" extends="bc-default" namespace="/bc-business">
 		<action name="contractLabour/create" class="contractLabourAction" method="create">
 			<result name="form">/bc-business/contractLabour/form.jsp</result>
 		</action>
 		<action name="contractLabour/certMess" class="contractLabourAction" method="certMess">
+		</action>
+	</package>
+	
+	<!-- 责任人合同合同 -->
+	<package name="contractCharger" extends="bc-default" namespace="/bc-business">
+		<action name="contractCharger/create" class="contractChargerAction" method="create">
+			<result name="form">/bc-business/contractCharger/form.jsp</result>
 		</action>
 	</package>
 </struts>
