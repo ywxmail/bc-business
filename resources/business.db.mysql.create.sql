@@ -98,6 +98,7 @@ create table BS_CERT (
     ID BIGINT NOT NULL auto_increment,
     STATUS_ int(1) NOT NULL COMMENT '状态：0-已禁用,1-启用中,2-已删除',
     UID_ varchar(36) NOT NULL,
+    TYPE_ int(1) NOT NULL COMMENT '证件类型：居民身份证、机动车驾驶证、从业资格证、服务资格证、驾驶培训证、机动车行驶证、道路运输证',
     CERT_CODE varchar(255) NOT NULL COMMENT '证件号',
     CERT_NAME varchar(255) NOT NULL COMMENT '证件简称',
     CERT_FULL_NAME varchar(255) COMMENT '证件全称',
