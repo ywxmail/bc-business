@@ -109,6 +109,7 @@ create table BS_CERT (
     ID number(19) NOT NULL,
     STATUS_ number(1) NOT NULL,
     UID_ varchar2(36) NOT NULL,
+    TYPE_ NUMBER(1) NOT NULL,
     CERT_CODE varchar2(255) NOT NULL,
     CERT_NAME varchar2(255) NOT NULL,
     CERT_FULL_NAME varchar2(255),
@@ -131,6 +132,7 @@ create table BS_CERT (
 COMMENT ON TABLE BS_CERT IS '证件';
 COMMENT ON COLUMN BS_CERT.STATUS_ IS '状态：0-启用中,1-已禁用,2-已删除';
 COMMENT ON COLUMN BS_CERT.CERT_CODE IS '证件号';
+COMMENT ON COLUMN BS_CERT.TYPE_ IS '证件类型：居民身份证、机动车驾驶证、从业资格证、服务资格证、驾驶培训证、机动车行驶证、道路运输证';
 COMMENT ON COLUMN BS_CERT.CERT_NAME IS '证件简称';
 COMMENT ON COLUMN BS_CERT.CERT_FULL_NAME IS '证件全称';
 COMMENT ON COLUMN BS_CERT.LICENCER IS '发证机关';
