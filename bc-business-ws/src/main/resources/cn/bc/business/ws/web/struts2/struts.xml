@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<!-- WebService接口测试 -->
+	<package name="WSMiddleTestAction" extends="bc-default"
+		namespace="/bc-business/ws/test">
+		<action name="show" class="wSMiddleTestAction" method="show">
+			<result>/bc-business/ws/test/form.jsp</result>
+		</action>
+		<action name="xml" class="wSMiddleTestAction" method="getXml" />
+		<action name="dataset" class="wSMiddleTestAction" method="getDataSet" />
+	</package>
+</struts>
