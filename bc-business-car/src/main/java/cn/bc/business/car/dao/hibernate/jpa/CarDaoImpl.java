@@ -120,7 +120,7 @@ public class CarDaoImpl extends HibernateCrudJpaDao<Car> implements CarDao{
 		final StringBuffer hql = new StringBuffer();
 		
 		hql.append("select car.id,car.status,car.code,car.plateType,car.plateNo,")
-		   .append("(select m.driver.id from CarByDriver m where m.car.id = car.id and m.classes=2),")
+		   .append("(select m.driver.id from CarByDriver m where m.car.id = car.id and m.classes=?),")
 		   .append("car.factoryType,car.factoryModel,car.businessType,car.motorcade.name,car.unit.name,car.registerDate,car.originNo,car.vin ");
 		
 		//方便统计记录数
@@ -129,7 +129,7 @@ public class CarDaoImpl extends HibernateCrudJpaDao<Car> implements CarDao{
 		hql.append(sqlStr);
 		
 		//组合查询条件
-		//args.add(CarByDriver.TYPE_ZHENGBAN);
+		args.add(CarByDriver.TYPE_ZHENGBAN);
 		setWhere(condition,args,hql);
 		
 		//排序
