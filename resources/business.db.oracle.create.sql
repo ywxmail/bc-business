@@ -463,8 +463,8 @@ CREATE TABLE BS_CAR (
    ID                   NUMBER(19)           NOT NULL,
    UID_                 VARCHAR2(36)         NOT NULL,
    STATUS_              NUMBER(1)            NOT NULL,
-   UNIT_ID              NUMBER(19)           NOT NULL,
-   MOTORCADE_ID         NUMBER(19)           NOT NULL,
+   UNIT_ID              NUMBER(19),
+   MOTORCADE_ID         NUMBER(19),
    BS_TYPE              VARCHAR2(255),
    CODE                 VARCHAR2(255),
    ORIGIN_NO            VARCHAR2(255),
@@ -719,7 +719,7 @@ CREATE TABLE BS_CAR_DRIVER (
    STATUS_              NUMBER(1)            NOT NULL,
    DRIVER_ID            NUMBER(19)           NOT NULL,
    CAR_ID               NUMBER(19)           NOT NULL,
-   CLASSES              VARCHAR2(255)        NOT NULL,
+   CLASSES              NUMBER(1)         NOT NULL,
    START_DATE           DATE,
    END_DATE             DATE,
    FILE_DATE            DATE                 NOT NULL,
@@ -733,7 +733,7 @@ COMMENT ON TABLE BS_CAR_DRIVER IS '司机营运车辆';
 COMMENT ON COLUMN BS_CAR_DRIVER.STATUS_ IS '状态：0-启用中,1-已禁用,2-已删除';
 COMMENT ON COLUMN BS_CAR_DRIVER.DRIVER_ID IS '司机ID';
 COMMENT ON COLUMN BS_CAR_DRIVER.CAR_ID IS '车辆ID';
-COMMENT ON COLUMN BS_CAR_DRIVER.CLASSES IS '营运班次:如正班、副班、顶班';
+COMMENT ON COLUMN BS_CAR_DRIVER.CLASSES IS '营运班次:如1-正班、2-副班、3-顶班';
 COMMENT ON COLUMN BS_CAR_DRIVER.START_DATE IS '起始时段';
 COMMENT ON COLUMN BS_CAR_DRIVER.END_DATE IS '结束时段';
 COMMENT ON COLUMN BS_CAR_DRIVER.FILE_DATE IS '创建时间';
@@ -804,10 +804,10 @@ CREATE TABLE BS_BLACKLIST (
    ID                   NUMBER(19)           NOT NULL,
    TYPE_                VARCHAR2(255)        NOT NULL,
    UNIT_ID              number(19),
-   DRIVER_ID            NUMBER(19)           NOT NULL,
-   CAR_ID               NUMBER(19)           NOT NULL,
+   DRIVER_ID            NUMBER(19),
+   CAR_ID               NUMBER(19),
    MOTORCADE_ID         NUMBER(19),
-   SUBJECT              VARCHAR2(1000)       NOT NULL,
+   SUBJECT              VARCHAR2(1000),
    LOCK_DATE            DATE                 NOT NULL,
    UNLOCK_DATE          DATE,
    LOCKER_ID            NUMBER(19)           NOT NULL,

@@ -3,7 +3,6 @@
  */
 package cn.bc.business.blacklist.web.struts2;
 
-import java.util.Calendar;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,19 +17,17 @@ import cn.bc.business.car.domain.Car;
 import cn.bc.business.carman.domain.CarMan;
 import cn.bc.business.carman.service.CarByDriverService;
 import cn.bc.business.carman.service.CarManService;
+import cn.bc.business.motorcade.domain.Motorcade;
 import cn.bc.business.web.struts2.FileEntityAction;
 import cn.bc.core.query.condition.Condition;
 import cn.bc.core.query.condition.Direction;
 import cn.bc.core.query.condition.impl.EqualsCondition;
 import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.identity.domain.ActorHistory;
-import cn.bc.identity.service.ActorService;
-import cn.bc.identity.web.SystemContext;
 import cn.bc.option.domain.OptionItem;
 import cn.bc.option.service.OptionService;
 import cn.bc.web.formater.AbstractFormater;
 import cn.bc.web.formater.CalendarFormater;
-import cn.bc.web.formater.KeyValueFormater;
 import cn.bc.web.ui.html.grid.Column;
 import cn.bc.web.ui.html.grid.GridData;
 import cn.bc.web.ui.html.grid.TextColumn;
@@ -146,7 +143,7 @@ public class BlacklistAction extends FileEntityAction<Long, Blacklist> {
 
 	@Override
 	protected String[] getSearchFields() {
-		return new String[] { "driver.name", "motorcade.name","type" ,"unit.name","locker.name"};
+		return new String[] { "driver.name", "motorcade.name","type" ,"unit.name","locker.name","subject","car.plateNo"};
 	}
 
 	@Override
@@ -158,26 +155,36 @@ public class BlacklistAction extends FileEntityAction<Long, Blacklist> {
 					
 			columns.add(new TextColumn("motorcade.name",
 					getText("blacklist.motorcade.name"), 50)
-					.setValueFormater(new AbstractFormater() {
+					.setValueFormater(new AbstractFormater<String>() {
 						@Override
 						public String format(Object context, Object value) {
 							Blacklist blacklist = (Blacklist) context;
+							Motorcade motorcade=blacklist.getMotorcade();
+							if(motorcade==null){
+								return null;
+							}else{
 							return blacklist.getMotorcade().getName();
-									
+							}		
 						}
 					}));
 			columns.add(new TextColumn("driver.name",
 					getText("blacklist.driver"), 70)
-					.setValueFormater(new AbstractFormater() {
+					.setValueFormater(new AbstractFormater<String>() {
 						@Override
 						public String format(Object context, Object value) {
 							Blacklist blacklist = (Blacklist) context;
-							return blacklist.getDriver().getName();
+							CarMan driver=blacklist.getDriver();
+							if(driver==null){
+								return null;
+							}else{
+								return blacklist.getDriver().getName();
+							}
+							
 						}
 					}));
 			columns.add(new TextColumn("car.plateNo",
 					getText("blacklist.car.plateNo"), 100)
-					.setValueFormater(new AbstractFormater() {
+					.setValueFormater(new AbstractFormater<String>() {
 						@Override
 						public String format(Object context, Object value) {
 							Blacklist blacklist = (Blacklist) context;
@@ -190,7 +197,7 @@ public class BlacklistAction extends FileEntityAction<Long, Blacklist> {
 					getText("blacklist.code"), 70).setSortable(true));
 			columns.add(new TextColumn("motorcade.name",
 					getText("blacklist.motorcade.name"), 50)
-					.setValueFormater(new AbstractFormater() {
+					.setValueFormater(new AbstractFormater<String>() {
 						@Override
 						public String format(Object context, Object value) {
 							Blacklist blacklist = (Blacklist) context;
@@ -200,7 +207,7 @@ public class BlacklistAction extends FileEntityAction<Long, Blacklist> {
 					}));
 			columns.add(new TextColumn("car.plateNo",
 					getText("blacklist.car.plateNo"), 100)
-					.setValueFormater(new AbstractFormater() {
+					.setValueFormater(new AbstractFormater<String>() {
 						@Override
 						public String format(Object context, Object value) {
 							Blacklist blacklist = (Blacklist) context;
@@ -217,7 +224,7 @@ public class BlacklistAction extends FileEntityAction<Long, Blacklist> {
 		.setSortable(true).setDir(Direction.Desc).setUseTitleFromLabel(true)
 		.setValueFormater(new CalendarFormater("yyyy-MM-dd HH:mm:ss")));
 		columns.add(new TextColumn("locker.name",
-				getText("blacklist.locker.name"), 70).setValueFormater(new AbstractFormater() {
+				getText("blacklist.locker.name"), 70).setValueFormater(new AbstractFormater<String>() {
 					@Override
 					public String format(Object context, Object value) {
 						Blacklist blacklist = (Blacklist) context;
@@ -228,7 +235,7 @@ public class BlacklistAction extends FileEntityAction<Long, Blacklist> {
 		.setSortable(true).setDir(Direction.Desc).setUseTitleFromLabel(true)
 		.setValueFormater(new CalendarFormater("yyyy-MM-dd HH:mm:ss")));
 		columns.add(new TextColumn("unlocker.name",
-				getText("blacklist.unlocker.name"), 70).setValueFormater(new AbstractFormater() {
+				getText("blacklist.unlocker.name"), 70).setValueFormater(new AbstractFormater<String>() {
 					@Override
 					public String format(Object context, Object value) {
 						Blacklist blacklist = (Blacklist) context;
