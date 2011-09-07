@@ -19,6 +19,7 @@
 		<module>bc-business-carman</module>
 		<module>bc-business-motorcade</module>
 		<module>bc-business-blacklist</module>
+		<module>bc-business-ws</module>
 		<module>bc-business-charger</module>
 	</modules>
 	<scm>
