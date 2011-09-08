@@ -30,6 +30,6 @@
 	<bean id="contractChargerDao" class="cn.bc.business.contract.dao.hibernate.jpa.ContractChargerDaoImpl"
 		p:entityManagerFactory-ref="entityManagerFactory" />
 	<bean id="contractChargerService" class="cn.bc.business.contract.service.ContractChargerServiceImpl"
-		p:contractLabourDao-ref="contractChargerDao" />	
+		p:contractChargerDao-ref="contractChargerDao" />	
 		
 </beans>

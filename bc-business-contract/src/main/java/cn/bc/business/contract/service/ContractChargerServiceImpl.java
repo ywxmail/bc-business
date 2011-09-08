@@ -19,13 +19,13 @@ public class ContractChargerServiceImpl extends DefaultCrudService<Contract4Char
 		ContractChargerService {
 	private ContractChargerDao contractChargerDao;
 
-	public ContractChargerDao getContractLabourDao() {
+	public ContractChargerDao getContractChargerDao() {
 		return contractChargerDao;
 	}
 
-	public void setContractLabourDao(ContractChargerDao certDao) {
-		this.contractChargerDao = certDao;
-		this.setCrudDao(certDao);
+	public void setContractChargerDao(ContractChargerDao contractChargerDao) {
+		this.contractChargerDao = contractChargerDao;
+		this.setCrudDao(contractChargerDao);
 	}
 	
 	@Override

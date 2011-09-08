@@ -24,9 +24,6 @@ import cn.bc.core.query.condition.Direction;
 import cn.bc.core.query.condition.impl.EqualsCondition;
 import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.identity.web.SystemContext;
-import cn.bc.business.OptionConstants;
-import cn.bc.option.domain.OptionItem;
-import cn.bc.option.service.OptionService;
 import cn.bc.web.formater.AbstractFormater;
 import cn.bc.web.formater.CalendarRangeFormater;
 import cn.bc.web.formater.KeyValueFormater;
@@ -166,7 +163,7 @@ public class CarByDriverAction extends FileEntityAction<Long, CarByDriver> {
 					.setValueFormater(new KeyValueFormater(getEntityStatuses())));
 			columns.add(new TextColumn("car.plateNo",
 					getText("carByDriver.car.plateNo"), 150)
-					.setValueFormater(new AbstractFormater() {
+					.setValueFormater(new AbstractFormater<String>() {
 						@Override
 						public String format(Object context, Object value) {
 							CarByDriver carByDriver = (CarByDriver) context;
@@ -176,7 +173,7 @@ public class CarByDriverAction extends FileEntityAction<Long, CarByDriver> {
 					}));
 			columns.add(new TextColumn("driver.name",
 					getText("carByDriver.driver"), 100)
-					.setValueFormater(new AbstractFormater() {
+					.setValueFormater(new AbstractFormater<String>() {
 						@Override
 						public String format(Object context, Object value) {
 							CarByDriver carByDriver = (CarByDriver) context;
@@ -193,7 +190,7 @@ public class CarByDriverAction extends FileEntityAction<Long, CarByDriver> {
 					.setValueFormater(new KeyValueFormater(getEntityStatuses())));
 			columns.add(new TextColumn("car.plateNo",
 					getText("carByDriver.car.plateNo"), 150)
-					.setValueFormater(new AbstractFormater() {
+					.setValueFormater(new AbstractFormater<String>() {
 						@Override
 						public String format(Object context, Object value) {
 							CarByDriver carByDriver = (CarByDriver) context;
@@ -247,13 +244,13 @@ public class CarByDriverAction extends FileEntityAction<Long, CarByDriver> {
 		Map<String, String> type = new HashMap<String, String>();
 		type = new HashMap<String, String>();
 		type.put(String.valueOf(CarByDriver.TYPE_WEIDINGYI),
-				getText("carByDriver.weidingyi"));
+				getText("carByDriver.classes.weidingyi"));
 		type.put(String.valueOf(CarByDriver.TYPE_ZHENGBAN),
-				getText("carByDriver.zhengban"));
+				getText("carByDriver.classes.zhengban"));
 		type.put(String.valueOf(CarByDriver.TYPE_FUBAN),
-				getText("carByDriver.fuban"));
+				getText("carByDriver.classes.fuban"));
 		type.put(String.valueOf(CarByDriver.TYPE_DINGBAN),
-				getText("carByDriver.dingban"));
+				getText("carByDriver.classes.dingban"));
 		return type;
 	}
 

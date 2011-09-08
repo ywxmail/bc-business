@@ -120,7 +120,7 @@ public class CarDaoImpl extends HibernateCrudJpaDao<Car> implements CarDao{
 		final StringBuffer hql = new StringBuffer();
 		
 		hql.append("select car.id,car.status,car.code,car.plateType,car.plateNo,")
-		   .append("(select m.driver.id from CarByDriver m where m.car.id = car.id and m.classes=2),")
+		   .append("(select m.driver.id from CarByDriver m where m.car.id = car.id and m.classes=?),")
 		   .append("car.factoryType,car.factoryModel,car.businessType,car.motorcade.name,car.unit.name,car.registerDate,car.originNo,car.vin ");
 		
 		//方便统计记录数
@@ -129,7 +129,7 @@ public class CarDaoImpl extends HibernateCrudJpaDao<Car> implements CarDao{
 		hql.append(sqlStr);
 		
 		//组合查询条件
-		//args.add(CarByDriver.TYPE_ZHENGBAN);
+		args.add(CarByDriver.TYPE_ZHENGBAN);
 		setWhere(condition,args,hql);
 		
 		//排序
@@ -260,16 +260,22 @@ public class CarDaoImpl extends HibernateCrudJpaDao<Car> implements CarDao{
 	 * @param hql
 	 */
 	public void setWhere(Condition condition,ArrayList<Object> args,StringBuffer hql){
+		String[] strAry;
+		String asName;
+		//处理字符串获取别名
+		strAry = hql.toString().toLowerCase().split("from");
+		strAry = strAry[strAry.length-1].split(" ");
+		asName = strAry[strAry.length-1];
 		
 		if(condition != null && condition.getValues().size() > 0){
 			hql.append(" WHERE ");
 			if(condition.getValues().size() == 1){		//当模块Action的getSearchFields()方法只有一个参数时
 				//为需要查询的条件加上别名如 xx.列
-				hql.append(condition.getExpression("car"));
+				hql.append(condition.getExpression(asName));
 				//获取搜索框输入的参数并拼装到args
 				args.add(condition.getValues().get(0));
 			}else{
-				hql.append(condition.getExpression("car"));
+				hql.append(condition.getExpression(asName));
 				//循环获取搜索框输入的参数并拼装到args
 				for (int i = 0;i < condition.getValues().size(); i++){
 					args.add(condition.getValues().get(i));

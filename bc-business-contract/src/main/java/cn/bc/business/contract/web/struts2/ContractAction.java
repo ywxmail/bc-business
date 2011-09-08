@@ -123,7 +123,7 @@ public class ContractAction extends FileEntityAction<Long, Contract> {
 							}
 						}));
 		columns.add(new TextColumn("transactor", getText("contract.transactor"))
-				.setValueFormater(new AbstractFormater() {
+				.setValueFormater(new AbstractFormater<String>() {
 					@Override
 					public String format(Object context, Object value) {
 						Contract contract = (Contract) context;

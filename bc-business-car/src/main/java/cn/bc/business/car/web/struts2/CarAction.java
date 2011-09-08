@@ -158,7 +158,7 @@ public class CarAction extends FileEntityAction<Long, Car> {
 		columns.add(new TextColumn("['code']",	getText("car.code"))
 				.setSortable(true));
 		columns.add(new TextColumn("['plateType']", getText("car.plate"),		100)
-				.setValueFormater(new AbstractFormater() {
+				.setValueFormater(new AbstractFormater<String>() {
 					@Override
 					public String format(Object context, Object value) {
 						Map car = (Map) context;
@@ -166,7 +166,7 @@ public class CarAction extends FileEntityAction<Long, Car> {
 					}
 				}));
 		columns.add(new TextColumn("['name']", getText("car.carMan"),		100).
-				setUseTitleFromLabel(true).setValueFormater(new AbstractFormater() {
+				setUseTitleFromLabel(true).setValueFormater(new AbstractFormater<String>() {
 					@Override
 					public String format(Object context, Object value) {
 						Map car = (Map) context;
@@ -178,7 +178,7 @@ public class CarAction extends FileEntityAction<Long, Car> {
 					}
 				}));
 		columns.add(new TextColumn("['factoryType']", getText("car.factory"),	140)
-				.setValueFormater(new AbstractFormater() {
+				.setValueFormater(new AbstractFormater<String>() {
 					@Override
 					public String format(Object context, Object value) {
 						//从上下文取出元素Map

@@ -149,7 +149,7 @@ public class Blacklist extends FileEntityImpl {
 		this.unit = unit;
 	}
 
-	@ManyToOne(fetch = FetchType.EAGER, optional = false)
+	@ManyToOne(fetch = FetchType.EAGER, optional = true)
 	@JoinColumn(name = "MOTORCADE_ID", referencedColumnName = "ID")
 	public Motorcade getMotorcade() {
 		return motorcade;
@@ -159,7 +159,7 @@ public class Blacklist extends FileEntityImpl {
 		this.motorcade = motorcade;
 	}
 
-	@ManyToOne(fetch = FetchType.EAGER, optional = false)
+	@ManyToOne(fetch = FetchType.EAGER, optional = true)
 	@JoinColumn(name = "CAR_ID", referencedColumnName = "ID")
 	public Car getCar() {
 		return car;
@@ -169,7 +169,7 @@ public class Blacklist extends FileEntityImpl {
 		this.car = car;
 	}
 
-	@ManyToOne(fetch = FetchType.EAGER, optional = false)
+	@ManyToOne(fetch = FetchType.EAGER, optional = true)
 	@JoinColumn(name = "DRIVER_ID", referencedColumnName = "ID")
 	public CarMan getDriver() {
 		return driver;
