@@ -14,7 +14,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import cn.bc.identity.domain.Actor;
+import cn.bc.identity.domain.ActorHistory;
 import cn.bc.identity.domain.RichFileEntityImpl;
 
 /**
@@ -36,7 +36,7 @@ public class Contract extends RichFileEntityImpl {
 	private String code;// 合同编号
 	private int    type;// 合同类型：如劳动合同、承包合同等
 	private String wordNo;// 文书号
-	private Actor transactor;// 经办人
+	private ActorHistory transactor;// 经办人
 
 	private Calendar signDate;// 签订日期
 	private Calendar startDate;// 生效日期
@@ -78,11 +78,11 @@ public class Contract extends RichFileEntityImpl {
 
 	@ManyToOne(fetch = FetchType.EAGER, optional = false)
 	@JoinColumn(name = "TRANSACTOR_ID", referencedColumnName = "ID")
-	public Actor getTransactor() {
+	public ActorHistory getTransactor() {
 		return transactor;
 	}
 
-	public void setTransactor(Actor transactor) {
+	public void setTransactor(ActorHistory transactor) {
 		this.transactor = transactor;
 	}
 
