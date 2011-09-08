@@ -18,7 +18,7 @@ import cn.bc.business.contract.domain.Contract;
 import cn.bc.business.contract.service.ContractService;
 import cn.bc.business.web.struts2.FileEntityAction;
 import cn.bc.core.query.condition.impl.OrderCondition;
-import cn.bc.identity.domain.Actor;
+import cn.bc.identity.domain.ActorHistory;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.web.formater.AbstractFormater;
 import cn.bc.web.formater.CalendarFormater;
@@ -127,7 +127,7 @@ public class ContractAction extends FileEntityAction<Long, Contract> {
 					@Override
 					public String format(Object context, Object value) {
 						Contract contract = (Contract) context;
-						Actor transactor = contract.getTransactor();
+						ActorHistory transactor = contract.getTransactor();
 						if (transactor == null) {
 							return null;
 						} else {
