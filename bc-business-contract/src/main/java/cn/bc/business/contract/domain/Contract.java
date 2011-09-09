@@ -14,7 +14,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import cn.bc.identity.domain.Actor;
+import cn.bc.identity.domain.ActorHistory;
 import cn.bc.identity.domain.ActorHistory;
 import cn.bc.identity.domain.RichFileEntityImpl;
 
@@ -83,8 +83,8 @@ public class Contract extends RichFileEntityImpl {
 		return transactor;
 	}
 
-	public void setTransactor(ActorHistory actor) {
-		this.transactor = actor;
+	public void setTransactor(ActorHistory transactor) {
+		this.transactor = transactor;
 	}
 
 	public String getCode() {

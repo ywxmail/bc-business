@@ -23,9 +23,9 @@ public class ContractLabourServiceImpl extends DefaultCrudService<Contract4Labou
 		return contractLabourDao;
 	}
 
-	public void setContractLabourDao(ContractLabourDao certDao) {
-		this.contractLabourDao = certDao;
-		this.setCrudDao(certDao);
+	public void setContractLabourDao(ContractLabourDao contractLabourDao) {
+		this.contractLabourDao = contractLabourDao;
+		this.setCrudDao(contractLabourDao);
 	}
 	
 	@Override
