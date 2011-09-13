@@ -154,7 +154,7 @@ public class ContractAction extends FileEntityAction<Long, Contract> {
 		grid.setName(getText(StringUtils.uncapitalize(getEntityConfigName())));
 
 		// 单选及双击行编辑
-		grid.setSingleSelect(true).setDblClickRow("bc.contractList.edit");
+		grid.setSingleSelect(false).setDblClickRow("bc.contractList.edit");
 
 		// 分页条
 		grid.setFooter(buildGridFooter(grid));
