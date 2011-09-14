@@ -48,28 +48,27 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 	public boolean isManager;
 	public CarManService carManService;
 	public String portrait;
-	public Map <String,String>statusesValue;
+	public Map<String, String> statusesValue;
 	public OptionService optionService;
 	public OptionConstants optionConstants;
-	public List<OptionItem> carManHouseTypeList;//司机责任人户口性质列表
-	public List<OptionItem> carManLevelList;//司机责任人等级列表
-	public List<OptionItem> carManModelList;//司机责任人准驾车型列表
-    
-	public IdGeneratorService getIdGeneratorService() {  
-        return idGeneratorService;  
-    }  
-    
+	public List<OptionItem> carManHouseTypeList;// 司机责任人户口性质列表
+	public List<OptionItem> carManLevelList;// 司机责任人等级列表
+	public List<OptionItem> carManModelList;// 司机责任人准驾车型列表
+
+	public IdGeneratorService getIdGeneratorService() {
+		return idGeneratorService;
+	}
+
 	@Autowired
 	public void setOptionService(OptionService optionService) {
 		this.optionService = optionService;
 	}
 
+	@Autowired
+	public void setIdGeneratorService(IdGeneratorService idGeneratorService) {
+		this.idGeneratorService = idGeneratorService;
+	}
 
-
-	@Autowired  
-    public void setIdGeneratorService(IdGeneratorService idGeneratorService) {  
-        this.idGeneratorService = idGeneratorService;  
-    }  
 	@Autowired
 	public void setCarManService(CarManService carManService) {
 		this.carManService = carManService;
@@ -80,7 +79,7 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 	public String create() throws Exception {
 		String result = super.create();
 		this.getE().setStatus(RichEntity.STATUS_ENABLED);
-		statusesValue=this.getEntityStatuses();
+		statusesValue = this.getEntityStatuses();
 		this.getE().setUid(this.getIdGeneratorService().next(CarMan.KEY_UID));
 		this.getE().setSex(1);
 		carManHouseTypeList = this.optionService
@@ -100,7 +99,7 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 		String result = super.open();
 
 		// 获取相片的连接
-		//portrait = "/bc/libs/themes/default/images/portrait/1in110x140.png";
+		// portrait = "/bc/libs/themes/default/images/portrait/1in110x140.png";
 
 		return result;
 	}
@@ -108,9 +107,11 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 	@Override
 	public String edit() throws Exception {
 		String result = super.edit();
-		statusesValue=this.getEntityStatuses();
+		statusesValue = this.getEntityStatuses();
 		carManHouseTypeList = this.optionService
-		        .findOptionItemByGroupKeyWithCurrent(optionConstants.CARMAN_HOUSETYPE,null,this.getE().getHouseType()); 
+				.findOptionItemByGroupKeyWithCurrent(
+						optionConstants.CARMAN_HOUSETYPE, null, this.getE()
+								.getHouseType());
 		carManLevelList = this.optionService
 				.findOptionItemByGroupKey(optionConstants.CARMAN_LEVEL);
 		carManModelList = this.optionService
@@ -119,6 +120,14 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 		portrait = "/bc/libs/themes/default/images/portrait/1in110x140.png";
 
 		return result;
+	}
+
+	// 视图特殊条件
+	@Override
+	protected Condition getSpecalCondition() {
+
+		return null;
+
 	}
 
 	@Override
@@ -139,11 +148,6 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 	@Override
 	protected OrderCondition getDefaultOrderCondition() {
 		return new OrderCondition("fileDate", Direction.Desc);
-	}
-	
-	@Override
-	protected Condition getSpecalCondition() {
-		return null;
 	}
 
 	// 设置页面的尺寸
@@ -180,7 +184,7 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 
 	@Override
 	protected String[] getSearchFields() {
-		return new String[] {  "name",  "origin" };
+		return new String[] { "name", "origin" };
 	}
 
 	@Override
@@ -189,13 +193,13 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 		isManager = isManager();
 
 		List<Column> columns = super.buildGridColumns();
-		columns.add(new TextColumn("status", getText("carMan.status"),80)
-		.setSortable(true).setValueFormater(
-				new KeyValueFormater(getEntityStatuses())));
-		columns.add(new TextColumn("type", getText("carMan.type"),80)
+		columns.add(new TextColumn("status", getText("carMan.status"), 80)
+				.setSortable(true).setValueFormater(
+						new KeyValueFormater(getEntityStatuses())));
+		columns.add(new TextColumn("type", getText("carMan.type"), 80)
 				.setSortable(true).setValueFormater(
 						new KeyValueFormater(getType())));
-		columns.add(new TextColumn("name", getText("carMan.name"),80)
+		columns.add(new TextColumn("name", getText("carMan.name"), 80)
 				.setSortable(true));
 		columns.add(new TextColumn("origin", getText("carMan.origin"))
 				.setSortable(true));
@@ -206,7 +210,7 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 	private boolean isManager() {
 		return ((SystemContext) this.getContext()).hasAnyRole(MANAGER_KEY);
 	}
-	
+
 	/**
 	 * 获取分类值转换列表
 	 * 
@@ -223,6 +227,5 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 				getText("carMan.type.driverAndCharger"));
 		return type;
 	}
-	
-	
+
 }

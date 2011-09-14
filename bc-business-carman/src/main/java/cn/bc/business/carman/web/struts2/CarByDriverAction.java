@@ -13,6 +13,8 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
+import cn.bc.business.car.domain.Car;
+import cn.bc.business.car.service.CarService;
 import cn.bc.business.carman.domain.CarByDriver;
 import cn.bc.business.carman.domain.CarMan;
 import cn.bc.business.carman.service.CarByDriverService;
@@ -53,11 +55,18 @@ public class CarByDriverAction extends FileEntityAction<Long, CarByDriver> {
 	public String portrait;
 	public Map<String, String> statusesValueList;// 状态列表
 	public CarManService carManService;
+	public CarService carService;
 	public Long carManId;
+	public Long carId;
 
 	@Autowired
 	public void setCarManService(CarManService carManService) {
 		this.carManService = carManService;
+	}
+
+	@Autowired
+	public void CarService(CarService carService) {
+		this.carService = carService;
 	}
 
 	@Autowired
@@ -74,6 +83,9 @@ public class CarByDriverAction extends FileEntityAction<Long, CarByDriver> {
 		if (carManId != null) {
 			CarMan driver = this.carManService.load(carManId);
 			this.getE().setDriver(driver);
+		} else if (carId != null) {
+			Car car = this.carService.load(carId);
+			this.getE().setCar(car);
 		}
 		return result;
 	}
@@ -90,6 +102,9 @@ public class CarByDriverAction extends FileEntityAction<Long, CarByDriver> {
 	protected Condition getSpecalCondition() {
 		if (carManId != null) {
 			return new EqualsCondition("driver.id", carManId);
+		}
+		if (carId != null) {
+			return new EqualsCondition("car.id", carId);
 		} else {
 			return null;
 		}
@@ -156,7 +171,7 @@ public class CarByDriverAction extends FileEntityAction<Long, CarByDriver> {
 
 		List<Column> columns = super.buildGridColumns();
 
-		if (carManId == null) {
+		if (carManId != null) {
 			columns.add(new TextColumn("status",
 					getText("carByDriver.statuses"), 100)
 					.setSortable(true)
@@ -171,6 +186,16 @@ public class CarByDriverAction extends FileEntityAction<Long, CarByDriver> {
 									+ carByDriver.getCar().getPlateNo();
 						}
 					}));
+
+			columns.add(new TextColumn("classes",
+					getText("carByDriver.classes"), 100).setSortable(true)
+					.setValueFormater(new KeyValueFormater(getType())));
+		} else if (carId != null) {
+			columns.add(new TextColumn("status",
+					getText("carByDriver.statuses"), 100)
+					.setSortable(true)
+					.setValueFormater(new KeyValueFormater(getEntityStatuses())));
+
 			columns.add(new TextColumn("driver.name",
 					getText("carByDriver.driver"), 100)
 					.setValueFormater(new AbstractFormater<String>() {
@@ -196,6 +221,15 @@ public class CarByDriverAction extends FileEntityAction<Long, CarByDriver> {
 							CarByDriver carByDriver = (CarByDriver) context;
 							return carByDriver.getCar().getPlateType() + " "
 									+ carByDriver.getCar().getPlateNo();
+						}
+					}));
+			columns.add(new TextColumn("driver.name",
+					getText("carByDriver.driver"), 100)
+					.setValueFormater(new AbstractFormater<String>() {
+						@Override
+						public String format(Object context, Object value) {
+							CarByDriver carByDriver = (CarByDriver) context;
+							return carByDriver.getDriver().getName();
 						}
 					}));
 			columns.add(new TextColumn("classes",
@@ -225,6 +259,9 @@ public class CarByDriverAction extends FileEntityAction<Long, CarByDriver> {
 		HtmlPage page = super.buildHtml4Paging();
 		if (carManId != null)
 			page.setAttr("data-extras", new Json().put("carManId", carManId)
+					.toString());
+		if (carId != null)
+			page.setAttr("data-extras", new Json().put("carId", carId)
 					.toString());
 		return page;
 	}
