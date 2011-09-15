@@ -62,7 +62,12 @@ public class CarDaoImpl extends HibernateCrudJpaDao<Car> implements CarDao{
 		   .append("car.factoryType,car.factoryModel,car.businessType,car.motorcade.name,car.unit.name,car.registerDate,car.originNo,car.vin FROM Car car ");
 
 		//组合查询条件
-		setWhere(condition,args,hql);
+		setWhere(condition,hql);
+		
+		for (int i = 0;i < condition.getValues().size(); i++){
+			args.add(condition.getValues().get(i));
+		}
+		
 		// 排序
 		hql.append(" order by car.id");
 		if (logger.isDebugEnabled()) {
@@ -115,9 +120,9 @@ public class CarDaoImpl extends HibernateCrudJpaDao<Car> implements CarDao{
 	public Page<Map<String,Object>> page(final Condition condition,final int pageNo,int pageSize) {
 		//设置最大页数,如果小于1都按1计算
 		final int _pageSize = pageSize < 1 ? 1 : pageSize;	
-		ArrayList<Object> args 	= new ArrayList<Object>();
 		final StringBuffer hql = new StringBuffer();
 		
+		//因为用正班做查询条件1部车辆返回多个正班司机.待解决 CarByDriver.TYPE_ZHENGBAN
 		hql.append("select car.id,car.status,car.code,car.plateType,car.plateNo,")
 		   .append("(select m.driver.name from CarByDriver m where m.car.id = car.id and m.classes="+CarByDriver.TYPE_FUBAN+"),")
 		   .append("car.factoryType,car.factoryModel,car.businessType,car.motorcade.name,car.unit.name,car.registerDate,car.originNo,car.vin ");
@@ -128,9 +133,7 @@ public class CarDaoImpl extends HibernateCrudJpaDao<Car> implements CarDao{
 		hql.append(sqlStr);
 		
 		//组合查询条件
-		//args.add(new Integer(CarByDriver.TYPE_ZHENGBAN));	因为用正班做查询条件1部车辆返回多个正班司机.待解决
-		args.add(new Integer(CarByDriver.TYPE_FUBAN));
-//		setWhere(condition,args,hql);
+		setWhere(condition,hql);
 		
 		//排序
 		hql.append(" order by car.id");
@@ -213,7 +216,6 @@ public class CarDaoImpl extends HibernateCrudJpaDao<Car> implements CarDao{
 	 */
 	public int count(final Condition condition,String sqlStr){
 		
-		ArrayList<Object>  args4Count 	= new ArrayList<Object>();
 		final StringBuffer hql4Count 	= new StringBuffer();
 		
 		sqlStr = "select count(*) " + sqlStr;
@@ -221,7 +223,7 @@ public class CarDaoImpl extends HibernateCrudJpaDao<Car> implements CarDao{
 		hql4Count.append(sqlStr) ;
 		
 		//组合查询条件
-		setWhere(condition,args4Count,hql4Count);
+		setWhere(condition,hql4Count);
 		
 		final String queryString = hql4Count.toString();
 		
@@ -259,7 +261,7 @@ public class CarDaoImpl extends HibernateCrudJpaDao<Car> implements CarDao{
 	 * @param args
 	 * @param hql
 	 */
-	public void setWhere(Condition condition,ArrayList<Object> args,StringBuffer hql){
+	public void setWhere(Condition condition,StringBuffer hql){
 		String[] strAry;
 		String asName;
 		//处理字符串获取别名
@@ -269,18 +271,18 @@ public class CarDaoImpl extends HibernateCrudJpaDao<Car> implements CarDao{
 		
 		if(condition != null && condition.getValues().size() > 0){
 			hql.append(" WHERE ");
-			if(condition.getValues().size() == 1){		//当模块Action的getSearchFields()方法只有一个参数时
-				//为需要查询的条件加上别名如 xx.列
-				hql.append(condition.getExpression(asName));
+			//为需要查询的条件加上别名如 xx.列
+			hql.append(condition.getExpression(asName));
+			//if(condition.getValues().size() == 1){		//当模块Action的getSearchFields()方法只有一个参数时
 				//获取搜索框输入的参数并拼装到args
-				args.add(condition.getValues().get(0));
-			}else{
-				hql.append(condition.getExpression(asName));
-				//循环获取搜索框输入的参数并拼装到args
-				for (int i = 0;i < condition.getValues().size(); i++){
-					args.add(condition.getValues().get(i));
-				}
-			}
+				//args.add(condition.getValues().get(0));
+//			}else{
+//				hql.append(condition.getExpression(asName));
+//				//循环获取搜索框输入的参数并拼装到args
+//				for (int i = 0;i < condition.getValues().size(); i++){
+//					args.add(condition.getValues().get(i));
+//				}
+//			}
 		
 		}
 	}
