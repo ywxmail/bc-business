@@ -157,7 +157,7 @@ public class CarByDriverAction extends FileEntityAction<Long, CarByDriver> {
 			// 查看按钮
 			tb.addButton(getDefaultOpenToolbarButton());
 		}
-		if (carManId == null) {
+		if (carManId == null||carId == null) {
 			// 搜索按钮
 			tb.addButton(getDefaultSearchToolbarButton());
 		}
