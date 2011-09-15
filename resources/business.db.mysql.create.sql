@@ -320,6 +320,7 @@ CREATE TABLE BS_CAR(
    STATUS_              INT(1) NOT NULL COMMENT '状态：0-已禁用,1-启用中,2-已删除',
    UNIT_ID        		BIGINT COMMENT '所属单位ID',
    MOTORCADE_ID         BIGINT COMMENT '所属车队ID',
+   DRIVER		VARCHAR(255) COMMENT '司机信息',
    BS_TYPE              VARCHAR(255) COMMENT '营运性质',
    CODE                 VARCHAR(255) COMMENT '自编号',
    ORIGIN_NO            VARCHAR(255) COMMENT '原车号',
