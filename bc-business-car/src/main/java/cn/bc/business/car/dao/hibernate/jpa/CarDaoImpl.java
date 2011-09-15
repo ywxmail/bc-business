@@ -18,7 +18,6 @@ import org.springframework.util.StringUtils;
 
 import cn.bc.business.car.dao.CarDao;
 import cn.bc.business.car.domain.Car;
-import cn.bc.business.carman.domain.CarByDriver;
 import cn.bc.core.Page;
 import cn.bc.core.RichEntity;
 import cn.bc.core.query.condition.Condition;
@@ -57,19 +56,21 @@ public class CarDaoImpl extends HibernateCrudJpaDao<Car> implements CarDao{
 	public List<Map<String, Object>> list(Condition condition) {
 		ArrayList<Object> args 	= new ArrayList<Object>();
 		StringBuffer hql = new StringBuffer();
-		hql.append("select car.id,car.status,car.code,car.plateType,car.plateNo,")
-		   .append("(select m.driver.name from CarByDriver m where m.car.id = car.id and m.classes="+CarByDriver.TYPE_FUBAN+"),")
-		   .append("car.factoryType,car.factoryModel,car.businessType,car.motorcade.name,car.unit.name,car.registerDate,car.originNo,car.vin FROM Car car ");
+		hql.append("SELECT car.id,car.status,car.code,car.plateType,car.plateNo,car.driver")
+		   //.append("(select m.driver.name from CarByDriver m where m.car.id = car.id and m.classes="+CarByDriver.TYPE_FUBAN+"),")
+		   .append(",car.factoryType,car.factoryModel,car.businessType,car.motorcade.name,car.unit.name,car.registerDate,car.originNo,car.vin FROM Car car ");
 
 		//组合查询条件
-		setWhere(condition,hql);
+		if(condition != null && condition.getValues().size() > 0){
+			setWhere(condition,hql);
+		}
 		
 		for (int i = 0;i < condition.getValues().size(); i++){
 			args.add(condition.getValues().get(i));
 		}
 		
 		// 排序
-		hql.append(" order by car.id");
+		hql.append(" order by car.status,car.fileDate desc");
 		if (logger.isDebugEnabled()) {
 			logger.debug("hql=" + hql);
 			logger.debug("args="
@@ -94,7 +95,7 @@ public class CarDaoImpl extends HibernateCrudJpaDao<Car> implements CarDao{
 			map.put("code", 		ary[2]);
 			map.put("plateType", 	ary[3]);
 			map.put("plateNo", 		ary[4]);
-			map.put("name", 		ary[5]);
+			map.put("driver", 		ary[5]);
 			map.put("factoryType", 	ary[6]);
 			map.put("factoryModel", ary[7]);
 			map.put("businessType", ary[8]);
@@ -123,9 +124,9 @@ public class CarDaoImpl extends HibernateCrudJpaDao<Car> implements CarDao{
 		final StringBuffer hql = new StringBuffer();
 		
 		//因为用正班做查询条件1部车辆返回多个正班司机.待解决 CarByDriver.TYPE_ZHENGBAN
-		hql.append("select car.id,car.status,car.code,car.plateType,car.plateNo,")
-		   .append("(select m.driver.name from CarByDriver m where m.car.id = car.id and m.classes="+CarByDriver.TYPE_FUBAN+"),")
-		   .append("car.factoryType,car.factoryModel,car.businessType,car.motorcade.name,car.unit.name,car.registerDate,car.originNo,car.vin ");
+		hql.append("SELECT car.id,car.status,car.code,car.plateType,car.plateNo,car.driver")
+		   //.append("(select m.driver.name from CarByDriver m where m.car.id = car.id and m.classes="+CarByDriver.TYPE_FUBAN+"),")
+		   .append(",car.factoryType,car.factoryModel,car.businessType,car.motorcade.name,car.unit.name,car.registerDate,car.originNo,car.vin ");
 		
 		//方便统计记录数
 		String sqlStr =	" FROM Car car ";
@@ -133,10 +134,11 @@ public class CarDaoImpl extends HibernateCrudJpaDao<Car> implements CarDao{
 		hql.append(sqlStr);
 		
 		//组合查询条件
-		setWhere(condition,hql);
-		
+		if(condition != null && condition.getValues().size() > 0){
+			setWhere(condition,hql);
+		}
 		//排序
-		hql.append(" order by car.id");
+		hql.append(" order by car.status,car.fileDate desc");
 		//if (logger.isDebugEnabled()) {
 			logger.debug("pageNo=" + pageNo);
 			logger.debug("pageSize=" + _pageSize);
@@ -186,7 +188,7 @@ public class CarDaoImpl extends HibernateCrudJpaDao<Car> implements CarDao{
 			map.put("code", 		ary[2]);
 			map.put("plateType", 	ary[3]);
 			map.put("plateNo", 		ary[4]);
-			map.put("name", 		ary[5]);
+			map.put("driver", 		ary[5]);
 			map.put("factoryType", 	ary[6]);
 			map.put("factoryModel", ary[7]);
 			map.put("businessType", ary[8]);
@@ -221,9 +223,11 @@ public class CarDaoImpl extends HibernateCrudJpaDao<Car> implements CarDao{
 		sqlStr = "select count(*) " + sqlStr;
 		
 		hql4Count.append(sqlStr) ;
-		
 		//组合查询条件
-		setWhere(condition,hql4Count);
+		if(condition != null && condition.getValues().size() > 0){
+			setWhere(condition,hql4Count);
+		}
+		
 		
 		final String queryString = hql4Count.toString();
 		
