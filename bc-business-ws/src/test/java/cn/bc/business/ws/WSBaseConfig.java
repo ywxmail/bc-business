@@ -82,20 +82,12 @@ public abstract class WSBaseConfig {
 		if (params == null)
 			throw new CoreException("need params");
 		StringBuffer msgTpl = new StringBuffer();
-		msgTpl.append(this.wrapXMLMark(this.getSoapMethod() + " xmlns=\""
+		msgTpl.append(WSUtils.wrapXMLMark(this.getSoapMethod() + " xmlns=\""
 				+ this.getSoapNamespace() + "\""));
 		for (Entry<String, String> e : params.entrySet()) {
-			msgTpl.append(this.makeXMLNode(e.getKey(), e.getValue()));
+			msgTpl.append(WSUtils.makeXMLNode(e.getKey(), e.getValue()));
 		}
-		msgTpl.append(this.wrapXMLMark("/" + this.getSoapMethod()));
+		msgTpl.append(WSUtils.wrapXMLMark("/" + this.getSoapMethod()));
 		return msgTpl;
-	}
-
-	protected Object makeXMLNode(String key, String value) {
-		return this.wrapXMLMark(key) + value + this.wrapXMLMark("/" + key);
-	}
-
-	protected String wrapXMLMark(String value) {
-		return "<" + value + ">";
 	}
 }
