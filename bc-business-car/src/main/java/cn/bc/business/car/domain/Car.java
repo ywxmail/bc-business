@@ -267,7 +267,7 @@ public class Car extends RichFileEntityImpl {
 		this.color = color;
 	}
 
-	@Column(name = "RNGINE_NO")
+	@Column(name = "ENGINE_NO")
 	public String getEngineNo() {
 		return engineNo;
 	}
@@ -276,7 +276,7 @@ public class Car extends RichFileEntityImpl {
 		this.engineNo = engineNo;
 	}
 
-	@Column(name = "RNGINE_TYPE")
+	@Column(name = "ENGINE_TYPE")
 	public String getEngineType() {
 		return engineType;
 	}
