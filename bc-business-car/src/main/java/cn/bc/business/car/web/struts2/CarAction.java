@@ -140,7 +140,7 @@ public class CarAction extends FileEntityAction<Long, Car> {
 	//搜索条件
 	@Override
 	protected String[] getSearchFields() {
-		return new String[] { "plateType", "plateNo", "factoryType" };
+		return new String[] { "plateType", "plateNo", "factoryType", "driver" };
 	}
 	
 	
@@ -165,13 +165,13 @@ public class CarAction extends FileEntityAction<Long, Car> {
 						return car.get("plateType") + " "+ car.get("plateNo");
 					}
 				}));
-		columns.add(new TextColumn("['name']", getText("car.carMan"),		100).
+		columns.add(new TextColumn("['driver']", getText("car.carMan"),		100).
 				setUseTitleFromLabel(true).setValueFormater(new AbstractFormater<String>() {
 					@Override
 					public String format(Object context, Object value) {
 						Map car = (Map) context;
-						if(car.get("name") != null){
-							return car.get("name") + "("+getText("car.by.driver.classes")+")";
+						if(car.get("driver") != null){
+							return car.get("driver") + "("+getText("car.by.driver.classes")+")";
 						}else{
 							return "";
 						}
