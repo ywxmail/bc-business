@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	
+	<!-- 居民身份证-->
+	<package name="certIdentity" extends="bc-default" namespace="/bc-business">
+		<action name="certIdentity/create" class="certIdentityAction" method="create">
+			<result name="form">/bc-business/cert/driver4cert/certIdentity/form.jsp</result>
+		</action>
+		<action name="certIdentity/edit" class="certIdentityAction" method="edit">
+			<result name="form">/bc-business/cert/driver4cert/certIdentity/form.jsp</result>
+		</action>
+	</package>
+	
+	<!-- 机动车行驶证-->
+	<package name="certVehicelicense" extends="bc-default" namespace="/bc-business">
+		<action name="certVehicelicense/carInfo" class="certVehicelicenseAction" method="carInfo">
+		</action>
+		<action name="certVehicelicense/create" class="certVehicelicenseAction" method="create">
+			<result name="form">/bc-business/cert/car4cert/certVehicelicense/form.jsp</result>
+		</action>
+		<action name="certVehicelicense/edit" class="certVehicelicenseAction" method="edit">
+			<result name="form">/bc-business/cert/car4cert/certVehicelicense/form.jsp</result>
+		</action>
+	</package>
+	
+</struts>	
+
+

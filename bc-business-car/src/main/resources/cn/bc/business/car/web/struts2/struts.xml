@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+
+	
+	<package name="car4Cert" extends="bc-default" namespace="/bc-business/car4cert">
+		<action name="create" class="car4CertAction" method="create">
+			<result name="showdialog" >/bc-business/cert/car4cert/select.jsp</result>
+		</action>
+		<!-- 分页视图 -->
+		<action name="paging" class="car4CertAction" method="paging" />
+		<action name="data" class="car4CertAction" method="data" />
+		<action name="delete" class="car4CertAction" method="delete" />
+		<!-- 非分页视图 -->
+		<action name="list" class="car4CertAction" method="list" />
+	</package>
+</struts>

@@ -14,7 +14,7 @@
 		<action name="contractLabour/create" class="contractLabourAction" method="create">
 			<result name="form">/bc-business/contractLabour/form.jsp</result>
 		</action>
-		<action name="contractLabour/certMess" class="contractLabourAction" method="certMess">
+		<action name="contractLabour/certInfo" class="contractLabourAction" method="certInfo">
 		</action>
 	</package>
 	

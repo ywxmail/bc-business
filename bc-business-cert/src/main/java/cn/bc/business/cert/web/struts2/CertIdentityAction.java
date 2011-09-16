@@ -1,9 +1,9 @@
 /**
  * 
  */
-package cn.bc.business.contract.web.struts2;
+package cn.bc.business.cert.web.struts2;
 
-import java.util.List;
+import java.util.Calendar;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,94 +12,112 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
 import cn.bc.business.cert.domain.Cert;
+import cn.bc.business.cert.domain.Cert4Identity;
+import cn.bc.business.cert.service.CertIdentityService;
 import cn.bc.business.cert.service.CertService;
-import cn.bc.business.contract.domain.Contract;
-import cn.bc.business.contract.domain.Contract4Labour;
-import cn.bc.business.contract.service.ContractLabourService;
 import cn.bc.business.web.struts2.FileEntityAction;
 import cn.bc.core.RichEntityImpl;
 import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.docs.service.AttachService;
 import cn.bc.docs.web.ui.html.AttachWidget;
 import cn.bc.identity.web.SystemContext;
-import cn.bc.web.ui.html.grid.Column;
-import cn.bc.web.ui.html.grid.GridData;
 import cn.bc.web.ui.html.page.ButtonOption;
-import cn.bc.web.ui.html.page.HtmlPage;
 import cn.bc.web.ui.html.page.PageOption;
-import cn.bc.web.ui.json.Json;
 
 /**
- * 司机劳动合同Action
+ * 居民身份证Action
  * 
  * @author wis.ho
  * 
  */
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 @Controller
-public class ContractLabourAction extends FileEntityAction<Long, Contract4Labour> {
-	// private static Log logger = LogFactory.getLog(ContractAction.class);
-	private static final long 		serialVersionUID 			= 1L;
-	public 	ContractLabourService 	contractLabourService;
-	public	CertService				certService;
-	private AttachService 			attachService;
-	private String					MANAGER_KEY 				= "R_ADMIN";// 管理角色的编码
-	public 	boolean 	   			isManager;
-	public	Long 					carManId;
-	public  String 					certCode;
-	public 	AttachWidget 			attachsUI;
-	public 	Map<String,String>		statusesValue;
+public class CertIdentityAction extends FileEntityAction<Long, Cert4Identity> {
+	// private static Log logger = LogFactory.getLog(CertIdentityAction.class);
+	private static final long 		    serialVersionUID		= 1L;                       
+	public 	CertIdentityService		    certIdentityService;    
+	public 	CertService					certService;
+	private AttachService 			    attachService;                                          
+	private String					    MANAGER_KEY				= "R_ADMIN";// 管理角色的编码      
+	public 	boolean 	   			    isManager;                                              
+	public 	AttachWidget 			    attachsUI;                                              
+	public 	Map<String,String>		    statusesValue;                                          
+	public	Long					    carManId;                                               
+	public  Map<String,Object>	 		carManMessMap;
 	
-
 	@Autowired
-	public void setContractLabourService(ContractLabourService contractLabourService) {
-		this.contractLabourService = contractLabourService;
-		this.setCrudService(contractLabourService);
+	public void setCertIdentityService(CertIdentityService certIdentityService) {
+		this.certIdentityService = certIdentityService;
+		this.setCrudService(certIdentityService);
 	}
+	
 	
 	@Autowired
 	public void setCertService(CertService certService) {
 		this.certService = certService;
 	}
-	
+
+
 	@Autowired
 	public void setAttachService(AttachService attachService) {
 		this.attachService = attachService;
 	}
-
-
-
+	
 
 	@SuppressWarnings("static-access")
 	public String create() throws Exception {
 		String r = super.create();
 		isManager = isManager();
-		this.getE().setUid(this.getIdGeneratorService().next(this.getE().KEY_UID));
-		this.getE().setType(Contract.TYPE_LABOUR);
+
+		this.getE().setUid(this.getIdGeneratorService().next(this.getE().ATTACH_TYPE));
+		this.getE().setType(Cert.TYPE_IDENTITY);
 		this.getE().setStatus(RichEntityImpl.STATUS_DISABLED);
 		
 		attachsUI = buildAttachsUI(true);
-
 		return r;
 	}
 	
 	@Override
 	public String edit() throws Exception {
 		this.setE(this.getCrudService().load(this.getId()));
-		// 表单可选项的加载
+		
 		this.formPageOption = 	buildFormPageOption();
 		statusesValue		=	this.getEntityStatuses();
+		
+		//根据certId查找carMan信息
+		carManMessMap = this.certService.findCarManMessByCertId(this.getId());
+		carManId = Long.valueOf(carManMessMap.get("id")+"");
+		this.getE().setName(carManMessMap.get("name")+"");
 		
 		// 构建附件控件
 		attachsUI = buildAttachsUI(false);
 		return "form";
 	}
 	
+
+	@Override
+	public String save() throws Exception{
+		SystemContext context = this.getSystyemContext();
+		
+		//设置最后更新人的信息
+		Cert4Identity e = this.getE();
+		e.setModifier(context.getUserHistory());
+		e.setModifiedDate(Calendar.getInstance());
+		
+		this.getCrudService().save(e);
+		
+		//保存证件与司机的关联表信息
+		this.certService.carManNCert4Save(carManId,getE().getId());
+		
+		return "saveSuccess";
+	}
+
+	
 	@SuppressWarnings("static-access")
 	private AttachWidget buildAttachsUI(boolean isNew) {
 		isManager = isManager();
 		// 构建附件控件
-		String ptype = "contractLabour.main";
+		String ptype = "certIdentity.main";
 		AttachWidget attachsUI = new AttachWidget();
 		attachsUI.setFlashUpload(this.isFlashUpload());
 		attachsUI.addClazz("formAttachs");
@@ -125,11 +143,6 @@ public class ContractLabourAction extends FileEntityAction<Long, Contract4Labour
 	}
 
 	@Override
-	protected GridData buildGridData(List<Column> columns) {
-		return super.buildGridData(columns).setRowLabelExpression("name");
-	}
-
-	@Override
 	protected OrderCondition getDefaultOrderCondition() {
 		return null;// new OrderCondition("fileDate", Direction.Desc);
 	}
@@ -140,37 +153,9 @@ public class ContractLabourAction extends FileEntityAction<Long, Contract4Labour
 				.setHeight(400).setMinHeight(300);
 	}
 
-	@Override
-	protected String[] getSearchFields() {
-		return new String[] { "code", "wordNo" };
-	}
-	
-	
 	// 判断当前用户是否是本模块管理员
 	private boolean isManager() {
 		return ((SystemContext) this.getContext()).hasAnyRole(MANAGER_KEY);
 	}
-	
-	public Json json;
-	public String certInfo(){
-		Cert cert = this.certService.findCertByCarManId(carManId);
-		json = new Json();
-		if(cert != null && cert.getCertCode().length() > 0){
-			certCode = cert.getCertCode();
-			json.put("certCode", certCode);
-		}
-		
-		return "json";
-	}
-	
-	@Override
-	protected HtmlPage buildHtml4Paging() {
-		HtmlPage page = super.buildHtml4Paging();
-		if (carManId != null)
-			page.setAttr("data-extras", new Json().put("carManId", carManId)
-					.toString());
-		return page;
-	}
-
 
 }

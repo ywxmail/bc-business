@@ -24,8 +24,24 @@ import cn.bc.identity.domain.RichFileEntityImpl;
 public class Cert extends RichFileEntityImpl {
 	private static final long serialVersionUID = 1L;
 	public static final String ATTACH_TYPE = Cert.class.getSimpleName();
+	/**证件类型：居民身份证*/
+	public static final int TYPE_IDENTITY		= 1;
+	/**证件类型：机动车驾驶证*/
+	public static final int TYPE_DRIVING 		= 2;
+	/**证件类型：从业资格证*/
+	public static final int TYPE_CYZG 			= 3;
+	/**证件类型：服务资格证*/
+	public static final int TYPE_FWZG 			= 4;
+	/**证件类型：驾驶培训证*/
+	public static final int TYPE_JSPX			= 5;
+	/**证件类型：机动车行驶证*/
+	public static final int TYPE_VEHICELICENSE 	= 6;
+	/**证件类型：道路运输证*/
+	public static final int TYPE_ROADTRANSPORT 	= 7;
 
+	
 	private String certCode;// 证件号
+	private int    type;//居民身份证、机动车驾驶证、从业资格证、服务资格证、驾驶培训证、机动车行驶证、道路运输证
 	private String certName;// 证件简称
 	private String certFullName;// 证件全称
 	private String licencer;// 发证机关
@@ -47,6 +63,15 @@ public class Cert extends RichFileEntityImpl {
 
 	public void setCertCode(String certCode) {
 		this.certCode = certCode;
+	}
+	
+	@Column(name = "TYPE_")
+	public int getType() {
+		return type;
+	}
+
+	public void setType(int type) {
+		this.type = type;
 	}
 
 	@Column(name = "CERT_NAME")

@@ -8,4 +8,17 @@
 		<action name="select" class="selectCarManAction2" method="select"/>
 		<action name="select/search" class="selectCarManAction" method="search"/>
 	</package> -->
+	
+	
+	<package name="driver4Cert" extends="bc-default" namespace="/bc-business/driver4cert">
+		<action name="create" class="driver4CertAction" method="create">
+			<result name="showdialog" >/bc-business/cert/driver4cert/select.jsp</result>
+		</action>
+		<!-- 分页视图 -->
+		<action name="paging" class="driver4CertAction" method="paging" />
+		<action name="data" class="driver4CertAction" method="data" />
+		<action name="delete" class="driver4CertAction" method="delete" />
+		<!-- 非分页视图 -->
+		<action name="list" class="driver4CertAction" method="list" />
+	</package>
 </struts>

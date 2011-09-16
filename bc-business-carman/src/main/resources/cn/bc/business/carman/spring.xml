@@ -33,4 +33,10 @@
 		p:entityManagerFactory-ref="entityManagerFactory" />
 	<bean id="carManHistoryService" class="cn.bc.business.carman.service.CarManHistoryServiceImpl"
 		p:carManHistoryDao-ref="carManHistoryDao" />
+		
+	<!-- cert -->
+	<bean id="certDao" class="cn.bc.business.cert.dao.hibernate.jpa.CertDaoImpl"
+		p:entityManagerFactory-ref="entityManagerFactory" />
+	<bean id="certService" class="cn.bc.business.cert.service.CertServiceImpl"
+		p:certDao-ref="certDao" />
 </beans>

@@ -19,4 +19,17 @@
 		p:entityManagerFactory-ref="entityManagerFactory" />
 	<bean id="certService" class="cn.bc.business.cert.service.CertServiceImpl"
 		p:certDao-ref="certDao" />
+	
+	<!-- certIdentity -->
+	<bean id="certIdentityDao" class="cn.bc.business.cert.dao.hibernate.jpa.CertIdentityDaoImpl"
+		p:entityManagerFactory-ref="entityManagerFactory" />
+	<bean id="certIdentityService" class="cn.bc.business.cert.service.CertIdentityServiceImpl"
+		p:certIdentityDao-ref="certIdentityDao" />
+	
+	<!-- certVehicelicense -->
+	<bean id="certVehicelicenseDao" class="cn.bc.business.cert.dao.hibernate.jpa.CertVehicelicenseDaoImpl"
+		p:entityManagerFactory-ref="entityManagerFactory" />
+	<bean id="certVehicelicenseService" class="cn.bc.business.cert.service.CertVehicelicenseServiceImpl"
+		p:certVehicelicenseDao-ref="certVehicelicenseDao" />	
+	
 </beans>

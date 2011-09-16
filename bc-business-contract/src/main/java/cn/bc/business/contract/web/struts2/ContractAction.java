@@ -47,7 +47,7 @@ public class ContractAction extends FileEntityAction<Long, Contract> {
 	public ContractService contractService;
 	private String MANAGER_KEY = "R_ADMIN";// 管理角色的编码
 	public boolean isManager;
-	public String contractType;
+	public String carId;
 
 	public Map<String, String> statusesValue;
 

@@ -25,7 +25,7 @@ public class Cert4VehiceLicense extends Cert4Car {
 
 	private String owner;// 所有人
 	private String address;// 住址
-	private String useCharacter;//  
+	private String useCharacter;//使用性质  
 	private String vehiceType;// 车辆类型
 	private String vin;// 车辆识别代号
 	private String engineNo;// 发动机号码
@@ -38,6 +38,7 @@ public class Cert4VehiceLicense extends Cert4Car {
 	private int totalWeight;// 总质量，单位kg
 	private int curbWeight;// 整备质量，单位kg
 	private int accessWeight;// 核定载质量，单位kg
+	private int pullWeight;// 准牵引总质量，单位kg
 	private int accessCount;// 核定载人数
 	private Calendar scrapDate;// 强制报废日期
 	private String desc;// 备注
@@ -178,6 +179,15 @@ public class Cert4VehiceLicense extends Cert4Car {
 
 	public void setAccessWeight(int accessWeight) {
 		this.accessWeight = accessWeight;
+	}
+	
+	@Column(name = "PULL_WEIGHT")
+	public int getPullWeight() {
+		return pullWeight;
+	}
+
+	public void setPullWeight(int pullWeight) {
+		this.pullWeight = pullWeight;
 	}
 
 	@Column(name = "ACCESS_COUNT")
