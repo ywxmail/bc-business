@@ -227,6 +227,7 @@ CREATE TABLE BS_CERT_VEHICELICENSE(
    TOTAL_WEIGHT         BIGINT COMMENT '总质量，单位KG',
    CURB_WEIGHT          BIGINT COMMENT '整备质量，单位KG',
    ACCESS_WEIGHT        BIGINT COMMENT '核定载质量，单位KG',
+   PULL_WEIGHT          BIGINT COMMENT '准牵引总质量，单位KG',
    ACCESS_COUNT         BIGINT COMMENT '核定载人数',
    SCRAP_DATE           DATETIME COMMENT '强制报废日期',
    DESC_                VARCHAR(500) COMMENT '备注',
