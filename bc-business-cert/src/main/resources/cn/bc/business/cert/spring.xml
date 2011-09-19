@@ -32,4 +32,10 @@
 	<bean id="certVehicelicenseService" class="cn.bc.business.cert.service.CertVehicelicenseServiceImpl"
 		p:certVehicelicenseDao-ref="certVehicelicenseDao" />	
 	
+	<!-- certRoadtransport -->
+	<bean id="certRoadtransportDao" class="cn.bc.business.cert.dao.hibernate.jpa.CertRoadtransportDaoImpl"
+		p:entityManagerFactory-ref="entityManagerFactory" />
+	<bean id="certRoadtransportService" class="cn.bc.business.cert.service.CertRoadtransportServiceImpl"
+		p:certRoadtransportDao-ref="certRoadtransportDao" />	
+	
 </beans>

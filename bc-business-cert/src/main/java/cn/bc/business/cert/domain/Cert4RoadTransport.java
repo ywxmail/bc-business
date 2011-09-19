@@ -31,6 +31,7 @@ public class Cert4RoadTransport extends Cert4Car {
 	private int dimHeight;// 外廓尺寸：高，单位mm
 	private String scope;// 经营范围
 	private String level;// 技术等级
+	private String desc;// 备注
 
 	public Cert4RoadTransport() {
 		this.setCertName("道路运输证");
@@ -114,4 +115,15 @@ public class Cert4RoadTransport extends Cert4Car {
 	public void setLevel(String level) {
 		this.level = level;
 	}
+
+	@Column(name = "DESC_")
+	public String getDesc() {
+		return desc;
+	}
+
+	public void setDesc(String desc) {
+		this.desc = desc;
+	}
+	
+	
 }

@@ -26,6 +26,18 @@
 		</action>
 	</package>
 	
+	<!-- 道路运输证-->
+	<package name="certRoadtransport" extends="bc-default" namespace="/bc-business">
+		<action name="certRoadtransport/carInfo" class="certRoadtransportAction" method="carInfo">
+		</action>
+		<action name="certRoadtransport/create" class="certRoadtransportAction" method="create">
+			<result name="form">/bc-business/cert/car4cert/certRoadtransport/form.jsp</result>
+		</action>
+		<action name="certRoadtransport/edit" class="certRoadtransportAction" method="edit">
+			<result name="form">/bc-business/cert/car4cert/certRoadtransport/form.jsp</result>
+		</action>
+	</package>
+	
 </struts>	
 
 
