@@ -8,7 +8,7 @@ import cn.bc.business.cert.domain.Cert4VehiceLicense;
 import cn.bc.core.service.DefaultCrudService;
 
 /**
- * 证件Service的实现
+ * 机动车行驶证Service的实现
  * 
  * @author dragon
  */
