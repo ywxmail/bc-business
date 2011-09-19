@@ -12,7 +12,7 @@ import cn.bc.orm.hibernate.jpa.HibernateCrudJpaDao;
 
 
 /**
- * 居民身份证证件Dao的hibernate jpa实现
+ * 机动车行驶证Dao的hibernate jpa实现
  * 
  * @author dragon
  */

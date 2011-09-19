@@ -9,7 +9,7 @@ import cn.bc.core.service.CrudService;
 
 
 /**
- * 居民身份证件Service
+ * 机动车行驶证Service
  * 
  * @author dragon
  */
