@@ -29,7 +29,7 @@ import cn.bc.web.ui.html.page.PageOption;
 import cn.bc.web.ui.json.Json;
 
 /**
- * 居民身份证Action
+ * 机动车行驶证Action
  * 
  * @author wis.ho
  * 
