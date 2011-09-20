@@ -14,6 +14,46 @@
 		</action>
 	</package>
 	
+	<!-- 机动车驾驶证-->
+	<package name="certDriving" extends="bc-default" namespace="/bc-business">
+		<action name="certDriving/create" class="certDrivingAction" method="create">
+			<result name="form">/bc-business/cert/driver4cert/certDriving/form.jsp</result>
+		</action>
+		<action name="certDriving/edit" class="certDrivingAction" method="edit">
+			<result name="form">/bc-business/cert/driver4cert/certDriving/form.jsp</result>
+		</action>
+	</package>
+	
+	<!-- 从业资格证-->
+	<package name="certCyzg" extends="bc-default" namespace="/bc-business">
+		<action name="certCyzg/create" class="certCyzgAction" method="create">
+			<result name="form">/bc-business/cert/driver4cert/certCyzg/form.jsp</result>
+		</action>
+		<action name="certCyzg/edit" class="certCyzgAction" method="edit">
+			<result name="form">/bc-business/cert/driver4cert/certCyzg/form.jsp</result>
+		</action>
+	</package>
+	
+	<!-- 服务资格证-->
+	<package name="certFwzg" extends="bc-default" namespace="/bc-business">
+		<action name="certFwzg/create" class="certFwzgAction" method="create">
+			<result name="form">/bc-business/cert/driver4cert/certFwzg/form.jsp</result>
+		</action>
+		<action name="certFwzg/edit" class="certFwzgAction" method="edit">
+			<result name="form">/bc-business/cert/driver4cert/certFwzg/form.jsp</result>
+		</action>
+	</package>
+	
+	<!-- 驾驶培训证-->
+	<package name="certJspx" extends="bc-default" namespace="/bc-business">
+		<action name="certJspx/create" class="certJspxAction" method="create">
+			<result name="form">/bc-business/cert/driver4cert/certJspx/form.jsp</result>
+		</action>
+		<action name="certJspx/edit" class="certJspxAction" method="edit">
+			<result name="form">/bc-business/cert/driver4cert/certJspx/form.jsp</result>
+		</action>
+	</package>
+	
 	<!-- 机动车行驶证-->
 	<package name="certVehicelicense" extends="bc-default" namespace="/bc-business">
 		<action name="certVehicelicense/carInfo" class="certVehicelicenseAction" method="carInfo">
