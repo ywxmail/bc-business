@@ -109,7 +109,7 @@ create table BS_CERT (
     ID number(19) NOT NULL,
     STATUS_ number(1) NOT NULL,
     UID_ varchar2(36) NOT NULL,
-    TYPE_ NUMBER(1) NOT NULL,
+    TYPE_ number(1) NOT NULL,
     CERT_CODE varchar2(255) NOT NULL,
     CERT_NAME varchar2(255) NOT NULL,
     CERT_FULL_NAME varchar2(255),
