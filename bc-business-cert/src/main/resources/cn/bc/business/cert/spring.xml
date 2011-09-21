@@ -26,10 +26,42 @@
 	<bean id="certIdentityService" class="cn.bc.business.cert.service.CertIdentityServiceImpl"
 		p:certIdentityDao-ref="certIdentityDao" />
 	
+	<!-- certDriving -->
+	<bean id="certDrivingDao" class="cn.bc.business.cert.dao.hibernate.jpa.CertDrivingDaoImpl"
+		p:entityManagerFactory-ref="entityManagerFactory" />
+	<bean id="certDrivingService" class="cn.bc.business.cert.service.CertDrivingServiceImpl"
+		p:certDrivingDao-ref="certDrivingDao" />	
+	
+	<!-- certCyzg -->
+	<bean id="certCyzgDao" class="cn.bc.business.cert.dao.hibernate.jpa.CertCyzgDaoImpl"
+		p:entityManagerFactory-ref="entityManagerFactory" />
+	<bean id="certCyzgService" class="cn.bc.business.cert.service.CertCyzgServiceImpl"
+		p:certCyzgDao-ref="certCyzgDao" />	
+		
+	<!-- certFwzg -->
+	<bean id="certFwzgDao" class="cn.bc.business.cert.dao.hibernate.jpa.CertFwzgDaoImpl"
+		p:entityManagerFactory-ref="entityManagerFactory" />
+	<bean id="certFwzgService" class="cn.bc.business.cert.service.CertFwzgServiceImpl"
+		p:certFwzgDao-ref="certFwzgDao" />	
+		
+	<!-- certJspx -->
+	<bean id="certJspxDao" class="cn.bc.business.cert.dao.hibernate.jpa.CertJspxDaoImpl"
+		p:entityManagerFactory-ref="entityManagerFactory" />
+	<bean id="certJspxService" class="cn.bc.business.cert.service.CertJspxServiceImpl"
+		p:certJspxDao-ref="certJspxDao" />	
+	
 	<!-- certVehicelicense -->
 	<bean id="certVehicelicenseDao" class="cn.bc.business.cert.dao.hibernate.jpa.CertVehicelicenseDaoImpl"
 		p:entityManagerFactory-ref="entityManagerFactory" />
 	<bean id="certVehicelicenseService" class="cn.bc.business.cert.service.CertVehicelicenseServiceImpl"
 		p:certVehicelicenseDao-ref="certVehicelicenseDao" />	
+	
+	<!-- certRoadtransport -->
+	<bean id="certRoadtransportDao" class="cn.bc.business.cert.dao.hibernate.jpa.CertRoadtransportDaoImpl"
+		p:entityManagerFactory-ref="entityManagerFactory" />
+	<bean id="certRoadtransportService" class="cn.bc.business.cert.service.CertRoadtransportServiceImpl"
+		p:certRoadtransportDao-ref="certRoadtransportDao" />	
+		
+
 	
 </beans>

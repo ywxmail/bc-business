@@ -165,7 +165,7 @@ public class Driver4CertAction extends CertAction {
 		grid.setName(getText(StringUtils.uncapitalize(getEntityConfigName())));
 
 		// 单选及双击行编辑
-		grid.setSingleSelect(false).setDblClickRow("bc.certList.edit");
+		grid.setSingleSelect(false).setDblClickRow("bc.certdriverList.edit");
 
 		// 分页条
 		grid.setFooter(buildGridFooter(grid));
@@ -182,12 +182,12 @@ public class Driver4CertAction extends CertAction {
 			// 新建按钮
 			tb.addButton(new ToolbarButton().setIcon("ui-icon-document")
 					.setText(getText("label.create"))
-					.setClick("bc.certList.create"));
+					.setClick("bc.certdriverList.create"));
 			
 			// 编辑按钮
 			tb.addButton(new ToolbarButton().setIcon("ui-icon-document")
 					.setText(getText("label.edit"))
-					.setClick("bc.certList.edit"));
+					.setClick("bc.certdriverList.edit"));
 
 			
 			// 删除按钮
