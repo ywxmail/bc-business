@@ -11,8 +11,6 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
-import cn.bc.business.cert.domain.Cert;
-import cn.bc.business.cert.service.CertService;
 import cn.bc.business.contract.domain.Contract;
 import cn.bc.business.contract.domain.Contract4Labour;
 import cn.bc.business.contract.service.ContractLabourService;
@@ -41,7 +39,7 @@ public class ContractLabourAction extends FileEntityAction<Long, Contract4Labour
 	// private static Log logger = LogFactory.getLog(ContractAction.class);
 	private static final long 		serialVersionUID 			= 1L;
 	public 	ContractLabourService 	contractLabourService;
-	public	CertService				certService;
+//	public	CertService				certService;
 	private AttachService 			attachService;
 	private String					MANAGER_KEY 				= "R_ADMIN";// 管理角色的编码
 	public 	boolean 	   			isManager;
@@ -56,11 +54,11 @@ public class ContractLabourAction extends FileEntityAction<Long, Contract4Labour
 		this.contractLabourService = contractLabourService;
 		this.setCrudService(contractLabourService);
 	}
-	
-	@Autowired
-	public void setCertService(CertService certService) {
-		this.certService = certService;
-	}
+//	
+//	@Autowired
+//	public void setCertService(CertService certService) {
+//		this.certService = certService;
+//	}
 	
 	@Autowired
 	public void setAttachService(AttachService attachService) {
@@ -153,12 +151,12 @@ public class ContractLabourAction extends FileEntityAction<Long, Contract4Labour
 	
 	public Json json;
 	public String certInfo(){
-		Cert cert = this.certService.findCertByCarManId(carManId);
-		json = new Json();
-		if(cert != null && cert.getCertCode().length() > 0){
-			certCode = cert.getCertCode();
-			json.put("certCode", certCode);
-		}
+//		Cert cert = this.certService.findCertByCarManId(carManId);
+//		json = new Json();
+//		if(cert != null && cert.getCertCode().length() > 0){
+//			certCode = cert.getCertCode();
+//			json.put("certCode", certCode);
+//		}
 		
 		return "json";
 	}

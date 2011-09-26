@@ -7,15 +7,10 @@ import java.util.Calendar;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import cn.bc.identity.domain.ActorHistory;
-import cn.bc.identity.domain.ActorHistory;
 import cn.bc.identity.domain.RichFileEntityImpl;
 
 /**
@@ -37,7 +32,8 @@ public class Contract extends RichFileEntityImpl {
 	private String code;// 合同编号
 	private int    type;// 合同类型：如劳动合同、承包合同等
 	private String wordNo;// 文书号
-	private ActorHistory transactor;// 经办人
+	private Long transactorId;// 经办人ID
+	private String transactorName;// 经办人姓名
 
 	private Calendar signDate;// 签订日期
 	private Calendar startDate;// 生效日期
@@ -77,14 +73,22 @@ public class Contract extends RichFileEntityImpl {
 		this.type = type;
 	}
 
-	@ManyToOne(fetch = FetchType.EAGER, optional = false)
-	@JoinColumn(name = "TRANSACTOR_ID", referencedColumnName = "ID")
-	public ActorHistory getTransactor() {
-		return transactor;
+	@Column(name = "TRANSACTOR_ID")
+	public Long getTransactorId() {
+		return transactorId;
 	}
 
-	public void setTransactor(ActorHistory transactor) {
-		this.transactor = transactor;
+	public void setTransactorId(Long transactorId) {
+		this.transactorId = transactorId;
+	}
+
+	@Column(name = "TRANSACTOR_NAME")
+	public String getTransactorName() {
+		return transactorName;
+	}
+
+	public void setTransactorName(String transactorName) {
+		this.transactorName = transactorName;
 	}
 
 	public String getCode() {
