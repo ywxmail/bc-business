@@ -3,6 +3,8 @@
  */
 package cn.bc.business.runcase.domain;
 
+import java.util.Calendar;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
@@ -30,8 +32,9 @@ public class Case4InfractTraffic extends CaseBase {
 	private String comment;// 处理意见
 
 	private boolean deliver;// 是否邮递
-	private boolean close;// 是否结案
+	private Calendar deliverDate;// 邮递时间
 	private boolean sign;// 是否签领
+	private Calendar signDate;// 签领时间
 
 	@Column(name = "CHARGER1_ID")
 	public Long getChargerId() {
@@ -111,15 +114,6 @@ public class Case4InfractTraffic extends CaseBase {
 		this.deliver = deliver;
 	}
 
-	@Column(name = "IS_CLOSE")
-	public boolean isClose() {
-		return close;
-	}
-
-	public void setClose(boolean close) {
-		this.close = close;
-	}
-
 	@Column(name = "IS_SIGN")
 	public boolean isSign() {
 		return sign;
@@ -127,5 +121,23 @@ public class Case4InfractTraffic extends CaseBase {
 
 	public void setSign(boolean sign) {
 		this.sign = sign;
+	}
+
+	@Column(name = "DELIVER_DATE")
+	public Calendar getDeliverDate() {
+		return deliverDate;
+	}
+
+	public void setDeliverDate(Calendar deliverDate) {
+		this.deliverDate = deliverDate;
+	}
+
+	@Column(name = "SIGN_DATE")
+	public Calendar getSignDate() {
+		return signDate;
+	}
+
+	public void setSignDate(Calendar signDate) {
+		this.signDate = signDate;
 	}
 }
