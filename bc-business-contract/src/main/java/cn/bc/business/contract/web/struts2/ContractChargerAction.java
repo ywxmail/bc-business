@@ -3,10 +3,8 @@
  */
 package cn.bc.business.contract.web.struts2;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -14,7 +12,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
 import cn.bc.business.OptionConstants;
-import cn.bc.business.carman.domain.CarMan;
 import cn.bc.business.contract.domain.Contract;
 import cn.bc.business.contract.domain.Contract4Charger;
 import cn.bc.business.contract.service.ContractChargerService;
@@ -111,23 +108,23 @@ public class ContractChargerAction extends FileEntityAction<Long, Contract4Charg
 	
 	
 	private void dealCharger4Save() {
-		Set<CarMan> chargers = null;
-		if(this.assignChargerIds != null && this.assignChargerIds.length() > 0){
-			chargers = new HashSet<CarMan>();
-			String[] chargerIds = this.assignChargerIds.split(",");
-			CarMan carMan;
-			for(String cid : chargerIds){
-				carMan = new CarMan();
-				carMan.setId(new Long(cid));
-				chargers.add(carMan);
-			}
-		}
-		if(this.getE().getChargers() != null){
-			this.getE().getChargers().clear();
-			this.getE().getChargers().addAll(chargers);
-		}else{
-			this.getE().setChargers(chargers);
-		}
+//		Set<CarMan> chargers = null;
+//		if(this.assignChargerIds != null && this.assignChargerIds.length() > 0){
+//			chargers = new HashSet<CarMan>();
+//			String[] chargerIds = this.assignChargerIds.split(",");
+//			CarMan carMan;
+//			for(String cid : chargerIds){
+//				carMan = new CarMan();
+//				carMan.setId(new Long(cid));
+//				chargers.add(carMan);
+//			}
+//		}
+//		if(this.getE().getChargers() != null){
+//			this.getE().getChargers().clear();
+//			this.getE().getChargers().addAll(chargers);
+//		}else{
+//			this.getE().setChargers(chargers);
+//		}
 		
 	}
 

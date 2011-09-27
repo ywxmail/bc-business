@@ -17,6 +17,7 @@ import javax.persistence.OrderBy;
 import javax.persistence.Table;
 
 import cn.bc.business.cert.domain.Cert;
+import cn.bc.business.contract.domain.Contract;
 import cn.bc.business.motorcade.domain.Motorcade;
 import cn.bc.identity.domain.Actor;
 import cn.bc.identity.domain.RichFileEntityImpl;
@@ -89,6 +90,7 @@ public class Car extends RichFileEntityImpl {
 	private String desc3;// 备注3
 	
 	private Set<Cert> certs;//拥有的证件
+	private Set<Contract> contracts;//合同
 
 	@ManyToOne(fetch = FetchType.EAGER, optional = false)
 	@JoinColumn(name = "MOTORCADE_ID", referencedColumnName = "ID")
@@ -123,6 +125,22 @@ public class Car extends RichFileEntityImpl {
 
 	public void setCerts(Set<Cert> certs) {
 		this.certs = certs;
+	}
+
+	@OneToMany(fetch=FetchType.LAZY)
+    @JoinTable(name="BS_CAR_CONTRACT",
+        joinColumns=
+            @JoinColumn(name="CAR_ID", referencedColumnName="ID"),
+        inverseJoinColumns=
+            @JoinColumn(name="CONTRACT_ID", referencedColumnName="ID")
+        )
+    @OrderBy("fileDate desc")
+	public Set<Contract> getContracts() {
+		return contracts;
+	}
+
+	public void setContracts(Set<Contract> contracts) {
+		this.contracts = contracts;
 	}
 
 	@ManyToOne(fetch = FetchType.EAGER, optional = false)

@@ -17,18 +17,6 @@
 			<artifactId>bc-business-base</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<!-- 司机责任人 -->
-		<dependency>
-			<groupId>cn.bc.business</groupId>
-			<artifactId>bc-business-carman</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<!-- 车辆 -->
-		<dependency>
-			<groupId>cn.bc.business</groupId>
-			<artifactId>bc-business-car</artifactId>
-			<version>${project.version}</version>
-		</dependency>
 		<!-- 选项模块 -->
 		<dependency>
 			<groupId>cn.bc</groupId>

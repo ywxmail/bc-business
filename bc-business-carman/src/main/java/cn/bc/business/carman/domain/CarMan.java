@@ -16,6 +16,7 @@ import javax.persistence.OrderBy;
 import javax.persistence.Table;
 
 import cn.bc.business.cert.domain.Cert;
+import cn.bc.business.contract.domain.Contract;
 import cn.bc.identity.domain.RichFileEntityImpl;
 
 /**
@@ -34,9 +35,6 @@ public class CarMan extends RichFileEntityImpl {
 	public static final int TYPE_CHARGER = 1;
 	/**类别：司机和责任人*/
 	public static final int TYPE_DRIVER_AND_CHARGER = 2;
-	
-	
-	
 
 	private int type;// 类别
 	private String orderNo;// 排序号
@@ -73,6 +71,7 @@ public class CarMan extends RichFileEntityImpl {
 	private String accessCerts;// 已考取证件：历史数据保存
 	
 	private Set<Cert> certs;//拥有的证件
+	private Set<Contract> contracts;//合同
 
 	@Column(name = "DESC_")
 	public String getDescription() {
@@ -97,6 +96,22 @@ public class CarMan extends RichFileEntityImpl {
 
 	public void setCerts(Set<Cert> certs) {
 		this.certs = certs;
+	}
+
+	@OneToMany(fetch=FetchType.LAZY)
+    @JoinTable(name="BS_CARMAN_CONTRACT",
+        joinColumns=
+            @JoinColumn(name="MAN_ID", referencedColumnName="ID"),
+        inverseJoinColumns=
+            @JoinColumn(name="CONTRACT_ID", referencedColumnName="ID")
+        )
+    @OrderBy("fileDate desc")
+	public Set<Contract> getContracts() {
+		return contracts;
+	}
+
+	public void setContracts(Set<Contract> contracts) {
+		this.contracts = contracts;
 	}
 
 	@Column(name = "ORDER_")

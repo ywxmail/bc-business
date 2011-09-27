@@ -38,10 +38,19 @@ public class Case4Accident extends CaseBase {
 	private String driverClasses;// 驾驶状态：如正班等
 	private String insuranceCompany;// 保险公司
 	private String insuranceInfo;// 相关保单信息
-	private boolean close;// 是否结案
 	private boolean deliver;// 是否送保
+	private Calendar deliverDate;// 送保日期
+	private Float deliverMoney;// 送保金额
 	private boolean claim;// 是否保险公司赔付
+	private Calendar claimDate;// 保险公司赔付日期
+	private Float claimMoney;// 保险公司赔付金额
+	private String claimCode;// 保险公司赔付收据号
+	private String claimNo1;// 商业险赔付号
+	private String claimNo2;// 交强险赔付号
 	private boolean pay;// 是否司机受款
+	private Calendar payDate;// 司机受款日期
+	private Float payMoney;// 司机受款金额
+	private String payCode;// 司机受款收据号
 
 	private String casualties;// 伤亡情况
 	private String carHurt;// 车损情况
@@ -185,15 +194,6 @@ public class Case4Accident extends CaseBase {
 		this.insuranceInfo = insuranceInfo;
 	}
 
-	@Column(name = "IS_CLOSE")
-	public boolean isClose() {
-		return close;
-	}
-
-	public void setClose(boolean close) {
-		this.close = close;
-	}
-
 	@Column(name = "IS_DELIVER")
 	public boolean isDeliver() {
 		return deliver;
@@ -201,6 +201,24 @@ public class Case4Accident extends CaseBase {
 
 	public void setDeliver(boolean deliver) {
 		this.deliver = deliver;
+	}
+
+	@Column(name = "DELIVER_DATE")
+	public Calendar getDeliverDate() {
+		return deliverDate;
+	}
+
+	public void setDeliverDate(Calendar deliverDate) {
+		this.deliverDate = deliverDate;
+	}
+
+	@Column(name = "DELIVER_MONEY")
+	public Float getDeliverMoney() {
+		return deliverMoney;
+	}
+
+	public void setDeliverMoney(Float deliverMoney) {
+		this.deliverMoney = deliverMoney;
 	}
 
 	@Column(name = "IS_CLAIM")
@@ -212,6 +230,51 @@ public class Case4Accident extends CaseBase {
 		this.claim = claim;
 	}
 
+	@Column(name = "CLAIM_DATE")
+	public Calendar getClaimDate() {
+		return claimDate;
+	}
+
+	public void setClaimDate(Calendar claimDate) {
+		this.claimDate = claimDate;
+	}
+
+	@Column(name = "CLAIM_MONEY")
+	public Float getClaimMoney() {
+		return claimMoney;
+	}
+
+	public void setClaimMoney(Float claimMoney) {
+		this.claimMoney = claimMoney;
+	}
+
+	@Column(name = "CLAIM_CODE")
+	public String getClaimCode() {
+		return claimCode;
+	}
+
+	public void setClaimCode(String claimCode) {
+		this.claimCode = claimCode;
+	}
+
+	@Column(name = "CLAIM_NO1")
+	public String getClaimNo1() {
+		return claimNo1;
+	}
+
+	public void setClaimNo1(String claimNo1) {
+		this.claimNo1 = claimNo1;
+	}
+
+	@Column(name = "CLAIM_NO2")
+	public String getClaimNo2() {
+		return claimNo2;
+	}
+
+	public void setClaimNo2(String claimNo2) {
+		this.claimNo2 = claimNo2;
+	}
+
 	@Column(name = "IS_PAY")
 	public boolean isPay() {
 		return pay;
@@ -219,6 +282,33 @@ public class Case4Accident extends CaseBase {
 
 	public void setPay(boolean pay) {
 		this.pay = pay;
+	}
+
+	@Column(name = "PAY_DATE")
+	public Calendar getPayDate() {
+		return payDate;
+	}
+
+	public void setPayDate(Calendar payDate) {
+		this.payDate = payDate;
+	}
+
+	@Column(name = "PAY_MONEY")
+	public Float getPayMoney() {
+		return payMoney;
+	}
+
+	public void setPayMoney(Float payMoney) {
+		this.payMoney = payMoney;
+	}
+
+	@Column(name = "PAY_CODE")
+	public String getPayCode() {
+		return payCode;
+	}
+
+	public void setPayCode(String payCode) {
+		this.payCode = payCode;
 	}
 
 	@Column(name = "CASUALTIES")
