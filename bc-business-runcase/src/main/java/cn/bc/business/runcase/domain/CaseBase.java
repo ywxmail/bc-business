@@ -57,6 +57,8 @@ public class CaseBase extends RichFileEntityImpl {
 	private String address;// 事发地点
 	private Calendar happenDate;// 事发时间
 	private Calendar closeDate;// 结案日期
+	private Long closerId;// 结案人ID(ActorHistory的ID)
+	private String closerName;// 结案人姓名
 	private String description;// 备注、详细内容
 
 	private Long motorcadeId;// 车队ID
@@ -132,9 +134,27 @@ public class CaseBase extends RichFileEntityImpl {
 	public Calendar getCloseDate() {
 		return closeDate;
 	}
-
+	
 	public void setCloseDate(Calendar closeDate) {
 		this.closeDate = closeDate;
+	}
+
+	@Column(name = "CLOSER_ID")
+	public Long getCloserId() {
+		return closerId;
+	}
+
+	public void setCloserId(Long closerId) {
+		this.closerId = closerId;
+	}
+
+	@Column(name = "CLOSER_NAME")
+	public String getCloserName() {
+		return closerName;
+	}
+
+	public void setCloserName(String closerName) {
+		this.closerName = closerName;
 	}
 
 	@Column(name = "DESC_")
