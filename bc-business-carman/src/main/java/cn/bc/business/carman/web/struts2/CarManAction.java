@@ -24,6 +24,7 @@ import cn.bc.identity.service.IdGeneratorService;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.option.domain.OptionItem;
 import cn.bc.option.service.OptionService;
+import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.formater.KeyValueFormater;
 import cn.bc.web.ui.html.grid.Column;
 import cn.bc.web.ui.html.grid.GridData;
@@ -153,8 +154,8 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 	// 设置页面的尺寸
 	@Override
 	protected PageOption buildListPageOption() {
-		return super.buildListPageOption().setWidth(500).setMinWidth(400)
-				.setHeight(400).setMinHeight(300);
+		return super.buildListPageOption().setWidth(1000).setMinWidth(400)
+				.setHeight(500).setMinHeight(300);
 	}
 
 	@Override
@@ -193,7 +194,7 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 		isManager = isManager();
 
 		List<Column> columns = super.buildGridColumns();
-		columns.add(new TextColumn("status", getText("carMan.status"), 80)
+		columns.add(new TextColumn("status", getText("carMan.status"), 60)
 				.setSortable(true).setValueFormater(
 						new KeyValueFormater(getEntityStatuses())));
 		columns.add(new TextColumn("type", getText("carMan.type"), 80)
@@ -201,8 +202,19 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 						new KeyValueFormater(getType())));
 		columns.add(new TextColumn("name", getText("carMan.name"), 80)
 				.setSortable(true));
-		columns.add(new TextColumn("origin", getText("carMan.origin"))
+		columns.add(new TextColumn("cert4Indentity",
+				getText("carMan.cert4Indentity"), 160).setSortable(true));
+		columns.add(new TextColumn("cert4CYZG", getText("carMan.cert4CYZG"),
+				120).setSortable(true));
+		columns.add(new TextColumn("cert4FWZG", getText("carMan.cert4FWZG"),
+				100).setSortable(true));
+		columns.add(new TextColumn("workDate", getText("carMan.workDate"), 120)
+				.setSortable(true).setValueFormater(
+						new CalendarFormater("yyyy-MM-dd ")));
+		columns.add(new TextColumn("origin", getText("carMan.origin"), 100)
 				.setSortable(true));
+		columns.add(new TextColumn("formerUnit", getText("carMan.formerUnit"),
+				80).setSortable(true));
 		return columns;
 	}
 
