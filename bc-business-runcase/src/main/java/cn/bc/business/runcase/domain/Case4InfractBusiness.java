@@ -40,6 +40,7 @@ public class Case4InfractBusiness extends CaseBase {
 	private String detain;// 扣留物品
 	private Float jeom;// 扣分
 	private Float penalty;// 罚款金额
+	private Float penalty2;// 违约金
 	private String area;// 所属区县
 	private String pullUnit;// 拖车单位
 	private String operator;// 执法人
@@ -190,6 +191,14 @@ public class Case4InfractBusiness extends CaseBase {
 
 	public void setPenalty(Float penalty) {
 		this.penalty = penalty;
+	}
+
+	public Float getPenalty2() {
+		return penalty2;
+	}
+
+	public void setPenalty2(Float penalty2) {
+		this.penalty2 = penalty2;
 	}
 
 	public String getArea() {
