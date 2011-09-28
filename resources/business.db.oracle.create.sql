@@ -1039,9 +1039,9 @@ CREATE TABLE BS_CASE_INFRACT_TRAFFIC (
    JEOM                 NUMBER(3,1),
    COMMENT_             VARCHAR2(4000),
    IS_DELIVER           NUMBER(1)            NOT NULL,
-   DELIVER_DATE         DATE                 not null,
+   DELIVER_DATE         DATE,
    IS_SIGN              number(1)            not null,
-   SIGN_DATE            DATE                 not null,
+   SIGN_DATE            DATE,
    CONSTRAINT BSPK_CASE_INFRACT_TRAFFIC PRIMARY KEY (ID)
 );
 COMMENT ON TABLE BS_CASE_INFRACT_TRAFFIC IS '½»Í¨Î¥ÕÂ';
