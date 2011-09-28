@@ -49,7 +49,7 @@ public class MotorcadeAction extends FileEntityAction<Long, Motorcade> {
 
 	@Override
 	public String create() throws Exception {
-		this.readonly = false;
+//		this.readonly = false;
 		SystemContext context = (SystemContext) this.getContext();
 		Motorcade e = this.getMotorcadeService().create();
 		e.setFileDate(Calendar.getInstance());

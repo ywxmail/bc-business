@@ -63,7 +63,7 @@ public class HistoryCarQuantityAction extends
 
 	@Override
 	public String create() throws Exception {
-		this.readonly = false;
+//		this.readonly = false;
 		HistoryCarQuantity e = this.getHistoryCarQuantityService().create();
 		Motorcade motorcade = this.motorcadeService.load(pid);
 		SystemContext context = (SystemContext) this.getContext();
