@@ -51,6 +51,11 @@ public class CertCyzgAction extends FileEntityAction<Long, Cert4CongYeZiGe> {
 		this.setCrudService(certCyzgService);
 	}
 	
+	@Override
+	public boolean isReadonly() {
+		SystemContext context = (SystemContext) this.getContext();
+		return !context.hasAnyRole(MANAGER_KEY);
+	}
 	
 	@Autowired
 	public void setCertService(CertService certService) {

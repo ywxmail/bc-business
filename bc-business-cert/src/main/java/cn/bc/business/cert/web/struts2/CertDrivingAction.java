@@ -51,6 +51,11 @@ public class CertDrivingAction extends FileEntityAction<Long, Cert4Driving> {
 		this.setCrudService(certDrivingService);
 	}
 	
+	@Override
+	public boolean isReadonly() {
+		SystemContext context = (SystemContext) this.getContext();
+		return !context.hasAnyRole(MANAGER_KEY);
+	}
 	
 	@Autowired
 	public void setCertService(CertService certService) {
