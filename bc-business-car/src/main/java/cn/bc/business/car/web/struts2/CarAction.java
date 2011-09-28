@@ -45,7 +45,7 @@ import cn.bc.web.ui.html.page.PageOption;
 public class CarAction extends FileEntityAction<Long, Car> {
 	// private static Log logger = LogFactory.getLog(CarAction.class);
 	private static final long serialVersionUID = 1L;
-	public String MANAGER_KEY = "R_MANAGER_BUSINESS";// 管理角色的编码
+	public String MANAGER_KEY = "R_MANAGER_BUSINESS"; // 车辆管理员角色的编码
 
 	private CarService carService;
 	private MotorcadeService motorcadeService;
@@ -81,7 +81,7 @@ public class CarAction extends FileEntityAction<Long, Car> {
 	@Override
 	public boolean isReadonly() {
 		SystemContext context = (SystemContext) this.getContext();
-		return !context.hasAnyRole(MANAGER_KEY);// 超级管理员
+		return !context.hasAnyRole(MANAGER_KEY);
 	}
 
 	@Override

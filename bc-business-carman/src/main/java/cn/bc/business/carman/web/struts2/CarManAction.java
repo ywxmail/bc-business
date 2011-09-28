@@ -31,7 +31,6 @@ import cn.bc.web.ui.html.grid.GridData;
 import cn.bc.web.ui.html.grid.TextColumn;
 import cn.bc.web.ui.html.page.ButtonOption;
 import cn.bc.web.ui.html.page.PageOption;
-import cn.bc.web.ui.html.toolbar.Toolbar;
 
 /**
  * 司机责任人Action
@@ -45,8 +44,7 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 	// private static Log logger = LogFactory.getLog(BulletinAction.class);
 	private static final long serialVersionUID = 1L;
 	private IdGeneratorService idGeneratorService;
-	private String MANAGER_KEY = "R_ADMIN";// 管理角色的编码
-	public boolean isManager;
+	public String MANAGER_KEY = "R_MANAGER_BUSINESS";// 管理角色的编码
 	public CarManService carManService;
 	public String portrait;
 	public Map<String, String> statusesValue;
@@ -77,6 +75,12 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 	}
 
 	@Override
+	public boolean isReadonly() {
+		SystemContext context = (SystemContext) this.getContext();
+		return !context.hasAnyRole(MANAGER_KEY);
+	}
+
+	@Override
 	public String create() throws Exception {
 		String result = super.create();
 		this.getE().setStatus(RichEntity.STATUS_ENABLED);
@@ -84,11 +88,11 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 		this.getE().setUid(this.getIdGeneratorService().next(CarMan.KEY_UID));
 		this.getE().setSex(1);
 		carManHouseTypeList = this.optionService
-				.findOptionItemByGroupKey(optionConstants.CARMAN_HOUSETYPE);
+				.findOptionItemByGroupKey(OptionConstants.CARMAN_HOUSETYPE);
 		carManLevelList = this.optionService
-				.findOptionItemByGroupKey(optionConstants.CARMAN_LEVEL);
+				.findOptionItemByGroupKey(OptionConstants.CARMAN_LEVEL);
 		carManModelList = this.optionService
-				.findOptionItemByGroupKey(optionConstants.CARMAN_MODEL);
+				.findOptionItemByGroupKey(OptionConstants.CARMAN_MODEL);
 		// 获取相片的连接
 		portrait = "/bc/libs/themes/default/images/portrait/1in110x140.png";
 
@@ -111,12 +115,12 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 		statusesValue = this.getEntityStatuses();
 		carManHouseTypeList = this.optionService
 				.findOptionItemByGroupKeyWithCurrent(
-						optionConstants.CARMAN_HOUSETYPE, null, this.getE()
+						OptionConstants.CARMAN_HOUSETYPE, null, this.getE()
 								.getHouseType());
 		carManLevelList = this.optionService
-				.findOptionItemByGroupKey(optionConstants.CARMAN_LEVEL);
+				.findOptionItemByGroupKey(OptionConstants.CARMAN_LEVEL);
 		carManModelList = this.optionService
-				.findOptionItemByGroupKey(optionConstants.CARMAN_MODEL);
+				.findOptionItemByGroupKey(OptionConstants.CARMAN_MODEL);
 		// 获取相片的连接
 		portrait = "/bc/libs/themes/default/images/portrait/1in110x140.png";
 
@@ -126,16 +130,14 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 	// 视图特殊条件
 	@Override
 	protected Condition getSpecalCondition() {
-
 		return null;
-
 	}
 
 	@Override
 	protected PageOption buildFormPageOption() {
-		PageOption option = new PageOption().setWidth(810).setMinWidth(250)
-				.setMinHeight(200);
-		if (isManager()) {
+		PageOption option = super.buildFormPageOption().setWidth(810)
+				.setMinWidth(250).setMinHeight(200);
+		if (!this.isReadonly()) {
 			option.addButton(new ButtonOption(getText("label.save"), "save"));
 		}
 		return option;
@@ -159,40 +161,12 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 	}
 
 	@Override
-	protected Toolbar buildToolbar() {
-		isManager = isManager();
-		Toolbar tb = new Toolbar();
-
-		if (isManager) {
-			// 新建按钮
-			tb.addButton(getDefaultCreateToolbarButton());
-
-			// 编辑按钮
-			tb.addButton(getDefaultEditToolbarButton());
-
-			// 删除按钮
-			tb.addButton(getDefaultDeleteToolbarButton());
-		} else {// 普通用户
-			// 查看按钮
-			tb.addButton(getDefaultOpenToolbarButton());
-		}
-
-		// 搜索按钮
-		tb.addButton(getDefaultSearchToolbarButton());
-
-		return tb;
-	}
-
-	@Override
 	protected String[] getSearchFields() {
 		return new String[] { "name", "origin" };
 	}
 
 	@Override
 	protected List<Column> buildGridColumns() {
-		// 是否本模块管理员
-		isManager = isManager();
-
 		List<Column> columns = super.buildGridColumns();
 		columns.add(new TextColumn("status", getText("carMan.status"), 60)
 				.setSortable(true).setValueFormater(
@@ -216,11 +190,6 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 		columns.add(new TextColumn("formerUnit", getText("carMan.formerUnit"),
 				80).setSortable(true));
 		return columns;
-	}
-
-	// 判断当前用户是否是本模块管理员
-	private boolean isManager() {
-		return ((SystemContext) this.getContext()).hasAnyRole(MANAGER_KEY);
 	}
 
 	/**
