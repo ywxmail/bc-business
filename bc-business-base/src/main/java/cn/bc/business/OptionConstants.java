@@ -39,4 +39,27 @@ public class OptionConstants extends cn.bc.option.OptionConstants {
 	
 	/** 签约类型	*/
 	public final static String CONTRACT_SIGNTYPE = "contract.signType";
+	
+	
+	/** 营运事件交通违章责任	*/
+	public final static String IT_DUTY = "it.duty";
+	/** 营运事件交通违章程度	*/
+	public final static String IT_DEGREE = "it.degree";
+	/** 营运事件交通违章性质	*/
+	public final static String IT_PROPERITES = "it.properties";
+	/** 营运事件营运没收证件	*/
+	public final static String BS_CERT = "bs.cert";
+	/** 营运事件事故理赔性质	*/
+	public final static String BS_PROPERITES = "bs.properties";
+	/** 营运事件事故理赔司机类型	*/
+	public final static String CA_CARMANTYPE = "ca.carmantype";
+	/** 营运事件事故理赔处理部门	*/
+	public final static String CA_DEPARTMENT = "ca.department";
+	/** 营运事件事故理赔保险公司	*/
+	public final static String CA_COMPANY = "ca.company";
+	
+	
+	
+	
+	
 }

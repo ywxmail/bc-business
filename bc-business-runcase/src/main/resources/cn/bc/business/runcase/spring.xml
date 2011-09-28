@@ -19,4 +19,17 @@
 		p:entityManagerFactory-ref="entityManagerFactory" />
 	<bean id="caseBaseService" class="cn.bc.business.runcase.service.CaseBaseServiceImpl"
 		p:caseBaseDao-ref="caseBaseDao" />
+	
+	<!-- caseTraffic -->
+	<bean id="caseTrafficDao" class="cn.bc.business.runcase.dao.hibernate.jpa.CaseTrafficDaoImpl"
+		p:entityManagerFactory-ref="entityManagerFactory" />
+	<bean id="caseTrafficService" class="cn.bc.business.runcase.service.CaseTrafficServiceImpl"
+		p:caseTrafficDao-ref="caseTrafficDao" />
+		
+	<!-- caseBusinessDao -->
+	<bean id="caseBusinessDao" class="cn.bc.business.runcase.dao.hibernate.jpa.CaseBusinessDaoImpl"
+		p:entityManagerFactory-ref="entityManagerFactory" />
+	<bean id="caseBusinessService" class="cn.bc.business.runcase.service.CaseBusinessServiceImpl"
+		p:caseBusinessDao-ref="caseBusinessDao" />	
+		
 </beans>

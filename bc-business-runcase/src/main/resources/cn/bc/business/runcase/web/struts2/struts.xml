@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	
+	<!-- 交通违章 -->
+	<package name="caseTraffic" extends="bc-default" namespace="/bc-business">
+		<action name="caseTraffic/closefile" class="caseTrafficAction" method="closefile">
+		</action>
+	</package>
+	
+	<!-- 营运违章 -->
+	<package name="caseBusiness" extends="bc-default" namespace="/bc-business">
+		<action name="caseBusiness/closefile" class="caseBusinessAction" method="closefile">
+		</action>
+	</package>
+	
+
+</struts>
