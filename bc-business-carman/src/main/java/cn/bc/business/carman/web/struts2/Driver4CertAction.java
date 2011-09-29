@@ -21,7 +21,6 @@ import cn.bc.core.Page;
 import cn.bc.core.exception.CoreException;
 import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.docs.web.ui.html.AttachWidget;
-import cn.bc.identity.web.SystemContext;
 import cn.bc.web.formater.AbstractFormater;
 import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.formater.CalendarRangeFormater;
@@ -49,7 +48,6 @@ import cn.bc.web.ui.json.Json;
 public class Driver4CertAction extends CertAction {
 	// private static Log logger = LogFactory.getLog(BulletinAction.class);
 	private static final long serialVersionUID = 1L;
-	private String 				MANAGER_KEY 	= 	"R_MANAGER_BUSINESS";// 管理角色的编码
 	public 	boolean 			isManager;
 	public 	Long				carManId;
 	public	CarManService		carManService;
@@ -71,7 +69,7 @@ public class Driver4CertAction extends CertAction {
 	protected PageOption buildFormPageOption() {
 		PageOption option = new PageOption().setWidth(680).setMinWidth(250)
 				.setMinHeight(200).setModal(false);
-		if (isManager()) {
+		if (!isReadonly()) {
 			option.addButton(new ButtonOption(getText("label.save"), "save"));
 		}
 		return option; 
@@ -115,7 +113,7 @@ public class Driver4CertAction extends CertAction {
 
 	@SuppressWarnings("unused")
 	private AttachWidget buildAttachsUI(boolean isNew) {
-		isManager = isManager();
+		isManager = isReadonly();
 		// 构建附件控件
 //		String ptype = "car.main";
 //		AttachWidget attachsUI = new AttachWidget();
@@ -175,10 +173,10 @@ public class Driver4CertAction extends CertAction {
 	
 	@Override
 	protected Toolbar buildToolbar() {
-		isManager = isManager();
+		isManager = isReadonly();
 		Toolbar tb = new Toolbar();
 		
-		if (isManager) {
+		if (!isManager) {
 			// 新建按钮
 			tb.addButton(new ToolbarButton().setIcon("ui-icon-document")
 					.setText(getText("label.create"))
@@ -213,7 +211,7 @@ public class Driver4CertAction extends CertAction {
 	@SuppressWarnings("rawtypes")
 	protected List<Column> buildGridColumns() {
 		// 是否本模块管理员
-		isManager = isManager();
+		isManager = isReadonly();
 
 		//List<Column> columns = super.buildGridColumns();
 		List<Column> columns = new ArrayList<Column>();
@@ -251,11 +249,7 @@ public class Driver4CertAction extends CertAction {
 				.setSortable(true));
 		return columns;
 	}
-	
-	// 判断当前用户是否是本模块管理员
-	private boolean isManager() {
-		return ((SystemContext) this.getContext()).hasAnyRole(MANAGER_KEY);
-	}
+
 
 	
 	/**

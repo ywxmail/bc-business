@@ -77,7 +77,7 @@ public class CertRoadtransportAction extends FileEntityAction<Long, Cert4RoadTra
 	@SuppressWarnings("static-access")
 	public String create() throws Exception {
 		String r = super.create();
-		isManager = isManager();
+		isManager = isReadonly();
 
 		this.getE().setUid(this.getIdGeneratorService().next(this.getE().ATTACH_TYPE));
 		this.getE().setType(Cert.TYPE_ROADTRANSPORT);
@@ -152,7 +152,7 @@ public class CertRoadtransportAction extends FileEntityAction<Long, Cert4RoadTra
 	
 	@SuppressWarnings("static-access")
 	private AttachWidget buildAttachsUI(boolean isNew) {
-		isManager = isManager();
+		isManager = isReadonly();
 		// 构建附件控件
 		String ptype = "certRoadtransport.main";
 		AttachWidget attachsUI = new AttachWidget();
@@ -190,10 +190,6 @@ public class CertRoadtransportAction extends FileEntityAction<Long, Cert4RoadTra
 				.setHeight(400).setMinHeight(300);
 	}
 
-	// 判断当前用户是否是本模块管理员
-	private boolean isManager() {
-		return ((SystemContext) this.getContext()).hasAnyRole(MANAGER_KEY);
-	}
 	
     /**
      * 格式化日期

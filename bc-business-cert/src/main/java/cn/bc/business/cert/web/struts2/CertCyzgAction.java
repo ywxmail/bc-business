@@ -72,7 +72,7 @@ public class CertCyzgAction extends FileEntityAction<Long, Cert4CongYeZiGe> {
 	@SuppressWarnings("static-access")
 	public String create() throws Exception {
 		String r = super.create();
-		isManager = isManager();
+		isManager = isReadonly();
 
 		this.getE().setUid(this.getIdGeneratorService().next(this.getE().ATTACH_TYPE));
 		this.getE().setType(Cert.TYPE_CYZG);
@@ -120,7 +120,7 @@ public class CertCyzgAction extends FileEntityAction<Long, Cert4CongYeZiGe> {
 	
 	@SuppressWarnings("static-access")
 	private AttachWidget buildAttachsUI(boolean isNew) {
-		isManager = isManager();
+		isManager = isReadonly();
 		// 构建附件控件
 		String ptype = "certIdentity.main";
 		AttachWidget attachsUI = new AttachWidget();
@@ -157,10 +157,4 @@ public class CertCyzgAction extends FileEntityAction<Long, Cert4CongYeZiGe> {
 		return super.buildListPageOption().setWidth(800).setMinWidth(300)
 				.setHeight(400).setMinHeight(300);
 	}
-
-	// 判断当前用户是否是本模块管理员
-	private boolean isManager() {
-		return ((SystemContext) this.getContext()).hasAnyRole(MANAGER_KEY);
-	}
-
 }

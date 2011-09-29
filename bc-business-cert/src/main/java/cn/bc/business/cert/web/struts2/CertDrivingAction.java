@@ -72,7 +72,7 @@ public class CertDrivingAction extends FileEntityAction<Long, Cert4Driving> {
 	@SuppressWarnings("static-access")
 	public String create() throws Exception {
 		String r = super.create();
-		isManager = isManager();
+		isManager = isReadonly();
 
 		this.getE().setUid(this.getIdGeneratorService().next(this.getE().ATTACH_TYPE));
 		this.getE().setType(Cert.TYPE_DRIVING);
@@ -136,7 +136,7 @@ public class CertDrivingAction extends FileEntityAction<Long, Cert4Driving> {
 	
 	@SuppressWarnings("static-access")
 	private AttachWidget buildAttachsUI(boolean isNew) {
-		isManager = isManager();
+		isManager = isReadonly();
 		// 构建附件控件
 		String ptype = "certIdentity.main";
 		AttachWidget attachsUI = new AttachWidget();
@@ -174,9 +174,5 @@ public class CertDrivingAction extends FileEntityAction<Long, Cert4Driving> {
 				.setHeight(400).setMinHeight(300);
 	}
 
-	// 判断当前用户是否是本模块管理员
-	private boolean isManager() {
-		return ((SystemContext) this.getContext()).hasAnyRole(MANAGER_KEY);
-	}
 
 }

@@ -105,7 +105,7 @@ public class CaseTrafficAction extends FileEntityAction<Long, Case4InfractTraffi
 		PageOption option = new PageOption().setWidth(840).setMinWidth(250)
 				.setMinHeight(200).setModal(false);
 		
-		if (isManager()) {
+		if (!isReadonly()) {
 			//特殊处理结案按钮
 			if(Case4InfractTraffic.STATUS_ACTIVE == getE().getStatus()){
 				ButtonOption buttonOption = new ButtonOption(getText("label.closefile"),null,"bc.caseTrafficForm.closefile");
@@ -131,10 +131,10 @@ public class CaseTrafficAction extends FileEntityAction<Long, Case4InfractTraffi
 
 	@Override
 	protected Toolbar buildToolbar() {
-		isManager = isManager();
+		isManager = isReadonly();
 		Toolbar tb = new Toolbar();
 
-		if (isManager) {
+		if (!isManager) {
 			// 新建按钮
 			tb.addButton(getDefaultCreateToolbarButton());
 
@@ -164,7 +164,7 @@ public class CaseTrafficAction extends FileEntityAction<Long, Case4InfractTraffi
 	@Override
 	protected List<Column> buildGridColumns() {
 		// 是否本模块管理员
-		isManager = isManager();
+		isManager = isReadonly();
 
 		List<Column> columns = super.buildGridColumns();
 		columns.add(new TextColumn("status",getText("runcase.status"),		50)
@@ -193,11 +193,6 @@ public class CaseTrafficAction extends FileEntityAction<Long, Case4InfractTraffi
 		columns.add(new TextColumn("driverCert", getText("runcase.driverCert"),			80)
 				.setSortable(true));
 		return columns;
-	}
-
-	// 判断当前用户是否是本模块管理员
-	private boolean isManager() {
-		return ((SystemContext) this.getContext()).hasAnyRole(MANAGER_KEY);
 	}
 	
 	@SuppressWarnings("static-access")

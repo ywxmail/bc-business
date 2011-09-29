@@ -30,7 +30,7 @@ public class CertAction extends FileEntityAction<Long, Cert> {
 	// private static Log logger = LogFactory.getLog(BulletinAction.class);
 	private static final long serialVersionUID = 1L;
 	public CertService certService;
-	public String MANAGER_KEY = "R_MANAGER_BUSINESS"; // 车辆管理员角色的编码
+	public String MANAGER_KEY = "R_ADMIN"; // 车辆管理员角色的编码
 
 	@Autowired
 	public void setCertService( CertService certService) {

@@ -63,7 +63,9 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 	public  List<OptionItem>		dutyList;						// 可选责任列表
 	public  List<OptionItem>		properitesList;					// 可选性质列表
 	public  List<OptionItem>		degreeList;						// 可选程度列表
-	
+	public  List<OptionItem>		certList;						// 可选没收证件列表
+	public  List<OptionItem>		departmentList;					// 可选执法机关列表
+
 	
 	public 	Map<String,String> 		statusesValue;
 	public	Map<String,String>		sourcesValue;
@@ -106,7 +108,7 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 	protected PageOption buildFormPageOption() {
 		PageOption option = new PageOption().setWidth(840).setMinWidth(250)
 				.setMinHeight(200).setModal(false).setHeight(500);
-		if (isManager()) {
+		if (!isReadonly()) {
 			//特殊处理结案按钮
 			if(Case4InfractTraffic.STATUS_ACTIVE == getE().getStatus()){
 				ButtonOption buttonOption = new ButtonOption(getText("label.closefile"),null,"bc.caseBusinessForm.closefile");
@@ -132,10 +134,10 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 
 	@Override
 	protected Toolbar buildToolbar() {
-		isManager = isManager();
+		isManager = isReadonly();
 		Toolbar tb = new Toolbar();
 
-		if (isManager) {
+		if (!isManager) {
 			// 新建按钮
 			tb.addButton(getDefaultCreateToolbarButton());
 
@@ -165,7 +167,7 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 	@Override
 	protected List<Column> buildGridColumns() {
 		// 是否本模块管理员
-		isManager = isManager();
+		isManager = isReadonly();
 
 		List<Column> columns = super.buildGridColumns();
 		columns.add(new TextColumn("status",getText("runcase.status"),		50)
@@ -196,10 +198,6 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 		return columns;
 	}
 
-	// 判断当前用户是否是本模块管理员
-	private boolean isManager() {
-		return ((SystemContext) this.getContext()).hasAnyRole(MANAGER_KEY);
-	}
 	
 	@SuppressWarnings("static-access")
 	@Override
@@ -275,6 +273,10 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 		this.properitesList				=	this.optionService.findOptionItemByGroupKey(OptionConstants.IT_PROPERITES);
 		// 加载可选程度列表
 		this.degreeList					=	this.optionService.findOptionItemByGroupKey(OptionConstants.IT_DEGREE);
+		// 加载可选没收证件列表
+		this.certList					=	this.optionService.findOptionItemByGroupKey(OptionConstants.BS_CERT);
+		// 加载可选执法机关列表
+		this.departmentList					=	this.optionService.findOptionItemByGroupKey(OptionConstants.CA_DEPARTMENT);
 	}
 	
 	/**
