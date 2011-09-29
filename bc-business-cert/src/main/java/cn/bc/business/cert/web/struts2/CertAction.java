@@ -15,6 +15,7 @@ import cn.bc.business.cert.domain.Cert;
 import cn.bc.business.cert.service.CertService;
 import cn.bc.business.web.struts2.FileEntityAction;
 import cn.bc.docs.web.ui.html.AttachWidget;
+import cn.bc.identity.web.SystemContext;
 import cn.bc.web.ui.html.page.PageOption;
 
 /**
@@ -29,6 +30,7 @@ public class CertAction extends FileEntityAction<Long, Cert> {
 	// private static Log logger = LogFactory.getLog(BulletinAction.class);
 	private static final long serialVersionUID = 1L;
 	public CertService certService;
+	public String MANAGER_KEY = "R_MANAGER_BUSINESS"; // 车辆管理员角色的编码
 
 	@Autowired
 	public void setCertService( CertService certService) {
@@ -47,6 +49,11 @@ public class CertAction extends FileEntityAction<Long, Cert> {
 				.setHeight(400).setMinHeight(300);
 	}
 	
+	@Override
+	public boolean isReadonly() {
+		SystemContext context = (SystemContext) this.getContext();
+		return !context.hasAnyRole(MANAGER_KEY);
+	}
 	
 	/**
 	 * 获取车辆证件类型列表

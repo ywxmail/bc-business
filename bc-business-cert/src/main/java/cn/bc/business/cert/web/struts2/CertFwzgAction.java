@@ -63,7 +63,12 @@ public class CertFwzgAction extends FileEntityAction<Long, Cert4FuWuZiGe> {
 		this.attachService = attachService;
 	}
 	
-
+	@Override
+	public boolean isReadonly() {
+		SystemContext context = (SystemContext) this.getContext();
+		return !context.hasAnyRole(MANAGER_KEY);
+	}
+	
 	@SuppressWarnings("static-access")
 	public String create() throws Exception {
 		String r = super.create();

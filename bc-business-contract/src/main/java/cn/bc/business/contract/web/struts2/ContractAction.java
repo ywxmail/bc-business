@@ -58,7 +58,7 @@ public class ContractAction extends FileEntityAction<Long, Contract> {
 	@SuppressWarnings("static-access")
 	@Override
 	public String create() throws Exception {
-		this.readonly = false;
+//		this.readonly = false;
 		Contract e = this.contractService.create();
 		this.setE(e);
 

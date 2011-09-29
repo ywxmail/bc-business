@@ -45,7 +45,7 @@ public class ChargerAction extends FileEntityAction<Long, Charger> {
 
 	@Override
 	public String create() throws Exception {
-		this.readonly = false;
+//		this.readonly = false;
 		SystemContext context = (SystemContext) this.getContext();
 		Charger e = this.getCrudService().create();
 		e.setFileDate(Calendar.getInstance());
