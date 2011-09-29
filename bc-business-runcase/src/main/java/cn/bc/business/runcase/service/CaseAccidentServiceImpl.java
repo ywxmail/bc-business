@@ -1,0 +1,27 @@
+/**
+ * 
+ */
+package cn.bc.business.runcase.service;
+
+import cn.bc.business.runcase.dao.CaseAccidentDao;
+import cn.bc.business.runcase.domain.Case4Accident;
+import cn.bc.core.service.DefaultCrudService;
+
+/**
+ * 营运事件事故理赔Service的实现
+ * 
+ * @author dragon
+ */
+public class CaseAccidentServiceImpl extends DefaultCrudService<Case4Accident> implements
+		CaseAccidentService {
+	private CaseAccidentDao caseAccidentDao;
+
+	public CaseAccidentDao getCaseAccidentDao() {
+		return caseAccidentDao;
+	}
+
+	public void setCaseAccidentDao(CaseAccidentDao caseAccidentDao) {
+		this.caseAccidentDao = caseAccidentDao;
+		this.setCrudDao(caseAccidentDao);
+	}
+}
