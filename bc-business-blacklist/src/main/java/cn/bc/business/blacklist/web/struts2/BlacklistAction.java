@@ -51,29 +51,27 @@ public class BlacklistAction extends FileEntityAction<Long, Blacklist> {
 	public Long carManId;
 	public OptionService optionService;
 	public OptionConstants optionConstants;
-	public List<OptionItem> blackLevelList;//黑名单等级列表
-	public List<OptionItem> blackTypeList;//黑名单限制项目
-	public CarByDriverService carByDriverService;	
-	public String carPlate;//车牌号码
-	public String unitName;//车辆所属单位名
-	public String motorcadeName;//车辆所属车队名
+	public List<OptionItem> blackLevelList;// 黑名单等级列表
+	public List<OptionItem> blackTypeList;// 黑名单限制项目
+	public CarByDriverService carByDriverService;
+	public String carPlate;// 车牌号码
+	public String unitName;// 车辆所属单位名
+	public String motorcadeName;// 车辆所属车队名
 	public CarManService carManService;
 	public Long carId;
 	public Long unitId;
 	public Long motorcadeId;
-    
-	
-	
-	
-	
+
 	@Autowired
 	public void setCarManService(CarManService carManService) {
 		this.carManService = carManService;
 	}
+
 	@Autowired
 	public void setCarByDriverService(CarByDriverService carByDriverService) {
 		this.carByDriverService = carByDriverService;
 	}
+
 	@Autowired
 	public void setOptionService(OptionService optionService) {
 		this.optionService = optionService;
@@ -88,24 +86,26 @@ public class BlacklistAction extends FileEntityAction<Long, Blacklist> {
 	@Override
 	public String create() throws Exception {
 		String result = super.create();
-		if(carManId!=null){
-			Car car=this.carByDriverService.selectCarByCarManId(new Long(carManId));
-			CarMan driver=this.carManService.load(carManId);
+		if (carManId != null) {
+			Car car = this.carByDriverService.selectCarByCarManId(new Long(
+					carManId));
+			CarMan driver = this.carManService.load(carManId);
 			this.getE().setCar(car);
 			this.getE().setDriver(driver);
 			this.getE().setUnit(car.getUnit());
 			this.getE().setMotorcade(car.getMotorcade());
-			
+
 		}
-		
-		blackLevelList=this.optionService
+
+		blackLevelList = this.optionService
 				.findOptionItemByGroupKey(optionConstants.CARMAN_LEVEL);
-		blackTypeList=this.optionService
+		blackTypeList = this.optionService
 				.findOptionItemByGroupKey(optionConstants.BLACKLIST_TYPE);
-		//this.formPageOption = buildFormPageOption();
+		// this.formPageOption = buildFormPageOption();
 
 		return result;
 	}
+
 	@Override
 	public String edit() throws Exception {
 		String result = super.edit();
@@ -127,7 +127,8 @@ public class BlacklistAction extends FileEntityAction<Long, Blacklist> {
 
 	@Override
 	protected GridData buildGridData(List<Column> columns) {
-		return super.buildGridData(columns).setRowLabelExpression("driver.name");
+		return super.buildGridData(columns)
+				.setRowLabelExpression("driver.name");
 	}
 
 	@Override
@@ -137,64 +138,66 @@ public class BlacklistAction extends FileEntityAction<Long, Blacklist> {
 
 	@Override
 	protected PageOption buildListPageOption() {
-		return super.buildListPageOption().setWidth(860).setMinWidth(300)
-				.setHeight(400).setMinHeight(300);
+		return super.buildListPageOption().setWidth(1024).setMinWidth(300)
+				.setHeight(460).setMinHeight(300);
 	}
 
 	@Override
 	protected String[] getSearchFields() {
-		return new String[] { "driver.name", "motorcade.name","type" ,"unit.name","locker.name","subject","car.plateNo"};
+		return new String[] { "driver.name", "motorcade.name", "type",
+				"unit.name", "locker.name", "subject", "car.plateNo", "code" };
 	}
 
 	@Override
 	protected List<Column> buildGridColumns() {
 		List<Column> columns = super.buildGridColumns();
 		if (carManId == null) {
-			columns.add(new TextColumn("code",
-					getText("blacklist.code"), 70).setSortable(true));
-					
-			columns.add(new TextColumn("motorcade.name",
-					getText("blacklist.motorcade.name"), 50)
-					.setValueFormater(new AbstractFormater<String>() {
-						@Override
-						public String format(Object context, Object value) {
-							Blacklist blacklist = (Blacklist) context;
-							Motorcade motorcade=blacklist.getMotorcade();
-							if(motorcade==null){
-								return null;
-							}else{
-							return blacklist.getMotorcade().getName();
-							}		
-						}
-					}));
+			columns.add(new TextColumn("code", getText("blacklist.code"), 120)
+					.setSortable(true));
 			columns.add(new TextColumn("driver.name",
-					getText("blacklist.driver"), 70)
+					getText("blacklist.driver"), 40)
 					.setValueFormater(new AbstractFormater<String>() {
 						@Override
 						public String format(Object context, Object value) {
 							Blacklist blacklist = (Blacklist) context;
-							CarMan driver=blacklist.getDriver();
-							if(driver==null){
+							CarMan driver = blacklist.getDriver();
+							if (driver == null) {
 								return null;
-							}else{
+							} else {
 								return blacklist.getDriver().getName();
 							}
-							
+
 						}
 					}));
-			columns.add(new TextColumn("car.plateNo",
-					getText("blacklist.car.plateNo"), 100)
+			columns.add(new TextColumn("motorcade.name",
+					getText("blacklist.motorcade.name"), 30)
 					.setValueFormater(new AbstractFormater<String>() {
 						@Override
 						public String format(Object context, Object value) {
 							Blacklist blacklist = (Blacklist) context;
-							return blacklist.getCar().getPlateType()+" "+blacklist.getCar().getPlateNo();
+							Motorcade motorcade = blacklist.getMotorcade();
+							if (motorcade == null) {
+								return null;
+							} else {
+								return blacklist.getMotorcade().getName();
+							}
+						}
+					}));
+
+			columns.add(new TextColumn("car.plateNo",
+					getText("blacklist.car.plateNo"), 60)
+					.setValueFormater(new AbstractFormater<String>() {
+						@Override
+						public String format(Object context, Object value) {
+							Blacklist blacklist = (Blacklist) context;
+							return blacklist.getCar().getPlateType() + "."
+									+ blacklist.getCar().getPlateNo();
 						}
 					}));
 
 		} else {
-			columns.add(new TextColumn("code",
-					getText("blacklist.code"), 70).setSortable(true));
+			columns.add(new TextColumn("code", getText("blacklist.code"), 70)
+					.setSortable(true));
 			columns.add(new TextColumn("motorcade.name",
 					getText("blacklist.motorcade.name"), 50)
 					.setValueFormater(new AbstractFormater<String>() {
@@ -202,75 +205,81 @@ public class BlacklistAction extends FileEntityAction<Long, Blacklist> {
 						public String format(Object context, Object value) {
 							Blacklist blacklist = (Blacklist) context;
 							return blacklist.getMotorcade().getName();
-									
+
 						}
 					}));
 			columns.add(new TextColumn("car.plateNo",
-					getText("blacklist.car.plateNo"), 100)
+					getText("blacklist.car.plateNo"), 60)
 					.setValueFormater(new AbstractFormater<String>() {
 						@Override
 						public String format(Object context, Object value) {
 							Blacklist blacklist = (Blacklist) context;
-							return blacklist.getCar().getPlateType()+" "+blacklist.getCar().getPlateNo();
+							return blacklist.getCar().getPlateType() + "."
+									+ blacklist.getCar().getPlateNo();
 						}
 					}));
 
 		}
-		columns.add(new TextColumn("type",
-				getText("blacklist.type"), 70).setSortable(true).setUseTitleFromLabel(true));	
-		columns.add(new TextColumn("subject",
-				getText("blacklist.subject"), 90).setSortable(true).setUseTitleFromLabel(true));	
-		columns.add(new TextColumn("lockDate", getText("blacklist.lockDate"), 100)
-		.setSortable(true).setDir(Direction.Desc).setUseTitleFromLabel(true)
-		.setValueFormater(new CalendarFormater("yyyy-MM-dd HH:mm:ss")));
+		columns.add(new TextColumn("type", getText("blacklist.type"), 70)
+				.setSortable(true).setUseTitleFromLabel(true));
+		columns.add(new TextColumn("subject", getText("blacklist.subject"), 110)
+				.setSortable(true).setUseTitleFromLabel(true));
+		columns.add(new TextColumn("lockDate", getText("blacklist.lockDate"),
+				100).setSortable(true).setDir(Direction.Desc)
+				.setUseTitleFromLabel(true)
+				.setValueFormater(new CalendarFormater("yyyy-MM-dd HH:mm:ss")));
 		columns.add(new TextColumn("locker.name",
-				getText("blacklist.locker.name"), 70).setValueFormater(new AbstractFormater<String>() {
+				getText("blacklist.locker.name"), 50)
+				.setValueFormater(new AbstractFormater<String>() {
 					@Override
 					public String format(Object context, Object value) {
 						Blacklist blacklist = (Blacklist) context;
 						return blacklist.getLocker().getName();
 					}
 				}));
-		columns.add(new TextColumn("unlockDate", getText("blacklist.unlockDate"), 100)
-		.setSortable(true).setDir(Direction.Desc).setUseTitleFromLabel(true)
-		.setValueFormater(new CalendarFormater("yyyy-MM-dd HH:mm:ss")));
+		columns.add(new TextColumn("unlockDate",
+				getText("blacklist.unlockDate"), 100).setSortable(true)
+				.setDir(Direction.Desc).setUseTitleFromLabel(true)
+				.setValueFormater(new CalendarFormater("yyyy-MM-dd HH:mm:ss")));
 		columns.add(new TextColumn("unlocker.name",
-				getText("blacklist.unlocker.name"), 70).setValueFormater(new AbstractFormater<String>() {
+				getText("blacklist.unlocker.name"), 60)
+				.setValueFormater(new AbstractFormater<String>() {
 					@Override
 					public String format(Object context, Object value) {
 						Blacklist blacklist = (Blacklist) context;
-						ActorHistory locker=blacklist.getUnlocker();
-						if(locker==null){
+						ActorHistory locker = blacklist.getUnlocker();
+						if (locker == null) {
 							return null;
-						}else{
-						return blacklist.getUnlocker().getName();
+						} else {
+							return blacklist.getUnlocker().getName();
 						}
 					}
 				}));
 		return columns;
 	}
-	
-	//返回所选司机的信息
+
+	// 返回所选司机的信息
 	public Json json;
-	public String carManMess(){
-	   Car car=this.carByDriverService.selectCarByCarManId(new Long(carManId));
-	   carId=car.getId();
-	   unitId=car.getUnit().getId();
-	   motorcadeId=car.getMotorcade().getId();
-	   carPlate=car.getPlateType()+car.getPlateNo();
-	   unitName=car.getUnit().getName();
-	   motorcadeName=car.getMotorcade().getName();
-	   
-	   json = new Json();
-	   json.put("carId", carId);
-	   json.put("unitId", unitId);
-	   json.put("carPlate", carPlate);
-	   json.put("motorcadeId", motorcadeId);
-	   json.put("unitName", unitName);
-	   json.put("motorcadeName", motorcadeName);
+
+	public String carManMess() {
+		Car car = this.carByDriverService
+				.selectCarByCarManId(new Long(carManId));
+		carId = car.getId();
+		unitId = car.getUnit().getId();
+		motorcadeId = car.getMotorcade().getId();
+		carPlate = car.getPlateType() + car.getPlateNo();
+		unitName = car.getUnit().getName();
+		motorcadeName = car.getMotorcade().getName();
+
+		json = new Json();
+		json.put("carId", carId);
+		json.put("unitId", unitId);
+		json.put("carPlate", carPlate);
+		json.put("motorcadeId", motorcadeId);
+		json.put("unitName", unitName);
+		json.put("motorcadeName", motorcadeName);
 		return "json";
 	}
-	
 
 	@Override
 	protected HtmlPage buildHtml4Paging() {
@@ -280,28 +289,27 @@ public class BlacklistAction extends FileEntityAction<Long, Blacklist> {
 					.toString());
 		return page;
 	}
-	
+
 	@Override
 	public String save() throws Exception {
-		
+
 		Blacklist e = this.getE();
-		if (e.getUnlocker() != null && e.getUnlocker().getId() == null){
+		if (e.getUnlocker() != null && e.getUnlocker().getId() == null) {
 			e.setUnlocker(null);
 		}
-		
-		 super.save();
+
+		super.save();
 		return "saveSuccess";
 	}
-	
-	// 视图特殊条件
-		@Override
-		protected Condition getSpecalCondition() {
-			if (carManId != null) {
-				return new EqualsCondition("driver.id", carManId);
-			} else {
-				return null;
-			}
-		}
 
+	// 视图特殊条件
+	@Override
+	protected Condition getSpecalCondition() {
+		if (carManId != null) {
+			return new EqualsCondition("driver.id", carManId);
+		} else {
+			return null;
+		}
+	}
 
 }
