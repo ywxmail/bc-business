@@ -14,4 +14,5 @@ import cn.bc.core.service.CrudService;
  */
 public interface ContractService extends CrudService<Contract> {
 
+
 }

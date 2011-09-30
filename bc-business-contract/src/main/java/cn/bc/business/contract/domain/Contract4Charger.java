@@ -26,9 +26,13 @@ public class Contract4Charger extends Contract {
 	private boolean takebackOrigin;// 已经收回原件:0-未1-已
 	private boolean includeCost;// 包含检审费用:0-不包含,1-包含
 	private String businessType;// 合同性质
+	private Long changerId1;	//责任ID1
+	private String changerName1;//责任姓名1	
+	private Long changerId2;	//责任ID2
+	private String changerName2;//责任姓名2	
 
 	public Contract4Charger() {
-		this.setCode("[责任人合同]");
+		this.setCode("[经济合同]");
 	}
 
 	@Column(name = "SIGN_TYPE")
@@ -83,4 +87,42 @@ public class Contract4Charger extends Contract {
 	public void setBusinessType(String businessType) {
 		this.businessType = businessType;
 	}
+
+	@Column(name = "CHARGER1_ID")
+	public Long getChangerId1() {
+		return changerId1;
+	}
+
+	public void setChangerId1(Long changerId1) {
+		this.changerId1 = changerId1;
+	}
+
+	@Column(name = "CHARGER1_NAME")
+	public String getChangerName1() {
+		return changerName1;
+	}
+
+	public void setChangerName1(String changerName1) {
+		this.changerName1 = changerName1;
+	}
+
+	@Column(name = "CHARGER2_ID")
+	public Long getChangerId2() {
+		return changerId2;
+	}
+
+	public void setChangerId2(Long changerId2) {
+		this.changerId2 = changerId2;
+	}
+
+	@Column(name = "CHARGER2_NAME")
+	public String getChangerName2() {
+		return changerName2;
+	}
+
+	public void setChangerName2(String changerName2) {
+		this.changerName2 = changerName2;
+	}
+	
+	
 }

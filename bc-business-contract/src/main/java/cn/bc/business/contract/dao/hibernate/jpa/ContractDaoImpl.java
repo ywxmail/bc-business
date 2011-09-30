@@ -15,4 +15,5 @@ import cn.bc.orm.hibernate.jpa.HibernateCrudJpaDao;
  */
 public class ContractDaoImpl extends HibernateCrudJpaDao<Contract> implements ContractDao{
 
+
 }
