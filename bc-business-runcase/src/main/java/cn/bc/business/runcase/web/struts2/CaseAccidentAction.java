@@ -114,7 +114,7 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 				.setMinHeight(200).setModal(false).setHeight(500);
 		if (!isReadonly()) {
 			//特殊处理结案按钮
-			if(Case4InfractTraffic.STATUS_ACTIVE == getE().getStatus()){
+			if(Case4InfractTraffic.STATUS_ACTIVE == getE().getStatus() && !getE().isNew()){
 				ButtonOption buttonOption = new ButtonOption(getText("label.closefile"),null,"bc.caseAccidentForm.closefile");
 				buttonOption.put("id", "bcSaveDlgButton");
 				option.addButton(buttonOption);

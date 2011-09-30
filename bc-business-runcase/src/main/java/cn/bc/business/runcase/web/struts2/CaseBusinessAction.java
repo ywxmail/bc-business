@@ -110,10 +110,10 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 	@Override
 	protected PageOption buildFormPageOption() {
 		PageOption option = new PageOption().setWidth(840).setMinWidth(250)
-				.setMinHeight(200).setModal(false).setHeight(500);
+				.setMinHeight(200).setModal(false).setHeight(650);
 		if (!isReadonly()) {
 			//特殊处理结案按钮
-			if(Case4InfractTraffic.STATUS_ACTIVE == getE().getStatus()){
+			if(Case4InfractTraffic.STATUS_ACTIVE == getE().getStatus() && !getE().isNew()){
 				ButtonOption buttonOption = new ButtonOption(getText("label.closefile"),null,"bc.caseBusinessForm.closefile");
 				buttonOption.put("id", "bcSaveDlgButton");
 				option.addButton(buttonOption);
@@ -273,7 +273,7 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 		// 加载可选没收证件列表
 		this.certList					=	this.optionService.findOptionItemByGroupKey(OptionConstants.BS_CERT);
 		// 加载可选执法机关列表
-		this.departmentList					=	this.optionService.findOptionItemByGroupKey(OptionConstants.CA_DEPARTMENT);
+		this.departmentList				=	this.optionService.findOptionItemByGroupKey(OptionConstants.CA_DEPARTMENT);
 	}
 	
 	/**
