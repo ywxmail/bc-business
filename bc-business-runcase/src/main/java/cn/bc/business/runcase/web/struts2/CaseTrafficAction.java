@@ -23,7 +23,9 @@ import cn.bc.business.runcase.domain.Case4InfractTraffic;
 import cn.bc.business.runcase.domain.CaseBase;
 import cn.bc.business.runcase.service.CaseTrafficService;
 import cn.bc.business.web.struts2.FileEntityAction;
+import cn.bc.core.query.condition.Condition;
 import cn.bc.core.query.condition.Direction;
+import cn.bc.core.query.condition.impl.EqualsCondition;
 import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.option.domain.OptionItem;
@@ -34,6 +36,7 @@ import cn.bc.web.ui.html.grid.Column;
 import cn.bc.web.ui.html.grid.GridData;
 import cn.bc.web.ui.html.grid.TextColumn;
 import cn.bc.web.ui.html.page.ButtonOption;
+import cn.bc.web.ui.html.page.HtmlPage;
 import cn.bc.web.ui.html.page.PageOption;
 import cn.bc.web.ui.html.toolbar.Toolbar;
 import cn.bc.web.ui.json.Json;
@@ -51,6 +54,7 @@ public class CaseTrafficAction extends FileEntityAction<Long, Case4InfractTraffi
 	private static 	final long 		serialVersionUID 	= 1L;
 	private String 					MANAGER_KEY 		= "R_ADMIN";// 管理角色的编码
 	public 	boolean 				isManager;
+	public  Long 					carId;
 	
 	@SuppressWarnings("unused")
 	private CaseTrafficService		caseTrafficService;
@@ -287,5 +291,25 @@ public class CaseTrafficAction extends FileEntityAction<Long, Case4InfractTraffi
 		return statuses;
 	}
 	
+	
+	// 视图特殊条件
+	@Override
+	protected Condition getSpecalCondition() {
+		if (carId != null) {
+			return new EqualsCondition("carId", carId);
+		} else {
+			return null;
+		}
+	}
+	
+
+	@Override
+	protected HtmlPage buildHtml4Paging() {
+		HtmlPage page = super.buildHtml4Paging();
+		if (carId != null)
+			page.setAttr("data-extras", new Json().put("carId", carId)
+					.toString());
+		return page;
+	}
 	
 }

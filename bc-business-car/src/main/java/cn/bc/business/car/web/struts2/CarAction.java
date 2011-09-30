@@ -108,14 +108,14 @@ public class CarAction extends FileEntityAction<Long, Car> {
 	// 设置页面的尺寸
 	@Override
 	protected PageOption buildListPageOption() {
-		return super.buildListPageOption().setWidth(800).setMinWidth(300)
-				.setHeight(400).setMinHeight(300);
+		return super.buildListPageOption().setWidth(1000).setMinWidth(400)
+				.setHeight(500).setMinHeight(300);
 	}
 
 	// 搜索条件
 	@Override
 	protected String[] getSearchFields() {
-		return new String[] { "plateType", "plateNo", "factoryType", "driver" };
+		return new String[] { "plateType", "plateNo", "factoryType", "driver", "certNo2" };
 	}
 
 	@SuppressWarnings("rawtypes")
@@ -125,9 +125,7 @@ public class CarAction extends FileEntityAction<Long, Car> {
 		columns.add(new TextColumn("['id']", "ID", 40));
 		columns.add(new TextColumn("['status']", getText("car.status"), 50)
 				.setSortable(true).setValueFormater(
-						new EntityStatusFormater(getEntityStatuses())));
-		columns.add(new TextColumn("['code']", getText("car.code"))
-				.setSortable(true));
+				new EntityStatusFormater(getEntityStatuses())));
 		columns.add(new TextColumn("['plateType']", getText("car.plate"), 100)
 				.setValueFormater(new AbstractFormater<String>() {
 					@Override
@@ -136,6 +134,12 @@ public class CarAction extends FileEntityAction<Long, Car> {
 						return car.get("plateType") + " " + car.get("plateNo");
 					}
 				}));
+		columns.add(new TextColumn("['unit']", getText("car.unit"), 80)
+				.setSortable(true));
+		columns.add(new TextColumn("['motorcade']", getText("car.motorcade"), 80)
+				.setSortable(true));
+		columns.add(new TextColumn("['registerDate']",getText("car.registerDate"), 100).setSortable(true)
+				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
 		columns.add(new TextColumn("['driver']", getText("car.carMan"), 100)
 				.setUseTitleFromLabel(true).setValueFormater(
 						new AbstractFormater<String>() {
@@ -151,8 +155,12 @@ public class CarAction extends FileEntityAction<Long, Car> {
 								}
 							}
 						}));
+		columns.add(new TextColumn("['certNo2']",
+				getText("car.certNo2"), 100));
+		columns.add(new TextColumn("['businessType']",
+				getText("car.businessType"), 100));
 		columns.add(new TextColumn("['factoryType']", getText("car.factory"),
-				140).setValueFormater(new AbstractFormater<String>() {
+				120).setValueFormater(new AbstractFormater<String>() {
 			@Override
 			public String format(Object context, Object value) {
 				// 从上下文取出元素Map
@@ -170,15 +178,8 @@ public class CarAction extends FileEntityAction<Long, Car> {
 				}
 			}
 		}));
-		columns.add(new TextColumn("['businessType']",
-				getText("car.businessType"), 100));
-		columns.add(new TextColumn("['motorcade']", getText("car.motorcade"))
+		columns.add(new TextColumn("['code']", getText("car.code"), 60)
 				.setSortable(true));
-		columns.add(new TextColumn("['unit']", getText("car.unit"))
-				.setSortable(true));
-		columns.add(new TextColumn("['registerDate']",
-				getText("car.registerDate"), 100).setSortable(true)
-				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
 		columns.add(new TextColumn("['originNo']", getText("car.originNo"), 100)
 				.setSortable(true));
 		columns.add(new TextColumn("['vin']", getText("car.vin"), 120));
