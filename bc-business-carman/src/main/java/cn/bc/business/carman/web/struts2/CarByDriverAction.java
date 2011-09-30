@@ -157,7 +157,7 @@ public class CarByDriverAction extends FileEntityAction<Long, CarByDriver> {
 			// 查看按钮
 			tb.addButton(getDefaultOpenToolbarButton());
 		}
-		if (carManId == null||carId == null) {
+		if (carManId == null || carId == null) {
 			// 搜索按钮
 			tb.addButton(getDefaultSearchToolbarButton());
 		}
@@ -182,7 +182,7 @@ public class CarByDriverAction extends FileEntityAction<Long, CarByDriver> {
 						@Override
 						public String format(Object context, Object value) {
 							CarByDriver carByDriver = (CarByDriver) context;
-							return carByDriver.getCar().getPlateType() + " "
+							return carByDriver.getCar().getPlateType() + "."
 									+ carByDriver.getCar().getPlateNo();
 						}
 					}));
@@ -210,21 +210,21 @@ public class CarByDriverAction extends FileEntityAction<Long, CarByDriver> {
 					.setValueFormater(new KeyValueFormater(getType())));
 		} else {
 			columns.add(new TextColumn("status",
-					getText("carByDriver.statuses"), 150)
+					getText("carByDriver.statuses"), 50)
 					.setSortable(true)
 					.setValueFormater(new KeyValueFormater(getEntityStatuses())));
 			columns.add(new TextColumn("car.plateNo",
-					getText("carByDriver.car.plateNo"), 150)
+					getText("carByDriver.car.plateNo"), 70)
 					.setValueFormater(new AbstractFormater<String>() {
 						@Override
 						public String format(Object context, Object value) {
 							CarByDriver carByDriver = (CarByDriver) context;
-							return carByDriver.getCar().getPlateType() + " "
+							return carByDriver.getCar().getPlateType() + "."
 									+ carByDriver.getCar().getPlateNo();
 						}
 					}));
 			columns.add(new TextColumn("driver.name",
-					getText("carByDriver.driver"), 100)
+					getText("carByDriver.driver"), 60)
 					.setValueFormater(new AbstractFormater<String>() {
 						@Override
 						public String format(Object context, Object value) {
@@ -233,19 +233,13 @@ public class CarByDriverAction extends FileEntityAction<Long, CarByDriver> {
 						}
 					}));
 			columns.add(new TextColumn("classes",
-					getText("carByDriver.classes"), 150).setSortable(true)
+					getText("carByDriver.classes"), 50).setSortable(true)
 					.setValueFormater(new KeyValueFormater(getType())));
 		}
 
-		columns.add(new TextColumn("startDate",
-				getText("carByDriver.timeInterva"), 270).setSortable(true)
-				.setValueFormater(new CalendarRangeFormater() {
-					@Override
-					public Calendar getToDate(Object context, Object value) {
-						CarByDriver carByDriver = (CarByDriver) context;
-						return carByDriver.getEndDate();
-					}
-				}));
+		columns.add(new TextColumn("description", getText("carMan.description"),
+				270).setSortable(true));
+
 		return columns;
 	}
 

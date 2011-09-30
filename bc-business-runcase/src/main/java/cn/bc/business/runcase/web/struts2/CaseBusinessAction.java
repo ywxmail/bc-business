@@ -29,7 +29,6 @@ import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.option.domain.OptionItem;
 import cn.bc.option.service.OptionService;
-import cn.bc.web.formater.AbstractFormater;
 import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.formater.EntityStatusFormater;
 import cn.bc.web.ui.html.grid.Column;
@@ -178,14 +177,8 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 				.setSortable(true).setValueFormater(new EntityStatusFormater(getSourceStatuses())));
 		columns.add(new TextColumn("motorcadeName", getText("runcase.motorcadeName"),		80)
 				.setSortable(true));
-		columns.add(new TextColumn("carPlate", getText("runcase.carPlate"),		100).
-				setUseTitleFromLabel(true).setValueFormater(new AbstractFormater<String>() {
-					@Override
-					public String format(Object context, Object value) {
-						CaseBase car = (CaseBase) context;
-						return car.getCarPlate()+" "+car.getCaseNo();
-					}
-				}));
+		columns.add(new TextColumn("carPlate", getText("runcase.carPlate"),		100)
+				.setSortable(true).setUseTitleFromLabel(true));
 		columns.add(new TextColumn("driverName", getText("runcase.driverName"),70)
 				.setSortable(true));
 		columns.add(new TextColumn("happenDate", getText("runcase.happenDate"),	150)

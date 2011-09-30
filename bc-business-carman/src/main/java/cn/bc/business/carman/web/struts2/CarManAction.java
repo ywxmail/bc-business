@@ -163,7 +163,8 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 
 	@Override
 	protected String[] getSearchFields() {
-		return new String[] { "name", "origin" };
+		return new String[] { "name", "origin", "cert4Indentity", "cert4CYZG",
+				"cert4FWZG" };
 	}
 
 	@Override
@@ -187,12 +188,12 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 								return args;
 							}
 						}));
+		columns.add(new TextColumn("cert4FWZG", getText("carMan.cert4FWZG"),
+				100).setSortable(true));
 		columns.add(new TextColumn("cert4Indentity",
 				getText("carMan.cert4Indentity"), 160).setSortable(true));
 		columns.add(new TextColumn("cert4CYZG", getText("carMan.cert4CYZG"),
 				120).setSortable(true));
-		columns.add(new TextColumn("cert4FWZG", getText("carMan.cert4FWZG"),
-				100).setSortable(true));
 		columns.add(new TextColumn("workDate", getText("carMan.workDate"), 120)
 				.setSortable(true).setValueFormater(
 						new CalendarFormater("yyyy-MM-dd ")));
