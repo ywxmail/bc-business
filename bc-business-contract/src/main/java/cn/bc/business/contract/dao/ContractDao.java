@@ -14,4 +14,5 @@ import cn.bc.core.dao.CrudDao;
  */
 public interface ContractDao extends CrudDao<Contract> {
 
+
 }

@@ -5,9 +5,13 @@ package cn.bc.business.contract.service;
 
 
 import java.io.Serializable;
+import java.util.List;
+import java.util.Map;
 
 import cn.bc.business.contract.dao.ContractChargerDao;
 import cn.bc.business.contract.domain.Contract4Charger;
+import cn.bc.core.Page;
+import cn.bc.core.query.condition.Condition;
 import cn.bc.core.service.DefaultCrudService;
 
 /**
@@ -38,6 +42,71 @@ public class ContractChargerServiceImpl extends DefaultCrudService<Contract4Char
 	public void delete(Serializable[] ids) {
 		//批量合同
 		this.contractChargerDao.delete(ids);
+	}
+
+	/**
+	 * 删除单个CarNContract
+	 * @parma contractId 
+	 * @return
+	 */
+	public void deleteCarNContract(Long contractId) {
+		if(contractId != null){
+			this.contractChargerDao.deleteCarNContract(contractId);
+		}
+		
+	}
+
+	/**
+	 * 删除批量CarNContract
+	 * @parma contractId 
+	 * @return
+	 */
+	public void deleteCarNContract(Long[] contractIds) {
+		if(contractIds != null && contractIds.length>0){
+			this.contractChargerDao.deleteCarNContract(contractIds);
+		}
+	}
+	
+	/**
+	 * 保存合同与车辆的关联表信息
+	 * @parma carId 
+	 * @parma contractId 
+	 * @return
+	 */
+	public void carNContract4Save(Long carId, Long contractId) {
+		this.contractChargerDao.carNContract4Save(carId,contractId);
+	}
+
+	/**
+	 * 查找车辆合同列表
+	 * @parma condition 
+	 * @parma carId 
+	 * @return
+	 */
+	public List<? extends Object> list4car(Condition condition, Long carId) {
+		return this.contractChargerDao.list4car(condition,carId);
+	}
+
+	/**
+	 * 查找车辆合同分页
+	 * @parma condition 
+	 * @parma carId 
+	 * @return
+	 */
+	public Page<? extends Object> page4car(Condition condition, int pageNo,
+			int pageSize) {
+		return this.contractChargerDao.page4car(condition,pageNo,pageSize);
+	}
+
+	/**
+	 * 根据contractId查找car信息
+	 * @parma contractId 
+	 * @return
+	 */
+	public Map<String, Object> findCarInfoByContractId(Long contractId) {
+		Map<String, Object> queryMap = null;
+		queryMap = this.contractChargerDao.findCarInfoByContractId(contractId);
+		return queryMap;
 	}
 	
 }
