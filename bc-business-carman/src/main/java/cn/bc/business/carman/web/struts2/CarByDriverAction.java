@@ -3,7 +3,6 @@
  */
 package cn.bc.business.carman.web.struts2;
 
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,9 +25,8 @@ import cn.bc.core.query.condition.Direction;
 import cn.bc.core.query.condition.impl.EqualsCondition;
 import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.identity.web.SystemContext;
-import cn.bc.web.formater.AbstractFormater;
-import cn.bc.web.formater.CalendarRangeFormater;
 import cn.bc.web.formater.KeyValueFormater;
+import cn.bc.web.formater.LinkFormater;
 import cn.bc.web.ui.html.grid.Column;
 import cn.bc.web.ui.html.grid.GridData;
 import cn.bc.web.ui.html.grid.TextColumn;
@@ -171,74 +169,83 @@ public class CarByDriverAction extends FileEntityAction<Long, CarByDriver> {
 
 		List<Column> columns = super.buildGridColumns();
 
-		if (carManId != null) {
-			columns.add(new TextColumn("status",
-					getText("carByDriver.statuses"), 100)
-					.setSortable(true)
-					.setValueFormater(new KeyValueFormater(getEntityStatuses())));
+		columns.add(new TextColumn("status", getText("carByDriver.statuses"),
+				100).setSortable(true).setValueFormater(
+				new KeyValueFormater(getEntityStatuses())));
+		if (carManId != null || (carManId == null && carId == null)) {
 			columns.add(new TextColumn("car.plateNo",
 					getText("carByDriver.car.plateNo"), 150)
-					.setValueFormater(new AbstractFormater<String>() {
+					.setValueFormater(new LinkFormater(this.getContextPath()
+							+ "/bc-business/car/edit?id={0}", "car") {
 						@Override
-						public String format(Object context, Object value) {
+						public Object[] getParams(Object context, Object value) {
+							CarByDriver carByDriver = (CarByDriver) context;
+							Object[] args = new Object[1];
+							args[0] = carByDriver.getCar().getId().toString();
+							return args;
+						}
+
+						@Override
+						public String getTaskbarTitle(Object context,
+								Object value) {
+							CarByDriver carByDriver = (CarByDriver) context;
+							return getText("car") + " - "
+									+ carByDriver.getCar().getPlateType() + "."
+									+ carByDriver.getCar().getPlateNo();
+						}
+
+						@Override
+						public String getWinId(Object context, Object value) {
+							return "car"
+									+ ((CarByDriver) context).getDriver()
+											.getId();
+						}
+
+						@Override
+						public String getLinkText(Object context, Object value) {
 							CarByDriver carByDriver = (CarByDriver) context;
 							return carByDriver.getCar().getPlateType() + "."
 									+ carByDriver.getCar().getPlateNo();
 						}
 					}));
 
-			columns.add(new TextColumn("classes",
-					getText("carByDriver.classes"), 100).setSortable(true)
-					.setValueFormater(new KeyValueFormater(getType())));
-		} else if (carId != null) {
-			columns.add(new TextColumn("status",
-					getText("carByDriver.statuses"), 100)
-					.setSortable(true)
-					.setValueFormater(new KeyValueFormater(getEntityStatuses())));
-
+		}
+		if (carId != null || (carManId == null && carId == null)) {
 			columns.add(new TextColumn("driver.name",
 					getText("carByDriver.driver"), 100)
-					.setValueFormater(new AbstractFormater<String>() {
+					.setValueFormater(new LinkFormater(this.getContextPath()
+							+ "/bc-business/carMan/edit?id={0}", "driver") {
 						@Override
-						public String format(Object context, Object value) {
+						public Object[] getParams(Object context, Object value) {
 							CarByDriver carByDriver = (CarByDriver) context;
-							return carByDriver.getDriver().getName();
+							Object[] args = new Object[1];
+							args[0] = carByDriver.getDriver().getId()
+									.toString();
+							return args;
+						}
+
+						@Override
+						public String getTaskbarTitle(Object context,
+								Object value) {
+							return getText("carMan.type.driver") + " - "
+									+ value;
+						}
+
+						@Override
+						public String getWinId(Object context, Object value) {
+							return "driver"
+									+ ((CarByDriver) context).getDriver()
+											.getId();
 						}
 					}));
-			columns.add(new TextColumn("classes",
-					getText("carByDriver.classes"), 100).setSortable(true)
-					.setValueFormater(new KeyValueFormater(getType())));
-		} else {
-			columns.add(new TextColumn("status",
-					getText("carByDriver.statuses"), 50)
-					.setSortable(true)
-					.setValueFormater(new KeyValueFormater(getEntityStatuses())));
-			columns.add(new TextColumn("car.plateNo",
-					getText("carByDriver.car.plateNo"), 70)
-					.setValueFormater(new AbstractFormater<String>() {
-						@Override
-						public String format(Object context, Object value) {
-							CarByDriver carByDriver = (CarByDriver) context;
-							return carByDriver.getCar().getPlateType() + "."
-									+ carByDriver.getCar().getPlateNo();
-						}
-					}));
-			columns.add(new TextColumn("driver.name",
-					getText("carByDriver.driver"), 60)
-					.setValueFormater(new AbstractFormater<String>() {
-						@Override
-						public String format(Object context, Object value) {
-							CarByDriver carByDriver = (CarByDriver) context;
-							return carByDriver.getDriver().getName();
-						}
-					}));
-			columns.add(new TextColumn("classes",
-					getText("carByDriver.classes"), 50).setSortable(true)
-					.setValueFormater(new KeyValueFormater(getType())));
 		}
 
-		columns.add(new TextColumn("description", getText("carMan.description"),
-				270).setSortable(true));
+		columns.add(new TextColumn("classes", getText("carByDriver.classes"),
+				100).setSortable(true).setValueFormater(
+				new KeyValueFormater(getType())));
+
+		columns.add(new TextColumn("description",
+				getText("carMan.description"), 270).setSortable(true));
 
 		return columns;
 	}

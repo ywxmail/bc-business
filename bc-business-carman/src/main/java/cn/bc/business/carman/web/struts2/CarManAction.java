@@ -26,7 +26,6 @@ import cn.bc.option.domain.OptionItem;
 import cn.bc.option.service.OptionService;
 import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.formater.KeyValueFormater;
-import cn.bc.web.formater.LinkFormater;
 import cn.bc.web.ui.html.grid.Column;
 import cn.bc.web.ui.html.grid.GridData;
 import cn.bc.web.ui.html.grid.TextColumn;
@@ -177,17 +176,7 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 				.setSortable(true).setValueFormater(
 						new KeyValueFormater(getType())));
 		columns.add(new TextColumn("name", getText("carMan.name"), 80)
-				.setSortable(true).setValueFormater(
-						new LinkFormater(this.getContextPath()
-								+ "/bs/carman/edit?id={0}") {
-							@Override
-							public Object[] getParams(Object context,
-									Object value) {
-								Object[] args = new Object[1];
-								args[0] = ((CarMan) context).getId().toString();
-								return args;
-							}
-						}));
+				.setSortable(true));
 		columns.add(new TextColumn("cert4FWZG", getText("carMan.cert4FWZG"),
 				100).setSortable(true));
 		columns.add(new TextColumn("cert4Indentity",
