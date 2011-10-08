@@ -138,7 +138,9 @@ public class ContractChargerAction extends FileEntityAction<Long, Contract4Charg
 		this.getCrudService().save(e);
 		
 		//保存证件与司机的关联表信息
-		this.contractChargerService.carNContract4Save(carId,getE().getId());
+		if(carId != null){
+			this.contractChargerService.carNContract4Save(carId,getE().getId());
+		}
 		
 		return "saveSuccess";
 		

@@ -116,8 +116,10 @@ public class CertVehicelicenseAction extends FileEntityAction<Long, Cert4VehiceL
 		e.setCertCode(e.getArchiveNo());
 		this.getCrudService().save(e);
 		
-		//保存证件与司机的关联表信息
-		this.certService.carNCert4Save(carId,getE().getId());
+		//保存证件与车辆的关联表信息
+		if(carId != null){
+			this.certService.carNCert4Save(carId,getE().getId());
+		}
 		
 		return "saveSuccess";
 	}
