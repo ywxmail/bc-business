@@ -127,7 +127,7 @@ public class ContractLabourDaoImpl extends HibernateCrudJpaDao<Contract4Labour> 
 	 * @parma carId 
 	 * @return
 	 */
-	public List<? extends Object> list4carMan(Condition condition, Long carManId) {
+	public List<Map<String, Object>> list4carMan(Condition condition, Long carManId) {
 		ArrayList<Object> args 	= new ArrayList<Object>();
 		StringBuffer hql = new StringBuffer();
 		
@@ -187,7 +187,7 @@ public class ContractLabourDaoImpl extends HibernateCrudJpaDao<Contract4Labour> 
 	 * @parma carId 
 	 * @return
 	 */
-	public Page<? extends Object> page4carMan(final Condition condition,final int pageNo,
+	public Page<Map<String,Object>> page4carMan(final Condition condition,final int pageNo,
 			final int pageSize) {
 		//设置最大页数,如果小于1都按1计算
 		final int _pageSize = pageSize < 1 ? 1 : pageSize;	

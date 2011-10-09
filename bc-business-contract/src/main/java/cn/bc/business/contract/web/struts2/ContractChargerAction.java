@@ -35,7 +35,9 @@ import cn.bc.web.ui.html.grid.Column;
 import cn.bc.web.ui.html.grid.GridData;
 import cn.bc.web.ui.html.grid.TextColumn;
 import cn.bc.web.ui.html.page.ButtonOption;
+import cn.bc.web.ui.html.page.HtmlPage;
 import cn.bc.web.ui.html.page.PageOption;
+import cn.bc.web.ui.json.Json;
 
 /**
  * 经济合同Action
@@ -185,7 +187,7 @@ public class ContractChargerAction extends FileEntityAction<Long, Contract4Charg
 	 * @return
 	 */
 	@Override
-	protected List<? extends Object> findList() {
+	protected List<Map<String, Object>> findList() {
 		return this.contractChargerService.list4car(this.getCondition(),carId);
 	}
 	
@@ -194,7 +196,7 @@ public class ContractChargerAction extends FileEntityAction<Long, Contract4Charg
 	 * 
 	 * @return
 	 */
-	protected Page<? extends Object> findPage() {
+	protected Page<Map<String,Object>> findPage() {
 		return this.contractChargerService.page4car(
 					this.getCondition(),this.getPage().getPageNo(), 
 					this.getPage().getPageSize());
@@ -329,14 +331,14 @@ public class ContractChargerAction extends FileEntityAction<Long, Contract4Charg
 //	}
 //	
 //
-//	@Override
-//	protected HtmlPage buildHtml4Paging() {
-//		HtmlPage page = super.buildHtml4Paging();
-//		if (carId != null)
-//			page.setAttr("data-extras", new Json().put("carId", carId)
-//					.toString());
-//		return page;
-//	}
+	@Override
+	protected HtmlPage buildHtml4Paging() {
+		HtmlPage page = super.buildHtml4Paging();
+		if (carId != null)
+			page.setAttr("data-extras", new Json().put("carId", carId)
+					.toString());
+		return page;
+	}
 	
 	/**
 	 * 获取Contract的合同类型列表

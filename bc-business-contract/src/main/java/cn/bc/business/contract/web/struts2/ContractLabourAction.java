@@ -32,6 +32,7 @@ import cn.bc.web.ui.html.grid.Column;
 import cn.bc.web.ui.html.grid.GridData;
 import cn.bc.web.ui.html.grid.TextColumn;
 import cn.bc.web.ui.html.page.ButtonOption;
+import cn.bc.web.ui.html.page.HtmlPage;
 import cn.bc.web.ui.html.page.PageOption;
 import cn.bc.web.ui.json.Json;
 
@@ -164,7 +165,7 @@ public class ContractLabourAction extends FileEntityAction<Long, Contract4Labour
 	 * @return
 	 */
 	@Override
-	protected List<? extends Object> findList() {
+	protected List<Map<String, Object>> findList() {
 		return this.contractLabourService.list4carMan(this.getCondition(),carManId);
 	}
 	
@@ -173,7 +174,7 @@ public class ContractLabourAction extends FileEntityAction<Long, Contract4Labour
 	 * 
 	 * @return
 	 */
-	protected Page<? extends Object> findPage() {
+	protected Page<Map<String,Object>> findPage() {
 		return this.contractLabourService.page4carMan(
 					this.getCondition(),this.getPage().getPageNo(), 
 					this.getPage().getPageSize());
@@ -288,6 +289,15 @@ public class ContractLabourAction extends FileEntityAction<Long, Contract4Labour
 		return "contractLabour";
 	}
 	
+	@Override
+	protected HtmlPage buildHtml4Paging() {
+		HtmlPage page = super.buildHtml4Paging();
+		if (carManId != null)
+			page.setAttr("data-extras", new Json().put("carManId", carManId)
+					.toString());
+		return page;
+	}
+	
 	/**
 	 * 获取Contract的合同类型列表
 	 * 
@@ -302,14 +312,6 @@ public class ContractLabourAction extends FileEntityAction<Long, Contract4Labour
 		return types;
 	}
 	
-//	@Override
-//	protected HtmlPage buildHtml4Paging() {
-//		HtmlPage page = super.buildHtml4Paging();
-//		if (carManId != null)
-//			page.setAttr("data-extras", new Json().put("carManId", carManId)
-//					.toString());
-//		return page;
-//	}
 
 
 }

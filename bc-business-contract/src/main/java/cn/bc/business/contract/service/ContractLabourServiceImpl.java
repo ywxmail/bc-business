@@ -82,7 +82,7 @@ public class ContractLabourServiceImpl extends DefaultCrudService<Contract4Labou
 	 * @parma carId 
 	 * @return
 	 */
-	public List<? extends Object> list4carMan(Condition condition, Long carManId) {
+	public List<Map<String, Object>> list4carMan(Condition condition, Long carManId) {
 		return this.contractLabourDao.list4carMan(condition,carManId);
 	}
 
@@ -92,7 +92,7 @@ public class ContractLabourServiceImpl extends DefaultCrudService<Contract4Labou
 	 * @parma carId 
 	 * @return
 	 */
-	public Page<? extends Object> page4carMan(Condition condition, int pageNo,
+	public Page<Map<String,Object>> page4carMan(Condition condition, int pageNo,
 			int pageSize) {
 		return this.contractLabourDao.page4carMan(condition,pageNo,pageSize);
 	}

@@ -47,7 +47,7 @@ public interface ContractChargerService extends CrudService<Contract4Charger> {
 	 * @parma carId 
 	 * @return
 	 */
-	List<? extends Object> list4car(Condition condition, Long carId);
+	List<Map<String, Object>> list4car(Condition condition, Long carId);
 
 	/**
 	 * 查找车辆合同分页
@@ -55,7 +55,7 @@ public interface ContractChargerService extends CrudService<Contract4Charger> {
 	 * @parma carId 
 	 * @return
 	 */
-	Page<? extends Object> page4car(Condition condition, int pageNo,
+	Page<Map<String,Object>> page4car(Condition condition, int pageNo,
 			int pageSize);
 
 	/**

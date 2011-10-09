@@ -47,7 +47,7 @@ public interface ContractLabourDao extends CrudDao<Contract4Labour> {
 	 * @parma carId 
 	 * @return
 	 */
-	List<? extends Object> list4carMan(Condition condition, Long carManId);
+	List<Map<String, Object>> list4carMan(Condition condition, Long carManId);
 
 	/**
 	 * 查找劳动合同分页
@@ -55,7 +55,7 @@ public interface ContractLabourDao extends CrudDao<Contract4Labour> {
 	 * @parma carId 
 	 * @return
 	 */
-	Page<? extends Object> page4carMan(Condition condition, int pageNo,
+	Page<Map<String,Object>> page4carMan(Condition condition, int pageNo,
 			int pageSize);
 
 	/**
