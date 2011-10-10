@@ -11,15 +11,8 @@
 	
 	<!-- 劳动合同 -->
 	<package name="contractLabour" extends="bc-default" namespace="/bc-business">
-		<action name="contractLabour/create" class="contractLabourAction" method="create">
-			<result name="form">/bc-business/contractLabour/form.jsp</result>
-		</action>
 		<action name="contractLabour/certInfo" class="contractLabourAction" method="certInfo">
 		</action>
 	</package>
 	
-	<!-- 经济合同 -->
-	<package name="contractCharger" extends="bc-default" namespace="/bc-business">
-
-	</package>
 </struts>

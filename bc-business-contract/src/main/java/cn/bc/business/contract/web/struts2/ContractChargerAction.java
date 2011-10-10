@@ -35,10 +35,12 @@ import cn.bc.web.ui.html.grid.Column;
 import cn.bc.web.ui.html.grid.GridData;
 import cn.bc.web.ui.html.grid.TextColumn;
 import cn.bc.web.ui.html.page.ButtonOption;
+import cn.bc.web.ui.html.page.HtmlPage;
 import cn.bc.web.ui.html.page.PageOption;
+import cn.bc.web.ui.json.Json;
 
 /**
- * 责任人合同Action
+ * 经济合同Action
  * 
  * @author wis.ho
  * 
@@ -49,21 +51,22 @@ public class ContractChargerAction extends FileEntityAction<Long, Contract4Charg
 	// private static Log logger = LogFactory.getLog(ContractAction.class);
 	private static final long 		serialVersionUID 			= 1L;
 	public 	ContractChargerService 	contractChargerService;
-//	public 	ContractService 		contractService;
 	private AttachService 			attachService;
 	private OptionService			optionService;
 	private String					MANAGER_KEY 				= "R_ADMIN";// 管理角色的编码
 	public 	boolean 	   			isManager;
-	public	Long 					carManId;
 	public	Long					carId; 
-//	public  String 					certCode;
 	public 	AttachWidget 			attachsUI;
-	public	String					assignChargerIds;
+	
 	public 	Map<String,String>		statusesValue;
-	public  Map<String,Object>	 	carInfoMap;
 	
 	public  List<OptionItem>		signTypeList;							// 可选签约类型
 	public  List<OptionItem>		businessTypeList;						// 可选营运性质列表
+//	public	Long 					carManId;
+//	public  String 					certCode;
+//	public	String					assignChargerIds;
+//	public  Map<String,Object>	 	carInfoMap;
+//	public 	ContractService 		contractService;
 
 	@Autowired
 	public void setContractChargerService(ContractChargerService contractChargerService) {
@@ -76,12 +79,6 @@ public class ContractChargerAction extends FileEntityAction<Long, Contract4Charg
 //		this.contractService = contractService;
 //	}
 	
-	@Override
-	public boolean isReadonly() {
-		SystemContext context = (SystemContext) this.getContext();
-		return !context.hasAnyRole(MANAGER_KEY);
-	}
-	
 	@Autowired
 	public void setAttachService(AttachService attachService) {
 		this.attachService = attachService;
@@ -91,8 +88,21 @@ public class ContractChargerAction extends FileEntityAction<Long, Contract4Charg
 	public void setOptionService(OptionService optionService) {
 		this.optionService = optionService;
 	}
+	
+	public Long getCarId() {
+		return carId;
+	}
 
+	public void setCarId(Long carId) {
+		this.carId = carId;
+	}
 
+	@Override
+	public boolean isReadonly() {
+		SystemContext context = (SystemContext) this.getContext();
+		return !context.hasAnyRole(MANAGER_KEY);
+	}
+	
 	@SuppressWarnings("static-access")
 	public String create() throws Exception {
 		String r = super.create();
@@ -137,8 +147,10 @@ public class ContractChargerAction extends FileEntityAction<Long, Contract4Charg
 		e.setModifiedDate(Calendar.getInstance());
 		this.getCrudService().save(e);
 		
-		//保存证件与司机的关联表信息
-		this.contractChargerService.carNContract4Save(carId,getE().getId());
+		//保存证件与车辆的关联表信息
+		if(carId != null){
+			this.contractChargerService.carNContract4Save(carId,getE().getId());
+		}
 		
 		return "saveSuccess";
 		
@@ -175,7 +187,7 @@ public class ContractChargerAction extends FileEntityAction<Long, Contract4Charg
 	 * @return
 	 */
 	@Override
-	protected List<? extends Object> findList() {
+	protected List<Map<String, Object>> findList() {
 		return this.contractChargerService.list4car(this.getCondition(),carId);
 	}
 	
@@ -184,7 +196,7 @@ public class ContractChargerAction extends FileEntityAction<Long, Contract4Charg
 	 * 
 	 * @return
 	 */
-	protected Page<? extends Object> findPage() {
+	protected Page<Map<String,Object>> findPage() {
 		return this.contractChargerService.page4car(
 					this.getCondition(),this.getPage().getPageNo(), 
 					this.getPage().getPageSize());
@@ -319,14 +331,14 @@ public class ContractChargerAction extends FileEntityAction<Long, Contract4Charg
 //	}
 //	
 //
-//	@Override
-//	protected HtmlPage buildHtml4Paging() {
-//		HtmlPage page = super.buildHtml4Paging();
-//		if (carId != null)
-//			page.setAttr("data-extras", new Json().put("carId", carId)
-//					.toString());
-//		return page;
-//	}
+	@Override
+	protected HtmlPage buildHtml4Paging() {
+		HtmlPage page = super.buildHtml4Paging();
+		if (carId != null)
+			page.setAttr("data-extras", new Json().put("carId", carId)
+					.toString());
+		return page;
+	}
 	
 	/**
 	 * 获取Contract的合同类型列表

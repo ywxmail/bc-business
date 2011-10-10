@@ -112,7 +112,9 @@ public class CertFwzgAction extends FileEntityAction<Long, Cert4FuWuZiGe> {
 		this.getCrudService().save(e);
 		
 		//保存证件与司机的关联表信息
-		this.certService.carManNCert4Save(carManId,getE().getId());
+		if(carManId != null){
+			this.certService.carManNCert4Save(carManId,getE().getId());
+		}
 		
 		return "saveSuccess";
 	}

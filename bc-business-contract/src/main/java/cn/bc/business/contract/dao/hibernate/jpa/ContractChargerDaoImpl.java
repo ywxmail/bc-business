@@ -127,7 +127,7 @@ public class ContractChargerDaoImpl extends HibernateCrudJpaDao<Contract4Charger
 	 * @parma carId 
 	 * @return
 	 */
-	public List<? extends Object> list4car(Condition condition, Long carId) {
+	public List<Map<String, Object>> list4car(Condition condition, Long carId) {
 		ArrayList<Object> args 	= new ArrayList<Object>();
 		StringBuffer hql = new StringBuffer();
 		
