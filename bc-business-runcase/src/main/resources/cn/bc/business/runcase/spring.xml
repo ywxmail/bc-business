@@ -38,4 +38,10 @@
 	<bean id="caseAccidentService" class="cn.bc.business.runcase.service.CaseAccidentServiceImpl"
 		p:caseAccidentDao-ref="caseAccidentDao" />	
 		
+	<!-- caseAccidentDao -->
+	<bean id="caseAdviceDao" class="cn.bc.business.runcase.dao.hibernate.jpa.CaseAdviceDaoImpl"
+		p:entityManagerFactory-ref="entityManagerFactory" />
+	<bean id="caseAdviceService" class="cn.bc.business.runcase.service.CaseAdviceServiceImpl"
+		p:caseAdviceDao-ref="caseAdviceDao" />	
+		
 </beans>
