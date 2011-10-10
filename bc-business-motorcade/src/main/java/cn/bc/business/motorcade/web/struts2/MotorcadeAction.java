@@ -49,7 +49,7 @@ public class MotorcadeAction extends FileEntityAction<Long, Motorcade> {
 
 	@Override
 	public String create() throws Exception {
-//		this.readonly = false;
+		// this.readonly = false;
 		SystemContext context = (SystemContext) this.getContext();
 		Motorcade e = this.getMotorcadeService().create();
 		e.setFileDate(Calendar.getInstance());
@@ -128,7 +128,7 @@ public class MotorcadeAction extends FileEntityAction<Long, Motorcade> {
 
 	@Override
 	protected String[] getSearchFields() {
-		return new String[] { "code", "name", "fullName" };
+		return new String[] { "code", "name", "company" };
 	}
 
 	@Override
@@ -137,15 +137,17 @@ public class MotorcadeAction extends FileEntityAction<Long, Motorcade> {
 		isManager = isManager();
 
 		List<Column> columns = super.buildGridColumns();
-		columns.add(new TextColumn("code", getText("label.code"), 130)
+		columns.add(new TextColumn("status", getText("label.status"), 60)
+				.setSortable(true).setValueFormater(
+						new KeyValueFormater(getEntityStatuses())));
+		columns.add(new TextColumn("code", getText("label.code"), 100)
 				.setSortable(true).setUseTitleFromLabel(true));
 		columns.add(new TextColumn("name", getText("motorcade.name"), 130)
 				.setSortable(true).setUseTitleFromLabel(true));
-		columns.add(new TextColumn("fullName", getText("motorcade.fullName"),
-				300).setSortable(true).setUseTitleFromLabel(true));
-		columns.add(new TextColumn("status", getText("label.status"), 130)
-				.setSortable(true).setValueFormater(
-						new KeyValueFormater(getEntityStatuses())));
+		columns.add(new TextColumn("company", getText("motorcade.company"))
+				.setSortable(true).setUseTitleFromLabel(true));
+		// columns.add(new TextColumn("fullName", getText("motorcade.fullName"),
+		// 300).setSortable(true).setUseTitleFromLabel(true));
 		return columns;
 	}
 
