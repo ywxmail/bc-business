@@ -83,7 +83,7 @@ public class ContractChargerServiceImpl extends DefaultCrudService<Contract4Char
 	 * @parma carId 
 	 * @return
 	 */
-	public List<? extends Object> list4car(Condition condition, Long carId) {
+	public List<Map<String, Object>> list4car(Condition condition, Long carId) {
 		return this.contractChargerDao.list4car(condition,carId);
 	}
 
@@ -93,7 +93,7 @@ public class ContractChargerServiceImpl extends DefaultCrudService<Contract4Char
 	 * @parma carId 
 	 * @return
 	 */
-	public Page<? extends Object> page4car(Condition condition, int pageNo,
+	public Page<Map<String,Object>> page4car(Condition condition, int pageNo,
 			int pageSize) {
 		return this.contractChargerDao.page4car(condition,pageNo,pageSize);
 	}
