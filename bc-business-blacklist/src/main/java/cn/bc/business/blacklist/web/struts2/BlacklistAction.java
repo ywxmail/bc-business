@@ -119,7 +119,7 @@ public class BlacklistAction extends FileEntityAction<Long, Blacklist> {
 
 	@Override
 	protected PageOption buildFormPageOption() {
-		PageOption option = new PageOption().setWidth(720).setMinWidth(250)
+		PageOption option = new PageOption().setWidth(740).setMinWidth(250)
 				.setMinHeight(200).setModal(false);
 		option.addButton(new ButtonOption(getText("label.save"), "save"));
 		return option;
