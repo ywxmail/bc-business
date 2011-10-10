@@ -21,5 +21,11 @@
 		<action name="caseAccident/closefile" class="caseAccidentAction" method="closefile">
 		</action>
 	</package>
+	
+	<!-- 投诉建议 -->
+	<package name="caseAdvice" extends="bc-default" namespace="/bc-business">
+		<action name="caseAdvice/closefile" class="caseAdviceAction" method="closefile">
+		</action>
+	</package>
 
 </struts>
