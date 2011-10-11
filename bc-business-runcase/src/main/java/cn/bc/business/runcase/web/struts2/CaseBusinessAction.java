@@ -312,8 +312,9 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 	protected Condition getSpecalCondition() {
 		if (carId != null) {
 			return new EqualsCondition("carId", carId);
-		}else if (carManId != null) {
-			return new EqualsCondition("carManId", carManId);
+		}
+		if (carManId != null) {
+			return new EqualsCondition("driverId", carManId);
 		}else {
 			return null;
 		}
@@ -327,7 +328,7 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 			page.setAttr("data-extras", new Json().put("carId", carId)
 					.toString());
 		if (carManId != null)
-			page.setAttr("data-extras", new Json().put("carManId", carManId)
+			page.setAttr("data-extras", new Json().put("driverId", carManId)
 					.toString());
 		return page;
 	}
