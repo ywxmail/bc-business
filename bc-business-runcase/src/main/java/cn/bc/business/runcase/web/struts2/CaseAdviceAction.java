@@ -56,6 +56,7 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4InfractBusines
 	private String 					MANAGER_KEY 		= "R_ADMIN";// 管理角色的编码
 	public 	boolean 				isManager;
 	public  Long					carId;
+	public  Long					carManId;
 	
 	@SuppressWarnings("unused")
 	private CaseBusinessService		caseBusinessService;
@@ -313,7 +314,9 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4InfractBusines
 	protected Condition getSpecalCondition() {
 		if (carId != null) {
 			return new EqualsCondition("carId", carId);
-		} else {
+		}else if (carManId != null) {
+			return new EqualsCondition("carManId", carManId);
+		}else {
 			return null;
 		}
 	}
@@ -324,6 +327,9 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4InfractBusines
 		HtmlPage page = super.buildHtml4Paging();
 		if (carId != null)
 			page.setAttr("data-extras", new Json().put("carId", carId)
+					.toString());
+		if (carManId != null)
+			page.setAttr("data-extras", new Json().put("carManId", carManId)
 					.toString());
 		return page;
 	}
