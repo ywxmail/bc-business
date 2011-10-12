@@ -19,10 +19,10 @@ import org.springframework.stereotype.Controller;
 import cn.bc.business.OptionConstants;
 import cn.bc.business.motorcade.domain.Motorcade;
 import cn.bc.business.motorcade.service.MotorcadeService;
-import cn.bc.business.runcase.domain.Case4InfractBusiness;
 import cn.bc.business.runcase.domain.Case4InfractTraffic;
+import cn.bc.business.runcase.domain.Case4Praise;
 import cn.bc.business.runcase.domain.CaseBase;
-import cn.bc.business.runcase.service.CaseBusinessService;
+import cn.bc.business.runcase.service.CasePraiseService;
 import cn.bc.business.web.struts2.FileEntityAction;
 import cn.bc.core.query.condition.Condition;
 import cn.bc.core.query.condition.Direction;
@@ -31,6 +31,7 @@ import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.option.domain.OptionItem;
 import cn.bc.option.service.OptionService;
+import cn.bc.web.formater.AbstractFormater;
 import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.formater.EntityStatusFormater;
 import cn.bc.web.ui.html.grid.Column;
@@ -43,23 +44,22 @@ import cn.bc.web.ui.html.toolbar.Toolbar;
 import cn.bc.web.ui.json.Json;
 
 /**
- * 投诉建议Action
+ * 表扬Action
  * 
  * @author dragon
  * 
  */
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 @Controller
-public class CaseAdviceAction extends FileEntityAction<Long, Case4InfractBusiness> {
+public class CasePraiseAction extends FileEntityAction<Long, Case4Praise> {
 	// private static Log logger = LogFactory.getLog(CarAction.class);
 	private static 	final long 		serialVersionUID 	= 1L;
 	private String 					MANAGER_KEY 		= "R_ADMIN";// 管理角色的编码
 	public 	boolean 				isManager;
-	public  Long					carId;
-	public  Long					carManId;
+	public	Long					carId;
 	
 	@SuppressWarnings("unused")
-	private CaseBusinessService		caseBusinessService;
+	private CasePraiseService		casePraiseService;	
 	private MotorcadeService	 	motorcadeService;
 	private OptionService			optionService;
 
@@ -76,9 +76,9 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4InfractBusines
 
 
 	@Autowired
-	public void setCaseBusinessService(CaseBusinessService caseBusinessService) {
-		this.caseBusinessService = caseBusinessService;
-		this.setCrudService(caseBusinessService);
+	public void setCasePraiseService(CasePraiseService casePraiseService) {
+		this.casePraiseService = casePraiseService;
+		this.setCrudService(casePraiseService);
 	}
 	
 	@Autowired
@@ -98,7 +98,7 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4InfractBusines
 	
 	//复写搜索URL方法
 	protected String getEntityConfigName() {
-		return "caseAdvice";
+		return "casePraise";
 	}
 
 	@Override
@@ -111,11 +111,11 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4InfractBusines
 	@Override
 	protected PageOption buildFormPageOption() {
 		PageOption option = new PageOption().setWidth(840).setMinWidth(250)
-				.setMinHeight(200).setModal(false).setHeight(650);
+				.setMinHeight(200).setModal(false).setHeight(500);
 		if (!isReadonly()) {
 			//特殊处理结案按钮
 			if(Case4InfractTraffic.STATUS_ACTIVE == getE().getStatus() && !getE().isNew()){
-				ButtonOption buttonOption = new ButtonOption(getText("label.closefile"),null,"bc.caseBusinessForm.closefile");
+				ButtonOption buttonOption = new ButtonOption(getText("label.closefile"),null,"bc.caseAccidentForm.closefile");
 				buttonOption.put("id", "bcSaveDlgButton");
 				option.addButton(buttonOption);
 			}
@@ -176,16 +176,20 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4InfractBusines
 		List<Column> columns = super.buildGridColumns();
 		columns.add(new TextColumn("status",getText("runcase.status"),		50)
 				.setSortable(true).setValueFormater(new EntityStatusFormater(getCaseStatuses())));
-		columns.add(new TextColumn("caseNo",	getText("runcase.caseNo2"))
+		columns.add(new TextColumn("caseNo",	getText("runcase.caseNo3"))
 				.setSortable(true));
-		columns.add(new TextColumn("source", getText("runcase.ifsource"),		80)
-				.setSortable(true).setValueFormater(new EntityStatusFormater(getSourceStatuses())));
+		columns.add(new TextColumn("sort", getText("runcase.sort"),		80)
+				.setSortable(true));
 		columns.add(new TextColumn("motorcadeName", getText("runcase.motorcadeName"),		80)
 				.setSortable(true));
-		columns.add(new TextColumn("carPlate", getText("runcase.carPlate"),		100)
-				.setSortable(true).setUseTitleFromLabel(true));
-		columns.add(new TextColumn("driverCert",	getText("runcase.driverCert"),		80)
-				.setSortable(true));
+		columns.add(new TextColumn("carPlate", getText("runcase.carPlate"),		100).
+				setUseTitleFromLabel(true).setValueFormater(new AbstractFormater<String>() {
+					@Override
+					public String format(Object context, Object value) {
+						CaseBase car = (CaseBase) context;
+						return car.getCarPlate()+" "+car.getCaseNo();
+					}
+				}));
 		columns.add(new TextColumn("driverName", getText("runcase.driverName"),70)
 				.setSortable(true));
 		columns.add(new TextColumn("happenDate", getText("runcase.happenDate"),	150)
@@ -206,7 +210,7 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4InfractBusines
 		this.getE().setUid(this.getIdGeneratorService().next(this.getE().ATTACH_TYPE));
 		
 		// 初始化信息
-		this.getE().setType  (CaseBase.TYPE_COMPLAIN);
+		this.getE().setType  (CaseBase.TYPE_PRAISE);
 		this.getE().setStatus(CaseBase.STATUS_ACTIVE);
 		
 		// 表单可选项的加载
@@ -231,7 +235,7 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4InfractBusines
 	@Override
 	public String save() throws Exception{
 		SystemContext context = this.getSystyemContext();
-		Case4InfractBusiness e = this.getE();
+		Case4Praise e = this.getE();
 		
 		if(e != null && (e.getReceiverId() == null || e.getReceiverId() < 0)){
 			e.setReceiverId(context.getUserHistory().getId());
@@ -279,6 +283,7 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4InfractBusines
 		this.departmentList				=	this.optionService.findOptionItemByGroupKey(OptionConstants.CA_DEPARTMENT);
 	}
 	
+	
 	/**
 	 * 获取Entity的状态值转换列表
 	 * 
@@ -314,10 +319,7 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4InfractBusines
 	protected Condition getSpecalCondition() {
 		if (carId != null) {
 			return new EqualsCondition("carId", carId);
-		}
-		if (carManId != null) {
-			return new EqualsCondition("driverId", carManId);
-		}else {
+		} else {
 			return null;
 		}
 	}
@@ -328,9 +330,6 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4InfractBusines
 		HtmlPage page = super.buildHtml4Paging();
 		if (carId != null)
 			page.setAttr("data-extras", new Json().put("carId", carId)
-					.toString());
-		if (carManId != null)
-			page.setAttr("data-extras", new Json().put("driverId", carManId)
 					.toString());
 		return page;
 	}
