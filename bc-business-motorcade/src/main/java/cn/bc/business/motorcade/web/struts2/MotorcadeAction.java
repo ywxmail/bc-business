@@ -12,6 +12,7 @@ import cn.bc.business.motorcade.domain.Motorcade;
 import cn.bc.business.motorcade.service.MotorcadeService;
 import cn.bc.business.web.struts2.FileEntityAction;
 import cn.bc.core.query.condition.Condition;
+import cn.bc.core.query.condition.Direction;
 import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.web.formater.KeyValueFormater;
@@ -86,7 +87,7 @@ public class MotorcadeAction extends FileEntityAction<Long, Motorcade> {
 
 	@Override
 	protected OrderCondition getDefaultOrderCondition() {
-		return null;// new OrderCondition("fileDate", Direction.Desc);
+		return new OrderCondition("status", Direction.Asc).add("fileDate", Direction.Desc);
 	}
 
 	@Override
