@@ -27,5 +27,11 @@
 		<action name="caseAdvice/closefile" class="caseAdviceAction" method="closefile">
 		</action>
 	</package>
+	
+	<!-- 表扬 -->
+	<package name="casePraise" extends="bc-default" namespace="/bc-business">
+		<action name="casePraise/closefile" class="casePraiseAction" method="closefile">
+		</action>
+	</package>
 
 </struts>
