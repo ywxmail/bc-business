@@ -24,8 +24,8 @@
 		<module>bc-business-charger</module>
 	</modules>
 	<scm>
-		<connection>scm:git:git://localhost/bc-business.git</connection>
-		<developerConnection>scm:git:[fetch=]git://localhost/bc-business.git[push=]git@localhost:bc-business.git</developerConnection>
+		<connection>scm:git:git@192.168.0.222:bc-business.git</connection>
+		<developerConnection>scm:git:git@192.168.0.222:bc-business.git</developerConnection>
 		<url>https://localhost/bc-business</url>
 	</scm>
 </project>
