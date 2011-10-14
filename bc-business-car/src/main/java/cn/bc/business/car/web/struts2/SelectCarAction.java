@@ -13,12 +13,17 @@ import org.springframework.stereotype.Controller;
 import cn.bc.business.BSConstants;
 import cn.bc.business.car.domain.Car;
 import cn.bc.business.car.service.CarService;
-import cn.bc.core.CrudOperations;
+import cn.bc.core.query.Query;
+import cn.bc.core.query.condition.Condition;
+import cn.bc.core.query.condition.impl.EqualsCondition;
+import cn.bc.core.query.condition.impl.InCondition;
+import cn.bc.core.util.StringUtils;
 import cn.bc.web.formater.AbstractFormater;
 import cn.bc.web.struts2.AbstractSelectPageAction;
 import cn.bc.web.ui.html.grid.Column;
 import cn.bc.web.ui.html.grid.TextColumn;
 import cn.bc.web.ui.html.page.PageOption;
+import cn.bc.web.ui.json.Json;
 
 /**
  * 选择车辆Action
@@ -28,10 +33,10 @@ import cn.bc.web.ui.html.page.PageOption;
  */
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 @Controller
-public class SelectCarAction extends AbstractSelectPageAction {
+public class SelectCarAction extends AbstractSelectPageAction<Car> {
 	private static final long serialVersionUID = 1L;
 	public CarService carService;
-	public String types; // 类型控制
+	public String status; // 车辆的状态，多个用逗号连接
 
 	@Autowired
 	public void setCarService(CarService carService) {
@@ -39,8 +44,8 @@ public class SelectCarAction extends AbstractSelectPageAction {
 	}
 
 	@Override
-	protected CrudOperations<? extends Object> getGridDataService() {
-		return this.carService;
+	protected Query<Car> getQuery() {
+		return this.carService.createQuery();
 	}
 
 	@Override
@@ -56,12 +61,12 @@ public class SelectCarAction extends AbstractSelectPageAction {
 	@Override
 	protected List<Column> getGridColumns() {
 		List<Column> columns = super.getGridColumns();
-		columns.add(new TextColumn("plateType", getText("car.plate"))
+		columns.add(new TextColumn("plateNo", getText("car.plate"))
 				.setValueFormater(new AbstractFormater<String>() {
 					@Override
 					public String format(Object context, Object value) {
 						Car car = (Car) context;
-						return car.getPlateType() + " " + car.getPlateNo();
+						return car.getPlateType() + "." + car.getPlateNo();
 					}
 				}));
 		return columns;
@@ -90,5 +95,31 @@ public class SelectCarAction extends AbstractSelectPageAction {
 	@Override
 	protected String getHtmlPageTitle() {
 		return this.getText("car.title.selectCar");
+	}
+
+	@Override
+	protected Condition getGridSpecalCondition() {
+		if (status != null && status.length() > 0) {
+			String[] ss = status.split(",");
+			if (ss.length == 1) {
+				return new EqualsCondition("status", new Integer(ss[0]));
+			} else {
+				return new InCondition("status",
+						StringUtils.stringArray2IntegerArray(ss));
+			}
+		} else {
+			return null;
+		}
+	}
+
+	@Override
+	protected Json getGridExtrasData() {
+		if (this.status == null || this.status.length() == 0) {
+			return null;
+		} else {
+			Json json = new Json();
+			json.put("status", status);
+			return json;
+		}
 	}
 }
