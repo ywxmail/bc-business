@@ -81,7 +81,7 @@ public class CarAction extends FileEntityAction<Long, Car> {
 	@Override
 	public boolean isReadonly() {
 		SystemContext context = (SystemContext) this.getContext();
-		return !context.hasAnyRole(MANAGER_KEY);
+		return !context.hasAnyRole(MANAGER_KEY,getText("key.role.admin"));
 	}
 
 	@Override
@@ -174,13 +174,12 @@ public class CarAction extends FileEntityAction<Long, Car> {
 		return columns;
 	}
 
-	@SuppressWarnings("static-access")
 	@Override
 	public String create() throws Exception {
 		String r = super.create();
 		this.getE().setUnit(this.getSystyemContext().getUnit());
 		this.getE().setUid(
-				this.getIdGeneratorService().next(this.getE().KEY_UID));
+				this.getIdGeneratorService().next(Car.KEY_UID));
 
 		// 表单可选项的加载
 		statusesValue = this.getEntityStatuses();
@@ -228,7 +227,7 @@ public class CarAction extends FileEntityAction<Long, Car> {
 	// 表单可选项的加载
 	public void initSelects() {
 		// 加载可选车队列表
-		this.motorcadeList = this.motorcadeService.createQuery().list();
+		this.motorcadeList = this.motorcadeService.findActive();
 		// 加载可选营运性质列表
 		this.businessTypeList = this.optionService
 				.findOptionItemByGroupKey(OptionConstants.CAR_BUSINESS_NATURE);
