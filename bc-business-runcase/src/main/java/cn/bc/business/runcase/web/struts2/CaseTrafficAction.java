@@ -3,8 +3,6 @@
  */
 package cn.bc.business.runcase.web.struts2;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -56,9 +54,11 @@ public class CaseTrafficAction extends FileEntityAction<Long, Case4InfractTraffi
 	public 	boolean 				isManager;
 	public  Long 					carId;
 	public  Long 					carManId;
+	public  String					isClosed;			
 	
 	@SuppressWarnings("unused")
 	private CaseTrafficService		caseTrafficService;
+	//private CaseBaseService			caseBaseService;
 	private MotorcadeService	 	motorcadeService;
 	private OptionService			optionService;
 
@@ -71,12 +71,18 @@ public class CaseTrafficAction extends FileEntityAction<Long, Case4InfractTraffi
 	public	Map<String,String>		sourcesValue;
 
 
+
 	@Autowired
 	public void setCaseTrafficService(CaseTrafficService caseTrafficService) {
 		this.caseTrafficService = caseTrafficService;
 		this.setCrudService(caseTrafficService);
 	}
 	
+//	@Autowired
+//	public void setCaseBaseService(CaseBaseService caseBaseService) {
+//		this.caseBaseService = caseBaseService;
+//	}
+
 	@Autowired
 	public void setMotorcadeService(MotorcadeService motorcadeService) {
 		this.motorcadeService = motorcadeService;
@@ -106,7 +112,7 @@ public class CaseTrafficAction extends FileEntityAction<Long, Case4InfractTraffi
 
 	@Override
 	protected PageOption buildFormPageOption() {
-		PageOption option = new PageOption().setWidth(840).setMinWidth(250)
+		PageOption option = new PageOption().setWidth(840).setMinWidth(250).setHeight(500)
 				.setMinHeight(200).setModal(false);
 		
 		if (!isReadonly()) {
@@ -161,7 +167,7 @@ public class CaseTrafficAction extends FileEntityAction<Long, Case4InfractTraffi
 	//搜索条件
 	@Override
 	protected String[] getSearchFields() {
-		return new String[] { "caseNo", "carPlate" ,"driverName", "driverCert", "motorcadeName" };
+		return new String[] { "caseNo", "carPlate" ,"driverName", "driverCert", "motorcadeName","closerName" };
 	}
 	
 	
@@ -173,23 +179,24 @@ public class CaseTrafficAction extends FileEntityAction<Long, Case4InfractTraffi
 		List<Column> columns = super.buildGridColumns();
 		columns.add(new TextColumn("status",getText("runcase.status"),		50)
 				.setSortable(true).setValueFormater(new EntityStatusFormater(getCaseStatuses())));
-		columns.add(new TextColumn("caseNo",	getText("runcase.caseNo1"))
-				.setSortable(true));
-		columns.add(new TextColumn("source", getText("runcase.ifsource"),		80)
-				.setSortable(true).setValueFormater(new EntityStatusFormater(getSourceStatuses())));
+		columns.add(new TextColumn("subject", getText("runcase.subject"),	120));
 		columns.add(new TextColumn("motorcadeName", getText("runcase.motorcadeName"),		80)
 				.setSortable(true));
 		columns.add(new TextColumn("carPlate", getText("runcase.carPlate"),		100)
 				.setSortable(true).setUseTitleFromLabel(true));
 		columns.add(new TextColumn("driverName", getText("runcase.driverName"),70)
+					.setSortable(true));
+		columns.add(new TextColumn("closerName", getText("runcase.closerName"),70)
 				.setSortable(true));
-		columns.add(new TextColumn("happenDate", getText("runcase.happenDate"),	150)
+		columns.add(new TextColumn("happenDate", getText("runcase.happenDate"),	120)
 				.setSortable(true).setValueFormater(new CalendarFormater("yyyy-MM-dd")));
-		columns.add(new TextColumn("subject", getText("runcase.subject"),	120));
-		columns.add(new TextColumn("address", getText("runcase.address"),120)
-				.setSortable(true));
-		columns.add(new TextColumn("driverCert", getText("runcase.driverCert"),			80)
-				.setSortable(true));
+		columns.add(new TextColumn("closeDate", getText("runcase.closeDate"),	120)
+				.setSortable(true).setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+		columns.add(new TextColumn("address", getText("runcase.address"),120));
+		columns.add(new TextColumn("source", getText("runcase.ifsource"),		70)
+				.setSortable(true).setValueFormater(new EntityStatusFormater(getSourceStatuses())));
+		columns.add(new TextColumn("driverCert", getText("runcase.driverCert"),	80));
+		columns.add(new TextColumn("caseNo",	getText("runcase.caseNo1")));
 		return columns;
 	}
 	
@@ -202,6 +209,8 @@ public class CaseTrafficAction extends FileEntityAction<Long, Case4InfractTraffi
 		// 初始化信息
 		this.getE().setType  (CaseBase.TYPE_INFRACT_TRAFFIC);
 		this.getE().setStatus(CaseBase.STATUS_ACTIVE);
+		this.getE().setCode(this.getIdGeneratorService().next(this.getE().ATTACH_TYPE));
+		statusesValue		=	this.getCaseStatuses();
 		sourcesValue		=	this.getSourceStatuses();
 		// 表单可选项的加载
 		initSelects();
@@ -229,17 +238,28 @@ public class CaseTrafficAction extends FileEntityAction<Long, Case4InfractTraffi
 		e.setModifier(context.getUserHistory());
 		e.setModifiedDate(Calendar.getInstance());
 		
+		//设置结案信息
+		if(isClosed.length() > 0 && isClosed.equals("1")){
+			e.setStatus(CaseBase.STATUS_CLOSED);
+			e.setCloserId(context.getUserHistory().getId());
+			e.setCloserName(context.getUserHistory().getName());
+			e.setCloseDate(Calendar.getInstance(Locale.CHINA));
+		}
+		
 		this.getCrudService().save(e);
 		
 		return "saveSuccess";
 	}
 	
+/*
+ *  业务变更注释
 	public Json json;
 	public String closefile(){
 		SystemContext context = this.getSystyemContext();
 		
 		this.getE().setStatus(CaseBase.STATUS_CLOSED);
-		this.getE().setCloserId(context.getUserHistory().getActorId());
+		this.getE().setCloserId(context.getUserHistory().getId());
+		this.getE().setCloserName(context.getUserHistory().getName());
 		this.getE().setCloseDate(Calendar.getInstance(Locale.CHINA));
 		
 		DateFormat df = new SimpleDateFormat("yyyy-MM-dd");   
@@ -248,8 +268,22 @@ public class CaseTrafficAction extends FileEntityAction<Long, Case4InfractTraffi
 		json = new Json();
 		json.put("status", this.getE().getStatus());
 		json.put("closeDate", closeDateStr);
+		json.put("closeId",   this.getE().getCloserId());
+		json.put("closeName", this.getE().getCloserName());
 		return "json";
 	}
+	
+	public String getCarNManInfo(){
+		if(carId != null){	//从页面ajax请求carId参数不为空时通过carManId查找关联司机信息
+			this.caseBaseService.findCarManNameNCertCodeByCarId(carId);
+		}
+		if(carManId != null){ //从页面ajax请求carManId参数不为空时通过carId查找关联车辆信息
+			this.caseBaseService.findCarPlateNCertCodeByCarManId(carManId);
+		}
+		return "json";
+	}
+	
+*/
 	
 	
 	// 表单可选项的加载

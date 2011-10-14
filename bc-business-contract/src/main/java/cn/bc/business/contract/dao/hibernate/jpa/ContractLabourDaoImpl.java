@@ -24,6 +24,7 @@ import org.springframework.orm.jpa.JpaCallback;
 import org.springframework.util.StringUtils;
 
 import cn.bc.business.contract.dao.ContractLabourDao;
+import cn.bc.business.contract.domain.Contract;
 import cn.bc.business.contract.domain.Contract4Labour;
 import cn.bc.core.Page;
 import cn.bc.core.query.condition.Condition;
@@ -108,19 +109,49 @@ public class ContractLabourDaoImpl extends HibernateCrudJpaDao<Contract4Labour> 
 	 * @return
 	 */
 	public void carManNContract4Save(Long carManId, Long contractId) {
-		String sql = "select * from BS_CARMAN_CONTRACT carmancontract where carmancontract.man_id = ? and carmancontract.contract_id = ?";
-
-		//jdbc查询BS_CAR_CONTRACT表是否存在对应carId和contractId噶记录
+		String sql = "select * from BS_CARMAN_CONTRACT carmancontract where carmancontract.contract_id = ?";
+		String insertSql = "";
+		//jdbc查询BS_CARMAN_CONTRACT表是否存在对应carManId和contractId噶记录
 		@SuppressWarnings("rawtypes")
-		List list = this.jdbcTemplate.queryForList(sql,new Object[]{carManId,contractId});
+		List list = this.jdbcTemplate.queryForList(sql,new Object[]{contractId});
 		
 		if(list == null || list.size() < 1){
-			String insertSql = "insert into BS_CARMAN_CONTRACT(man_id,contract_id)values("+carManId+","+contractId+")";
-			//插入BS_CAR_CONTRACT中间表
+			//插入BS_CARMAN_CONTRACT中间表
+			insertSql = "insert into BS_CARMAN_CONTRACT(man_id,contract_id)values("+carManId+","+contractId+")";
+			this.jdbcTemplate.execute(insertSql);
+		}else{
+			//删除BS_CARMAN_CONTRACT中间表重复数据
+			String	delSql = "delete from BS_CARMAN_CONTRACT cc where cc.contract_id="+contractId;
+			this.jdbcTemplate.execute(delSql);
+			
+			//插入BS_CARMAN_CONTRACT中间表
+			insertSql = "insert into BS_CARMAN_CONTRACT(man_id,contract_id)values("+carManId+","+contractId+")";
 			this.jdbcTemplate.execute(insertSql);
 		}
 	}
-
+	
+	public void carNContract4Save(Long carId, Long contractId) {
+		String sql = "select * from BS_CAR_CONTRACT carcontract where carcontract.contract_id = ?";
+		String insertSql = "";
+		//jdbc查询BS_CAR_CONTRACT表是否存在对应carId和contractId噶记录
+		@SuppressWarnings("rawtypes")
+		List list = this.jdbcTemplate.queryForList(sql,new Object[]{contractId});
+		
+		if(list == null || list.size() < 1){
+			//插入BS_CAR_CONTRACT中间表
+			insertSql = "insert into BS_CAR_CONTRACT(car_id,contract_id)values("+carId+","+contractId+")";
+			this.jdbcTemplate.execute(insertSql);
+		}else{
+			//删除BS_CAR_CONTRACT中间表重复数据
+			String	delSql = "delete from BS_CAR_CONTRACT cc where cc.contract_id="+contractId;
+			this.jdbcTemplate.execute(delSql);
+			
+			//插入BS_CAR_CONTRACT中间表
+			insertSql = "insert into BS_CAR_CONTRACT(car_id,contract_id)values("+carId+","+contractId+")";
+			this.jdbcTemplate.execute(insertSql);
+		}
+	}
+	
 	/**
 	 * 查找劳动合同列表
 	 * @parma condition 
@@ -131,7 +162,7 @@ public class ContractLabourDaoImpl extends HibernateCrudJpaDao<Contract4Labour> 
 		ArrayList<Object> args 	= new ArrayList<Object>();
 		StringBuffer hql = new StringBuffer();
 		
-		hql.append("select contract.id, contract.code, contract.type, contract.signDate,contract.startDate,contract.endDate,contract.transactorName")
+		hql.append("select contract.id, contract.code, contract.type, contract.signDate,contract.startDate,contract.endDate,contract.transactorName,contract.ext_str1,contract.ext_str2,")
 		   .append(" from CarMan carman join carman.contracts contract")
 		   .append(" where carman.id=?");
 		
@@ -148,7 +179,7 @@ public class ContractLabourDaoImpl extends HibernateCrudJpaDao<Contract4Labour> 
 
 		
 		// 排序
-		hql.append(" order by contract.id");
+		hql.append(" order by contract.signDate DESC");
 		if (logger.isDebugEnabled()) {
 			logger.debug("hql=" + hql);
 			logger.debug("args="
@@ -175,6 +206,8 @@ public class ContractLabourDaoImpl extends HibernateCrudJpaDao<Contract4Labour> 
 			map.put("startDate", 		ary[4]);
 			map.put("endDate", 			ary[5]);
 			map.put("transactorName", 	ary[6]);
+			map.put("ext_str1", 		ary[7]);
+			map.put("ext_str2", 		ary[8]);
 			
 			result.add(map);
 		}
@@ -193,10 +226,11 @@ public class ContractLabourDaoImpl extends HibernateCrudJpaDao<Contract4Labour> 
 		final int _pageSize = pageSize < 1 ? 1 : pageSize;	
 		final StringBuffer hql = new StringBuffer();
 		
-		hql.append("select contract.id, contract.code, contract.type, contract.signDate,contract.startDate,contract.endDate,contract.transactorName");
+		hql.append("select contract.id, contract.code, contract.type, contract.signDate,contract.startDate,contract.endDate,contract.transactorName,contract.ext_str1,contract.ext_str2");
 		
 		//方便统计记录数
-		String sqlStr =	" from CarMan carman join carman.contracts contract";
+		String sqlStr =	" from Contract contract WHERE contract.type="+Contract.TYPE_LABOUR;
+		//String sqlStr =	" from CarMan carman join carman.contracts contract";
 		
 		hql.append(sqlStr);
 		
@@ -205,7 +239,7 @@ public class ContractLabourDaoImpl extends HibernateCrudJpaDao<Contract4Labour> 
 			setWhere(condition,hql);
 		}
 		//排序
-		hql.append(" order by contract.id");
+		hql.append(" order by contract.signDate DESC");
 		if (logger.isDebugEnabled()) {
 			logger.debug("pageNo=" + pageNo);
 			logger.debug("pageSize=" + _pageSize);
@@ -257,6 +291,8 @@ public class ContractLabourDaoImpl extends HibernateCrudJpaDao<Contract4Labour> 
 			map.put("startDate", 		ary[4]);
 			map.put("endDate", 			ary[5]);
 			map.put("transactorName", 	ary[6]);
+			map.put("ext_str1", 		ary[7]);
+			map.put("ext_str2", 		ary[8]);
 			
 			result.add(map);
 		}
@@ -320,7 +356,7 @@ public class ContractLabourDaoImpl extends HibernateCrudJpaDao<Contract4Labour> 
 	 * @param hql
 	 */
 	public void setWhere(Condition condition,StringBuffer hql){
-		hql.append(" WHERE ");
+		hql.append(" AND ");
 		hql.append(condition.getExpression());
 	}
 
@@ -344,4 +380,17 @@ public class ContractLabourDaoImpl extends HibernateCrudJpaDao<Contract4Labour> 
 		}
 		return queryMap;
 	}
+	
+	public Long findCarIdByContractId(Long contractId) {
+		String sql = "select cc.car_id from BS_CAR_CONTRACT cc where cc.contract_id="+contractId;
+		Long carId = jdbcTemplate.queryForLong(sql);
+		return carId;
+	}
+	
+	public Long findCarManIdByContractId(Long contractId) {
+		String sql = "select cc.man_id from BS_CARMAN_CONTRACT cc where cc.contract_id="+contractId;
+		Long carManId = jdbcTemplate.queryForLong(sql);
+		return carManId;
+	}
+
 }

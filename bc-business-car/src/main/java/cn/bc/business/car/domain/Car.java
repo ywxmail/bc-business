@@ -34,7 +34,8 @@ public class Car extends RichFileEntityImpl {
 	public  static final String KEY_UID = Car.class.getSimpleName();
 
 	private Motorcade motorcade;// 所属车队
-	private String driver;
+	private String driver;		//司机姓名
+	private String charger;		//责任人姓名
 	private Actor unit;// 所属单位
 	private String businessType;// 营运性质
 
@@ -109,6 +110,15 @@ public class Car extends RichFileEntityImpl {
 
 	public void setDriver(String driver) {
 		this.driver = driver;
+	}
+	
+	@Column(name = "CHARGER")
+	public String getCharger() {
+		return charger;
+	}
+
+	public void setCharger(String charger) {
+		this.charger = charger;
 	}
 
 	@OneToMany(fetch=FetchType.LAZY)

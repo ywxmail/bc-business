@@ -14,4 +14,8 @@ import cn.bc.core.service.CrudService;
  */
 public interface CaseBaseService extends CrudService<CaseBase> {
 
+	void findCarManNameNCertCodeByCarId(Long carId);
+
+	void findCarPlateNCertCodeByCarManId(Long carManId);
+
 }

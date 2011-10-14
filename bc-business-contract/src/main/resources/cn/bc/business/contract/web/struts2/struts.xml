@@ -11,8 +11,25 @@
 	
 	<!-- 劳动合同 -->
 	<package name="contractLabour" extends="bc-default" namespace="/bc-business">
+		<action name="contractLabour/create" class="contractLabourAction" method="create">
+			<result name="form">/bc-business/contractLabour/form.jsp</result>
+		</action>		
+		<action name="contractLabour/edit" class="contractLabourAction" method="edit">
+			<result name="form">/bc-business/contractLabour/form.jsp</result>
+		</action>
+		<action name="contractLabour/delete" class="contractLabourAction" method="delete" />
 		<action name="contractLabour/certInfo" class="contractLabourAction" method="certInfo">
 		</action>
 	</package>
 	
+	<!-- 经济合同 -->
+	<package name="contractCharger" extends="bc-default" namespace="/bc-business">
+		<action name="contractCharger/create" class="contractChargerAction" method="create">
+			<result name="form">/bc-business/contractCharger/form.jsp</result>
+		</action>
+		<action name="contractCharger/edit" class="contractChargerAction" method="edit">
+			<result name="form">/bc-business/contractCharger/form.jsp</result>
+		</action>
+		<action name="contractCharger/delete" class="contractChargerAction" method="delete" />
+	</package>
 </struts>

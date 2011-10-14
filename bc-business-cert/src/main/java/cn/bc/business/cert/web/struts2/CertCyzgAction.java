@@ -76,7 +76,8 @@ public class CertCyzgAction extends FileEntityAction<Long, Cert4CongYeZiGe> {
 
 		this.getE().setUid(this.getIdGeneratorService().next(this.getE().ATTACH_TYPE));
 		this.getE().setType(Cert.TYPE_CYZG);
-		this.getE().setStatus(RichEntityImpl.STATUS_DISABLED);
+		this.getE().setStatus(RichEntityImpl.STATUS_ENABLED);
+		statusesValue		=	this.getEntityStatuses();
 		
 		attachsUI = buildAttachsUI(true);
 		return r;
@@ -87,7 +88,6 @@ public class CertCyzgAction extends FileEntityAction<Long, Cert4CongYeZiGe> {
 		this.setE(this.getCrudService().load(this.getId()));
 		
 		this.formPageOption = 	buildFormPageOption();
-		statusesValue		=	this.getEntityStatuses();
 		
 		//根据certId查找carMan信息
 		carManMessMap = this.certService.findCarManMessByCertId(this.getId());

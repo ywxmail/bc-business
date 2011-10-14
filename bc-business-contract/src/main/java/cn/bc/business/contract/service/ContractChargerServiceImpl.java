@@ -5,6 +5,7 @@ package cn.bc.business.contract.service;
 
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -107,6 +108,30 @@ public class ContractChargerServiceImpl extends DefaultCrudService<Contract4Char
 		Map<String, Object> queryMap = null;
 		queryMap = this.contractChargerDao.findCarInfoByContractId(contractId);
 		return queryMap;
+	}
+
+	public List<String> findChargerIdByContractId(Long contractId) {
+		List<String> list = new ArrayList<String>();
+		list = this.contractChargerDao.findChargerIdByContractId(contractId);
+		return list;
+	}
+
+	public void carMansNContract4Save(String assignChargerIds, Long contractId) {
+		this.contractChargerDao.carMansNContract4Save(assignChargerIds,contractId);
+	}
+
+	public Long findCarIdByContractId(Long contractId) {
+		Long carId = null;
+		carId = contractChargerDao.findCarIdByContractId(contractId);
+		return carId;
+	}
+
+	public void updateCar4dirverName(String assignChargerNames, Long carId) {
+		this.contractChargerDao.updateCar4dirverName(assignChargerNames,carId);
+	}
+
+	public void updateCarMan4dirverName(String assignChargerNames, Long carId) {
+		this.contractChargerDao.updateCarMan4dirverName(assignChargerNames,carId);
 	}
 	
 }

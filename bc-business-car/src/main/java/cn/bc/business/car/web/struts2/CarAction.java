@@ -92,7 +92,7 @@ public class CarAction extends FileEntityAction<Long, Car> {
 	@Override
 	protected PageOption buildFormPageOption() {
 		PageOption option = super.buildFormPageOption().setWidth(840).setMinWidth(250)
-				.setHeight(700).setMinHeight(200).setModal(false);
+				.setHeight(550).setMinHeight(200).setModal(false);
 		if (!this.isReadonly()) {
 			option.addButton(new ButtonOption(getText("label.save"), "save"));
 		}
@@ -108,14 +108,14 @@ public class CarAction extends FileEntityAction<Long, Car> {
 	// 设置页面的尺寸
 	@Override
 	protected PageOption buildListPageOption() {
-		return super.buildListPageOption().setWidth(1000).setMinWidth(400)
+		return super.buildListPageOption().setWidth(900).setMinWidth(400)
 				.setHeight(500).setMinHeight(300);
 	}
 
 	// 搜索条件
 	@Override
 	protected String[] getSearchFields() {
-		return new String[] { "plateType", "plateNo", "factoryType", "driver", "certNo2" };
+		return new String[] { "plateType", "plateNo", "factoryType", "driver", "certNo2", "charger" };
 	}
 
 	@SuppressWarnings("rawtypes")
@@ -126,35 +126,23 @@ public class CarAction extends FileEntityAction<Long, Car> {
 		columns.add(new TextColumn("['status']", getText("car.status"), 50)
 				.setSortable(true).setValueFormater(
 				new EntityStatusFormater(getEntityStatuses())));
-		columns.add(new TextColumn("['plateType']", getText("car.plate"), 100)
-				.setValueFormater(new AbstractFormater<String>() {
+		columns.add(new TextColumn("['plateType']", getText("car.plate"), 80)
+				.setUseTitleFromLabel(true).setValueFormater(new AbstractFormater<String>() {
 					@Override
 					public String format(Object context, Object value) {
 						Map car = (Map) context;
 						return car.get("plateType") + " " + car.get("plateNo");
 					}
 				}));
-		columns.add(new TextColumn("['unit']", getText("car.unit"), 80)
-				.setSortable(true));
+		columns.add(new TextColumn("['driver']", getText("car.carMan"), 120));
+		columns.add(new TextColumn("['charger']", getText("car.charger"), 120));
 		columns.add(new TextColumn("['motorcade']", getText("car.motorcade"), 80)
+				.setSortable(true));
+		columns.add(new TextColumn("['unit']", getText("car.unit"), 80)
 				.setSortable(true));
 		columns.add(new TextColumn("['registerDate']",getText("car.registerDate"), 100).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
-		columns.add(new TextColumn("['driver']", getText("car.carMan"), 100)
-				.setUseTitleFromLabel(true).setValueFormater(
-						new AbstractFormater<String>() {
-							@Override
-							public String format(Object context, Object value) {
-								Map car = (Map) context;
-								if (car.get("driver") != null) {
-									return car.get("driver") + "("
-											+ getText("car.by.driver.classes")
-											+ ")";
-								} else {
-									return "";
-								}
-							}
-						}));
+		
 		columns.add(new TextColumn("['certNo2']",
 				getText("car.certNo2"), 100));
 		columns.add(new TextColumn("['businessType']",
@@ -194,8 +182,10 @@ public class CarAction extends FileEntityAction<Long, Car> {
 		this.getE().setUid(
 				this.getIdGeneratorService().next(this.getE().KEY_UID));
 
+		// 表单可选项的加载
+		statusesValue = this.getEntityStatuses();
 		// 初始化车辆的状态
-		this.getE().setStatus(RichEntityImpl.STATUS_DISABLED);
+		this.getE().setStatus(RichEntityImpl.STATUS_ENABLED);
 
 		// 表单可选项的加载
 		initSelects();
