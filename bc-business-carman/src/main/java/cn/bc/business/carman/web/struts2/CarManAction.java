@@ -77,7 +77,7 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 	@Override
 	public boolean isReadonly() {
 		SystemContext context = (SystemContext) this.getContext();
-		return !context.hasAnyRole(MANAGER_KEY);
+		return !context.hasAnyRole(MANAGER_KEY,getText("key.role.admin"));
 	}
 
 	@Override

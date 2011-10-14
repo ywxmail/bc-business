@@ -76,7 +76,9 @@ public class CertFwzgAction extends FileEntityAction<Long, Cert4FuWuZiGe> {
 
 		this.getE().setUid(this.getIdGeneratorService().next(this.getE().ATTACH_TYPE));
 		this.getE().setType(Cert.TYPE_FWZG);
-		this.getE().setStatus(RichEntityImpl.STATUS_DISABLED);
+		this.getE().setStatus(RichEntityImpl.STATUS_ENABLED);
+		
+		statusesValue		=	this.getEntityStatuses();
 		
 		attachsUI = buildAttachsUI(true);
 		return r;

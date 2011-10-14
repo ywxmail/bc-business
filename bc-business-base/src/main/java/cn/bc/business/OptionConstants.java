@@ -65,7 +65,6 @@ public class OptionConstants extends cn.bc.option.OptionConstants {
 	
 	
 	
-	
-	
-	
+	/** 车队的可选缴费日 */
+	public final static String MOTORCADE_PAYMENT_DATE = "motorcade.paymentDate";
 }

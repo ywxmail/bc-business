@@ -3,8 +3,6 @@
  */
 package cn.bc.business.runcase.web.struts2;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -49,38 +47,47 @@ import cn.bc.web.ui.json.Json;
  */
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 @Controller
-public class CaseTrafficAction extends
-		FileEntityAction<Long, Case4InfractTraffic> {
+public class CaseTrafficAction extends FileEntityAction<Long, Case4InfractTraffic> {
 	// private static Log logger = LogFactory.getLog(CarAction.class);
-	private static final long serialVersionUID = 1L;
-	private String MANAGER_KEY = "R_ADMIN";// 管理角色的编码
-	public boolean isManager;
-	public Long carId;
-	public Long carManId;
-
+	private static 	final long 		serialVersionUID 	= 1L;
+	private String 					MANAGER_KEY 		= "R_ADMIN";// 管理角色的编码
+	public 	boolean 				isManager;
+	public  Long 					carId;
+	public  Long 					carManId;
+	public  String					isClosed;			
+	
 	@SuppressWarnings("unused")
-	private CaseTrafficService caseTrafficService;
-	private MotorcadeService motorcadeService;
-	private OptionService optionService;
+	private CaseTrafficService		caseTrafficService;
+	//private CaseBaseService			caseBaseService;
+	private MotorcadeService	 	motorcadeService;
+	private OptionService			optionService;
 
-	public List<Motorcade> motorcadeList; // 可选车队列表
-	public List<OptionItem> dutyList; // 可选责任列表
-	public List<OptionItem> properitesList; // 可选性质列表
+	public 	List<Motorcade> 		motorcadeList;					// 可选车队列表
+	public  List<OptionItem>		dutyList;						// 可选责任列表
+	public  List<OptionItem>		properitesList;					// 可选性质列表
+	
+	
+	public 	Map<String,String> 		statusesValue;
+	public	Map<String,String>		sourcesValue;
 
-	public Map<String, String> statusesValue;
-	public Map<String, String> sourcesValue;
+
 
 	@Autowired
 	public void setCaseTrafficService(CaseTrafficService caseTrafficService) {
 		this.caseTrafficService = caseTrafficService;
 		this.setCrudService(caseTrafficService);
 	}
+	
+//	@Autowired
+//	public void setCaseBaseService(CaseBaseService caseBaseService) {
+//		this.caseBaseService = caseBaseService;
+//	}
 
 	@Autowired
 	public void setMotorcadeService(MotorcadeService motorcadeService) {
 		this.motorcadeService = motorcadeService;
 	}
-
+	
 	@Autowired
 	public void setOptionService(OptionService optionService) {
 		this.optionService = optionService;
@@ -90,30 +97,28 @@ public class CaseTrafficAction extends
 	protected OrderCondition getDefaultOrderCondition() {
 		return new OrderCondition("fileDate", Direction.Desc);
 	}
-
-	// 复写搜索URL方法
+	
+	//复写搜索URL方法
 	protected String getEntityConfigName() {
 		return "caseTraffic";
 	}
-
+	
 	@Override
 	public boolean isReadonly() {
 		SystemContext context = (SystemContext) this.getContext();
 		return !context.hasAnyRole(MANAGER_KEY);
 	}
 
+
 	@Override
 	protected PageOption buildFormPageOption() {
-		PageOption option = new PageOption().setWidth(840).setMinWidth(250)
+		PageOption option = new PageOption().setWidth(840).setMinWidth(250).setHeight(500)
 				.setMinHeight(200).setModal(false);
-
+		
 		if (!isReadonly()) {
-			// 特殊处理结案按钮
-			if (Case4InfractTraffic.STATUS_ACTIVE == getE().getStatus()
-					&& !getE().isNew()) {
-				ButtonOption buttonOption = new ButtonOption(
-						getText("label.closefile"), null,
-						"bc.caseTrafficForm.closefile");
+			//特殊处理结案按钮
+			if(Case4InfractTraffic.STATUS_ACTIVE == getE().getStatus() && !getE().isNew()){
+				ButtonOption buttonOption = new ButtonOption(getText("label.closefile"),null,"bc.caseTrafficForm.closefile");
 				buttonOption.put("id", "bcSaveDlgButton");
 				option.addButton(buttonOption);
 			}
@@ -159,116 +164,138 @@ public class CaseTrafficAction extends
 		return tb;
 	}
 
-	// 搜索条件
+	//搜索条件
 	@Override
 	protected String[] getSearchFields() {
-		return new String[] { "caseNo", "carPlate", "driverName", "driverCert",
-				"motorcadeName" };
+		return new String[] { "caseNo", "carPlate" ,"driverName", "driverCert", "motorcadeName","closerName" };
 	}
-
+	
+	
 	@Override
 	protected List<Column> buildGridColumns() {
 		// 是否本模块管理员
 		isManager = isReadonly();
 
 		List<Column> columns = super.buildGridColumns();
-		columns.add(new TextColumn("status", getText("runcase.status"), 50)
-				.setSortable(true).setValueFormater(
-						new EntityStatusFormater(getCaseStatuses())));
-		columns.add(new TextColumn("caseNo", getText("runcase.caseNo1"))
+		columns.add(new TextColumn("status",getText("runcase.status"),		50)
+				.setSortable(true).setValueFormater(new EntityStatusFormater(getCaseStatuses())));
+		columns.add(new TextColumn("subject", getText("runcase.subject"),	120));
+		columns.add(new TextColumn("motorcadeName", getText("runcase.motorcadeName"),		80)
 				.setSortable(true));
-		columns.add(new TextColumn("source", getText("runcase.ifsource"), 80)
-				.setSortable(true).setValueFormater(
-						new EntityStatusFormater(getSourceStatuses())));
-		columns.add(new TextColumn("motorcadeName",
-				getText("runcase.motorcadeName"), 80).setSortable(true));
-		columns.add(new TextColumn("carPlate", getText("runcase.carPlate"), 100)
+		columns.add(new TextColumn("carPlate", getText("runcase.carPlate"),		100)
 				.setSortable(true).setUseTitleFromLabel(true));
-		columns.add(new TextColumn("driverName", getText("runcase.driverName"),
-				70).setSortable(true));
-		columns.add(new TextColumn("happenDate", getText("runcase.happenDate"),
-				150).setSortable(true).setValueFormater(
-				new CalendarFormater("yyyy-MM-dd")));
-		columns.add(new TextColumn("subject", getText("runcase.subject"), 120));
-		columns.add(new TextColumn("address", getText("runcase.address"), 120)
+		columns.add(new TextColumn("driverName", getText("runcase.driverName"),70)
+					.setSortable(true));
+		columns.add(new TextColumn("closerName", getText("runcase.closerName"),70)
 				.setSortable(true));
-		columns.add(new TextColumn("driverCert", getText("runcase.driverCert"),
-				80).setSortable(true));
+		columns.add(new TextColumn("happenDate", getText("runcase.happenDate"),	120)
+				.setSortable(true).setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+		columns.add(new TextColumn("closeDate", getText("runcase.closeDate"),	120)
+				.setSortable(true).setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+		columns.add(new TextColumn("address", getText("runcase.address"),120));
+		columns.add(new TextColumn("source", getText("runcase.ifsource"),		70)
+				.setSortable(true).setValueFormater(new EntityStatusFormater(getSourceStatuses())));
+		columns.add(new TextColumn("driverCert", getText("runcase.driverCert"),	80));
+		columns.add(new TextColumn("caseNo",	getText("runcase.caseNo1")));
 		return columns;
 	}
-
+	
 	@SuppressWarnings("static-access")
 	@Override
 	public String create() throws Exception {
 		String r = super.create();
-		this.getE().setUid(
-				this.getIdGeneratorService().next(this.getE().ATTACH_TYPE));
-
+		this.getE().setUid(this.getIdGeneratorService().next(this.getE().ATTACH_TYPE));
+		
 		// 初始化信息
-		this.getE().setType(CaseBase.TYPE_INFRACT_TRAFFIC);
+		this.getE().setType  (CaseBase.TYPE_INFRACT_TRAFFIC);
 		this.getE().setStatus(CaseBase.STATUS_ACTIVE);
-		sourcesValue = this.getSourceStatuses();
+		this.getE().setCode(this.getIdGeneratorService().next(this.getE().ATTACH_TYPE));
+		statusesValue		=	this.getCaseStatuses();
+		sourcesValue		=	this.getSourceStatuses();
 		// 表单可选项的加载
 		initSelects();
-
-		return r;
+		
+		return r; 
 	}
-
+	
 	@Override
 	public String edit() throws Exception {
 		this.setE(this.getCrudService().load(this.getId()));
 		// 表单可选项的加载
-		this.formPageOption = buildFormPageOption();
-		statusesValue = this.getCaseStatuses();
-		sourcesValue = this.getSourceStatuses();
+		this.formPageOption = 	buildFormPageOption();
+		statusesValue		=	this.getCaseStatuses();
+		sourcesValue		=	this.getSourceStatuses();
 		initSelects();
 		return "form";
 	}
-
+	
 	@Override
-	public String save() throws Exception {
+	public String save() throws Exception{
 		SystemContext context = this.getSystyemContext();
-
-		// 设置最后更新人的信息
+		
+		//设置最后更新人的信息
 		Case4InfractTraffic e = this.getE();
 		e.setModifier(context.getUserHistory());
 		e.setModifiedDate(Calendar.getInstance());
-
+		
+		//设置结案信息
+		if(isClosed.length() > 0 && isClosed.equals("1")){
+			e.setStatus(CaseBase.STATUS_CLOSED);
+			e.setCloserId(context.getUserHistory().getId());
+			e.setCloserName(context.getUserHistory().getName());
+			e.setCloseDate(Calendar.getInstance(Locale.CHINA));
+		}
+		
 		this.getCrudService().save(e);
-
+		
 		return "saveSuccess";
 	}
-
+	
+/*
+ *  业务变更注释
 	public Json json;
-
-	public String closefile() {
+	public String closefile(){
 		SystemContext context = this.getSystyemContext();
-
+		
 		this.getE().setStatus(CaseBase.STATUS_CLOSED);
-		this.getE().setCloserId(context.getUserHistory().getActorId());
+		this.getE().setCloserId(context.getUserHistory().getId());
+		this.getE().setCloserName(context.getUserHistory().getName());
 		this.getE().setCloseDate(Calendar.getInstance(Locale.CHINA));
-
-		DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+		
+		DateFormat df = new SimpleDateFormat("yyyy-MM-dd");   
 		String closeDateStr = df.format(this.getE().getCloseDate().getTime());
-
+		
 		json = new Json();
 		json.put("status", this.getE().getStatus());
 		json.put("closeDate", closeDateStr);
+		json.put("closeId",   this.getE().getCloserId());
+		json.put("closeName", this.getE().getCloserName());
 		return "json";
 	}
-
-	// 表单可选项的加载
-	public void initSelects() {
-		// 加载可选车队列表
-		this.motorcadeList = this.motorcadeService.createQuery().list();
-		// 加载可选责任列表
-		this.dutyList = this.optionService
-				.findOptionItemByGroupKey(OptionConstants.IT_DUTY);
-		// 加载可选性质列表
-		this.properitesList = this.optionService
-				.findOptionItemByGroupKey(OptionConstants.IT_PROPERITES);
+	
+	public String getCarNManInfo(){
+		if(carId != null){	//从页面ajax请求carId参数不为空时通过carManId查找关联司机信息
+			this.caseBaseService.findCarManNameNCertCodeByCarId(carId);
+		}
+		if(carManId != null){ //从页面ajax请求carManId参数不为空时通过carId查找关联车辆信息
+			this.caseBaseService.findCarPlateNCertCodeByCarManId(carManId);
+		}
+		return "json";
 	}
-
+	
+*/
+	
+	
+	// 表单可选项的加载
+	public void initSelects(){
+		// 加载可选车队列表
+		this.motorcadeList 				= 	this.motorcadeService.createQuery().list();
+		// 加载可选责任列表
+		this.dutyList					=	this.optionService.findOptionItemByGroupKey(OptionConstants.IT_DUTY);
+		// 加载可选性质列表
+		this.properitesList				=	this.optionService.findOptionItemByGroupKey(OptionConstants.IT_PROPERITES);
+	}
+	
 	/**
 	 * 获取Entity的状态值转换列表
 	 * 
@@ -282,7 +309,7 @@ public class CaseTrafficAction extends
 				getText("runcase.select.status.closed"));
 		return statuses;
 	}
-
+	
 	/**
 	 * 获取Entity的来源值转换列表
 	 * 
@@ -298,30 +325,32 @@ public class CaseTrafficAction extends
 				getText("runcase.select.source.fromdriver"));
 		return statuses;
 	}
-
+	
+	
 	// 视图特殊条件
 	@Override
 	protected Condition getSpecalCondition() {
-		if (carManId != null) {
-			return new EqualsCondition("driverId", carManId);
-		}
 		if (carId != null) {
 			return new EqualsCondition("carId", carId);
-		} else {
+		}
+		if (carManId != null) {
+			return new EqualsCondition("driverId", carManId);
+		}else {
 			return null;
 		}
 	}
+	
 
 	@Override
 	protected HtmlPage buildHtml4Paging() {
 		HtmlPage page = super.buildHtml4Paging();
-		if (carManId != null)
-			page.setAttr("data-extras", new Json().put("carManId", carManId)
-					.toString());
 		if (carId != null)
 			page.setAttr("data-extras", new Json().put("carId", carId)
 					.toString());
+		if (carManId != null)
+			page.setAttr("data-extras", new Json().put("driverId", carManId)
+					.toString());
 		return page;
 	}
-
+	
 }

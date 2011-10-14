@@ -107,5 +107,22 @@ public class ContractLabourServiceImpl extends DefaultCrudService<Contract4Labou
 		queryMap = this.contractLabourDao.findCertByCarManId(carManId);
 		return queryMap;
 	}
+
+	public void carNContract4Save(Long carId, Long contractId) {
+		this.contractLabourDao.carNContract4Save(carId,contractId);
+	}
+
+	public Long findCarIdByContractId(Long contractId) {
+		Long carId = null;
+		carId = contractLabourDao.findCarIdByContractId(contractId);
+		return carId;
+	}
+
+	public Long findCarManIdByContractId(Long contractId) {
+		Long carManId = null;
+		carManId = contractLabourDao.findCarManIdByContractId(contractId);
+		return carManId;
+	}
+
 	
 }

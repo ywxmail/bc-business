@@ -65,4 +65,15 @@ public interface ContractChargerDao extends CrudDao<Contract4Charger> {
 	 */
 	Map<String, Object> findCarInfoByContractId(Long contractId);
 
+	
+	List<String> findChargerIdByContractId(Long contractId);
+
+	
+	void carMansNContract4Save(String assignChargerIds, Long contractId);
+
+	public Long findCarIdByContractId(Long contractId);
+
+	void updateCar4dirverName(String assignChargerNames, Long carId);
+
+	void updateCarMan4dirverName(String assignChargerNames, Long carId);
 }

@@ -19,10 +19,10 @@ import org.springframework.stereotype.Controller;
 import cn.bc.business.OptionConstants;
 import cn.bc.business.motorcade.domain.Motorcade;
 import cn.bc.business.motorcade.service.MotorcadeService;
-import cn.bc.business.runcase.domain.Case4InfractBusiness;
 import cn.bc.business.runcase.domain.Case4InfractTraffic;
+import cn.bc.business.runcase.domain.Case4Praise;
 import cn.bc.business.runcase.domain.CaseBase;
-import cn.bc.business.runcase.service.CaseBusinessService;
+import cn.bc.business.runcase.service.CasePraiseService;
 import cn.bc.business.web.struts2.FileEntityAction;
 import cn.bc.core.query.condition.Condition;
 import cn.bc.core.query.condition.Direction;
@@ -31,6 +31,7 @@ import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.option.domain.OptionItem;
 import cn.bc.option.service.OptionService;
+import cn.bc.web.formater.AbstractFormater;
 import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.formater.EntityStatusFormater;
 import cn.bc.web.ui.html.grid.Column;
@@ -43,47 +44,48 @@ import cn.bc.web.ui.html.toolbar.Toolbar;
 import cn.bc.web.ui.json.Json;
 
 /**
- * 投诉建议Action
+ * 表扬Action
  * 
  * @author dragon
  * 
  */
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 @Controller
-public class CaseAdviceAction extends
-		FileEntityAction<Long, Case4InfractBusiness> {
+public class CasePraiseAction extends FileEntityAction<Long, Case4Praise> {
 	// private static Log logger = LogFactory.getLog(CarAction.class);
-	private static final long serialVersionUID = 1L;
-	private String MANAGER_KEY = "R_ADMIN";// 管理角色的编码
-	public boolean isManager;
-	public Long carManId;
-
+	private static 	final long 		serialVersionUID 	= 1L;
+	private String 					MANAGER_KEY 		= "R_ADMIN";// 管理角色的编码
+	public 	boolean 				isManager;
+	public	Long					carId;
+	
 	@SuppressWarnings("unused")
-	private CaseBusinessService caseBusinessService;
-	private MotorcadeService motorcadeService;
-	private OptionService optionService;
+	private CasePraiseService		casePraiseService;	
+	private MotorcadeService	 	motorcadeService;
+	private OptionService			optionService;
 
-	public List<Motorcade> motorcadeList; // 可选车队列表
-	public List<OptionItem> dutyList; // 可选责任列表
-	public List<OptionItem> properitesList; // 可选性质列表
-	public List<OptionItem> degreeList; // 可选程度列表
-	public List<OptionItem> certList; // 可选没收证件列表
-	public List<OptionItem> departmentList; // 可选执法机关列表
+	public 	List<Motorcade> 		motorcadeList;					// 可选车队列表
+	public  List<OptionItem>		dutyList;						// 可选责任列表
+	public  List<OptionItem>		properitesList;					// 可选性质列表
+	public  List<OptionItem>		degreeList;						// 可选程度列表
+	public  List<OptionItem>		certList;						// 可选没收证件列表
+	public  List<OptionItem>		departmentList;					// 可选执法机关列表
 
-	public Map<String, String> statusesValue;
-	public Map<String, String> sourcesValue;
+	
+	public 	Map<String,String> 		statusesValue;
+	public	Map<String,String>		sourcesValue;
+
 
 	@Autowired
-	public void setCaseBusinessService(CaseBusinessService caseBusinessService) {
-		this.caseBusinessService = caseBusinessService;
-		this.setCrudService(caseBusinessService);
+	public void setCasePraiseService(CasePraiseService casePraiseService) {
+		this.casePraiseService = casePraiseService;
+		this.setCrudService(casePraiseService);
 	}
-
+	
 	@Autowired
 	public void setMotorcadeService(MotorcadeService motorcadeService) {
 		this.motorcadeService = motorcadeService;
 	}
-
+	
 	@Autowired
 	public void setOptionService(OptionService optionService) {
 		this.optionService = optionService;
@@ -93,10 +95,10 @@ public class CaseAdviceAction extends
 	protected OrderCondition getDefaultOrderCondition() {
 		return new OrderCondition("fileDate", Direction.Desc);
 	}
-
-	// 复写搜索URL方法
+	
+	//复写搜索URL方法
 	protected String getEntityConfigName() {
-		return "caseAdvice";
+		return "casePraise";
 	}
 
 	@Override
@@ -105,17 +107,15 @@ public class CaseAdviceAction extends
 		return !context.hasAnyRole(MANAGER_KEY);
 	}
 
+	
 	@Override
 	protected PageOption buildFormPageOption() {
 		PageOption option = new PageOption().setWidth(840).setMinWidth(250)
-				.setMinHeight(200).setModal(false).setHeight(650);
+				.setMinHeight(200).setModal(false).setHeight(500);
 		if (!isReadonly()) {
-			// 特殊处理结案按钮
-			if (Case4InfractTraffic.STATUS_ACTIVE == getE().getStatus()
-					&& !getE().isNew()) {
-				ButtonOption buttonOption = new ButtonOption(
-						getText("label.closefile"), null,
-						"bc.caseBusinessForm.closefile");
+			//特殊处理结案按钮
+			if(Case4InfractTraffic.STATUS_ACTIVE == getE().getStatus() && !getE().isNew()){
+				ButtonOption buttonOption = new ButtonOption(getText("label.closefile"),null,"bc.caseAccidentForm.closefile");
 				buttonOption.put("id", "bcSaveDlgButton");
 				option.addButton(buttonOption);
 			}
@@ -161,132 +161,129 @@ public class CaseAdviceAction extends
 		return tb;
 	}
 
-	// 搜索条件
+	//搜索条件
 	@Override
 	protected String[] getSearchFields() {
-		return new String[] { "caseNo", "carPlate", "driverName", "driverCert",
-				"motorcadeName" };
+		return new String[] { "caseNo", "carPlate" ,"driverName", "driverCert", "motorcadeName" };
 	}
-
+	
+	
 	@Override
 	protected List<Column> buildGridColumns() {
 		// 是否本模块管理员
 		isManager = isReadonly();
 
 		List<Column> columns = super.buildGridColumns();
-		columns.add(new TextColumn("status", getText("runcase.status"), 50)
-				.setSortable(true).setValueFormater(
-						new EntityStatusFormater(getCaseStatuses())));
-		columns.add(new TextColumn("caseNo", getText("runcase.caseNo2"))
+		columns.add(new TextColumn("status",getText("runcase.status"),		50)
+				.setSortable(true).setValueFormater(new EntityStatusFormater(getCaseStatuses())));
+		columns.add(new TextColumn("caseNo",	getText("runcase.caseNo3"))
 				.setSortable(true));
-		columns.add(new TextColumn("source", getText("runcase.ifsource"), 80)
-				.setSortable(true).setValueFormater(
-						new EntityStatusFormater(getSourceStatuses())));
-		columns.add(new TextColumn("motorcadeName",
-				getText("runcase.motorcadeName"), 80).setSortable(true));
-		columns.add(new TextColumn("carPlate", getText("runcase.carPlate"), 100)
-				.setSortable(true).setUseTitleFromLabel(true));
-		columns.add(new TextColumn("driverCert", getText("runcase.driverCert"),
-				80).setSortable(true));
-		columns.add(new TextColumn("driverName", getText("runcase.driverName"),
-				70).setSortable(true));
-		columns.add(new TextColumn("happenDate", getText("runcase.happenDate"),
-				150).setSortable(true).setValueFormater(
-				new CalendarFormater("yyyy-MM-dd")));
-		columns.add(new TextColumn("subject", getText("runcase.subject"), 120));
-		columns.add(new TextColumn("address", getText("runcase.address"), 120)
+		columns.add(new TextColumn("sort", getText("runcase.sort"),		80)
 				.setSortable(true));
-		columns.add(new TextColumn("driverCert", getText("runcase.driverCert"),
-				80).setSortable(true));
+		columns.add(new TextColumn("motorcadeName", getText("runcase.motorcadeName"),		80)
+				.setSortable(true));
+		columns.add(new TextColumn("carPlate", getText("runcase.carPlate"),		100).
+				setUseTitleFromLabel(true).setValueFormater(new AbstractFormater<String>() {
+					@Override
+					public String format(Object context, Object value) {
+						CaseBase car = (CaseBase) context;
+						return car.getCarPlate()+" "+car.getCaseNo();
+					}
+				}));
+		columns.add(new TextColumn("driverName", getText("runcase.driverName"),70)
+				.setSortable(true));
+		columns.add(new TextColumn("happenDate", getText("runcase.happenDate"),	150)
+				.setSortable(true).setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+		columns.add(new TextColumn("subject", getText("runcase.subject"),	120));
+		columns.add(new TextColumn("address", getText("runcase.address"),120)
+				.setSortable(true));
+		columns.add(new TextColumn("driverCert", getText("runcase.driverCert"),			80)
+				.setSortable(true));
 		return columns;
 	}
 
+	
 	@SuppressWarnings("static-access")
 	@Override
 	public String create() throws Exception {
 		String r = super.create();
-		this.getE().setUid(
-				this.getIdGeneratorService().next(this.getE().ATTACH_TYPE));
-
+		this.getE().setUid(this.getIdGeneratorService().next(this.getE().ATTACH_TYPE));
+		
 		// 初始化信息
-		this.getE().setType(CaseBase.TYPE_INFRACT_BUSINESS);
+		this.getE().setType  (CaseBase.TYPE_PRAISE);
 		this.getE().setStatus(CaseBase.STATUS_ACTIVE);
-
+		
 		// 表单可选项的加载
-		sourcesValue = this.getSourceStatuses();
+		sourcesValue		=	this.getSourceStatuses();
 		initSelects();
-
-		return r;
+		
+		return r; 
 	}
-
+	
 	@Override
 	public String edit() throws Exception {
 		this.setE(this.getCrudService().load(this.getId()));
-		this.formPageOption = buildFormPageOption();
+		this.formPageOption = 	buildFormPageOption();
 
 		// 表单可选项的加载
-		statusesValue = this.getCaseStatuses();
-		sourcesValue = this.getSourceStatuses();
+		statusesValue		=	this.getCaseStatuses();
+		sourcesValue		=	this.getSourceStatuses();
 		initSelects();
 		return "form";
 	}
-
+	
 	@Override
-	public String save() throws Exception {
+	public String save() throws Exception{
 		SystemContext context = this.getSystyemContext();
-		Case4InfractBusiness e = this.getE();
-
-		if (e != null && (e.getReceiverId() == null || e.getReceiverId() < 0)) {
+		Case4Praise e = this.getE();
+		
+		if(e != null && (e.getReceiverId() == null || e.getReceiverId() < 0)){
 			e.setReceiverId(context.getUserHistory().getId());
 			e.setReceiverName(context.getUserHistory().getName());
 		}
-		// 设置最后更新人的信息
+		//设置最后更新人的信息
 		e.setModifier(context.getUserHistory());
 		e.setModifiedDate(Calendar.getInstance());
 		this.getCrudService().save(e);
 
+		
 		return "saveSuccess";
 	}
-
+	
 	public Json json;
-
-	public String closefile() {
+	public String closefile(){
 		SystemContext context = this.getSystyemContext();
-
+		
 		this.getE().setStatus(CaseBase.STATUS_CLOSED);
 		this.getE().setCloserId(context.getUserHistory().getActorId());
 		this.getE().setCloseDate(Calendar.getInstance(Locale.CHINA));
-
-		DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+		
+		DateFormat df = new SimpleDateFormat("yyyy-MM-dd");   
 		String closeDateStr = df.format(this.getE().getCloseDate().getTime());
-
+		
 		json = new Json();
 		json.put("status", this.getE().getStatus());
 		json.put("closeDate", closeDateStr);
 		return "json";
 	}
-
+	
 	// 表单可选项的加载
-	public void initSelects() {
+	public void initSelects(){
 		// 加载可选车队列表
-		this.motorcadeList = this.motorcadeService.createQuery().list();
+		this.motorcadeList 				= 	this.motorcadeService.createQuery().list();
 		// 加载可选责任列表
-		this.dutyList = this.optionService
-				.findOptionItemByGroupKey(OptionConstants.IT_DUTY);
+		this.dutyList					=	this.optionService.findOptionItemByGroupKey(OptionConstants.IT_DUTY);
 		// 加载可选性质列表
-		this.properitesList = this.optionService
-				.findOptionItemByGroupKey(OptionConstants.IT_PROPERITES);
+		this.properitesList				=	this.optionService.findOptionItemByGroupKey(OptionConstants.IT_PROPERITES);
 		// 加载可选程度列表
-		this.degreeList = this.optionService
-				.findOptionItemByGroupKey(OptionConstants.IT_DEGREE);
+		this.degreeList					=	this.optionService.findOptionItemByGroupKey(OptionConstants.IT_DEGREE);
 		// 加载可选没收证件列表
-		this.certList = this.optionService
-				.findOptionItemByGroupKey(OptionConstants.BS_CERT);
+		this.certList					=	this.optionService.findOptionItemByGroupKey(OptionConstants.BS_CERT);
 		// 加载可选执法机关列表
-		this.departmentList = this.optionService
-				.findOptionItemByGroupKey(OptionConstants.CA_DEPARTMENT);
+		this.departmentList				=	this.optionService.findOptionItemByGroupKey(OptionConstants.CA_DEPARTMENT);
 	}
-
+	
+	
 	/**
 	 * 获取Entity的状态值转换列表
 	 * 
@@ -300,7 +297,7 @@ public class CaseAdviceAction extends
 				getText("runcase.select.status.closed"));
 		return statuses;
 	}
-
+	
 	/**
 	 * 获取Entity的来源转换列表
 	 * 
@@ -316,28 +313,27 @@ public class CaseAdviceAction extends
 				getText("runcase.select.source.fromdriver"));
 		return statuses;
 	}
-
+	
 	// 视图特殊条件
 	@Override
 	protected Condition getSpecalCondition() {
-		if (carManId != null) {
-			return new EqualsCondition("driverId", carManId);
-		}
-		if (carManId != null) {
-			return new EqualsCondition("driverId", carManId);
-		}else {
+		if (carId != null) {
+			return new EqualsCondition("carId", carId);
+		} else {
 			return null;
 		}
 	}
+	
 
 	@Override
 	protected HtmlPage buildHtml4Paging() {
 		HtmlPage page = super.buildHtml4Paging();
-		if (carManId != null)
-			page.setAttr("data-extras", new Json().put("carManId", carManId)
+		if (carId != null)
+			page.setAttr("data-extras", new Json().put("carId", carId)
 					.toString());
-
 		return page;
 	}
-
+	
+	
+	
 }

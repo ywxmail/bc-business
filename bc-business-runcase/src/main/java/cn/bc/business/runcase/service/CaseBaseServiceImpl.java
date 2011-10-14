@@ -24,4 +24,14 @@ public class CaseBaseServiceImpl extends DefaultCrudService<CaseBase> implements
 		this.caseBaseDao = caseBaseDao;
 		this.setCrudDao(caseBaseDao);
 	}
+
+	public void findCarManNameNCertCodeByCarId(Long carId) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void findCarPlateNCertCodeByCarManId(Long carManId) {
+		// TODO Auto-generated method stub
+		
+	}
 }

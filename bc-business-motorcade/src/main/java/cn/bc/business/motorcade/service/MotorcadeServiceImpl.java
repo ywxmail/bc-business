@@ -1,6 +1,7 @@
 package cn.bc.business.motorcade.service;
 
 import java.io.Serializable;
+import java.util.List;
 
 import cn.bc.business.motorcade.dao.HistoryCarQuantityDao;
 import cn.bc.business.motorcade.dao.MotorcadeDao;
@@ -34,5 +35,9 @@ public class MotorcadeServiceImpl extends DefaultCrudService<Motorcade> implemen
 	@Override
 	public void delete(Serializable[] ids) {
 		this.motorcadeDao.delete(ids);
+	}
+
+	public List<Motorcade> findActive() {
+		return this.motorcadeDao.findActive();
 	}
 }

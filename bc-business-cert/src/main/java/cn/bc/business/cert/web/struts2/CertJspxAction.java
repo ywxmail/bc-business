@@ -77,7 +77,8 @@ public class CertJspxAction extends FileEntityAction<Long, Cert4DriverEducation>
 
 		this.getE().setUid(this.getIdGeneratorService().next(this.getE().ATTACH_TYPE));
 		this.getE().setType(Cert.TYPE_JSPX);
-		this.getE().setStatus(RichEntityImpl.STATUS_DISABLED);
+		this.getE().setStatus(RichEntityImpl.STATUS_ENABLED);
+		statusesValue		=	this.getEntityStatuses();
 		
 		attachsUI = buildAttachsUI(true);
 		return r;
