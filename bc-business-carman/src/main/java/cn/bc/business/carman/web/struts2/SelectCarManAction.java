@@ -11,9 +11,12 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
 import cn.bc.business.BSConstants;
+import cn.bc.business.carman.domain.CarMan;
 import cn.bc.business.carman.service.CarManService;
-import cn.bc.core.CrudOperations;
+import cn.bc.core.query.Query;
 import cn.bc.core.query.condition.Condition;
+import cn.bc.core.query.condition.impl.AndCondition;
+import cn.bc.core.query.condition.impl.EqualsCondition;
 import cn.bc.core.query.condition.impl.InCondition;
 import cn.bc.core.util.StringUtils;
 import cn.bc.web.struts2.AbstractSelectPageAction;
@@ -30,10 +33,11 @@ import cn.bc.web.ui.json.Json;
  */
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 @Controller
-public class SelectCarManAction extends AbstractSelectPageAction {
+public class SelectCarManAction extends AbstractSelectPageAction<CarMan> {
 	private static final long serialVersionUID = 1L;
 	public CarManService carManService;
 	public String types; // 类型控制
+	public String status; // 状态，多个用逗号连接
 
 	@Autowired
 	public void setCarManService(CarManService carManService) {
@@ -41,8 +45,8 @@ public class SelectCarManAction extends AbstractSelectPageAction {
 	}
 
 	@Override
-	protected CrudOperations<? extends Object> getGridDataService() {
-		return this.carManService;
+	protected Query<CarMan> getQuery() {
+		return this.carManService.createQuery();
 	}
 
 	@Override
@@ -96,26 +100,53 @@ public class SelectCarManAction extends AbstractSelectPageAction {
 
 	@Override
 	protected Condition getGridSpecalCondition() {
-		if (this.types == null || this.types.length() == 0)
+		Condition c1 = null;
+		if (this.types != null && this.types.length() > 0) {
+			// 用空格分隔多个查询条件的值的处理
+			String[] values = this.types.split(",");
+			Integer[] _values = StringUtils.stringArray2IntegerArray(values);
+
+			// 添加查询条件
+			c1 = new InCondition("type", _values);
+		}
+
+		Condition c2 = null;
+		// status
+		if (status != null && status.length() > 0) {
+			String[] ss = status.split(",");
+
+			if (ss.length == 1) {
+				c2 = new EqualsCondition("status", new Integer(ss[0]));
+			} else {
+				c2 = new InCondition("status",
+						StringUtils.stringArray2IntegerArray(ss));
+			}
+		}
+
+		if (c1 != null && c2 == null) {
+			return c1;
+		} else if (c1 == null && c2 != null) {
+			return c2;
+		} else if (c1 != null && c2 != null) {
+			return new AndCondition().add(c1).add(c2);
+		} else {
 			return null;
-
-		// 用空格分隔多个查询条件的值的处理
-		String[] values = this.types.split(",");
-		Integer[] _values = StringUtils.stringArray2IntegerArray(values);
-
-		// 添加查询条件
-		InCondition in = new InCondition("type", _values);
-		return in;
+		}
 	}
 
 	@Override
 	protected Json getGridExtrasData() {
-		if (this.types == null || this.types.length() == 0) {
-			return null;
-		} else {
-			Json json = new Json();
+		Json json = null;
+		if (this.types != null && this.types.length() > 0) {
+			json = new Json();
 			json.put("types", types);
-			return json;
 		}
+
+		if (this.status != null && this.status.length() > 0) {
+			if (json == null)
+				json = new Json();
+			json.put("status", status);
+		}
+		return json;
 	}
 }
