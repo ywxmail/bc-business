@@ -136,7 +136,7 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 	@Override
 	protected PageOption buildFormPageOption() {
 		PageOption option = super.buildFormPageOption().setWidth(810)
-				.setMinWidth(250).setMinHeight(200);
+				.setMinWidth(250).setMaxHeight(450).setMinHeight(200);
 		if (!this.isReadonly()) {
 			option.addButton(new ButtonOption(getText("label.save"), "save"));
 		}
@@ -156,7 +156,7 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 	// 设置页面的尺寸
 	@Override
 	protected PageOption buildListPageOption() {
-		return super.buildListPageOption().setWidth(1000).setMinWidth(400)
+		return super.buildListPageOption().setWidth(900).setMinWidth(400)
 				.setHeight(500).setMinHeight(300);
 	}
 

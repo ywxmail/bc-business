@@ -61,7 +61,7 @@ public class SelectCarAction extends AbstractSelectPageAction {
 					@Override
 					public String format(Object context, Object value) {
 						Car car = (Car) context;
-						return car.getPlateType() + " " + car.getPlateNo();
+						return car.getPlateType() + "." + car.getPlateNo();
 					}
 				}));
 		return columns;
