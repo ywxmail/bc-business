@@ -264,13 +264,14 @@ public class BlacklistAction extends FileEntityAction<Long, Blacklist> {
 	public String carManMess() {
 		Car car = this.carByDriverService
 				.selectCarByCarManId(new Long(carManId));
+		if(car!=null){
 		carId = car.getId();
 		unitId = car.getUnit().getId();
 		motorcadeId = car.getMotorcade().getId();
 		carPlate = car.getPlateType() + car.getPlateNo();
 		unitName = car.getUnit().getName();
 		motorcadeName = car.getMotorcade().getName();
-
+		}
 		json = new Json();
 		json.put("carId", carId);
 		json.put("unitId", unitId);
@@ -279,6 +280,7 @@ public class BlacklistAction extends FileEntityAction<Long, Blacklist> {
 		json.put("unitName", unitName);
 		json.put("motorcadeName", motorcadeName);
 		return "json";
+		
 	}
 
 	@Override

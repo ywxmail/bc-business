@@ -58,7 +58,7 @@ public class CarDaoImpl extends HibernateCrudJpaDao<Car> implements CarDao{
 		StringBuffer hql = new StringBuffer();
 		hql.append("SELECT car.id,car.status,car.code,car.plateType,car.plateNo,car.driver")
 		   //.append("(select m.driver.name from CarByDriver m where m.car.id = car.id and m.classes="+CarByDriver.TYPE_FUBAN+"),")
-		   .append(",car.factoryType,car.factoryModel,car.businessType,car.motorcade.name,car.unit.name,car.registerDate,car.originNo,car.vin,car.certNo2 FROM Car car ");
+		   .append(",car.factoryType,car.factoryModel,car.businessType,car.motorcade.name,car.unit.name,car.registerDate,car.originNo,car.vin,car.certNo2,car.charger FROM Car car ");
 
 		//组合查询条件
 		if(condition != null && condition.getValues().size() > 0){
@@ -104,7 +104,8 @@ public class CarDaoImpl extends HibernateCrudJpaDao<Car> implements CarDao{
 			map.put("registerDate",	ary[11]);
 			map.put("originNo",		ary[12]);
 			map.put("vin", 			ary[13]);
-			map.put("certNo2", 			ary[14]);
+			map.put("certNo2", 		ary[14]);
+			map.put("charger", 		ary[15]);
 			
 			result.add(map);
 		}
@@ -127,7 +128,7 @@ public class CarDaoImpl extends HibernateCrudJpaDao<Car> implements CarDao{
 		//因为用正班做查询条件1部车辆返回多个正班司机.待解决 CarByDriver.TYPE_ZHENGBAN
 		hql.append("SELECT car.id,car.status,car.code,car.plateType,car.plateNo,car.driver")
 		   //.append("(select m.driver.name from CarByDriver m where m.car.id = car.id and m.classes="+CarByDriver.TYPE_FUBAN+"),")
-		   .append(",car.factoryType,car.factoryModel,car.businessType,car.motorcade.name,car.unit.name,car.registerDate,car.originNo,car.vin,car.certNo2 ");
+		   .append(",car.factoryType,car.factoryModel,car.businessType,car.motorcade.name,car.unit.name,car.registerDate,car.originNo,car.vin,car.certNo2,car.charger");
 		
 		//方便统计记录数
 		String sqlStr =	" FROM Car car ";
@@ -199,6 +200,7 @@ public class CarDaoImpl extends HibernateCrudJpaDao<Car> implements CarDao{
 			map.put("originNo",		ary[12]);
 			map.put("vin", 			ary[13]);
 			map.put("certNo2", 		ary[14]);
+			map.put("charger", 		ary[15]);
 			
 			result.add(map);
 		}

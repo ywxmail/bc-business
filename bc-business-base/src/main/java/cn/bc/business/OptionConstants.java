@@ -57,6 +57,12 @@ public class OptionConstants extends cn.bc.option.OptionConstants {
 	public final static String CA_DEPARTMENT = "ca.department";
 	/** 营运事件事故理赔保险公司	*/
 	public final static String CA_COMPANY = "ca.company";
+	/** 营运事件事故理赔事故性质	*/
+	public final static String CA_SORT = "ca.sort";
+	/** 营运事件事故理赔责任	*/
+	public final static String CA_DUTY = "ca.duty";
+	
+	
 	
 	
 	/** 车队的可选缴费日 */

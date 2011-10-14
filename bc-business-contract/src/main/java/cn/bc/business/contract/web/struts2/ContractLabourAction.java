@@ -16,6 +16,7 @@ import org.springframework.stereotype.Controller;
 
 import cn.bc.business.contract.domain.Contract;
 import cn.bc.business.contract.domain.Contract4Labour;
+import cn.bc.business.contract.service.ContractChargerService;
 import cn.bc.business.contract.service.ContractLabourService;
 import cn.bc.business.web.struts2.FileEntityAction;
 import cn.bc.core.Page;
@@ -32,7 +33,6 @@ import cn.bc.web.ui.html.grid.Column;
 import cn.bc.web.ui.html.grid.GridData;
 import cn.bc.web.ui.html.grid.TextColumn;
 import cn.bc.web.ui.html.page.ButtonOption;
-import cn.bc.web.ui.html.page.HtmlPage;
 import cn.bc.web.ui.html.page.PageOption;
 import cn.bc.web.ui.json.Json;
 
@@ -47,11 +47,15 @@ import cn.bc.web.ui.json.Json;
 public class ContractLabourAction extends FileEntityAction<Long, Contract4Labour> {
 	// private static Log logger = LogFactory.getLog(ContractAction.class);
 	private static final long 		serialVersionUID 			= 1L;
-	public 	ContractLabourService 	contractLabourService;
+	private ContractLabourService 	contractLabourService;
+	private ContractChargerService	contractChargerService;
 	private AttachService 			attachService;
 	private String					MANAGER_KEY 				= "R_ADMIN";// 管理角色的编码
 	public 	boolean 	   			isManager;
 	private	Long 					carManId;
+	private	Long 					carId;
+	private	Long 					oldCarManId;
+	private	Long 					oldCarId;
 	public  String 					certCode;
 	public 	AttachWidget 			attachsUI;
 	public 	Map<String,String>		statusesValue;
@@ -64,17 +68,27 @@ public class ContractLabourAction extends FileEntityAction<Long, Contract4Labour
 		this.contractLabourService = contractLabourService;
 		this.setCrudService(contractLabourService);
 	}
-//	
-//	@Autowired
-//	public void setCertService(CertService certService) {
-//		this.certService = certService;
-//	}
 	
+	@Autowired
+	public void setContractChargerService(
+			ContractChargerService contractChargerService) {
+		this.contractChargerService = contractChargerService;
+	}
+
 	@Autowired
 	public void setAttachService(AttachService attachService) {
 		this.attachService = attachService;
 	}
 	
+	
+	public Long getCarId() {
+		return carId;
+	}
+
+	public void setCarId(Long carId) {
+		this.carId = carId;
+	}
+
 	public Long getCarManId() {
 		return carManId;
 	}
@@ -83,20 +97,39 @@ public class ContractLabourAction extends FileEntityAction<Long, Contract4Labour
 		this.carManId = carManId;
 	}
 	
+	public Long getOldCarManId() {
+		return oldCarManId;
+	}
+
+	public void setOldCarManId(Long oldCarManId) {
+		this.oldCarManId = oldCarManId;
+	}
+
+	public Long getOldCarId() {
+		return oldCarId;
+	}
+
+	public void setOldCarId(Long oldCarId) {
+		this.oldCarId = oldCarId;
+	}
+
 	@Override
 	public boolean isReadonly() {
 		SystemContext context = (SystemContext) this.getContext();
 		return !context.hasAnyRole(MANAGER_KEY);
 	}
+	
 
 	@SuppressWarnings("static-access")
 	public String create() throws Exception {
 		String r = super.create();
 		isManager = isReadonly();
 		
+		this.getE().setCode(this.getIdGeneratorService().next(this.getE().KEY_UID));
 		this.getE().setUid(this.getIdGeneratorService().next(this.getE().KEY_UID));
 		this.getE().setType(Contract.TYPE_LABOUR);
-		this.getE().setStatus(RichEntityImpl.STATUS_DISABLED);
+		this.getE().setStatus(RichEntityImpl.STATUS_ENABLED);
+		statusesValue		=	this.getEntityStatuses();
 		
 		attachsUI = buildAttachsUI(true);
 
@@ -109,9 +142,15 @@ public class ContractLabourAction extends FileEntityAction<Long, Contract4Labour
 		// 表单可选项的加载
 		this.formPageOption = 	buildFormPageOption();
 		statusesValue		=	this.getEntityStatuses();
-		
 		// 构建附件控件
 		attachsUI = buildAttachsUI(false);
+		//根据contractId查找所属的carId
+		carId = this.contractLabourService.findCarIdByContractId(this.getE().getId());
+		oldCarId = carId;
+		//根据contractId查找所属的carManId
+		carManId = this.contractLabourService.findCarManIdByContractId(this.getE().getId());
+		oldCarManId = carManId;
+		
 		return "form";
 	}
 	
@@ -123,12 +162,26 @@ public class ContractLabourAction extends FileEntityAction<Long, Contract4Labour
 		Contract4Labour e = this.getE();
 		e.setModifier(context.getUserHistory());
 		e.setModifiedDate(Calendar.getInstance());
+		
 		this.getCrudService().save(e);
 		
-		//保存证件与司机的关联表信息
-		if(carManId != null){
+		//保存合同与车辆的关联表信息
+		if(oldCarId != null){
+			if(oldCarId != carId && !oldCarId.equals(carId)){
+				this.contractLabourService.carNContract4Save(carId,getE().getId());
+			}
+		}else{
+			this.contractLabourService.carNContract4Save(carId,getE().getId());
+		}
+		//保存合同与司机的关联表信息
+		if(oldCarManId != null){
+			if(oldCarManId != carManId && !oldCarManId.equals(carManId)){
+				this.contractLabourService.carManNContract4Save(carManId,getE().getId());
+			}
+		}else{
 			this.contractLabourService.carManNContract4Save(carManId,getE().getId());
 		}
+		
 		
 		return "saveSuccess";
 		
@@ -138,8 +191,10 @@ public class ContractLabourAction extends FileEntityAction<Long, Contract4Labour
 	@Override
 	public String delete() throws Exception {
 		if (this.getId() != null) {// 删除一条
-			//单个删除中间表car_contract表
+			//单个删除中间表carman_contract表
 			this.contractLabourService.deleteCarManNContract(this.getId());
+			//单个删除中间表car_contract表
+			this.contractChargerService.deleteCarNContract(this.getId());
 			//单个删除本表
 			this.getCrudService().delete(this.getId());
 		} else {// 删除一批
@@ -148,6 +203,7 @@ public class ContractLabourAction extends FileEntityAction<Long, Contract4Labour
 				Long[] contractIds = cn.bc.core.util.StringUtils
 						.stringArray2LongArray(this.getIds().split(","));
 				this.contractLabourService.deleteCarManNContract(contractIds);
+				this.contractChargerService.deleteCarNContract(contractIds);
 				//批量删除本表
 				Long[] ids = cn.bc.core.util.StringUtils
 						.stringArray2LongArray(this.getIds().split(","));
@@ -186,16 +242,17 @@ public class ContractLabourAction extends FileEntityAction<Long, Contract4Labour
 		//List<Column> columns = super.buildGridColumns();
 		List<Column> columns = new ArrayList<Column>();
 		columns.add(new TextColumn("['id']", "ID",20));
-		columns.add(new TextColumn("['code']", getText("contract.code"),150)
-				.setSortable(true).setUseTitleFromLabel(true));
-		columns.add(new TextColumn("['type']", getText("contract.type"),120)
+		columns.add(new TextColumn("['type']", getText("contract.type"),80)
 				.setSortable(true).setUseTitleFromLabel(true)
 				.setValueFormater(new KeyValueFormater(getEntityTypes())));
-		columns.add(new TextColumn("['signDate']", getText("contract.signDate"))
+		columns.add(new TextColumn("['ext_str1']", getText("contract.car"),80));
+		columns.add(new TextColumn("['ext_str2']", getText("contract.labour.driver"),80));
+		columns.add(new TextColumn("['transactorName']", getText("contract.transactor"),60));
+		columns.add(new TextColumn("['signDate']", getText("contract.signDate"),90)
 				.setSortable(true).setValueFormater(
 						new CalendarFormater("yyyy-MM-dd")));
-		columns.add(new TextColumn("['startDate']", getText("contract.deadline"),200)
-				.setSortable(true).setValueFormater(
+		columns.add(new TextColumn("['startDate']", getText("contract.deadline"))
+				.setValueFormater(
 						new CalendarRangeFormater("yyyy-MM-dd") {
 							@SuppressWarnings("rawtypes")
 							@Override
@@ -205,7 +262,8 @@ public class ContractLabourAction extends FileEntityAction<Long, Contract4Labour
 								return (Calendar) contract.get("endDate");
 							}
 						}));
-		columns.add(new TextColumn("['transactorName']", getText("contract.transactor")));
+		columns.add(new TextColumn("['code']", getText("contract.code"),120)
+				.setUseTitleFromLabel(true));
 
 		return columns;
 	}
@@ -251,14 +309,15 @@ public class ContractLabourAction extends FileEntityAction<Long, Contract4Labour
 
 	@Override
 	protected PageOption buildListPageOption() {
-		return super.buildListPageOption().setWidth(800).setMinWidth(300)
+		return super.buildListPageOption().setWidth(850).setMinWidth(300)
 				.setHeight(400).setMinHeight(300);
 	}
 
 	@Override
 	protected String[] getSearchFields() {
-		return new String[] { "contract.code", "contract.wordNo", "carman.name" };
+		return new String[] { "contract.code", "contract.wordNo" , "contract.ext_str1", "contract.ext_str2"};
 	}
+	
 	
 	// 判断当前用户是否是本模块管理员
 	private boolean isManager() {
@@ -289,14 +348,15 @@ public class ContractLabourAction extends FileEntityAction<Long, Contract4Labour
 		return "contractLabour";
 	}
 	
-	@Override
-	protected HtmlPage buildHtml4Paging() {
-		HtmlPage page = super.buildHtml4Paging();
-		if (carManId != null)
-			page.setAttr("data-extras", new Json().put("carManId", carManId)
-					.toString());
-		return page;
-	}
+//	@Override
+//	protected HtmlPage buildHtml4Paging() {
+//		HtmlPage page = super.buildHtml4Paging();
+//		if (carManId != null)
+//			page.setAttr("data-extras", new Json().put("carManId", carManId)
+//					.toString());
+//		return page;
+//	}
+	
 	
 	/**
 	 * 获取Contract的合同类型列表

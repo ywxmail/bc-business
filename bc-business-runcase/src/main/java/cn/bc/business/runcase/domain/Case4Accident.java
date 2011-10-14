@@ -22,7 +22,7 @@ public class Case4Accident extends CaseBase {
 			.getSimpleName();
 
 	private Calendar receiveDate;// 受理时间
-	private Long receiverId;// 经办人ID(对应ActorHistory的ID)
+	private Long receiverId;// 经办人ID(对应Actor的ID)
 	private String receiverName;// 经办人姓名
 	private String receiveCode;// 受理编号
 	private String department;// 处理部门

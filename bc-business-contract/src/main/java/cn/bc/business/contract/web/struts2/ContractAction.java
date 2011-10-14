@@ -3,6 +3,7 @@
  */
 package cn.bc.business.contract.web.struts2;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -27,9 +28,11 @@ import cn.bc.web.ui.html.grid.Grid;
 import cn.bc.web.ui.html.grid.GridData;
 import cn.bc.web.ui.html.grid.TextColumn;
 import cn.bc.web.ui.html.page.ButtonOption;
+import cn.bc.web.ui.html.page.HtmlPage;
 import cn.bc.web.ui.html.page.PageOption;
 import cn.bc.web.ui.html.toolbar.Toolbar;
 import cn.bc.web.ui.html.toolbar.ToolbarButton;
+import cn.bc.web.ui.json.Json;
 
 /**
  * 合同Action
@@ -45,7 +48,8 @@ public class ContractAction extends FileEntityAction<Long, Contract> {
 	public ContractService contractService;
 	private String MANAGER_KEY = "R_ADMIN";// 管理角色的编码
 	public boolean isManager;
-	public String carId;
+	public Long carId;
+	public Long carManId;
 
 	public Map<String, String> statusesValue;
 
@@ -54,17 +58,22 @@ public class ContractAction extends FileEntityAction<Long, Contract> {
 		this.contractService = contractService;
 		this.setCrudService(contractService);
 	}
+	
+	@Override
+	public boolean isReadonly() {
+		SystemContext context = (SystemContext) this.getContext();
+		return !context.hasAnyRole(MANAGER_KEY);
+	}
 
-	@SuppressWarnings("static-access")
 	@Override
 	public String create() throws Exception {
 //		this.readonly = false;
-		Contract e = this.contractService.create();
-		this.setE(e);
-
-		this.getE().setUid(
-				this.getIdGeneratorService().next(this.getE().ATTACH_TYPE));
-		this.formPageOption = buildFormPageOption();
+//		Contract e = this.contractService.create();
+//		this.setE(e);
+//
+//		this.getE().setUid(
+//				this.getIdGeneratorService().next(this.getE().ATTACH_TYPE));
+//		this.formPageOption = buildFormPageOption();
 
 		return "showdialog";
 	}
@@ -80,12 +89,12 @@ public class ContractAction extends FileEntityAction<Long, Contract> {
 
 	@Override
 	protected GridData buildGridData(List<Column> columns) {
-		return super.buildGridData(columns).setRowLabelExpression("code");
+		return super.buildGridData(columns).setRowLabelExpression("['code']");
 	}
 
 	@Override
 	protected OrderCondition getDefaultOrderCondition() {
-		return null;// new OrderCondition("fileDate", Direction.Desc);
+		return null;//new OrderCondition("fileDate", Direction.Desc);
 	}
 
 	@Override
@@ -96,31 +105,35 @@ public class ContractAction extends FileEntityAction<Long, Contract> {
 
 	@Override
 	protected String[] getSearchFields() {
-		return new String[] { "code", "wordNo" };
+		return new String[] { "contract.code", "contract.wordNo", "contract.ext_str1", "contract.ext_str2" };
 	}
 
 	@Override
 	protected List<Column> buildGridColumns() {
-		List<Column> columns = super.buildGridColumns();
-		columns.add(new TextColumn("code", getText("contract.code"),150)
-				.setSortable(true).setUseTitleFromLabel(true));
-		columns.add(new TextColumn("type", getText("contract.type"),120)
+		List<Column> columns = new ArrayList<Column>();
+		columns.add(new TextColumn("['id']", "ID",20));
+		columns.add(new TextColumn("['type']", getText("contract.type"),80)
 				.setSortable(true).setUseTitleFromLabel(true)
 				.setValueFormater(new KeyValueFormater(getEntityTypes())));
-		columns.add(new TextColumn("signDate", getText("contract.signDate"))
+		columns.add(new TextColumn("['ext_str1']", getText("contract.car"),80));
+		columns.add(new TextColumn("['ext_str2']", getText("contract.labour.driver"),80));
+		columns.add(new TextColumn("['transactorName']", getText("contract.transactor"),60));
+		columns.add(new TextColumn("['signDate']", getText("contract.signDate"),90)
 				.setSortable(true).setValueFormater(
 						new CalendarFormater("yyyy-MM-dd")));
-		columns.add(new TextColumn("startDate", getText("contract.deadline"),200)
-				.setSortable(true).setValueFormater(
+		columns.add(new TextColumn("['startDate']", getText("contract.deadline"))
+				.setValueFormater(
 						new CalendarRangeFormater("yyyy-MM-dd") {
+							@SuppressWarnings("rawtypes")
 							@Override
 							public Calendar getToDate(Object context,
 									Object value) {
-								Contract contract = (Contract) context;
-								return contract.getEndDate();
+								Map contract = (Map) context;
+								return (Calendar) contract.get("endDate");
 							}
 						}));
-		columns.add(new TextColumn("transactorName", getText("contract.transactor")));
+		columns.add(new TextColumn("['code']", getText("contract.code"),120)
+				.setUseTitleFromLabel(true));
 
 		return columns;
 	}
@@ -156,10 +169,10 @@ public class ContractAction extends FileEntityAction<Long, Contract> {
 
 	@Override
 	protected Toolbar buildToolbar() {
-		isManager = isManager();
+		isManager = isReadonly();
 		Toolbar tb = new Toolbar();
 
-		if (isManager) {
+		if (!isManager) {
 			// 新建按钮
 			tb.addButton(new ToolbarButton().setIcon("ui-icon-document")
 					.setText(getText("label.create"))
@@ -171,7 +184,10 @@ public class ContractAction extends FileEntityAction<Long, Contract> {
 					.setClick("bc.contractList.edit"));
 
 			// 删除按钮
-			tb.addButton(getDefaultDeleteToolbarButton());
+			//tb.addButton(getDefaultDeleteToolbarButton());
+			tb.addButton(new ToolbarButton().setIcon("ui-icon-document")
+					.setText(getText("label.delete"))
+					.setClick("bc.contractList.del"));
 		} else {// 普通用户
 			// 查看按钮
 			tb.addButton(getDefaultOpenToolbarButton());
@@ -182,10 +198,49 @@ public class ContractAction extends FileEntityAction<Long, Contract> {
 
 		return tb;
 	}
+	
+	/**
+	 * 根据请求的条件查找非分页信息对象
+	 * 
+	 * @return
+	 */
+	@Override
+	protected List<Map<String,Object>> findList() {
+		List<Map<String,Object>> list = null;
+		if(carId != null){
+			list = this.contractService.list4Car(this.getCondition(),carId);
+		}
+		if(carManId != null){
+			list = this.contractService.list4CarMan(this.getCondition(),carManId);
+		}
+		return list;
+	}
+	
 
-	// 判断当前用户是否是本模块管理员
-	private boolean isManager() {
-		return ((SystemContext) this.getContext()).hasAnyRole(MANAGER_KEY);
+//	// 视图特殊条件
+//	@Override
+//	protected Condition getSpecalCondition() {
+//		if (carId != null) {
+//			return new EqualsCondition("carId", carId);
+//		}
+//		if (carManId != null) {
+//			return new EqualsCondition("carManId", carManId);
+//		}else {
+//			return null;
+//		}
+//	}
+	
+	
+	@Override
+	protected HtmlPage buildHtml4Paging() {
+		HtmlPage page = super.buildHtml4Paging();
+		if (carId != null)
+			page.setAttr("data-extras", new Json().put("carId", carId)
+					.toString());
+		if (carManId != null)
+			page.setAttr("data-extras", new Json().put("carManId", carManId)
+					.toString());
+		return page;
 	}
 	
 	/**
