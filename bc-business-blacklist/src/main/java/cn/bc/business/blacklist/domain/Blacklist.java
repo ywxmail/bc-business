@@ -38,8 +38,8 @@ public class Blacklist extends FileEntityImpl {
 	private String code;// 编号
 	private String lockReason;// 锁定原因
 	private String unlockReason;// 解锁原因
-	private ActorHistory locker;// 锁定人
-	private ActorHistory unlocker;// 解锁人
+	private Actor locker;// 锁定人
+	private Actor unlocker;// 解锁人
 
 	private Calendar lockDate;// 锁定时间
 	private Calendar unlockDate;// 解锁时间
@@ -103,21 +103,21 @@ public class Blacklist extends FileEntityImpl {
 
 	@ManyToOne(fetch = FetchType.EAGER, optional = false)
 	@JoinColumn(name = "LOCKER_ID", referencedColumnName = "ID")
-	public ActorHistory getLocker() {
+	public Actor getLocker() {
 		return locker;
 	}
 
-	public void setLocker(ActorHistory locker) {
+	public void setLocker(Actor locker) {
 		this.locker = locker;
 	}
 
 	@ManyToOne(fetch = FetchType.EAGER, optional = true)
 	@JoinColumn(name = "UNLOCKER_ID", referencedColumnName = "ID")
-	public ActorHistory getUnlocker() {
+	public Actor getUnlocker() {
 		return unlocker;
 	}
 
-	public void setUnlocker(ActorHistory unlocker) {
+	public void setUnlocker(Actor unlocker) {
 		this.unlocker = unlocker;
 	}
 

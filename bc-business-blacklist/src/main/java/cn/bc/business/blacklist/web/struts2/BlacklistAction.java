@@ -23,7 +23,7 @@ import cn.bc.core.query.condition.Condition;
 import cn.bc.core.query.condition.Direction;
 import cn.bc.core.query.condition.impl.EqualsCondition;
 import cn.bc.core.query.condition.impl.OrderCondition;
-import cn.bc.identity.domain.ActorHistory;
+import cn.bc.identity.domain.Actor;
 import cn.bc.option.domain.OptionItem;
 import cn.bc.option.service.OptionService;
 import cn.bc.web.formater.AbstractFormater;
@@ -247,7 +247,7 @@ public class BlacklistAction extends FileEntityAction<Long, Blacklist> {
 					@Override
 					public String format(Object context, Object value) {
 						Blacklist blacklist = (Blacklist) context;
-						ActorHistory locker = blacklist.getUnlocker();
+						Actor locker = blacklist.getUnlocker();
 						if (locker == null) {
 							return null;
 						} else {
@@ -264,13 +264,13 @@ public class BlacklistAction extends FileEntityAction<Long, Blacklist> {
 	public String carManMess() {
 		Car car = this.carByDriverService
 				.selectCarByCarManId(new Long(carManId));
-		if(car!=null){
-		carId = car.getId();
-		unitId = car.getUnit().getId();
-		motorcadeId = car.getMotorcade().getId();
-		carPlate = car.getPlateType() + car.getPlateNo();
-		unitName = car.getUnit().getName();
-		motorcadeName = car.getMotorcade().getName();
+		if (car != null) {
+			carId = car.getId();
+			unitId = car.getUnit().getId();
+			motorcadeId = car.getMotorcade().getId();
+			carPlate = car.getPlateType() + car.getPlateNo();
+			unitName = car.getUnit().getName();
+			motorcadeName = car.getMotorcade().getName();
 		}
 		json = new Json();
 		json.put("carId", carId);
@@ -280,7 +280,7 @@ public class BlacklistAction extends FileEntityAction<Long, Blacklist> {
 		json.put("unitName", unitName);
 		json.put("motorcadeName", motorcadeName);
 		return "json";
-		
+
 	}
 
 	@Override

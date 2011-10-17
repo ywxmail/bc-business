@@ -3,8 +3,6 @@
  */
 package cn.bc.business.runcase.web.struts2;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -38,7 +36,6 @@ import cn.bc.docs.web.ui.html.AttachWidget;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.option.domain.OptionItem;
 import cn.bc.option.service.OptionService;
-import cn.bc.web.formater.AbstractFormater;
 import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.formater.EntityStatusFormater;
 import cn.bc.web.ui.html.grid.Column;
@@ -64,6 +61,7 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 	private String MANAGER_KEY = "R_ADMIN";// 管理角色的编码
 	public boolean isManager;
 	public Long carId;
+	public String isClosed;
 
 	@SuppressWarnings("unused")
 	private CaseAccidentService caseAccidentService;
@@ -245,7 +243,7 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 				.setSortable(true));
 		columns.add(new TextColumn("motorcadeName",
 				getText("runcase.motorcadeName"), 80).setSortable(true));
-		
+
 		columns.add(new TextColumn("carPlate", getText("runcase.carPlate"), 100)
 				.setSortable(true));
 		columns.add(new TextColumn("driverName", getText("runcase.driverName"),
@@ -333,10 +331,20 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 		SystemContext context = this.getSystyemContext();
 		Case4Accident e = this.getE();
 
-		if (e != null && (e.getReceiverId() == null || e.getReceiverId() < 0)) {
-			e.setReceiverId(context.getUserHistory().getId());
-			e.setReceiverName(context.getUserHistory().getName());
-		}
+		// if (e != null && (e.getReceiverId() == null || e.getReceiverId() <
+		// 0)) {
+		// e.setReceiverId(context.getUserHistory().getId());
+		// e.setReceiverName(context.getUserHistory().getName());
+		// }
+
+		// //设置结案信息
+		// if(isClosed.length() > 0 && isClosed.equals("1")){
+		// e.setStatus(CaseBase.STATUS_CLOSED);
+		// e.setCloserId(context.getUserHistory().getId());
+		// e.setCloserName(context.getUserHistory().getName());
+		// e.setCloseDate(Calendar.getInstance(Locale.CHINA));
+		// }
+
 		// 设置最后更新人的信息
 		e.setModifier(context.getUserHistory());
 		e.setModifiedDate(Calendar.getInstance());
@@ -351,18 +359,22 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 		SystemContext context = this.getSystyemContext();
 
 		this.getE().setStatus(CaseBase.STATUS_CLOSED);
-		this.getE().setCloserId(context.getUserHistory().getActorId());
-		this.getE().setCloserName(context.getUserHistory().getName());
+		this.getE().setCloserId(context.getUser().getId());
+		this.getE().setCloserName(context.getUser().getName());
 		this.getE().setCloseDate(Calendar.getInstance(Locale.CHINA));
+		this.getCrudService().save(this.getE());
 
-		DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-		String closeDateStr = df.format(this.getE().getCloseDate().getTime());
-		json = new Json();
-		json.put("status", this.getE().getStatus());
-		json.put("closeDate", closeDateStr);
-		json.put("closerId", context.getUserHistory().getActorId());
-		json.put("closerName", context.getUserHistory().getName());
-		return "json";
+		return "saveSuccess";
+		// DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+		// String closeDateStr =
+		// df.format(this.getE().getCloseDate().getTime());
+		// json = new Json();
+		// json.put("status", this.getE().getStatus());
+		// //结案日期
+		// json.put("closeDate",Calendar.getInstance(Locale.CHINA).toString());
+		// json.put("closerId", context.getUser().getId());
+		// json.put("closerName", context.getUser().getName());
+		// return "json";
 	}
 
 	// 表单可选项的加载

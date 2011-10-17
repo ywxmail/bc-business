@@ -238,8 +238,8 @@ public class CasePraiseAction extends FileEntityAction<Long, Case4Praise> {
 		Case4Praise e = this.getE();
 		
 		if(e != null && (e.getReceiverId() == null || e.getReceiverId() < 0)){
-			e.setReceiverId(context.getUserHistory().getId());
-			e.setReceiverName(context.getUserHistory().getName());
+			e.setReceiverId(context.getUser().getId());
+			e.setReceiverName(context.getUser().getName());
 		}
 		//设置最后更新人的信息
 		e.setModifier(context.getUserHistory());
@@ -255,7 +255,7 @@ public class CasePraiseAction extends FileEntityAction<Long, Case4Praise> {
 		SystemContext context = this.getSystyemContext();
 		
 		this.getE().setStatus(CaseBase.STATUS_CLOSED);
-		this.getE().setCloserId(context.getUserHistory().getActorId());
+		this.getE().setCloserId(context.getUser().getId());
 		this.getE().setCloseDate(Calendar.getInstance(Locale.CHINA));
 		
 		DateFormat df = new SimpleDateFormat("yyyy-MM-dd");   

@@ -207,8 +207,8 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 		// 初始化信息
 		this.getE().setType  (CaseBase.TYPE_INFRACT_BUSINESS);
 		this.getE().setStatus(CaseBase.STATUS_ACTIVE);
-		this.getE().setReceiverId(context.getUserHistory().getId());
-		this.getE().setReceiverName(context.getUserHistory().getName());
+		this.getE().setReceiverId(context.getUser().getId());
+		this.getE().setReceiverName(context.getUser().getName());
 		this.getE().setCode(this.getIdGeneratorService().next(this.getE().ATTACH_TYPE));
 
 		// 表单可选项的加载
@@ -237,15 +237,15 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 		Case4InfractBusiness e = this.getE();
 		
 		if(e != null && (e.getReceiverId() == null || e.getReceiverId() < 0)){
-			e.setReceiverId(context.getUserHistory().getId());
-			e.setReceiverName(context.getUserHistory().getName());
+			e.setReceiverId(context.getUser().getId());
+			e.setReceiverName(context.getUser().getName());
 		}
 		
 		//设置结案信息
 		if(isClosed.length() > 0 && isClosed.equals("1")){
 			e.setStatus(CaseBase.STATUS_CLOSED);
-			e.setCloserId(context.getUserHistory().getId());
-			e.setCloserName(context.getUserHistory().getName());
+			e.setCloserId(context.getUser().getId());
+			e.setCloserName(context.getUser().getName());
 			e.setCloseDate(Calendar.getInstance(Locale.CHINA));
 		}
 		//设置最后更新人的信息

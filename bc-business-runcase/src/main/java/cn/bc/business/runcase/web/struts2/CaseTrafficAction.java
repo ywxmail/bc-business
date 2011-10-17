@@ -241,8 +241,8 @@ public class CaseTrafficAction extends FileEntityAction<Long, Case4InfractTraffi
 		//设置结案信息
 		if(isClosed.length() > 0 && isClosed.equals("1")){
 			e.setStatus(CaseBase.STATUS_CLOSED);
-			e.setCloserId(context.getUserHistory().getId());
-			e.setCloserName(context.getUserHistory().getName());
+			e.setCloserId(context.getUser().getId());
+			e.setCloserName(context.getUser().getName());
 			e.setCloseDate(Calendar.getInstance(Locale.CHINA));
 		}
 		
