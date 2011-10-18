@@ -62,6 +62,7 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 	public boolean isManager;
 	public Long carId;
 	public String isClosed;
+	public boolean isMoreCar;
 
 	@SuppressWarnings("unused")
 	private CaseAccidentService caseAccidentService;
@@ -264,10 +265,13 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 		String r = super.create();
 		if (carManId != null) {
 			CarMan driver = this.carManService.load(carManId);
-			Car car = this.caseAccidentService.selectAllCarByCarManId(carManId);
-			if (car != null) {
+			List<Car> car = this.carService.selectAllCarByCarManId(carManId);
+			if(car.size()==1){
 				this.getE().setCarPlate(
-						car.getPlateType() + "." + car.getPlateNo());
+						car.get(0).getPlateType()+ "." + car.get(0).getPlateNo());
+			}
+			if(car.size()>1){
+				isMoreCar=true;
 			}
 			this.getE().setDriverId(carManId);
 			this.getE().setDriverName(driver.getName());
@@ -337,13 +341,13 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 		// e.setReceiverName(context.getUserHistory().getName());
 		// }
 
-		// //设置结案信息
-		// if(isClosed.length() > 0 && isClosed.equals("1")){
-		// e.setStatus(CaseBase.STATUS_CLOSED);
-		// e.setCloserId(context.getUserHistory().getId());
-		// e.setCloserName(context.getUserHistory().getName());
-		// e.setCloseDate(Calendar.getInstance(Locale.CHINA));
-		// }
+		 //设置结案信息
+		 if(isClosed.length() > 0 && isClosed.equals("1")){
+		 e.setStatus(CaseBase.STATUS_CLOSED);
+		 e.setCloserId(context.getUser().getId());
+		 e.setCloserName(context.getUser().getName());
+		 e.setCloseDate(Calendar.getInstance(Locale.CHINA));
+		 }
 
 		// 设置最后更新人的信息
 		e.setModifier(context.getUserHistory());
@@ -356,15 +360,21 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 	public Json json;
 
 	public String closefile() {
+		this.setE(this.getCrudService().load(this.getId()));
 		SystemContext context = this.getSystyemContext();
+		Case4Accident e = this.getE();
+//		Case4Accident ca=this.getCrudService().load(this.getE().getId());
+//		this.getE().setAuthor(ca.getAuthor());
+//		this.getE().setFileDate(ca.getFileDate());
+//		this.getE().setModifier(ca.getModifier());
+//		this.getE().setModifiedDate(ca.getModifiedDate());
+		e.setStatus(CaseBase.STATUS_CLOSED);
+		e.setCloserId(context.getUser().getId());
+		e.setCloserName(context.getUser().getName());
+		e.setCloseDate(Calendar.getInstance(Locale.CHINA));
+		this.getCrudService().save(e);
 
-		this.getE().setStatus(CaseBase.STATUS_CLOSED);
-		this.getE().setCloserId(context.getUser().getId());
-		this.getE().setCloserName(context.getUser().getName());
-		this.getE().setCloseDate(Calendar.getInstance(Locale.CHINA));
-		this.getCrudService().save(this.getE());
-
-		return "saveSuccess";
+		return "form";
 		// DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 		// String closeDateStr =
 		// df.format(this.getE().getCloseDate().getTime());

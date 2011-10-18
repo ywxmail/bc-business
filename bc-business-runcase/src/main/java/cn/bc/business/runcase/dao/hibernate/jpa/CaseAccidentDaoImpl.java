@@ -6,7 +6,6 @@ package cn.bc.business.runcase.dao.hibernate.jpa;
 import java.io.Serializable;
 import java.util.List;
 
-import cn.bc.business.car.domain.Car;
 import cn.bc.business.carman.domain.CarByDriver;
 import cn.bc.business.carman.domain.CarMan;
 import cn.bc.business.runcase.dao.CaseAccidentDao;
@@ -51,39 +50,15 @@ public class CaseAccidentDaoImpl extends HibernateCrudJpaDao<Case4Accident>
 		}
 	}
 
-	// 通过carManId查找车辆
-	public Car findAllcarBycarManId(Long carManId) {
-		Car car = null;
-		String hql = "select c.car from CarByDriver c where c.driver.id=? and c.status=?";
-		List list = this.getJpaTemplate().find(
-				hql,
-				new Object[] { carManId,
-						new Integer(CarByDriver.STATUS_ENABLED) });
-		if (list.size() == 1) {
-			car = (Car) list.get(0);
-			return car;
-		} else if (list.size() == 0) {
-			return null;
-		} else {
-			car = (Car) list.get(0);
-
-			if (logger.isDebugEnabled()) {
-				logger.debug("有两个或两个以上状态为启用中车辆信息，显示其中一辆车的信息！");
-
-			}
-			return car;
-		}
-	}
-
 	// 通过carId查找司机
 	public CarMan findcarManBycarcarId(Long carId) {
-		CarMan carman=null;
-		
+		CarMan carman = null;
+
 		String hql = "select c.driver from CarByDriver c where c.car.id=? and c.status=?";
-		List list = this.getJpaTemplate().find(
-				hql,
-				new Object[] { carId,
-						new Integer(CarByDriver.STATUS_ENABLED) });
+		List list = this.getJpaTemplate()
+				.find(hql,
+						new Object[] { carId,
+								new Integer(CarByDriver.STATUS_ENABLED) });
 		if (list.size() == 1) {
 			carman = (CarMan) list.get(0);
 			return carman;

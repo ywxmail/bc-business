@@ -138,7 +138,7 @@ public class CarAction extends FileEntityAction<Long, Car> {
 		columns.add(new TextColumn("['charger']", getText("car.charger"), 120));
 		columns.add(new TextColumn("['motorcade']", getText("car.motorcade"), 80)
 				.setSortable(true));
-		columns.add(new TextColumn("['unit']", getText("car.unit"), 80)
+		columns.add(new TextColumn("['oldUnitName']", getText("car.unit"), 80)
 				.setSortable(true));
 		columns.add(new TextColumn("['registerDate']",getText("car.registerDate"), 100).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
@@ -177,7 +177,7 @@ public class CarAction extends FileEntityAction<Long, Car> {
 	@Override
 	public String create() throws Exception {
 		String r = super.create();
-		this.getE().setUnit(this.getSystyemContext().getUnit());
+		//this.getE().setUnit(this.getSystyemContext().getUnit());
 		this.getE().setUid(
 				this.getIdGeneratorService().next(Car.KEY_UID));
 

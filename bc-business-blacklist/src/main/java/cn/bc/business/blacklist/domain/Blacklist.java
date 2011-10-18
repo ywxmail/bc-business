@@ -44,7 +44,7 @@ public class Blacklist extends FileEntityImpl {
 	private Calendar lockDate;// 锁定时间
 	private Calendar unlockDate;// 解锁时间
 
-	private Actor unit;// 车属单位
+	private String oldUnitName;// 车属单位
 	private Motorcade motorcade;// 车队
 	private Car car;// 车辆
 	private CarMan driver;// 司机
@@ -139,14 +139,13 @@ public class Blacklist extends FileEntityImpl {
 		this.unlockDate = unlockDate;
 	}
 
-	@ManyToOne(fetch = FetchType.EAGER, optional = false)
-	@JoinColumn(name = "UNIT_ID", referencedColumnName = "ID")
-	public Actor getUnit() {
-		return unit;
+	@Column(name = "OLD_UNIT_NAME")
+	public String getOldUnitName() {
+		return oldUnitName;
 	}
 
-	public void setUnit(Actor unit) {
-		this.unit = unit;
+	public void setOldUnitName(String oldUnitName) {
+		this.oldUnitName = oldUnitName;
 	}
 
 	@ManyToOne(fetch = FetchType.EAGER, optional = true)

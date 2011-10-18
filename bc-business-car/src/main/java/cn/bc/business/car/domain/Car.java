@@ -31,12 +31,12 @@ import cn.bc.identity.domain.RichFileEntityImpl;
 @Table(name = "BS_CAR")
 public class Car extends RichFileEntityImpl {
 	private static final long serialVersionUID = 1L;
-	public  static final String KEY_UID = Car.class.getSimpleName();
+	public static final String KEY_UID = Car.class.getSimpleName();
 
 	private Motorcade motorcade;// 所属车队
-	private String driver;		//司机姓名
-	private String charger;		//责任人姓名
-	private Actor unit;// 所属单位
+	private String driver; // 司机姓名
+	private String charger; // 责任人姓名
+	private String oldUnitName;// 所属单位
 	private String businessType;// 营运性质
 
 	private String code;// 自编号
@@ -89,9 +89,9 @@ public class Car extends RichFileEntityImpl {
 	private String desc1;// 备注1
 	private String desc2;// 备注2
 	private String desc3;// 备注3
-	
-	private Set<Cert> certs;//拥有的证件
-	private Set<Contract> contracts;//合同
+
+	private Set<Cert> certs;// 拥有的证件
+	private Set<Contract> contracts;// 合同
 
 	@ManyToOne(fetch = FetchType.EAGER, optional = false)
 	@JoinColumn(name = "MOTORCADE_ID", referencedColumnName = "ID")
@@ -102,7 +102,7 @@ public class Car extends RichFileEntityImpl {
 	public void setMotorcade(Motorcade motorcade) {
 		this.motorcade = motorcade;
 	}
-	
+
 	@Column(name = "DRIVER")
 	public String getDriver() {
 		return driver;
@@ -111,7 +111,7 @@ public class Car extends RichFileEntityImpl {
 	public void setDriver(String driver) {
 		this.driver = driver;
 	}
-	
+
 	@Column(name = "CHARGER")
 	public String getCharger() {
 		return charger;
@@ -121,14 +121,9 @@ public class Car extends RichFileEntityImpl {
 		this.charger = charger;
 	}
 
-	@OneToMany(fetch=FetchType.LAZY)
-    @JoinTable(name="BS_CAR_CERT",
-        joinColumns=
-            @JoinColumn(name="CAR_ID", referencedColumnName="ID"),
-        inverseJoinColumns=
-            @JoinColumn(name="CERT_ID", referencedColumnName="ID")
-        )
-    @OrderBy("certCode asc")
+	@OneToMany(fetch = FetchType.LAZY)
+	@JoinTable(name = "BS_CAR_CERT", joinColumns = @JoinColumn(name = "CAR_ID", referencedColumnName = "ID"), inverseJoinColumns = @JoinColumn(name = "CERT_ID", referencedColumnName = "ID"))
+	@OrderBy("certCode asc")
 	public Set<Cert> getCerts() {
 		return certs;
 	}
@@ -137,14 +132,9 @@ public class Car extends RichFileEntityImpl {
 		this.certs = certs;
 	}
 
-	@OneToMany(fetch=FetchType.LAZY)
-    @JoinTable(name="BS_CAR_CONTRACT",
-        joinColumns=
-            @JoinColumn(name="CAR_ID", referencedColumnName="ID"),
-        inverseJoinColumns=
-            @JoinColumn(name="CONTRACT_ID", referencedColumnName="ID")
-        )
-    @OrderBy("fileDate desc")
+	@OneToMany(fetch = FetchType.LAZY)
+	@JoinTable(name = "BS_CAR_CONTRACT", joinColumns = @JoinColumn(name = "CAR_ID", referencedColumnName = "ID"), inverseJoinColumns = @JoinColumn(name = "CONTRACT_ID", referencedColumnName = "ID"))
+	@OrderBy("fileDate desc")
 	public Set<Contract> getContracts() {
 		return contracts;
 	}
@@ -153,14 +143,13 @@ public class Car extends RichFileEntityImpl {
 		this.contracts = contracts;
 	}
 
-	@ManyToOne(fetch = FetchType.EAGER, optional = false)
-	@JoinColumn(name = "UNIT_ID", referencedColumnName = "ID")
-	public Actor getUnit() {
-		return unit;
+	@Column(name = "OLD_UNIT_NAME")
+	public String getOldUnitName() {
+		return oldUnitName;
 	}
 
-	public void setUnit(Actor belongUnit) {
-		this.unit = belongUnit;
+	public void setOldUnitName(String oldUnitName) {
+		this.oldUnitName = oldUnitName;
 	}
 
 	@Column(name = "BS_TYPE")

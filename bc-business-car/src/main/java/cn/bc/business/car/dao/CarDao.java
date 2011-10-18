@@ -11,27 +11,30 @@ import cn.bc.core.Page;
 import cn.bc.core.dao.CrudDao;
 import cn.bc.core.query.condition.Condition;
 
-
 /**
  * 车辆Dao
  * 
  * @author dragon
  */
 public interface CarDao extends CrudDao<Car> {
-	
+
 	/**
 	 * 查找汽车列表
-	 * @parma condition 
+	 * 
+	 * @parma condition
 	 * @return
 	 */
 	List<Map<String, Object>> list(Condition condition);
-	
+
 	/**
 	 * 查找汽车分页
-	 * @parma condition 
-	 * @parma Page 
+	 * 
+	 * @parma condition
+	 * @parma Page
 	 * @return
 	 */
 	Page<Map<String, Object>> page(Condition condition, int pageNo, int pageSize);
-	
+
+	/** 通过carManId找车辆 */
+	List<Car> findAllcarBycarManId(Long id);
 }

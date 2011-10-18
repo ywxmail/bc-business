@@ -36,4 +36,6 @@ public interface CarService extends CrudService<Car> {
 	 */
 	Page<? extends Object> page(Condition condition,int pageNo, int pageSize);
 
+	/** 根据司机ID查找返回状态为启用中相关辆信息 */
+	List<Car> selectAllCarByCarManId(Long id);
 }
