@@ -29,11 +29,11 @@ import cn.bc.identity.domain.RichFileEntityImpl;
 public class CarMan extends RichFileEntityImpl {
 	private static final long serialVersionUID = 1L;
 	public static final String KEY_UID = CarMan.class.getSimpleName();
-	/**类别：司机*/
+	/** 类别：司机 */
 	public static final int TYPE_DRIVER = 0;
-	/**类别：责任人*/
+	/** 类别：责任人 */
 	public static final int TYPE_CHARGER = 1;
-	/**类别：司机和责任人*/
+	/** 类别：司机和责任人 */
 	public static final int TYPE_DRIVER_AND_CHARGER = 2;
 
 	private int type;// 类别
@@ -43,7 +43,7 @@ public class CarMan extends RichFileEntityImpl {
 	private String origin;// 籍贯
 	private int region;// 区域
 	private String houseType;// 户口性质
-	
+
 	private Calendar birthdate;// 出生日期
 	private Calendar workDate;// 入职日期
 	private String formerUnit;// 入职原单位
@@ -52,9 +52,9 @@ public class CarMan extends RichFileEntityImpl {
 	private String phone;// 电话1
 	private String phone1;// 电话2
 	private String description;// 备注
-	private String level;//等级
-	
-	//历史遗留
+	private String level;// 等级
+
+	// 历史遗留
 	private String model;// 准驾车型
 	private String cert4Indentity;// 身份证号
 	private String cert4Driving;// 驾驶证号
@@ -65,13 +65,13 @@ public class CarMan extends RichFileEntityImpl {
 	private String cert4FWZG;// 服务资格证号
 	private String cert4CYZG;// 从业资格证号
 	private int drivingStatus;// 驾驶状态
-	private String extFZJG;// 分支机构：用于历史数据的保存
+	private String oldNnitName;// 分支机构：用于历史数据的保存
 	private String extZRR;// 责任人：用于历史数据的保存
-	private boolean  gz;// 驾驶证是否广州:0-否,1-是
+	private boolean gz;// 驾驶证是否广州:0-否,1-是
 	private String accessCerts;// 已考取证件：历史数据保存
-	
-	private Set<Cert> certs;//拥有的证件
-	private Set<Contract> contracts;//合同
+
+	private Set<Cert> certs;// 拥有的证件
+	private Set<Contract> contracts;// 合同
 
 	@Column(name = "DESC_")
 	public String getDescription() {
@@ -82,14 +82,9 @@ public class CarMan extends RichFileEntityImpl {
 		this.description = description;
 	}
 
-	@OneToMany(fetch=FetchType.LAZY)
-    @JoinTable(name="BS_CARMAN_CERT",
-        joinColumns=
-            @JoinColumn(name="MAN_ID", referencedColumnName="ID"),
-        inverseJoinColumns=
-            @JoinColumn(name="CERT_ID", referencedColumnName="ID")
-        )
-    @OrderBy("certCode asc")
+	@OneToMany(fetch = FetchType.LAZY)
+	@JoinTable(name = "BS_CARMAN_CERT", joinColumns = @JoinColumn(name = "MAN_ID", referencedColumnName = "ID"), inverseJoinColumns = @JoinColumn(name = "CERT_ID", referencedColumnName = "ID"))
+	@OrderBy("certCode asc")
 	public Set<Cert> getCerts() {
 		return certs;
 	}
@@ -98,14 +93,9 @@ public class CarMan extends RichFileEntityImpl {
 		this.certs = certs;
 	}
 
-	@OneToMany(fetch=FetchType.LAZY)
-    @JoinTable(name="BS_CARMAN_CONTRACT",
-        joinColumns=
-            @JoinColumn(name="MAN_ID", referencedColumnName="ID"),
-        inverseJoinColumns=
-            @JoinColumn(name="CONTRACT_ID", referencedColumnName="ID")
-        )
-    @OrderBy("fileDate desc")
+	@OneToMany(fetch = FetchType.LAZY)
+	@JoinTable(name = "BS_CARMAN_CONTRACT", joinColumns = @JoinColumn(name = "MAN_ID", referencedColumnName = "ID"), inverseJoinColumns = @JoinColumn(name = "CONTRACT_ID", referencedColumnName = "ID"))
+	@OrderBy("fileDate desc")
 	public Set<Contract> getContracts() {
 		return contracts;
 	}
@@ -322,13 +312,13 @@ public class CarMan extends RichFileEntityImpl {
 		this.drivingStatus = drivingStatus;
 	}
 
-	@Column(name = "EXT_FZJG")
-	public String getExtFZJG() {
-		return extFZJG;
+	public String getOldNnitName() {
+		return oldNnitName;
 	}
 
-	public void setExtFZJG(String extFZJG) {
-		this.extFZJG = extFZJG;
+	@Column(name = "OLD_UNIT_NAME")
+	public void setOldNnitName(String oldNnitName) {
+		this.oldNnitName = oldNnitName;
 	}
 
 	@Column(name = "EXT_ZRR")
@@ -365,5 +355,5 @@ public class CarMan extends RichFileEntityImpl {
 	public void setLevel(String level) {
 		this.level = level;
 	}
-	
+
 }

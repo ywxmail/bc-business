@@ -91,7 +91,7 @@ public class BlacklistAction extends FileEntityAction<Long, Blacklist> {
 			CarMan driver = this.carManService.load(carManId);
 			this.getE().setCar(car);
 			this.getE().setDriver(driver);
-			this.getE().setUnit(car.getUnit());
+			this.getE().setOldNnitName(car.getOldNnitName());
 			this.getE().setMotorcade(car.getMotorcade());
 
 		}
@@ -264,15 +264,13 @@ public class BlacklistAction extends FileEntityAction<Long, Blacklist> {
 				.selectCarByCarManId(new Long(carManId));
 		if (car != null) {
 			carId = car.getId();
-			unitId = car.getUnit().getId();
 			motorcadeId = car.getMotorcade().getId();
 			carPlate = car.getPlateType() + car.getPlateNo();
-			unitName = car.getUnit().getName();
+			unitName = car.getOldNnitName();
 			motorcadeName = car.getMotorcade().getName();
 		}
 		json = new Json();
 		json.put("carId", carId);
-		json.put("unitId", unitId);
 		json.put("carPlate", carPlate);
 		json.put("motorcadeId", motorcadeId);
 		json.put("unitName", unitName);
