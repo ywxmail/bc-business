@@ -61,7 +61,6 @@ public class BlacklistAction extends FileEntityAction<Long, Blacklist> {
 	public Long carId;
 	public Long unitId;
 	public Long motorcadeId;
-
 	@Autowired
 	public void setCarManService(CarManService carManService) {
 		this.carManService = carManService;
@@ -113,7 +112,6 @@ public class BlacklistAction extends FileEntityAction<Long, Blacklist> {
 				.findOptionItemByGroupKey(optionConstants.BLACKLIST_TYPE);
 		blackLevelList = this.optionService
 				.findOptionItemByGroupKey(optionConstants.CARMAN_LEVEL);
-
 		return result;
 	}
 
@@ -133,7 +131,7 @@ public class BlacklistAction extends FileEntityAction<Long, Blacklist> {
 
 	@Override
 	protected OrderCondition getDefaultOrderCondition() {
-		return null;// new OrderCondition("fileDate", Direction.Desc);
+		return new OrderCondition("fileDate", Direction.Desc);
 	}
 
 	@Override

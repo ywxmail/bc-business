@@ -6,7 +6,6 @@ package cn.bc.business.runcase.dao.hibernate.jpa;
 import java.io.Serializable;
 import java.util.List;
 
-import cn.bc.business.car.domain.Car;
 import cn.bc.business.carman.domain.CarByDriver;
 import cn.bc.business.carman.domain.CarMan;
 import cn.bc.business.runcase.dao.CaseAccidentDao;
