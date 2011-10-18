@@ -36,7 +36,7 @@ public class Car extends RichFileEntityImpl {
 	private Motorcade motorcade;// 所属车队
 	private String driver; // 司机姓名
 	private String charger; // 责任人姓名
-	private String oldNnitName;// 所属单位
+	private String oldUnitName;// 所属单位
 	private String businessType;// 营运性质
 
 	private String code;// 自编号
@@ -143,13 +143,13 @@ public class Car extends RichFileEntityImpl {
 		this.contracts = contracts;
 	}
 
-	public String getOldNnitName() {
-		return oldNnitName;
+	@Column(name = "OLD_UNIT_NAME")
+	public String getOldUnitName() {
+		return oldUnitName;
 	}
 
-	@Column(name = "OLD_UNIT_NAME")
-	public void setOldNnitName(String oldNnitName) {
-		this.oldNnitName = oldNnitName;
+	public void setOldUnitName(String oldUnitName) {
+		this.oldUnitName = oldUnitName;
 	}
 
 	@Column(name = "BS_TYPE")
