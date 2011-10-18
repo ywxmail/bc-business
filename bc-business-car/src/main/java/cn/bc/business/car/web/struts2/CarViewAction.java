@@ -8,30 +8,27 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
-import org.springframework.orm.jpa.JpaTemplate;
 import org.springframework.stereotype.Controller;
 
-import cn.bc.business.BSConstants;
-import cn.bc.core.RichEntity;
-import cn.bc.core.query.Query;
+import cn.bc.business.web.struts2.ViewAction;
+import cn.bc.core.Entity;
 import cn.bc.core.query.condition.Condition;
+import cn.bc.core.query.condition.Direction;
 import cn.bc.core.query.condition.impl.EqualsCondition;
 import cn.bc.core.query.condition.impl.InCondition;
+import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.core.util.StringUtils;
-import cn.bc.orm.hibernate.jpa.HibernateJpaNativeQuery;
-import cn.bc.orm.hibernate.jpa.RowMapper;
+import cn.bc.db.jdbc.RowMapper;
+import cn.bc.db.jdbc.SqlObject;
 import cn.bc.web.formater.AbstractFormater;
 import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.formater.EntityStatusFormater;
-import cn.bc.web.struts2.AbstractGridPageAction;
 import cn.bc.web.ui.html.grid.Column;
 import cn.bc.web.ui.html.grid.IdColumn;
 import cn.bc.web.ui.html.grid.TextColumn4MapKey;
 import cn.bc.web.ui.html.page.PageOption;
-import cn.bc.web.ui.html.toolbar.Toolbar;
 import cn.bc.web.ui.json.Json;
 
 /**
@@ -42,32 +39,35 @@ import cn.bc.web.ui.json.Json;
  */
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 @Controller
-public class CarViewAction extends AbstractGridPageAction<Map<String, Object>> {
+public class CarViewAction extends ViewAction<Map<String, Object>> {
 	private static final long serialVersionUID = 1L;
-	public String status; // 车辆的状态，多个用逗号连接
-	private JpaTemplate jpaTemplate;
+	public String status = String.valueOf(Entity.STATUS_ENABLED); // 车辆的状态，多个用逗号连接
 
-	@Autowired
-	public void setJpaTemplate(JpaTemplate jpaTemplate) {
-		this.jpaTemplate = jpaTemplate;
+	@Override
+	protected OrderCondition getGridDefaultOrderCondition() {
+		// 默认排序方向：状态|登记日期|车队
+		return new OrderCondition("c.status_", Direction.Asc).add(
+				"c.register_date", Direction.Desc).add("m.name", Direction.Asc);
 	}
 
 	@Override
-	protected Query<Map<String, Object>> getQuery() {
-		HibernateJpaNativeQuery<Map<String, Object>> query = new HibernateJpaNativeQuery<Map<String, Object>>(
-				jpaTemplate);
+	protected SqlObject<Map<String, Object>> getSqlObject() {
+		SqlObject<Map<String, Object>> sqlObject = new SqlObject<Map<String, Object>>();
 
-		// 构建查询语句
+		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer sql = new StringBuffer();
-		sql.append("select c.id,c.status_,c.plate_type,c.plate_no,c.driver,c.charger,c.factory_type,c.factory_model,c.cert_no2");
-		sql.append(",c.register_date,c.bs_type,c.code,c.origin_no,c.vin,m.id,m.name");
+		sql.append("select c.id,c.status_,c.plate_type,c.plate_no,c.driver,c.charger,c.factory_type,c.factory_model");
+		sql.append(",c.cert_no2,c.register_date,c.bs_type,c.code,c.origin_no,c.vin");
+		sql.append(",c.motorcade_id,m.name");
 		sql.append(" from bs_car c");
 		sql.append(" inner join bs_motorcade m on m.id=c.motorcade_id");
-		sql.append("");
-		query.setSql(sql.toString());
+		sqlObject.setSql(sql.toString());
+		
+		// 注入参数
+		sqlObject.setArgs(null);
 
 		// 数据映射器
-		query.setRowMapper(new RowMapper<Map<String, Object>>() {
+		sqlObject.setRowMapper(new RowMapper<Map<String, Object>>() {
 			public Map<String, Object> mapRow(Object[] rs, int rowNum) {
 				Map<String, Object> map = new HashMap<String, Object>();
 				int i = 0;
@@ -90,58 +90,53 @@ public class CarViewAction extends AbstractGridPageAction<Map<String, Object>> {
 				return map;
 			}
 		});
-		return query;
-	}
-
-	@Override
-	protected String getHtmlPageNamespace() {
-		return this.getContextPath() + BSConstants.NAMESPACE;
-	}
-
-	@Override
-	protected String getFormActionName() {
-		return "car";
+		return sqlObject;
 	}
 
 	@Override
 	protected List<Column> getGridColumns() {
 		List<Column> columns = new ArrayList<Column>();
 		columns.add(new IdColumn(true, "['plate_type']+'.'+['plate_no']")
-				.setId("id").setValueExpression("['id']"));
-		// columns.add(new TextColumn("['id']", "ID", 40));
-		columns.add(new TextColumn4MapKey("status_", getText("car.status"), 50)
-				.setSortable(true).setValueFormater(
-						new EntityStatusFormater(getEntityStatuses())));
-		columns.add(new TextColumn4MapKey("plate_no", getText("car.plate"), 80)
-				.setUseTitleFromLabel(true).setValueFormater(
-						new AbstractFormater<String>() {
-							@SuppressWarnings("unchecked")
-							@Override
-							public String format(Object context, Object value) {
-								Map<String, Object> car = (Map<String, Object>) context;
-								return car.get("plate_type") + "."
-										+ car.get("plate_no");
-							}
-						}));
-		columns.add(new TextColumn4MapKey("driver", getText("car.carMan"), 150));
-		columns.add(new TextColumn4MapKey("charger", getText("car.charger")));
-		columns.add(new TextColumn4MapKey("motorcade_name",
-				getText("car.motorcade"), 80).setSortable(true));
-		columns.add(new TextColumn4MapKey("register_date",
+				.setId("c.id").setValueExpression("['id']"));
+		columns.add(new TextColumn4MapKey("c.status_", "status_",
+				getText("car.status"), 60).setSortable(true).setValueFormater(
+				new EntityStatusFormater(getEntityStatuses())));
+		columns.add(new TextColumn4MapKey("c.register_date", "register_date",
 				getText("car.registerDate"), 100).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
-
-		columns.add(new TextColumn4MapKey("cert_no2", getText("car.certNo2"),
-				100));
-		columns.add(new TextColumn4MapKey("bs_type",
-				getText("car.businessType"), 100));
-		columns.add(new TextColumn4MapKey("factory_type",
-				getText("car.factory"), 120)
+		columns.add(new TextColumn4MapKey("m.name", "motorcade_name",
+				getText("car.motorcade"), 80).setSortable(true)
+				.setUseTitleFromLabel(true));
+		columns.add(new TextColumn4MapKey("c.plate_no", "plate_no",
+				getText("car.plate"), 80).setUseTitleFromLabel(true)
 				.setValueFormater(new AbstractFormater<String>() {
 					@SuppressWarnings("unchecked")
 					@Override
 					public String format(Object context, Object value) {
+						Map<String, Object> car = (Map<String, Object>) context;
+						return car.get("plate_type") + "."
+								+ car.get("plate_no");
+					}
+				}));
+		columns.add(new TextColumn4MapKey("c.bs_type", "bs_type",
+				getText("car.businessType"), 100));
+		columns.add(new TextColumn4MapKey("c.origin_no", "origin_no",
+				getText("car.originNo"), 80).setSortable(true)
+				.setUseTitleFromLabel(true));
+		columns.add(new TextColumn4MapKey("c.cert_no2", "cert_no2",
+				getText("car.certNo2"), 100));
+		columns.add(new TextColumn4MapKey("c.driver", "driver",
+				getText("car.carMan")).setUseTitleFromLabel(true));
+		columns.add(new TextColumn4MapKey("c.charger", "charger",
+				getText("car.charger"), 100).setUseTitleFromLabel(true));
+
+		columns.add(new TextColumn4MapKey("c.factory_type", "factory_type",
+				getText("car.factory"), 120).setUseTitleFromLabel(true)
+				.setValueFormater(new AbstractFormater<String>() {
+					@Override
+					public String format(Object context, Object value) {
 						// 从上下文取出元素Map
+						@SuppressWarnings("unchecked")
 						Map<String, Object> car = (Map<String, Object>) context;
 						if (car.get("factory_type") != null
 								&& car.get("factory_model") != null) {
@@ -156,12 +151,23 @@ public class CarViewAction extends AbstractGridPageAction<Map<String, Object>> {
 						}
 					}
 				}));
-		columns.add(new TextColumn4MapKey("code", getText("car.code"), 60)
-				.setSortable(true));
-		columns.add(new TextColumn4MapKey("origin_no", getText("car.originNo"),
-				100).setSortable(true));
-		columns.add(new TextColumn4MapKey("vin", getText("car.vin"), 120));
+		columns.add(new TextColumn4MapKey("c.vin", "vin", getText("car.vin"),
+				120).setUseTitleFromLabel(true));
+		columns.add(new TextColumn4MapKey("c.code", "code",
+				getText("car.code"), 60).setSortable(true)
+				.setUseTitleFromLabel(true));
 		return columns;
+	}
+
+	@Override
+	protected String[] getGridSearchFields() {
+		return new String[] { "c.plate_no", "c.driver", "c.charger",
+				"c.cert_no2", "c.factory_type", "m.name" };
+	}
+
+	@Override
+	protected String getFormActionName() {
+		return "car";
 	}
 
 	@Override
@@ -171,19 +177,8 @@ public class CarViewAction extends AbstractGridPageAction<Map<String, Object>> {
 	}
 
 	@Override
-	protected String[] getGridSearchFields() {
-		return new String[] { "c.plate_type", "c.plate_no", "c.factory_type",
-				"c.driver", "c.cert_no2", "c.charger" };
-	}
-
-	@Override
 	protected String getGridRowLabelExpression() {
 		return "['plate_type'] + '.' + ['plate_no']";
-	}
-
-	@Override
-	protected String getHtmlPageTitle() {
-		return this.getText("car.title");
 	}
 
 	@Override
@@ -210,50 +205,5 @@ public class CarViewAction extends AbstractGridPageAction<Map<String, Object>> {
 			json.put("status", status);
 			return json;
 		}
-	}
-
-	@Override
-	protected Toolbar getHtmlPageToolbar() {
-		Toolbar tb = new Toolbar();
-
-		if (this.isReadonly()) {
-			// 查看按钮
-			tb.addButton(Toolbar
-					.getDefaultEditToolbarButton(getText("label.read")));
-		} else {
-			// 新建按钮
-			tb.addButton(Toolbar
-					.getDefaultCreateToolbarButton(getText("label.create")));
-
-			// 编辑按钮
-			tb.addButton(Toolbar
-					.getDefaultEditToolbarButton(getText("label.edit")));
-
-			// 删除按钮
-			tb.addButton(Toolbar
-					.getDefaultDeleteToolbarButton(getText("label.delete")));
-		}
-
-		// 搜索按钮
-		tb.addButton(Toolbar
-				.getDefaultSearchToolbarButton(getText("title.click2search")));
-
-		return tb;
-	}
-
-	/**
-	 * 获取Entity的状态值转换列表
-	 * 
-	 * @return
-	 */
-	protected Map<String, String> getEntityStatuses() {
-		Map<String, String> statuses = new HashMap<String, String>();
-		statuses.put(String.valueOf(RichEntity.STATUS_DISABLED),
-				getText("entity.status.disabled"));
-		statuses.put(String.valueOf(RichEntity.STATUS_ENABLED),
-				getText("entity.status.enabled"));
-		statuses.put(String.valueOf(RichEntity.STATUS_DELETED),
-				getText("entity.status.deleted"));
-		return statuses;
 	}
 }
