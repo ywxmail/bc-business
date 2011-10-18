@@ -16,4 +16,9 @@
 		<!-- 非分页视图 -->
 		<action name="list" class="car4CertAction" method="list" />
 	</package>
+	<package name="selectMoreCarWithCarMan" extends="bc-default" namespace="/bc-business/selectMoreCarWithCarMan">
+		<action name="selectCars" class="selectMoreCarWithCarManAction" method="selectCars">
+			<result>/bc-business/car/selectMoreCar/select.jsp</result>
+		</action>
+	</package>
 </struts>

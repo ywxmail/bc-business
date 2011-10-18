@@ -16,8 +16,8 @@ import cn.bc.core.service.DefaultCrudService;
  * 
  * @author dragon
  */
-public class CaseAccidentServiceImpl extends DefaultCrudService<Case4Accident> implements
-		CaseAccidentService {
+public class CaseAccidentServiceImpl extends DefaultCrudService<Case4Accident>
+		implements CaseAccidentService {
 	private CaseAccidentDao caseAccidentDao;
 
 	public CaseAccidentDao getCaseAccidentDao() {
@@ -27,11 +27,6 @@ public class CaseAccidentServiceImpl extends DefaultCrudService<Case4Accident> i
 	public void setCaseAccidentDao(CaseAccidentDao caseAccidentDao) {
 		this.caseAccidentDao = caseAccidentDao;
 		this.setCrudDao(caseAccidentDao);
-	}
-
-	public Car selectAllCarByCarManId(Long id) {
-		// TODO Auto-generated method stub
-		return  (this.caseAccidentDao.findAllcarBycarManId(id));
 	}
 
 	public CarMan selectCarManByCarId(Long id) {

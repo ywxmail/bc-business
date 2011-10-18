@@ -3,6 +3,8 @@
  */
 package cn.bc.business.runcase.dao;
 
+import java.util.List;
+
 import cn.bc.business.car.domain.Car;
 import cn.bc.business.carman.domain.CarMan;
 import cn.bc.business.runcase.domain.Case4Accident;
@@ -14,8 +16,6 @@ import cn.bc.core.dao.CrudDao;
  * @author dragon
  */
 public interface CaseAccidentDao extends CrudDao<Case4Accident> {
-	/** 理赔模块里通过carManId找车辆 */
-	Car findAllcarBycarManId(Long id);
 
 	/** 理赔模块里通过carId找司机 */
 	CarMan findcarManBycarcarId(Long id);
