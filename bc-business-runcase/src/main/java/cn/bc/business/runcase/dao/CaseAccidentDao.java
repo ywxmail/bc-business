@@ -3,9 +3,6 @@
  */
 package cn.bc.business.runcase.dao;
 
-import java.util.List;
-
-import cn.bc.business.car.domain.Car;
 import cn.bc.business.carman.domain.CarMan;
 import cn.bc.business.runcase.domain.Case4Accident;
 import cn.bc.core.dao.CrudDao;
