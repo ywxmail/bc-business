@@ -55,7 +55,7 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 	public 	boolean 				isManager;
 	public  Long					carId;
 	public  Long					carManId;
-	public  String					isClosed;	
+	//public  String					isClosed;	
 	
 	@SuppressWarnings("unused")
 	private CaseBusinessService		caseBusinessService;
@@ -242,8 +242,7 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 		}
 		
 		//设置结案信息
-		if(isClosed.length() > 0 && isClosed.equals("1")){
-			e.setStatus(CaseBase.STATUS_CLOSED);
+		if(e.getStatus() == 1){
 			e.setCloserId(context.getUser().getId());
 			e.setCloserName(context.getUser().getName());
 			e.setCloseDate(Calendar.getInstance(Locale.CHINA));

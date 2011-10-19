@@ -121,5 +121,8 @@ public interface CertDao extends CrudDao<Cert> {
 	 * @return
 	 */
 	Map<String, Object> findCarByCarId(Long carId);
+
+	
+	Map<String, Object> findCarManByCarManId(Long carManId);
 	
 }

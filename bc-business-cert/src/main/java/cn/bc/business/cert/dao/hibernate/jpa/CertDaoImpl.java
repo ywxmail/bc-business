@@ -16,6 +16,7 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.orm.jpa.JpaCallback;
 import org.springframework.util.StringUtils;
@@ -359,7 +360,12 @@ public class CertDaoImpl extends HibernateCrudJpaDao<Cert> implements CertDao{
 				" where mc.cert_id ="+certId;
 		
 		//jdbc查询BS_CARMAN记录
-		queryMap = this.jdbcTemplate.queryForMap(sql);
+		try {
+			queryMap = this.jdbcTemplate.queryForMap(sql);
+		} catch (EmptyResultDataAccessException e) {
+			e.getStackTrace();
+			//logger.error(e.getMessage(), e);
+		}
 		
 		return queryMap;
 	}
@@ -595,7 +601,34 @@ public class CertDaoImpl extends HibernateCrudJpaDao<Cert> implements CertDao{
 				" WHERE cc.cert_id ="+certId;
 		
 		//jdbc查询BS_CAR记录
-		queryMap = this.jdbcTemplate.queryForMap(sql);
+		try {
+			queryMap = this.jdbcTemplate.queryForMap(sql);
+		} catch (EmptyResultDataAccessException e) {
+			e.getStackTrace();
+			//logger.error(e.getMessage(), e);
+		}
+		
+		return queryMap;
+	}
+	
+	/**
+	 * 根据carId查找car详细信息
+	 * @parma certId 
+	 * @return
+	 */
+	public Map<String, Object> findCarByCarId(Long carId) {
+		Map<String,Object> queryMap = null;
+		String sql = "SELECT car.id,car.plate_type,car.plate_no,car.factory_type,car.factory_model,car.register_date,car.scrap_date,car.level_,car.vin,car.engine_no" +
+				",car.total_weight,car.dim_len,car.dim_width,car.dim_height,car.access_weight,car.access_count FROM BS_CAR car " +
+				" WHERE car.id ="+carId;
+		
+		//jdbc查询BS_CAR记录
+		try {
+			queryMap = this.jdbcTemplate.queryForMap(sql);
+		} catch (EmptyResultDataAccessException e) {
+			e.getStackTrace();
+			//logger.error(e.getMessage(), e);
+		}
 		
 		return queryMap;
 	}
@@ -605,14 +638,17 @@ public class CertDaoImpl extends HibernateCrudJpaDao<Cert> implements CertDao{
 	 * @parma certId 
 	 * @return
 	 */
-	public Map<String, Object> findCarByCarId(Long carId) {
+	public Map<String, Object> findCarManByCarManId(Long carManId) {
 		Map<String,Object> queryMap = null;
-		String sql = "SELECT car.id,car.factory_type,car.factory_model,car.register_date,car.scrap_date,car.level_,car.vin,car.engine_no" +
-				",car.total_weight,car.dim_len,car.dim_width,car.dim_height,car.access_weight,car.access_count FROM BS_CAR car " +
-				" WHERE car.id ="+carId;
+		String sql = "select man.id,man.name,man.cert_fwzg from BS_CARMAN man where man.id="+carManId;
 		
-		//jdbc查询BS_CAR记录
-		queryMap = this.jdbcTemplate.queryForMap(sql);
+		//jdbc查询BS_CARMAN记录
+		try {
+			queryMap = this.jdbcTemplate.queryForMap(sql);
+		} catch (EmptyResultDataAccessException e) {
+			e.getStackTrace();
+			//logger.error(e.getMessage(), e);
+		}
 		
 		return queryMap;
 	}

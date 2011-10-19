@@ -72,5 +72,16 @@ public interface ContractLabourService extends CrudService<Contract4Labour> {
 	
 	public Long findCarManIdByContractId(Long contractId);
 
+	Map<String, Object> findCarManByCarId(Long carId);
+
+	List<Map<String, Object>> selectRelateCarByCarManId(Long carManId);
+
+	Map<String, Object> findCarManByCarManId(Long carManId);
+
+	Map<String, Object> findCarByCarId(Long carId);
+
+	List<Map<String, Object>> selectRelateCarManByCarId(Long carId);
+
+
 
 }

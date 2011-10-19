@@ -61,6 +61,15 @@ public class CertRoadtransportAction extends FileEntityAction<Long, Cert4RoadTra
 	public void setCertService(CertService certService) {
 		this.certService = certService;
 	}
+	
+	
+	public Long getCarId() {
+		return carId;
+	}
+
+	public void setCarId(Long carId) {
+		this.carId = carId;
+	}
 
 
 	@Autowired
@@ -78,6 +87,22 @@ public class CertRoadtransportAction extends FileEntityAction<Long, Cert4RoadTra
 	public String create() throws Exception {
 		String r = super.create();
 		isManager = isReadonly();
+		Cert4RoadTransport e = this.getE();
+		//根据carId查找car信息
+		if(carId != null){
+			carMessMap = this.certService.findCarByCarId(carId);
+				
+			String factory = "";
+			if(carMessMap.get("factory_type") != null && carMessMap.get("factory_type").toString().length() > 0){
+				factory = carMessMap.get("factory_type")+"."+carMessMap.get("factory_model");
+			}
+			e.setPlate(isNullObject(carMessMap.get("plate_type")+""+carMessMap.get("plate_no")));
+			e.setFactory(factory);
+			e.setLevel(isNullObject(carMessMap.get("level_")));
+			e.setDimLen(Integer.valueOf(isNullObject(carMessMap.get("dim_len"))));
+			e.setDimWidth(Integer.valueOf(isNullObject(carMessMap.get("dim_width"))));
+			e.setDimHeight(Integer.valueOf(isNullObject(carMessMap.get("dim_height"))));
+		}
 
 		this.getE().setUid(this.getIdGeneratorService().next(this.getE().ATTACH_TYPE));
 		this.getE().setType(Cert.TYPE_ROADTRANSPORT);
@@ -98,7 +123,7 @@ public class CertRoadtransportAction extends FileEntityAction<Long, Cert4RoadTra
 		//根据certId查找car信息
 		carMessMap = this.certService.findCarMessByCertId(this.getId());
 		carId = Long.valueOf(carMessMap.get("id")+"");
-		this.getE().setPlate(carMessMap.get("plate_type")+" "+carMessMap.get("plate_no"));
+		this.getE().setPlate(carMessMap.get("plate_type")+"."+carMessMap.get("plate_no"));
 		
 		// 构建附件控件
 		attachsUI = buildAttachsUI(false);

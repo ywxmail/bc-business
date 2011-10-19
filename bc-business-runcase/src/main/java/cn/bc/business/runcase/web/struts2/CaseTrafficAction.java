@@ -54,7 +54,6 @@ public class CaseTrafficAction extends FileEntityAction<Long, Case4InfractTraffi
 	public 	boolean 				isManager;
 	public  Long 					carId;
 	public  Long 					carManId;
-	public  String					isClosed;			
 	
 	@SuppressWarnings("unused")
 	private CaseTrafficService		caseTrafficService;
@@ -239,7 +238,7 @@ public class CaseTrafficAction extends FileEntityAction<Long, Case4InfractTraffi
 		e.setModifiedDate(Calendar.getInstance());
 		
 		//设置结案信息
-		if(isClosed.length() > 0 && isClosed.equals("1")){
+		if(e.getStatus() == 1){
 			e.setStatus(CaseBase.STATUS_CLOSED);
 			e.setCloserId(context.getUser().getId());
 			e.setCloserName(context.getUser().getName());

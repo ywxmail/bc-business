@@ -40,8 +40,8 @@ public class Contract extends RichFileEntityImpl {
 	private Calendar endDate;// 到期日期
 	private String content;// 内容
 
-	private String ext_str1;// 扩展域
-	private String ext_str2;// 扩展域
+	private String ext_str1;// 扩展域(车牌)	
+	private String ext_str2;// 扩展域(司机)
 	private String ext_str3;// 扩展域
 	private Integer ext_num1;// 扩展域
 	private Integer ext_num2;// 扩展域

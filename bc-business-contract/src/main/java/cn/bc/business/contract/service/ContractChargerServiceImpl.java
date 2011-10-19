@@ -133,5 +133,17 @@ public class ContractChargerServiceImpl extends DefaultCrudService<Contract4Char
 	public void updateCarMan4dirverName(String assignChargerNames, Long carId) {
 		this.contractChargerDao.updateCarMan4dirverName(assignChargerNames,carId);
 	}
+
+	public Map<String, Object> findCarByCarId(Long carId) {
+		Map<String, Object> queryMap = null;
+		queryMap = this.contractChargerDao.findCarByCarId(carId);
+		return queryMap;
+	}
+
+	public Map<String, Object> findCarByCarManId(Long carManId) {
+		Map<String, Object> queryMap = null;
+		queryMap = this.contractChargerDao.findCarByCarManId(carManId);
+		return queryMap;
+	}
 	
 }
