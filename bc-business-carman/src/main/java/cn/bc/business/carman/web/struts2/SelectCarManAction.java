@@ -19,6 +19,7 @@ import cn.bc.core.query.condition.impl.AndCondition;
 import cn.bc.core.query.condition.impl.EqualsCondition;
 import cn.bc.core.query.condition.impl.InCondition;
 import cn.bc.core.util.StringUtils;
+import cn.bc.db.jdbc.SqlObject;
 import cn.bc.web.struts2.AbstractSelectPageAction;
 import cn.bc.web.ui.html.grid.Column;
 import cn.bc.web.ui.html.grid.TextColumn;
@@ -152,6 +153,12 @@ public class SelectCarManAction extends AbstractSelectPageAction<CarMan> {
 
 	@Override
 	protected String getFormActionName() {
+		return null;
+	}
+
+	@Override
+	protected SqlObject<CarMan> getSqlObject() {
+		// TODO Auto-generated method stub
 		return null;
 	}
 }
