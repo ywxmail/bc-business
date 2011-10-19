@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.util.StringUtils;
 
 import cn.bc.business.contract.dao.ContractDao;
@@ -22,6 +24,7 @@ import cn.bc.orm.hibernate.jpa.HibernateCrudJpaDao;
  * @author dragon
  */
 public class ContractDaoImpl extends HibernateCrudJpaDao<Contract> implements ContractDao{
+	private static Log logger = LogFactory.getLog(ContractDaoImpl.class);
 
 	public List<Map<String, Object>> list4Car(Condition condition,Long carId) {
 		ArrayList<Object> args 	= new ArrayList<Object>();
