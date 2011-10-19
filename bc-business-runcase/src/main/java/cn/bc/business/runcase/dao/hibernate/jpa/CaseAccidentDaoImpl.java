@@ -6,6 +6,9 @@ package cn.bc.business.runcase.dao.hibernate.jpa;
 import java.io.Serializable;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import cn.bc.business.carman.domain.CarByDriver;
 import cn.bc.business.carman.domain.CarMan;
 import cn.bc.business.runcase.dao.CaseAccidentDao;
@@ -19,6 +22,7 @@ import cn.bc.orm.hibernate.jpa.HibernateCrudJpaDao;
  */
 public class CaseAccidentDaoImpl extends HibernateCrudJpaDao<Case4Accident>
 		implements CaseAccidentDao {
+	private static Log logger = LogFactory.getLog(CaseAccidentDaoImpl.class);
 
 	/**
 	 * author : wis.ho update date: 2011-9-26 description:

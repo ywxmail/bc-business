@@ -2,6 +2,7 @@ package cn.bc.business.motorcade.service;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 
 import cn.bc.business.motorcade.dao.HistoryCarQuantityDao;
 import cn.bc.business.motorcade.dao.MotorcadeDao;
@@ -39,5 +40,9 @@ public class MotorcadeServiceImpl extends DefaultCrudService<Motorcade> implemen
 
 	public List<Motorcade> findActive() {
 		return this.motorcadeDao.findActive();
+	}
+
+	public List<Map<String, String>> find4Option() {
+		return this.motorcadeDao.find4Option();
 	}
 }

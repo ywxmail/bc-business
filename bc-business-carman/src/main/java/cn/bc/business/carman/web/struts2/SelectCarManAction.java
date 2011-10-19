@@ -149,4 +149,9 @@ public class SelectCarManAction extends AbstractSelectPageAction<CarMan> {
 		}
 		return json;
 	}
+
+	@Override
+	protected String getFormActionName() {
+		return null;
+	}
 }

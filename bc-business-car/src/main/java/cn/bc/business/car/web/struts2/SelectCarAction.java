@@ -122,4 +122,9 @@ public class SelectCarAction extends AbstractSelectPageAction<Car> {
 			return json;
 		}
 	}
+
+	@Override
+	protected String getFormActionName() {
+		return null;
+	}
 }

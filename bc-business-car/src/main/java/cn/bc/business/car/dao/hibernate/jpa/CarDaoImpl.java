@@ -13,6 +13,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceException;
 import javax.persistence.Query;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.orm.jpa.JpaCallback;
 import org.springframework.util.StringUtils;
 
@@ -29,6 +31,7 @@ import cn.bc.orm.hibernate.jpa.HibernateCrudJpaDao;
  * @author dragon
  */
 public class CarDaoImpl extends HibernateCrudJpaDao<Car> implements CarDao {
+	private static Log logger = LogFactory.getLog(CarDaoImpl.class);
 
 	@Override
 	public void delete(Serializable id) {
