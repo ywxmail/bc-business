@@ -181,7 +181,7 @@ public class CarAction extends FileEntityAction<Long, Car> {
 	@Override
 	public String create() throws Exception {
 		String r = super.create();
-		// this.getE().setUnit(this.getSystyemContext().getUnit());
+		this.getE().setOldUnitName(getText("app.oldUnitName"));
 		this.getE().setUid(this.getIdGeneratorService().next(Car.KEY_UID));
 
 		// 表单可选项的加载
