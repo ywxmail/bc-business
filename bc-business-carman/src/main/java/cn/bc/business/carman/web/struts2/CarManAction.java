@@ -86,7 +86,7 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 		this.getE().setStatus(RichEntity.STATUS_ENABLED);
 		statusesValue = this.getEntityStatuses();
 		this.getE().setUid(this.getIdGeneratorService().next(CarMan.KEY_UID));
-		this.getE().setSex(1);
+		this.getE().setSex(0);
 		carManHouseTypeList = this.optionService
 				.findOptionItemByGroupKey(OptionConstants.CARMAN_HOUSETYPE);
 		carManLevelList = this.optionService

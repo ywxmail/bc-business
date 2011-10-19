@@ -4,6 +4,7 @@
 package cn.bc.business.carman.dao.hibernate.jpa;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import cn.bc.business.carman.dao.CarManDao;
@@ -83,5 +84,16 @@ public class CarManDaoImpl extends HibernateCrudJpaDao<CarMan> implements
 		// args.add(carManId);
 		// args.add(certId);
 		// this.executeSql(hql, args);
+	}
+	/**
+	 * 根据车辆ID查找返回状态为启用中相关司机信息
+	 * 
+	 * @parma carId
+	 * @return
+	 */
+	public List<CarMan> findAllcarManBycarId(Long carId) {
+		String hql = "select c.driver from CarByDriver c where c.car.id=? and c.status=?";
+		//0为启用中
+		return this.getJpaTemplate().find(hql, new Object[] { carId,new Integer( 0 )});
 	}
 }

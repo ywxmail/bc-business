@@ -33,9 +33,9 @@ public class Case4Accident extends CaseBase {
 	private String duty;// 责任
 	private String sort;// 性质
 	private String weather;// 天气
-	private String driverArea;// 司机区域
-	private String driverType;// 司机类型：车主等
-	private String driverClasses;// 驾驶状态：如正班等
+	private int driverArea;// 司机区域
+	private int driverType;// 司机类型：车主等
+	private int driverClasses;// 驾驶状态：如正班等
 	private String insuranceCompany;// 保险公司
 	private String insuranceInfo;// 相关保单信息
 	private boolean deliver;// 是否送保
@@ -150,35 +150,35 @@ public class Case4Accident extends CaseBase {
 	}
 
 	@Column(name = "DRIVER_AREA")
-	public String getDriverArea() {
+	public int getDriverArea() {
 		return driverArea;
 	}
 
-	public void setDriverArea(String driverArea) {
-		this.driverArea = driverArea;
-	}
-
 	@Column(name = "DRIVER_TYPE")
-	public String getDriverType() {
+	public int getDriverType() {
 		return driverType;
 	}
 
-	public void setDriverType(String driverType) {
+	public void setDriverType(int driverType) {
 		this.driverType = driverType;
 	}
 
-	@Column(name = "DRIVER_CLASSES")
-	public String getDriverClasses() {
-		return driverClasses;
-	}
-
-	public void setDriverClasses(String driverClasses) {
-		this.driverClasses = driverClasses;
+	public void setDriverArea(int driverArea) {
+		this.driverArea = driverArea;
 	}
 
 	@Column(name = "INSURANCE_COMPANY")
 	public String getInsuranceCompany() {
 		return insuranceCompany;
+	}
+
+	@Column(name = "DRIVER_CLASSES")
+	public int getDriverClasses() {
+		return driverClasses;
+	}
+
+	public void setDriverClasses(int driverClasses) {
+		this.driverClasses = driverClasses;
 	}
 
 	public void setInsuranceCompany(String insuranceCompany) {

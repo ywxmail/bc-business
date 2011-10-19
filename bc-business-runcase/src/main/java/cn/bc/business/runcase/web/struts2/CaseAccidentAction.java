@@ -60,9 +60,10 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 	private static final long serialVersionUID = 1L;
 	private String MANAGER_KEY = "R_ADMIN";// 管理角色的编码
 	public boolean isManager;
-	public Long carId;
+	private Long carId;
 	public String isClosed;
 	public boolean isMoreCar;
+	public boolean isMoreCarMan;
 
 	@SuppressWarnings("unused")
 	private CaseAccidentService caseAccidentService;
@@ -84,9 +85,25 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 	public Map<String, String> statusesValue;
 	public Map<String, String> sourcesValue;
 
-	public Long carManId;
+	private Long carManId;
 	public CarManService carManService;
 	public CarService carService;
+
+	public Long getCarId() {
+		return carId;
+	}
+
+	public void setCarId(Long carId) {
+		this.carId = carId;
+	}
+
+	public Long getCarManId() {
+		return carManId;
+	}
+
+	public void setCarManId(Long carManId) {
+		this.carManId = carManId;
+	}
 
 	@Autowired
 	public void CarService(CarService carService) {
@@ -266,21 +283,38 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 		if (carManId != null) {
 			CarMan driver = this.carManService.load(carManId);
 			List<Car> car = this.carService.selectAllCarByCarManId(carManId);
-			if(car.size()==1){
+			if (car.size() == 1) {
 				this.getE().setCarPlate(
-						car.get(0).getPlateType()+ "." + car.get(0).getPlateNo());
+						car.get(0).getPlateType() + "."
+								+ car.get(0).getPlateNo());
+				this.getE().setMotorcadeId(car.get(0).getMotorcade().getId());
 			}
-			if(car.size()>1){
-				isMoreCar=true;
+			if (car.size() > 1) {
+				isMoreCar = true;
 			}
 			this.getE().setDriverId(carManId);
 			this.getE().setDriverName(driver.getName());
 			this.getE().setDriverCert(driver.getCert4FWZG());
+			this.getE().setDriverArea(driver.getRegion());
+			this.getE().setDriverClasses(driver.getDrivingStatus());
 		}
 		if (carId != null) {
 			Car car = this.carService.load(carId);
 			this.getE()
 					.setCarPlate(car.getPlateType() + "." + car.getPlateNo());
+			this.getE().setCarId(carId);
+			this.getE().setMotorcadeId(car.getMotorcade().getId());
+			List<CarMan> carMan = this.carManService
+					.selectAllCarManByCarId(carId);
+			if (carMan.size() == 1) {
+				this.getE().setDriverName(carMan.get(0).getName());
+				this.getE().setDriverId(carMan.get(0).getId());
+				this.getE().setDriverCert(carMan.get(0).getCert4FWZG());
+				this.getE().setDriverArea(carMan.get(0).getRegion());
+				this.getE().setDriverClasses(carMan.get(0).getDrivingStatus());
+			} else {
+				isMoreCarMan = true;
+			}
 		}
 		departmentList = this.optionService
 				.findOptionItemByGroupKey(optionConstants.CA_DEPARTMENT);
@@ -341,13 +375,13 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 		// e.setReceiverName(context.getUserHistory().getName());
 		// }
 
-		 //设置结案信息
-		 if(isClosed.length() > 0 && isClosed.equals("1")){
-		 e.setStatus(CaseBase.STATUS_CLOSED);
-		 e.setCloserId(context.getUser().getId());
-		 e.setCloserName(context.getUser().getName());
-		 e.setCloseDate(Calendar.getInstance(Locale.CHINA));
-		 }
+		// 设置结案信息
+		if (isClosed.length() > 0 && isClosed.equals("1")) {
+			e.setStatus(CaseBase.STATUS_CLOSED);
+			e.setCloserId(context.getUser().getId());
+			e.setCloserName(context.getUser().getName());
+			e.setCloseDate(Calendar.getInstance(Locale.CHINA));
+		}
 
 		// 设置最后更新人的信息
 		e.setModifier(context.getUserHistory());
@@ -363,11 +397,11 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 		this.setE(this.getCrudService().load(this.getId()));
 		SystemContext context = this.getSystyemContext();
 		Case4Accident e = this.getE();
-//		Case4Accident ca=this.getCrudService().load(this.getE().getId());
-//		this.getE().setAuthor(ca.getAuthor());
-//		this.getE().setFileDate(ca.getFileDate());
-//		this.getE().setModifier(ca.getModifier());
-//		this.getE().setModifiedDate(ca.getModifiedDate());
+		// Case4Accident ca=this.getCrudService().load(this.getE().getId());
+		// this.getE().setAuthor(ca.getAuthor());
+		// this.getE().setFileDate(ca.getFileDate());
+		// this.getE().setModifier(ca.getModifier());
+		// this.getE().setModifiedDate(ca.getModifiedDate());
 		e.setStatus(CaseBase.STATUS_CLOSED);
 		e.setCloserId(context.getUser().getId());
 		e.setCloserName(context.getUser().getName());
@@ -457,5 +491,6 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 					.toString());
 		return page;
 	}
+	
 
 }
