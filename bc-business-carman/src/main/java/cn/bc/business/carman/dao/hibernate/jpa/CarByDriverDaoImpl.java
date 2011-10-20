@@ -5,8 +5,12 @@ package cn.bc.business.carman.dao.hibernate.jpa;
 
 import java.util.List;
 
+import javax.sql.DataSource;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import cn.bc.business.car.domain.Car;
 import cn.bc.business.carman.dao.CarByDriverDao;
@@ -21,6 +25,12 @@ import cn.bc.orm.hibernate.jpa.HibernateCrudJpaDao;
 public class CarByDriverDaoImpl extends HibernateCrudJpaDao<CarByDriver>
 		implements CarByDriverDao {
 	protected final Log logger = LogFactory.getLog(getClass());
+	private JdbcTemplate jdbcTemplate;
+
+	@Autowired
+	public void setDataSource(DataSource dataSource) {
+		this.jdbcTemplate = new JdbcTemplate(dataSource);
+	}
 
 	public Car findBycarManId(Long carManId) {
 		// TODO Auto-generated method stub
@@ -47,4 +57,18 @@ public class CarByDriverDaoImpl extends HibernateCrudJpaDao<CarByDriver>
 
 	}
 
+	/**
+	 * 更新车辆模块的司机信息
+	 * 
+	 * @param id
+	 */
+	public void updateCar4Driver(Long id) {
+
+		String sql = " update BS_CAR c set c.driver = (select wmsys.wm_concat(m.name || '('"
+				+ " || (case when cm.classes=1 then '正班' when cm.classes=2 then '副班' when cm.classes=3 then '顶班' else '无' end)"
+				+ " || ')') from BS_CAR_DRIVER cm  inner join BS_CARMAN m on m.id = cm.driver_id where cm.status_=0 and cm.car_id = c.id "
+				+ ") where c.id = ? ";
+		this.jdbcTemplate.update(sql, new Object[] { id });
+
+	}
 }

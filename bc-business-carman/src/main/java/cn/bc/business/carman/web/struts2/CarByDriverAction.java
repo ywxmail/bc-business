@@ -3,6 +3,7 @@
  */
 package cn.bc.business.carman.web.struts2;
 
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -292,4 +293,16 @@ public class CarByDriverAction extends FileEntityAction<Long, CarByDriver> {
 		return type;
 	}
 
+	@Override
+	public String save() throws Exception {
+		SystemContext context = this.getSystyemContext();
+
+		// 设置最后更新人的信息
+		this.getE().setModifier(context.getUserHistory());
+		this.getE().setModifiedDate(Calendar.getInstance());
+
+		super.save();
+		this.carByDriverService.updateCar4Driver(this.getE().getCar().getId());
+		return "saveSuccess";
+	}
 }
