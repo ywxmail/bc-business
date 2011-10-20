@@ -44,6 +44,7 @@ public class CertJspxAction extends FileEntityAction<Long, Cert4DriverEducation>
 	public 	Map<String,String>		    statusesValue;                                          
 	public	Long					    carManId;                                               
 	public  Map<String,Object>	 		carManMessMap;
+	public  Map<String,Object>	 		carManMap;
 	
 	@Autowired
 	public void setCertJspxService(CertJspxService certJspxService) {
@@ -63,6 +64,14 @@ public class CertJspxAction extends FileEntityAction<Long, Cert4DriverEducation>
 		this.attachService = attachService;
 	}
 	
+	public Long getCarManId() {
+		return carManId;
+	}
+
+	public void setCarManId(Long carManId) {
+		this.carManId = carManId;
+	}
+	
 
 	@Override
 	public boolean isReadonly() {
@@ -75,6 +84,12 @@ public class CertJspxAction extends FileEntityAction<Long, Cert4DriverEducation>
 		String r = super.create();
 		isManager = isReadonly();
 
+		if(carManId != null){
+			carManMap = this.certService.findCarManByCarManId(carManId);
+			this.getE().setName(isNullObject(carManMap.get("name")));
+			this.getE().setCertCode(isNullObject(carManMap.get("cert_fwzg")));
+		}
+		
 		this.getE().setUid(this.getIdGeneratorService().next(this.getE().ATTACH_TYPE));
 		this.getE().setType(Cert.TYPE_JSPX);
 		this.getE().setStatus(RichEntityImpl.STATUS_ENABLED);
@@ -162,5 +177,12 @@ public class CertJspxAction extends FileEntityAction<Long, Cert4DriverEducation>
 				.setHeight(400).setMinHeight(300);
 	}
 
+    public String isNullObject(Object obj){
+    	if(null != obj){
+    		return obj.toString();
+    	}else{
+    		return "";
+    	}
+    }
 
 }

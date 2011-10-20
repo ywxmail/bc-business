@@ -3,25 +3,33 @@
  */
 package cn.bc.business.car.web.struts2;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
 import cn.bc.business.BSConstants;
-import cn.bc.business.car.domain.Car;
-import cn.bc.business.car.service.CarService;
-import cn.bc.core.query.Query;
+import cn.bc.core.Entity;
 import cn.bc.core.query.condition.Condition;
+import cn.bc.core.query.condition.Direction;
 import cn.bc.core.query.condition.impl.EqualsCondition;
 import cn.bc.core.query.condition.impl.InCondition;
+import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.core.util.StringUtils;
+import cn.bc.db.jdbc.RowMapper;
+import cn.bc.db.jdbc.SqlObject;
 import cn.bc.web.formater.AbstractFormater;
+import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.struts2.AbstractSelectPageAction;
 import cn.bc.web.ui.html.grid.Column;
-import cn.bc.web.ui.html.grid.TextColumn;
+import cn.bc.web.ui.html.grid.Grid;
+import cn.bc.web.ui.html.grid.IdColumn;
+import cn.bc.web.ui.html.grid.TextColumn4MapKey;
+import cn.bc.web.ui.html.page.HtmlPage;
 import cn.bc.web.ui.html.page.PageOption;
 import cn.bc.web.ui.json.Json;
 
@@ -33,63 +41,73 @@ import cn.bc.web.ui.json.Json;
  */
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 @Controller
-public class SelectCarAction extends AbstractSelectPageAction<Car> {
+public class SelectCarAction extends AbstractSelectPageAction<Map<String, Object>> {
 	private static final long serialVersionUID = 1L;
-	public CarService carService;
-	public String status; // 车辆的状态，多个用逗号连接
+	public String status = String.valueOf(Entity.STATUS_ENABLED); // 车辆的状态，多个用逗号连接
 
-	@Autowired
-	public void setCarService(CarService carService) {
-		this.carService = carService;
+	@Override
+	protected OrderCondition getGridDefaultOrderCondition() {
+		// 默认排序方向：状态|登记日期|车队
+		return new OrderCondition("c.status_", Direction.Asc).add(
+				"c.register_date", Direction.Desc).add("m.name", Direction.Asc);
 	}
 
 	@Override
-	protected Query<Car> getQuery() {
-		return this.carService.createQuery();
-	}
+	protected SqlObject<Map<String, Object>> getSqlObject() {
+		SqlObject<Map<String, Object>> sqlObject = new SqlObject<Map<String, Object>>();
 
-	@Override
-	protected String getHtmlPageNamespace() {
-		return this.getContextPath() + BSConstants.NAMESPACE + "/selectCar";
-	}
+		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
+		StringBuffer sql = new StringBuffer();
+		sql.append("select c.id,c.status_,c.plate_type,c.plate_no,c.register_date");
+		sql.append(",c.motorcade_id,m.name");
+		sql.append(" from bs_car c");
+		sql.append(" inner join bs_motorcade m on m.id=c.motorcade_id");
+		sqlObject.setSql(sql.toString());
 
-	@Override
-	protected String getClickOkMethod() {
-		return "bs.carSelectDialog.clickOk";
+		// 注入参数
+		sqlObject.setArgs(null);
+
+		// 数据映射器
+		sqlObject.setRowMapper(new RowMapper<Map<String, Object>>() {
+			public Map<String, Object> mapRow(Object[] rs, int rowNum) {
+				Map<String, Object> map = new HashMap<String, Object>();
+				int i = 0;
+				map.put("id", rs[i++]);
+				map.put("status_", rs[i++]);
+				map.put("plate_type", rs[i++]);
+				map.put("plate_no", rs[i++]);
+				map.put("register_date", rs[i++]);
+				map.put("motorcade_id", rs[i++]);
+				map.put("motorcade_name", rs[i++]);
+				return map;
+			}
+		});
+		return sqlObject;
 	}
 
 	@Override
 	protected List<Column> getGridColumns() {
-		List<Column> columns = super.getGridColumns();
-		columns.add(new TextColumn("plateNo", getText("car.plate"))
+		List<Column> columns = new ArrayList<Column>();
+		columns.add(new IdColumn(true, "['plate_type']+'.'+['plate_no']")
+				.setId("c.id").setValueExpression("['id']"));
+		columns.add(new TextColumn4MapKey("c.plate_no", "plate_no",
+				getText("car.plate"), 80).setUseTitleFromLabel(true)
 				.setValueFormater(new AbstractFormater<String>() {
+					@SuppressWarnings("unchecked")
 					@Override
 					public String format(Object context, Object value) {
-						Car car = (Car) context;
-						return car.getPlateType() + "." + car.getPlateNo();
+						Map<String, Object> car = (Map<String, Object>) context;
+						return car.get("plate_type") + "."
+								+ car.get("plate_no");
 					}
 				}));
+		columns.add(new TextColumn4MapKey("c.register_date", "register_date",
+				getText("car.registerDate"), 100).setSortable(true)
+				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+		columns.add(new TextColumn4MapKey("m.name", "motorcade_name",
+				getText("car.motorcade")).setSortable(true)
+				.setUseTitleFromLabel(true));
 		return columns;
-	}
-
-	@Override
-	protected PageOption getHtmlPageOption() {
-		return super.getHtmlPageOption().setWidth(400).setHeight(450);
-	}
-
-	@Override
-	protected String getHtmlPageJs() {
-		return this.getContextPath() + BSConstants.NAMESPACE + "/car/select.js";
-	}
-
-	@Override
-	protected String[] getGridSearchFields() {
-		return new String[] { "plateType", "plateNo" };
-	}
-
-	@Override
-	protected String getGridRowLabelExpression() {
-		return "plateType + ' ' + plateNo";
 	}
 
 	@Override
@@ -98,13 +116,38 @@ public class SelectCarAction extends AbstractSelectPageAction<Car> {
 	}
 
 	@Override
+	protected String[] getGridSearchFields() {
+		return new String[] { "c.plate_no", "m.name" };
+	}
+
+	@Override
+	protected PageOption getHtmlPageOption() {
+		return super.getHtmlPageOption().setWidth(400).setHeight(450);
+	}
+
+	@Override
+	protected String getGridRowLabelExpression() {
+		return "['plate_type'] + '.' + ['plate_no']";
+	}
+
+	@Override
+	protected HtmlPage buildHtmlPage() {
+		return super.buildHtmlPage().setNamespace(this.getHtmlPageNamespace() + "/selectCar");
+	}
+
+	@Override
+	protected String getHtmlPageJs() {
+		return this.getHtmlPageNamespace() + "/car/select.js";
+	}
+
+	@Override
 	protected Condition getGridSpecalCondition() {
 		if (status != null && status.length() > 0) {
 			String[] ss = status.split(",");
 			if (ss.length == 1) {
-				return new EqualsCondition("status", new Integer(ss[0]));
+				return new EqualsCondition("c.status_", new Integer(ss[0]));
 			} else {
-				return new InCondition("status",
+				return new InCondition("c.status_",
 						StringUtils.stringArray2IntegerArray(ss));
 			}
 		} else {
@@ -124,7 +167,17 @@ public class SelectCarAction extends AbstractSelectPageAction<Car> {
 	}
 
 	@Override
-	protected String getFormActionName() {
-		return null;
+	protected Grid getHtmlPageGrid() {
+		return super.getHtmlPageGrid();
+	}
+
+	@Override
+	protected String getClickOkMethod() {
+		return "bs.carSelectDialog.clickOk";
+	}
+
+	@Override
+	protected String getHtmlPageNamespace() {
+		return this.getContextPath() + BSConstants.NAMESPACE;
 	}
 }

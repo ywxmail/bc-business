@@ -74,5 +74,16 @@ public interface ContractLabourDao extends CrudDao<Contract4Labour> {
 	
 	public Long findCarManIdByContractId(Long contractId);
 
+	Map<String, Object> findCarManByCarId(Long carId);
+
+	List<Map<String, Object>> selectRelateCarByCarManId(Long carManId);
+
+	Map<String, Object> findCarManByCarManId(Long carManId);
+
+	Map<String, Object> findCarByCarManId(Long carId);
+
+	List<Map<String, Object>> selectRelateCarManByCarId(Long carId);
+
+
 
 }

@@ -42,7 +42,8 @@ public class CertCyzgAction extends FileEntityAction<Long, Cert4CongYeZiGe> {
 	public 	boolean 	   			    isManager;                                              
 	public 	AttachWidget 			    attachsUI;                                              
 	public 	Map<String,String>		    statusesValue;                                          
-	public	Long					    carManId;                                               
+	public	Long					    carManId;   
+	public  Map<String,Object>	 		carManMap;
 	public  Map<String,Object>	 		carManMessMap;
 	
 	@Autowired
@@ -68,12 +69,26 @@ public class CertCyzgAction extends FileEntityAction<Long, Cert4CongYeZiGe> {
 		this.attachService = attachService;
 	}
 	
+	public Long getCarManId() {
+		return carManId;
+	}
+
+	public void setCarManId(Long carManId) {
+		this.carManId = carManId;
+	}
+
 
 	@SuppressWarnings("static-access")
 	public String create() throws Exception {
 		String r = super.create();
 		isManager = isReadonly();
 
+		if(carManId != null){
+			carManMap = this.certService.findCarManByCarManId(carManId);
+			this.getE().setName(isNullObject(carManMap.get("name")));
+			this.getE().setCertCode(isNullObject(carManMap.get("cert_fwzg")));
+		}
+		
 		this.getE().setUid(this.getIdGeneratorService().next(this.getE().ATTACH_TYPE));
 		this.getE().setType(Cert.TYPE_CYZG);
 		this.getE().setStatus(RichEntityImpl.STATUS_ENABLED);
@@ -159,4 +174,12 @@ public class CertCyzgAction extends FileEntityAction<Long, Cert4CongYeZiGe> {
 		return super.buildListPageOption().setWidth(800).setMinWidth(300)
 				.setHeight(400).setMinHeight(300);
 	}
+	
+    public String isNullObject(Object obj){
+    	if(null != obj){
+    		return obj.toString();
+    	}else{
+    		return "";
+    	}
+    }
 }

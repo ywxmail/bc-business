@@ -61,6 +61,14 @@ public class CertVehicelicenseAction extends FileEntityAction<Long, Cert4VehiceL
 	public void setCertService(CertService certService) {
 		this.certService = certService;
 	}
+	
+	public Long getCarId() {
+		return carId;
+	}
+
+	public void setCarId(Long carId) {
+		this.carId = carId;
+	}
 
 
 	@Autowired
@@ -78,10 +86,45 @@ public class CertVehicelicenseAction extends FileEntityAction<Long, Cert4VehiceL
 	public String create() throws Exception {
 		String r = super.create();
 		isManager = isReadonly();
-
-		this.getE().setUid(this.getIdGeneratorService().next(this.getE().ATTACH_TYPE));
-		this.getE().setType(Cert.TYPE_VEHICELICENSE);
-		this.getE().setStatus(RichEntityImpl.STATUS_ENABLED);
+		Cert4VehiceLicense e = this.getE();
+		
+		//根据carId查找car信息
+		if(carId != null){
+			carMessMap = this.certService.findCarByCarId(carId);
+			
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+			Date date;
+			Calendar date2 = Calendar.getInstance();
+			
+			if(getDayStartString(carMessMap.get("register_date")).length() > 0){
+				date = sdf.parse(carMessMap.get("register_date")+"");
+				date2.setTime(date);
+				e.setRegisterDate(date2);
+			}
+			
+			if(getDayStartString(carMessMap.get("scrap_date")).length() > 0){
+				date = sdf.parse(carMessMap.get("scrap_date")+"");
+				date2.setTime(date);
+				e.setScrapDate(date2);
+			}
+			String factory = "";
+			if(carMessMap.get("factory_type") != null && carMessMap.get("factory_type").toString().length() > 0){
+				factory = carMessMap.get("factory_type")+"."+carMessMap.get("factory_model");
+			}
+			e.setPlate(isNullObject(carMessMap.get("plate_type")+""+carMessMap.get("plate_no")));
+			e.setFactory(factory);
+			e.setVin(isNullObject(carMessMap.get("vin")));
+			e.setEngineNo(isNullObject(carMessMap.get("engine_no")));
+			e.setTotalWeight(Integer.valueOf(isNullObject(carMessMap.get("total_weight"))));
+			e.setDimLen(Integer.valueOf(isNullObject(carMessMap.get("dim_len"))));
+			e.setDimWidth(Integer.valueOf(isNullObject(carMessMap.get("dim_width"))));
+			e.setDimHeight(Integer.valueOf(isNullObject(carMessMap.get("dim_height"))));
+			e.setAccessWeight(Integer.valueOf(isNullObject(carMessMap.get("access_weight"))));
+		}
+		
+		e.setUid(this.getIdGeneratorService().next(this.getE().ATTACH_TYPE));
+		e.setType(Cert.TYPE_VEHICELICENSE);
+		e.setStatus(RichEntityImpl.STATUS_ENABLED);
 		statusesValue		=	this.getEntityStatuses();
 		
 		attachsUI = buildAttachsUI(true);
@@ -98,7 +141,7 @@ public class CertVehicelicenseAction extends FileEntityAction<Long, Cert4VehiceL
 		//根据certId查找car信息
 		carMessMap = this.certService.findCarMessByCertId(this.getId());
 		carId = Long.valueOf(carMessMap.get("id")+"");
-		this.getE().setPlate(carMessMap.get("plate_type")+" "+carMessMap.get("plate_no"));
+		this.getE().setPlate(carMessMap.get("plate_type")+"."+carMessMap.get("plate_no"));
 		
 		// 构建附件控件
 		attachsUI = buildAttachsUI(false);
@@ -177,7 +220,7 @@ public class CertVehicelicenseAction extends FileEntityAction<Long, Cert4VehiceL
 
 	@Override
 	protected PageOption buildFormPageOption() {
-		PageOption option = new PageOption().setWidth(750).setMinWidth(250)
+		PageOption option = new PageOption().setWidth(750).setMinWidth(250).setHeight(450)
 				.setMinHeight(160).setModal(false);
 		option.addButton(new ButtonOption(getText("label.save"), "save"));
 		return option;
@@ -199,10 +242,10 @@ public class CertVehicelicenseAction extends FileEntityAction<Long, Cert4VehiceL
      * 格式化日期
      * @return
      */
-    public String getDayStartString(Date date){
-    	if(null != date){
+    public String getDayStartString(Object object){
+    	if(null != object){
 	    	DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-	    	StringBuffer str = new StringBuffer(df.format(date));
+	    	StringBuffer str = new StringBuffer(df.format(object));
 	        return str.toString();
     	}else{
     		return "";
@@ -216,5 +259,14 @@ public class CertVehicelicenseAction extends FileEntityAction<Long, Cert4VehiceL
     		return "";
     	}
     }
+    
+//	@Override
+//	protected HtmlPage buildHtml4Paging() {
+//		HtmlPage page = super.buildHtml4Paging();
+//		if (carId != null)
+//			page.setAttr("data-extras", new Json().put("carId", carId)
+//					.toString());
+//		return page;
+//	}
 
 }

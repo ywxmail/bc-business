@@ -393,4 +393,75 @@ public class ContractLabourDaoImpl extends HibernateCrudJpaDao<Contract4Labour> 
 		return carManId;
 	}
 
+	public Map<String, Object> findCarManByCarId(Long carId) {
+		Map<String,Object> queryMap = null;
+		String sql = "SELECT man.id,man.name,man.cert_fwzg FROM BS_CAR_DRIVER cd left join Bs_Carman man on cd.driver_id = man.id"+
+					" where cd.car_id="+carId;
+		
+		//jdbc查询BS_CARMAN记录
+		try {
+			queryMap = this.jdbcTemplate.queryForMap(sql);
+		} catch (EmptyResultDataAccessException e) {
+			e.getStackTrace();
+			//logger.error(e.getMessage(), e);
+		}
+		
+		return queryMap;
+	}
+
+	public List<Map<String, Object>> selectRelateCarByCarManId(Long carManId) {
+		List<Map<String,Object>> list = null;
+		String sql = "SELECT car.id,car.plate_type,car.plate_no,car.factory_type,car.factory_model,car.register_date,car.scrap_date,car.level_,car.vin,car.engine_no" +
+				",car.total_weight,car.dim_len,car.dim_width,car.dim_height,car.access_weight,car.access_count,cd.car_id FROM BS_CAR_DRIVER cd left join BS_CAR car on cd.car_id = car.id" +
+				" where cd.driver_id="+carManId;
+		
+		list = this.jdbcTemplate.queryForList(sql);
+		
+		return list;
+	}
+
+	public Map<String, Object> findCarManByCarManId(Long carManId) {
+		Map<String,Object> queryMap = null;
+		String sql = "SELECT man.id,man.name,man.cert_fwzg FROM BS_CARMAN man" +
+					 " where man.id="+carManId;
+		
+		//jdbc查询BS_CARMAN记录
+		try {
+			queryMap = this.jdbcTemplate.queryForMap(sql);
+		} catch (EmptyResultDataAccessException e) {
+			e.getStackTrace();
+			//logger.error(e.getMessage(), e);
+		}
+		
+		return queryMap;
+	}
+
+	public Map<String, Object> findCarByCarManId(Long carId) {
+		Map<String,Object> queryMap = null;
+		String sql = "SELECT car.id,car.plate_type,car.plate_no,car.factory_type,car.factory_model,car.register_date,car.scrap_date,car.level_,car.vin,car.engine_no" +
+					 ",car.total_weight,car.dim_len,car.dim_width,car.dim_height,car.access_weight,car.access_count FROM BS_CAR car"+
+					 " where car.id="+carId;
+		
+		//jdbc查询BS_CAR记录
+		try {
+			queryMap = this.jdbcTemplate.queryForMap(sql);
+		} catch (EmptyResultDataAccessException e) {
+			e.getStackTrace();
+			//logger.error(e.getMessage(), e);
+		}
+		
+		return queryMap;
+	}
+
+	public List<Map<String, Object>> selectRelateCarManByCarId(Long carId) {
+		List<Map<String,Object>> list = null;
+		String sql = "SELECT man.id,man.name,man.cert_fwzg,cd.driver_id FROM BS_CARMAN man left join BS_CAR_DRIVER cd on man.id=cd.driver_id" +
+				" where cd.car_id="+carId;
+		
+		list = this.jdbcTemplate.queryForList(sql);
+		
+		return list;
+	}
+
+
 }

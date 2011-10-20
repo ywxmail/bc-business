@@ -56,6 +56,7 @@ public class ContractChargerAction extends FileEntityAction<Long, Contract4Charg
 	private String					MANAGER_KEY 				= "R_ADMIN";// 管理角色的编码
 	public 	boolean 	   			isManager;
 	public	Long					carId; 
+	public	Long					carManId;
 	private	Long 					oldCarId;
 	public 	AttachWidget 			attachsUI;
 	
@@ -67,9 +68,9 @@ public class ContractChargerAction extends FileEntityAction<Long, Contract4Charg
 	public	String					assignChargerIds;
 	public  String					assignChargerNames;
 	public  String []				chargerNameAry;
+	public  Map<String,Object>	 	carInfoMap;
 //	public	Long 					carManId;
 //	public  String 					certCode;
-//	public  Map<String,Object>	 	carInfoMap;
 //	public 	ContractService 		contractService;
 
 //	@Autowired
@@ -126,6 +127,21 @@ public class ContractChargerAction extends FileEntityAction<Long, Contract4Charg
 		String r = super.create();
 		isManager = isReadonly();
 
+		if(carId != null){
+			//根据carId查找车辆的车牌号码
+			carInfoMap = this.contractChargerService.findCarByCarId(carId);
+			this.getE().setExt_str1(isNullObject(carInfoMap.get("plate_type")+"."+carInfoMap.get("plate_no")));
+		}
+		
+		if(carManId != null){
+			//根据carManId查找车辆的车牌号码
+			carInfoMap = this.contractChargerService.findCarByCarManId(carManId);
+			this.getE().setExt_str1(isNullObject(carInfoMap.get("plate_type")+"."+carInfoMap.get("plate_no")));
+			carId = Long.valueOf(isNullObject(carInfoMap.get("id")));
+		}
+		
+		
+		
 		this.getE().setCode(this.getIdGeneratorService().next(this.getE().ATTACH_TYPE));
 		this.getE().setUid(this.getIdGeneratorService().next(this.getE().ATTACH_TYPE));
 		this.getE().setType(Contract.TYPE_CHARGER);
@@ -152,6 +168,7 @@ public class ContractChargerAction extends FileEntityAction<Long, Contract4Charg
 //		carInfoMap = this.contractService.findCarInfoByContractId(this.getId());
 //		carId = Long.valueOf(carInfoMap.get("id")+"");
 //		this.getE().setExt_str1(carInfoMap.get("plate_type")+" "+carInfoMap.get("plate_no"));
+		
 		
 		
 		Contract4Charger e = this.getE();
@@ -407,4 +424,11 @@ public class ContractChargerAction extends FileEntityAction<Long, Contract4Charg
 		return types;
 	}
 
+    public String isNullObject(Object obj){
+    	if(null != obj){
+    		return obj.toString();
+    	}else{
+    		return "";
+    	}
+    }
 }

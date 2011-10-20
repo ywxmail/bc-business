@@ -131,6 +131,9 @@ public interface CertService extends CrudService<Cert> {
 	Map<String, Object> findCarByCarId(Long carId);
 
 
+	Map<String, Object> findCarManByCarManId(Long carManId);
+
+
 	
 	
 }

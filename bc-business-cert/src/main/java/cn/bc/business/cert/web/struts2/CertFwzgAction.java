@@ -44,6 +44,7 @@ public class CertFwzgAction extends FileEntityAction<Long, Cert4FuWuZiGe> {
 	public 	Map<String,String>		    statusesValue;                                          
 	public	Long					    carManId;                                               
 	public  Map<String,Object>	 		carManMessMap;
+	public  Map<String,Object>	 		carManMap;
 	
 	@Autowired
 	public void setCertFwzgService(CertFwzgService certFwzgService) {
@@ -63,6 +64,14 @@ public class CertFwzgAction extends FileEntityAction<Long, Cert4FuWuZiGe> {
 		this.attachService = attachService;
 	}
 	
+	public Long getCarManId() {
+		return carManId;
+	}
+
+	public void setCarManId(Long carManId) {
+		this.carManId = carManId;
+	}
+	
 	@Override
 	public boolean isReadonly() {
 		SystemContext context = (SystemContext) this.getContext();
@@ -74,6 +83,12 @@ public class CertFwzgAction extends FileEntityAction<Long, Cert4FuWuZiGe> {
 		String r = super.create();
 		isManager = isReadonly();
 
+		if(carManId != null){
+			carManMap = this.certService.findCarManByCarManId(carManId);
+			this.getE().setName(isNullObject(carManMap.get("name")));
+			this.getE().setCertCode(isNullObject(carManMap.get("cert_fwzg")));
+		}
+		
 		this.getE().setUid(this.getIdGeneratorService().next(this.getE().ATTACH_TYPE));
 		this.getE().setType(Cert.TYPE_FWZG);
 		this.getE().setStatus(RichEntityImpl.STATUS_ENABLED);
@@ -161,6 +176,14 @@ public class CertFwzgAction extends FileEntityAction<Long, Cert4FuWuZiGe> {
 		return super.buildListPageOption().setWidth(800).setMinWidth(300)
 				.setHeight(400).setMinHeight(300);
 	}
+	
+    public String isNullObject(Object obj){
+    	if(null != obj){
+    		return obj.toString();
+    	}else{
+    		return "";
+    	}
+    }
 
 
 }

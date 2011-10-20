@@ -46,20 +46,25 @@ import cn.bc.web.ui.json.Json;
 @Controller
 public class ContractLabourAction extends FileEntityAction<Long, Contract4Labour> {
 	// private static Log logger = LogFactory.getLog(ContractAction.class);
-	private static final long 		serialVersionUID 			= 1L;
-	private ContractLabourService 	contractLabourService;
-	private ContractChargerService	contractChargerService;
-	private AttachService 			attachService;
-	private String					MANAGER_KEY 				= "R_ADMIN";// 管理角色的编码
-	public 	boolean 	   			isManager;
-	private	Long 					carManId;
-	private	Long 					carId;
-	private	Long 					oldCarManId;
-	private	Long 					oldCarId;
-	public  String 					certCode;
-	public 	AttachWidget 			attachsUI;
-	public 	Map<String,String>		statusesValue;
-	public	Map<String,Object>		certInfoMap;
+	private static final long 			serialVersionUID 			= 1L;
+	private ContractLabourService 		contractLabourService;
+	private ContractChargerService		contractChargerService;
+	private AttachService 				attachService;
+	private String						MANAGER_KEY 				= "R_ADMIN";// 管理角色的编码
+	public 	boolean 	   				isManager;
+	private	Long 						carManId;
+	private	Long 						carId;
+	private	Long 						oldCarManId;
+	private	Long 						oldCarId;
+	public  String 						certCode;
+	public 	AttachWidget 				attachsUI;
+	public 	Map<String,String>			statusesValue;
+	public	Map<String,Object>			certInfoMap;
+	public	Map<String,Object>			carInfoMap;
+	public	Map<String,Object>			carManInfoMap;
+	public	List<Map<String,Object>>	infoList;
+	public 	boolean 					isMoreCar;
+	public 	boolean 					isMoreCarMan;
 //	public	CertService				certService;
 	
 
@@ -124,6 +129,42 @@ public class ContractLabourAction extends FileEntityAction<Long, Contract4Labour
 	public String create() throws Exception {
 		String r = super.create();
 		isManager = isReadonly();
+		
+		if(carId != null && carManId == null){
+			//根据carId查找车辆以及司机id
+			carInfoMap = this.contractLabourService.findCarByCarId(carId);
+			infoList = this.contractLabourService.selectRelateCarManByCarId(carId);
+			if(infoList.size() == 1){
+				carManId = Long.valueOf(isNullObject(infoList.get(0).get("driver_id")));
+				this.getE().setExt_str2(isNullObject(infoList.get(0).get("name")));
+				this.getE().setCertNo(isNullObject(infoList.get(0).get("cert_fwzg")));
+			}
+			if(infoList.size() > 1){
+				isMoreCarMan = true;
+			}
+			this.getE().setExt_str1(
+				isNullObject(carInfoMap.get("plate_type"))+"."+
+				isNullObject(carInfoMap.get("plate_no"))
+			);
+		}
+		
+		if(carManId != null && carId == null){
+			//根据carManId查找司机以及车辆id
+			carManInfoMap = this.contractLabourService.findCarManByCarManId(carManId);
+			infoList = this.contractLabourService.selectRelateCarByCarManId(carManId);
+			if(infoList.size() == 1){
+				carId = Long.valueOf(isNullObject(infoList.get(0).get("car_id")));
+				this.getE().setExt_str1(
+					isNullObject(infoList.get(0).get("plate_type"))+"."+
+					isNullObject(infoList.get(0).get("plate_no"))
+				);
+			}
+			if(infoList.size() > 1){
+				isMoreCar = true;
+			}
+			this.getE().setExt_str2(isNullObject(carManInfoMap.get("name")));
+			this.getE().setCertNo(isNullObject(carManInfoMap.get("cert_fwzg")));
+		}
 		
 		this.getE().setCode(this.getIdGeneratorService().next(this.getE().KEY_UID));
 		this.getE().setUid(this.getIdGeneratorService().next(this.getE().KEY_UID));
@@ -372,6 +413,12 @@ public class ContractLabourAction extends FileEntityAction<Long, Contract4Labour
 		return types;
 	}
 	
-
+    public String isNullObject(Object obj){
+    	if(null != obj){
+    		return obj.toString();
+    	}else{
+    		return "";
+    	}
+    }
 
 }

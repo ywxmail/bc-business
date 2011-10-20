@@ -190,5 +190,11 @@ public class CertServiceImpl extends DefaultCrudService<Cert> implements
 		return queryMap;
 	}
 
+	public Map<String, Object> findCarManByCarManId(Long carManId) {
+		Map<String, Object> queryMap = null;
+		queryMap = this.certDao.findCarManByCarManId(carManId);
+		return queryMap;
+	}
+
 	
 }
