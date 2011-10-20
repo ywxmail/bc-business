@@ -508,9 +508,9 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 			o = new Json();
 			o.put("name", driver.getName());
 			o.put("id", driver.getId());
-			o.put("cert4fwzg", driver.getCert4FWZG());
+			o.put("cert4FWZG", driver.getCert4FWZG());
 			o.put("region", driver.getRegion());
-			o.put("drivingstaus", driver.getDrivingStatus());
+			o.put("drivingStatus", driver.getDrivingStatus());
 			
 			jsons.add(o);
 		}
