@@ -14,11 +14,14 @@
 	<package name="caseBusiness" extends="bc-default" namespace="/bc-business">
 		<action name="caseBusiness/closefile" class="caseBusinessAction" method="closefile">
 		</action>
+		<action name="caseBusiness/selectCarMansInfo" class="caseBusinessAction" method="selectCarMansInfo">
+		</action>
+		
 	</package>
 	
 	<!-- 事故理赔 -->
 	<package name="caseAccident" extends="bc-default" namespace="/bc-business">
-		<action name="caseAccident/closefile" class="caseAccidentAction" method="closefile">
+		<action name="caseAccident/selectCarMansInfo" class="caseAccidentAction" method="selectCarMansInfo">
 		</action>
 	</package>
 	

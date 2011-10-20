@@ -46,6 +46,7 @@ import cn.bc.web.ui.html.page.HtmlPage;
 import cn.bc.web.ui.html.page.PageOption;
 import cn.bc.web.ui.html.toolbar.Toolbar;
 import cn.bc.web.ui.json.Json;
+import cn.bc.web.ui.json.JsonArray;
 
 /**
  * 事故理赔Action
@@ -64,6 +65,8 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 	public String isClosed;
 	public boolean isMoreCar;
 	public boolean isMoreCarMan;
+	public boolean isNullCar;
+	public boolean isNullCarMan;
 
 	@SuppressWarnings("unused")
 	private CaseAccidentService caseAccidentService;
@@ -288,9 +291,10 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 						car.get(0).getPlateType() + "."
 								+ car.get(0).getPlateNo());
 				this.getE().setMotorcadeId(car.get(0).getMotorcade().getId());
-			}
-			if (car.size() > 1) {
+			} else if (car.size() > 1) {
 				isMoreCar = true;
+			} else {
+				isNullCar = true;
 			}
 			this.getE().setDriverId(carManId);
 			this.getE().setDriverName(driver.getName());
@@ -312,8 +316,10 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 				this.getE().setDriverCert(carMan.get(0).getCert4FWZG());
 				this.getE().setDriverArea(carMan.get(0).getRegion());
 				this.getE().setDriverClasses(carMan.get(0).getDrivingStatus());
-			} else {
+			} else if (carMan.size() > 1) {
 				isMoreCarMan = true;
+			} else {
+				isNullCarMan = true;
 			}
 		}
 		departmentList = this.optionService
@@ -391,7 +397,7 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 		return "saveSuccess";
 	}
 
-	public Json json;
+	// public Json json;
 
 	public String closefile() {
 		this.setE(this.getCrudService().load(this.getId()));
@@ -491,6 +497,41 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 					.toString());
 		return page;
 	}
-	
+
+	public String json;
+
+	public String selectCarMansInfo() {
+		List<CarMan> drivers = this.carManService.selectAllCarManByCarId(carId);
+		JsonArray jsons = new JsonArray();
+		Json o;
+		for(CarMan driver : drivers){
+			o = new Json();
+			o.put("name", driver.getName());
+			o.put("id", driver.getId());
+			o.put("cert4fwzg", driver.getCert4FWZG());
+			o.put("region", driver.getRegion());
+			o.put("drivingstaus", driver.getDrivingStatus());
+			
+			jsons.add(o);
+		}
+		json = jsons.toString();
+		return "json";
+		
+//		json = new Json();
+//		if (carMans.size() == 1) {
+//			json.put("name", carMans.get(0).getName());
+//			json.put("id", carMans.get(0).getId());
+//			json.put("cert4fwzg", carMans.get(0).getCert4FWZG());
+//			json.put("region", carMans.get(0).getRegion());
+//			json.put("drivingstaus", carMans.get(0).getDrivingStatus());
+//
+//		} else if(carMans.size()==0){
+//			isNullCarMan = true;
+//			return "a";
+//		}else{
+//			isMoreCarMan = true;
+//			
+//		}
+	}
 
 }
