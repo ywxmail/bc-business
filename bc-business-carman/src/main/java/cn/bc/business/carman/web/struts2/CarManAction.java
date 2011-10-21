@@ -3,6 +3,7 @@
  */
 package cn.bc.business.carman.web.struts2;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +21,7 @@ import cn.bc.core.RichEntity;
 import cn.bc.core.query.condition.Condition;
 import cn.bc.core.query.condition.Direction;
 import cn.bc.core.query.condition.impl.OrderCondition;
+import cn.bc.core.util.DateUtils;
 import cn.bc.identity.service.IdGeneratorService;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.option.domain.OptionItem;
@@ -50,9 +52,9 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 	public Map<String, String> statusesValue;
 	public OptionService optionService;
 	public OptionConstants optionConstants;
-	public List<OptionItem> carManHouseTypeList;// 司机责任人户口性质列表
-	public List<OptionItem> carManLevelList;// 司机责任人等级列表
-	public List<OptionItem> carManModelList;// 司机责任人准驾车型列表
+	public List<Map<String, String>> carManHouseTypeList;// 司机责任人户口性质列表
+	public List<Map<String, String>> carManLevelList;// 司机责任人等级列表
+	public List<Map<String, String>> carManModelList;// 司机责任人准驾车型列表
 
 	public IdGeneratorService getIdGeneratorService() {
 		return idGeneratorService;
@@ -77,7 +79,7 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 	@Override
 	public boolean isReadonly() {
 		SystemContext context = (SystemContext) this.getContext();
-		return !context.hasAnyRole(MANAGER_KEY,getText("key.role.admin"));
+		return !context.hasAnyRole(MANAGER_KEY, getText("key.role.admin"));
 	}
 
 	@Override
@@ -87,12 +89,7 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 		statusesValue = this.getEntityStatuses();
 		this.getE().setUid(this.getIdGeneratorService().next(CarMan.KEY_UID));
 		this.getE().setSex(0);
-		carManHouseTypeList = this.optionService
-				.findOptionItemByGroupKey(OptionConstants.CARMAN_HOUSETYPE);
-		carManLevelList = this.optionService
-				.findOptionItemByGroupKey(OptionConstants.CARMAN_LEVEL);
-		carManModelList = this.optionService
-				.findOptionItemByGroupKey(OptionConstants.CARMAN_MODEL);
+		this.initSelects();
 		// 获取相片的连接
 		portrait = "/bc/libs/themes/default/images/portrait/1in110x140.png";
 
@@ -111,20 +108,30 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 
 	@Override
 	public String edit() throws Exception {
-		String result = super.edit();
-		statusesValue = this.getEntityStatuses();
-		carManHouseTypeList = this.optionService
-				.findOptionItemByGroupKeyWithCurrent(
-						OptionConstants.CARMAN_HOUSETYPE, null, this.getE()
-								.getHouseType());
-		carManLevelList = this.optionService
-				.findOptionItemByGroupKey(OptionConstants.CARMAN_LEVEL);
-		carManModelList = this.optionService
-				.findOptionItemByGroupKey(OptionConstants.CARMAN_MODEL);
+//		String result = super.edit();
+//		statusesValue = this.getEntityStatuses();
+//		this.initSelects();
 		// 获取相片的连接
 		portrait = "/bc/libs/themes/default/images/portrait/1in110x140.png";
 
-		return result;
+		//return result;
+		Date startTime = new Date();
+		String r = super.edit();
+
+		if (logger.isInfoEnabled())
+			logger.info("edit耗时1："
+					+ DateUtils.getWasteTime(startTime, new Date()));
+		this.setE(this.getCrudService().load(this.getId()));
+
+		// 表单可选项的加载
+		statusesValue = this.getEntityStatuses();
+
+		initSelects();
+
+		if (logger.isInfoEnabled())
+			logger.info("edit耗时："
+					+ DateUtils.getWasteTime(startTime, new Date()));
+		return r;
 	}
 
 	// 视图特殊条件
@@ -208,6 +215,29 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 		type.put(String.valueOf(CarMan.TYPE_DRIVER_AND_CHARGER),
 				getText("carMan.type.driverAndCharger"));
 		return type;
+	}
+
+	// 表单可选项的加载
+	public void initSelects() {
+		Date startTime = new Date();
+		logger.info("motorcadeList耗时：" + DateUtils.getWasteTime(startTime));
+
+		// 批量加载可选项列表
+		Map<String, List<Map<String, String>>> optionItems = this.optionService
+				.findOptionItemByGroupKeys(new String[] {
+						OptionConstants.CARMAN_HOUSETYPE,
+						OptionConstants.CARMAN_LEVEL,
+						OptionConstants.CARMAN_MODEL, });
+		// 司机责任人户口性质列表
+		this.carManHouseTypeList = optionItems
+				.get(OptionConstants.CARMAN_HOUSETYPE);
+		// 司机责任人等级列表
+		this.carManLevelList = optionItems.get(OptionConstants.CARMAN_LEVEL);
+		//  司机责任人准驾车型列表
+		this.carManModelList = optionItems.get(OptionConstants.CARMAN_MODEL);
+		
+		if (logger.isInfoEnabled())
+			logger.info("findOptionItem耗时：" + DateUtils.getWasteTime(startTime));
 	}
 
 }
