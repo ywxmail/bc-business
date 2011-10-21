@@ -65,6 +65,8 @@ public class ContractLabourAction extends FileEntityAction<Long, Contract4Labour
 	public	List<Map<String,Object>>	infoList;
 	public 	boolean 					isMoreCar;
 	public 	boolean 					isMoreCarMan;
+	public 	boolean 					isNullCar;
+	public 	boolean 					isNullCarMan;
 //	public	CertService				certService;
 	
 
@@ -138,9 +140,10 @@ public class ContractLabourAction extends FileEntityAction<Long, Contract4Labour
 				carManId = Long.valueOf(isNullObject(infoList.get(0).get("driver_id")));
 				this.getE().setExt_str2(isNullObject(infoList.get(0).get("name")));
 				this.getE().setCertNo(isNullObject(infoList.get(0).get("cert_fwzg")));
-			}
-			if(infoList.size() > 1){
+			}else if(infoList.size() > 1){
 				isMoreCarMan = true;
+			}else{
+				isNullCarMan = true;
 			}
 			this.getE().setExt_str1(
 				isNullObject(carInfoMap.get("plate_type"))+"."+
@@ -158,9 +161,10 @@ public class ContractLabourAction extends FileEntityAction<Long, Contract4Labour
 					isNullObject(infoList.get(0).get("plate_type"))+"."+
 					isNullObject(infoList.get(0).get("plate_no"))
 				);
-			}
-			if(infoList.size() > 1){
+			}else if(infoList.size() > 1){
 				isMoreCar = true;
+			}else{
+				isNullCar = true;
 			}
 			this.getE().setExt_str2(isNullObject(carManInfoMap.get("name")));
 			this.getE().setCertNo(isNullObject(carManInfoMap.get("cert_fwzg")));
@@ -373,7 +377,6 @@ public class ContractLabourAction extends FileEntityAction<Long, Contract4Labour
 //			certCode = cert.getCertCode();
 //			json.put("certCode", certCode);
 //		}
-		
 		certInfoMap	= this.contractLabourService.findCertByCarManId(carManId);
 		json = new Json();
 		if(certInfoMap != null && certInfoMap.size() > 0){
@@ -381,6 +384,22 @@ public class ContractLabourAction extends FileEntityAction<Long, Contract4Labour
 			json.put("cert_code", certCode);
 		}
 		
+		return "json";
+	}
+	
+	public String carManInfo(){
+		
+		json = new Json();
+		infoList = this.contractLabourService.selectRelateCarManByCarId(carId);
+		if(infoList.size() == 1){
+			json.put("id",isNullObject(infoList.get(0).get("driver_id")));
+			json.put("name",isNullObject(infoList.get(0).get("name")));
+			json.put("certNo",isNullObject(infoList.get(0).get("cert_fwzg")));
+			json.put("isMore","false");
+		}
+		if(infoList.size() > 1){
+			json.put("isMore","true");
+		}
 		return "json";
 	}
 	
