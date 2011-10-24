@@ -145,8 +145,8 @@ public class BlacklistAction extends FileEntityAction<Long, Blacklist> {
 
 	@Override
 	protected PageOption buildListPageOption() {
-		return super.buildListPageOption().setWidth(1024).setMinWidth(300)
-				.setHeight(460).setMinHeight(300);
+		return super.buildListPageOption().setWidth(700).setMinWidth(300)
+				.setHeight(350).setMinHeight(300);
 	}
 
 	@Override
