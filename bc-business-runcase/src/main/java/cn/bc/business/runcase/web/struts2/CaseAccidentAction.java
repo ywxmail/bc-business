@@ -18,7 +18,6 @@ import cn.bc.business.OptionConstants;
 import cn.bc.business.car.domain.Car;
 import cn.bc.business.car.service.CarService;
 import cn.bc.business.carman.domain.CarMan;
-import cn.bc.business.carman.service.CarByDriverService;
 import cn.bc.business.carman.service.CarManService;
 import cn.bc.business.motorcade.domain.Motorcade;
 import cn.bc.business.motorcade.service.MotorcadeService;
@@ -44,7 +43,6 @@ import cn.bc.web.ui.html.grid.TextColumn;
 import cn.bc.web.ui.html.page.ButtonOption;
 import cn.bc.web.ui.html.page.HtmlPage;
 import cn.bc.web.ui.html.page.PageOption;
-import cn.bc.web.ui.html.toolbar.Toolbar;
 import cn.bc.web.ui.json.Json;
 import cn.bc.web.ui.json.JsonArray;
 
@@ -59,8 +57,6 @@ import cn.bc.web.ui.json.JsonArray;
 public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 	// private static Log logger = LogFactory.getLog(CarAction.class);
 	private static final long serialVersionUID = 1L;
-	private String MANAGER_KEY = "R_ADMIN";// 管理角色的编码
-	public boolean isManager;
 	private Long carId;
 	public String isClosed;
 	public boolean isMoreCar;
@@ -74,8 +70,6 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 	private OptionService optionService;
 	private AttachService attachService;
 	public AttachWidget attachsUI;
-	public OptionConstants optionConstants;
-	public CarByDriverService carByDriverService;
 
 	public List<Motorcade> motorcadeList; // 可选车队列表
 	public List<OptionItem> dutyList; // 可选责任列表
@@ -89,8 +83,8 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 	public Map<String, String> sourcesValue;
 
 	private Long carManId;
-	public CarManService carManService;
-	public CarService carService;
+	private CarManService carManService;
+	private CarService carService;
 
 	public Long getCarId() {
 		return carId;
@@ -111,11 +105,6 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 	@Autowired
 	public void CarService(CarService carService) {
 		this.carService = carService;
-	}
-
-	@Autowired
-	public void CarByDriverService(CarByDriverService carByDriverService) {
-		this.carByDriverService = carByDriverService;
 	}
 
 	@Autowired
@@ -149,14 +138,8 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 		this.carManService = carManService;
 	}
 
-	// 判断当前用户是否是本模块管理员
-	private boolean isManager() {
-		return ((SystemContext) this.getContext()).hasAnyRole(MANAGER_KEY);
-	}
-
 	@SuppressWarnings("static-access")
 	private AttachWidget buildAttachsUI(boolean isNew) {
-		isManager = isManager();
 		// 构建附件控件
 		String ptype = "contractLabour.main";
 		AttachWidget attachsUI = new AttachWidget();
@@ -182,8 +165,10 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 
 	@Override
 	public boolean isReadonly() {
+		// 事故理赔管理员或系统管理员
 		SystemContext context = (SystemContext) this.getContext();
-		return !context.hasAnyRole(MANAGER_KEY);
+		return !context.hasAnyRole(getText("key.role.bs.accident"),
+				getText("key.role.bc.admin"));
 	}
 
 	@Override
@@ -217,31 +202,6 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 				.setHeight(400).setMinHeight(300);
 	}
 
-	@Override
-	protected Toolbar buildToolbar() {
-		isManager = isReadonly();
-		Toolbar tb = new Toolbar();
-
-		if (!isManager) {
-			// 新建按钮
-			tb.addButton(getDefaultCreateToolbarButton());
-
-			// 编辑按钮
-			tb.addButton(getDefaultEditToolbarButton());
-
-			// 删除按钮
-			tb.addButton(getDefaultDeleteToolbarButton());
-		} else {// 普通用户
-			// 查看按钮
-			tb.addButton(getDefaultOpenToolbarButton());
-		}
-
-		// 搜索按钮
-		tb.addButton(getDefaultSearchToolbarButton());
-
-		return tb;
-	}
-
 	// 搜索条件
 	@Override
 	protected String[] getSearchFields() {
@@ -251,9 +211,6 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 
 	@Override
 	protected List<Column> buildGridColumns() {
-		// 是否本模块管理员
-		isManager = isReadonly();
-
 		List<Column> columns = super.buildGridColumns();
 		columns.add(new TextColumn("status", getText("runcase.status"), 50)
 				.setSortable(true).setValueFormater(
@@ -323,13 +280,13 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 			}
 		}
 		departmentList = this.optionService
-				.findOptionItemByGroupKey(optionConstants.CA_DEPARTMENT);
+				.findOptionItemByGroupKey(OptionConstants.CA_DEPARTMENT);
 		companyList = this.optionService
-				.findOptionItemByGroupKey(optionConstants.CA_COMPANY);
+				.findOptionItemByGroupKey(OptionConstants.CA_COMPANY);
 		dutyList = this.optionService
-				.findOptionItemByGroupKey(optionConstants.CA_DUTY);
+				.findOptionItemByGroupKey(OptionConstants.CA_DUTY);
 		sortList = this.optionService
-				.findOptionItemByGroupKey(optionConstants.CA_SORT);
+				.findOptionItemByGroupKey(OptionConstants.CA_SORT);
 		this.getE().setUid(
 				this.getIdGeneratorService().next(this.getE().ATTACH_TYPE));
 
@@ -357,13 +314,13 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 		initSelects();
 
 		departmentList = this.optionService
-				.findOptionItemByGroupKey(optionConstants.CA_DEPARTMENT);
+				.findOptionItemByGroupKey(OptionConstants.CA_DEPARTMENT);
 		companyList = this.optionService
-				.findOptionItemByGroupKey(optionConstants.CA_COMPANY);
+				.findOptionItemByGroupKey(OptionConstants.CA_COMPANY);
 		dutyList = this.optionService
-				.findOptionItemByGroupKey(optionConstants.CA_DUTY);
+				.findOptionItemByGroupKey(OptionConstants.CA_DUTY);
 		sortList = this.optionService
-				.findOptionItemByGroupKey(optionConstants.CA_SORT);
+				.findOptionItemByGroupKey(OptionConstants.CA_SORT);
 
 		// 构建附件控件
 		attachsUI = buildAttachsUI(false);
@@ -504,34 +461,34 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 		List<CarMan> drivers = this.carManService.selectAllCarManByCarId(carId);
 		JsonArray jsons = new JsonArray();
 		Json o;
-		for(CarMan driver : drivers){
+		for (CarMan driver : drivers) {
 			o = new Json();
 			o.put("name", driver.getName());
 			o.put("id", driver.getId());
 			o.put("cert4FWZG", driver.getCert4FWZG());
 			o.put("region", driver.getRegion());
 			o.put("drivingStatus", driver.getDrivingStatus());
-			
+
 			jsons.add(o);
 		}
 		json = jsons.toString();
 		return "json";
-		
-//		json = new Json();
-//		if (carMans.size() == 1) {
-//			json.put("name", carMans.get(0).getName());
-//			json.put("id", carMans.get(0).getId());
-//			json.put("cert4fwzg", carMans.get(0).getCert4FWZG());
-//			json.put("region", carMans.get(0).getRegion());
-//			json.put("drivingstaus", carMans.get(0).getDrivingStatus());
-//
-//		} else if(carMans.size()==0){
-//			isNullCarMan = true;
-//			return "a";
-//		}else{
-//			isMoreCarMan = true;
-//			
-//		}
+
+		// json = new Json();
+		// if (carMans.size() == 1) {
+		// json.put("name", carMans.get(0).getName());
+		// json.put("id", carMans.get(0).getId());
+		// json.put("cert4fwzg", carMans.get(0).getCert4FWZG());
+		// json.put("region", carMans.get(0).getRegion());
+		// json.put("drivingstaus", carMans.get(0).getDrivingStatus());
+		//
+		// } else if(carMans.size()==0){
+		// isNullCarMan = true;
+		// return "a";
+		// }else{
+		// isMoreCarMan = true;
+		//
+		// }
 	}
 
 }

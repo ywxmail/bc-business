@@ -18,6 +18,7 @@ import cn.bc.core.query.condition.Direction;
 import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.db.jdbc.RowMapper;
 import cn.bc.db.jdbc.SqlObject;
+import cn.bc.identity.web.SystemContext;
 import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.formater.EntityStatusFormater;
 import cn.bc.web.ui.html.grid.Column;
@@ -38,6 +39,14 @@ public class CaseTrafficsAction extends ViewAction<Map<String, Object>> {
 	private static final long serialVersionUID = 1L;
 	public String status = String.valueOf(CaseBase.STATUS_ACTIVE)+","+String.valueOf(CaseBase.STATUS_CLOSED); // 交通违章的状态，多个用逗号连接
 	public String type = String.valueOf(CaseBase.TYPE_INFRACT_TRAFFIC);
+
+	@Override
+	public boolean isReadonly() {
+		// 交通违章管理员或系统管理员
+		SystemContext context = (SystemContext) this.getContext();
+		return !context.hasAnyRole(getText("key.role.bs.infractTraffic"),
+				getText("key.role.bc.admin"));
+	}
 
 	@Override
 	protected OrderCondition getGridDefaultOrderCondition() {

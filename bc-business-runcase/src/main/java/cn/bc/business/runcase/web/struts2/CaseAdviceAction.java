@@ -39,7 +39,6 @@ import cn.bc.web.ui.html.grid.TextColumn;
 import cn.bc.web.ui.html.page.ButtonOption;
 import cn.bc.web.ui.html.page.HtmlPage;
 import cn.bc.web.ui.html.page.PageOption;
-import cn.bc.web.ui.html.toolbar.Toolbar;
 import cn.bc.web.ui.json.Json;
 
 /**
@@ -54,8 +53,6 @@ public class CaseAdviceAction extends
 		FileEntityAction<Long, Case4InfractBusiness> {
 	// private static Log logger = LogFactory.getLog(CarAction.class);
 	private static final long serialVersionUID = 1L;
-	private String MANAGER_KEY = "R_ADMIN";// 管理角色的编码
-	public boolean isManager;
 	public Long carManId;
 
 	@SuppressWarnings("unused")
@@ -101,8 +98,10 @@ public class CaseAdviceAction extends
 
 	@Override
 	public boolean isReadonly() {
+		// 投诉与建议管理角色或系统管理员
 		SystemContext context = (SystemContext) this.getContext();
-		return !context.hasAnyRole(MANAGER_KEY);
+		return !context.hasAnyRole(getText("key.role.bs.advice"),
+				getText("key.role.bc.admin"));
 	}
 
 	@Override
@@ -136,31 +135,6 @@ public class CaseAdviceAction extends
 				.setHeight(400).setMinHeight(300);
 	}
 
-	@Override
-	protected Toolbar buildToolbar() {
-		isManager = isReadonly();
-		Toolbar tb = new Toolbar();
-
-		if (!isManager) {
-			// 新建按钮
-			tb.addButton(getDefaultCreateToolbarButton());
-
-			// 编辑按钮
-			tb.addButton(getDefaultEditToolbarButton());
-
-			// 删除按钮
-			tb.addButton(getDefaultDeleteToolbarButton());
-		} else {// 普通用户
-			// 查看按钮
-			tb.addButton(getDefaultOpenToolbarButton());
-		}
-
-		// 搜索按钮
-		tb.addButton(getDefaultSearchToolbarButton());
-
-		return tb;
-	}
-
 	// 搜索条件
 	@Override
 	protected String[] getSearchFields() {
@@ -170,9 +144,6 @@ public class CaseAdviceAction extends
 
 	@Override
 	protected List<Column> buildGridColumns() {
-		// 是否本模块管理员
-		isManager = isReadonly();
-
 		List<Column> columns = super.buildGridColumns();
 		columns.add(new TextColumn("status", getText("runcase.status"), 50)
 				.setSortable(true).setValueFormater(
