@@ -22,6 +22,7 @@ import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.core.util.StringUtils;
 import cn.bc.db.jdbc.RowMapper;
 import cn.bc.db.jdbc.SqlObject;
+import cn.bc.identity.web.SystemContext;
 import cn.bc.web.formater.AbstractFormater;
 import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.formater.EntityStatusFormater;
@@ -44,6 +45,14 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 	public String status = String.valueOf(Entity.STATUS_ENABLED); // 车辆的状态，多个用逗号连接
 
 	@Override
+	public boolean isReadonly() {
+		//车辆管理员或系统管理员
+		SystemContext context = (SystemContext) this.getContext();
+		return !context.hasAnyRole(getText("key.role.bs.car"),
+				getText("key.role.bc.admin"));
+	}
+
+	@Override
 	protected OrderCondition getGridDefaultOrderCondition() {
 		// 默认排序方向：状态|登记日期|车队
 		return new OrderCondition("c.status_", Direction.Asc).add(
@@ -62,7 +71,7 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 		sql.append(" from bs_car c");
 		sql.append(" inner join bs_motorcade m on m.id=c.motorcade_id");
 		sqlObject.setSql(sql.toString());
-		
+
 		// 注入参数
 		sqlObject.setArgs(null);
 

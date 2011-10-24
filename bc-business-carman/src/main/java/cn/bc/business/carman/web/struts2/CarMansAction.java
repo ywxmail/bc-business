@@ -23,6 +23,7 @@ import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.core.util.StringUtils;
 import cn.bc.db.jdbc.RowMapper;
 import cn.bc.db.jdbc.SqlObject;
+import cn.bc.identity.web.SystemContext;
 import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.formater.EntityStatusFormater;
 import cn.bc.web.formater.KeyValueFormater;
@@ -43,6 +44,14 @@ import cn.bc.web.ui.json.Json;
 public class CarMansAction extends ViewAction<Map<String, Object>> {
 	private static final long serialVersionUID = 1L;
 	public String status = String.valueOf(Entity.STATUS_ENABLED); // 车辆的状态，多个用逗号连接
+
+	@Override
+	public boolean isReadonly() {
+		//司机管理员或系统管理员
+		SystemContext context = (SystemContext) this.getContext();
+		return !context.hasAnyRole(getText("key.role.bs.driver"),
+				getText("key.role.bc.admin"));
+	}
 
 	@Override
 	protected OrderCondition getGridDefaultOrderCondition() {

@@ -24,7 +24,6 @@ import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.core.util.DateUtils;
 import cn.bc.identity.service.IdGeneratorService;
 import cn.bc.identity.web.SystemContext;
-import cn.bc.option.domain.OptionItem;
 import cn.bc.option.service.OptionService;
 import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.formater.KeyValueFormater;
@@ -46,7 +45,6 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 	// private static Log logger = LogFactory.getLog(BulletinAction.class);
 	private static final long serialVersionUID = 1L;
 	private IdGeneratorService idGeneratorService;
-	public String MANAGER_KEY = "R_MANAGER_BUSINESS";// 管理角色的编码
 	public CarManService carManService;
 	public String portrait;
 	public Map<String, String> statusesValue;
@@ -78,8 +76,10 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 
 	@Override
 	public boolean isReadonly() {
+		// 司机管理员或系统管理员
 		SystemContext context = (SystemContext) this.getContext();
-		return !context.hasAnyRole(MANAGER_KEY, getText("key.role.admin"));
+		return !context.hasAnyRole(getText("key.role.bs.driver"),
+				getText("key.role.bc.admin"));
 	}
 
 	@Override
@@ -108,13 +108,13 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 
 	@Override
 	public String edit() throws Exception {
-//		String result = super.edit();
-//		statusesValue = this.getEntityStatuses();
-//		this.initSelects();
+		// String result = super.edit();
+		// statusesValue = this.getEntityStatuses();
+		// this.initSelects();
 		// 获取相片的连接
 		portrait = "/bc/libs/themes/default/images/portrait/1in110x140.png";
 
-		//return result;
+		// return result;
 		Date startTime = new Date();
 		String r = super.edit();
 
@@ -233,9 +233,9 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 				.get(OptionConstants.CARMAN_HOUSETYPE);
 		// 司机责任人等级列表
 		this.carManLevelList = optionItems.get(OptionConstants.CARMAN_LEVEL);
-		//  司机责任人准驾车型列表
+		// 司机责任人准驾车型列表
 		this.carManModelList = optionItems.get(OptionConstants.CARMAN_MODEL);
-		
+
 		if (logger.isInfoEnabled())
 			logger.info("findOptionItem耗时：" + DateUtils.getWasteTime(startTime));
 	}
