@@ -34,7 +34,6 @@ import cn.bc.web.ui.html.grid.TextColumn;
 import cn.bc.web.ui.html.page.ButtonOption;
 import cn.bc.web.ui.html.page.HtmlPage;
 import cn.bc.web.ui.html.page.PageOption;
-import cn.bc.web.ui.html.toolbar.Toolbar;
 import cn.bc.web.ui.json.Json;
 
 /**
@@ -48,8 +47,6 @@ import cn.bc.web.ui.json.Json;
 public class CarByDriverAction extends FileEntityAction<Long, CarByDriver> {
 	// private static Log logger = LogFactory.getLog(BulletinAction.class);
 	private static final long serialVersionUID = 1L;
-	private String MANAGER_KEY = "R_ADMIN";// 管理角色的编码
-	public boolean isManager;
 	public CarByDriverService carByDriverService;
 	public String portrait;
 	public Map<String, String> statusesValueList;// 状态列表
@@ -72,6 +69,14 @@ public class CarByDriverAction extends FileEntityAction<Long, CarByDriver> {
 	public void setCarByDriverService(CarByDriverService carByDriverService) {
 		this.carByDriverService = carByDriverService;
 		this.setCrudService(carByDriverService);
+	}
+
+	@Override
+	public boolean isReadonly() {
+		// 车辆管理/司机管理或系统管理员
+		SystemContext context = (SystemContext) this.getContext();
+		return !context.hasAnyRole(getText("key.role.bs.car"),
+				getText("key.role.bs.driver"), getText("key.role.bc.admin"));
 	}
 
 	@Override
@@ -113,7 +118,7 @@ public class CarByDriverAction extends FileEntityAction<Long, CarByDriver> {
 	protected PageOption buildFormPageOption() {
 		PageOption option = new PageOption().setWidth(390).setMinWidth(250)
 				.setMinHeight(200);
-		if (isManager()) {
+		if (!isReadonly()) {
 			option.addButton(new ButtonOption(getText("label.save"), "save"));
 		}
 		return option;
@@ -139,37 +144,8 @@ public class CarByDriverAction extends FileEntityAction<Long, CarByDriver> {
 	}
 
 	@Override
-	protected Toolbar buildToolbar() {
-		isManager = isManager();
-		Toolbar tb = new Toolbar();
-
-		if (isManager) {
-			// 新建按钮
-			tb.addButton(getDefaultCreateToolbarButton());
-
-			// 编辑按钮
-			tb.addButton(getDefaultEditToolbarButton());
-
-			// 删除按钮
-			tb.addButton(getDefaultDeleteToolbarButton());
-		} else {// 普通用户
-			// 查看按钮
-			tb.addButton(getDefaultOpenToolbarButton());
-		}
-		if (carManId == null || carId == null) {
-			// 搜索按钮
-			tb.addButton(getDefaultSearchToolbarButton());
-		}
-		return tb;
-	}
-
-	@Override
 	protected List<Column> buildGridColumns() {
-		// 是否本模块管理员
-		isManager = isManager();
-
 		List<Column> columns = super.buildGridColumns();
-
 		columns.add(new TextColumn("status", getText("carByDriver.statuses"),
 				100).setSortable(true).setValueFormater(
 				new KeyValueFormater(getEntityStatuses())));
@@ -249,11 +225,6 @@ public class CarByDriverAction extends FileEntityAction<Long, CarByDriver> {
 				getText("carMan.description"), 270).setSortable(true));
 
 		return columns;
-	}
-
-	// 判断当前用户是否是本模块管理员
-	private boolean isManager() {
-		return ((SystemContext) this.getContext()).hasAnyRole(MANAGER_KEY);
 	}
 
 	@Override
