@@ -30,7 +30,6 @@ public class CertAction extends FileEntityAction<Long, Cert> {
 	// private static Log logger = LogFactory.getLog(BulletinAction.class);
 	private static final long serialVersionUID = 1L;
 	public CertService certService;
-	public String MANAGER_KEY = "R_ADMIN"; // 车辆管理员角色的编码
 
 	@Autowired
 	public void setCertService( CertService certService) {
@@ -38,9 +37,7 @@ public class CertAction extends FileEntityAction<Long, Cert> {
 		this.setCrudService(certService);
 	}
 
-
 	public AttachWidget attachsUI;
-
 	
 	// 设置页面的尺寸
 	@Override
@@ -48,11 +45,14 @@ public class CertAction extends FileEntityAction<Long, Cert> {
 		return super.buildListPageOption().setWidth(850).setMinWidth(300)
 				.setHeight(400).setMinHeight(300);
 	}
-	
+
 	@Override
 	public boolean isReadonly() {
+		// 车辆证件\司机证件管理员或系统管理员
 		SystemContext context = (SystemContext) this.getContext();
-		return !context.hasAnyRole(MANAGER_KEY);
+		return !context.hasAnyRole(getText("key.role.bs.cert4car"),
+				getText("key.role.bs.cert4driver"),
+				getText("key.role.bc.admin"));
 	}
 	
 	/**
