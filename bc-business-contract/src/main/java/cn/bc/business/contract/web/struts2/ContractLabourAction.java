@@ -50,8 +50,6 @@ public class ContractLabourAction extends FileEntityAction<Long, Contract4Labour
 	private ContractLabourService 		contractLabourService;
 	private ContractChargerService		contractChargerService;
 	private AttachService 				attachService;
-	private String						MANAGER_KEY 				= "R_ADMIN";// 管理角色的编码
-	public 	boolean 	   				isManager;
 	private	Long 						carManId;
 	private	Long 						carId;
 	private	Long 						oldCarManId;
@@ -122,15 +120,16 @@ public class ContractLabourAction extends FileEntityAction<Long, Contract4Labour
 
 	@Override
 	public boolean isReadonly() {
+		// 劳动合同管理员或系统管理员
 		SystemContext context = (SystemContext) this.getContext();
-		return !context.hasAnyRole(MANAGER_KEY);
+		return !context.hasAnyRole(getText("key.role.bs.contract4labour"),
+				getText("key.role.bc.admin"));
 	}
 	
 
 	@SuppressWarnings("static-access")
 	public String create() throws Exception {
 		String r = super.create();
-		isManager = isReadonly();
 		
 		if(carId != null && carManId == null){
 			//根据carId查找车辆以及司机id
@@ -315,7 +314,6 @@ public class ContractLabourAction extends FileEntityAction<Long, Contract4Labour
 	
 	@SuppressWarnings("static-access")
 	private AttachWidget buildAttachsUI(boolean isNew) {
-		isManager = isManager();
 		// 构建附件控件
 		String ptype = "contractLabour.main";
 		AttachWidget attachsUI = new AttachWidget();
@@ -361,12 +359,6 @@ public class ContractLabourAction extends FileEntityAction<Long, Contract4Labour
 	@Override
 	protected String[] getSearchFields() {
 		return new String[] { "contract.code", "contract.wordNo" , "contract.ext_str1", "contract.ext_str2"};
-	}
-	
-	
-	// 判断当前用户是否是本模块管理员
-	private boolean isManager() {
-		return ((SystemContext) this.getContext()).hasAnyRole(MANAGER_KEY);
 	}
 	
 	public Json json;
