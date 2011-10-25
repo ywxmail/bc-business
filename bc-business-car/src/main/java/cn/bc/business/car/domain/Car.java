@@ -15,11 +15,11 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import cn.bc.business.cert.domain.Cert;
 import cn.bc.business.contract.domain.Contract;
 import cn.bc.business.motorcade.domain.Motorcade;
-import cn.bc.identity.domain.Actor;
 import cn.bc.identity.domain.RichFileEntityImpl;
 
 /**
@@ -190,6 +190,11 @@ public class Car extends RichFileEntityImpl {
 	@Column(name = "PLATE_NO")
 	public String getPlateNo() {
 		return plateNo;
+	}
+
+	@Transient
+	public String getPlate() {
+		return this.plateType + "." + this.plateNo;
 	}
 
 	public void setPlateNo(String plateNo) {
