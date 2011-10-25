@@ -26,7 +26,6 @@ import cn.bc.web.formater.AbstractFormater;
 import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.struts2.AbstractSelectPageAction;
 import cn.bc.web.ui.html.grid.Column;
-import cn.bc.web.ui.html.grid.Grid;
 import cn.bc.web.ui.html.grid.IdColumn4MapKey;
 import cn.bc.web.ui.html.grid.TextColumn4MapKey;
 import cn.bc.web.ui.html.page.HtmlPage;
@@ -163,11 +162,6 @@ public class SelectCarAction extends AbstractSelectPageAction<Map<String, Object
 			json.put("status", status);
 			return json;
 		}
-	}
-
-	@Override
-	protected Grid getHtmlPageGrid() {
-		return super.getHtmlPageGrid();
 	}
 
 	@Override

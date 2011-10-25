@@ -4,92 +4,94 @@
 package cn.bc.business.carman.web.struts2;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
 import cn.bc.business.BSConstants;
-import cn.bc.business.carman.domain.CarMan;
-import cn.bc.business.carman.service.CarManService;
-import cn.bc.core.query.Query;
+import cn.bc.core.Entity;
 import cn.bc.core.query.condition.Condition;
+import cn.bc.core.query.condition.Direction;
 import cn.bc.core.query.condition.impl.AndCondition;
 import cn.bc.core.query.condition.impl.EqualsCondition;
 import cn.bc.core.query.condition.impl.InCondition;
+import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.core.util.StringUtils;
+import cn.bc.db.jdbc.RowMapper;
 import cn.bc.db.jdbc.SqlObject;
+import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.struts2.AbstractSelectPageAction;
 import cn.bc.web.ui.html.grid.Column;
-import cn.bc.web.ui.html.grid.IdColumn;
-import cn.bc.web.ui.html.grid.TextColumn;
+import cn.bc.web.ui.html.grid.IdColumn4MapKey;
+import cn.bc.web.ui.html.grid.TextColumn4MapKey;
+import cn.bc.web.ui.html.page.HtmlPage;
 import cn.bc.web.ui.html.page.PageOption;
 import cn.bc.web.ui.json.Json;
 
 /**
- * 选择司机、责任人Action
+ * 选择司机Action
  * 
  * @author dragon
  * 
  */
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 @Controller
-public class SelectCarManAction extends AbstractSelectPageAction<CarMan> {
+public class SelectCarManAction extends
+		AbstractSelectPageAction<Map<String, Object>> {
 	private static final long serialVersionUID = 1L;
-	public CarManService carManService;
-	public String types; // 类型控制
-	public String status; // 状态，多个用逗号连接
+	public String status = String.valueOf(Entity.STATUS_ENABLED); // 司机的状态，多个用逗号连接
+	public String types = String.valueOf(Entity.STATUS_ENABLED); // 司机的类型，多个用逗号连接
 
-	@Autowired
-	public void setCarManService(CarManService carManService) {
-		this.carManService = carManService;
+	@Override
+	protected OrderCondition getGridDefaultOrderCondition() {
+		// 默认排序方向：状态|创建日期
+		return new OrderCondition("c.status_", Direction.Asc).add(
+				"c.file_date", Direction.Desc);
 	}
 
 	@Override
-	protected Query<CarMan> getQuery() {
-		return this.carManService.createQuery();
-	}
+	protected SqlObject<Map<String, Object>> getSqlObject() {
+		SqlObject<Map<String, Object>> sqlObject = new SqlObject<Map<String, Object>>();
 
-	@Override
-	protected String getHtmlPageNamespace() {
-		return this.getContextPath() + BSConstants.NAMESPACE + "/selectCarMan";
-	}
+		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
+		StringBuffer sql = new StringBuffer();
+		sql.append("select c.id,c.name,c.cert_fwzg,c.work_date,c.type_ from BS_CARMAN c");
+		sqlObject.setSql(sql.toString());
 
-	@Override
-	protected String getClickOkMethod() {
-		return "bs.carManSelectDialog.clickOk";
+		// 注入参数
+		sqlObject.setArgs(null);
+
+		// 数据映射器
+		sqlObject.setRowMapper(new RowMapper<Map<String, Object>>() {
+			public Map<String, Object> mapRow(Object[] rs, int rowNum) {
+				Map<String, Object> map = new HashMap<String, Object>();
+				int i = 0;
+				map.put("id", rs[i++]);
+				map.put("name", rs[i++]);
+				map.put("cert_fwzg", rs[i++]);
+				map.put("work_date", rs[i++]);
+				return map;
+			}
+		});
+		return sqlObject;
 	}
 
 	@Override
 	protected List<Column> getGridColumns() {
 		List<Column> columns = new ArrayList<Column>();
-		columns.add(new IdColumn());
-		columns.add(new TextColumn("name", getText("carMan.name"))
-				.setSortable(true));
+		columns.add(new IdColumn4MapKey("c.id", "id"));
+		columns.add(new TextColumn4MapKey("c.name", "name",
+				getText("carMan.name"), 80).setSortable(true));
+		columns.add(new TextColumn4MapKey("c.cert_fwzg", "cert_fwzg",
+				getText("carMan.cert4FWZG"), 80));
+		columns.add(new TextColumn4MapKey("c.work_date", "work_date",
+				getText("carMan.workDate"), 120).setSortable(true)
+				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
 		return columns;
-	}
-
-	@Override
-	protected PageOption getHtmlPageOption() {
-		return super.getHtmlPageOption().setWidth(400).setHeight(450);
-	}
-
-	@Override
-	protected String getHtmlPageJs() {
-		return this.getContextPath() + BSConstants.NAMESPACE
-				+ "/carMan/select.js";
-	}
-
-	@Override
-	protected String[] getGridSearchFields() {
-		return new String[] { "name" };
-	}
-
-	@Override
-	protected String getGridRowLabelExpression() {
-		return "name";
 	}
 
 	@Override
@@ -103,65 +105,87 @@ public class SelectCarManAction extends AbstractSelectPageAction<CarMan> {
 	}
 
 	@Override
+	protected String[] getGridSearchFields() {
+		return new String[] { "c.name", "c.cert_fwzg" };
+	}
+
+	@Override
+	protected PageOption getHtmlPageOption() {
+		return super.getHtmlPageOption().setWidth(400).setHeight(450);
+	}
+
+	@Override
+	protected String getGridRowLabelExpression() {
+		return "['name']";
+	}
+
+	@Override
+	protected HtmlPage buildHtmlPage() {
+		return super.buildHtmlPage().setNamespace(
+				this.getHtmlPageNamespace() + "/selectCarMan");
+	}
+
+	@Override
+	protected String getHtmlPageJs() {
+		return this.getHtmlPageNamespace() + "/carMan/select.js";
+	}
+
+	@Override
 	protected Condition getGridSpecalCondition() {
-		Condition c1 = null;
-		if (this.types != null && this.types.length() > 0) {
-			// 用空格分隔多个查询条件的值的处理
-			String[] values = this.types.split(",");
-			Integer[] _values = StringUtils.stringArray2IntegerArray(values);
-
-			// 添加查询条件
-			c1 = new InCondition("type", _values);
-		}
-
-		Condition c2 = null;
-		// status
+		// 状态条件
+		Condition statusCondition = null;
 		if (status != null && status.length() > 0) {
 			String[] ss = status.split(",");
-
 			if (ss.length == 1) {
-				c2 = new EqualsCondition("status", new Integer(ss[0]));
+				statusCondition = new EqualsCondition("c.status_", new Integer(
+						ss[0]));
 			} else {
-				c2 = new InCondition("status",
+				statusCondition = new InCondition("c.status_",
 						StringUtils.stringArray2IntegerArray(ss));
 			}
 		}
 
-		if (c1 != null && c2 == null) {
-			return c1;
-		} else if (c1 == null && c2 != null) {
-			return c2;
-		} else if (c1 != null && c2 != null) {
-			return new AndCondition().add(c1).add(c2);
-		} else {
-			return null;
+		// 类型条件
+		Condition typeCondition = null;
+		if (types != null && types.length() > 0) {
+			String[] ss = types.split(",");
+			if (ss.length == 1) {
+				typeCondition = new EqualsCondition("c.type_", new Integer(
+						ss[0]));
+			} else {
+				typeCondition = new InCondition("c.type_",
+						StringUtils.stringArray2IntegerArray(ss));
+			}
 		}
+
+		// 合并条件
+		return new AndCondition().add(statusCondition).add(typeCondition);
 	}
 
 	@Override
 	protected Json getGridExtrasData() {
-		Json json = null;
+		Json json = new Json();
+
+		// 状态条件
+		if (this.status != null && this.status.length() > 0) {
+			json.put("status", status);
+		}
+
+		// 类型条件
 		if (this.types != null && this.types.length() > 0) {
-			json = new Json();
 			json.put("types", types);
 		}
 
-		if (this.status != null && this.status.length() > 0) {
-			if (json == null)
-				json = new Json();
-			json.put("status", status);
-		}
-		return json;
+		return json.isEmpty() ? null : json;
 	}
 
 	@Override
-	protected String getFormActionName() {
-		return null;
+	protected String getClickOkMethod() {
+		return "bs.carManSelectDialog.clickOk";
 	}
 
 	@Override
-	protected SqlObject<CarMan> getSqlObject() {
-		// TODO Auto-generated method stub
-		return null;
+	protected String getHtmlPageNamespace() {
+		return this.getContextPath() + BSConstants.NAMESPACE;
 	}
 }
