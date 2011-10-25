@@ -20,6 +20,7 @@ import cn.bc.core.query.condition.Direction;
 import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.db.jdbc.RowMapper;
 import cn.bc.db.jdbc.SqlObject;
+import cn.bc.identity.web.SystemContext;
 import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.formater.DateRangeFormater;
 import cn.bc.web.formater.EntityStatusFormater;
@@ -41,6 +42,14 @@ public class ContractLaboursAction extends ViewAction<Map<String, Object>> {
 	private static final long serialVersionUID = 1L;
 	public String status = String.valueOf(Entity.STATUS_ENABLED)+","+String.valueOf(Entity.STATUS_DISABLED); // 交通违章的状态，多个用逗号连接
 	public String type = String.valueOf(Contract.TYPE_CHARGER);
+
+	@Override
+	public boolean isReadonly() {
+		// 劳动合同管理员或系统管理员
+		SystemContext context = (SystemContext) this.getContext();
+		return !context.hasAnyRole(getText("key.role.bs.contract4labour"),
+				getText("key.role.bc.admin"));
+	}
 
 	@Override
 	protected OrderCondition getGridDefaultOrderCondition() {
