@@ -3,6 +3,7 @@
  */
 package cn.bc.business.carman.web.struts2;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,7 @@ import cn.bc.core.util.StringUtils;
 import cn.bc.db.jdbc.SqlObject;
 import cn.bc.web.struts2.AbstractSelectPageAction;
 import cn.bc.web.ui.html.grid.Column;
+import cn.bc.web.ui.html.grid.IdColumn;
 import cn.bc.web.ui.html.grid.TextColumn;
 import cn.bc.web.ui.html.page.PageOption;
 import cn.bc.web.ui.json.Json;
@@ -62,7 +64,8 @@ public class SelectCarManAction extends AbstractSelectPageAction<CarMan> {
 
 	@Override
 	protected List<Column> getGridColumns() {
-		List<Column> columns = super.getGridColumns();
+		List<Column> columns = new ArrayList<Column>();
+		columns.add(new IdColumn());
 		columns.add(new TextColumn("name", getText("carMan.name"))
 				.setSortable(true));
 		return columns;

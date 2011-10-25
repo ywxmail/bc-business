@@ -27,7 +27,7 @@ import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.struts2.AbstractSelectPageAction;
 import cn.bc.web.ui.html.grid.Column;
 import cn.bc.web.ui.html.grid.Grid;
-import cn.bc.web.ui.html.grid.IdColumn;
+import cn.bc.web.ui.html.grid.IdColumn4MapKey;
 import cn.bc.web.ui.html.grid.TextColumn4MapKey;
 import cn.bc.web.ui.html.page.HtmlPage;
 import cn.bc.web.ui.html.page.PageOption;
@@ -88,8 +88,7 @@ public class SelectCarAction extends AbstractSelectPageAction<Map<String, Object
 	@Override
 	protected List<Column> getGridColumns() {
 		List<Column> columns = new ArrayList<Column>();
-		columns.add(new IdColumn(true, "['plate_type']+'.'+['plate_no']")
-				.setId("c.id").setValueExpression("['id']"));
+		columns.add(new IdColumn4MapKey("c.id","id"));
 		columns.add(new TextColumn4MapKey("c.plate_no", "plate_no",
 				getText("car.plate"), 80).setUseTitleFromLabel(true)
 				.setValueFormater(new AbstractFormater<String>() {

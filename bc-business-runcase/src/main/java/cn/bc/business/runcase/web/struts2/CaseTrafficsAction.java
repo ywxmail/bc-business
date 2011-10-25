@@ -22,7 +22,7 @@ import cn.bc.identity.web.SystemContext;
 import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.formater.EntityStatusFormater;
 import cn.bc.web.ui.html.grid.Column;
-import cn.bc.web.ui.html.grid.IdColumn;
+import cn.bc.web.ui.html.grid.IdColumn4MapKey;
 import cn.bc.web.ui.html.grid.TextColumn4MapKey;
 import cn.bc.web.ui.html.page.PageOption;
 import cn.bc.web.ui.json.Json;
@@ -96,8 +96,7 @@ public class CaseTrafficsAction extends ViewAction<Map<String, Object>> {
 	@Override
 	protected List<Column> getGridColumns() {
 		List<Column> columns = new ArrayList<Column>();
-		columns.add(new IdColumn(true, "['case_no']")
-				.setId("cit.id").setValueExpression("['id']"));
+		columns.add(new IdColumn4MapKey("cit.id","id"));
 		columns.add(new TextColumn4MapKey("c.status_", "status_",
 				getText("runcase.status"), 50).setSortable(true).setValueFormater(
 				new EntityStatusFormater(getCaseStatuses()))); 

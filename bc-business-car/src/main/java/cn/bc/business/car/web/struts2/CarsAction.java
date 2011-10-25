@@ -27,7 +27,7 @@ import cn.bc.web.formater.AbstractFormater;
 import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.formater.EntityStatusFormater;
 import cn.bc.web.ui.html.grid.Column;
-import cn.bc.web.ui.html.grid.IdColumn;
+import cn.bc.web.ui.html.grid.IdColumn4MapKey;
 import cn.bc.web.ui.html.grid.TextColumn4MapKey;
 import cn.bc.web.ui.html.page.PageOption;
 import cn.bc.web.ui.json.Json;
@@ -105,8 +105,7 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 	@Override
 	protected List<Column> getGridColumns() {
 		List<Column> columns = new ArrayList<Column>();
-		columns.add(new IdColumn(true, "['plate_type']+'.'+['plate_no']")
-				.setId("c.id").setValueExpression("['id']"));
+		columns.add(new IdColumn4MapKey("c.id","id"));
 		columns.add(new TextColumn4MapKey("c.status_", "status_",
 				getText("car.status"), 60).setSortable(true).setValueFormater(
 				new EntityStatusFormater(getEntityStatuses())));
