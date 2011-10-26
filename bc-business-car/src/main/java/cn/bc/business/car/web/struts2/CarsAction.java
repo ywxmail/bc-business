@@ -44,7 +44,8 @@ import cn.bc.web.ui.json.Json;
 public class CarsAction extends ViewAction<Map<String, Object>> {
 	private static final long serialVersionUID = 1L;
 	public String status = String.valueOf(Entity.STATUS_ENABLED); // 车辆的状态，多个用逗号连接
-
+	public Long carManId;
+	public Long carId;
 	@Override
 	public boolean isReadonly() {
 		// 车辆管理员或系统管理员
