@@ -19,7 +19,7 @@ import cn.bc.identity.domain.RichFileEntityImpl;
 @Table(name = "BS_MOTORCADE")
 public class Motorcade extends RichFileEntityImpl {
 	private static final long serialVersionUID = 1L;
-	public  static final String KEY_UID = Motorcade.class.getSimpleName();
+	public  static final String KEY_UID = "motorcade.uid";
 	/** 类别：分队 */
 	public static final int TYPE_TEAM = 0;
 	/** 类别：分组 */

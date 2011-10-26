@@ -28,7 +28,7 @@ import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.formater.EntityStatusFormater;
 import cn.bc.web.formater.KeyValueFormater;
 import cn.bc.web.ui.html.grid.Column;
-import cn.bc.web.ui.html.grid.IdColumn;
+import cn.bc.web.ui.html.grid.IdColumn4MapKey;
 import cn.bc.web.ui.html.grid.TextColumn4MapKey;
 import cn.bc.web.ui.html.page.PageOption;
 import cn.bc.web.ui.json.Json;
@@ -47,7 +47,7 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	public boolean isReadonly() {
-		//司机管理员或系统管理员
+		// 司机管理员或系统管理员
 		SystemContext context = (SystemContext) this.getContext();
 		return !context.hasAnyRole(getText("key.role.bs.driver"),
 				getText("key.role.bc.admin"));
@@ -98,8 +98,7 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 	@Override
 	protected List<Column> getGridColumns() {
 		List<Column> columns = new ArrayList<Column>();
-		columns.add(new IdColumn(true, "['name']").setId("c.id")
-				.setValueExpression("['id']"));
+		columns.add(new IdColumn4MapKey("c.id", "id"));
 		columns.add(new TextColumn4MapKey("c.status_", "status_",
 				getText("carMan.status"), 60)
 				.setSortable(true)
@@ -129,7 +128,7 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 	@Override
 	protected String[] getGridSearchFields() {
 		return new String[] { "c.name", "c.origin", "c.cert_identity",
-				"c.cert_cyzg", "c.cert_fwzg", };
+				"c.cert_cyzg", "c.cert_fwzg" };
 	}
 
 	@Override

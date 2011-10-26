@@ -27,7 +27,7 @@ import cn.bc.core.query.condition.impl.EqualsCondition;
 import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.web.formater.KeyValueFormater;
-import cn.bc.web.formater.LinkFormater;
+import cn.bc.web.formater.LinkFormater4Id;
 import cn.bc.web.ui.html.grid.Column;
 import cn.bc.web.ui.html.grid.GridData;
 import cn.bc.web.ui.html.grid.TextColumn;
@@ -152,14 +152,12 @@ public class CarByDriverAction extends FileEntityAction<Long, CarByDriver> {
 		if (carManId != null || (carManId == null && carId == null)) {
 			columns.add(new TextColumn("car.plateNo",
 					getText("carByDriver.car.plateNo"), 150)
-					.setValueFormater(new LinkFormater(this.getContextPath()
+					.setValueFormater(new LinkFormater4Id(this.getContextPath()
 							+ "/bc-business/car/edit?id={0}", "car") {
 						@Override
-						public Object[] getParams(Object context, Object value) {
-							CarByDriver carByDriver = (CarByDriver) context;
-							Object[] args = new Object[1];
-							args[0] = carByDriver.getCar().getId().toString();
-							return args;
+						public String getIdValue(Object context, Object value) {
+							return ((CarByDriver) context).getCar().getId()
+									.toString();
 						}
 
 						@Override
@@ -167,22 +165,13 @@ public class CarByDriverAction extends FileEntityAction<Long, CarByDriver> {
 								Object value) {
 							CarByDriver carByDriver = (CarByDriver) context;
 							return getText("car") + " - "
-									+ carByDriver.getCar().getPlateType() + "."
-									+ carByDriver.getCar().getPlateNo();
-						}
-
-						@Override
-						public String getWinId(Object context, Object value) {
-							return "car"
-									+ ((CarByDriver) context).getDriver()
-											.getId();
+									+ carByDriver.getCar().getPlate();
 						}
 
 						@Override
 						public String getLinkText(Object context, Object value) {
 							CarByDriver carByDriver = (CarByDriver) context;
-							return carByDriver.getCar().getPlateType() + "."
-									+ carByDriver.getCar().getPlateNo();
+							return carByDriver.getCar().getPlate();
 						}
 					}));
 
@@ -190,15 +179,12 @@ public class CarByDriverAction extends FileEntityAction<Long, CarByDriver> {
 		if (carId != null || (carManId == null && carId == null)) {
 			columns.add(new TextColumn("driver.name",
 					getText("carByDriver.driver"), 100)
-					.setValueFormater(new LinkFormater(this.getContextPath()
+					.setValueFormater(new LinkFormater4Id(this.getContextPath()
 							+ "/bc-business/carMan/edit?id={0}", "driver") {
 						@Override
-						public Object[] getParams(Object context, Object value) {
-							CarByDriver carByDriver = (CarByDriver) context;
-							Object[] args = new Object[1];
-							args[0] = carByDriver.getDriver().getId()
+						public String getIdValue(Object context, Object value) {
+							return ((CarByDriver) context).getDriver().getId()
 									.toString();
-							return args;
 						}
 
 						@Override
@@ -206,13 +192,6 @@ public class CarByDriverAction extends FileEntityAction<Long, CarByDriver> {
 								Object value) {
 							return getText("carMan.type.driver") + " - "
 									+ value;
-						}
-
-						@Override
-						public String getWinId(Object context, Object value) {
-							return "driver"
-									+ ((CarByDriver) context).getDriver()
-											.getId();
 						}
 					}));
 		}

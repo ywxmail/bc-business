@@ -11,7 +11,7 @@ import cn.bc.business.BSConstants;
 import cn.bc.web.struts2.jpa.ViewActionWithJpa;
 
 /**
- * 基于JPA原生查询的视图Action封装
+ * 营运系统各模块视图Action的基类封装
  * 
  * @author dragon
  * 
