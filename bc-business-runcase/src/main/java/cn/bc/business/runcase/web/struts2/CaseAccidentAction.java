@@ -4,6 +4,7 @@
 package cn.bc.business.runcase.web.struts2;
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -19,7 +20,6 @@ import cn.bc.business.car.domain.Car;
 import cn.bc.business.car.service.CarService;
 import cn.bc.business.carman.domain.CarMan;
 import cn.bc.business.carman.service.CarManService;
-import cn.bc.business.motorcade.domain.Motorcade;
 import cn.bc.business.motorcade.service.MotorcadeService;
 import cn.bc.business.runcase.domain.Case4Accident;
 import cn.bc.business.runcase.domain.Case4InfractTraffic;
@@ -30,10 +30,10 @@ import cn.bc.core.query.condition.Condition;
 import cn.bc.core.query.condition.Direction;
 import cn.bc.core.query.condition.impl.EqualsCondition;
 import cn.bc.core.query.condition.impl.OrderCondition;
+import cn.bc.core.util.DateUtils;
 import cn.bc.docs.service.AttachService;
 import cn.bc.docs.web.ui.html.AttachWidget;
 import cn.bc.identity.web.SystemContext;
-import cn.bc.option.domain.OptionItem;
 import cn.bc.option.service.OptionService;
 import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.formater.EntityStatusFormater;
@@ -71,13 +71,11 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 	private AttachService attachService;
 	public AttachWidget attachsUI;
 
-	public List<Motorcade> motorcadeList; // 可选车队列表
-	public List<OptionItem> dutyList; // 可选责任列表
-	public List<OptionItem> sortList; // 可选性质列表
-	public List<OptionItem> degreeList; // 可选程度列表
-	public List<OptionItem> certList; // 可选没收证件列表
-	public List<OptionItem> departmentList; // 可选执法机关列表
-	public List<OptionItem> companyList; // 可选保险公司列表
+	public List<Map<String, String>> motorcadeList; // 可选车队列表
+	public List<Map<String, String>> dutyList; // 可选责任列表
+	public List<Map<String, String>> sortList; // 可选性质列表
+	public List<Map<String, String>> departmentList; // 可选执法机关列表
+	public List<Map<String, String>> companyList; // 可选保险公司列表
 
 	public Map<String, String> statusesValue;
 	public Map<String, String> sourcesValue;
@@ -279,14 +277,15 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 				isNullCarMan = true;
 			}
 		}
-		departmentList = this.optionService
-				.findOptionItemByGroupKey(OptionConstants.CA_DEPARTMENT);
-		companyList = this.optionService
-				.findOptionItemByGroupKey(OptionConstants.CA_COMPANY);
-		dutyList = this.optionService
-				.findOptionItemByGroupKey(OptionConstants.CA_DUTY);
-		sortList = this.optionService
-				.findOptionItemByGroupKey(OptionConstants.CA_SORT);
+		// departmentList = this.optionService
+		// .findOptionItemByGroupKey(OptionConstants.CA_DEPARTMENT);
+		// companyList = this.optionService
+		// .findOptionItemByGroupKey(OptionConstants.CA_COMPANY);
+		// dutyList = this.optionService
+		// .findOptionItemByGroupKey(OptionConstants.CA_DUTY);
+		// sortList = this.optionService
+		// .findOptionItemByGroupKey(OptionConstants.CA_SORT);
+		this.initSelects();
 		this.getE().setUid(
 				this.getIdGeneratorService().next(this.getE().ATTACH_TYPE));
 
@@ -313,14 +312,14 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 		sourcesValue = this.getSourceStatuses();
 		initSelects();
 
-		departmentList = this.optionService
-				.findOptionItemByGroupKey(OptionConstants.CA_DEPARTMENT);
-		companyList = this.optionService
-				.findOptionItemByGroupKey(OptionConstants.CA_COMPANY);
-		dutyList = this.optionService
-				.findOptionItemByGroupKey(OptionConstants.CA_DUTY);
-		sortList = this.optionService
-				.findOptionItemByGroupKey(OptionConstants.CA_SORT);
+		// departmentList = this.optionService
+		// .findOptionItemByGroupKey(OptionConstants.CA_DEPARTMENT);
+		// companyList = this.optionService
+		// .findOptionItemByGroupKey(OptionConstants.CA_COMPANY);
+		// dutyList = this.optionService
+		// .findOptionItemByGroupKey(OptionConstants.CA_DUTY);
+		// sortList = this.optionService
+		// .findOptionItemByGroupKey(OptionConstants.CA_SORT);
 
 		// 构建附件控件
 		attachsUI = buildAttachsUI(false);
@@ -356,49 +355,33 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 
 	// public Json json;
 
-	public String closefile() {
-		this.setE(this.getCrudService().load(this.getId()));
-		SystemContext context = this.getSystyemContext();
-		Case4Accident e = this.getE();
-		// Case4Accident ca=this.getCrudService().load(this.getE().getId());
-		// this.getE().setAuthor(ca.getAuthor());
-		// this.getE().setFileDate(ca.getFileDate());
-		// this.getE().setModifier(ca.getModifier());
-		// this.getE().setModifiedDate(ca.getModifiedDate());
-		e.setStatus(CaseBase.STATUS_CLOSED);
-		e.setCloserId(context.getUser().getId());
-		e.setCloserName(context.getUser().getName());
-		e.setCloseDate(Calendar.getInstance(Locale.CHINA));
-		this.getCrudService().save(e);
-
-		return "form";
-		// DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-		// String closeDateStr =
-		// df.format(this.getE().getCloseDate().getTime());
-		// json = new Json();
-		// json.put("status", this.getE().getStatus());
-		// //结案日期
-		// json.put("closeDate",Calendar.getInstance(Locale.CHINA).toString());
-		// json.put("closerId", context.getUser().getId());
-		// json.put("closerName", context.getUser().getName());
-		// return "json";
-	}
-
-	// 表单可选项的加载
-	public void initSelects() {
-		// 加载可选车队列表
-		this.motorcadeList = this.motorcadeService.createQuery().list();
-
-		// 加载可选程度列表
-		this.degreeList = this.optionService
-				.findOptionItemByGroupKey(OptionConstants.IT_DEGREE);
-		// 加载可选没收证件列表
-		this.certList = this.optionService
-				.findOptionItemByGroupKey(OptionConstants.BS_CERT);
-		// 加载可选执法机关列表
-		this.departmentList = this.optionService
-				.findOptionItemByGroupKey(OptionConstants.CA_DEPARTMENT);
-	}
+	// public String closefile() {
+	// this.setE(this.getCrudService().load(this.getId()));
+	// SystemContext context = this.getSystyemContext();
+	// Case4Accident e = this.getE();
+	// // Case4Accident ca=this.getCrudService().load(this.getE().getId());
+	// // this.getE().setAuthor(ca.getAuthor());
+	// // this.getE().setFileDate(ca.getFileDate());
+	// // this.getE().setModifier(ca.getModifier());
+	// // this.getE().setModifiedDate(ca.getModifiedDate());
+	// e.setStatus(CaseBase.STATUS_CLOSED);
+	// e.setCloserId(context.getUser().getId());
+	// e.setCloserName(context.getUser().getName());
+	// e.setCloseDate(Calendar.getInstance(Locale.CHINA));
+	// this.getCrudService().save(e);
+	//
+	// return "form";
+	// // DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+	// // String closeDateStr =
+	// // df.format(this.getE().getCloseDate().getTime());
+	// // json = new Json();
+	// // json.put("status", this.getE().getStatus());
+	// // //结案日期
+	// // json.put("closeDate",Calendar.getInstance(Locale.CHINA).toString());
+	// // json.put("closerId", context.getUser().getId());
+	// // json.put("closerName", context.getUser().getName());
+	// // return "json";
+	// }
 
 	/**
 	 * 获取Entity的状态值转换列表
@@ -489,6 +472,33 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 		// isMoreCarMan = true;
 		//
 		// }
+	}
+
+	// 表单可选项的加载
+	public void initSelects() {
+		Date startTime = new Date();
+		// 加载可选车队列表
+		this.motorcadeList = this.motorcadeService.find4Option();
+		logger.info("motorcadeList耗时：" + DateUtils.getWasteTime(startTime));
+
+		// 批量加载可选项列表
+		Map<String, List<Map<String, String>>> optionItems = this.optionService
+				.findOptionItemByGroupKeys(new String[] {
+						OptionConstants.CA_DUTY, OptionConstants.CA_SORT,
+						OptionConstants.CA_DEPARTMENT,
+						OptionConstants.CA_COMPANY, });
+
+		// 加载可选责任列表
+		this.dutyList = optionItems.get(OptionConstants.CA_DUTY);
+		// 加载可选营运性质列表
+		this.sortList = optionItems.get(OptionConstants.CA_SORT);
+		// 加载可选执法机关列表
+		this.departmentList = optionItems.get(OptionConstants.CA_DEPARTMENT);
+		// 加载可选保险公司列表
+		this.companyList = optionItems.get(OptionConstants.CA_COMPANY);
+
+		if (logger.isInfoEnabled())
+			logger.info("findOptionItem耗时：" + DateUtils.getWasteTime(startTime));
 	}
 
 }
