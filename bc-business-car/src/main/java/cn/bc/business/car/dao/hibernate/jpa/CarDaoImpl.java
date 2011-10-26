@@ -20,8 +20,8 @@ import org.springframework.util.StringUtils;
 
 import cn.bc.business.car.dao.CarDao;
 import cn.bc.business.car.domain.Car;
+import cn.bc.core.Entity;
 import cn.bc.core.Page;
-import cn.bc.core.RichEntity;
 import cn.bc.core.query.condition.Condition;
 import cn.bc.orm.hibernate.jpa.HibernateCrudJpaDao;
 
@@ -35,17 +35,17 @@ public class CarDaoImpl extends HibernateCrudJpaDao<Car> implements CarDao {
 
 	@Override
 	public void delete(Serializable id) {
-		// 仅将状态标记为已删除
+		// 仅将状态标记为注销
 		Map<String, Object> attrs = new HashMap<String, Object>();
-		attrs.put("status", new Integer(RichEntity.STATUS_DELETED));
+		attrs.put("status", new Integer(Entity.STATUS_DISABLED));
 		this.update(id, attrs);
 	}
 
 	@Override
 	public void delete(Serializable[] ids) {
-		// 仅将状态标记为已删除
+		// 仅将状态标记为为注销
 		Map<String, Object> attrs = new HashMap<String, Object>();
-		attrs.put("status", new Integer(RichEntity.STATUS_DELETED));
+		attrs.put("status", new Integer(Entity.STATUS_DISABLED));
 		this.update(ids, attrs);
 	}
 

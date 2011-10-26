@@ -31,6 +31,7 @@ import cn.bc.web.ui.html.grid.Column;
 import cn.bc.web.ui.html.grid.IdColumn4MapKey;
 import cn.bc.web.ui.html.grid.TextColumn4MapKey;
 import cn.bc.web.ui.html.page.PageOption;
+import cn.bc.web.ui.html.toolbar.Toolbar;
 import cn.bc.web.ui.json.Json;
 
 /**
@@ -109,7 +110,7 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 		columns.add(new IdColumn4MapKey("c.id", "id"));
 		columns.add(new TextColumn4MapKey("c.status_", "status_",
 				getText("car.status"), 60).setSortable(true).setValueFormater(
-				new EntityStatusFormater(getEntityStatuses())));
+				new EntityStatusFormater(getBSStatuses1())));
 		columns.add(new TextColumn4MapKey("c.register_date", "register_date",
 				getText("car.registerDate"), 100).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
@@ -206,7 +207,7 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected Condition getGridSpecalCondition() {
-		if (status != null && status.length() > 0) {
+		if (status != null && status.trim().length() > 0) {
 			String[] ss = status.split(",");
 			if (ss.length == 1) {
 				return new EqualsCondition("c.status_", new Integer(ss[0]));
@@ -221,12 +222,21 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected Json getGridExtrasData() {
-		if (this.status == null || this.status.length() == 0) {
+		if (this.status == null || this.status.trim().length() == 0) {
 			return null;
 		} else {
 			Json json = new Json();
 			json.put("status", status);
 			return json;
 		}
+	}
+
+	@Override
+	protected Toolbar getHtmlPageToolbar() {
+		return super.getHtmlPageToolbar()
+				.addButton(
+						Toolbar.getDefaultToolbarRadioGroup(
+								this.getBSStatuses1(), "status", 0,
+								getText("title.click2changeSearchStatus")));
 	}
 }
