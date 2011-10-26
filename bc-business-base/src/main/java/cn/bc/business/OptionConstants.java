@@ -61,6 +61,10 @@ public class OptionConstants extends cn.bc.option.OptionConstants {
 	public final static String CA_SORT = "ca.sort";
 	/** 营运事件事故理赔责任	*/
 	public final static String CA_DUTY = "ca.duty";
+	/** 投诉建议来源	*/
+	public final static String AD_SOURCE = "ad.source";
+	/** 表扬类型	*/
+	public final static String PR_TYPE = "pr.type";
 	
 	
 	
