@@ -50,6 +50,7 @@ public class CaseBase extends RichFileEntityImpl {
 	private String subject;// 标题：事件的简要描述
 	private int type;// 事件类型：参考常数TYPE_XXXX的定义
 	private int source = SOURCE_SYS;// 来源：参考常数SOURCE_xxxx的定义
+	private String from; //信息来源(用户填写)
 	private String caseNo;// 案号
 	private String code;// 自编号
 	private String address;// 事发地点
@@ -109,6 +110,15 @@ public class CaseBase extends RichFileEntityImpl {
 
 	public void setSource(int source) {
 		this.source = source;
+	}
+	
+	@Column(name = "FROM_")
+	public String getFrom() {
+		return from;
+	}
+
+	public void setFrom(String from) {
+		this.from = from;
 	}
 
 	public String getAddress() {

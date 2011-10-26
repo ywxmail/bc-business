@@ -117,9 +117,12 @@ public class ContractAction extends FileEntityAction<Long, Contract> {
 		columns.add(new TextColumn("['type']", getText("contract.type"), 80)
 				.setSortable(true).setUseTitleFromLabel(true)
 				.setValueFormater(new KeyValueFormater(getEntityTypes())));
-		columns.add(new TextColumn("['ext_str1']", getText("contract.car"), 80));
-		columns.add(new TextColumn("['ext_str2']",
-				getText("contract.labour.driver"), 80));
+		if(carManId != null){
+			columns.add(new TextColumn("['ext_str1']", getText("contract.car"), 80));
+		}
+		if(carId != null){
+			columns.add(new TextColumn("['ext_str2']",getText("contract.labour.driver"), 80));
+		}
 		columns.add(new TextColumn("['transactorName']",
 				getText("contract.transactor"), 60));
 		columns.add(new TextColumn("['signDate']",

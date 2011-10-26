@@ -62,7 +62,7 @@ public class CaseTrafficsAction extends ViewAction<Map<String, Object>> {
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer sql = new StringBuffer();
 		sql.append("select cit.id,c.status_,c.subject,c.motorcade_name,c.car_plate,c.driver_name,c.closer_name,c.happen_date");
-		sql.append(",c.close_date,c.address,c.source,c.driver_cert,c.case_no");
+		sql.append(",c.close_date,c.address,c.from_,c.driver_cert,c.case_no");
 		sql.append(" from bs_case_infract_traffic cit inner join BS_CASE_BASE c on cit.id=c.id");
 		sqlObject.setSql(sql.toString());
 		
@@ -84,7 +84,7 @@ public class CaseTrafficsAction extends ViewAction<Map<String, Object>> {
 				map.put("happen_date", rs[i++]);
 				map.put("close_date", rs[i++]);
 				map.put("address", rs[i++]);
-				map.put("source", rs[i++]);
+				map.put("from_", rs[i++]);
 				map.put("driver_cert", rs[i++]);
 				map.put("case_no", rs[i++]);
 				return map;
@@ -118,9 +118,8 @@ public class CaseTrafficsAction extends ViewAction<Map<String, Object>> {
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
 		columns.add(new TextColumn4MapKey("c.address", "address",
 				getText("runcase.address"), 120));
-		columns.add(new TextColumn4MapKey("c.source", "source",
-				getText("runcase.source"), 60).setSortable(true).setValueFormater(
-				new EntityStatusFormater(getSourceStatuses())));
+		columns.add(new TextColumn4MapKey("c.from_", "from_",
+				getText("runcase.source"), 60).setSortable(true));
 		columns.add(new TextColumn4MapKey("c.driver_cert", "driver_cert",
 				getText("runcase.driverCert"), 80));
 		columns.add(new TextColumn4MapKey("c.case_no", "case_no",

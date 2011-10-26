@@ -193,8 +193,7 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 		columns.add(new TextColumn("closeDate", getText("runcase.closeDate"),	120)
 				.setSortable(true).setValueFormater(new CalendarFormater("yyyy-MM-dd")));
 		columns.add(new TextColumn("address", getText("runcase.address"),120));
-		columns.add(new TextColumn("source", getText("runcase.ifsource"),		70)
-				.setSortable(true).setValueFormater(new EntityStatusFormater(getSourceStatuses())));
+		columns.add(new TextColumn("from", getText("runcase.ifsource"),		70).setSortable(true));
 		columns.add(new TextColumn("driverCert", getText("runcase.driverCert"),	80));
 		columns.add(new TextColumn("caseNo",	getText("runcase.caseNo2")));
 		return columns;
