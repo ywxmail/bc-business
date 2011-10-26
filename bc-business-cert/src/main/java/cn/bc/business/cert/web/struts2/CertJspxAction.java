@@ -25,7 +25,7 @@ import cn.bc.web.ui.html.page.ButtonOption;
 import cn.bc.web.ui.html.page.PageOption;
 
 /**
- * 居民身份证Action
+ * 驾驶培训证Action
  * 
  * @author wis.ho
  * 
@@ -38,8 +38,6 @@ public class CertJspxAction extends FileEntityAction<Long, Cert4DriverEducation>
 	public 	CertJspxService				certJspxService;    
 	public 	CertService					certService;
 	private AttachService 			    attachService;                                          
-	private String					    MANAGER_KEY				= "R_ADMIN";// 管理角色的编码      
-	public 	boolean 	   			    isManager;                                              
 	public 	AttachWidget 			    attachsUI;                                              
 	public 	Map<String,String>		    statusesValue;                                          
 	public	Long					    carManId;                                               
@@ -75,14 +73,15 @@ public class CertJspxAction extends FileEntityAction<Long, Cert4DriverEducation>
 
 	@Override
 	public boolean isReadonly() {
+		// 司机证件管理员或系统管理员
 		SystemContext context = (SystemContext) this.getContext();
-		return !context.hasAnyRole(MANAGER_KEY);
+		return !context.hasAnyRole(getText("key.role.bs.cert4driver"),
+				getText("key.role.bc.admin"));
 	}
 	
 	@SuppressWarnings("static-access")
 	public String create() throws Exception {
 		String r = super.create();
-		isManager = isReadonly();
 
 		if(carManId != null){
 			carManMap = this.certService.findCarManByCarManId(carManId);
@@ -139,7 +138,6 @@ public class CertJspxAction extends FileEntityAction<Long, Cert4DriverEducation>
 	
 	@SuppressWarnings("static-access")
 	private AttachWidget buildAttachsUI(boolean isNew) {
-		isManager = isReadonly();
 		// 构建附件控件
 		String ptype = "certIdentity.main";
 		AttachWidget attachsUI = new AttachWidget();

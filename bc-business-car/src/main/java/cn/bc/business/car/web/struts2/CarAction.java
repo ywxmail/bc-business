@@ -45,7 +45,6 @@ import cn.bc.web.ui.html.page.PageOption;
 public class CarAction extends FileEntityAction<Long, Car> {
 	// private static Log logger = LogFactory.getLog(CarAction.class);
 	private static final long serialVersionUID = 1L;
-	public String MANAGER_KEY = "R_MANAGER_BUSINESS"; // 车辆管理员角色的编码
 
 	private CarService carService;
 	private MotorcadeService motorcadeService;
@@ -80,8 +79,10 @@ public class CarAction extends FileEntityAction<Long, Car> {
 
 	@Override
 	public boolean isReadonly() {
+		// 车辆管理员或系统管理员
 		SystemContext context = (SystemContext) this.getContext();
-		return !context.hasAnyRole(MANAGER_KEY, getText("key.role.admin"));
+		return !context.hasAnyRole(getText("key.role.bs.car"),
+				getText("key.role.bc.admin"));
 	}
 
 	@Override
@@ -182,7 +183,12 @@ public class CarAction extends FileEntityAction<Long, Car> {
 	public String create() throws Exception {
 		String r = super.create();
 		this.getE().setOldUnitName(getText("app.oldUnitName"));
+
+		// 自动生成uid
 		this.getE().setUid(this.getIdGeneratorService().next(Car.KEY_UID));
+		// 自动生成自编号
+		this.getE().setCode(
+				this.getIdGeneratorService().nextSN4Month(Car.KEY_CODE));
 
 		// 表单可选项的加载
 		statusesValue = this.getEntityStatuses();

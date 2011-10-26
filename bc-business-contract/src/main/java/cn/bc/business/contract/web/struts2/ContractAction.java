@@ -46,7 +46,6 @@ public class ContractAction extends FileEntityAction<Long, Contract> {
 	// private static Log logger = LogFactory.getLog(ContractAction.class);
 	private static final long serialVersionUID = 1L;
 	public ContractService contractService;
-	private String MANAGER_KEY = "R_ADMIN";// 管理角色的编码
 	public boolean isManager;
 	public Long carId;
 	public Long carManId;
@@ -58,26 +57,28 @@ public class ContractAction extends FileEntityAction<Long, Contract> {
 		this.contractService = contractService;
 		this.setCrudService(contractService);
 	}
-	
+
 	@Override
 	public boolean isReadonly() {
+		// 合同管理员或系统管理员
 		SystemContext context = (SystemContext) this.getContext();
-		return !context.hasAnyRole(MANAGER_KEY);
+		return !context.hasAnyRole(getText("key.role.bs.contract4charger"),
+				getText("key.role.bs.contract4labour"),
+				getText("key.role.bc.admin"));
 	}
 
 	@Override
 	public String create() throws Exception {
-//		this.readonly = false;
-//		Contract e = this.contractService.create();
-//		this.setE(e);
-//
-//		this.getE().setUid(
-//				this.getIdGeneratorService().next(this.getE().ATTACH_TYPE));
-//		this.formPageOption = buildFormPageOption();
+		// this.readonly = false;
+		// Contract e = this.contractService.create();
+		// this.setE(e);
+		//
+		// this.getE().setUid(
+		// this.getIdGeneratorService().next(this.getE().ATTACH_TYPE));
+		// this.formPageOption = buildFormPageOption();
 
 		return "showdialog";
 	}
-
 
 	@Override
 	protected PageOption buildFormPageOption() {
@@ -94,7 +95,7 @@ public class ContractAction extends FileEntityAction<Long, Contract> {
 
 	@Override
 	protected OrderCondition getDefaultOrderCondition() {
-		return null;//new OrderCondition("fileDate", Direction.Desc);
+		return null;// new OrderCondition("fileDate", Direction.Desc);
 	}
 
 	@Override
@@ -105,39 +106,41 @@ public class ContractAction extends FileEntityAction<Long, Contract> {
 
 	@Override
 	protected String[] getSearchFields() {
-		return new String[] { "contract.code", "contract.wordNo", "contract.ext_str1", "contract.ext_str2" };
+		return new String[] { "contract.code", "contract.wordNo",
+				"contract.ext_str1", "contract.ext_str2" };
 	}
 
 	@Override
 	protected List<Column> buildGridColumns() {
 		List<Column> columns = new ArrayList<Column>();
-		columns.add(new TextColumn("['id']", "ID",20));
-		columns.add(new TextColumn("['type']", getText("contract.type"),80)
+		columns.add(new TextColumn("['id']", "ID", 20));
+		columns.add(new TextColumn("['type']", getText("contract.type"), 80)
 				.setSortable(true).setUseTitleFromLabel(true)
 				.setValueFormater(new KeyValueFormater(getEntityTypes())));
-		columns.add(new TextColumn("['ext_str1']", getText("contract.car"),80));
-		columns.add(new TextColumn("['ext_str2']", getText("contract.labour.driver"),80));
-		columns.add(new TextColumn("['transactorName']", getText("contract.transactor"),60));
-		columns.add(new TextColumn("['signDate']", getText("contract.signDate"),90)
-				.setSortable(true).setValueFormater(
-						new CalendarFormater("yyyy-MM-dd")));
-		columns.add(new TextColumn("['startDate']", getText("contract.deadline"))
-				.setValueFormater(
-						new CalendarRangeFormater("yyyy-MM-dd") {
-							@SuppressWarnings("rawtypes")
-							@Override
-							public Calendar getToDate(Object context,
-									Object value) {
-								Map contract = (Map) context;
-								return (Calendar) contract.get("endDate");
-							}
-						}));
-		columns.add(new TextColumn("['code']", getText("contract.code"),120)
+		columns.add(new TextColumn("['ext_str1']", getText("contract.car"), 80));
+		columns.add(new TextColumn("['ext_str2']",
+				getText("contract.labour.driver"), 80));
+		columns.add(new TextColumn("['transactorName']",
+				getText("contract.transactor"), 60));
+		columns.add(new TextColumn("['signDate']",
+				getText("contract.signDate"), 90).setSortable(true)
+				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+		columns.add(new TextColumn("['startDate']",
+				getText("contract.deadline"))
+				.setValueFormater(new CalendarRangeFormater("yyyy-MM-dd") {
+					@SuppressWarnings("rawtypes")
+					@Override
+					public Calendar getToDate(Object context, Object value) {
+						Map contract = (Map) context;
+						return (Calendar) contract.get("endDate");
+					}
+				}));
+		columns.add(new TextColumn("['code']", getText("contract.code"), 120)
 				.setUseTitleFromLabel(true));
 
 		return columns;
 	}
-	
+
 	/** 构建视图页面的表格 */
 	protected Grid buildGrid() {
 		List<Column> columns = this.buildGridColumns();
@@ -184,7 +187,7 @@ public class ContractAction extends FileEntityAction<Long, Contract> {
 					.setClick("bc.contractList.edit"));
 
 			// 删除按钮
-			//tb.addButton(getDefaultDeleteToolbarButton());
+			// tb.addButton(getDefaultDeleteToolbarButton());
 			tb.addButton(new ToolbarButton().setIcon("ui-icon-document")
 					.setText(getText("label.delete"))
 					.setClick("bc.contractList.del"));
@@ -198,39 +201,38 @@ public class ContractAction extends FileEntityAction<Long, Contract> {
 
 		return tb;
 	}
-	
+
 	/**
 	 * 根据请求的条件查找非分页信息对象
 	 * 
 	 * @return
 	 */
 	@Override
-	protected List<Map<String,Object>> findList() {
-		List<Map<String,Object>> list = null;
-		if(carId != null){
-			list = this.contractService.list4Car(this.getCondition(),carId);
+	protected List<Map<String, Object>> findList() {
+		List<Map<String, Object>> list = null;
+		if (carId != null) {
+			list = this.contractService.list4Car(this.getCondition(), carId);
 		}
-		if(carManId != null){
-			list = this.contractService.list4CarMan(this.getCondition(),carManId);
+		if (carManId != null) {
+			list = this.contractService.list4CarMan(this.getCondition(),
+					carManId);
 		}
 		return list;
 	}
-	
 
-//	// 视图特殊条件
-//	@Override
-//	protected Condition getSpecalCondition() {
-//		if (carId != null) {
-//			return new EqualsCondition("carId", carId);
-//		}
-//		if (carManId != null) {
-//			return new EqualsCondition("carManId", carManId);
-//		}else {
-//			return null;
-//		}
-//	}
-	
-	
+	// // 视图特殊条件
+	// @Override
+	// protected Condition getSpecalCondition() {
+	// if (carId != null) {
+	// return new EqualsCondition("carId", carId);
+	// }
+	// if (carManId != null) {
+	// return new EqualsCondition("carManId", carManId);
+	// }else {
+	// return null;
+	// }
+	// }
+
 	@Override
 	protected HtmlPage buildHtml4Paging() {
 		HtmlPage page = super.buildHtml4Paging();
@@ -242,7 +244,7 @@ public class ContractAction extends FileEntityAction<Long, Contract> {
 					.toString());
 		return page;
 	}
-	
+
 	/**
 	 * 获取Contract的合同类型列表
 	 * 

@@ -8,19 +8,18 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
 
-import cn.bc.business.carman.service.CarManService;
 import cn.bc.business.cert.domain.Cert;
 import cn.bc.business.cert.web.struts2.CertAction;
 import cn.bc.core.Page;
 import cn.bc.core.exception.CoreException;
 import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.docs.web.ui.html.AttachWidget;
+import cn.bc.identity.web.SystemContext;
 import cn.bc.web.formater.AbstractFormater;
 import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.formater.CalendarRangeFormater;
@@ -48,17 +47,16 @@ import cn.bc.web.ui.json.Json;
 public class Driver4CertAction extends CertAction {
 	// private static Log logger = LogFactory.getLog(BulletinAction.class);
 	private static final long serialVersionUID = 1L;
-	public 	boolean 			isManager;
 	public 	Long				carManId;
-	public	CarManService		carManService;
-
 	public 	Map<String, String> statusesValue;
 
-	@Autowired
-	public void CarManService(CarManService carManService) {
-		this.carManService = carManService;
+	@Override
+	public boolean isReadonly() {
+		//司机证件管理员或系统管理员
+		SystemContext context = (SystemContext) this.getContext();
+		return !context.hasAnyRole(getText("key.role.bs.cert4driver"),
+				getText("key.role.bc.admin"));
 	}
-	
 	
 	@Override
 	public Class<? extends Cert> getEntityClass() {
@@ -113,7 +111,6 @@ public class Driver4CertAction extends CertAction {
 
 	@SuppressWarnings("unused")
 	private AttachWidget buildAttachsUI(boolean isNew) {
-		isManager = isReadonly();
 		// 构建附件控件
 //		String ptype = "car.main";
 //		AttachWidget attachsUI = new AttachWidget();
@@ -173,10 +170,9 @@ public class Driver4CertAction extends CertAction {
 	
 	@Override
 	protected Toolbar buildToolbar() {
-		isManager = isReadonly();
 		Toolbar tb = new Toolbar();
 		
-		if (!isManager) {
+		if (!isReadonly()) {
 			// 新建按钮
 			tb.addButton(new ToolbarButton().setIcon("ui-icon-document")
 					.setText(getText("label.create"))
@@ -210,9 +206,6 @@ public class Driver4CertAction extends CertAction {
 	@Override
 	@SuppressWarnings("rawtypes")
 	protected List<Column> buildGridColumns() {
-		// 是否本模块管理员
-		isManager = isReadonly();
-
 		//List<Column> columns = super.buildGridColumns();
 		List<Column> columns = new ArrayList<Column>();
 		columns.add(new TextColumn("['id']", "ID",20));

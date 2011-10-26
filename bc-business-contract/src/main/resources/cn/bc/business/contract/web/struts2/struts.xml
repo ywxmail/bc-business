@@ -20,6 +20,8 @@
 		<action name="contractLabour/delete" class="contractLabourAction" method="delete" />
 		<action name="contractLabour/certInfo" class="contractLabourAction" method="certInfo">
 		</action>
+		<action name="contractLabour/carManInfo" class="contractLabourAction" method="carManInfo">
+		</action>
 	</package>
 	
 	<!-- 经济合同 -->

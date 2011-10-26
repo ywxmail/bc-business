@@ -22,11 +22,13 @@ import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.core.util.StringUtils;
 import cn.bc.db.jdbc.RowMapper;
 import cn.bc.db.jdbc.SqlObject;
+import cn.bc.identity.web.SystemContext;
 import cn.bc.web.formater.AbstractFormater;
 import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.formater.EntityStatusFormater;
+import cn.bc.web.formater.LinkFormater4Id;
 import cn.bc.web.ui.html.grid.Column;
-import cn.bc.web.ui.html.grid.IdColumn;
+import cn.bc.web.ui.html.grid.IdColumn4MapKey;
 import cn.bc.web.ui.html.grid.TextColumn4MapKey;
 import cn.bc.web.ui.html.page.PageOption;
 import cn.bc.web.ui.json.Json;
@@ -39,9 +41,17 @@ import cn.bc.web.ui.json.Json;
  */
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 @Controller
-public class CarViewAction extends ViewAction<Map<String, Object>> {
+public class CarsAction extends ViewAction<Map<String, Object>> {
 	private static final long serialVersionUID = 1L;
 	public String status = String.valueOf(Entity.STATUS_ENABLED); // 车辆的状态，多个用逗号连接
+
+	@Override
+	public boolean isReadonly() {
+		// 车辆管理员或系统管理员
+		SystemContext context = (SystemContext) this.getContext();
+		return !context.hasAnyRole(getText("key.role.bs.car"),
+				getText("key.role.bc.admin"));
+	}
 
 	@Override
 	protected OrderCondition getGridDefaultOrderCondition() {
@@ -62,7 +72,7 @@ public class CarViewAction extends ViewAction<Map<String, Object>> {
 		sql.append(" from bs_car c");
 		sql.append(" inner join bs_motorcade m on m.id=c.motorcade_id");
 		sqlObject.setSql(sql.toString());
-		
+
 		// 注入参数
 		sqlObject.setArgs(null);
 
@@ -96,8 +106,7 @@ public class CarViewAction extends ViewAction<Map<String, Object>> {
 	@Override
 	protected List<Column> getGridColumns() {
 		List<Column> columns = new ArrayList<Column>();
-		columns.add(new IdColumn(true, "['plate_type']+'.'+['plate_no']")
-				.setId("c.id").setValueExpression("['id']"));
+		columns.add(new IdColumn4MapKey("c.id", "id"));
 		columns.add(new TextColumn4MapKey("c.status_", "status_",
 				getText("car.status"), 60).setSortable(true).setValueFormater(
 				new EntityStatusFormater(getEntityStatuses())));
@@ -105,8 +114,22 @@ public class CarViewAction extends ViewAction<Map<String, Object>> {
 				getText("car.registerDate"), 100).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
 		columns.add(new TextColumn4MapKey("m.name", "motorcade_name",
-				getText("car.motorcade"), 80).setSortable(true)
-				.setUseTitleFromLabel(true));
+				getText("car.motorcade"), 80)
+				.setSortable(true)
+				.setUseTitleFromLabel(true)
+				.setValueFormater(
+						new LinkFormater4Id(this.getContextPath()
+								+ "/bc-business/motorcade/edit?id={0}",
+								"motorcade") {
+							@SuppressWarnings("unchecked")
+							@Override
+							public String getIdValue(Object context,
+									Object value) {
+								return StringUtils
+										.toString(((Map<String, Object>) context)
+												.get("motorcade_id"));
+							}
+						}));
 		columns.add(new TextColumn4MapKey("c.plate_no", "plate_no",
 				getText("car.plate"), 80).setUseTitleFromLabel(true)
 				.setValueFormater(new AbstractFormater<String>() {
@@ -173,7 +196,7 @@ public class CarViewAction extends ViewAction<Map<String, Object>> {
 	@Override
 	protected PageOption getHtmlPageOption() {
 		return super.getHtmlPageOption().setWidth(900).setMinWidth(400)
-				.setHeight(550).setMinHeight(300);
+				.setHeight(400).setMinHeight(300);
 	}
 
 	@Override

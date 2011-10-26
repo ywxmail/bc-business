@@ -24,6 +24,7 @@ import cn.bc.core.query.condition.Direction;
 import cn.bc.core.query.condition.impl.EqualsCondition;
 import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.identity.domain.Actor;
+import cn.bc.identity.web.SystemContext;
 import cn.bc.option.domain.OptionItem;
 import cn.bc.option.service.OptionService;
 import cn.bc.web.formater.AbstractFormater;
@@ -50,7 +51,6 @@ public class BlacklistAction extends FileEntityAction<Long, Blacklist> {
 	public BlacklistService blacklistService;
 	public Long carManId;
 	public OptionService optionService;
-	public OptionConstants optionConstants;
 	public List<OptionItem> blackLevelList;// 黑名单等级列表
 	public List<OptionItem> blackTypeList;// 黑名单限制项目
 	public CarByDriverService carByDriverService;
@@ -61,6 +61,7 @@ public class BlacklistAction extends FileEntityAction<Long, Blacklist> {
 	public Long carId;
 	public Long unitId;
 	public Long motorcadeId;
+
 	@Autowired
 	public void setCarManService(CarManService carManService) {
 		this.carManService = carManService;
@@ -83,6 +84,14 @@ public class BlacklistAction extends FileEntityAction<Long, Blacklist> {
 	}
 
 	@Override
+	public boolean isReadonly() {
+		// 黑名单管理员或系统管理员
+		SystemContext context = (SystemContext) this.getContext();
+		return !context.hasAnyRole(getText("key.role.bs.blacklist"),
+				getText("key.role.bc.admin"));
+	}
+
+	@Override
 	public String create() throws Exception {
 		String result = super.create();
 		if (carManId != null) {
@@ -97,9 +106,9 @@ public class BlacklistAction extends FileEntityAction<Long, Blacklist> {
 		}
 
 		blackLevelList = this.optionService
-				.findOptionItemByGroupKey(optionConstants.CARMAN_LEVEL);
+				.findOptionItemByGroupKey(OptionConstants.CARMAN_LEVEL);
 		blackTypeList = this.optionService
-				.findOptionItemByGroupKey(optionConstants.BLACKLIST_TYPE);
+				.findOptionItemByGroupKey(OptionConstants.BLACKLIST_TYPE);
 		// this.formPageOption = buildFormPageOption();
 
 		return result;
@@ -109,9 +118,9 @@ public class BlacklistAction extends FileEntityAction<Long, Blacklist> {
 	public String edit() throws Exception {
 		String result = super.edit();
 		blackTypeList = this.optionService
-				.findOptionItemByGroupKey(optionConstants.BLACKLIST_TYPE);
+				.findOptionItemByGroupKey(OptionConstants.BLACKLIST_TYPE);
 		blackLevelList = this.optionService
-				.findOptionItemByGroupKey(optionConstants.CARMAN_LEVEL);
+				.findOptionItemByGroupKey(OptionConstants.CARMAN_LEVEL);
 		return result;
 	}
 
@@ -136,8 +145,8 @@ public class BlacklistAction extends FileEntityAction<Long, Blacklist> {
 
 	@Override
 	protected PageOption buildListPageOption() {
-		return super.buildListPageOption().setWidth(1024).setMinWidth(300)
-				.setHeight(460).setMinHeight(300);
+		return super.buildListPageOption().setWidth(700).setMinWidth(300)
+				.setHeight(350).setMinHeight(300);
 	}
 
 	@Override

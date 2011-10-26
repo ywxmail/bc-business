@@ -8,6 +8,8 @@
 	<package name="caseTraffic" extends="bc-default" namespace="/bc-business">
 		<action name="caseTraffic/closefile" class="caseTrafficAction" method="closefile">
 		</action>
+		<action name="caseTraffic/selectCarMansInfo" class="caseTrafficAction" method="selectCarMansInfo">
+		</action>
 	</package>
 	
 	<!-- 营运违章 -->
@@ -29,11 +31,15 @@
 	<package name="caseAdvice" extends="bc-default" namespace="/bc-business">
 		<action name="caseAdvice/closefile" class="caseAdviceAction" method="closefile">
 		</action>
+		<action name="caseAdvice/selectCarMansInfo" class="caseAdviceAction" method="selectCarMansInfo">
+		</action>
 	</package>
 	
 	<!-- 表扬 -->
 	<package name="casePraise" extends="bc-default" namespace="/bc-business">
 		<action name="casePraise/closefile" class="casePraiseAction" method="closefile">
+		</action>
+		<action name="casePraise/selectCarMansInfo" class="casePraiseAction" method="selectCarMansInfo">
 		</action>
 	</package>
 

@@ -50,8 +50,6 @@ public class ContractLabourAction extends FileEntityAction<Long, Contract4Labour
 	private ContractLabourService 		contractLabourService;
 	private ContractChargerService		contractChargerService;
 	private AttachService 				attachService;
-	private String						MANAGER_KEY 				= "R_ADMIN";// 管理角色的编码
-	public 	boolean 	   				isManager;
 	private	Long 						carManId;
 	private	Long 						carId;
 	private	Long 						oldCarManId;
@@ -65,6 +63,8 @@ public class ContractLabourAction extends FileEntityAction<Long, Contract4Labour
 	public	List<Map<String,Object>>	infoList;
 	public 	boolean 					isMoreCar;
 	public 	boolean 					isMoreCarMan;
+	public 	boolean 					isNullCar;
+	public 	boolean 					isNullCarMan;
 //	public	CertService				certService;
 	
 
@@ -120,15 +120,16 @@ public class ContractLabourAction extends FileEntityAction<Long, Contract4Labour
 
 	@Override
 	public boolean isReadonly() {
+		// 劳动合同管理员或系统管理员
 		SystemContext context = (SystemContext) this.getContext();
-		return !context.hasAnyRole(MANAGER_KEY);
+		return !context.hasAnyRole(getText("key.role.bs.contract4labour"),
+				getText("key.role.bc.admin"));
 	}
 	
 
 	@SuppressWarnings("static-access")
 	public String create() throws Exception {
 		String r = super.create();
-		isManager = isReadonly();
 		
 		if(carId != null && carManId == null){
 			//根据carId查找车辆以及司机id
@@ -138,9 +139,10 @@ public class ContractLabourAction extends FileEntityAction<Long, Contract4Labour
 				carManId = Long.valueOf(isNullObject(infoList.get(0).get("driver_id")));
 				this.getE().setExt_str2(isNullObject(infoList.get(0).get("name")));
 				this.getE().setCertNo(isNullObject(infoList.get(0).get("cert_fwzg")));
-			}
-			if(infoList.size() > 1){
+			}else if(infoList.size() > 1){
 				isMoreCarMan = true;
+			}else{
+				isNullCarMan = true;
 			}
 			this.getE().setExt_str1(
 				isNullObject(carInfoMap.get("plate_type"))+"."+
@@ -158,9 +160,10 @@ public class ContractLabourAction extends FileEntityAction<Long, Contract4Labour
 					isNullObject(infoList.get(0).get("plate_type"))+"."+
 					isNullObject(infoList.get(0).get("plate_no"))
 				);
-			}
-			if(infoList.size() > 1){
+			}else if(infoList.size() > 1){
 				isMoreCar = true;
+			}else{
+				isNullCar = true;
 			}
 			this.getE().setExt_str2(isNullObject(carManInfoMap.get("name")));
 			this.getE().setCertNo(isNullObject(carManInfoMap.get("cert_fwzg")));
@@ -311,7 +314,6 @@ public class ContractLabourAction extends FileEntityAction<Long, Contract4Labour
 	
 	@SuppressWarnings("static-access")
 	private AttachWidget buildAttachsUI(boolean isNew) {
-		isManager = isManager();
 		// 构建附件控件
 		String ptype = "contractLabour.main";
 		AttachWidget attachsUI = new AttachWidget();
@@ -359,12 +361,6 @@ public class ContractLabourAction extends FileEntityAction<Long, Contract4Labour
 		return new String[] { "contract.code", "contract.wordNo" , "contract.ext_str1", "contract.ext_str2"};
 	}
 	
-	
-	// 判断当前用户是否是本模块管理员
-	private boolean isManager() {
-		return ((SystemContext) this.getContext()).hasAnyRole(MANAGER_KEY);
-	}
-	
 	public Json json;
 	public String certInfo(){
 //		Cert cert = this.certService.findCertByCarManId(carManId);
@@ -373,7 +369,6 @@ public class ContractLabourAction extends FileEntityAction<Long, Contract4Labour
 //			certCode = cert.getCertCode();
 //			json.put("certCode", certCode);
 //		}
-		
 		certInfoMap	= this.contractLabourService.findCertByCarManId(carManId);
 		json = new Json();
 		if(certInfoMap != null && certInfoMap.size() > 0){
@@ -381,6 +376,22 @@ public class ContractLabourAction extends FileEntityAction<Long, Contract4Labour
 			json.put("cert_code", certCode);
 		}
 		
+		return "json";
+	}
+	
+	public String carManInfo(){
+		
+		json = new Json();
+		infoList = this.contractLabourService.selectRelateCarManByCarId(carId);
+		if(infoList.size() == 1){
+			json.put("id",isNullObject(infoList.get(0).get("driver_id")));
+			json.put("name",isNullObject(infoList.get(0).get("name")));
+			json.put("certNo",isNullObject(infoList.get(0).get("cert_fwzg")));
+			json.put("isMore","false");
+		}
+		if(infoList.size() > 1){
+			json.put("isMore","true");
+		}
 		return "json";
 	}
 	

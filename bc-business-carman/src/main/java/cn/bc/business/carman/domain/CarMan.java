@@ -28,7 +28,7 @@ import cn.bc.identity.domain.RichFileEntityImpl;
 @Table(name = "BS_CARMAN")
 public class CarMan extends RichFileEntityImpl {
 	private static final long serialVersionUID = 1L;
-	public static final String KEY_UID = CarMan.class.getSimpleName();
+	public static final String KEY_UID = "carman.uid";
 	/** 类别：司机 */
 	public static final int TYPE_DRIVER = 0;
 	/** 类别：责任人 */

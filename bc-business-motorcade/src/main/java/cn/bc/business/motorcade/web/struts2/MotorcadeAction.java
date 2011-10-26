@@ -35,7 +35,7 @@ import cn.bc.web.ui.html.page.PageOption;
 public class MotorcadeAction extends FileEntityAction<Long, Motorcade> {
 	// private static Log logger = LogFactory.getLog(MotorcadeAction.class);
 	private static final long serialVersionUID = 1L;
-	private String MANAGER_KEY = "R_MANAGER_MOTORCADE";// 车队管理角色的编码
+	private String MANAGER_KEY = getText("key.role.bs.motorcade");// 车队管理角色的编码
 	private OptionService optionService;
 	private MotorcadeService motorcadeService;
 	public List<OptionItem> paymentDates; // 可选缴费日列表
@@ -54,7 +54,7 @@ public class MotorcadeAction extends FileEntityAction<Long, Motorcade> {
 	@Override
 	public boolean isReadonly() {
 		SystemContext context = (SystemContext) this.getContext();
-		return !context.hasAnyRole(MANAGER_KEY, getText("key.role.admin"));
+		return !context.hasAnyRole(MANAGER_KEY, getText("key.role.bc.admin"));
 	}
 
 	@Override
@@ -80,7 +80,7 @@ public class MotorcadeAction extends FileEntityAction<Long, Motorcade> {
 	public String edit() throws Exception {
 		// 表单可选项的加载
 		initSelects();
-		
+
 		return super.edit();
 	}
 
@@ -134,8 +134,8 @@ public class MotorcadeAction extends FileEntityAction<Long, Motorcade> {
 		columns.add(new TextColumn("status", getText("label.status"), 60)
 				.setSortable(true).setValueFormater(
 						new KeyValueFormater(getEntityStatuses())));
-		columns.add(new TextColumn("unit.name", getText("motorcade.unit"),
-				120).setSortable(true).setUseTitleFromLabel(true));
+		columns.add(new TextColumn("unit.name", getText("motorcade.unit"), 120)
+				.setSortable(true).setUseTitleFromLabel(true));
 		columns.add(new TextColumn("principalName",
 				getText("motorcade.principal"), 80).setSortable(true));
 		columns.add(new TextColumn("code", getText("label.code"), 80)
