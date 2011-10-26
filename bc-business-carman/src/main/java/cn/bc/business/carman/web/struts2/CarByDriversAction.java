@@ -12,27 +12,23 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
-import sun.tools.tree.ThisExpression;
-
 import cn.bc.business.carman.domain.CarByDriver;
 import cn.bc.business.web.struts2.ViewAction;
 import cn.bc.core.Entity;
 import cn.bc.core.query.condition.Condition;
 import cn.bc.core.query.condition.Direction;
+import cn.bc.core.query.condition.impl.AndCondition;
 import cn.bc.core.query.condition.impl.EqualsCondition;
 import cn.bc.core.query.condition.impl.InCondition;
 import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.core.util.StringUtils;
 import cn.bc.db.jdbc.RowMapper;
 import cn.bc.db.jdbc.SqlObject;
-import cn.bc.web.formater.AbstractFormater;
-import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.formater.EntityStatusFormater;
 import cn.bc.web.formater.KeyValueFormater;
 import cn.bc.web.formater.LinkFormater;
 import cn.bc.web.ui.html.grid.Column;
-import cn.bc.web.ui.html.grid.IdColumn;
-import cn.bc.web.ui.html.grid.TextColumn;
+import cn.bc.web.ui.html.grid.IdColumn4MapKey;
 import cn.bc.web.ui.html.grid.TextColumn4MapKey;
 import cn.bc.web.ui.html.page.PageOption;
 import cn.bc.web.ui.json.Json;
@@ -64,8 +60,8 @@ public class CarByDriversAction extends ViewAction<Map<String, Object>> {
 
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer sql = new StringBuffer();
-		sql.append("select d.id,d.status_,d.classes,d.desc_,c.plate_type,c.plate_no,b.name,c.id");
-		sql.append(",b.id from BS_CAR_DRIVER d ");
+		sql.append("select d.id,d.status_,d.classes,d.desc_,c.plate_type,c.plate_no,b.name,d.car_id");
+		sql.append(",d.driver_id from BS_CAR_DRIVER d ");
 		sql.append(" inner join BS_CAR c on c.id=d.car_id");
 		sql.append(" inner join BS_CARMAN b on b.id=d.driver_id");
 		sqlObject.setSql(sql.toString());
@@ -95,57 +91,49 @@ public class CarByDriversAction extends ViewAction<Map<String, Object>> {
 		return sqlObject;
 	}
 
-	
-
 	@Override
 	protected List<Column> getGridColumns() {
 		List<Column> columns = new ArrayList<Column>();
-		columns.add(new IdColumn(true, "['c.plate_type']+'.'+['c.plate_no']")
-				.setId("d.id").setValueExpression("['id']"));
+		columns.add(new IdColumn4MapKey("c.id", "id"));
 		columns.add(new TextColumn4MapKey("d.status_", "status_",
-				getText("carByDriver.statuses"), 100).setSortable(true).setValueFormater(
-				new EntityStatusFormater(getEntityStatuses())));
+				getText("carByDriver.statuses"), 100)
+				.setSortable(true)
+				.setValueFormater(new EntityStatusFormater(getEntityStatuses())));
 		if (carManId != null || (carManId == null && carId == null)) {
 			columns.add(new TextColumn4MapKey("c.plate_no", "plate",
-					getText("carByDriver.car.plateNo"), 150).setUseTitleFromLabel(true)
-					.setValueFormater(
-							new LinkFormater(this.getContextPath()
-									+ "/bc-business/car/edit?id={0}", "car") {
-								@Override
-								public Object[] getParams(Object context,
-										Object value) {
-									Map<String, Object> map = (Map<String, Object>) context;
-									Object[] args = new Object[1];
-									args[0] = map.get("carId");
-									return args;
-								}
+					getText("carByDriver.car.plateNo"), 150)
+					.setValueFormater(new LinkFormater(this.getContextPath()
+							+ "/bc-business/car/edit?id={0}", "car") {
+						@Override
+						public Object[] getParams(Object context, Object value) {
+							Map<String, Object> map = (Map<String, Object>) context;
+							Object[] args = new Object[1];
+							args[0] = map.get("carId");
+							return args;
+						}
 
-								@Override
-								public String getTaskbarTitle(Object context,
-										Object value) {
-									Map<String, Object> map = (Map<String, Object>) context;
-									return getText("car") + " - "
-											+ map.get("plate");
+						@Override
+						public String getTaskbarTitle(Object context,
+								Object value) {
+							Map<String, Object> map = (Map<String, Object>) context;
+							return getText("car") + " - " + map.get("plate");
 
-								}
+						}
 
-								@Override
-								public String getWinId(Object context,
-										Object value) {
-									return "car"
-											+ ((Map<String, Object>) context)
-													.get("carId");
+						@Override
+						public String getWinId(Object context, Object value) {
+							return "car"
+									+ ((Map<String, Object>) context)
+											.get("carId");
 
-								}
+						}
 
-								@Override
-								public String getLinkText(Object context,
-										Object value) {
-									Map<String, Object> map = (Map<String, Object>) context;
-									return getText("car") + " - "
-											+ map.get("plate");
-								}
-							}));
+						@Override
+						public String getLinkText(Object context, Object value) {
+							Map<String, Object> map = (Map<String, Object>) context;
+							return getText("car") + " - " + map.get("plate");
+						}
+					}));
 
 		}
 		if (carId != null || (carManId == null && carId == null)) {
@@ -177,7 +165,8 @@ public class CarByDriversAction extends ViewAction<Map<String, Object>> {
 					}));
 		}
 		columns.add(new TextColumn4MapKey("d.classes", "classes",
-				getText("carByDriver.classes"), 100));
+				getText("carByDriver.classes"), 100)
+				.setValueFormater(new KeyValueFormater(getType())));
 		columns.add(new TextColumn4MapKey("d.desc_", "desc_",
 				getText("carMan.description"), 270).setSortable(true));
 
@@ -186,8 +175,8 @@ public class CarByDriversAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected String[] getGridSearchFields() {
-		return new String[] { "c.plate_no", "c.driver", "c.charger",
-				"c.cert_no2", "c.factory_type", "m.name" };
+		return new String[] { "c.plate_type", "c.plate_no", "b.name",
+				"d.classes" };
 	}
 
 	@Override
@@ -208,27 +197,70 @@ public class CarByDriversAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected Condition getGridSpecalCondition() {
+		// 状态条件
+		Condition statusCondition = null;
 		if (status != null && status.length() > 0) {
 			String[] ss = status.split(",");
 			if (ss.length == 1) {
-				return new EqualsCondition("c.status_", new Integer(ss[0]));
+				statusCondition = new EqualsCondition("d.status_", new Integer(
+						ss[0]));
 			} else {
-				return new InCondition("c.status_",
+				statusCondition = new InCondition("d.status_",
 						StringUtils.stringArray2IntegerArray(ss));
 			}
 		} else {
 			return null;
 		}
+		// carManId条件
+		Condition carManIdCondition = null;
+		if (carManId != null) {
+			carManIdCondition = new EqualsCondition("d.driver_id", carManId);
+		}
+		// carId条件
+		Condition carIdCondition = null;
+		if (carId != null) {
+			carIdCondition = new EqualsCondition("d.car_id", carId);
+		}
+		// 合并条件
+		return new AndCondition().add(statusCondition).add(carManIdCondition)
+				.add(carIdCondition);
 	}
 
 	@Override
 	protected Json getGridExtrasData() {
-		if (this.status == null || this.status.length() == 0) {
-			return null;
-		} else {
-			Json json = new Json();
+		Json json = new Json();
+		// 状态条件
+		if (this.status != null || this.status.length() != 0) {
 			json.put("status", status);
-			return json;
 		}
+		// carManId条件
+		if (carManId != null) {
+			json.put("carManId", carManId);
+		}
+		// carId条件
+		if (carId != null) {
+			json.put("carId", carId);
+		}
+		return json.isEmpty() ? null : json;
 	}
+
+	/**
+	 * 获取营运班次值转换列表
+	 * 
+	 * @return
+	 */
+	protected Map<String, String> getType() {
+		Map<String, String> type = new HashMap<String, String>();
+		type = new HashMap<String, String>();
+		type.put(String.valueOf(CarByDriver.TYPE_WEIDINGYI),
+				getText("carByDriver.classes.weidingyi"));
+		type.put(String.valueOf(CarByDriver.TYPE_ZHENGBAN),
+				getText("carByDriver.classes.zhengban"));
+		type.put(String.valueOf(CarByDriver.TYPE_FUBAN),
+				getText("carByDriver.classes.fuban"));
+		type.put(String.valueOf(CarByDriver.TYPE_DINGBAN),
+				getText("carByDriver.classes.dingban"));
+		return type;
+	}
+
 }
