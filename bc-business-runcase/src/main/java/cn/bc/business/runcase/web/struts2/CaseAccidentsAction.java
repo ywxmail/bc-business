@@ -32,6 +32,7 @@ import cn.bc.web.ui.html.grid.Column;
 import cn.bc.web.ui.html.grid.IdColumn4MapKey;
 import cn.bc.web.ui.html.grid.TextColumn4MapKey;
 import cn.bc.web.ui.html.page.PageOption;
+import cn.bc.web.ui.html.toolbar.Toolbar;
 import cn.bc.web.ui.json.Json;
 
 /**
@@ -107,7 +108,7 @@ public class CaseAccidentsAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("c.status_", "status_",
 				getText("runcase.status"), 60)
 				.setSortable(true)
-				.setValueFormater(new EntityStatusFormater(getEntityStatuses())));
+				.setValueFormater(new EntityStatusFormater(getBSStatuses2())));
 		columns.add(new TextColumn4MapKey("b.code", "code",
 				getText("runcase.caseNo3"), 160).setSortable(true));
 		columns.add(new TextColumn4MapKey("c.sort", "sort",
@@ -216,5 +217,13 @@ public class CaseAccidentsAction extends ViewAction<Map<String, Object>> {
 		type.put(String.valueOf(CarMan.TYPE_DRIVER_AND_CHARGER),
 				getText("carMan.type.driverAndCharger"));
 		return type;
+	}
+	@Override
+	protected Toolbar getHtmlPageToolbar() {
+		return super.getHtmlPageToolbar()
+				.addButton(
+						Toolbar.getDefaultToolbarRadioGroup(
+								this.getBSStatuses1(), "status", 0,
+								getText("title.click2changeSearchStatus")));
 	}
 }

@@ -83,7 +83,7 @@ public class CarByDriverAction extends FileEntityAction<Long, CarByDriver> {
 	public String create() throws Exception {
 		String result = super.create();
 		this.getE().setStatus(RichEntity.STATUS_ENABLED);
-		statusesValueList = this.getEntityStatuses();
+		statusesValueList = this.getBSStatuses1();
 		if (carManId != null) {
 			CarMan driver = this.carManService.load(carManId);
 			this.getE().setDriver(driver);

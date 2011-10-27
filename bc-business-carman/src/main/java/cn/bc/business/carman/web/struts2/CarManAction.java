@@ -22,6 +22,7 @@ import cn.bc.core.query.condition.Condition;
 import cn.bc.core.query.condition.Direction;
 import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.core.util.DateUtils;
+import cn.bc.identity.domain.ActorDetail;
 import cn.bc.identity.service.IdGeneratorService;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.option.service.OptionService;
@@ -86,9 +87,9 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 	public String create() throws Exception {
 		String result = super.create();
 		this.getE().setStatus(RichEntity.STATUS_ENABLED);
-		statusesValue = this.getEntityStatuses();
+		statusesValue = this.getBSStatuses1();
 		this.getE().setUid(this.getIdGeneratorService().next(CarMan.KEY_UID));
-		this.getE().setSex(0);
+		this.getE().setSex(ActorDetail.SEX_MAN);
 		this.initSelects();
 		// 获取相片的连接
 		portrait = "/bc/libs/themes/default/images/portrait/1in110x140.png";

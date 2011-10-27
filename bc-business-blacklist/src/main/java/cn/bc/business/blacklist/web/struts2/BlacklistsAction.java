@@ -111,12 +111,16 @@ public class BlacklistsAction extends ViewAction<Map<String, Object>> {
 		columns.add(new IdColumn4MapKey("b.id", "id"));
 		columns.add(new TextColumn4MapKey("b.code", "code",
 				getText("blacklist.code"), 160).setSortable(true));
-		columns.add(new TextColumn4MapKey("cm.name", "drivers",
-				getText("blacklist.driver"), 60).setSortable(true));
+		if (carManId == null) {
+			columns.add(new TextColumn4MapKey("cm.name", "drivers",
+					getText("blacklist.driver"), 60).setSortable(true));
+		}
 		columns.add(new TextColumn4MapKey("m.name", "motorcade_name",
 				getText("blacklist.motorcade.name"), 50).setSortable(true));
-		columns.add(new TextColumn4MapKey("c.plate_no", "plate",
-				getText("blacklist.car.plateNo"), 80).setSortable(true));
+		if (carId == null) {
+			columns.add(new TextColumn4MapKey("c.plate_no", "plate",
+					getText("blacklist.car.plateNo"), 80).setSortable(true));
+		}
 		columns.add(new TextColumn4MapKey("b.type_", "type_",
 				getText("blacklist.type"), 100));
 		columns.add(new TextColumn4MapKey("b.subject", "subject",
@@ -163,31 +167,31 @@ public class BlacklistsAction extends ViewAction<Map<String, Object>> {
 	@Override
 	protected Condition getGridSpecalCondition() {
 
-		 // carManId条件
-		 if (carManId != null) {
-		 return new EqualsCondition("b.driver_id", carManId);
-		 } else if (carId != null) {
-		 return new EqualsCondition("b.car_id", carId);
-		 } else {
-		 return null;
-		 }
 		// carManId条件
-//		Condition carManIdCondition = null;
-//		if (carManId != null) {
-//			carManIdCondition = new EqualsCondition("b.driver_id", carManId);
-//		}
-//		// carId条件
-//		Condition carIdCondition = null;
-//		if (carId != null) {
-//			carIdCondition = new EqualsCondition("b.car_id", carId);
-//		}
-//		// 合并条件
-//		if (carManId != null || carId != null) {
-//			return new AndCondition().add(carManIdCondition)
-//					.add(carIdCondition);
-//		} else {
-//			return null;
-//		}
+		if (carManId != null) {
+			return new EqualsCondition("b.driver_id", carManId);
+		} else if (carId != null) {
+			return new EqualsCondition("b.car_id", carId);
+		} else {
+			return null;
+		}
+		// carManId条件
+		// Condition carManIdCondition = null;
+		// if (carManId != null) {
+		// carManIdCondition = new EqualsCondition("b.driver_id", carManId);
+		// }
+		// // carId条件
+		// Condition carIdCondition = null;
+		// if (carId != null) {
+		// carIdCondition = new EqualsCondition("b.car_id", carId);
+		// }
+		// // 合并条件
+		// if (carManId != null || carId != null) {
+		// return new AndCondition().add(carManIdCondition)
+		// .add(carIdCondition);
+		// } else {
+		// return null;
+		// }
 
 	}
 
