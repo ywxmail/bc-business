@@ -292,7 +292,7 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 		// 初始化信息
 		this.getE().setType(CaseBase.TYPE_INFRACT_BUSINESS);
 		this.getE().setStatus(CaseBase.STATUS_ACTIVE);
-		statusesValue = this.getCaseStatuses();
+		statusesValue = this.getBSStatuses2();
 
 		// 表单可选项的加载
 		sourcesValue = this.getSourceStatuses();

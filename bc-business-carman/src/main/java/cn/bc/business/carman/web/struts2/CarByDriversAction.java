@@ -31,6 +31,7 @@ import cn.bc.web.ui.html.grid.Column;
 import cn.bc.web.ui.html.grid.IdColumn4MapKey;
 import cn.bc.web.ui.html.grid.TextColumn4MapKey;
 import cn.bc.web.ui.html.page.PageOption;
+import cn.bc.web.ui.html.toolbar.Toolbar;
 import cn.bc.web.ui.json.Json;
 
 /**
@@ -96,9 +97,8 @@ public class CarByDriversAction extends ViewAction<Map<String, Object>> {
 		List<Column> columns = new ArrayList<Column>();
 		columns.add(new IdColumn4MapKey("c.id", "id"));
 		columns.add(new TextColumn4MapKey("d.status_", "status_",
-				getText("carByDriver.statuses"), 100)
-				.setSortable(true)
-				.setValueFormater(new EntityStatusFormater(getEntityStatuses())));
+				getText("carByDriver.statuses"), 100).setSortable(true)
+				.setValueFormater(new EntityStatusFormater(getBSStatuses1())));
 		if (carManId != null || (carManId == null && carId == null)) {
 			columns.add(new TextColumn4MapKey("c.plate_no", "plate",
 					getText("carByDriver.car.plateNo"), 150)
@@ -261,6 +261,15 @@ public class CarByDriversAction extends ViewAction<Map<String, Object>> {
 		type.put(String.valueOf(CarByDriver.TYPE_DINGBAN),
 				getText("carByDriver.classes.dingban"));
 		return type;
+	}
+
+	@Override
+	protected Toolbar getHtmlPageToolbar() {
+		return super.getHtmlPageToolbar()
+				.addButton(
+						Toolbar.getDefaultToolbarRadioGroup(
+								this.getBSStatuses1(), "status", 0,
+								getText("title.click2changeSearchStatus")));
 	}
 
 }

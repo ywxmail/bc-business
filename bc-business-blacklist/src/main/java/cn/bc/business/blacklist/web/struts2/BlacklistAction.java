@@ -3,7 +3,9 @@
  */
 package cn.bc.business.blacklist.web.struts2;
 
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -23,9 +25,9 @@ import cn.bc.core.query.condition.Condition;
 import cn.bc.core.query.condition.Direction;
 import cn.bc.core.query.condition.impl.EqualsCondition;
 import cn.bc.core.query.condition.impl.OrderCondition;
+import cn.bc.core.util.DateUtils;
 import cn.bc.identity.domain.Actor;
 import cn.bc.identity.web.SystemContext;
-import cn.bc.option.domain.OptionItem;
 import cn.bc.option.service.OptionService;
 import cn.bc.web.formater.AbstractFormater;
 import cn.bc.web.formater.CalendarFormater;
@@ -51,8 +53,8 @@ public class BlacklistAction extends FileEntityAction<Long, Blacklist> {
 	public BlacklistService blacklistService;
 	public Long carManId;
 	public OptionService optionService;
-	public List<OptionItem> blackLevelList;// 黑名单等级列表
-	public List<OptionItem> blackTypeList;// 黑名单限制项目
+	public List<Map<String, String>> blackLevelList;// 黑名单等级列表
+	public List<Map<String, String>> blackTypeList;// 黑名单限制项目
 	public CarByDriverService carByDriverService;
 	public String carPlate;// 车牌号码
 	public String unitName;// 车辆所属单位名
@@ -105,22 +107,20 @@ public class BlacklistAction extends FileEntityAction<Long, Blacklist> {
 
 		}
 
-		blackLevelList = this.optionService
-				.findOptionItemByGroupKey(OptionConstants.CARMAN_LEVEL);
-		blackTypeList = this.optionService
-				.findOptionItemByGroupKey(OptionConstants.BLACKLIST_TYPE);
+		// blackLevelList = this.optionService
+		// .findOptionItemByGroupKey(OptionConstants.CARMAN_LEVEL);
+		// blackTypeList = this.optionService
+		// .findOptionItemByGroupKey(OptionConstants.BLACKLIST_TYPE);
 		// this.formPageOption = buildFormPageOption();
-
+		initSelects();
 		return result;
 	}
 
 	@Override
 	public String edit() throws Exception {
 		String result = super.edit();
-		blackTypeList = this.optionService
-				.findOptionItemByGroupKey(OptionConstants.BLACKLIST_TYPE);
-		blackLevelList = this.optionService
-				.findOptionItemByGroupKey(OptionConstants.CARMAN_LEVEL);
+
+		initSelects();
 		return result;
 	}
 
@@ -317,6 +317,25 @@ public class BlacklistAction extends FileEntityAction<Long, Blacklist> {
 		} else {
 			return null;
 		}
+	}
+
+	// 表单可选项的加载
+	public void initSelects() {
+		Date startTime = new Date();
+
+		// 批量加载可选项列表
+		Map<String, List<Map<String, String>>> optionItems = this.optionService
+				.findOptionItemByGroupKeys(new String[] {
+						OptionConstants.CARMAN_LEVEL,
+						OptionConstants.BLACKLIST_TYPE, });
+
+		// 加载黑名单等级列表
+		this.blackLevelList = optionItems.get(OptionConstants.CARMAN_LEVEL);
+		// 加载黑名单限制项目
+		this.blackTypeList = optionItems.get(OptionConstants.BLACKLIST_TYPE);
+
+		if (logger.isInfoEnabled())
+			logger.info("findOptionItem耗时：" + DateUtils.getWasteTime(startTime));
 	}
 
 }
