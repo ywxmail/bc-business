@@ -12,7 +12,6 @@ import org.springframework.stereotype.Controller;
 
 import cn.bc.business.BSConstants;
 import cn.bc.core.Entity;
-import cn.bc.core.RichEntity;
 import cn.bc.web.struts2.jpa.ViewActionWithJpa;
 
 /**
@@ -38,11 +37,11 @@ public abstract class ViewAction<T extends Object> extends ViewActionWithJpa<T> 
 	 */
 	protected Map<String, String> getBSStatuses1() {
 		Map<String, String> statuses = new LinkedHashMap<String, String>();
-		statuses.put(String.valueOf(RichEntity.STATUS_ENABLED),
+		statuses.put(String.valueOf(Entity.STATUS_ENABLED),
 				getText("bs.status.active"));
 		statuses.put(String.valueOf(Entity.STATUS_DISABLED),
 				getText("bs.status.logout"));
-		statuses.put(" ", getText("bs.status.all"));
+		statuses.put("", getText("bs.status.all"));
 		return statuses;
 	}
 
@@ -53,11 +52,11 @@ public abstract class ViewAction<T extends Object> extends ViewActionWithJpa<T> 
 	 */
 	protected Map<String, String> getBSStatuses2() {
 		Map<String, String> statuses = new LinkedHashMap<String, String>();
-		statuses.put(String.valueOf(RichEntity.STATUS_ENABLED),
+		statuses.put(String.valueOf(Entity.STATUS_ENABLED),
 				getText("bs.status.active"));
 		statuses.put(String.valueOf(Entity.STATUS_DISABLED),
 				getText("bs.status.closed"));
-		statuses.put(" ", getText("bs.status.all"));
+		statuses.put("", getText("bs.status.all"));
 		return statuses;
 	}
 }
