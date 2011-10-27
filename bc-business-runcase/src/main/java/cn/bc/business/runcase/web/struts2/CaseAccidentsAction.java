@@ -223,7 +223,7 @@ public class CaseAccidentsAction extends ViewAction<Map<String, Object>> {
 		return super.getHtmlPageToolbar()
 				.addButton(
 						Toolbar.getDefaultToolbarRadioGroup(
-								this.getBSStatuses1(), "status", 0,
+								this.getBSStatuses2(), "status", 0,
 								getText("title.click2changeSearchStatus")));
 	}
 }

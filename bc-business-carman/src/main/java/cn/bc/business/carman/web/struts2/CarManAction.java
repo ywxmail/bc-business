@@ -125,7 +125,7 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 		this.setE(this.getCrudService().load(this.getId()));
 
 		// 表单可选项的加载
-		statusesValue = this.getEntityStatuses();
+		statusesValue = this.getBSStatuses1();
 
 		initSelects();
 
