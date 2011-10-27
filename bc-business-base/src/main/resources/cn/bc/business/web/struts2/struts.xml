@@ -17,5 +17,8 @@
 		<action name="/*/read" class="{1}Action" method="edit">
 			<result name="form">/bc-business/{1}/formr.jsp</result>
 		</action>
+		
+		<!-- 通过车辆id或车牌号查询相关信息 -->
+		<action name="findInfoByCar" class="findInfoByCarAction"/>
 	</package>
 </struts>
