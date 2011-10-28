@@ -207,6 +207,10 @@ public class CaseTrafficAction extends FileEntityAction<Long, Case4InfractTraffi
 	public String create() throws Exception {
 		String r = super.create();
 		this.getE().setUid(this.getIdGeneratorService().next(this.getE().ATTACH_TYPE));
+		// 自动生成自编号
+		this.getE().setCode(
+				this.getIdGeneratorService().nextSN4Month(Case4InfractTraffic.KEY_CODE));
+		
 		if (carManId != null) {
 			CarMan driver = this.carManService.load(carManId);
 			List<Car> car = this.carService.selectAllCarByCarManId(carManId);
@@ -215,6 +219,7 @@ public class CaseTrafficAction extends FileEntityAction<Long, Case4InfractTraffi
 						car.get(0).getPlateType() + "."
 								+ car.get(0).getPlateNo());
 				this.getE().setMotorcadeId(car.get(0).getMotorcade().getId());
+				this.getE().setMotorcadeName(car.get(0).getMotorcade().getName());
 			} else if (car.size() > 1) {
 				isMoreCar = true;
 			} else {
@@ -230,6 +235,7 @@ public class CaseTrafficAction extends FileEntityAction<Long, Case4InfractTraffi
 					.setCarPlate(car.getPlateType() + "." + car.getPlateNo());
 			this.getE().setCarId(carId);
 			this.getE().setMotorcadeId(car.getMotorcade().getId());
+			this.getE().setMotorcadeName(car.getMotorcade().getName());
 			List<CarMan> carMan = this.carManService
 					.selectAllCarManByCarId(carId);
 			if (carMan.size() == 1) {
@@ -246,7 +252,6 @@ public class CaseTrafficAction extends FileEntityAction<Long, Case4InfractTraffi
 		// 初始化信息
 		this.getE().setType  (CaseBase.TYPE_INFRACT_TRAFFIC);
 		this.getE().setStatus(CaseBase.STATUS_ACTIVE);
-		this.getE().setCode(this.getIdGeneratorService().next(this.getE().ATTACH_TYPE));
 		statusesValue		=	this.getCaseStatuses();
 		sourcesValue		=	this.getSourceStatuses();
 		// 表单可选项的加载
