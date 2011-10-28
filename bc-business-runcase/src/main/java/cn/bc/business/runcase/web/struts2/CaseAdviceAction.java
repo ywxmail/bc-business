@@ -19,7 +19,6 @@ import cn.bc.business.car.domain.Car;
 import cn.bc.business.car.service.CarService;
 import cn.bc.business.carman.domain.CarMan;
 import cn.bc.business.carman.service.CarManService;
-import cn.bc.business.motorcade.domain.Motorcade;
 import cn.bc.business.motorcade.service.MotorcadeService;
 import cn.bc.business.runcase.domain.Case4Advice;
 import cn.bc.business.runcase.domain.CaseBase;
@@ -30,6 +29,7 @@ import cn.bc.core.query.condition.Direction;
 import cn.bc.core.query.condition.impl.EqualsCondition;
 import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.identity.web.SystemContext;
+import cn.bc.option.domain.OptionItem;
 import cn.bc.option.service.OptionService;
 import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.formater.EntityStatusFormater;
@@ -68,7 +68,7 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 	private CarManService 					carManService;
 	private CarService 						carService;
 
-	public 	List<Motorcade> 				motorcadeList;					// 可选车队列表
+	public List<Map<String, String>> 		motorcadeList;					// 可选车队列表
 	public  List<Map<String, String>>		dutyList;						// 可选责任列表
 	public  List<Map<String, String>> 		degreeList; 					// 可选程度列表
 	public  List<Map<String, String>> 		certList; 						// 可选没收证件列表
@@ -370,7 +370,12 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 	// 表单可选项的加载
 	public void initSelects(){
 		// 加载可选车队列表
-		this.motorcadeList 	= 	this.motorcadeService.createQuery().list();
+		this.motorcadeList = this.motorcadeService.find4Option();
+		if (this.getE().getMotorcadeId() != null)
+			OptionItem.insertIfNotExist(this.motorcadeList, this.getE()
+					.getMotorcadeId().toString(), this.getE()
+					.getMotorcadeName());
+
 		// 加载可选责任列表
 		this.allList		=	this.optionService.findOptionItemByGroupKeys(new String[] {
 									OptionConstants.IT_DUTY,OptionConstants.AD_SOURCE,

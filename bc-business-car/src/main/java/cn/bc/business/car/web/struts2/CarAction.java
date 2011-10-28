@@ -16,6 +16,7 @@ import org.springframework.stereotype.Controller;
 import cn.bc.business.OptionConstants;
 import cn.bc.business.car.domain.Car;
 import cn.bc.business.car.service.CarService;
+import cn.bc.business.motorcade.domain.Motorcade;
 import cn.bc.business.motorcade.service.MotorcadeService;
 import cn.bc.business.web.struts2.FileEntityAction;
 import cn.bc.core.Page;
@@ -24,6 +25,7 @@ import cn.bc.core.query.condition.Direction;
 import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.core.util.DateUtils;
 import cn.bc.identity.web.SystemContext;
+import cn.bc.option.domain.OptionItem;
 import cn.bc.option.service.OptionService;
 import cn.bc.web.formater.AbstractFormater;
 import cn.bc.web.formater.CalendarFormater;
@@ -248,6 +250,9 @@ public class CarAction extends FileEntityAction<Long, Car> {
 		// 加载可选车队列表
 		this.motorcadeList = this.motorcadeService.find4Option();
 		logger.info("motorcadeList耗时：" + DateUtils.getWasteTime(startTime));
+		Motorcade m = this.getE().getMotorcade();
+		OptionItem.insertIfNotExist(this.motorcadeList, m.getId().toString(),
+				m.getName());
 
 		// 批量加载可选项列表
 		Map<String, List<Map<String, String>>> optionItems = this.optionService

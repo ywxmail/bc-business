@@ -34,6 +34,7 @@ import cn.bc.core.util.DateUtils;
 import cn.bc.docs.service.AttachService;
 import cn.bc.docs.web.ui.html.AttachWidget;
 import cn.bc.identity.web.SystemContext;
+import cn.bc.option.domain.OptionItem;
 import cn.bc.option.service.OptionService;
 import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.formater.EntityStatusFormater;
@@ -479,6 +480,10 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 		Date startTime = new Date();
 		// 加载可选车队列表
 		this.motorcadeList = this.motorcadeService.find4Option();
+		if (this.getE().getMotorcadeId() != null)
+			OptionItem.insertIfNotExist(this.motorcadeList, this.getE()
+					.getMotorcadeId().toString(), this.getE()
+					.getMotorcadeName());
 		logger.info("motorcadeList耗时：" + DateUtils.getWasteTime(startTime));
 
 		// 批量加载可选项列表
