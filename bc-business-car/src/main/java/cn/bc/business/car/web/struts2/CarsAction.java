@@ -15,9 +15,8 @@ import org.springframework.stereotype.Controller;
 import cn.bc.business.web.struts2.ViewAction;
 import cn.bc.core.Entity;
 import cn.bc.core.query.condition.Condition;
+import cn.bc.core.query.condition.ConditionUtils;
 import cn.bc.core.query.condition.Direction;
-import cn.bc.core.query.condition.impl.EqualsCondition;
-import cn.bc.core.query.condition.impl.InCondition;
 import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.core.util.StringUtils;
 import cn.bc.db.jdbc.RowMapper;
@@ -47,6 +46,7 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 	public String status = String.valueOf(Entity.STATUS_ENABLED); // 车辆的状态，多个用逗号连接
 	public Long carManId;
 	public Long carId;
+
 	@Override
 	public boolean isReadonly() {
 		// 车辆管理员或系统管理员
@@ -208,27 +208,18 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected Condition getGridSpecalCondition() {
-		if (status != null && status.trim().length() > 0) {
-			String[] ss = status.split(",");
-			if (ss.length == 1) {
-				return new EqualsCondition("c.status_", new Integer(ss[0]));
-			} else {
-				return new InCondition("c.status_",
-						StringUtils.stringArray2IntegerArray(ss));
-			}
-		} else {
-			return null;
-		}
+		// 状态条件
+		return ConditionUtils.toConditionByComma4IntegerValue(this.status,
+				"c.status_");
 	}
 
 	@Override
-	protected Json getGridExtrasData() {
-		if (this.status == null || this.status.trim().length() == 0) {
-			return null;
-		} else {
-			Json json = new Json();
+	protected void extendGridExtrasData(Json json) {
+		super.extendGridExtrasData(json);
+
+		// 状态条件
+		if (this.status != null && this.status.trim().length() > 0) {
 			json.put("status", status);
-			return json;
 		}
 	}
 
