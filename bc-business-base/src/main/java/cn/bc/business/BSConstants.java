@@ -6,7 +6,7 @@ package cn.bc.business;
  * @author dragon
  * 
  */
-public class BSConstants extends cn.bc.option.OptionConstants {
+public class BSConstants {
 	/** 营运子系统命名空间前缀 */
 	public final static String NAMESPACE = "/bc-business";
 }
