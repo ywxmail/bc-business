@@ -43,8 +43,8 @@ public class MotorcadeDaoImpl extends HibernateCrudJpaDao<Motorcade> implements
 					public Map<String, String> mapRow(Object[] rs, int rowNum) {
 						Map<String, String> oi = new HashMap<String, String>();
 						int i = 0;
-						oi.put("id", rs[i++].toString());
-						oi.put("name", rs[i++].toString());
+						oi.put("key", rs[i++].toString());
+						oi.put("value", rs[i++].toString());
 						return oi;
 					}
 				});
