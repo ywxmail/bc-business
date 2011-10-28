@@ -223,7 +223,7 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 		this.getE().setUid(this.getIdGeneratorService().next(this.getE().ATTACH_TYPE));
 		// 自动生成自编号
 		this.getE().setCode(
-				this.getIdGeneratorService().nextSN4Month(CaseBase.KEY_CODE));
+				this.getIdGeneratorService().nextSN4Month(Case4Advice.KEY_CODE));
 		
 		if (carManId != null) {
 			CarMan driver = this.carManService.load(carManId);
