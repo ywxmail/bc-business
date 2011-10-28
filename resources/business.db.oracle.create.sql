@@ -1173,7 +1173,7 @@ CREATE TABLE BS_CASE_ADVICE (
    SUBJECT2             VARCHAR2(255),
    DETAIL               VARCHAR2(4000),
    CAR_COLOR            VARCHAR2(255),
-   DRIVER_SEX           NUMBER(1)            NOT NULL,
+   DRIVER_SEX           NUMBER(1),
    DRIVER_FEATURE       VARCHAR2(255),
    ADVISOR_NAME         VARCHAR2(255),
    ADVISOR_SEX          NUMBER(1)            NOT NULL,

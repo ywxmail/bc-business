@@ -90,6 +90,9 @@ public class CertJspxAction extends FileEntityAction<Long, Cert4DriverEducation>
 		}
 		
 		this.getE().setUid(this.getIdGeneratorService().next(this.getE().ATTACH_TYPE));
+		// 自动生成自编号
+		this.getE().setCertCode(
+				this.getIdGeneratorService().nextSN4Month(Cert4DriverEducation.KEY_CODE));
 		this.getE().setType(Cert.TYPE_JSPX);
 		this.getE().setStatus(RichEntityImpl.STATUS_ENABLED);
 		statusesValue		=	this.getEntityStatuses();

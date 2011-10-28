@@ -19,10 +19,8 @@ import cn.bc.business.car.domain.Car;
 import cn.bc.business.car.service.CarService;
 import cn.bc.business.carman.domain.CarMan;
 import cn.bc.business.carman.service.CarManService;
-import cn.bc.business.motorcade.domain.Motorcade;
 import cn.bc.business.motorcade.service.MotorcadeService;
 import cn.bc.business.runcase.domain.Case4InfractBusiness;
-import cn.bc.business.runcase.domain.Case4InfractTraffic;
 import cn.bc.business.runcase.domain.CaseBase;
 import cn.bc.business.runcase.service.CaseBusinessService;
 import cn.bc.business.web.struts2.FileEntityAction;
@@ -31,6 +29,7 @@ import cn.bc.core.query.condition.Direction;
 import cn.bc.core.query.condition.impl.EqualsCondition;
 import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.identity.web.SystemContext;
+import cn.bc.option.domain.OptionItem;
 import cn.bc.option.service.OptionService;
 import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.formater.EntityStatusFormater;
@@ -68,7 +67,7 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 	private CarManService 						carManService;
 	private CarService 							carService;
 
-	public 	List<Motorcade> 					motorcadeList;					// 可选车队列表
+	public  List<Map<String, String>> 					motorcadeList;					// 可选车队列表
 	public  List<Map<String, String>>			dutyList;						// 可选责任列表
 	public  List<Map<String, String>>			properitesList;					// 可选性质列表
 	public  List<Map<String, String>>			degreeList;						// 可选程度列表
@@ -146,7 +145,7 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 				.setMinHeight(200).setModal(false);
 		if (!isReadonly()) {
 			//特殊处理结案按钮
-			if(Case4InfractTraffic.STATUS_ACTIVE == getE().getStatus() && !getE().isNew()){
+			if(Case4InfractBusiness.STATUS_ACTIVE == getE().getStatus() && !getE().isNew()){
 				ButtonOption buttonOption = new ButtonOption(getText("label.closefile"),null,"bc.caseBusinessForm.closefile");
 				buttonOption.put("id", "bcSaveDlgButton");
 				option.addButton(buttonOption);
@@ -206,6 +205,9 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 		String r = super.create();
 		SystemContext context = this.getSystyemContext();
 		this.getE().setUid(this.getIdGeneratorService().next(this.getE().ATTACH_TYPE));
+		// 自动生成自编号
+		this.getE().setCode(
+				this.getIdGeneratorService().nextSN4Month(Case4InfractBusiness.KEY_CODE));
 		
 		if (carManId != null) {
 			CarMan driver = this.carManService.load(carManId);
@@ -215,6 +217,7 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 						car.get(0).getPlateType() + "."
 								+ car.get(0).getPlateNo());
 				this.getE().setMotorcadeId(car.get(0).getMotorcade().getId());
+				this.getE().setMotorcadeName(car.get(0).getMotorcade().getName());
 			} else if (car.size() > 1) {
 				isMoreCar = true;
 			} else {
@@ -230,6 +233,7 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 					.setCarPlate(car.getPlateType() + "." + car.getPlateNo());
 			this.getE().setCarId(carId);
 			this.getE().setMotorcadeId(car.getMotorcade().getId());
+			this.getE().setMotorcadeName(car.getMotorcade().getName());
 			List<CarMan> carMan = this.carManService
 					.selectAllCarManByCarId(carId);
 			if (carMan.size() == 1) {
@@ -248,7 +252,6 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 		this.getE().setStatus(CaseBase.STATUS_ACTIVE);
 		this.getE().setReceiverId(context.getUser().getId());
 		this.getE().setReceiverName(context.getUser().getName());
-		this.getE().setCode(this.getIdGeneratorService().next(this.getE().ATTACH_TYPE));
 
 		// 表单可选项的加载
 		statusesValue		=	this.getCaseStatuses();
@@ -339,7 +342,11 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 	// 表单可选项的加载
 	public void initSelects(){
 		// 加载可选车队列表
-		this.motorcadeList 				= 	this.motorcadeService.createQuery().list();
+		this.motorcadeList = this.motorcadeService.find4Option();
+		if (this.getE().getMotorcadeId() != null)
+			OptionItem.insertIfNotExist(this.motorcadeList, this.getE()
+					.getMotorcadeId().toString(), this.getE()
+					.getMotorcadeName());
 		
 		this.allList					=	this.optionService.findOptionItemByGroupKeys(new String []{
 												OptionConstants.IT_DUTY,

@@ -89,6 +89,9 @@ public class CertDrivingAction extends FileEntityAction<Long, Cert4Driving> {
 		}
 		
 		this.getE().setUid(this.getIdGeneratorService().next(this.getE().ATTACH_TYPE));
+		// 自动生成自编号
+		this.getE().setCertCode(
+				this.getIdGeneratorService().nextSN4Month(Cert4Driving.KEY_CODE));
 		this.getE().setType(Cert.TYPE_DRIVING);
 		this.getE().setStatus(RichEntityImpl.STATUS_ENABLED);
 		statusesValue		=	this.getEntityStatuses();

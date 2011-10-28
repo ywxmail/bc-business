@@ -31,6 +31,9 @@
 	<package name="caseAdvice" extends="bc-default" namespace="/bc-business">
 		<action name="caseAdvice/closefile" class="caseAdviceAction" method="closefile">
 		</action>
+		<action name="caseAdvice/selectSubject" class="caseAdviceAction" method="selectSubject">
+			<result name="showdialog" >/bc-business/caseAdvice/select.jsp</result>
+		</action>
 		<action name="caseAdvice/selectCarMansInfo" class="caseAdviceAction" method="selectCarMansInfo">
 		</action>
 	</package>

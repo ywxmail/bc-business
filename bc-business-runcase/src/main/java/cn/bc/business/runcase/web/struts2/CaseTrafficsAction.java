@@ -14,7 +14,10 @@ import org.springframework.stereotype.Controller;
 
 import cn.bc.business.runcase.domain.CaseBase;
 import cn.bc.business.web.struts2.ViewAction;
+import cn.bc.core.query.condition.Condition;
+import cn.bc.core.query.condition.ConditionUtils;
 import cn.bc.core.query.condition.Direction;
+import cn.bc.core.query.condition.impl.EqualsCondition;
 import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.db.jdbc.RowMapper;
 import cn.bc.db.jdbc.SqlObject;
@@ -25,6 +28,7 @@ import cn.bc.web.ui.html.grid.Column;
 import cn.bc.web.ui.html.grid.IdColumn4MapKey;
 import cn.bc.web.ui.html.grid.TextColumn4MapKey;
 import cn.bc.web.ui.html.page.PageOption;
+import cn.bc.web.ui.html.toolbar.Toolbar;
 import cn.bc.web.ui.json.Json;
 
 /**
@@ -37,8 +41,9 @@ import cn.bc.web.ui.json.Json;
 @Controller
 public class CaseTrafficsAction extends ViewAction<Map<String, Object>> {
 	private static final long serialVersionUID = 1L;
-	public String status = String.valueOf(CaseBase.STATUS_ACTIVE)+","+String.valueOf(CaseBase.STATUS_CLOSED); // 交通违章的状态，多个用逗号连接
-	public String type = String.valueOf(CaseBase.TYPE_INFRACT_TRAFFIC);
+	public String status = String.valueOf(CaseBase.STATUS_ACTIVE); // 交通违章的状态，多个用逗号连接
+	public Long carManId;
+	public Long carId;
 
 	@Override
 	public boolean isReadonly() {
@@ -62,7 +67,7 @@ public class CaseTrafficsAction extends ViewAction<Map<String, Object>> {
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer sql = new StringBuffer();
 		sql.append("select cit.id,c.status_,c.subject,c.motorcade_name,c.car_plate,c.driver_name,c.closer_name,c.happen_date");
-		sql.append(",c.close_date,c.address,c.from_,c.driver_cert,c.case_no");
+		sql.append(",c.close_date,c.address,c.from_,c.driver_cert,c.case_no,c.driver_id,c.car_id");
 		sql.append(" from bs_case_infract_traffic cit inner join BS_CASE_BASE c on cit.id=c.id");
 		sqlObject.setSql(sql.toString());
 		
@@ -87,6 +92,9 @@ public class CaseTrafficsAction extends ViewAction<Map<String, Object>> {
 				map.put("from_", rs[i++]);
 				map.put("driver_cert", rs[i++]);
 				map.put("case_no", rs[i++]);
+				map.put("driver_id", rs[i++]);
+				map.put("car_id", rs[i++]);
+				
 				return map;
 			}
 		});
@@ -147,44 +155,50 @@ public class CaseTrafficsAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected String getGridRowLabelExpression() {
-		return "['case_no']";
+		return "['car_plate']";
 	}
 
 	
-//	@Override
-//	protected Condition getGridSpecalCondition() {
-//
-//		if (type != null && type.length() > 0) {
-//			String[] ss = type.split(",");
-//			if (ss.length == 1) {
-//				return new EqualsCondition("c.type_", new Integer(ss[0]));
-//			} else {
-//				return new InCondition("c.types_",
-//						StringUtils.stringArray2IntegerArray(ss));
-//			}
-//		}else{
-//			return null;
-//		}
-//
-//	}
 	
-
 	@Override
-	protected Json getGridExtrasData() {
-		if((this.status == null || this.status.length() == 0) && 
-			(this.type == null || this.type.length() == 0)){
-			return null;
-		}else{
-			Json json = new Json();
-			if (this.status != null || this.status.length() > 0) {
-				json.put("status", status);
-			}
-			if (this.type != null || this.type.length() > 0){
-				json.put("type", type);
-			} 
-			return json;
+	protected Condition getGridSpecalCondition() {
+		//状态条件
+		Condition statusCondition = ConditionUtils.toConditionByComma4IntegerValue(this.status,
+				"c.status_");
+		
+		// carManId条件
+		Condition carManIdCondition = null;
+		if (carManId != null) {
+			carManIdCondition = new EqualsCondition("c.driver_id", carManId);
+		}
+		
+		// carId条件
+		Condition carIdCondition = null;
+		if (carId != null) {
+			carIdCondition =new EqualsCondition("c.car_id", carId);
+		}
+		
+		return ConditionUtils.mix2AndCondition(statusCondition,carManIdCondition,carIdCondition);
+	}
+	
+	@Override
+	protected void extendGridExtrasData(Json json) {
+		super.extendGridExtrasData(json);
+
+		// 状态条件
+		if (this.status != null && this.status.trim().length() > 0) {
+			json.put("status", status);
+		}
+		
+		if (carManId != null) {
+			json.put("carManId", carManId);
+		}
+		// carId条件
+		if (carId != null) {
+			json.put("carId", carId);
 		}
 	}
+
 	
 	/**
 	 * 获取Entity的状态值转换列表
@@ -214,6 +228,15 @@ public class CaseTrafficsAction extends ViewAction<Map<String, Object>> {
 		statuses.put(String.valueOf(CaseBase.SOURCE_FROM_DRIVER),
 				getText("runcase.select.source.fromdriver"));
 		return statuses;
+	}
+	
+	@Override
+	protected Toolbar getHtmlPageToolbar() {
+		return super.getHtmlPageToolbar()
+				.addButton(
+						Toolbar.getDefaultToolbarRadioGroup(
+								this.getBSStatuses2(), "status", 0,
+								getText("title.click2changeSearchStatus")));
 	}
 
 }

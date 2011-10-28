@@ -1,6 +1,8 @@
 package cn.bc.business.motorcade.web.struts2;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -12,6 +14,7 @@ import cn.bc.business.motorcade.domain.Motorcade;
 import cn.bc.business.motorcade.service.MotorcadeService;
 import cn.bc.business.web.struts2.FileEntityAction;
 import cn.bc.core.Entity;
+import cn.bc.core.exception.CoreException;
 import cn.bc.core.query.condition.Direction;
 import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.identity.web.SystemContext;
@@ -23,6 +26,7 @@ import cn.bc.web.ui.html.grid.GridData;
 import cn.bc.web.ui.html.grid.TextColumn;
 import cn.bc.web.ui.html.page.ButtonOption;
 import cn.bc.web.ui.html.page.PageOption;
+import cn.bc.web.ui.json.Json;
 
 /**
  * 车队信息Action
@@ -78,10 +82,12 @@ public class MotorcadeAction extends FileEntityAction<Long, Motorcade> {
 
 	@Override
 	public String edit() throws Exception {
+		String r = super.edit();
+		
 		// 表单可选项的加载
 		initSelects();
-
-		return super.edit();
+		
+		return r;
 	}
 
 	private void initSelects() {
@@ -154,5 +160,29 @@ public class MotorcadeAction extends FileEntityAction<Long, Motorcade> {
 			e.setParent(null);
 
 		return super.save();
+	}
+
+	public Json json;
+
+	@Override
+	public String delete() throws Exception {
+		// 将状态设置为禁用而不是物理删除
+		Map<String, Object> attributes = new HashMap<String, Object>();
+		attributes.put("status", new Integer(Entity.STATUS_DISABLED));
+
+		if (this.getId() != null) {// 处理一条
+			this.motorcadeService.update(this.getId(), attributes);
+		} else {// 处理一批
+			if (this.getIds() != null && this.getIds().length() > 0) {
+				Long[] ids = cn.bc.core.util.StringUtils
+						.stringArray2LongArray(this.getIds().split(","));
+				this.motorcadeService.update(ids, attributes);
+			} else {
+				throw new CoreException("must set property id or ids");
+			}
+		}
+		json = new Json();
+		json.put("msg", getText("form.disabled.success"));
+		return "json";
 	}
 }

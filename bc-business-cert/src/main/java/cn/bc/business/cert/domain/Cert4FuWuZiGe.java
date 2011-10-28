@@ -20,7 +20,7 @@ import javax.persistence.Table;
 public class Cert4FuWuZiGe extends Cert4Man {
 	private static final long serialVersionUID = 1L;
 	public static final String ATTACH_TYPE = Cert4FuWuZiGe.class.getSimpleName();
-	
+	public static final String KEY_CODE = "cert.certCode";
 	private String level;// 等级
 	private String serviceUnit;// 服务单位
 	

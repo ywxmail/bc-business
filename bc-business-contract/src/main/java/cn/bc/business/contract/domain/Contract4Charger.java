@@ -20,6 +20,7 @@ import javax.persistence.Table;
 public class Contract4Charger extends Contract {
 	private static final long serialVersionUID = 1L;
 	public static final String ATTACH_TYPE = Contract4Charger.class.getSimpleName();
+	public static final String KEY_CODE = "contract.code";
 	private String signType;// 签约类型:如新户
 	private boolean logout;// 注销:0-未,1-已
 	private String oldContent;// 旧合同内容

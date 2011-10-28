@@ -14,9 +14,8 @@ import org.springframework.stereotype.Controller;
 
 import cn.bc.business.web.struts2.ViewAction;
 import cn.bc.core.query.condition.Condition;
+import cn.bc.core.query.condition.ConditionUtils;
 import cn.bc.core.query.condition.Direction;
-import cn.bc.core.query.condition.impl.EqualsCondition;
-import cn.bc.core.query.condition.impl.InCondition;
 import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.core.util.StringUtils;
 import cn.bc.db.jdbc.RowMapper;
@@ -28,6 +27,7 @@ import cn.bc.web.ui.html.grid.Column;
 import cn.bc.web.ui.html.grid.IdColumn4MapKey;
 import cn.bc.web.ui.html.grid.TextColumn4MapKey;
 import cn.bc.web.ui.html.page.PageOption;
+import cn.bc.web.ui.html.toolbar.Toolbar;
 import cn.bc.web.ui.json.Json;
 
 /**
@@ -108,7 +108,9 @@ public class MotorcadesAction extends ViewAction<Map<String, Object>> {
 				getText("motorcade.name")).setSortable(true)
 				.setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("m.principal_name", "principalName",
-				getText("motorcade.principal"), 65).setSortable(true)
+				getText("motorcade.principal"), 65)
+				.setSortable(true)
+				.setUseTitleFromLabel(true)
 				.setValueFormater(
 						new LinkFormater4Id(this.getContextPath()
 								+ "/bc/user/edit?id={0}", "user") {
@@ -153,27 +155,23 @@ public class MotorcadesAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected Condition getGridSpecalCondition() {
-		if (status != null && status.length() > 0) {
-			String[] ss = status.split(",");
-			if (ss.length == 1) {
-				return new EqualsCondition("m.status_", new Integer(ss[0]));
-			} else {
-				return new InCondition("m.status_",
-						StringUtils.stringArray2IntegerArray(ss));
-			}
-		} else {
-			return null;
+		// 状态条件
+		return ConditionUtils.toConditionByComma4IntegerValue(this.status,
+				"m.status_");
+	}
+
+	@Override
+	protected void extendGridExtrasData(Json json) {
+		super.extendGridExtrasData(json);
+
+		// 状态条件
+		if (this.status != null && this.status.trim().length() > 0) {
+			json.put("status", status);
 		}
 	}
 
 	@Override
-	protected Json getGridExtrasData() {
-		if (this.status == null || this.status.length() == 0) {
-			return null;
-		} else {
-			Json json = new Json();
-			json.put("status", status);
-			return json;
-		}
+	protected Toolbar getHtmlPageToolbar() {
+		return getHtmlPageToolbar(true);
 	}
 }

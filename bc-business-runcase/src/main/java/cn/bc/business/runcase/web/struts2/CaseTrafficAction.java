@@ -19,7 +19,6 @@ import cn.bc.business.car.domain.Car;
 import cn.bc.business.car.service.CarService;
 import cn.bc.business.carman.domain.CarMan;
 import cn.bc.business.carman.service.CarManService;
-import cn.bc.business.motorcade.domain.Motorcade;
 import cn.bc.business.motorcade.service.MotorcadeService;
 import cn.bc.business.runcase.domain.Case4InfractTraffic;
 import cn.bc.business.runcase.domain.CaseBase;
@@ -30,6 +29,7 @@ import cn.bc.core.query.condition.Direction;
 import cn.bc.core.query.condition.impl.EqualsCondition;
 import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.identity.web.SystemContext;
+import cn.bc.option.domain.OptionItem;
 import cn.bc.option.service.OptionService;
 import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.formater.EntityStatusFormater;
@@ -68,7 +68,7 @@ public class CaseTrafficAction extends FileEntityAction<Long, Case4InfractTraffi
 	private CarManService 					carManService;
 	private CarService 						carService;
 
-	public 	List<Motorcade> 				motorcadeList;					// 可选车队列表
+	public List<Map<String, String>> 		motorcadeList;					// 可选车队列表
 	public  List<Map<String, String>>		dutyList;						// 可选责任列表
 	public  List<Map<String, String>>		properitesList;					// 可选性质列表
 	
@@ -207,6 +207,10 @@ public class CaseTrafficAction extends FileEntityAction<Long, Case4InfractTraffi
 	public String create() throws Exception {
 		String r = super.create();
 		this.getE().setUid(this.getIdGeneratorService().next(this.getE().ATTACH_TYPE));
+		// 自动生成自编号
+		this.getE().setCode(
+				this.getIdGeneratorService().nextSN4Month(Case4InfractTraffic.KEY_CODE));
+		
 		if (carManId != null) {
 			CarMan driver = this.carManService.load(carManId);
 			List<Car> car = this.carService.selectAllCarByCarManId(carManId);
@@ -215,6 +219,7 @@ public class CaseTrafficAction extends FileEntityAction<Long, Case4InfractTraffi
 						car.get(0).getPlateType() + "."
 								+ car.get(0).getPlateNo());
 				this.getE().setMotorcadeId(car.get(0).getMotorcade().getId());
+				this.getE().setMotorcadeName(car.get(0).getMotorcade().getName());
 			} else if (car.size() > 1) {
 				isMoreCar = true;
 			} else {
@@ -230,6 +235,7 @@ public class CaseTrafficAction extends FileEntityAction<Long, Case4InfractTraffi
 					.setCarPlate(car.getPlateType() + "." + car.getPlateNo());
 			this.getE().setCarId(carId);
 			this.getE().setMotorcadeId(car.getMotorcade().getId());
+			this.getE().setMotorcadeName(car.getMotorcade().getName());
 			List<CarMan> carMan = this.carManService
 					.selectAllCarManByCarId(carId);
 			if (carMan.size() == 1) {
@@ -246,7 +252,6 @@ public class CaseTrafficAction extends FileEntityAction<Long, Case4InfractTraffi
 		// 初始化信息
 		this.getE().setType  (CaseBase.TYPE_INFRACT_TRAFFIC);
 		this.getE().setStatus(CaseBase.STATUS_ACTIVE);
-		this.getE().setCode(this.getIdGeneratorService().next(this.getE().ATTACH_TYPE));
 		statusesValue		=	this.getCaseStatuses();
 		sourcesValue		=	this.getSourceStatuses();
 		// 表单可选项的加载
@@ -344,7 +349,12 @@ public class CaseTrafficAction extends FileEntityAction<Long, Case4InfractTraffi
 	// 表单可选项的加载
 	public void initSelects(){
 		// 加载可选车队列表
-		this.motorcadeList 	= 	this.motorcadeService.createQuery().list();
+		this.motorcadeList = this.motorcadeService.find4Option();
+		if (this.getE().getMotorcadeId() != null)
+			OptionItem.insertIfNotExist(this.motorcadeList, this.getE()
+					.getMotorcadeId().toString(), this.getE()
+					.getMotorcadeName());
+
 		// 加载可选责任列表
 		this.allList		=	this.optionService.findOptionItemByGroupKeys(new String[] {
 									OptionConstants.IT_DUTY,OptionConstants.IT_PROPERITES

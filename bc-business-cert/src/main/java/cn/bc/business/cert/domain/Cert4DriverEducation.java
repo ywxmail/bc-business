@@ -22,7 +22,7 @@ import javax.persistence.Table;
 public class Cert4DriverEducation extends Cert4Man {
 	private static final long serialVersionUID = 1L;
 	public static final String ATTACH_TYPE = Cert4DriverEducation.class.getSimpleName();
-
+	public static final String KEY_CODE = "cert.certCode";
 	private String domain;// 培训专业
 	private Calendar trainDate;// 培训时间
 	private Integer trainHour;// 培训学时

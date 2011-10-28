@@ -89,6 +89,9 @@ public class CertIdentityAction extends FileEntityAction<Long, Cert4Identity> {
 		}
 		
 		this.getE().setUid(this.getIdGeneratorService().next(this.getE().ATTACH_TYPE));
+		// 自动生成自编号
+		this.getE().setCertCode(
+				this.getIdGeneratorService().nextSN4Month(Cert4Identity.KEY_CODE));
 		this.getE().setType(Cert.TYPE_IDENTITY);
 		this.getE().setStatus(RichEntityImpl.STATUS_ENABLED);
 		
