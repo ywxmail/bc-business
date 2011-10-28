@@ -24,6 +24,7 @@ import cn.bc.identity.domain.RichFileEntityImpl;
 public class CaseBase extends RichFileEntityImpl {
 	private static final long serialVersionUID = 1L;
 	public static final String ATTACH_TYPE = CaseBase.class.getSimpleName();
+	
 	/** 事件状态：在案 */
 	public static final int STATUS_ACTIVE = 0;
 	/** 事件状态：已结案 */
@@ -50,7 +51,7 @@ public class CaseBase extends RichFileEntityImpl {
 	private String subject;// 标题：事件的简要描述
 	private int type;// 事件类型：参考常数TYPE_XXXX的定义
 	private int source = SOURCE_SYS;// 来源：参考常数SOURCE_xxxx的定义
-	private String from; //信息来源(用户填写)
+	private String from = "电话"; //信息来源(用户填写)
 	private String caseNo;// 案号
 	private String code;// 自编号
 	private String address;// 事发地点

@@ -4,9 +4,15 @@
 package cn.bc.business.runcase.domain;
 
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
+import javax.persistence.Transient;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * 投诉、建议与表扬
@@ -16,18 +22,27 @@ import javax.persistence.MappedSuperclass;
 @MappedSuperclass
 public class CaseBase4AdviceAndPraise extends CaseBase {
 	private static final long serialVersionUID = 1L;
+	private static Log logger = LogFactory.getLog(CaseBase4AdviceAndPraise.class);
 	public static final String ATTACH_TYPE = CaseBase4AdviceAndPraise.class
 			.getSimpleName();
+	
+	/** 性别:未定义 */
+	public static final int SEX_NONE = 0;
+	/** 性别:男 */
+	public static final int SEX_MAN = 1;
+	/** 性别:女 */
+	public static final int SEX_WOMAN = 2;
+	
 	private Calendar receiveDate;// 接诉时间
 	private Long receiverId;// 经办人ID(对应ActorHistory的ID)
 	private String receiverName;// 经办人姓名
 	private String subject2;// 投诉建议项目小类(大类使用基类的subject)
 	private String detail;// 投诉内容
 	private String carColor;// 车色
-	private int driverSex;// 司机性别:参考 ActorDetail 类 SEX_XXX 常数的定义
+	//private int driverSex;// 司机性别:参考 ActorDetail 类 SEX_XXX 常数的定义
 	private String driverFeature;// 司机特征
 	private String advisorName;// 提诉人姓名
-	private int advisorSex;// 提诉人性别
+	//private int advisorSex;// 提诉人性别
 	private Integer advisorAge;// 提诉人年龄
 	private String advisorPhone;// 提诉人电话
 	private String advisorCert;// 提诉人证件号
@@ -100,13 +115,59 @@ public class CaseBase4AdviceAndPraise extends CaseBase {
 		this.carColor = carColor;
 	}
 
+//	@Column(name = "DRIVER_SEX")
+//	public int getDriverSex() {
+//		return driverSex;
+//	}
+//
+//	public void setDriverSex(int driverSex) {
+//		this.driverSex = driverSex;
+//	}
+	
+	/**
+	 * @return 司机性别(0-未设置,1-男,2-女)
+	 */
 	@Column(name = "DRIVER_SEX")
-	public int getDriverSex() {
-		return driverSex;
+	public Integer getDriverSex() {
+		Integer i = getInteger("driverSex");
+		if (i == null)
+			return 1;
+		else
+			return i.intValue();
 	}
 
-	public void setDriverSex(int driverSex) {
-		this.driverSex = driverSex;
+	public void setDriverSex(Integer sex) {
+		set("driverSex", new Integer(sex));
+	}
+	
+	@Transient
+	private Map<String, Object> attrs;
+
+	/**
+	 * @param key
+	 *            键
+	 * @return 指定键的属性值
+	 */
+	@Transient
+	public Object get(String key) {
+		return (attrs != null && attrs.containsKey(key)) ? attrs.get(key)
+				: null;
+	}
+
+	public void set(String key, Object value) {
+		if (logger.isDebugEnabled())
+			logger.debug("key=" + key + ";value=" + value + ";valueType="
+					+ (value != null ? value.getClass() : "?"));
+		if (key == null)
+			throw new RuntimeException("key can't to be null");
+		if (attrs == null)
+			attrs = new HashMap<String, Object>();
+		attrs.put(key, value);
+	}
+
+	@Transient
+	public Integer getInteger(String key) {
+		return (Integer) get(key);
 	}
 
 	@Column(name = "DRIVER_FEATURE")
@@ -127,13 +188,29 @@ public class CaseBase4AdviceAndPraise extends CaseBase {
 		this.advisorName = advisorName;
 	}
 
+//	@Column(name = "ADVISOR_SEX")
+//	public int getAdvisorSex() {
+//		return advisorSex;
+//	}
+//
+//	public void setAdvisorSex(int advisorSex) {
+//		this.advisorSex = advisorSex;
+//	}
+	
+	/**
+	 * @return 	提诉人性别(0-未设置,1-男,2-女)
+	 */
 	@Column(name = "ADVISOR_SEX")
-	public int getAdvisorSex() {
-		return advisorSex;
+	public Integer getAdvisorSex() {
+		Integer i = getInteger("advisorSex");
+		if (i == null)
+			return 1;
+		else
+			return i.intValue();
 	}
 
-	public void setAdvisorSex(int advisorSex) {
-		this.advisorSex = advisorSex;
+	public void setAdvisorSex(Integer sex) {
+		set("advisorSex", new Integer(sex));
 	}
 
 	@Column(name = "ADVISOR_AGE")
