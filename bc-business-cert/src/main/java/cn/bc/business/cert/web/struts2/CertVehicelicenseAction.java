@@ -122,6 +122,9 @@ public class CertVehicelicenseAction extends FileEntityAction<Long, Cert4VehiceL
 		}
 		
 		e.setUid(this.getIdGeneratorService().next(this.getE().ATTACH_TYPE));
+		// 自动生成自编号
+		this.getE().setCertCode(
+				this.getIdGeneratorService().nextSN4Month(Cert4VehiceLicense.KEY_CODE));
 		e.setType(Cert.TYPE_VEHICELICENSE);
 		e.setStatus(RichEntityImpl.STATUS_ENABLED);
 		statusesValue		=	this.getEntityStatuses();

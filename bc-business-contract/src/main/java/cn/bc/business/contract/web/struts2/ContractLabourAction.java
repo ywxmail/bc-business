@@ -131,6 +131,7 @@ public class ContractLabourAction extends FileEntityAction<Long, Contract4Labour
 	public String create() throws Exception {
 		String r = super.create();
 		
+		
 		if(carId != null && carManId == null){
 			//根据carId查找车辆以及司机id
 			carInfoMap = this.contractLabourService.findCarByCarId(carId);
@@ -169,8 +170,9 @@ public class ContractLabourAction extends FileEntityAction<Long, Contract4Labour
 			this.getE().setCertNo(isNullObject(carManInfoMap.get("cert_fwzg")));
 		}
 		
-		this.getE().setCode(this.getIdGeneratorService().next(this.getE().KEY_UID));
+		// 自动生成自编号
 		this.getE().setUid(this.getIdGeneratorService().next(this.getE().KEY_UID));
+		this.getE().setCode(this.getIdGeneratorService().nextSN4Month(Contract4Labour.KEY_CODE));
 		this.getE().setType(Contract.TYPE_LABOUR);
 		this.getE().setStatus(RichEntityImpl.STATUS_ENABLED);
 		statusesValue		=	this.getEntityStatuses();

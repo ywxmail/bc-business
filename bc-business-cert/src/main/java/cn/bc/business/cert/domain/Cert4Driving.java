@@ -21,7 +21,7 @@ import javax.persistence.Table;
 public class Cert4Driving extends Cert4Man {
 	private static final long serialVersionUID = 1L;
 	public static final String ATTACH_TYPE = Cert4Driving.class.getSimpleName();
-
+	public static final String KEY_CODE = "cert.certCode";
 	private String model;// 准驾车型
 	private Calendar receiveDate;// 初次领证日期
 	private String archiveNo;// 档案编号

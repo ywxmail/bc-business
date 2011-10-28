@@ -21,7 +21,7 @@ public class Cert4RoadTransport extends Cert4Car {
 	private static final long serialVersionUID = 1L;
 	public static final String ATTACH_TYPE = Cert4RoadTransport.class
 			.getSimpleName();
-
+	public static final String KEY_CODE = "cert.certCode";
 	private String owner;// 业户名称
 	private String address;// 地址
 	private String businessCertNo;// 经营许可证号

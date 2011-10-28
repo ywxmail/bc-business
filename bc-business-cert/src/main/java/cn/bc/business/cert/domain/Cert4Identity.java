@@ -19,7 +19,7 @@ import javax.persistence.Table;
 public class Cert4Identity extends Cert4Man {
 	private static final long serialVersionUID = 1L;
 	public static final String ATTACH_TYPE = Cert4Identity.class.getSimpleName();
-
+	public static final String KEY_CODE = "cert.certCode";
 	public Cert4Identity() {
 		this.setCertName("居民身份证");
 		this.setCertFullName("中华人民共和国居民身份证");

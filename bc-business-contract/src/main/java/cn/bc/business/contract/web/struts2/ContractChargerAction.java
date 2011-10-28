@@ -141,8 +141,8 @@ public class ContractChargerAction extends FileEntityAction<Long, Contract4Charg
 		
 		
 		
-		this.getE().setCode(this.getIdGeneratorService().next(this.getE().ATTACH_TYPE));
 		this.getE().setUid(this.getIdGeneratorService().next(this.getE().ATTACH_TYPE));
+		this.getE().setCode(this.getIdGeneratorService().nextSN4Month(Contract4Charger.KEY_CODE));
 		this.getE().setType(Contract.TYPE_CHARGER);
 		this.getE().setStatus(RichEntityImpl.STATUS_ENABLED);
 		statusesValue		=	this.getEntityStatuses();

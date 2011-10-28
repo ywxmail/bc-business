@@ -20,6 +20,7 @@ import javax.persistence.Table;
 public class Contract4Labour extends Contract {
 	private static final long serialVersionUID = 1L;
 	public static final String KEY_UID = Contract4Labour.class.getSimpleName();
+	public static final String KEY_CODE = "contract.code";
 	private String certNo;// 资格证号
 	private boolean additionProtocol;// 补充协议:0-无,1-有
 	private String preIndustryName;// 前身行业名称

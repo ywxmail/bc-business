@@ -15,12 +15,10 @@ import org.springframework.stereotype.Controller;
 import cn.bc.business.runcase.domain.CaseBase;
 import cn.bc.business.web.struts2.ViewAction;
 import cn.bc.core.query.condition.Condition;
+import cn.bc.core.query.condition.ConditionUtils;
 import cn.bc.core.query.condition.Direction;
-import cn.bc.core.query.condition.impl.AndCondition;
 import cn.bc.core.query.condition.impl.EqualsCondition;
-import cn.bc.core.query.condition.impl.InCondition;
 import cn.bc.core.query.condition.impl.OrderCondition;
-import cn.bc.core.util.StringUtils;
 import cn.bc.db.jdbc.RowMapper;
 import cn.bc.db.jdbc.SqlObject;
 import cn.bc.identity.web.SystemContext;
@@ -161,47 +159,37 @@ public class CaseTrafficsAction extends ViewAction<Map<String, Object>> {
 	}
 
 	
+	
 	@Override
 	protected Condition getGridSpecalCondition() {
-		// 状态条件
-		Condition statusCondition = null;
-		if (status != null && status.length() > 0) {
-			String[] ss = status.split(",");
-			if (ss.length == 1) {
-				statusCondition = new EqualsCondition("c.status_", new Integer(
-						ss[0]));
-			} else {
-				statusCondition = new InCondition("c.status_",
-						StringUtils.stringArray2IntegerArray(ss));
-			}
-		}else {
-			return null;
-		}
+		//状态条件
+		Condition statusCondition = ConditionUtils.toConditionByComma4IntegerValue(this.status,
+				"c.status_");
 		
 		// carManId条件
 		Condition carManIdCondition = null;
 		if (carManId != null) {
 			carManIdCondition = new EqualsCondition("c.driver_id", carManId);
 		}
+		
 		// carId条件
 		Condition carIdCondition = null;
 		if (carId != null) {
-			carIdCondition = new EqualsCondition("c.car_id", carId);
+			carIdCondition =new EqualsCondition("c.car_id", carId);
 		}
-		// 合并条件
-		return new AndCondition().add(statusCondition).add(carManIdCondition)
-				.add(carIdCondition);
+		
+		return ConditionUtils.mix2AndCondition(statusCondition,carManIdCondition,carIdCondition);
 	}
 	
-
 	@Override
-	protected Json getGridExtrasData() {
-		Json json = new Json();
+	protected void extendGridExtrasData(Json json) {
+		super.extendGridExtrasData(json);
+
 		// 状态条件
-		if (this.status != null || this.status.length() != 0) {
+		if (this.status != null && this.status.trim().length() > 0) {
 			json.put("status", status);
 		}
-		// carManId条件
+		
 		if (carManId != null) {
 			json.put("carManId", carManId);
 		}
@@ -209,8 +197,8 @@ public class CaseTrafficsAction extends ViewAction<Map<String, Object>> {
 		if (carId != null) {
 			json.put("carId", carId);
 		}
-		return json.isEmpty() ? null : json;
 	}
+
 	
 	/**
 	 * 获取Entity的状态值转换列表

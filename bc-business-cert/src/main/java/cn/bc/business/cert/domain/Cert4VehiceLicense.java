@@ -22,7 +22,7 @@ import javax.persistence.Table;
 public class Cert4VehiceLicense extends Cert4Car {
 	private static final long serialVersionUID = 1L;
 	public static final String ATTACH_TYPE = Cert4VehiceLicense.class.getSimpleName();
-
+	public static final String KEY_CODE = "cert.certCode";
 	private String owner;// 所有人
 	private String address;// 住址
 	private String useCharacter;//使用性质  

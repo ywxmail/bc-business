@@ -68,7 +68,7 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 	private CarManService 					carManService;
 	private CarService 						carService;
 
-	public List<Map<String, String>> 		motorcadeList;					// 可选车队列表
+	public 	List<Map<String, String>> 		motorcadeList;					// 可选车队列表
 	public  List<Map<String, String>>		dutyList;						// 可选责任列表
 	public  List<Map<String, String>> 		degreeList; 					// 可选程度列表
 	public  List<Map<String, String>> 		certList; 						// 可选没收证件列表
@@ -156,7 +156,7 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 
 	@Override
 	protected PageOption buildFormPageOption() {
-		PageOption option = new PageOption().setWidth(840).setMinWidth(250).setHeight(500)
+		PageOption option = new PageOption().setWidth(920).setMinWidth(250).setHeight(500)
 				.setMinHeight(200).setModal(false);
 		
 		if (!isReadonly()) {
