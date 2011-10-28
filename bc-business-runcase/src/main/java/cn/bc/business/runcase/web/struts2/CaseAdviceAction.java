@@ -21,7 +21,6 @@ import cn.bc.business.carman.domain.CarMan;
 import cn.bc.business.carman.service.CarManService;
 import cn.bc.business.motorcade.service.MotorcadeService;
 import cn.bc.business.runcase.domain.Case4Advice;
-import cn.bc.business.runcase.domain.Case4InfractTraffic;
 import cn.bc.business.runcase.domain.CaseBase;
 import cn.bc.business.runcase.service.CaseAdviceService;
 import cn.bc.business.web.struts2.FileEntityAction;
@@ -60,6 +59,7 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 	public  boolean 						isMoreCarMan;
 	public  boolean 						isNullCar;
 	public  boolean 						isNullCarMan;
+	private	boolean							multiple;
    //public  String							isClosed;	
 	@SuppressWarnings("unused")
 	private CaseAdviceService				caseAdviceService;
@@ -70,15 +70,24 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 
 	public List<Map<String, String>> 		motorcadeList;					// 可选车队列表
 	public  List<Map<String, String>>		dutyList;						// 可选责任列表
-	public  List<Map<String, String>>		properitesList;					// 可选性质列表
 	public  List<Map<String, String>> 		degreeList; 					// 可选程度列表
 	public  List<Map<String, String>> 		certList; 						// 可选没收证件列表
-	public  List<Map<String, String>> 		departmentList; 				// 可选执法机关列表
+	public  List<Map<String, String>> 		sourceList; 					// 可选投诉建议来源
 	
 	
 	public 	Map<String,String> 				statusesValue;
 	public	Map<String,String>				sourcesValue;
 	private Map<String, List<Map<String, String>>> 			allList;
+
+	
+	
+	public boolean isMultiple() {
+		return multiple;
+	}
+
+	public void setMultiple(boolean multiple) {
+		this.multiple = multiple;
+	}
 
 	public Long getCarId() {
 		return carId;
@@ -152,8 +161,8 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 		
 		if (!isReadonly()) {
 			//特殊处理结案按钮
-			if(Case4InfractTraffic.STATUS_ACTIVE == getE().getStatus() && !getE().isNew()){
-				ButtonOption buttonOption = new ButtonOption(getText("label.closefile"),null,"bc.caseTrafficForm.closefile");
+			if(Case4Advice.STATUS_ACTIVE == getE().getStatus() && !getE().isNew()){
+				ButtonOption buttonOption = new ButtonOption(getText("label.closefile"),null,"bc.caseAdviceForm.closefile");
 				buttonOption.put("id", "bcSaveDlgButton");
 				option.addButton(buttonOption);
 			}
@@ -212,6 +221,10 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 	public String create() throws Exception {
 		String r = super.create();
 		this.getE().setUid(this.getIdGeneratorService().next(this.getE().ATTACH_TYPE));
+		// 自动生成自编号
+		this.getE().setCode(
+				this.getIdGeneratorService().nextSN4Month(Case4Advice.KEY_CODE));
+		
 		if (carManId != null) {
 			CarMan driver = this.carManService.load(carManId);
 			List<Car> car = this.carService.selectAllCarByCarManId(carManId);
@@ -248,15 +261,16 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 			}
 		}
 		
-		// 初始化信息
-		this.getE().setType  (CaseBase.TYPE_COMPLAIN);
-		//this.getE().setAdviceType(Case4Advice.ADVICE_TYPE_COMPLAIN);
-		this.getE().setStatus(CaseBase.STATUS_ACTIVE);
-		this.getE().setCode(this.getIdGeneratorService().next(this.getE().ATTACH_TYPE));
-		statusesValue		=	this.getCaseStatuses();
-		sourcesValue		=	this.getSourceStatuses();
 		// 表单可选项的加载
 		initSelects();
+		
+		// 初始化信息
+		this.getE().setType  (CaseBase.TYPE_COMPLAIN);
+		this.getE().setStatus(CaseBase.STATUS_ACTIVE);
+		statusesValue		=	this.getCaseStatuses();
+		sourcesValue		=	this.getSourceStatuses();
+		
+
 		
 		return r; 
 	}
@@ -346,6 +360,10 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 		return "json";
 	}
 	
+	public String selectSubject(){
+		return "showdialog";
+	}
+	
 	
 	// 表单可选项的加载
 	public void initSelects(){
@@ -358,20 +376,18 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 
 		// 加载可选责任列表
 		this.allList		=	this.optionService.findOptionItemByGroupKeys(new String[] {
-									OptionConstants.IT_DUTY,OptionConstants.IT_PROPERITES,
+									OptionConstants.IT_DUTY,OptionConstants.AD_SOURCE,
 									OptionConstants.IT_DEGREE,OptionConstants.BS_CERT,
-									OptionConstants.CA_DEPARTMENT
+									
 								});
 		// 可选责任列表
 		this.dutyList			=	allList.get(OptionConstants.IT_DUTY);	
-		// 可选性质列表
-		this.properitesList		=	allList.get(OptionConstants.IT_PROPERITES);	
 		// 可选程度列表
 		this.degreeList			=	allList.get(OptionConstants.IT_DEGREE);
 		// 可选没收证件列表
 		this.certList			=	allList.get(OptionConstants.BS_CERT);
-		// 可选执法机关列表
-		this.departmentList		=	allList.get(OptionConstants.CA_DEPARTMENT);
+		// 可选投诉建议来源
+		this.sourceList			=	allList.get(OptionConstants.AD_SOURCE);
 	
 	}
 	

@@ -18,6 +18,7 @@ import javax.persistence.Table;
 @Table(name = "BS_CASE_INFRACT_BUSINESS")
 public class Case4InfractBusiness extends CaseBase {
 	private static final long serialVersionUID = 1L;
+	public static final String KEY_CODE = "runcase.code";
 	public static final String ATTACH_TYPE = Case4InfractBusiness.class
 			.getSimpleName();
 

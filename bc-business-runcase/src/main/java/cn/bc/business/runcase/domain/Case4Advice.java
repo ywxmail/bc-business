@@ -19,6 +19,8 @@ import javax.persistence.Table;
 public class Case4Advice extends CaseBase4AdviceAndPraise {
 	private static final long serialVersionUID = 1L;
 	public static final String ATTACH_TYPE = Case4Advice.class.getSimpleName();
+	public static final String KEY_CODE = "runcase.code";
+	
 	/** 投诉还是建议：投诉 */
 	public static final int ADVICE_TYPE_COMPLAIN = 0;
 	/** 投诉还是建议：建议 */
