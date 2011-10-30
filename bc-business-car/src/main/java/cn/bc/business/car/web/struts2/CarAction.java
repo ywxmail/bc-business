@@ -249,10 +249,13 @@ public class CarAction extends FileEntityAction<Long, Car> {
 		Date startTime = new Date();
 		// 加载可选车队列表
 		this.motorcadeList = this.motorcadeService.find4Option();
-		logger.info("motorcadeList耗时：" + DateUtils.getWasteTime(startTime));
+		if (logger.isInfoEnabled())
+			logger.info("motorcadeList耗时：" + DateUtils.getWasteTime(startTime));
 		Motorcade m = this.getE().getMotorcade();
-		OptionItem.insertIfNotExist(this.motorcadeList, m.getId().toString(),
-				m.getName());
+		if (m != null) {
+			OptionItem.insertIfNotExist(this.motorcadeList, m.getId()
+					.toString(), m.getName());
+		}
 
 		// 批量加载可选项列表
 		Map<String, List<Map<String, String>>> optionItems = this.optionService
