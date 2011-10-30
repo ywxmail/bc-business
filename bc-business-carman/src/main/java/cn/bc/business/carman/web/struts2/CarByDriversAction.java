@@ -26,7 +26,7 @@ import cn.bc.db.jdbc.RowMapper;
 import cn.bc.db.jdbc.SqlObject;
 import cn.bc.web.formater.EntityStatusFormater;
 import cn.bc.web.formater.KeyValueFormater;
-import cn.bc.web.formater.LinkFormater;
+import cn.bc.web.formater.LinkFormater4Id;
 import cn.bc.web.ui.html.grid.Column;
 import cn.bc.web.ui.html.grid.IdColumn4MapKey;
 import cn.bc.web.ui.html.grid.TextColumn4MapKey;
@@ -102,65 +102,46 @@ public class CarByDriversAction extends ViewAction<Map<String, Object>> {
 		if (carManId != null || (carManId == null && carId == null)) {
 			columns.add(new TextColumn4MapKey("c.plate_no", "plate",
 					getText("carByDriver.car.plateNo"), 150)
-					.setValueFormater(new LinkFormater(this.getContextPath()
+					.setValueFormater(new LinkFormater4Id(this.getContextPath()
 							+ "/bc-business/car/edit?id={0}", "car") {
+						@SuppressWarnings("unchecked")
 						@Override
-						public Object[] getParams(Object context, Object value) {
-							Map<String, Object> map = (Map<String, Object>) context;
-							Object[] args = new Object[1];
-							args[0] = map.get("carId");
-							return args;
+						public String getIdValue(Object context, Object value) {
+							return StringUtils
+									.toString(((Map<String, Object>) context)
+											.get("carId"));
 						}
 
 						@Override
 						public String getTaskbarTitle(Object context,
 								Object value) {
+							@SuppressWarnings("unchecked")
 							Map<String, Object> map = (Map<String, Object>) context;
 							return getText("car") + " - " + map.get("plate");
 
-						}
-
-						@Override
-						public String getWinId(Object context, Object value) {
-							return "car"
-									+ ((Map<String, Object>) context)
-											.get("carId");
-
-						}
-
-						@Override
-						public String getLinkText(Object context, Object value) {
-							Map<String, Object> map = (Map<String, Object>) context;
-							return getText("car") + " - " + map.get("plate");
 						}
 					}));
-
 		}
 		if (carId != null || (carManId == null && carId == null)) {
 			columns.add(new TextColumn4MapKey("b.name", "driver",
 					getText("carByDriver.driver"), 100)
-					.setValueFormater(new LinkFormater(this.getContextPath()
+					.setValueFormater(new LinkFormater4Id(this.getContextPath()
 							+ "/bc-business/carMan/edit?id={0}", "driver") {
+						@SuppressWarnings("unchecked")
 						@Override
-						public Object[] getParams(Object context, Object value) {
-							Map<String, Object> map = (Map<String, Object>) context;
-							Object[] args = new Object[1];
-							args[0] = map.get("driverId");
-							return args;
+						public String getIdValue(Object context, Object value) {
+							return StringUtils
+									.toString(((Map<String, Object>) context)
+											.get("driverId"));
 						}
 
 						@Override
 						public String getTaskbarTitle(Object context,
 								Object value) {
+							@SuppressWarnings("unchecked")
 							Map<String, Object> map = (Map<String, Object>) context;
 							return getText("carByDriver.driver") + " - "
 									+ map.get("driver");
-						}
-
-						@Override
-						public String getWinId(Object context, Object value) {
-							Map<String, Object> map = (Map<String, Object>) context;
-							return "driver" + map.get("driverId");
 						}
 					}));
 		}
