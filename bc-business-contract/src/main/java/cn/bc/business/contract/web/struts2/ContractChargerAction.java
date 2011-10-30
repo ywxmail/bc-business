@@ -344,13 +344,13 @@ public class ContractChargerAction extends FileEntityAction<Long, Contract4Charg
 		attachsUI.addExtension(getText("app.attachs.extensions"))
 				.setMaxCount(Integer.parseInt(getText("app.attachs.maxCount")))
 				.setMaxSize(Integer.parseInt(getText("app.attachs.maxSize")));
-		attachsUI.setReadOnly(!this.getE().isNew());
+		attachsUI.setReadOnly(this.isReadonly());
 		return attachsUI;
 	}
 
 	@Override
 	protected PageOption buildFormPageOption() {
-		PageOption option = new PageOption().setWidth(750).setMinWidth(250)
+		PageOption option = new PageOption().setWidth(728).setMinWidth(250)
 				.setMinHeight(160).setModal(false);
 		//option.addButton(new ButtonOption(getText("label.save"), "save"));
 		option.addButton(new ButtonOption(getText("label.save"), null, "bc.contractChargerForm.save"));
