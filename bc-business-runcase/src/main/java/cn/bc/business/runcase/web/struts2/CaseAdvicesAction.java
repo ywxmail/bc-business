@@ -12,6 +12,7 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
+import cn.bc.business.runcase.domain.Case4Advice;
 import cn.bc.business.web.struts2.ViewAction;
 import cn.bc.core.Entity;
 import cn.bc.core.query.condition.Condition;
@@ -26,6 +27,7 @@ import cn.bc.db.jdbc.SqlObject;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.formater.EntityStatusFormater;
+import cn.bc.web.formater.KeyValueFormater;
 import cn.bc.web.ui.html.grid.Column;
 import cn.bc.web.ui.html.grid.IdColumn4MapKey;
 import cn.bc.web.ui.html.grid.TextColumn4MapKey;
@@ -68,7 +70,7 @@ public class CaseAdvicesAction extends ViewAction<Map<String, Object>> {
 
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer sql = new StringBuffer();
-		sql.append("select a.id, b.status_,b.subject,b.motorcade_name,b.car_plate,b.driver_name");
+		sql.append("select a.id, b.status_,a.advice_type,b.subject,b.motorcade_name,b.car_plate,b.driver_name");
 		sql.append(",b.closer_name,b.close_date,a.advisor_name,b.happen_date,b.address");
 		sql.append(",b.from_,b.driver_cert,a.receive_code,b.case_no ");
 		sql.append(" from BS_CASE_ADVICE a");
@@ -85,6 +87,7 @@ public class CaseAdvicesAction extends ViewAction<Map<String, Object>> {
 				int i = 0;
 				map.put("id", rs[i++]);
 				map.put("status_", rs[i++]);
+				map.put("advice_type", rs[i++]);
 				map.put("subject", rs[i++]);
 				map.put("motorcade_name", rs[i++]);
 				map.put("car_plate", rs[i++]);
@@ -112,6 +115,9 @@ public class CaseAdvicesAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("c.status_", "status_",
 				getText("runcase.status"), 50).setSortable(true)
 				.setValueFormater(new EntityStatusFormater(getBSStatuses2())));
+		columns.add(new TextColumn4MapKey("a.advice_type", "advice_type",
+				getText("runcase.adviceType"), 80).setSortable(true)
+				.setValueFormater(new KeyValueFormater(getType())));
 		columns.add(new TextColumn4MapKey("b.subject", "subject",
 				getText("runcase.subject"), 120).setSortable(true));
 		columns.add(new TextColumn4MapKey("b.motorcade_name", "motorcade_name",
@@ -228,5 +234,21 @@ public class CaseAdvicesAction extends ViewAction<Map<String, Object>> {
 						Toolbar.getDefaultToolbarRadioGroup(
 								this.getBSStatuses2(), "status", 0,
 								getText("title.click2changeSearchStatus")));
+	}
+
+	/**
+	 * 获取类型(表扬,投诉)分类值转换列表
+	 * 
+	 * @return
+	 */
+	protected Map<String, String> getType() {
+		Map<String, String> type = new HashMap<String, String>();
+		type = new HashMap<String, String>();
+		type.put(String.valueOf(Case4Advice.ADVICE_TYPE_COMPLAIN),
+				getText("runcase.select.complain"));
+		type.put(String.valueOf(Case4Advice.ADVICE_TYPE_SUGGEST),
+				getText("runcase.select.suggest"));
+
+		return type;
 	}
 }
