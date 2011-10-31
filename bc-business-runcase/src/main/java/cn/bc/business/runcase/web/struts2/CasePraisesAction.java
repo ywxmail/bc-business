@@ -34,14 +34,14 @@ import cn.bc.web.ui.html.toolbar.Toolbar;
 import cn.bc.web.ui.json.Json;
 
 /**
- * 事故理赔Action
+ * 投诉视图Action
  * 
  * @author dragon
  * 
  */
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 @Controller
-public class CaseAccidentsAction extends ViewAction<Map<String, Object>> {
+public class CasePraisesAction extends ViewAction<Map<String, Object>> {
 	private static final long serialVersionUID = 1L;
 	public String status = String.valueOf(Entity.STATUS_ENABLED); // 车辆的状态，多个用逗号连接
 	public Long carManId;
@@ -68,8 +68,9 @@ public class CaseAccidentsAction extends ViewAction<Map<String, Object>> {
 
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer sql = new StringBuffer();
-		sql.append("select c.id,b.status_,b.code,c.sort,b.motorcade_name,b.driver_name,b.car_plate,b.driver_cert,b.happen_date");
-		sql.append(",b.address,b.driver_id,b.car_id from BS_CASE_ACCIDENT c inner join BS_CASE_BASE b on b.id=c.id");
+		sql.append("select b.id,b.status_,b.from_,b.code,b.motorcade_name,b.car_plate,b.driver_name,b.driver_cert,b.happen_date");
+		sql.append(",b.subject,b.address ,p.advisor_name ");
+		sql.append(" from BS_CASE_PRAISE p inner join BS_CASE_BASE b on b.id=p.id");
 		sqlObject.setSql(sql.toString());
 
 		// 注入参数
@@ -82,16 +83,16 @@ public class CaseAccidentsAction extends ViewAction<Map<String, Object>> {
 				int i = 0;
 				map.put("id", rs[i++]);
 				map.put("status_", rs[i++]);
+				map.put("from_", rs[i++]);
 				map.put("code", rs[i++]);
-				map.put("sort", rs[i++]);
 				map.put("motorcade_name", rs[i++]);
-				map.put("driver_name", rs[i++]);
 				map.put("car_plate", rs[i++]);
+				map.put("driver_name", rs[i++]);
 				map.put("driver_cert", rs[i++]);
 				map.put("happen_date", rs[i++]);
+				map.put("subject", rs[i++]);
 				map.put("address", rs[i++]);
-				map.put("driver_id", rs[i++]);
-				map.put("car_id", rs[i++]);
+				map.put("advisor_name", rs[i++]);
 
 				return map;
 			}
@@ -102,45 +103,52 @@ public class CaseAccidentsAction extends ViewAction<Map<String, Object>> {
 	@Override
 	protected List<Column> getGridColumns() {
 		List<Column> columns = new ArrayList<Column>();
-		columns.add(new IdColumn4MapKey("c.id", "id"));
-		columns.add(new TextColumn4MapKey("c.status_", "status_",
-				getText("runcase.status"), 60).setSortable(true)
+		columns.add(new IdColumn4MapKey("b.id", "id"));
+		columns.add(new TextColumn4MapKey("b.status_", "status_",
+				getText("runcase.status"), 50).setSortable(true)
 				.setValueFormater(new EntityStatusFormater(getBSStatuses2())));
 		columns.add(new TextColumn4MapKey("b.code", "code",
-				getText("runcase.caseNo3"), 160).setSortable(true));
-		columns.add(new TextColumn4MapKey("c.sort", "sort",
-				getText("runcase.sort"), 80).setSortable(true));
+				getText("runcase.code"), 130).setSortable(true));
+		columns.add(new TextColumn4MapKey("b.from_", "from_",
+				getText("runcase.source"), 70).setSortable(true)
+				.setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("b.motorcade_name", "motorcade_name",
-				getText("runcase.motorcadeName"), 80));
-		if (carManId == null) {
-			columns.add(new TextColumn4MapKey("b.driver_name", "driver_name",
-					getText("runcase.driverName"), 80).setSortable(true));
-		}
+				getText("runcase.motorcadeName"), 80).setSortable(true));
 		if (carId == null) {
 			columns.add(new TextColumn4MapKey("b.car_plate", "car_plate",
-					getText("runcase.carPlate"), 120));
+					getText("runcase.carPlate"), 100));
+		}
+		if (carManId == null) {
+			columns.add(new TextColumn4MapKey("b.driver_name", "driver_name",
+					getText("runcase.driverName"), 70).setSortable(true));
 		}
 		columns.add(new TextColumn4MapKey("b.driver_cert", "driver_cert",
-				getText("runcase.driverCert"), 80).setSortable(true));
+				getText("runcase.driverCert"), 100).setSortable(true)
+				.setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("b.happen_date", "happen_date",
-				getText("runcase.happenDate"), 120).setSortable(true)
+				getText("runcase.happenDate"), 100).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+		columns.add(new TextColumn4MapKey("b.subject", "subject",
+				getText("runcase.subject"), 120).setSortable(true));
 		columns.add(new TextColumn4MapKey("b.address", "address",
 				getText("runcase.address"), 100).setSortable(true)
 				.setUseTitleFromLabel(true));
+		columns.add(new TextColumn4MapKey("p.advisor_name", "advisor_name",
+				getText("runcase.praiseName"), 70).setSortable(true));
 
 		return columns;
 	}
 
 	@Override
 	protected String[] getGridSearchFields() {
-		return new String[] { "b.code", "b.motorcade_name", "b.car_plate",
-				"c.sort", "b.driver_name", "b.driver_cert" };
+		return new String[] { "b.case_no", "b.motorcade_name", "b.car_plate",
+				"b.closer_name", "b.driver_name", "b.driver_cert",
+				"a.advisor_name" };
 	}
 
 	@Override
 	protected String getFormActionName() {
-		return "caseAccident";
+		return "casePraise";
 	}
 
 	@Override
@@ -211,4 +219,5 @@ public class CaseAccidentsAction extends ViewAction<Map<String, Object>> {
 								this.getBSStatuses2(), "status", 0,
 								getText("title.click2changeSearchStatus")));
 	}
+
 }

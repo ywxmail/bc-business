@@ -174,7 +174,7 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 	}
 
 	/**
-	 * 获取分类值转换列表
+	 * 获取司机分类值转换列表
 	 * 
 	 * @return
 	 */
