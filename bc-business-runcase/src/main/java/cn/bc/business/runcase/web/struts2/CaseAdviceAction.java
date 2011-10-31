@@ -156,7 +156,7 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 
 	@Override
 	protected PageOption buildFormPageOption() {
-		PageOption option = new PageOption().setWidth(920).setMinWidth(250).setHeight(500)
+		PageOption option = new PageOption().setWidth(835).setMinWidth(250).setHeight(500)
 				.setMinHeight(200).setModal(false);
 		
 		if (!isReadonly()) {
