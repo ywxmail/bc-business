@@ -1,17 +1,16 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>cn.bc.business</groupId>
 		<artifactId>bc-business-parent</artifactId>
-		<version>0.1-SNAPSHOT</version>
+		<version>0.2-SNAPSHOT</version>
 		<relativePath>../bc-business-parent/pom.xml</relativePath>
 	</parent>
 	<artifactId>bc-business-charger</artifactId>
-	<description>车队负责人</description>
+	<description>锟斤拷锟接革拷锟斤拷锟斤拷</description>
 	
 	<dependencies>
-		<!-- 本子系统的公共模块 -->
+		<!-- 锟斤拷锟斤拷系统锟侥癸拷锟斤拷模锟斤拷 -->
 		<dependency>
 			<groupId>cn.bc.business</groupId>
 			<artifactId>bc-business-base</artifactId>
