@@ -36,6 +36,8 @@
 		</action>
 		<action name="caseAdvice/selectCarMansInfo" class="caseAdviceAction" method="selectCarMansInfo">
 		</action>
+		<action name="caseAdvice/closed" class="caseAdviceAction" method="closed">
+		</action>
 	</package>
 	
 	<!-- 表扬 -->
@@ -43,6 +45,9 @@
 		<action name="casePraise/closefile" class="casePraiseAction" method="closefile">
 		</action>
 		<action name="casePraise/selectCarMansInfo" class="casePraiseAction" method="selectCarMansInfo">
+		</action>
+		<action name="casePraise/selectSubject" class="casePraiseAction" method="selectSubject">
+			<result name="showdialog" >/bc-business/casePraise/select.jsp</result>
 		</action>
 	</package>
 

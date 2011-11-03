@@ -141,8 +141,8 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 	
 	@Override
 	protected PageOption buildFormPageOption() {
-		PageOption option = new PageOption().setWidth(840).setMinWidth(250).setHeight(500)
-				.setMinHeight(200).setModal(false);
+		PageOption option = super.buildFormPageOption().setWidth(840).setMinWidth(250).setHeight(500)
+				.setMinHeight(200);
 		if (!isReadonly()) {
 			//特殊处理结案按钮
 			if(Case4InfractBusiness.STATUS_ACTIVE == getE().getStatus() && !getE().isNew()){

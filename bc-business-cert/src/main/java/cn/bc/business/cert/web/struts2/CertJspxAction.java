@@ -139,12 +139,11 @@ public class CertJspxAction extends FileEntityAction<Long, Cert4DriverEducation>
 	}
 
 	
-	@SuppressWarnings("static-access")
 	private AttachWidget buildAttachsUI(boolean isNew) {
 		// 构建附件控件
-		String ptype = "certIdentity.main";
+		String ptype = "certJspx.main";
 		AttachWidget attachsUI = new AttachWidget();
-		attachsUI.setFlashUpload(this.isFlashUpload());
+		attachsUI.setFlashUpload(isFlashUpload());
 		attachsUI.addClazz("formAttachs");
 		if (!isNew)
 			attachsUI.addAttach(this.attachService.findByPtype(ptype, this
@@ -155,15 +154,19 @@ public class CertJspxAction extends FileEntityAction<Long, Cert4DriverEducation>
 		attachsUI.addExtension(getText("app.attachs.extensions"))
 				.setMaxCount(Integer.parseInt(getText("app.attachs.maxCount")))
 				.setMaxSize(Integer.parseInt(getText("app.attachs.maxSize")));
-		attachsUI.setReadOnly(!this.getE().isNew());
+		if (this.isReadonly()) {
+			attachsUI.setReadOnly(true);
+		}
 		return attachsUI;
 	}
 
 	@Override
 	protected PageOption buildFormPageOption() {
-		PageOption option = new PageOption().setWidth(800).setMinWidth(250)
-				.setMinHeight(160).setModal(false);
-		option.addButton(new ButtonOption(getText("label.save"), "save"));
+		PageOption option = super.buildFormPageOption().setWidth(800).setMinWidth(250)
+				.setMinHeight(160);
+		if (!this.isReadonly()) {
+			option.addButton(new ButtonOption(getText("label.save"), "save"));
+		}
 		return option;
 	}
 

@@ -18,12 +18,14 @@ import cn.bc.business.web.struts2.ViewAction;
 import cn.bc.core.Entity;
 import cn.bc.core.query.condition.Direction;
 import cn.bc.core.query.condition.impl.OrderCondition;
+import cn.bc.core.util.StringUtils;
 import cn.bc.db.jdbc.RowMapper;
 import cn.bc.db.jdbc.SqlObject;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.formater.DateRangeFormater;
 import cn.bc.web.formater.EntityStatusFormater;
+import cn.bc.web.formater.LinkFormater4Id;
 import cn.bc.web.ui.html.grid.Column;
 import cn.bc.web.ui.html.grid.IdColumn4MapKey;
 import cn.bc.web.ui.html.grid.TextColumn4MapKey;
@@ -65,7 +67,11 @@ public class ContractLaboursAction extends ViewAction<Map<String, Object>> {
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer sql = new StringBuffer();
 		sql.append("select cl.id,c.type_,c.ext_str1,c.ext_str2,c.transactor_name,c.sign_date,c.start_date,c.end_date,c.code");
-		sql.append(" from BS_CONTRACT_LABOUR cl inner join BS_CONTRACT c on cl.id = c.id");
+		sql.append(",car.id carId");
+		sql.append(" from BS_CONTRACT_LABOUR cl");
+		sql.append(" inner join BS_CONTRACT c on cl.id = c.id");
+		sql.append(" inner join BS_CAR_CONTRACT carc on c.id = carc.contract_id");
+		sql.append(" inner join BS_Car car on carc.car_id = car.id");
 		sqlObject.setSql(sql.toString());
 		
 		// 注入参数
@@ -85,6 +91,7 @@ public class ContractLaboursAction extends ViewAction<Map<String, Object>> {
 				map.put("start_date", rs[i++]);
 				map.put("end_date", rs[i++]);
 				map.put("code", rs[i++]);
+				map.put("carId", rs[i++]);
 				return map;
 			}
 		});
@@ -99,11 +106,23 @@ public class ContractLaboursAction extends ViewAction<Map<String, Object>> {
 				getText("contract.type"), 80).setSortable(true).setValueFormater(
 				new EntityStatusFormater(getEntityTypes()))); 
 		columns.add(new TextColumn4MapKey("c.ext_str1", "ext_str1",
-				getText("contract.car"), 80).setUseTitleFromLabel(true));
+				getText("contract.car"), 80).setUseTitleFromLabel(true)
+				.setValueFormater(
+						new LinkFormater4Id(this.getContextPath()
+								+ "/bc-business/car/edit?id={0}", "car") {
+							@SuppressWarnings("unchecked")
+							@Override
+							public String getIdValue(Object context,
+									Object value) {
+								return StringUtils
+										.toString(((Map<String, Object>) context)
+												.get("carId"));
+							}
+						}));
 		columns.add(new TextColumn4MapKey("c.motorcade_name", "ext_str2",
 				getText("contract.labour.driver"), 80).setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("c.transactor_name", "transactor_name",
-				getText("contract.transactor"), 60).setUseTitleFromLabel(true));
+				getText("contract.transactor"), 80).setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("c.sign_date", "sign_date",
 				getText("contract.signDate"), 90).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));

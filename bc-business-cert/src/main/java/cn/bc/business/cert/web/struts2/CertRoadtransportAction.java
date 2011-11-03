@@ -180,12 +180,11 @@ public class CertRoadtransportAction extends FileEntityAction<Long, Cert4RoadTra
 	}
 
 	
-	@SuppressWarnings("static-access")
 	private AttachWidget buildAttachsUI(boolean isNew) {
 		// 构建附件控件
 		String ptype = "certRoadtransport.main";
 		AttachWidget attachsUI = new AttachWidget();
-		attachsUI.setFlashUpload(this.isFlashUpload());
+		attachsUI.setFlashUpload(isFlashUpload());
 		attachsUI.addClazz("formAttachs");
 		if (!isNew)
 			attachsUI.addAttach(this.attachService.findByPtype(ptype, this
@@ -196,15 +195,19 @@ public class CertRoadtransportAction extends FileEntityAction<Long, Cert4RoadTra
 		attachsUI.addExtension(getText("app.attachs.extensions"))
 				.setMaxCount(Integer.parseInt(getText("app.attachs.maxCount")))
 				.setMaxSize(Integer.parseInt(getText("app.attachs.maxSize")));
-		attachsUI.setReadOnly(!this.getE().isNew());
+		if (this.isReadonly()) {
+			attachsUI.setReadOnly(true);
+		}
 		return attachsUI;
 	}
 
 	@Override
 	protected PageOption buildFormPageOption() {
-		PageOption option = new PageOption().setWidth(750).setMinWidth(250)
-				.setMinHeight(160).setModal(false);
-		option.addButton(new ButtonOption(getText("label.save"), "save"));
+		PageOption option = super.buildFormPageOption().setWidth(750).setMinWidth(250)
+				.setMinHeight(160);
+		if (!this.isReadonly()) {
+			option.addButton(new ButtonOption(getText("label.save"), "save"));
+		}
 		return option;
 	}
 

@@ -144,8 +144,8 @@ public class CaseTrafficAction extends FileEntityAction<Long, Case4InfractTraffi
 
 	@Override
 	protected PageOption buildFormPageOption() {
-		PageOption option = new PageOption().setWidth(840).setMinWidth(250).setHeight(500)
-				.setMinHeight(200).setModal(false);
+		PageOption option = super.buildFormPageOption().setWidth(820).setMinWidth(250).setHeight(500)
+				.setMinHeight(200);
 		
 		if (!isReadonly()) {
 			//特殊处理结案按钮
