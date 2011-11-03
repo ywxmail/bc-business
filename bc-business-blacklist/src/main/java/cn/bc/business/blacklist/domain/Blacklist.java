@@ -18,7 +18,6 @@ import cn.bc.business.car.domain.Car;
 import cn.bc.business.carman.domain.CarMan;
 import cn.bc.business.motorcade.domain.Motorcade;
 import cn.bc.identity.domain.Actor;
-import cn.bc.identity.domain.ActorHistory;
 import cn.bc.identity.domain.FileEntityImpl;
 
 /**
@@ -31,7 +30,15 @@ import cn.bc.identity.domain.FileEntityImpl;
 @Inheritance(strategy = InheritanceType.JOINED)
 public class Blacklist extends FileEntityImpl {
 	private static final long serialVersionUID = 1L;
+	public static final String KEY_CODE = "blacklist.code";
+	/** 状态：新建 */
+	public static final int STATUS_XINJIAN = 2;
+	/** 状态：锁定 */
+	public static final int STATUS_SUODING = 0;
+	/** 状态：解锁 */
+	public static final int STATUS_JIESUO = 1;
 
+	private int status;// 状态
 	private String subject;// 主题
 	private String type;// 类型，如提醒、限制一切业务
 	private String level;// 等级
@@ -48,6 +55,15 @@ public class Blacklist extends FileEntityImpl {
 	private Motorcade motorcade;// 车队
 	private Car car;// 车辆
 	private CarMan driver;// 司机
+
+	@Column(name = "STATUS_")
+	public int getStatus() {
+		return status;
+	}
+
+	public void setStatus(int status) {
+		this.status = status;
+	}
 
 	public String getCode() {
 		return code;

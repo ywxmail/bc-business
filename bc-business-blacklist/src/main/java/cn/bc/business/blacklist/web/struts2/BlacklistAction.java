@@ -3,7 +3,9 @@
  */
 package cn.bc.business.blacklist.web.struts2;
 
+import java.util.Calendar;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -16,6 +18,7 @@ import cn.bc.business.OptionConstants;
 import cn.bc.business.blacklist.domain.Blacklist;
 import cn.bc.business.blacklist.service.BlacklistService;
 import cn.bc.business.car.domain.Car;
+import cn.bc.business.car.service.CarService;
 import cn.bc.business.carman.domain.CarMan;
 import cn.bc.business.carman.service.CarByDriverService;
 import cn.bc.business.carman.service.CarManService;
@@ -60,9 +63,36 @@ public class BlacklistAction extends FileEntityAction<Long, Blacklist> {
 	public String unitName;// 车辆所属单位名
 	public String motorcadeName;// 车辆所属车队名
 	public CarManService carManService;
+	private CarService carService;
 	public Long carId;
 	public Long unitId;
 	public Long motorcadeId;
+	public Map<String, String> statusesValue;
+	public boolean isMoreCar;// 标识是否一个司机对应有多辆车
+	public boolean isMoreCarMan;// 标识是否一辆车对应多个司机
+	public boolean isNullCar;// 标识是否没有车和司机对应
+	public boolean isNullCarMan;// 标识是否没有司机和车对应
+
+	public Long getCarManId() {
+		return carManId;
+	}
+
+	public void setCarManId(Long carManId) {
+		this.carManId = carManId;
+	}
+
+	public Long getCarId() {
+		return carId;
+	}
+
+	public void setCarId(Long carId) {
+		this.carId = carId;
+	}
+
+	@Autowired
+	public void CarService(CarService carService) {
+		this.carService = carService;
+	}
 
 	@Autowired
 	public void setCarManService(CarManService carManService) {
@@ -87,48 +117,124 @@ public class BlacklistAction extends FileEntityAction<Long, Blacklist> {
 
 	@Override
 	public boolean isReadonly() {
+		// if (this.getE() != null) {// 表单
+		// return this.getE().getStatus() != Blacklist.STATUS_DAISUODING;
+		// } else {// 视图
 		// 黑名单管理员或系统管理员
 		SystemContext context = (SystemContext) this.getContext();
 		return !context.hasAnyRole(getText("key.role.bs.blacklist"),
 				getText("key.role.bc.admin"));
+		// }
 	}
 
 	@Override
 	public String create() throws Exception {
+
 		String result = super.create();
+
+		// if (carManId != null) {
+		// Car car = this.carByDriverService.selectCarByCarManId(new Long(
+		// carManId));
+		// CarMan driver = this.carManService.load(carManId);
+		// this.getE().setCar(car);
+		// this.getE().setDriver(driver);
+		// this.getE().setOldUnitName(car.getOldUnitName());
+		// this.getE().setMotorcade(car.getMotorcade());
+		//
+		// }
 		if (carManId != null) {
-			Car car = this.carByDriverService.selectCarByCarManId(new Long(
-					carManId));
 			CarMan driver = this.carManService.load(carManId);
-			this.getE().setCar(car);
+			List<Car> car = this.carService.selectAllCarByCarManId(carManId);
+			if (car.size() == 1) {
+				this.getE().setCar(car.get(0));
+				this.getE().setMotorcade(car.get(0).getMotorcade());
+			} else if (car.size() > 1) {
+				isMoreCar = true;
+			} else {
+				isNullCar = true;
+			}
 			this.getE().setDriver(driver);
-			this.getE().setOldUnitName(car.getOldUnitName());
-			this.getE().setMotorcade(car.getMotorcade());
 
 		}
+		if (carId != null) {
+			Car car = this.carService.load(carId);
+			this.getE().setCar(car);
 
-		// blackLevelList = this.optionService
-		// .findOptionItemByGroupKey(OptionConstants.CARMAN_LEVEL);
-		// blackTypeList = this.optionService
-		// .findOptionItemByGroupKey(OptionConstants.BLACKLIST_TYPE);
-		// this.formPageOption = buildFormPageOption();
+			this.getE().setMotorcade(car.getMotorcade());
+			List<CarMan> carMan = this.carManService
+					.selectAllCarManByCarId(carId);
+			if (carMan.size() == 1) {
+				this.getE().setDriver(carMan.get(0));
+
+			} else if (carMan.size() > 1) {
+				isMoreCarMan = true;
+			} else {
+				isNullCarMan = true;
+			}
+		}
 		initSelects();
 		return result;
 	}
 
 	@Override
+	protected void afterCreate(Blacklist entity) {
+		SystemContext context = this.getSystyemContext();
+		entity.setStatus(Blacklist.STATUS_XINJIAN);
+		this.getE().setLocker(context.getUser());
+		this.getE().setLockDate(Calendar.getInstance());
+		this.getE().setCode(
+				this.getIdGeneratorService().nextSN4Month(Blacklist.KEY_CODE));
+		// 设置创建人信息
+		entity.setFileDate(Calendar.getInstance());
+		entity.setAuthor(context.getUserHistory());
+	}
+
+	@Override
+	public String save() throws Exception {
+		SystemContext context = this.getSystyemContext();
+		// 解决object references an unsaved transient instance 错误，（表单隐藏域以新建一个
+		// 对象,但没有保存相关的数据而出现的错误）
+		Blacklist e = this.getE();
+		if (e.getUnlocker() != null && e.getUnlocker().getId() == null) {
+			e.setUnlocker(null);
+		}
+
+		// 设置最后更新人的信息
+		if (this.getE().getStatus() == Blacklist.STATUS_SUODING) {
+			this.getE().setModifier(context.getUserHistory());
+			this.getE().setModifiedDate(Calendar.getInstance());
+		} else {
+			this.getE().setUnlocker(context.getUser());
+			this.getE().setUnlockDate(Calendar.getInstance());
+		}
+		super.save();
+		return "saveSuccess";
+	}
+
+	@Override
 	public String edit() throws Exception {
 		String result = super.edit();
-
+		statusesValue = this.getBLStatuses();
 		initSelects();
 		return result;
 	}
 
 	@Override
 	protected PageOption buildFormPageOption() {
-		PageOption option = new PageOption().setWidth(720).setMinWidth(250)
-				.setMinHeight(200).setModal(false);
-		option.addButton(new ButtonOption(getText("label.save"), "save"));
+		PageOption option = super.buildFormPageOption().setWidth(720)
+				.setMinWidth(250).setMinHeight(200);
+		// 新建时状态为2，表单只显示锁定按钮
+		if (isReadonly() == false
+				&& this.getE().getStatus() == Blacklist.STATUS_XINJIAN) {
+			option.addButton(new ButtonOption(getText("blacklist.locker"),
+					null, "bc.business.blacklistForm.lcoker"));
+			// 状态为锁定时，只显示解锁按钮
+		} else if (isReadonly() == false
+				&& this.getE().getStatus() == Blacklist.STATUS_SUODING) {
+			option.addButton(new ButtonOption(getText("blacklist.unlocker"),
+					null, "bc.business.blacklistForm.unlcoker"));
+		}
+
 		return option;
 	}
 
@@ -297,18 +403,6 @@ public class BlacklistAction extends FileEntityAction<Long, Blacklist> {
 		return page;
 	}
 
-	@Override
-	public String save() throws Exception {
-
-		Blacklist e = this.getE();
-		if (e.getUnlocker() != null && e.getUnlocker().getId() == null) {
-			e.setUnlocker(null);
-		}
-
-		super.save();
-		return "saveSuccess";
-	}
-
 	// 视图特殊条件
 	@Override
 	protected Condition getSpecalCondition() {
@@ -336,6 +430,22 @@ public class BlacklistAction extends FileEntityAction<Long, Blacklist> {
 
 		if (logger.isInfoEnabled())
 			logger.info("findOptionItem耗时：" + DateUtils.getWasteTime(startTime));
+	}
+
+	/**
+	 * 状态值转换列表：锁定|解锁|全部
+	 * 
+	 * @return
+	 */
+	protected Map<String, String> getBLStatuses() {
+		Map<String, String> statuses = new LinkedHashMap<String, String>();
+		statuses.put(String.valueOf(Blacklist.STATUS_SUODING),
+				getText("blacklist.locker"));
+		statuses.put(String.valueOf(Blacklist.STATUS_JIESUO),
+				getText("blacklist.unlocker"));
+		statuses.put("", getText("bs.status.all"));
+
+		return statuses;
 	}
 
 }

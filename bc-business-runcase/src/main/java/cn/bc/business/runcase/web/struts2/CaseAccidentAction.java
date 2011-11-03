@@ -60,10 +60,10 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 	private static final long serialVersionUID = 1L;
 	private Long carId;
 	public String isClosed;
-	public boolean isMoreCar;
-	public boolean isMoreCarMan;
-	public boolean isNullCar;
-	public boolean isNullCarMan;
+	public boolean isMoreCar;//标识是否一个司机对应有多辆车
+	public boolean isMoreCarMan;//标识是否一辆车对应多个司机
+	public boolean isNullCar;//标识是否没有车和司机对应
+	public boolean isNullCarMan;//标识是否没有司机和车对应
 
 	@SuppressWarnings("unused")
 	private CaseAccidentService caseAccidentService;

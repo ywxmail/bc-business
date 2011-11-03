@@ -5,6 +5,7 @@ package cn.bc.business.blacklist.web.struts2;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -12,9 +13,8 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
-import cn.bc.business.carman.domain.CarMan;
+import cn.bc.business.blacklist.domain.Blacklist;
 import cn.bc.business.web.struts2.ViewAction;
-import cn.bc.core.Entity;
 import cn.bc.core.query.condition.Condition;
 import cn.bc.core.query.condition.Direction;
 import cn.bc.core.query.condition.impl.AndCondition;
@@ -27,11 +27,11 @@ import cn.bc.db.jdbc.SqlObject;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.formater.EntityStatusFormater;
-import cn.bc.web.formater.KeyValueFormater;
 import cn.bc.web.ui.html.grid.Column;
 import cn.bc.web.ui.html.grid.IdColumn4MapKey;
 import cn.bc.web.ui.html.grid.TextColumn4MapKey;
 import cn.bc.web.ui.html.page.PageOption;
+import cn.bc.web.ui.html.toolbar.Toolbar;
 import cn.bc.web.ui.json.Json;
 
 /**
@@ -44,15 +44,15 @@ import cn.bc.web.ui.json.Json;
 @Controller
 public class BlacklistsAction extends ViewAction<Map<String, Object>> {
 	private static final long serialVersionUID = 1L;
-	public String status = String.valueOf(Entity.STATUS_ENABLED); // 车辆的状态，多个用逗号连接
+	public String status = String.valueOf(Blacklist.STATUS_SUODING); // 黑名单的状态，多个用逗号连接
 	public Long carManId;
 	public Long carId;
 
 	@Override
 	public boolean isReadonly() {
-		// 司机管理员或系统管理员
+		// 黑名单管理员或系统管理员
 		SystemContext context = (SystemContext) this.getContext();
-		return !context.hasAnyRole(getText("key.role.bs.driver"),
+		return !context.hasAnyRole(getText("key.role.bs.blacklist"),
 				getText("key.role.bc.admin"));
 	}
 
@@ -68,7 +68,7 @@ public class BlacklistsAction extends ViewAction<Map<String, Object>> {
 
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer sql = new StringBuffer();
-		sql.append("select b.id,b.code,cm.name drivers,m.name motorcade_name,c.plate_type,c.plate_no,b.type_,b.subject,b.lock_date,l.name locker");
+		sql.append("select b.id,b.status_,b.code,cm.name drivers,m.name motorcade_name,c.plate_type,c.plate_no,b.type_,b.subject,b.lock_date,l.name locker");
 		sql.append(",b.unlock_date,u.name unlocker,b.locker_id,b.car_id from BS_BLACKLIST b inner join BS_CARMAN cm on cm.id=b.driver_id ");
 		sql.append(" inner join BS_MOTORCADE m on m.id=b.motorcade_id");
 		sql.append(" inner join BS_CAR c on c.id=b.car_id");
@@ -85,6 +85,7 @@ public class BlacklistsAction extends ViewAction<Map<String, Object>> {
 				Map<String, Object> map = new HashMap<String, Object>();
 				int i = 0;
 				map.put("id", rs[i++]);
+				map.put("status_", rs[i++]);
 				map.put("code", rs[i++]);
 				map.put("drivers", rs[i++]);
 				map.put("motorcade_name", rs[i++]);
@@ -109,6 +110,9 @@ public class BlacklistsAction extends ViewAction<Map<String, Object>> {
 	protected List<Column> getGridColumns() {
 		List<Column> columns = new ArrayList<Column>();
 		columns.add(new IdColumn4MapKey("b.id", "id"));
+		columns.add(new TextColumn4MapKey("b.status_", "status_",
+				getText("blacklist.status"), 60).setSortable(true)
+				.setValueFormater(new EntityStatusFormater(getBLStatuses())));
 		columns.add(new TextColumn4MapKey("b.code", "code",
 				getText("blacklist.code"), 160).setSortable(true));
 		if (carManId == null) {
@@ -166,38 +170,50 @@ public class BlacklistsAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected Condition getGridSpecalCondition() {
-
-		// carManId条件
-		if (carManId != null) {
-			return new EqualsCondition("b.driver_id", carManId);
-		} else if (carId != null) {
-			return new EqualsCondition("b.car_id", carId);
-		} else {
-			return null;
+		// 状态条件
+		Condition statusCondition = null;
+		if (status != null && status.length() > 0) {
+			String[] ss = status.split(",");
+			if (ss.length == 1) {
+				statusCondition = new EqualsCondition("b.status_", new Integer(
+						ss[0]));
+			} else {
+				statusCondition = new InCondition("b.status_",
+						StringUtils.stringArray2IntegerArray(ss));
+			}
 		}
-		// carManId条件
-		// Condition carManIdCondition = null;
+
+		// // carManId条件
 		// if (carManId != null) {
-		// carManIdCondition = new EqualsCondition("b.driver_id", carManId);
-		// }
-		// // carId条件
-		// Condition carIdCondition = null;
-		// if (carId != null) {
-		// carIdCondition = new EqualsCondition("b.car_id", carId);
-		// }
-		// // 合并条件
-		// if (carManId != null || carId != null) {
-		// return new AndCondition().add(carManIdCondition)
-		// .add(carIdCondition);
+		// return new EqualsCondition("b.driver_id", carManId);
+		// } else if (carId != null) {
+		// return new EqualsCondition("b.car_id", carId);
 		// } else {
 		// return null;
 		// }
+		// carManId条件
+		Condition carManIdCondition = null;
+		if (carManId != null) {
+			carManIdCondition = new EqualsCondition("b.driver_id", carManId);
+		}
+		// carId条件
+		Condition carIdCondition = null;
+		if (carId != null) {
+			carIdCondition = new EqualsCondition("b.car_id", carId);
+		}
+		// 合并条件
+		return new AndCondition().add(statusCondition).add(carManIdCondition)
+				.add(carIdCondition);
 
 	}
 
 	@Override
 	protected Json getGridExtrasData() {
 		Json json = new Json();
+		// 状态条件
+		if (this.status != null || this.status.length() != 0) {
+			json.put("status", status);
+		}
 		// carManId条件
 		if (carManId != null) {
 			json.put("carManId", carManId);
@@ -206,8 +222,31 @@ public class BlacklistsAction extends ViewAction<Map<String, Object>> {
 		if (carId != null) {
 			json.put("carId", carId);
 		}
-
 		return json.isEmpty() ? null : json;
+	}
+
+	@Override
+	protected Toolbar getHtmlPageToolbar() {
+		return super.getHtmlPageToolbar()
+				.addButton(
+						Toolbar.getDefaultToolbarRadioGroup(
+								this.getBLStatuses(), "status", 0,
+								getText("title.click2changeSearchStatus")));
+	}
+
+	/**
+	 * 状态值转换列表：锁定|解锁|待锁定|全部
+	 * 
+	 * @return
+	 */
+	protected Map<String, String> getBLStatuses() {
+		Map<String, String> statuses = new LinkedHashMap<String, String>();
+		statuses.put(String.valueOf(Blacklist.STATUS_SUODING),
+				getText("blacklist.locker"));
+		statuses.put(String.valueOf(Blacklist.STATUS_JIESUO),
+				getText("blacklist.unlocker"));
+		statuses.put("", getText("bs.status.all"));
+		return statuses;
 	}
 
 }

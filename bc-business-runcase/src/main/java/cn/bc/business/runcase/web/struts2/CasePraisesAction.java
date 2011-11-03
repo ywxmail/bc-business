@@ -175,8 +175,6 @@ public class CasePraisesAction extends ViewAction<Map<String, Object>> {
 				statusCondition = new InCondition("b.status_",
 						StringUtils.stringArray2IntegerArray(ss));
 			}
-		} else {
-			return null;
 		}
 		// carManId条件
 		Condition carManIdCondition = null;

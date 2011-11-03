@@ -189,9 +189,7 @@ public class CarByDriversAction extends ViewAction<Map<String, Object>> {
 				statusCondition = new InCondition("d.status_",
 						StringUtils.stringArray2IntegerArray(ss));
 			}
-		} else {
-			return null;
-		}
+		} 
 		// carManId条件
 		Condition carManIdCondition = null;
 		if (carManId != null) {
