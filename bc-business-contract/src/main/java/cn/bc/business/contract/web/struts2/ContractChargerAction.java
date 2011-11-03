@@ -54,19 +54,19 @@ public class ContractChargerAction extends FileEntityAction<Long, Contract4Charg
 	private AttachService 			attachService;
 	private OptionService			optionService;
 	public	Long					carId; 
-	public	Long					carManId;
-	private	Long 					oldCarId;
+	public	Long					carManId;								
+	private	Long 					oldCarId;								//记录旧有的carId
 	public 	AttachWidget 			attachsUI;
 	
 	public 	Map<String,String>		statusesValue;
-	public	Map<String,String>		chargerInfoMap;
+	public	Map<String,String>		chargerInfoMap;							//责任人Map
 	
-	public  List<OptionItem>		signTypeList;							// 可选签约类型
-	public  List<OptionItem>		businessTypeList;						// 可选营运性质列表
-	public	String					assignChargerIds;
-	public  String					assignChargerNames;
-	public  String []				chargerNameAry;
-	public  Map<String,Object>	 	carInfoMap;
+	public  List<OptionItem>		signTypeList;							//可选签约类型
+	public  List<OptionItem>		businessTypeList;						//可选营运性质列表
+	public	String					assignChargerIds;						//多个责任人Id
+	public  String					assignChargerNames;						//多个责任人name
+	public  String []				chargerNameAry;							
+	public  Map<String,Object>	 	carInfoMap;								//车辆Map
 //	public	Long 					carManId;
 //	public  String 					certCode;
 //	public 	ContractService 		contractService;
@@ -328,12 +328,11 @@ public class ContractChargerAction extends FileEntityAction<Long, Contract4Charg
 	}
 
 
-	@SuppressWarnings("static-access")
 	private AttachWidget buildAttachsUI(boolean isNew) {
 		// 构建附件控件
-		String ptype = "contractLabour.main";
+		String ptype = "contractCharger.main";
 		AttachWidget attachsUI = new AttachWidget();
-		attachsUI.setFlashUpload(this.isFlashUpload());
+		attachsUI.setFlashUpload(isFlashUpload());
 		attachsUI.addClazz("formAttachs");
 		if (!isNew)
 			attachsUI.addAttach(this.attachService.findByPtype(ptype, this
@@ -344,16 +343,20 @@ public class ContractChargerAction extends FileEntityAction<Long, Contract4Charg
 		attachsUI.addExtension(getText("app.attachs.extensions"))
 				.setMaxCount(Integer.parseInt(getText("app.attachs.maxCount")))
 				.setMaxSize(Integer.parseInt(getText("app.attachs.maxSize")));
-		attachsUI.setReadOnly(this.isReadonly());
+		if (this.isReadonly()) {
+			attachsUI.setReadOnly(true);
+		}
 		return attachsUI;
 	}
 
 	@Override
 	protected PageOption buildFormPageOption() {
-		PageOption option = new PageOption().setWidth(728).setMinWidth(250)
-				.setMinHeight(160).setModal(false);
+		PageOption option = super.buildFormPageOption().setWidth(728).setMinWidth(250)
+				.setMinHeight(160);
 		//option.addButton(new ButtonOption(getText("label.save"), "save"));
-		option.addButton(new ButtonOption(getText("label.save"), null, "bc.contractChargerForm.save"));
+		if (!this.isReadonly()) {
+			option.addButton(new ButtonOption(getText("label.save"), null, "bc.contractChargerForm.save"));
+		}
 		return option;
 	}
 

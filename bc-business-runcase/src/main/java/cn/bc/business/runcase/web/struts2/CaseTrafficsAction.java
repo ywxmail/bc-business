@@ -19,11 +19,13 @@ import cn.bc.core.query.condition.ConditionUtils;
 import cn.bc.core.query.condition.Direction;
 import cn.bc.core.query.condition.impl.EqualsCondition;
 import cn.bc.core.query.condition.impl.OrderCondition;
+import cn.bc.core.util.StringUtils;
 import cn.bc.db.jdbc.RowMapper;
 import cn.bc.db.jdbc.SqlObject;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.formater.EntityStatusFormater;
+import cn.bc.web.formater.LinkFormater4Id;
 import cn.bc.web.ui.html.grid.Column;
 import cn.bc.web.ui.html.grid.IdColumn4MapKey;
 import cn.bc.web.ui.html.grid.TextColumn4MapKey;
@@ -113,7 +115,19 @@ public class CaseTrafficsAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("c.motorcade_name", "motorcade_name",
 				getText("runcase.motorcadeName"), 80).setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("c.car_plate", "car_plate",
-				getText("runcase.carPlate"), 100).setUseTitleFromLabel(true));
+				getText("runcase.carPlate"), 100).setUseTitleFromLabel(true)
+				.setValueFormater(
+						new LinkFormater4Id(this.getContextPath()
+								+ "/bc-business/car/edit?id={0}", "car") {
+							@SuppressWarnings("unchecked")
+							@Override
+							public String getIdValue(Object context,
+									Object value) {
+								return StringUtils
+										.toString(((Map<String, Object>) context)
+												.get("car_id"));
+							}
+						}));
 		columns.add(new TextColumn4MapKey("c.driver_name", "driver_name",
 				getText("runcase.driverName"), 70).setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("c.closer_name", "closer_name",

@@ -52,19 +52,19 @@ public class ContractLabourAction extends FileEntityAction<Long, Contract4Labour
 	private AttachService 				attachService;
 	private	Long 						carManId;
 	private	Long 						carId;
-	private	Long 						oldCarManId;
-	private	Long 						oldCarId;
-	public  String 						certCode;
+	private	Long 						oldCarManId;							//记录旧有的carManId
+	private	Long 						oldCarId;								//记录旧有的carId
+	public  String 						certCode;								//证件编号
 	public 	AttachWidget 				attachsUI;
 	public 	Map<String,String>			statusesValue;
-	public	Map<String,Object>			certInfoMap;
-	public	Map<String,Object>			carInfoMap;
-	public	Map<String,Object>			carManInfoMap;
-	public	List<Map<String,Object>>	infoList;
-	public 	boolean 					isMoreCar;
-	public 	boolean 					isMoreCarMan;
-	public 	boolean 					isNullCar;
-	public 	boolean 					isNullCarMan;
+	public	Map<String,Object>			certInfoMap;							//证件信息map
+	public	Map<String,Object>			carInfoMap;								//车辆信息map
+	public	Map<String,Object>			carManInfoMap;							//司机信息map
+	public	List<Map<String,Object>>	infoList;								//option列表
+	public 	boolean 					isMoreCar;								//是否存在多辆车
+	public 	boolean 					isMoreCarMan;							//是否存在多个司机
+	public 	boolean 					isNullCar;								//此司机没有车
+	public 	boolean 					isNullCarMan;							//此车没有司机
 //	public	CertService				certService;
 	
 
@@ -176,7 +176,7 @@ public class ContractLabourAction extends FileEntityAction<Long, Contract4Labour
 		this.getE().setType(Contract.TYPE_LABOUR);
 		this.getE().setStatus(RichEntityImpl.STATUS_ENABLED);
 		statusesValue		=	this.getEntityStatuses();
-		
+		// 构建附件控件
 		attachsUI = buildAttachsUI(true);
 
 		return r;
@@ -314,12 +314,11 @@ public class ContractLabourAction extends FileEntityAction<Long, Contract4Labour
 		return columns;
 	}
 	
-	@SuppressWarnings("static-access")
 	private AttachWidget buildAttachsUI(boolean isNew) {
 		// 构建附件控件
 		String ptype = "contractLabour.main";
 		AttachWidget attachsUI = new AttachWidget();
-		attachsUI.setFlashUpload(this.isFlashUpload());
+		attachsUI.setFlashUpload(isFlashUpload());
 		attachsUI.addClazz("formAttachs");
 		if (!isNew)
 			attachsUI.addAttach(this.attachService.findByPtype(ptype, this
@@ -330,15 +329,19 @@ public class ContractLabourAction extends FileEntityAction<Long, Contract4Labour
 		attachsUI.addExtension(getText("app.attachs.extensions"))
 				.setMaxCount(Integer.parseInt(getText("app.attachs.maxCount")))
 				.setMaxSize(Integer.parseInt(getText("app.attachs.maxSize")));
-		attachsUI.setReadOnly(this.isReadonly());
+		if (this.isReadonly()) {
+			attachsUI.setReadOnly(true);
+		}
 		return attachsUI;
 	}
 
 	@Override
 	protected PageOption buildFormPageOption() {
-		PageOption option = new PageOption().setWidth(728).setMinWidth(250)
+		PageOption option =	super.buildFormPageOption().setWidth(728).setMinWidth(250)
 				.setMinHeight(160).setModal(false).setHeight(565);
-		option.addButton(new ButtonOption(getText("label.save"), "save"));
+		if (!this.isReadonly()) {
+			option.addButton(new ButtonOption(getText("label.save"), "save"));
+		}
 		return option;
 	}
 
