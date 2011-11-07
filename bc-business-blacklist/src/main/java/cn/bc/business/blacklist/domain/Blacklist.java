@@ -32,11 +32,11 @@ public class Blacklist extends FileEntityImpl {
 	private static final long serialVersionUID = 1L;
 	public static final String KEY_CODE = "blacklist.code";
 	/** 状态：新建 */
-	public static final int STATUS_XINJIAN = 2;
+	public static final int STATUS_CREATE = 2;
 	/** 状态：锁定 */
-	public static final int STATUS_SUODING = 0;
+	public static final int STATUS_LOCK = 0;
 	/** 状态：解锁 */
-	public static final int STATUS_JIESUO = 1;
+	public static final int STATUS_UNLOCK = 1;
 
 	private int status;// 状态
 	private String subject;// 主题

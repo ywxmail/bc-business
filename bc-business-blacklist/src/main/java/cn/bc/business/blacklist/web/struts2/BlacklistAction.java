@@ -179,11 +179,12 @@ public class BlacklistAction extends FileEntityAction<Long, Blacklist> {
 	@Override
 	protected void afterCreate(Blacklist entity) {
 		SystemContext context = this.getSystyemContext();
-		entity.setStatus(Blacklist.STATUS_XINJIAN);
+		entity.setStatus(Blacklist.STATUS_CREATE);
 		this.getE().setLocker(context.getUser());
 		this.getE().setLockDate(Calendar.getInstance());
 		this.getE().setCode(
 				this.getIdGeneratorService().nextSN4Month(Blacklist.KEY_CODE));
+
 		// 设置创建人信息
 		entity.setFileDate(Calendar.getInstance());
 		entity.setAuthor(context.getUserHistory());
@@ -200,7 +201,7 @@ public class BlacklistAction extends FileEntityAction<Long, Blacklist> {
 		}
 
 		// 设置最后更新人的信息
-		if (this.getE().getStatus() == Blacklist.STATUS_SUODING) {
+		if (this.getE().getStatus() == Blacklist.STATUS_LOCK) {
 			this.getE().setModifier(context.getUserHistory());
 			this.getE().setModifiedDate(Calendar.getInstance());
 		} else {
@@ -215,6 +216,11 @@ public class BlacklistAction extends FileEntityAction<Long, Blacklist> {
 	public String edit() throws Exception {
 		String result = super.edit();
 		statusesValue = this.getBLStatuses();
+		SystemContext context = this.getSystyemContext();
+		if (this.getE().getStatus() == Blacklist.STATUS_LOCK) {
+			this.getE().setUnlockDate(Calendar.getInstance());
+			this.getE().setUnlocker(context.getUser());
+		}
 		initSelects();
 		return result;
 	}
@@ -225,12 +231,12 @@ public class BlacklistAction extends FileEntityAction<Long, Blacklist> {
 				.setMinWidth(250).setMinHeight(200);
 		// 新建时状态为2，表单只显示锁定按钮
 		if (isReadonly() == false
-				&& this.getE().getStatus() == Blacklist.STATUS_XINJIAN) {
+				&& this.getE().getStatus() == Blacklist.STATUS_CREATE) {
 			option.addButton(new ButtonOption(getText("blacklist.locker"),
 					null, "bc.business.blacklistForm.lcoker"));
 			// 状态为锁定时，只显示解锁按钮
 		} else if (isReadonly() == false
-				&& this.getE().getStatus() == Blacklist.STATUS_SUODING) {
+				&& this.getE().getStatus() == Blacklist.STATUS_LOCK) {
 			option.addButton(new ButtonOption(getText("blacklist.unlocker"),
 					null, "bc.business.blacklistForm.unlcoker"));
 		}
@@ -439,9 +445,9 @@ public class BlacklistAction extends FileEntityAction<Long, Blacklist> {
 	 */
 	protected Map<String, String> getBLStatuses() {
 		Map<String, String> statuses = new LinkedHashMap<String, String>();
-		statuses.put(String.valueOf(Blacklist.STATUS_SUODING),
+		statuses.put(String.valueOf(Blacklist.STATUS_LOCK),
 				getText("blacklist.locker"));
-		statuses.put(String.valueOf(Blacklist.STATUS_JIESUO),
+		statuses.put(String.valueOf(Blacklist.STATUS_UNLOCK),
 				getText("blacklist.unlocker"));
 		statuses.put("", getText("bs.status.all"));
 

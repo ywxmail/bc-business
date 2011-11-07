@@ -120,7 +120,7 @@ public class BlacklistsAction extends ViewAction<Map<String, Object>> {
 					getText("blacklist.driver"), 60).setSortable(true));
 		}
 		columns.add(new TextColumn4MapKey("m.name", "motorcade_name",
-				getText("blacklist.motorcade.name"), 50).setSortable(true));
+				getText("blacklist.motorcade.name"), 60).setSortable(true));
 		if (carId == null) {
 			columns.add(new TextColumn4MapKey("c.plate_no", "plate",
 					getText("blacklist.car.plateNo"), 80).setSortable(true));
@@ -134,13 +134,13 @@ public class BlacklistsAction extends ViewAction<Map<String, Object>> {
 				getText("blacklist.lockDate"), 100).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
 		columns.add(new TextColumn4MapKey("l.name", "locker",
-				getText("blacklist.locker.name"), 60).setSortable(true)
+				getText("blacklist.locker.name"), 80).setSortable(true)
 				.setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("b.unlock_date", "unlock_date",
 				getText("blacklist.unlockDate"), 100).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
 		columns.add(new TextColumn4MapKey("u.name", "unlocker",
-				getText("blacklist.unlocker.name"), 60).setSortable(true)
+				getText("blacklist.unlocker.name"), 80).setSortable(true)
 				.setUseTitleFromLabel(true));
 
 		return columns;
