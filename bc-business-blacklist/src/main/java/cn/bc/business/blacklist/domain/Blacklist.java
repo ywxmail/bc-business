@@ -31,8 +31,8 @@ import cn.bc.identity.domain.FileEntityImpl;
 public class Blacklist extends FileEntityImpl {
 	private static final long serialVersionUID = 1L;
 	public static final String KEY_CODE = "blacklist.code";
-	/** 状态：新建 */
-	public static final int STATUS_CREATE = 2;
+//	/** 状态：新建 */
+//	public static final int STATUS_CREATE = 2;
 	/** 状态：锁定 */
 	public static final int STATUS_LOCK = 0;
 	/** 状态：解锁 */
