@@ -44,7 +44,7 @@ import cn.bc.web.ui.json.Json;
 @Controller
 public class BlacklistsAction extends ViewAction<Map<String, Object>> {
 	private static final long serialVersionUID = 1L;
-	public String status = String.valueOf(Blacklist.STATUS_SUODING); // 黑名单的状态，多个用逗号连接
+	public String status = String.valueOf(Blacklist.STATUS_LOCK); // 黑名单的状态，多个用逗号连接
 	public Long carManId;
 	public Long carId;
 
@@ -241,9 +241,9 @@ public class BlacklistsAction extends ViewAction<Map<String, Object>> {
 	 */
 	protected Map<String, String> getBLStatuses() {
 		Map<String, String> statuses = new LinkedHashMap<String, String>();
-		statuses.put(String.valueOf(Blacklist.STATUS_SUODING),
+		statuses.put(String.valueOf(Blacklist.STATUS_LOCK),
 				getText("blacklist.locker"));
-		statuses.put(String.valueOf(Blacklist.STATUS_JIESUO),
+		statuses.put(String.valueOf(Blacklist.STATUS_UNLOCK),
 				getText("blacklist.unlocker"));
 		statuses.put("", getText("bs.status.all"));
 		return statuses;
