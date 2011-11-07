@@ -108,7 +108,7 @@ public class MotorcadesAction extends ViewAction<Map<String, Object>> {
 				getText("motorcade.name")).setSortable(true)
 				.setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("m.principal_name", "principalName",
-				getText("motorcade.principal"), 65)
+				getText("motorcade.principal"), 80)
 				.setSortable(true)
 				.setUseTitleFromLabel(true)
 				.setValueFormater(
