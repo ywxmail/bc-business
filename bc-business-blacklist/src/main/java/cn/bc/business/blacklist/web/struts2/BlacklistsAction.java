@@ -69,9 +69,9 @@ public class BlacklistsAction extends ViewAction<Map<String, Object>> {
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer sql = new StringBuffer();
 		sql.append("select b.id,b.status_,b.code,cm.name drivers,m.name motorcade_name,c.plate_type,c.plate_no,b.type_,b.subject,b.lock_date,l.name locker");
-		sql.append(",b.unlock_date,u.name unlocker,b.locker_id,b.car_id from BS_BLACKLIST b inner join BS_CARMAN cm on cm.id=b.driver_id ");
-		sql.append(" inner join BS_MOTORCADE m on m.id=b.motorcade_id");
-		sql.append(" inner join BS_CAR c on c.id=b.car_id");
+		sql.append(",b.unlock_date,u.name unlocker,b.locker_id,b.car_id from BS_BLACKLIST b left join BS_CARMAN cm on cm.id=b.driver_id ");
+		sql.append(" left join BS_MOTORCADE m on m.id=b.motorcade_id");
+		sql.append(" left join BS_CAR c on c.id=b.car_id");
 		sql.append(" inner join BC_IDENTITY_ACTOR l on l.id=b.locker_id");
 		sql.append(" left join BC_IDENTITY_ACTOR u on u.id=b.unlocker_id");
 		sqlObject.setSql(sql.toString());

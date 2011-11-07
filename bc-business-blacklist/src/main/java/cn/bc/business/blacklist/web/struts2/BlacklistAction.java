@@ -179,7 +179,8 @@ public class BlacklistAction extends FileEntityAction<Long, Blacklist> {
 	@Override
 	protected void afterCreate(Blacklist entity) {
 		SystemContext context = this.getSystyemContext();
-		entity.setStatus(Blacklist.STATUS_CREATE);
+		// entity.setStatus(Blacklist.STATUS_CREATE);
+		entity.setStatus(Blacklist.STATUS_LOCK);
 		this.getE().setLocker(context.getUser());
 		this.getE().setLockDate(Calendar.getInstance());
 		this.getE().setCode(
@@ -229,9 +230,15 @@ public class BlacklistAction extends FileEntityAction<Long, Blacklist> {
 	protected PageOption buildFormPageOption() {
 		PageOption option = super.buildFormPageOption().setWidth(720)
 				.setMinWidth(250).setMinHeight(200);
+
 		// 新建时状态为2，表单只显示锁定按钮
-		if (isReadonly() == false
-				&& this.getE().getStatus() == Blacklist.STATUS_CREATE) {
+		// if (isReadonly() == false
+		// && this.getE().getStatus() == Blacklist.STATUS_CREATE) {
+		// option.addButton(new ButtonOption(getText("blacklist.locker"),
+		// null, "bc.business.blacklistForm.lcoker"));
+		// // 状态为锁定时，只显示解锁按钮
+		// }
+		if (isReadonly() == false && this.getE().isNew()) {
 			option.addButton(new ButtonOption(getText("blacklist.locker"),
 					null, "bc.business.blacklistForm.lcoker"));
 			// 状态为锁定时，只显示解锁按钮
