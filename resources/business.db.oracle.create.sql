@@ -623,11 +623,11 @@ CREATE TABLE BS_CONTRACT (
    STATUS_              NUMBER(1)            NOT NULL,
    WORD_NO              VARCHAR2(255),
    CODE                 VARCHAR2(255)        NOT NULL,
-   TYPE_                NUMBER(1)	     	 NOT NULL,
+   TYPE_                NUMBER(1)	     NOT NULL,
    TRANSACTOR_ID        NUMBER(19),
    TRANSACTOR_NAME      VARCHAR2(255),
-   SIGN_DATE            DATE                 NOT NULL,
-   START_DATE           DATE                 NOT NULL,
+   SIGN_DATE            DATE,
+   START_DATE           DATE		     NOT NULL,
    END_DATE             DATE                 NOT NULL,
    CONTENT              VARCHAR2(4000),
    EXT_STR1             VARCHAR2(255),
@@ -681,8 +681,8 @@ CREATE TABLE BS_CONTRACT_LABOUR
    AGE                  NUMBER(3),
    ORIGIN               VARCHAR2(255),
    HOUSE_TYPE           VARCHAR2(255),
-   DOLE                 NUMBER(1),
-   FUNDING              NUMBER(1),
+   DOLE                 NUMBER(1),	     DEFAULT 0,
+   FUNDING              NUMBER(1),	     DEFAULT 0,
    INSURCODE            VARCHAR2(255),
    JOINDATE             DATE                 NOT NULL,
    REGISTER_DATE        DATE,
@@ -690,20 +690,21 @@ CREATE TABLE BS_CONTRACT_LABOUR
    BS_TYPE              VARCHAR2(255),
    BUY_UNIT             VARCHAR2(255)        NOT NULL,
    INSURANCE_TYPE       VARCHAR2(255),
-   IS_IQAMA             NUMBER(1),
-   IS_ACCOUNT_BOOK      NUMBER(1),
-   IS_IDENTITY_CARDS    NUMBER(1),
-   IS_FPC               NUMBER(1),
-   IS_UNEMPLOYED        NUMBER(1),
-   IS_HEALTHFORM        NUMBER(1),
-   IS_PHOTO             NUMBER(1),
+   IS_IQAMA             NUMBER(1)            DEFAULT 0,
+   IS_ACCOUNT_BOOK      NUMBER(1)            DEFAULT 0,
+   IS_IDENTITY_CARDS    NUMBER(1)            DEFAULT 0,
+   IS_FPC               NUMBER(1)            DEFAULT 0,
+   IS_UNEMPLOYED        NUMBER(1)            DEFAULT 0,
+   IS_HEALTHFORM        NUMBER(1)            DEFAULT 0,
+   IS_PHOTO             NUMBER(1)            DEFAULT 0,
    HAPPEN_DATE          DATE,
-   IS_OAS               NUMBER(1),
-   IS_IN_HOSPITAL       NUMBER(1),
-   IS_LI                NUMBER(1),
+   IS_OAS               NUMBER(1)            DEFAULT 0,
+   IS_IN_HOSPITAL       NUMBER(1)            DEFAULT 0,
+   IS_LI                NUMBER(1)            DEFAULT 0,
    BREEDING_DATE        DATE,
    GET_STARTDATE        DATE,
    GET_ENDDATE          DATE,
+   REMARK               VARCHAR2(255),
    CONSTRAINT BSPK_CONTRACT_LABOUR PRIMARY KEY (ID)
 );
 
@@ -738,6 +739,7 @@ COMMENT ON COLUMN BS_CONTRACT_LABOUR.IS_LI IS '是否劳动鉴别';
 COMMENT ON COLUMN BS_CONTRACT_LABOUR.BREEDING_DATE IS '生育日期';
 COMMENT ON COLUMN BS_CONTRACT_LABOUR.GET_STARTDATE IS '申领开始日期';
 COMMENT ON COLUMN BS_CONTRACT_LABOUR.GET_ENDDATE IS '申领结束日期';
+COMMENT ON COLUMN BS_CONTRACT_LABOUR.REMARK IS '备注';
 ALTER TABLE BS_CONTRACT_LABOUR ADD CONSTRAINT BSFK_CONTRACT4LABOUR_CONTRACT FOREIGN KEY (ID)
       REFERENCES BS_CONTRACT (ID);
 
