@@ -67,6 +67,12 @@ public class OptionConstants extends cn.bc.option.OptionConstants {
 	public final static String PR_TYPE = "pr.type";
 	
 	
+	/** 社保险种	*/
+	public final static String LB_INSURANCETYPE = "lb.insuranceType";
+	/** 购买单位	*/
+	public final static String LB_BUYUNIT = "lb.buyUnit";
+	
+	
 	
 	
 	/** 车队的可选缴费日 */
