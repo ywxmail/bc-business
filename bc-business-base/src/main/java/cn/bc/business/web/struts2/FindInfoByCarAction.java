@@ -3,6 +3,11 @@
  */
 package cn.bc.business.web.struts2;
 
+import java.text.DateFormat;
+import java.text.DecimalFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -83,6 +88,9 @@ public class FindInfoByCarAction extends ActionSupport {
 			car.put("plateNo", first.get("carPlateNo"));
 			car.put("plate",
 					first.get("carPlateType") + "." + first.get("carPlateNo"));
+			car.put("registerDate", getDateToString(first.get("carRegisterDate")));
+			car.put("bsType", first.get("carBsType"));
+
 			
 			//营运司机信息
 			for (Map<String, Object> info : infos) {
@@ -92,6 +100,12 @@ public class FindInfoByCarAction extends ActionSupport {
 				driver.put("name", info.get("driverName"));
 				driver.put("sex", info.get("driverSex"));
 				driver.put("cert4FWZG", info.get("driverCert4FWZG"));
+				driver.put("cert4IDENTITY", info.get("driverCert4IDENTITY"));
+				driver.put("origin", info.get("driverOrigin"));
+				driver.put("houseType", info.get("driverHouseType"));
+				driver.put("birthDate", info.get("driverBirthDate"));
+				driver.put("age", getBirthDateToString(info.get("driverBirthDate")));
+				
 				drivers.add(driver);
 			}
 		}
@@ -128,9 +142,10 @@ public class FindInfoByCarAction extends ActionSupport {
 
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer sql = new StringBuffer();
-		sql.append("select c.id carId,c.status_ carStatus,c.plate_type carPlateType,c.plate_no carPlateNo");
+		sql.append("select c.id carId,c.status_ carStatus,c.plate_type carPlateType,c.plate_no carPlateNo,c.register_date carRegisterDate,c.bs_type carBsType");
 		sql.append(",c.motorcade_id motorcadeId,m.name motorcadeName");
 		sql.append(",cd.classes driverClasses,cd.driver_id driverId,d.name driverName,d.sex driverSex,d.cert_fwzg driverCert4FWZG");
+		sql.append(",d.cert_identity driverCert4IDENTITY,d.origin driverOrigin,d.house_type driverHouseType,d.birthdate driverBirthDate");
 		sql.append(" from bs_car c");
 		sql.append(" inner join bs_motorcade m on m.id=c.motorcade_id");
 		sql.append(" inner join bs_car_driver cd on cd.car_id=c.id");
@@ -149,6 +164,8 @@ public class FindInfoByCarAction extends ActionSupport {
 				map.put("carStatus", rs[i++]);
 				map.put("carPlateType", rs[i++]);
 				map.put("carPlateNo", rs[i++]);
+				map.put("carRegisterDate", rs[i++]);
+				map.put("carBsType", rs[i++]);
 				map.put("motorcadeId", rs[i++]);
 				map.put("motorcadeName", rs[i++]);
 				map.put("driverClasses", rs[i++]);
@@ -156,9 +173,56 @@ public class FindInfoByCarAction extends ActionSupport {
 				map.put("driverName", rs[i++]);
 				map.put("driverSex", rs[i++]);
 				map.put("driverCert4FWZG", rs[i++]);
+				map.put("driverCert4IDENTITY", rs[i++]);
+				map.put("driverOrigin", rs[i++]);
+				map.put("driverHouseType", rs[i++]);
+				map.put("driverBirthDate", rs[i++]);
 				return map;
 			}
 		});
 		return sqlObject;
 	}
+	
+    /**
+     * 格式化日期
+     * @return
+     */
+    public String getDateToString(Object object){
+    	if(null != object){
+	    	DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+	    	StringBuffer str = new StringBuffer(df.format(object));
+	        return str.toString();
+    	}else{
+    		return "";
+    	}
+    }
+    
+    /**
+     * 计算当前岁数
+     * @return
+     */
+    public String getBirthDateToString(Object object){
+    	String birthDay = getDateToString(object);
+		if(birthDay.length() > 0){
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+			Date date = new Date();
+			Date myDate = null;
+			try {
+				myDate = sdf.parse(birthDay);
+			} catch (ParseException e) {
+				e.printStackTrace();
+			}
+			long day = (date.getTime() - myDate.getTime())/(24*60*60*1000) + 1;
+			birthDay = new DecimalFormat("#,00").format(day/365f);
+			birthDay = birthDay.split(",")[0];
+//			//得到当前的年份
+//			String cYear = sdf.format(new Date()).substring(0,4);
+//			//得到生日年份
+//			String birthYear = birthDay.substring(0,4);
+//			//计算当前年龄
+//			int age = Integer.parseInt(cYear) - Integer.parseInt(birthYear);
+//			birthDay = age+"";
+		}
+    	return birthDay;
+    }
 }

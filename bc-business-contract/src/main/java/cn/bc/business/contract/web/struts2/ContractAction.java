@@ -123,8 +123,6 @@ public class ContractAction extends FileEntityAction<Long, Contract> {
 		if(carId != null){
 			columns.add(new TextColumn("['ext_str2']",getText("contract.labour.driver"), 80));
 		}
-		columns.add(new TextColumn("['transactorName']",
-				getText("contract.transactor"), 60));
 		columns.add(new TextColumn("['signDate']",
 				getText("contract.signDate"), 90).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));

@@ -66,12 +66,16 @@ public class ContractLaboursAction extends ViewAction<Map<String, Object>> {
 
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer sql = new StringBuffer();
-		sql.append("select cl.id,c.type_,c.ext_str1,c.ext_str2,c.transactor_name,c.sign_date,c.start_date,c.end_date,c.code");
+		sql.append("select cl.id,c.type_,c.ext_str1,c.ext_str2,c.transactor_name,c.sign_date,c.start_date,c.end_date,c.code,cl.joinDate,cl.insurCode,cl.insurance_type,cl.cert_no,c.author_id,iah.actor_name");
 		sql.append(",car.id carId");
+		sql.append(",man.id manId");
 		sql.append(" from BS_CONTRACT_LABOUR cl");
 		sql.append(" inner join BS_CONTRACT c on cl.id = c.id");
 		sql.append(" inner join BS_CAR_CONTRACT carc on c.id = carc.contract_id");
 		sql.append(" inner join BS_Car car on carc.car_id = car.id");
+		sql.append(" inner join BS_CARMAN_CONTRACT manc on c.id = manc.contract_id");
+		sql.append(" inner join BS_CARMAN man on manc.man_id = man.id");
+		sql.append(" inner join BC_IDENTITY_ACTOR_HISTORY iah on c.author_id = iah.id");
 		sqlObject.setSql(sql.toString());
 		
 		// 注入参数
@@ -91,7 +95,14 @@ public class ContractLaboursAction extends ViewAction<Map<String, Object>> {
 				map.put("start_date", rs[i++]);
 				map.put("end_date", rs[i++]);
 				map.put("code", rs[i++]);
+				map.put("joinDate", rs[i++]);
+				map.put("insurCode", rs[i++]);
+				map.put("insurance_type", rs[i++]);
+				map.put("cert_no", rs[i++]);
+				map.put("author_id", rs[i++]);
+				map.put("name", rs[i++]);
 				map.put("carId", rs[i++]);
+				map.put("manId", rs[i++]);
 				return map;
 			}
 		});
@@ -103,7 +114,7 @@ public class ContractLaboursAction extends ViewAction<Map<String, Object>> {
 		List<Column> columns = new ArrayList<Column>();
 		columns.add(new IdColumn4MapKey("cl.id","id"));
 		columns.add(new TextColumn4MapKey("c.type_", "type_",
-				getText("contract.type"), 80).setSortable(true).setValueFormater(
+				getText("contract.type"), 60).setSortable(true).setValueFormater(
 				new EntityStatusFormater(getEntityTypes()))); 
 		columns.add(new TextColumn4MapKey("c.ext_str1", "ext_str1",
 				getText("contract.car"), 80).setUseTitleFromLabel(true)
@@ -119,13 +130,27 @@ public class ContractLaboursAction extends ViewAction<Map<String, Object>> {
 												.get("carId"));
 							}
 						}));
-		columns.add(new TextColumn4MapKey("c.motorcade_name", "ext_str2",
-				getText("contract.labour.driver"), 80).setUseTitleFromLabel(true));
-		columns.add(new TextColumn4MapKey("c.transactor_name", "transactor_name",
-				getText("contract.transactor"), 80).setUseTitleFromLabel(true));
-		columns.add(new TextColumn4MapKey("c.sign_date", "sign_date",
-				getText("contract.signDate"), 90).setSortable(true)
-				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+		columns.add(new TextColumn4MapKey("c.ext_str2", "ext_str2",
+				getText("contract.labour.driver"), 80).setUseTitleFromLabel(true)
+				.setValueFormater(
+						new LinkFormater4Id(this.getContextPath()
+								+ "/bc-business/carMan/edit?id={0}", "carMan") {
+							@SuppressWarnings("unchecked")
+							@Override
+							public String getIdValue(Object context,
+									Object value) {
+								return StringUtils
+										.toString(((Map<String, Object>) context)
+												.get("manId"));
+							}
+						}));
+		columns.add(new TextColumn4MapKey("cl.cert_no", "cert_no",
+					getText("contract.labour.certNo"),60));
+		columns.add(new TextColumn4MapKey("iah.name", "name",
+				getText("contract.author"), 80).setUseTitleFromLabel(true));
+//		columns.add(new TextColumn4MapKey("c.sign_date", "sign_date",
+//				getText("contract.signDate"), 90).setSortable(true)
+//				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
 		columns.add(new TextColumn4MapKey("c.start_date", "start_date", getText("contract.deadline"))
 				.setValueFormater(new DateRangeFormater("yyyy-MM-dd") {
 					@Override
@@ -135,15 +160,21 @@ public class ContractLaboursAction extends ViewAction<Map<String, Object>> {
 						return (Date) contract.get("end_date");
 					}
 				}));
+		columns.add(new TextColumn4MapKey("cl.insurance_type", "insurance_type",
+				getText("contract.labour.insuranceType")));
+		columns.add(new TextColumn4MapKey("cl.joinDate", "joinDate",
+				getText("contract.labour.joinDate"), 80)
+				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+		columns.add(new TextColumn4MapKey("cl.insurCode", "insurCode",
+				getText("contract.labour.insurCode"),80));
 		columns.add(new TextColumn4MapKey("c.code", "code",
-				getText("contract.code"),120));
-		
+				getText("contract.code"),60));
 		return columns;
 	}
 
 	@Override
 	protected String[] getGridSearchFields() {
-		return new String[] { "c.code", "c.ext_str1","c.ext_str2", "c.word_no" };
+		return new String[] { "c.code", "c.ext_str1","c.ext_str2", "cl.insurance_type, " };
 	}
 
 	@Override
