@@ -82,7 +82,7 @@ public class CarByDriverAction extends FileEntityAction<Long, CarByDriver> {
 	@Override
 	public String create() throws Exception {
 		String result = super.create();
-		
+
 		if (carManId != null) {
 			CarMan driver = this.carManService.load(carManId);
 			this.getE().setDriver(driver);
@@ -254,6 +254,8 @@ public class CarByDriverAction extends FileEntityAction<Long, CarByDriver> {
 
 		super.save();
 		this.carByDriverService.updateCar4Driver(this.getE().getCar().getId());
+		this.carByDriverService.updateDriver4Car(this.getE().getDriver()
+				.getId());
 		return "saveSuccess";
 	}
 }

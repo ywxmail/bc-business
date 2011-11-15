@@ -14,11 +14,26 @@ import cn.bc.core.service.CrudService;
  */
 public interface CarByDriverService extends CrudService<CarByDriver> {
 
-	// 根据司机ID查找返回相关正班车辆信息
+	/**
+	 * 根据司机ID查找返回相关正班车辆信息
+	 * 
+	 * @param id
+	 * @return
+	 */
 	Car selectCarByCarManId(Long id);
 
-	/** 更新车辆模块的司机信息 
-	 * @return */
+	/**
+	 * 更新车辆模块的司机信息
+	 * 
+	 * @return
+	 */
 	void updateCar4Driver(Long id);
+
+	/**
+	 * 更新司机模块的车辆信息
+	 * 
+	 * @param id
+	 */
+	void updateDriver4Car(Long id);
 
 }
