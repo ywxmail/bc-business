@@ -78,7 +78,7 @@ public class CarByDriverAction extends FileEntityAction<Long, CarByDriver> {
 
 	@Override
 	public String create() throws Exception {
-		String result = super.create();
+		//String result = super.create();
 
 		// if (carManId != null) {
 		// CarMan driver = this.carManService.load(carManId);
@@ -89,7 +89,13 @@ public class CarByDriverAction extends FileEntityAction<Long, CarByDriver> {
 		// }
 		// this.getE().setStatus(RichEntity.STATUS_ENABLED);
 		// statusesValueList = this.getBSStatuses1();
-		return result;
+		return "showdialog";
+	}
+
+	// 自定义视图加载的js
+	@Override
+	protected String getJs() {
+		return contextPath + "/bc-business/carByDriver/list.js";
 	}
 
 	@Override

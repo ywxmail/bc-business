@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.tools.ant.types.resources.selectors.Or;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
@@ -16,10 +17,12 @@ import cn.bc.business.carman.domain.CarByDriver;
 import cn.bc.business.web.struts2.ViewAction;
 import cn.bc.core.Entity;
 import cn.bc.core.query.condition.Condition;
+import cn.bc.core.query.condition.ConditionUtils;
 import cn.bc.core.query.condition.Direction;
 import cn.bc.core.query.condition.impl.AndCondition;
 import cn.bc.core.query.condition.impl.EqualsCondition;
 import cn.bc.core.query.condition.impl.InCondition;
+import cn.bc.core.query.condition.impl.OrCondition;
 import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.core.util.StringUtils;
 import cn.bc.db.jdbc.RowMapper;
@@ -251,8 +254,8 @@ public class CarByDriversAction extends ViewAction<Map<String, Object>> {
 						}));
 		columns.add(new TextColumn4MapKey("d.from_unit", "from_unit",
 				getText("carByDriver.fromUnit"), 100).setSortable(true));
-		columns.add(new TextColumn4MapKey("d.move_type",
-				"move_type", getText("carByDriver.moveType"), 100)
+		columns.add(new TextColumn4MapKey("d.move_type", "move_type",
+				getText("carByDriver.moveType"), 100)
 				.setValueFormater(new KeyValueFormater(getMoveType())));
 		columns.add(new TextColumn4MapKey("d.move_date", "move_date",
 				getText("carByDriver.moveDate"), 120).setSortable(true)
@@ -302,14 +305,21 @@ public class CarByDriversAction extends ViewAction<Map<String, Object>> {
 		if (carManId != null) {
 			carManIdCondition = new EqualsCondition("d.driver_id", carManId);
 		}
-		// carId条件
-		Condition carIdCondition = null;
+		// newCarId条件
+		Condition newCarIdCondition = null;
 		if (carId != null) {
-			carIdCondition = new EqualsCondition("d.car_id", carId);
+			newCarIdCondition = new EqualsCondition("d.new_car_id", carId);
 		}
+		// newCarId条件
+		Condition oldCarIdCondition = null;
+		if (carId != null) {
+			oldCarIdCondition = new EqualsCondition("d.old_car_id", carId);
+		}
+//		Condition carIdCondition = new OrCondition().add(newCarIdCondition)
+//				.add(oldCarIdCondition);
 		// 合并条件
-		return new AndCondition().add(statusCondition).add(carManIdCondition)
-				.add(carIdCondition);
+		return ConditionUtils.mix2AndCondition(statusCondition, ConditionUtils
+				.mix2OrCondition(newCarIdCondition, oldCarIdCondition));
 	}
 
 	@Override
@@ -348,8 +358,10 @@ public class CarByDriversAction extends ViewAction<Map<String, Object>> {
 				getText("carByDriver.classes.dingban"));
 		return type;
 	}
+
 	/**
 	 * 获取迁移类型值转换列表
+	 * 
 	 * @return
 	 */
 	protected Map<String, String> getMoveType() {
