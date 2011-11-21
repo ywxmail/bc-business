@@ -13,11 +13,14 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
+import cn.bc.business.car.domain.Car;
 import cn.bc.business.car.service.CarService;
 import cn.bc.business.carman.domain.CarByDriver;
+import cn.bc.business.carman.domain.CarMan;
 import cn.bc.business.carman.service.CarByDriverService;
 import cn.bc.business.carman.service.CarManService;
 import cn.bc.business.web.struts2.FileEntityAction;
+import cn.bc.core.RichEntity;
 import cn.bc.core.query.condition.Condition;
 import cn.bc.core.query.condition.Direction;
 import cn.bc.core.query.condition.impl.EqualsCondition;
@@ -78,24 +81,18 @@ public class CarByDriverAction extends FileEntityAction<Long, CarByDriver> {
 
 	@Override
 	public String create() throws Exception {
-		//String result = super.create();
+		String result = super.create();
 
-		// if (carManId != null) {
-		// CarMan driver = this.carManService.load(carManId);
-		// this.getE().setDriver(driver);
-		// } else if (carId != null) {
-		// Car car = this.carService.load(carId);
-		// this.getE().setCar(car);
-		// }
-		// this.getE().setStatus(RichEntity.STATUS_ENABLED);
-		// statusesValueList = this.getBSStatuses1();
-		return "showdialog";
-	}
-
-	// 自定义视图加载的js
-	@Override
-	protected String getJs() {
-		return contextPath + "/bc-business/carByDriver/list.js";
+		if (carManId != null) {
+			CarMan driver = this.carManService.load(carManId);
+			this.getE().setDriver(driver);
+		} else if (carId != null) {
+			Car car = this.carService.load(carId);
+			this.getE().setCar(car);
+		}
+		this.getE().setStatus(RichEntity.STATUS_ENABLED);
+		statusesValueList = this.getBSStatuses1();
+		return result;
 	}
 
 	@Override
@@ -153,33 +150,33 @@ public class CarByDriverAction extends FileEntityAction<Long, CarByDriver> {
 		columns.add(new TextColumn("status", getText("carByDriver.statuses"),
 				100).setSortable(true).setValueFormater(
 				new KeyValueFormater(getEntityStatuses())));
-		// if (carManId != null || (carManId == null && carId == null)) {
-		// columns.add(new TextColumn("car.plateNo",
-		// getText("carByDriver.car.plateNo"), 150)
-		// .setValueFormater(new LinkFormater4Id(this.getContextPath()
-		// + "/bc-business/car/edit?id={0}", "car") {
-		// @Override
-		// public String getIdValue(Object context, Object value) {
-		// return ((CarByDriver) context).getCar().getId()
-		// .toString();
-		// }
-		//
-		// // @Override
-		// // public String getTaskbarTitle(Object context,
-		// // Object value) {
-		// // CarByDriver carByDriver = (CarByDriver) context;
-		// // return getText("car") + " - "
-		// // + carByDriver.getCar().getPlate();
-		// // }
-		//
-		// // @Override
-		// // public String getLinkText(Object context, Object value) {
-		// // CarByDriver carByDriver = (CarByDriver) context;
-		// // return carByDriver.getCar().getPlate();
-		// // }
-		// }));
-		//
-		// }
+		if (carManId != null || (carManId == null && carId == null)) {
+			columns.add(new TextColumn("car.plateNo",
+					getText("carByDriver.car.plateNo"), 150)
+					.setValueFormater(new LinkFormater4Id(this.getContextPath()
+							+ "/bc-business/car/edit?id={0}", "car") {
+						@Override
+						public String getIdValue(Object context, Object value) {
+							return ((CarByDriver) context).getCar().getId()
+									.toString();
+						}
+
+						@Override
+						public String getTaskbarTitle(Object context,
+								Object value) {
+							CarByDriver carByDriver = (CarByDriver) context;
+							return getText("car") + " - "
+									+ carByDriver.getCar().getPlate();
+						}
+
+						@Override
+						public String getLinkText(Object context, Object value) {
+							CarByDriver carByDriver = (CarByDriver) context;
+							return carByDriver.getCar().getPlate();
+						}
+					}));
+
+		}
 		if (carId != null || (carManId == null && carId == null)) {
 			columns.add(new TextColumn("driver.name",
 					getText("carByDriver.driver"), 100)
@@ -256,7 +253,7 @@ public class CarByDriverAction extends FileEntityAction<Long, CarByDriver> {
 		this.getE().setModifiedDate(Calendar.getInstance());
 
 		super.save();
-		// this.carByDriverService.updateCar4Driver(this.getE().getCar().getId());
+		this.carByDriverService.updateCar4Driver(this.getE().getCar().getId());
 		this.carByDriverService.updateDriver4Car(this.getE().getDriver()
 				.getId());
 		return "saveSuccess";
