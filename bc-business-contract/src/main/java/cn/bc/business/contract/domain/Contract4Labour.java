@@ -30,6 +30,7 @@ public class Contract4Labour extends Contract {
 	private static Log logger = LogFactory.getLog(Contract4Labour.class);
 	public static final String KEY_UID = Contract4Labour.class.getSimpleName();
 	public static final String KEY_CODE = "contract.code";
+	public static final String KEY_PATCH = "patch.no";
 	private String certNo;// 资格证号
 	private String certIdentity;//身份证号
 	private Calendar birthDate; //出生日期

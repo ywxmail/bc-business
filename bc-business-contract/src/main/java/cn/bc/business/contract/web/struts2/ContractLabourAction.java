@@ -26,7 +26,6 @@ import cn.bc.business.contract.service.ContractChargerService;
 import cn.bc.business.contract.service.ContractLabourService;
 import cn.bc.business.web.struts2.FileEntityAction;
 import cn.bc.core.Page;
-import cn.bc.core.RichEntityImpl;
 import cn.bc.core.exception.CoreException;
 import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.docs.service.AttachService;
@@ -146,7 +145,6 @@ public class ContractLabourAction extends FileEntityAction<Long, Contract4Labour
 	}
 	
 
-	@SuppressWarnings("static-access")
 	public String create() throws Exception {
 		String r = super.create();
 		
@@ -234,14 +232,22 @@ public class ContractLabourAction extends FileEntityAction<Long, Contract4Labour
 			this.getE().setAge(Integer.valueOf(getBirthDateToString(carManInfoMap.get("birthdate"))));
 		}
 		
-		// 自动生成自编号
-		this.getE().setUid(this.getIdGeneratorService().next(this.getE().KEY_UID));
+		// 自动生成UID
+		this.getE().setUid(this.getIdGeneratorService().next(Contract4Labour.KEY_UID));
+		// 自动生成合同编号
 		this.getE().setCode(this.getIdGeneratorService().nextSN4Month(Contract4Labour.KEY_CODE));
+		// 自动生成批号
+		this.getE().setPatchNo(this.getIdGeneratorService().next(Contract4Labour.KEY_PATCH));
 		this.getE().setType(Contract.TYPE_LABOUR);
+		this.getE().setOpType(Contract.OPTYPE_CREATE);
+		this.getE().setMain(Contract.MAIN_NOW);
+		this.getE().setVerMajor(Contract.MAJOR_DEFALUT);
+		this.getE().setVerMinor(Contract.MINOR_DEFALUT);
 		this.getE().setInsuranceType(getText("contract.wujin"));
 		this.getE().setBuyUnit(getText("contract.baocheng"));
-		this.getE().setStatus(RichEntityImpl.STATUS_ENABLED);
-		statusesValue		=	this.getEntityStatuses();
+		this.getE().setStatus(Contract4Labour.STATUS_NORMAL);
+		
+		statusesValue  =	this.getEntityStatuses();
 		
 		// 表单可选项的加载
 		initSelects();
@@ -279,12 +285,31 @@ public class ContractLabourAction extends FileEntityAction<Long, Contract4Labour
 	
 	@Override
 	public String save() throws Exception{
+		if(this.getE().isNew()){
+			saveSwitch(false);
+		}else{
+			saveSwitch(true);
+		}
+		return "saveSuccess";
+	}
+	
+	public void saveSwitch(boolean flag){
 		SystemContext context = this.getSystyemContext();
+		
+		if(flag){
+			//TODO flag为true 要做应处理
+			Contract4Labour oldE = contractLabourService.load(this.getE().getPid());
+			oldE.setMain(Contract.MAIN_HISTORY);
+			this.getCrudService().save(oldE);
+		}
 		
 		//设置最后更新人的信息
 		Contract4Labour e = this.getE();
 		e.setModifier(context.getUserHistory());
 		e.setModifiedDate(Calendar.getInstance());
+		if(e.getOpType() > 0 && e.getOpType() == Contract.OPTYPE_RESIGN){ //操作状态离职的话,把状态设为离职
+			e.setStatus(Contract.OPTYPE_RESIGN);
+		}
 		
 		this.getCrudService().save(e);
 		
@@ -304,10 +329,7 @@ public class ContractLabourAction extends FileEntityAction<Long, Contract4Labour
 		}else{
 			this.contractLabourService.carManNContract4Save(carManId,getE().getId());
 		}
-		
-		
-		return "saveSuccess";
-		
+
 	}
 	
 	// 删除
@@ -525,6 +547,20 @@ public class ContractLabourAction extends FileEntityAction<Long, Contract4Labour
 				getText("contract.select.labour"));
 		types.put(String.valueOf(Contract.TYPE_CHARGER),
 				getText("contract.select.charger"));
+		return types;
+	}
+	
+	/**
+	 * 获取Contract的状态列表
+	 * 
+	 * @return
+	 */
+	protected Map<String, String> getEntityStatuses() {
+		Map<String, String> types = new HashMap<String, String>();
+		types.put(String.valueOf(Contract.STATUS_NORMAL),
+				getText("ccontract.normal"));
+		types.put(String.valueOf(Contract.STATUS_RESGIN),
+				getText("contract.resign"));
 		return types;
 	}
 	
