@@ -52,10 +52,6 @@ public class Contract4Labour extends Contract {
 	private boolean unemployed;// 就业手册:0-有,1-无
 	private boolean healthForm;// 体检表:0-有,1-无
 	private boolean photo;// 照片:0-有,1-无
-	private Calendar happenDate;// 事发日期
-	private boolean qAS;// 门诊:0-是,1-否
-	private boolean inHospital;// 住院:0-是,1-否
-	private boolean lI;// 劳动鉴别:0-是,1-否
 	private Calendar breedingDate;// 生育日期
 	private Calendar getStartDate;// 申领开始日期
 	private Calendar getEndDate;// 申领结束日期
@@ -254,43 +250,6 @@ public class Contract4Labour extends Contract {
 	
 	public void setPhoto(boolean photo) {
 		this.photo = photo;
-	}
-
-	@Column(name = "HAPPEN_DATE")
-	public Calendar getHappenDate() {
-		return happenDate;
-	}
-
-
-	public void setHappenDate(Calendar happenDate) {
-		this.happenDate = happenDate;
-	}
-
-	@Column(name = "IS_OAS")
-	public boolean isqAS() {
-		return qAS;
-	}
-	
-	public void setqAS(boolean qAS) {
-		this.qAS = qAS;
-	}
-
-	@Column(name = "IS_IN_HOSPITAL")
-	public boolean isInHospital() {
-		return inHospital;
-	}
-	
-	public void setInHospital(boolean inHospital) {
-		this.inHospital = inHospital;
-	}
-
-	@Column(name = "IS_LI")
-	public boolean islI() {
-		return lI;
-	}
-	
-	public void setlI(boolean lI) {
-		this.lI = lI;
 	}
 
 	@Column(name = "BREEDING_DATE")
