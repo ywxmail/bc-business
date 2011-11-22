@@ -20,10 +20,7 @@ import com.opensymphony.xwork2.ActionSupport;
 public class SelectMoveTypeAction extends ActionSupport {
 	private static final long serialVersionUID = 1L;
 
-	
-
-	
-	public String selectMoveType() throws Exception {
-		return "selectMoveTypesdialog";
+	public String excute() throws Exception {
+		return SUCCESS;
 	}
 }

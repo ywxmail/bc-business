@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.struts2.ServletActionContext;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
@@ -35,6 +36,7 @@ import cn.bc.web.ui.html.grid.IdColumn4MapKey;
 import cn.bc.web.ui.html.grid.TextColumn4MapKey;
 import cn.bc.web.ui.html.page.PageOption;
 import cn.bc.web.ui.html.toolbar.Toolbar;
+import cn.bc.web.ui.html.toolbar.ToolbarButton;
 import cn.bc.web.ui.json.Json;
 
 /**
@@ -187,7 +189,8 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 				}));
 		// }
 		columns.add(new TextColumn4MapKey("d.new_driver_state",
-				"new_driver_state", getText("carByDriverHistory.newDriverState"), 50)
+				"new_driver_state",
+				getText("carByDriverHistory.newDriverState"), 50)
 				.setValueFormater(new KeyValueFormater(getType())));
 		columns.add(new TextColumn4MapKey("d.newMotoreade", "newMotoreade",
 				getText("carByDriverHistory.newMotorcade"), 120)
@@ -231,7 +234,8 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 				}));
 
 		columns.add(new TextColumn4MapKey("d.old_driver_state",
-				"old_driver_state", getText("carByDriverHistory.oldDriverState"), 50)
+				"old_driver_state",
+				getText("carByDriverHistory.oldDriverState"), 50)
 				.setValueFormater(new KeyValueFormater(getType())));
 		columns.add(new TextColumn4MapKey("d.oldMotoreade", "oldMotoreade",
 				getText("carByDriverHistory.oldMotorcade"), 120)
@@ -316,8 +320,9 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 		// Condition carIdCondition = new OrCondition().add(newCarIdCondition)
 		// .add(oldCarIdCondition);
 		// 合并条件
-		return ConditionUtils.mix2AndCondition(statusCondition, ConditionUtils
-				.mix2OrCondition(newCarIdCondition, oldCarIdCondition));
+		return ConditionUtils.mix2AndCondition(statusCondition,
+				carManIdCondition, ConditionUtils.mix2OrCondition(
+						newCarIdCondition, oldCarIdCondition));
 	}
 
 	@Override
@@ -382,10 +387,20 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected Toolbar getHtmlPageToolbar() {
-		return super.getHtmlPageToolbar()
-				.addButton(
-						Toolbar.getDefaultToolbarRadioGroup(
-								this.getBSStatuses1(), "status", 0,
-								getText("title.click2changeSearchStatus")));
+		Toolbar tb = new Toolbar();
+
+		tb.addButton(
+				Toolbar.getDefaultToolbarRadioGroup(this.getBSStatuses1(),
+						"status", 0, getText("title.click2changeSearchStatus")));
+				tb.addButton(
+						new ToolbarButton().setIcon("ui-icon-document")
+								.setText("新建")
+								.setClick("bc.business.MoveTypeList.select"));
+		return tb;
+	}
+
+	protected String getHtmlPageJs() {
+		return this.getContextPath()
+				+ "/bc-business/carByDriverHistory/list.js";
 	}
 }

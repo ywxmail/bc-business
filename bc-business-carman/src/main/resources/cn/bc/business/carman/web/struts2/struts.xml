@@ -26,9 +26,14 @@
 			<result>/bc-business/carMan/selectMoreCarMan/select.jsp</result>
 		</action>
 	</package>
-	<package name="selectMoveType" extends="bc-default" namespace="/bc-business/selectMoveType">
-		<action name="selectMoveType" class="selectMoveTypeAction" method="selectMoveType">
-			<result name="selectMoveTypedialog" >/bc-business/carByDriver/selectMoveType/select.jsp</result>
+	<package name="selectMoveType" extends="bc-default" namespace="/bc-business">
+		<action name="selectMoveType" class="selectMoveTypeAction">
+			<result>/bc-business/carByDriverHistory/selectMoveType/select.jsp</result>
 		</action>
 	</package>
+	<!--  package name="carByDriverHistory" extends="bc-default" namespace="/bc-business/carByDriverHistory">
+		<action name="carByDriverHistory" class="carByDriverHistoryAction" method="create">
+			<result name="selectMoveType" >selectMoveType</result>
+		</action>
+	</package>-->
 </struts>
