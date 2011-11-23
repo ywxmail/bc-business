@@ -15,7 +15,7 @@ import cn.bc.core.service.DefaultCrudService;
  */
 public class CarByDriverServiceImpl extends DefaultCrudService<CarByDriver>
 		implements CarByDriverService {
-
+	
 	private CarByDriverDao carByDriverDao;
 
 	public CarByDriverDao getCarByDriverDao() {
@@ -32,19 +32,10 @@ public class CarByDriverServiceImpl extends DefaultCrudService<CarByDriver>
 		return (this.carByDriverDao.findBycarManId(id));
 
 	}
-
-	/**
-	 * 更新车辆模块的司机信息
-	 * 
-	 * @return
-	 */
+	/** 更新车辆模块的司机信息 
+	 * @return */
 	public void updateCar4Driver(Long id) {
-		this.carByDriverDao.updateCar4Driver(id);
-	}
-
-	public void updateDriver4Car(Long id) {
-		this.carByDriverDao.updateDriver4Car(id);
-
+		this.carByDriverDao.updateCar4Driver( id);
 	}
 
 }

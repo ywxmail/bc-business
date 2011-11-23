@@ -117,11 +117,14 @@ public class BlacklistAction extends FileEntityAction<Long, Blacklist> {
 
 	@Override
 	public boolean isReadonly() {
-
+		// if (this.getE() != null) {// 表单
+		// return this.getE().getStatus() != Blacklist.STATUS_DAISUODING;
+		// } else {// 视图
+		// 黑名单管理员或系统管理员
 		SystemContext context = (SystemContext) this.getContext();
 		return !context.hasAnyRole(getText("key.role.bs.blacklist"),
 				getText("key.role.bc.admin"));
-
+		// }
 	}
 
 	@Override
@@ -129,6 +132,16 @@ public class BlacklistAction extends FileEntityAction<Long, Blacklist> {
 
 		String result = super.create();
 
+		// if (carManId != null) {
+		// Car car = this.carByDriverService.selectCarByCarManId(new Long(
+		// carManId));
+		// CarMan driver = this.carManService.load(carManId);
+		// this.getE().setCar(car);
+		// this.getE().setDriver(driver);
+		// this.getE().setOldUnitName(car.getOldUnitName());
+		// this.getE().setMotorcade(car.getMotorcade());
+		//
+		// }
 		if (carManId != null) {
 			CarMan driver = this.carManService.load(carManId);
 			List<Car> car = this.carService.selectAllCarByCarManId(carManId);
@@ -218,7 +231,13 @@ public class BlacklistAction extends FileEntityAction<Long, Blacklist> {
 		PageOption option = super.buildFormPageOption().setWidth(720)
 				.setMinWidth(250).setMinHeight(200);
 
-		// 新建时表单只显示锁定按钮
+		// 新建时状态为2，表单只显示锁定按钮
+		// if (isReadonly() == false
+		// && this.getE().getStatus() == Blacklist.STATUS_CREATE) {
+		// option.addButton(new ButtonOption(getText("blacklist.locker"),
+		// null, "bc.business.blacklistForm.lcoker"));
+		// // 状态为锁定时，只显示解锁按钮
+		// }
 		if (isReadonly() == false && this.getE().isNew()) {
 			option.addButton(new ButtonOption(getText("blacklist.locker"),
 					null, "bc.business.blacklistForm.lcoker"));

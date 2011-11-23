@@ -22,10 +22,7 @@ import cn.bc.business.web.struts2.FileEntityAction;
  */
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 @Controller
-public class SelectMoreCarManWithCarAction extends
-		FileEntityAction<Long, CarMan> {
-
-	private static final long serialVersionUID = 1L;
+public class SelectMoreCarManWithCarAction extends FileEntityAction<Long, CarMan> {
 	public List<CarMan> carMans;
 	private CarManService carManService;
 	public Long carId;

@@ -29,7 +29,6 @@ import cn.bc.identity.domain.RichFileEntityImpl;
 public class CarMan extends RichFileEntityImpl {
 	private static final long serialVersionUID = 1L;
 	public static final String KEY_UID = "carman.uid";
-	public static final String KEY_CODE = "carman.code";
 	/** 类别：司机 */
 	public static final int TYPE_DRIVER = 0;
 	/** 类别：责任人 */

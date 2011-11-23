@@ -89,8 +89,6 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 		this.getE().setStatus(RichEntity.STATUS_ENABLED);
 		statusesValue = this.getBSStatuses1();
 		this.getE().setUid(this.getIdGeneratorService().next(CarMan.KEY_UID));
-		this.getE().setOrderNo(
-				this.getIdGeneratorService().nextSN4Month(CarMan.KEY_CODE));
 		this.getE().setSex(ActorDetail.SEX_MAN);
 		this.initSelects();
 		// 获取相片的连接

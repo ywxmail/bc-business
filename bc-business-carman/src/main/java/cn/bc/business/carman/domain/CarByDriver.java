@@ -18,9 +18,7 @@ import cn.bc.identity.domain.RichFileEntity;
 
 /**
  * 司机营运车辆
- * <p>
- * 关联司机营运哪些车辆、哪些班次
- * </p>
+ * <p>关联司机营运哪些车辆、哪些班次</p>
  * 
  * @author dragon
  */

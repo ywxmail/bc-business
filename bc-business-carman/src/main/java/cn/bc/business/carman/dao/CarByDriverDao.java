@@ -24,11 +24,4 @@ public interface CarByDriverDao extends CrudDao<CarByDriver> {
 	 */
 	void updateCar4Driver(Long id);
 
-	/**
-	 * 更新司机模块的车辆信息
-	 * 
-	 * @param id
-	 */
-	void updateDriver4Car(Long id);
-
 }

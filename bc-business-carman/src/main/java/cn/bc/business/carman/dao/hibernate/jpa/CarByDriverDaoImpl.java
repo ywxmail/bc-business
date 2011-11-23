@@ -36,7 +36,7 @@ public class CarByDriverDaoImpl extends HibernateCrudJpaDao<CarByDriver>
 		// TODO Auto-generated method stub
 		Car car = null;
 		String hql = "select c.car from CarByDriver c where c.driver.id=? and c.classes=?";
-		List<?> list = this.getJpaTemplate()
+		List list = this.getJpaTemplate()
 				.find(hql,
 						new Object[] { carManId,
 								new Integer(CarByDriver.TYPE_ZHENGBAN) });
@@ -67,15 +67,6 @@ public class CarByDriverDaoImpl extends HibernateCrudJpaDao<CarByDriver>
 		String sql = " update BS_CAR c set c.driver = (select wmsys.wm_concat(m.name || '('"
 				+ " || (case when cm.classes=1 then '正班' when cm.classes=2 then '副班' when cm.classes=3 then '顶班' else '无' end)"
 				+ " || ')') from BS_CAR_DRIVER cm  inner join BS_CARMAN m on m.id = cm.driver_id where cm.status_=0 and cm.car_id = c.id "
-				+ ") where c.id = ? ";
-		this.jdbcTemplate.update(sql, new Object[] { id });
-
-	}
-
-	public void updateDriver4Car(Long id) {
-		String sql = " update BS_CARMAN c set c.car = (select wmsys.wm_concat(m.plate_type || '.' || m.plate_no || '('"
-				+ " || (case when cm.classes=1 then '正班' when cm.classes=2 then '副班' when cm.classes=3 then '顶班' else '无' end)"
-				+ " || ')') from BS_CAR_DRIVER cm  inner join BS_CAR m on m.id = cm.car_id where cm.status_=0 and cm.driver_id = c.id "
 				+ ") where c.id = ? ";
 		this.jdbcTemplate.update(sql, new Object[] { id });
 

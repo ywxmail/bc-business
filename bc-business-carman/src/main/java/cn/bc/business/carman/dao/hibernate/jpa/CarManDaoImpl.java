@@ -27,13 +27,13 @@ public class CarManDaoImpl extends HibernateCrudJpaDao<CarMan> implements
 	}
 
 	public CarMan saveCert4CarMan(Long carManId, Cert cert) {
-		// 保存证件
+		//保存证件
 		cert = this.certDao.save(cert);
-
-		// 加载司机责任人
+		
+		//加载司机责任人
 		CarMan carMan = this.load(carManId);
-
-		// 添加证件关联
+		
+		//添加证件关联
 		Set<Cert> certs = carMan.getCerts();
 		boolean notin = true;
 		if (certs != null) {
@@ -43,7 +43,7 @@ public class CarManDaoImpl extends HibernateCrudJpaDao<CarMan> implements
 					break;
 				}
 			}
-		} else {
+		}else{
 			certs = new HashSet<Cert>();
 			carMan.setCerts(certs);
 		}
@@ -51,10 +51,10 @@ public class CarManDaoImpl extends HibernateCrudJpaDao<CarMan> implements
 			certs.add(cert);
 			return this.save(carMan);
 		}
-
+		
 		return carMan;
 	}
-
+	
 	public CarMan saveCertRelationship(Long carManId, Long certId) {
 		CarMan carMan = this.load(carManId);
 		Cert cert = this.getJpaTemplate().find(Cert.class, certId);
@@ -67,7 +67,7 @@ public class CarManDaoImpl extends HibernateCrudJpaDao<CarMan> implements
 					break;
 				}
 			}
-		} else {
+		}else{
 			certs = new HashSet<Cert>();
 			carMan.setCerts(certs);
 		}
@@ -85,18 +85,15 @@ public class CarManDaoImpl extends HibernateCrudJpaDao<CarMan> implements
 		// args.add(certId);
 		// this.executeSql(hql, args);
 	}
-
 	/**
 	 * 根据车辆ID查找返回状态为启用中相关司机信息
 	 * 
 	 * @parma carId
 	 * @return
 	 */
-	@SuppressWarnings("unchecked")
 	public List<CarMan> findAllcarManBycarId(Long carId) {
 		String hql = "select c.driver from CarByDriver c where c.car.id=? and c.status=?";
-		// 0为启用中
-		return this.getJpaTemplate().find(hql,
-				new Object[] { carId, new Integer(0) });
+		//0为启用中
+		return this.getJpaTemplate().find(hql, new Object[] { carId,new Integer( 0 )});
 	}
 }
