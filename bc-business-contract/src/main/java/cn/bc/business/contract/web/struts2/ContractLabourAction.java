@@ -140,9 +140,10 @@ public class ContractLabourAction extends FileEntityAction<Long, Contract4Labour
 	@Override
 	public boolean isReadonly() {
 		// 劳动合同管理员或系统管理员
-		SystemContext context = (SystemContext) this.getContext();
-		return !context.hasAnyRole(getText("key.role.bs.contract4labour"),
-				getText("key.role.bc.admin"));
+//		SystemContext context = (SystemContext) this.getContext();
+//		return !context.hasAnyRole(getText("key.role.bs.contract4labour"),
+//				getText("key.role.bc.admin"));
+		return true;
 	}
 	
 	public String create() throws Exception {
@@ -567,6 +568,8 @@ public class ContractLabourAction extends FileEntityAction<Long, Contract4Labour
 		Map<String, String> types = new HashMap<String, String>();
 		types.put(String.valueOf(Contract.STATUS_NORMAL),
 				getText("contract.normal"));
+		types.put(String.valueOf(Contract.STATUS_FAILURE),
+				getText("contract.resign"));
 		types.put(String.valueOf(Contract.STATUS_RESGIN),
 				getText("contract.resign"));
 		return types;

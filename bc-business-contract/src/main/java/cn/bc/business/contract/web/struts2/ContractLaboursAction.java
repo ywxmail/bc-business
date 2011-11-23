@@ -283,7 +283,7 @@ public class ContractLaboursAction extends ViewAction<Map<String, Object>> {
 	
 	
 	/**
-	 * 状态值转换列表：正常|辞职|全部
+	 * 状态值转换列表：正常|失效|离职|全部
 	 * 
 	 * @return
 	 */
@@ -291,6 +291,8 @@ public class ContractLaboursAction extends ViewAction<Map<String, Object>> {
 		Map<String, String> statuses = new LinkedHashMap<String, String>();
 		statuses.put(String.valueOf(Contract.STATUS_NORMAL),
 				getText("contract.normal"));
+		statuses.put(String.valueOf(Contract.STATUS_FAILURE),
+				getText("contract.failure"));
 		statuses.put(String.valueOf(Contract.STATUS_RESGIN),
 				getText("contract.resign"));
 		statuses.put("", getText("bs.status.all"));
@@ -368,7 +370,9 @@ public class ContractLaboursAction extends ViewAction<Map<String, Object>> {
 			or = (Condition) ConditionUtils.mix2OrCondition(contractIdCondition,pIdCondition);
 			
 		}
-		return ConditionUtils.mix2AndCondition(statusCondition,mainsCondition,or);
+		//return ConditionUtils.mix2AndCondition(statusCondition,mainsCondition,or);
+		//测试用
+		return ConditionUtils.mix2AndCondition(statusCondition,or);
 	}
 	
 	@Override
