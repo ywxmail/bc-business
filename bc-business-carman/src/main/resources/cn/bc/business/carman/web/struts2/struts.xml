@@ -31,9 +31,9 @@
 			<result>/bc-business/carByDriverHistory/selectMoveType/select.jsp</result>
 		</action>
 	</package>
-	<!--  package name="carByDriverHistory" extends="bc-default" namespace="/bc-business/carByDriverHistory">
-		<action name="carByDriverHistory" class="carByDriverHistoryAction" method="create">
-			<result name="selectMoveType" >selectMoveType</result>
+	 <package name="carByDriverHistory" extends="bc-default" namespace="/bc-business/carByDriverHistory">
+		<action name="create" class="carByDriverHistoryAction" method="create">
+			<result name="a" >/bc-business/carByDriverHistory/form1.jsp</result>
 		</action>
-	</package>-->
+	</package>
 </struts>

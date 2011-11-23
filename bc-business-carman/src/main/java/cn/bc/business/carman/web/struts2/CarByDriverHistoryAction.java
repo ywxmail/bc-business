@@ -46,6 +46,7 @@ public class CarByDriverHistoryAction extends
 	public CarService carService;
 	public Long carManId;
 	public Long carId;
+	public int moveType;
 
 	@Autowired
 	public void setCarManService(CarManService carManService) {
@@ -72,14 +73,17 @@ public class CarByDriverHistoryAction extends
 				getText("key.role.bs.driver"), getText("key.role.bc.admin"));
 	}
 
-	@Override
-	public String create() throws Exception {
-		//String result = super.create();
 
-		return "selectMoveType";
+	public String create() throws Exception {
+		// String result = super.create();
+		if (moveType == 0) {
+			return "a";
+		}
+		else{
+			return null;
+		}
 	}
 
-	
 	@Override
 	public String edit() throws Exception {
 		String result = super.edit();
