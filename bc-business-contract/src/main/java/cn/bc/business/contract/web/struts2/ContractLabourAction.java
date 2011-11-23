@@ -41,6 +41,7 @@ import cn.bc.web.ui.html.grid.GridData;
 import cn.bc.web.ui.html.grid.TextColumn;
 import cn.bc.web.ui.html.page.ButtonOption;
 import cn.bc.web.ui.html.page.PageOption;
+import cn.bc.web.ui.html.toolbar.ToolbarMenuButton;
 import cn.bc.web.ui.json.Json;
 
 /**
@@ -144,7 +145,6 @@ public class ContractLabourAction extends FileEntityAction<Long, Contract4Labour
 				getText("key.role.bc.admin"));
 	}
 	
-
 	public String create() throws Exception {
 		String r = super.create();
 		
@@ -237,7 +237,7 @@ public class ContractLabourAction extends FileEntityAction<Long, Contract4Labour
 		// 自动生成合同编号
 		this.getE().setCode(this.getIdGeneratorService().nextSN4Month(Contract4Labour.KEY_CODE));
 		// 自动生成批号
-		this.getE().setPatchNo(this.getIdGeneratorService().next(Contract4Labour.KEY_PATCH));
+		this.getE().setPatchNo(this.getIdGeneratorService().next(Contract4Labour.KEY_UID));
 		this.getE().setType(Contract.TYPE_LABOUR);
 		this.getE().setOpType(Contract.OPTYPE_CREATE);
 		this.getE().setMain(Contract.MAIN_NOW);
@@ -439,6 +439,14 @@ public class ContractLabourAction extends FileEntityAction<Long, Contract4Labour
 		PageOption option =	super.buildFormPageOption().setWidth(735).setHeight(650);
 		if (!this.isReadonly()) {
 			option.addButton(new ButtonOption(getText("label.save"), "save"));
+			option.addButton(
+			    new ToolbarMenuButton(getText("contract.labour.op"))
+			    	.addMenuItem(getText("contract.labour.optype.edit"),Contract.OPTYPE_EDIT+"")
+			    	.addMenuItem(getText("contract.labour.optype.transfer"),Contract.OPTYPE_TRANSFER+"")
+			    	.addMenuItem(getText("contract.labour.optype.renew"),Contract.OPTYPE_RENEW+"")
+			    	.addMenuItem(getText("contract.labour.optype.resign"),Contract.OPTYPE_RESIGN+"")
+			    	.setChange("bc.contractLabourForm.selectMenuButtonItem")
+			);
 		}
 		return option;
 	}
@@ -558,7 +566,7 @@ public class ContractLabourAction extends FileEntityAction<Long, Contract4Labour
 	protected Map<String, String> getEntityStatuses() {
 		Map<String, String> types = new HashMap<String, String>();
 		types.put(String.valueOf(Contract.STATUS_NORMAL),
-				getText("ccontract.normal"));
+				getText("contract.normal"));
 		types.put(String.valueOf(Contract.STATUS_RESGIN),
 				getText("contract.resign"));
 		return types;
