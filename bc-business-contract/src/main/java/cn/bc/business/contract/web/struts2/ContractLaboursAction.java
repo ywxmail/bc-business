@@ -99,9 +99,10 @@ public class ContractLaboursAction extends ViewAction<Map<String, Object>> {
 		}
 
 		// 搜索按钮
-		tb.addButton(Toolbar
-				.getDefaultSearchToolbarButton(getText("title.click2search")));
-
+		if(contractId == null){
+			tb.addButton(Toolbar
+					.getDefaultSearchToolbarButton(getText("title.click2search")));
+		}
 		return tb;
 	}
 	
@@ -122,12 +123,12 @@ public class ContractLaboursAction extends ViewAction<Map<String, Object>> {
 		sql.append(",car.id carId");
 		sql.append(",man.id manId");
 		sql.append(" from BS_CONTRACT_LABOUR cl");
-		sql.append(" inner join BS_CONTRACT c on cl.id = c.id");
-		sql.append(" inner join BS_CAR_CONTRACT carc on c.id = carc.contract_id");
-		sql.append(" inner join BS_Car car on carc.car_id = car.id");
-		sql.append(" inner join BS_CARMAN_CONTRACT manc on c.id = manc.contract_id");
-		sql.append(" inner join BS_CARMAN man on manc.man_id = man.id");
-		sql.append(" inner join BC_IDENTITY_ACTOR_HISTORY iah on c.author_id = iah.id");
+		sql.append(" left join BS_CONTRACT c on cl.id = c.id");
+		sql.append(" left join BS_CAR_CONTRACT carc on c.id = carc.contract_id");
+		sql.append(" left join BS_Car car on carc.car_id = car.id");
+		sql.append(" left join BS_CARMAN_CONTRACT manc on c.id = manc.contract_id");
+		sql.append(" left join BS_CARMAN man on manc.man_id = man.id");
+		sql.append(" left join BC_IDENTITY_ACTOR_HISTORY iah on c.author_id = iah.id");
 		sqlObject.setSql(sql.toString());
 		
 		// 注入参数
@@ -352,27 +353,32 @@ public class ContractLaboursAction extends ViewAction<Map<String, Object>> {
 	@Override
 	protected Condition getGridSpecalCondition() {
 		//状态条件
-		Condition statusCondition = ConditionUtils.toConditionByComma4IntegerValue(this.status,
-				"c.status_");
 		
 		//状态条件
+		Condition statusCondition = null;
 		Condition mainsCondition = null;
 		if (contractId == null) {
+			statusCondition = ConditionUtils.toConditionByComma4IntegerValue(this.status,
+					"c.status_");
 			mainsCondition = ConditionUtils.toConditionByComma4IntegerValue(this.mains,
 					"c.main");
 		}
 		
 		// contractId条件
-		Condition or = null;
+//		Condition or = null;
+//		if (contractId != null) {
+//			Condition contractIdCondition = new EqualsCondition("cl.id", contractId);
+//			Condition pIdCondition = new EqualsCondition("c.pid", contractId);
+//			or = (Condition) ConditionUtils.mix2OrCondition(contractIdCondition,pIdCondition);
+//			
+//		}
+		Condition idCondition = null;
 		if (contractId != null) {
-			Condition contractIdCondition = new EqualsCondition("cl.id", contractId);
-			Condition pIdCondition = new EqualsCondition("c.pid", contractId);
-			or = (Condition) ConditionUtils.mix2OrCondition(contractIdCondition,pIdCondition);
-			
+			idCondition = new EqualsCondition("c.id", contractId);
 		}
-		//return ConditionUtils.mix2AndCondition(statusCondition,mainsCondition,or);
+		//return ConditionUtils.mix2AndCondition(statusCondition,mainsCondition,pIdCondition);
 		//测试用
-		return ConditionUtils.mix2AndCondition(statusCondition,or);
+		return ConditionUtils.mix2AndCondition(statusCondition,idCondition);
 	}
 	
 	@Override
@@ -385,7 +391,7 @@ public class ContractLaboursAction extends ViewAction<Map<String, Object>> {
 		}
 		
 		if (contractId != null) {
-			json.put("contractId", "id");
+			json.put("id", contractId);
 		}
 		
 		
@@ -393,11 +399,15 @@ public class ContractLaboursAction extends ViewAction<Map<String, Object>> {
 	
 	@Override
 	protected Toolbar getHtmlPageToolbar() {
-		return super.getHtmlPageToolbar()
-				.addButton(
-						Toolbar.getDefaultToolbarRadioGroup(
-								this.getEntityStatuses(), "status", 0,
-								getText("title.click2changeSearchStatus")));
+		if(contractId == null){
+			return super.getHtmlPageToolbar()
+					.addButton(
+							Toolbar.getDefaultToolbarRadioGroup(
+									this.getEntityStatuses(), "status", 0,
+									getText("title.click2changeSearchStatus")));
+		}else{
+			return super.getHtmlPageToolbar();
+		}
 	}
 	
 
