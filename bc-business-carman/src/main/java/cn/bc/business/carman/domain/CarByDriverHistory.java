@@ -15,16 +15,17 @@ import javax.persistence.Table;
 import cn.bc.business.car.domain.Car;
 import cn.bc.business.motorcade.domain.Motorcade;
 import cn.bc.identity.domain.FileEntityImpl;
-import cn.bc.identity.domain.RichFileEntity;
 
 /**
  * 迁移记录
+ * 
  * @author dragon
  */
 @Entity
 @Table(name = "BS_CAR_DRIVER_HISTORY")
 public class CarByDriverHistory extends FileEntityImpl {
 	private static final long serialVersionUID = 1L;
+	public static final String KEY_UID = "carBydriverHistory.uid";
 	/** 营运类型：示定义 */
 	public static final int TYPE_WEIDINGYI = 0;
 	/** 营运类型：正班 */
@@ -33,7 +34,7 @@ public class CarByDriverHistory extends FileEntityImpl {
 	public static final int TYPE_FUBAN = 2;
 	/** 营运类型：顶班 */
 	public static final int TYPE_DINGBAN = 3;
-	
+
 	/** 营运类型：车辆到车辆 */
 	public static final int MOVETYPE_CLDCL = 0;
 	/** 营运类型：公司到公司(已注销) */
@@ -46,17 +47,16 @@ public class CarByDriverHistory extends FileEntityImpl {
 	public static final int MOVETYPE_JHWZX = 4;
 	/** 营运类型：新入职 */
 	public static final int MOVETYPE_XRZ = 5;
-	
-	
-	private int status = RichFileEntity.STATUS_ENABLED;// 状态
+	/** 营运类型：转车队 */
+	public static final int MOVETYPE_ZCD = 5;
 
-	private CarMan driver;// 营运的司机
-	private Car oldCar;// 原车辆
-	private Motorcade oldMotorcadeId;//原车队
-	private int oldDriverState;// 原营运班次:如正班、副班、顶班
-	private Car newCar;//现车辆
-	private Motorcade newMotorcadeId;//现车队
-	private int newDriverState;// 现营运班次:如正班、副班、顶班
+	private Long driverId;// 营运的司机
+	private Long fromCarId;// 原车辆
+	private Long fromMotorcadeId;// 原车队
+	private int fromClasses;// 原营运班次:如正班、副班、顶班
+	private Long toCarId;// 现车辆
+	private Long toMotorcadeId;// 现车队
+	private int toClasses;// 现营运班次:如正班、副班、顶班
 
 	private Calendar moveDate;// 迁移时间
 	private int moveType;// 迁移类型
@@ -75,62 +75,106 @@ public class CarByDriverHistory extends FileEntityImpl {
 		this.description = description;
 	}
 
-	@ManyToOne(fetch = FetchType.EAGER, optional = false)
-	@JoinColumn(name = "OLD_CAR_ID", referencedColumnName = "ID")
-	public Car getOldCar() {
-		return oldCar;
+	// @ManyToOne(fetch = FetchType.EAGER, optional = false)
+	// @JoinColumn(name = "FROM_CAR_ID", referencedColumnName = "ID")
+	// public Car getFromCar() {
+	// return fromCar;
+	// }
+	//
+	// public void setFromCar(Car fromCar) {
+	// this.fromCar = fromCar;
+	// }
+	//
+	// public void setFromMotorcade(Motorcade fromMotorcade) {
+	// this.fromMotorcade = fromMotorcade;
+	// }
+	//
+	// @ManyToOne(fetch = FetchType.EAGER, optional = false)
+	// @JoinColumn(name = "FROM_MOTORCADE_ID", referencedColumnName = "ID")
+	// public Motorcade getFromMotorcade() {
+	// return fromMotorcade;
+	// }
+	
+	
+	@Column(name = "DRIVER_ID")
+	public Long getDriverId() {
+		return driverId;
 	}
 
-	public void setOldCar(Car oldCar) {
-		this.oldCar = oldCar;
+	public void setDriverId(Long driverId) {
+		this.driverId = driverId;
+	}
+	@Column(name = "FROM_CAR_ID")
+	public Long getFromCarId() {
+		return fromCarId;
+	}
+	public void setFromCarId(Long fromCarId) {
+		this.fromCarId = fromCarId;
 	}
 
-	@ManyToOne(fetch = FetchType.EAGER, optional = false)
-	@JoinColumn(name = "OLD_MOTORCADE_ID", referencedColumnName = "ID")
-	public Motorcade getOldMotorcadeId() {
-		return oldMotorcadeId;
+	@Column(name = "FROM_MOTORCADE_ID")
+	public Long getFromMotorcadeId() {
+		return fromMotorcadeId;
 	}
 
-	public void setOldMotorcadeId(Motorcade oldMotorcadeId) {
-		this.oldMotorcadeId = oldMotorcadeId;
+	public void setFromMotorcadeId(Long fromMotorcadeId) {
+		this.fromMotorcadeId = fromMotorcadeId;
 	}
 
-	@Column(name = "OLD_DRIVER_STATE")
-	public int getOldDriverState() {
-		return oldDriverState;
+	@Column(name = "TO_CAR_ID")
+	public Long getToCarId() {
+		return toCarId;
 	}
 
-	public void setOldDriverState(int oldDriverState) {
-		this.oldDriverState = oldDriverState;
+	public void setToCarId(Long toCarId) {
+		this.toCarId = toCarId;
 	}
 
-	@ManyToOne(fetch = FetchType.EAGER, optional = false)
-	@JoinColumn(name = "NEW_CAR_ID", referencedColumnName = "ID")
-	public Car getNewCar() {
-		return newCar;
+	@Column(name = "TO_MOTORCADE_ID")
+	public Long getToMotorcadeId() {
+		return toMotorcadeId;
 	}
 
-	public void setNewCar(Car newCar) {
-		this.newCar = newCar;
+	public void setToMotorcadeId(Long toMotorcadeId) {
+		this.toMotorcadeId = toMotorcadeId;
 	}
 
-	@ManyToOne(fetch = FetchType.EAGER, optional = false)
-	@JoinColumn(name = "NEW_MOTORCADE_ID", referencedColumnName = "ID")
-	public Motorcade getNewMotorcadeId() {
-		return newMotorcadeId;
+	@Column(name = "FROM_CLASSES")
+	public int getFromClasses() {
+		return fromClasses;
 	}
 
-	public void setNewMotorcadeId(Motorcade newMotorcadeId) {
-		this.newMotorcadeId = newMotorcadeId;
+	public void setFromClasses(int fromClasses) {
+		this.fromClasses = fromClasses;
 	}
 
-	@Column(name = "NEW_DRIVER_STATE")
-	public int getNewDriverState() {
-		return newDriverState;
+	// @ManyToOne(fetch = FetchType.EAGER, optional = false)
+	// @JoinColumn(name = "TO_CAR_ID", referencedColumnName = "ID")
+	// public Car getToCar() {
+	// return toCar;
+	// }
+	//
+	// public void setToCar(Car toCar) {
+	// this.toCar = toCar;
+	// }
+	//
+	// @ManyToOne(fetch = FetchType.EAGER, optional = false)
+	// @JoinColumn(name = "TO_MOTORCADE_ID", referencedColumnName = "ID")
+	// public Motorcade getToMotorcade() {
+	// return toMotorcade;
+	// }
+	//
+	// public void setToMotorcade(Motorcade toMotorcade) {
+	// this.toMotorcade = toMotorcade;
+	// }
+
+	@Column(name = "TO_CLASSES")
+	public int getToClasses() {
+		return toClasses;
 	}
 
-	public void setNewDriverState(int newDriverState) {
-		this.newDriverState = newDriverState;
+	public void setToClasses(int toClasses) {
+		this.toClasses = toClasses;
 	}
 
 	@Column(name = "MOVE_DATE")
@@ -187,22 +231,14 @@ public class CarByDriverHistory extends FileEntityImpl {
 		this.cancelId = cancelId;
 	}
 
-	@ManyToOne(fetch = FetchType.EAGER, optional = false)
-	@JoinColumn(name = "DRIVER_ID", referencedColumnName = "ID")
-	public CarMan getDriver() {
-		return driver;
-	}
+	// @ManyToOne(fetch = FetchType.EAGER, optional = false)
+	// @JoinColumn(name = "DRIVER_ID", referencedColumnName = "ID")
+	// public CarMan getDriver() {
+	// return driver;
+	// }
+	//
+	// public void setDriver(CarMan driver) {
+	// this.driver = driver;
+	// }
 
-	public void setDriver(CarMan driver) {
-		this.driver = driver;
-	}
-
-	@Column(name = "STATUS_")
-	public int getStatus() {
-		return status;
-	}
-
-	public void setStatus(int status) {
-		this.status = status;
-	}
 }

@@ -15,19 +15,16 @@ import org.springframework.stereotype.Controller;
 import cn.bc.business.carman.domain.CarByDriver;
 import cn.bc.business.carman.domain.CarByDriverHistory;
 import cn.bc.business.web.struts2.ViewAction;
-import cn.bc.core.Entity;
 import cn.bc.core.query.condition.Condition;
 import cn.bc.core.query.condition.ConditionUtils;
 import cn.bc.core.query.condition.Direction;
 import cn.bc.core.query.condition.impl.EqualsCondition;
-import cn.bc.core.query.condition.impl.InCondition;
 import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.core.util.StringUtils;
 import cn.bc.db.jdbc.RowMapper;
 import cn.bc.db.jdbc.SqlObject;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.web.formater.CalendarFormater;
-import cn.bc.web.formater.EntityStatusFormater;
 import cn.bc.web.formater.KeyValueFormater;
 import cn.bc.web.formater.LinkFormater4Id;
 import cn.bc.web.ui.html.grid.Column;
@@ -48,7 +45,8 @@ import cn.bc.web.ui.json.Json;
 @Controller
 public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 	private static final long serialVersionUID = 1L;
-	public String status = String.valueOf(Entity.STATUS_ENABLED); // 车辆的状态，多个用逗号连接
+	// public String status = String.valueOf(Entity.STATUS_ENABLED); //
+	// 车辆的状态，多个用逗号连接
 	public Long carManId;
 	public Long carId;
 
@@ -63,8 +61,7 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 	@Override
 	protected OrderCondition getGridDefaultOrderCondition() {
 		// 默认排序方向：状态|创建日期
-		return new OrderCondition("d.status_", Direction.Asc).add(
-				"d.file_date", Direction.Desc);
+		return new OrderCondition("d.file_date", Direction.Desc);
 	}
 
 	@Override
@@ -73,15 +70,15 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer sql = new StringBuffer();
-		sql.append("select d.id,d.status_,m.cert_fwzg,m.name,nc.plate_type newPlateType,nc.plate_no newPlateNo,d.new_driver_state");
-		sql.append(",nm.name newMotoreade,d.to_unit,oc.plate_type oldPlateType,oc.plate_no oldPlateNo,d.old_driver_state");
-		sql.append(",om.name oldMotoreade,d.from_unit,d.move_type,d.move_date,d.driver_id,d.old_car_id,d.new_car_id");
-		sql.append(",d.old_motorcade_id,d.new_motorcade_id from BS_CAR_DRIVER_HISTORY d");
+		sql.append("select d.id,m.cert_fwzg,m.name,nc.plate_type newPlateType,nc.plate_no newPlateNo,d.to_classes");
+		sql.append(",nm.name newMotoreade,d.to_unit,oc.plate_type oldPlateType,oc.plate_no oldPlateNo,d.from_classes");
+		sql.append(",om.name oldMotoreade,d.from_unit,d.move_type,d.move_date,d.driver_id,d.from_car_id,d.to_car_id");
+		sql.append(",d.from_motorcade_id,d.to_motorcade_id from BS_CAR_DRIVER_HISTORY d");
 		sql.append(" left join BS_CARMAN m on m.id=d.driver_id");
-		sql.append(" left join BS_CAR  oc on oc.id=d.old_car_id");
-		sql.append(" left join BS_CAR  nc on nc.id=d.new_car_id");
-		sql.append(" left join BS_Motorcade  om on om.id=d.old_motorcade_id");
-		sql.append(" left join BS_Motorcade  nm on nm.id=d.new_motorcade_id");
+		sql.append(" left join BS_CAR  oc on oc.id=d.from_car_id");
+		sql.append(" left join BS_CAR  nc on nc.id=d.to_car_id");
+		sql.append(" left join BS_Motorcade  om on om.id=d.from_motorcade_id");
+		sql.append(" left join BS_Motorcade  nm on nm.id=d.to_motorcade_id");
 		sqlObject.setSql(sql.toString());
 
 		// 注入参数
@@ -93,7 +90,6 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 				Map<String, Object> map = new HashMap<String, Object>();
 				int i = 0;
 				map.put("id", rs[i++]);
-				map.put("status_", rs[i++]);
 				map.put("cert_fwzg", rs[i++]);
 				map.put("driver", rs[i++]);
 				map.put("newPlateType", rs[i++]);
@@ -105,7 +101,7 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 					map.put("newPlate", map.get("newPlateType").toString()
 							+ "." + map.get("newPlateNo").toString());
 				}
-				map.put("new_driver_state", rs[i++]);
+				map.put("to_classes", rs[i++]);
 				map.put("newMotoreade", rs[i++]);
 				map.put("to_unit", rs[i++]);
 				map.put("oldPlateType", rs[i++]);
@@ -117,16 +113,16 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 					map.put("oldPlate", map.get("oldPlateType").toString()
 							+ "." + map.get("oldPlateNo").toString());
 				}
-				map.put("old_driver_state", rs[i++]);
+				map.put("from_classes", rs[i++]);
 				map.put("oldMotoreade", rs[i++]);
 				map.put("from_unit", rs[i++]);
 				map.put("move_type", rs[i++]);
 				map.put("move_date", rs[i++]);
 				map.put("driver_id", rs[i++]);
-				map.put("old_car_id", rs[i++]);
-				map.put("new_car_id", rs[i++]);
-				map.put("old_motorcade_id", rs[i++]);
-				map.put("new_motorcade_id", rs[i++]);
+				map.put("from_car_id", rs[i++]);
+				map.put("to_car_id", rs[i++]);
+				map.put("from_motorcade_id", rs[i++]);
+				map.put("to_motorcade_id", rs[i++]);
 				return map;
 			}
 		});
@@ -137,9 +133,6 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 	protected List<Column> getGridColumns() {
 		List<Column> columns = new ArrayList<Column>();
 		columns.add(new IdColumn4MapKey("d.id", "id"));
-		columns.add(new TextColumn4MapKey("d.status_", "status_",
-				getText("carByDriverHistory.statuses"), 50).setSortable(true)
-				.setValueFormater(new EntityStatusFormater(getBSStatuses1())));
 		columns.add(new TextColumn4MapKey("d.cert_fwzg", "cert_fwzg",
 				getText("carByDriverHistory.cert_fwzg"), 80).setSortable(true));
 		if (carId != null || (carManId == null && carId == null)) {
@@ -166,7 +159,7 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 					}));
 		}
 		// if (carManId != null || (carManId == null && carId == null)) {
-		columns.add(new TextColumn4MapKey("d.newPlateType", "newPlate",
+		columns.add(new TextColumn4MapKey("nc.newPlateType", "newPlate",
 				getText("carByDriverHistory.newCar"), 100)
 				.setValueFormater(new LinkFormater4Id(this.getContextPath()
 						+ "/bc-business/car/edit?id={0}", "newPlate") {
@@ -175,7 +168,7 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 					public String getIdValue(Object context, Object value) {
 						return StringUtils
 								.toString(((Map<String, Object>) context)
-										.get("new_car_id"));
+										.get("to_car_id"));
 					}
 
 					@Override
@@ -187,11 +180,10 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 					}
 				}));
 		// }
-		columns.add(new TextColumn4MapKey("d.new_driver_state",
-				"new_driver_state",
+		columns.add(new TextColumn4MapKey("d.to_classes", "to_classes",
 				getText("carByDriverHistory.newDriverState"), 50)
 				.setValueFormater(new KeyValueFormater(getType())));
-		columns.add(new TextColumn4MapKey("d.newMotoreade", "newMotoreade",
+		columns.add(new TextColumn4MapKey("d.to_motorcade_id", "newMotoreade",
 				getText("carByDriverHistory.newMotorcade"), 120)
 				.setSortable(true)
 				.setUseTitleFromLabel(true)
@@ -205,7 +197,7 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 									Object value) {
 								return StringUtils
 										.toString(((Map<String, Object>) context)
-												.get("new_motorcade_id"));
+												.get("to_motorcade_id"));
 							}
 						}));
 		columns.add(new TextColumn4MapKey("d.to_unit", "to_unit",
@@ -220,7 +212,7 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 					public String getIdValue(Object context, Object value) {
 						return StringUtils
 								.toString(((Map<String, Object>) context)
-										.get("old_car_id"));
+										.get("from_car_id"));
 					}
 
 					@Override
@@ -232,8 +224,7 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 					}
 				}));
 
-		columns.add(new TextColumn4MapKey("d.old_driver_state",
-				"old_driver_state",
+		columns.add(new TextColumn4MapKey("d.from_classes", "from_classes",
 				getText("carByDriverHistory.oldDriverState"), 50)
 				.setValueFormater(new KeyValueFormater(getType())));
 		columns.add(new TextColumn4MapKey("d.oldMotoreade", "oldMotoreade",
@@ -250,7 +241,7 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 									Object value) {
 								return StringUtils
 										.toString(((Map<String, Object>) context)
-												.get("old_motorcade_id"));
+												.get("from_motorcade_id"));
 							}
 						}));
 		columns.add(new TextColumn4MapKey("d.from_unit", "from_unit",
@@ -289,18 +280,7 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected Condition getGridSpecalCondition() {
-		// 状态条件
-		Condition statusCondition = null;
-		if (status != null && status.length() > 0) {
-			String[] ss = status.split(",");
-			if (ss.length == 1) {
-				statusCondition = new EqualsCondition("d.status_", new Integer(
-						ss[0]));
-			} else {
-				statusCondition = new InCondition("d.status_",
-						StringUtils.stringArray2IntegerArray(ss));
-			}
-		}
+
 		// carManId条件
 		Condition carManIdCondition = null;
 		if (carManId != null) {
@@ -309,28 +289,25 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 		// newCarId条件
 		Condition newCarIdCondition = null;
 		if (carId != null) {
-			newCarIdCondition = new EqualsCondition("d.new_car_id", carId);
+			newCarIdCondition = new EqualsCondition("d.to_car_id", carId);
 		}
 		// newCarId条件
 		Condition oldCarIdCondition = null;
 		if (carId != null) {
-			oldCarIdCondition = new EqualsCondition("d.old_car_id", carId);
+			oldCarIdCondition = new EqualsCondition("d.from_car_id", carId);
 		}
 		// Condition carIdCondition = new OrCondition().add(newCarIdCondition)
 		// .add(oldCarIdCondition);
 		// 合并条件
-		return ConditionUtils.mix2AndCondition(statusCondition,
-				carManIdCondition, ConditionUtils.mix2OrCondition(
-						newCarIdCondition, oldCarIdCondition));
+		return ConditionUtils.mix2AndCondition(carManIdCondition,
+				ConditionUtils.mix2OrCondition(newCarIdCondition,
+						oldCarIdCondition));
 	}
 
 	@Override
 	protected Json getGridExtrasData() {
 		Json json = new Json();
-		// 状态条件
-		if (this.status != null || this.status.length() != 0) {
-			json.put("status", status);
-		}
+
 		// carManId条件
 		if (carManId != null) {
 			json.put("carManId", carManId);
@@ -388,13 +365,8 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 	protected Toolbar getHtmlPageToolbar() {
 		Toolbar tb = new Toolbar();
 
-		tb.addButton(
-				Toolbar.getDefaultToolbarRadioGroup(this.getBSStatuses1(),
-						"status", 0, getText("title.click2changeSearchStatus")));
-				tb.addButton(
-						new ToolbarButton().setIcon("ui-icon-document")
-								.setText("新建")
-								.setClick("bc.business.MoveTypeList.select"));
+		tb.addButton(new ToolbarButton().setIcon("ui-icon-document")
+				.setText("新建").setClick("bc.business.MoveTypeList.select"));
 		return tb;
 	}
 

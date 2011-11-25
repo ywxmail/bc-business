@@ -4,6 +4,7 @@
 package cn.bc.business.carman.web.struts2;
 
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -42,6 +43,7 @@ public class CarByDriverHistoryAction extends
 	public CarByDriverHistoryService carByDriverHistoryService;
 	public String portrait;
 	public Map<String, String> statusesValueList;// 状态列表
+	public Map<String, String> moveTypeValueList;// 状态列表
 	public CarManService carManService;
 	public CarService carService;
 	public Long carManId;
@@ -73,13 +75,35 @@ public class CarByDriverHistoryAction extends
 				getText("key.role.bs.driver"), getText("key.role.bc.admin"));
 	}
 
-
 	public String create() throws Exception {
 		// String result = super.create();
-		if (moveType == 0) {
-			return "a";
-		}
-		else{
+		statusesValueList = this.getBSStatuses1();
+		moveTypeValueList = this.getMoveType();
+		SystemContext context = this.getSystyemContext();
+		this.getE().setAuthor(context.getUserHistory());
+		this.getE().setFileDate(Calendar.getInstance());
+		if (moveType == CarByDriverHistory.MOVETYPE_CLDCL) {
+			this.getE().setMoveType(CarByDriverHistory.MOVETYPE_CLDCL);
+			return "zhuanChe";
+		} else if (moveType == CarByDriverHistory.MOVETYPE_GSDGSYZX) {
+			this.getE().setMoveType(CarByDriverHistory.MOVETYPE_GSDGSYZX);
+			return "zhuanGongSi";
+		} else if (moveType == CarByDriverHistory.MOVETYPE_ZXWYQX) {
+			this.getE().setMoveType(CarByDriverHistory.MOVETYPE_ZXWYQX);
+			return "zhuXiao";
+		} else if (moveType == CarByDriverHistory.MOVETYPE_YWGSQH) {
+			this.getE().setMoveType(CarByDriverHistory.MOVETYPE_YWGSQH);
+			return "qianHui";
+		} else if (moveType == CarByDriverHistory.MOVETYPE_JHWZX) {
+			this.getE().setMoveType(CarByDriverHistory.MOVETYPE_JHWZX);
+			return "jiaoHui";
+		} else if (moveType == CarByDriverHistory.MOVETYPE_XRZ) {
+			this.getE().setMoveType(CarByDriverHistory.MOVETYPE_XRZ);
+			return "xinRuZhi";
+		} else if (moveType == CarByDriverHistory.MOVETYPE_ZCD) {
+			this.getE().setMoveType(CarByDriverHistory.MOVETYPE_ZCD);
+			return "zhuanCheDui";
+		} else {
 			return null;
 		}
 	}
@@ -133,7 +157,6 @@ public class CarByDriverHistoryAction extends
 	@Override
 	public String save() throws Exception {
 		SystemContext context = this.getSystyemContext();
-
 		// 设置最后更新人的信息
 		this.getE().setModifier(context.getUserHistory());
 		this.getE().setModifiedDate(Calendar.getInstance());
@@ -142,4 +165,28 @@ public class CarByDriverHistoryAction extends
 
 		return "saveSuccess";
 	}
+
+	/**
+	 * 获取迁移类型值转换列表
+	 * 
+	 * @return
+	 */
+	protected Map<String, String> getMoveType() {
+		Map<String, String> type = new HashMap<String, String>();
+		type = new HashMap<String, String>();
+		type.put(String.valueOf(CarByDriverHistory.MOVETYPE_CLDCL),
+				getText("carByDriverHistory.moveType.cheliangdaocheliang"));
+		type.put(String.valueOf(CarByDriverHistory.MOVETYPE_GSDGSYZX),
+				getText("carByDriverHistory.moveType.gongsidaogongsiyizhuxiao"));
+		type.put(String.valueOf(CarByDriverHistory.MOVETYPE_ZXWYQX),
+				getText("carByDriverHistory.moveType.zhuxiaoweiyouquxiang"));
+		type.put(String.valueOf(CarByDriverHistory.MOVETYPE_YWGSQH),
+				getText("carByDriverHistory.moveType.youwaigongsiqianhui"));
+		type.put(String.valueOf(CarByDriverHistory.MOVETYPE_JHWZX),
+				getText("carByDriverHistory.moveType.jiaohuiweizhuxiao"));
+		type.put(String.valueOf(CarByDriverHistory.MOVETYPE_XRZ),
+				getText("carByDriverHistory.moveType.xinruzhi"));
+		return type;
+	}
+
 }
