@@ -20,6 +20,7 @@
 		<module>bc-business-motorcade</module>
 		<module>bc-business-blacklist</module>
 		<module>bc-business-ws</module>
+		<module>bc-business-sync</module>
 		<module>bc-business-spider</module>
 		<module>bc-business-runcase</module>
 		<module>bc-business-charger</module>

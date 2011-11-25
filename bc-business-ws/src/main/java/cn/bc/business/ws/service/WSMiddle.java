@@ -38,7 +38,7 @@ public interface WSMiddle {
 	String findXml(String bodyXml, String soapAction, StringBuffer strMsg);
 
 	/**
-	 * 查询企业的交通违章信息
+	 * 查询企业的交通违法信息
 	 * 
 	 * @param qyId
 	 *            企业ID
