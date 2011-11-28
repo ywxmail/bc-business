@@ -247,7 +247,7 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("d.from_unit", "from_unit",
 				getText("carByDriverHistory.fromUnit"), 100).setSortable(true));
 		columns.add(new TextColumn4MapKey("d.move_type", "move_type",
-				getText("carByDriverHistory.moveType"), 100)
+				getText("carByDriverHistory.moveType"), 140)
 				.setValueFormater(new KeyValueFormater(getMoveType())));
 		columns.add(new TextColumn4MapKey("d.move_date", "move_date",
 				getText("carByDriverHistory.moveDate"), 120).setSortable(true)
@@ -358,6 +358,8 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 				getText("carByDriverHistory.moveType.jiaohuiweizhuxiao"));
 		type.put(String.valueOf(CarByDriverHistory.MOVETYPE_XRZ),
 				getText("carByDriverHistory.moveType.xinruzhi"));
+		type.put(String.valueOf(CarByDriverHistory.MOVETYPE_ZCD),
+				getText("carByDriverHistory.moveType.cheduidaochedui"));
 		return type;
 	}
 

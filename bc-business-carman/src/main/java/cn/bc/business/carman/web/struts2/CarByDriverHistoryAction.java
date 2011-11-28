@@ -17,6 +17,7 @@ import cn.bc.business.car.service.CarService;
 import cn.bc.business.carman.domain.CarByDriverHistory;
 import cn.bc.business.carman.service.CarByDriverHistoryService;
 import cn.bc.business.carman.service.CarManService;
+import cn.bc.business.motorcade.service.MotorcadeService;
 import cn.bc.business.web.struts2.FileEntityAction;
 import cn.bc.core.query.condition.Direction;
 import cn.bc.core.query.condition.impl.OrderCondition;
@@ -44,11 +45,18 @@ public class CarByDriverHistoryAction extends
 	public String portrait;
 	public Map<String, String> statusesValueList;// 状态列表
 	public Map<String, String> moveTypeValueList;// 状态列表
+	public List<Map<String, String>> motorcadeList; // 可选车队列表
 	public CarManService carManService;
 	public CarService carService;
 	public Long carManId;
 	public Long carId;
 	public int moveType;
+	private MotorcadeService motorcadeService;
+
+	@Autowired
+	public void setMotorcadeService(MotorcadeService motorcadeService) {
+		this.motorcadeService = motorcadeService;
+	}
 
 	@Autowired
 	public void setCarManService(CarManService carManService) {
@@ -77,31 +85,30 @@ public class CarByDriverHistoryAction extends
 
 	public String create() throws Exception {
 		// String result = super.create();
+		this.motorcadeList = this.motorcadeService.find4Option();
 		statusesValueList = this.getBSStatuses1();
 		moveTypeValueList = this.getMoveType();
 		SystemContext context = this.getSystyemContext();
 		this.getE().setAuthor(context.getUserHistory());
 		this.getE().setFileDate(Calendar.getInstance());
+		this.getE().setMoveType(moveType);
+		return this.getFormName(this.getE().getMoveType());
+	}
+
+	private String getFormName(int moveType) {
 		if (moveType == CarByDriverHistory.MOVETYPE_CLDCL) {
-			this.getE().setMoveType(CarByDriverHistory.MOVETYPE_CLDCL);
 			return "zhuanChe";
 		} else if (moveType == CarByDriverHistory.MOVETYPE_GSDGSYZX) {
-			this.getE().setMoveType(CarByDriverHistory.MOVETYPE_GSDGSYZX);
 			return "zhuanGongSi";
 		} else if (moveType == CarByDriverHistory.MOVETYPE_ZXWYQX) {
-			this.getE().setMoveType(CarByDriverHistory.MOVETYPE_ZXWYQX);
 			return "zhuXiao";
 		} else if (moveType == CarByDriverHistory.MOVETYPE_YWGSQH) {
-			this.getE().setMoveType(CarByDriverHistory.MOVETYPE_YWGSQH);
 			return "qianHui";
 		} else if (moveType == CarByDriverHistory.MOVETYPE_JHWZX) {
-			this.getE().setMoveType(CarByDriverHistory.MOVETYPE_JHWZX);
 			return "jiaoHui";
 		} else if (moveType == CarByDriverHistory.MOVETYPE_XRZ) {
-			this.getE().setMoveType(CarByDriverHistory.MOVETYPE_XRZ);
 			return "xinRuZhi";
 		} else if (moveType == CarByDriverHistory.MOVETYPE_ZCD) {
-			this.getE().setMoveType(CarByDriverHistory.MOVETYPE_ZCD);
 			return "zhuanCheDui";
 		} else {
 			return null;
@@ -111,8 +118,10 @@ public class CarByDriverHistoryAction extends
 	@Override
 	public String edit() throws Exception {
 		String result = super.edit();
-		statusesValueList = this.getBSStatuses1();
-		return result;
+		// CarByDriverHistory e = new CarByDriverHistory();
+		// e = this.getCrudService().load(this.getE().getId());
+		this.motorcadeList = this.motorcadeService.find4Option();
+		return this.getFormName(this.getE().getMoveType());
 	}
 
 	@Override
@@ -156,6 +165,17 @@ public class CarByDriverHistoryAction extends
 
 	@Override
 	public String save() throws Exception {
+		CarByDriverHistory e = this.getE();
+		if (e.getToCar() != null && e.getToCar().getId() == null) {
+			e.setToCar(null);
+		}
+		if (e.getFromCar() != null && e.getFromCar().getId() == null) {
+			e.setFromCar(null);
+		}
+		if (e.getDriver() != null && e.getDriver().getId() == null) {
+			e.setDriver(null);
+		}
+
 		SystemContext context = this.getSystyemContext();
 		// 设置最后更新人的信息
 		this.getE().setModifier(context.getUserHistory());
@@ -186,6 +206,8 @@ public class CarByDriverHistoryAction extends
 				getText("carByDriverHistory.moveType.jiaohuiweizhuxiao"));
 		type.put(String.valueOf(CarByDriverHistory.MOVETYPE_XRZ),
 				getText("carByDriverHistory.moveType.xinruzhi"));
+		type.put(String.valueOf(CarByDriverHistory.MOVETYPE_ZCD),
+				getText("carByDriverHistory.moveType.cheduidaochedui"));
 		return type;
 	}
 
