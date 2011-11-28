@@ -30,6 +30,8 @@ import cn.bc.web.ui.html.grid.IdColumn4MapKey;
 import cn.bc.web.ui.html.grid.TextColumn4MapKey;
 import cn.bc.web.ui.html.page.PageOption;
 import cn.bc.web.ui.html.toolbar.Toolbar;
+import cn.bc.web.ui.html.toolbar.ToolbarButton;
+import cn.bc.web.ui.html.toolbar.ToolbarMenuButton;
 import cn.bc.web.ui.json.Json;
 
 /**
@@ -111,17 +113,17 @@ public class Sync4InfractTrafficsAction extends ViewAction<Map<String, Object>> 
 				getText("sync4InfractTraffic.car_plate"), 80));
 		columns.add(new TextColumn4MapKey("c.content", "content",
 				getText("sync4InfractTraffic.content"))
-		.setUseTitleFromLabel(true));
+				.setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("t.happen_date", "happen_date",
 				getText("sync4InfractTraffic.happen_date"), 140).setSortable(
-						true)
-						.setValueFormater(new CalendarFormater("yyyy-MM-dd HH:mm")));
+				true)
+				.setValueFormater(new CalendarFormater("yyyy-MM-dd HH:mm")));
 		columns.add(new TextColumn4MapKey("c.driver_name", "driver_name",
 				getText("sync4InfractTraffic.driver_name"), 80)
-		.setSortable(true));
+				.setSortable(true));
 		columns.add(new TextColumn4MapKey("c.driver_cert", "driver_cert",
 				getText("sync4InfractTraffic.driver_cert"), 80)
-		.setSortable(true));
+				.setSortable(true));
 		columns.add(new TextColumn4MapKey("b.syncId", "syncId",
 				getText("sync4InfractTraffic.syncId"), 120));
 		columns.add(new TextColumn4MapKey("c.jeom", "jeom",
@@ -138,6 +140,7 @@ public class Sync4InfractTrafficsAction extends ViewAction<Map<String, Object>> 
 				getText("bs.sync.status.new"));
 		statuses.put(String.valueOf(SyncBase.STATUS_DONE),
 				getText("bs.sync.status.done"));
+		statuses.put("", getText("bs.status.all"));
 		return statuses;
 	}
 
@@ -182,16 +185,50 @@ public class Sync4InfractTrafficsAction extends ViewAction<Map<String, Object>> 
 
 	@Override
 	protected Toolbar getHtmlPageToolbar() {
-		return super.getHtmlPageToolbar()
+		Toolbar tb = new Toolbar();
+
+		// 查看按钮
+		tb.addButton(Toolbar.getDefaultEditToolbarButton(getText("label.read")));
+
+		if (!this.isReadonly()) {
+			// "生成"按钮
+			tb.addButton(new ToolbarButton().setIcon("ui-icon-document")
+					.setText("label.generate")
+					.setClick("bs.sync4InfractTrafficsView.generate"));
+
+			// 删除按钮
+			tb.addButton(Toolbar
+					.getDefaultDeleteToolbarButton(getText("label.delete")));
+		}
+
+		// "标记为"按钮
+		ToolbarMenuButton menuButton = new ToolbarMenuButton(
+				getText("label.mark"));
+		menuButton
+				.addMenuItem(
+						getText("label.mark.done",
+								String.valueOf(SyncBase.STATUS_DONE)))
+				.addMenuItem(
+						getText("label.mark.new",
+								String.valueOf(SyncBase.STATUS_NEW)))
+				.setChange("bs.sync4InfractTrafficsView.selectMenuButtonItem");
+		tb.addButton(menuButton);
+
 		// 状态单选按钮组
-				.addButton(
-						Toolbar.getDefaultToolbarRadioGroup(
-								this.getSyncStatuses(), "status", 0,
-								getText("title.click2changeSearchStatus")));
+		tb.addButton(Toolbar.getDefaultToolbarRadioGroup(
+				this.getSyncStatuses(), "status", 0,
+				getText("title.click2changeSearchStatus")));
+
+		// 搜索按钮
+		tb.addButton(Toolbar
+				.getDefaultSearchToolbarButton(getText("title.click2search")));
+
+		return tb;
 	}
 
-	// @Override
-	// protected String getHtmlPageJs() {
-	// return this.getContextPath() + "/bc-business/car/view.js";
-	// }
+	@Override
+	protected String getHtmlPageJs() {
+		return this.getContextPath()
+				+ "/bc-business/sync/sync4InfractTraffics/view.js";
+	}
 }
