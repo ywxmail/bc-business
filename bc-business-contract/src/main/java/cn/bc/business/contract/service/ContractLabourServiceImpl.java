@@ -154,4 +154,15 @@ public class ContractLabourServiceImpl extends DefaultCrudService<Contract4Labou
 		return list;
 	}
 
+	/**
+	 * 根据司机ID查找关联的司机否存在劳动合同
+	 * @parma carManId 
+	 * @return
+	 */
+	public List<Map<String, Object>> findCarManIsExistContract(Long carManId) {
+		List<Map<String, Object>> list = null;
+		list = this.contractLabourDao.findCarManIsExistContract(carManId);
+		return list;
+	}
+
 }

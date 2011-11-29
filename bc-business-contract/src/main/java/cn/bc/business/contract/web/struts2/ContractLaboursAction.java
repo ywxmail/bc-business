@@ -119,7 +119,7 @@ public class ContractLaboursAction extends ViewAction<Map<String, Object>> {
 
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer sql = new StringBuffer();
-		sql.append("select cl.id,c.type_,c.ext_str1,c.ext_str2,c.transactor_name,c.sign_date,c.start_date,c.end_date,c.code,cl.joinDate,cl.insurCode,cl.insurance_type,cl.cert_no,c.author_id,c.ver_major,c.ver_minor,c.op_type,iah.actor_name");
+		sql.append("select cl.id,c.type_,c.status_,c.ext_str1,c.ext_str2,c.transactor_name,c.sign_date,c.start_date,c.end_date,c.code,cl.joinDate,cl.insurCode,cl.insurance_type,cl.cert_no,c.author_id,c.ver_major,c.ver_minor,c.op_type,iah.actor_name");
 		sql.append(",car.id carId");
 		sql.append(",man.id manId");
 		sql.append(" from BS_CONTRACT_LABOUR cl");
@@ -141,6 +141,7 @@ public class ContractLaboursAction extends ViewAction<Map<String, Object>> {
 				int i = 0;
 				map.put("id", rs[i++]);
 				map.put("type_", rs[i++]);
+				map.put("status_", rs[i++]);
 				map.put("ext_str1", rs[i++]);
 				map.put("ext_str2", rs[i++]);
 				map.put("transactor_name", rs[i++]);
@@ -169,6 +170,9 @@ public class ContractLaboursAction extends ViewAction<Map<String, Object>> {
 	protected List<Column> getGridColumns() {
 		List<Column> columns = new ArrayList<Column>();
 		columns.add(new IdColumn4MapKey("cl.id","id"));
+		columns.add(new TextColumn4MapKey("c.status_", "status_",
+				getText("contract.status"), 30).setSortable(true).setValueFormater(
+				new EntityStatusFormater(getEntityStatuses())));
 		columns.add(new TextColumn4MapKey("c.type_", "type_",
 				getText("contract.type"), 60).setSortable(true).setValueFormater(
 				new EntityStatusFormater(getEntityTypes()))); 

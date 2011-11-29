@@ -370,31 +370,65 @@ public class ContractLabourAction extends FileEntityAction<Long, Contract4Labour
 	// 删除
 	@Override
 	public String delete() throws Exception {
-		//TODO 删除最新记录将关联的记录一并删除
-		
 		if (this.getId() != null) {// 删除一条
-			//单个删除中间表carman_contract表
-			this.contractLabourService.deleteCarManNContract(this.getId());
-			//单个删除中间表car_contract表
-			this.contractChargerService.deleteCarNContract(this.getId());
-			//单个删除本表
-			this.getCrudService().delete(this.getId());
-		} else {// 删除一批
+			deleteAll(this.getId());
+		}else{// 删除一批
 			if (this.getIds() != null && this.getIds().length() > 0) {
 				//批量删除中间表car_contract表
-				Long[] contractIds = cn.bc.core.util.StringUtils
-						.stringArray2LongArray(this.getIds().split(","));
-				this.contractLabourService.deleteCarManNContract(contractIds);
-				this.contractChargerService.deleteCarNContract(contractIds);
-				//批量删除本表
 				Long[] ids = cn.bc.core.util.StringUtils
 						.stringArray2LongArray(this.getIds().split(","));
-				this.getCrudService().delete(ids);
-			} else {
+				deleteAll(ids);
+			}else{
 				throw new CoreException("must set property id or ids");
 			}
 		}
 		return "deleteSuccess";
+	}
+	
+	/**
+	 * 单条删除所有历史版本合同
+	 * 
+	 * @return
+	 */
+	public void deleteAll(Long id){
+		Contract c = this.contractLabourService.load(id);
+		//单个删除中间表carman_contract表
+		this.contractLabourService.deleteCarManNContract(id);
+		//单个删除中间表car_contract表
+		this.contractChargerService.deleteCarNContract(id);
+		//单个删除本表
+		this.getCrudService().delete(id);
+		if(c != null && c.getPid() != null){ //如有父级ID,递归删除父级记录
+			deleteAll(c.getPid());
+		}
+	}
+	
+	/**
+	 * 批量删除所有历史版本合同
+	 * 
+	 * @return
+	 */
+	public void deleteAll(Long[] ids){
+		List<Contract> objList = new ArrayList<Contract>();
+		for(Long id : ids){//通过id查找对应的对象并且存放再objList
+			Contract c = this.contractLabourService.load(id);
+			objList.add(c);
+		}
+		//批量删除中间表carman_contract表
+		this.contractLabourService.deleteCarManNContract(ids);
+		//批量删除中间表car_contract表
+		this.contractChargerService.deleteCarNContract(ids);
+		//批量删除本表
+		this.getCrudService().delete(ids);
+		List<Long> idList = new ArrayList<Long>();
+		for(Contract c : objList){//遍历objList里面的对象父级ID是否为空,不为空的放进idList
+			if(c != null && c.getPid() != null){
+				idList.add(c.getPid());
+			}
+		}
+		if(idList != null && idList.size() > 0){ //idList不为空执行递归批量删除方法
+			deleteAll(idList.toArray(new Long [0]));
+		}
 	}
 	
 	/**
@@ -475,15 +509,19 @@ public class ContractLabourAction extends FileEntityAction<Long, Contract4Labour
 	protected PageOption buildFormPageOption() {
 		PageOption option =	super.buildFormPageOption().setWidth(735).setHeight(650);
 		if (!this.isRole()) {
-			option.addButton(new ButtonOption(getText("label.save"), "save"));
-			if(!this.getE().isNew()){
+			ButtonOption buttonOption = new ButtonOption(getText("label.save"), "save");
+			buttonOption.put("id", "bcSaveBtn");
+			option.addButton(buttonOption);
+			if(!this.getE().isNew() && this.getE().getMain() == Contract.MAIN_NOW){
+				ToolbarMenuButton toolbarMenuButton = new ToolbarMenuButton(getText("contract.labour.op"));
+				toolbarMenuButton.setId("bcOpBtn");
+				toolbarMenuButton.addMenuItem(getText("contract.labour.optype.edit"),Contract.OPTYPE_EDIT+"")
+								.addMenuItem(getText("contract.labour.optype.transfer"),Contract.OPTYPE_TRANSFER+"")
+								.addMenuItem(getText("contract.labour.optype.renew"),Contract.OPTYPE_RENEW+"")
+								.addMenuItem(getText("contract.labour.optype.resign"),Contract.OPTYPE_RESIGN+"")
+								.setChange("bc.contractLabourForm.selectMenuButtonItem");
 				option.addButton(
-				    new ToolbarMenuButton(getText("contract.labour.op"))
-				    	.addMenuItem(getText("contract.labour.optype.edit"),Contract.OPTYPE_EDIT+"")
-				    	.addMenuItem(getText("contract.labour.optype.transfer"),Contract.OPTYPE_TRANSFER+"")
-				    	.addMenuItem(getText("contract.labour.optype.renew"),Contract.OPTYPE_RENEW+"")
-				    	.addMenuItem(getText("contract.labour.optype.resign"),Contract.OPTYPE_RESIGN+"")
-				    	.setChange("bc.contractLabourForm.selectMenuButtonItem")
+						toolbarMenuButton
 				);
 			}
 		}
@@ -539,6 +577,18 @@ public class ContractLabourAction extends FileEntityAction<Long, Contract4Labour
 		}
 		if(infoList.size() > 1){
 			json.put("isMore","true");
+		}
+		return "json";
+	}
+	
+	/** 根据车辆ID查找关联的司机否存在劳动合同 */
+	public String isExistContract(){
+		json = new Json();
+		List<Map<String,Object>> list = this.contractLabourService.findCarManIsExistContract(carManId);
+		if(list.size() > 0){
+			json.put("isExistContract", "true");
+		}else{
+			json.put("isExistContract", "false");
 		}
 		return "json";
 	}
