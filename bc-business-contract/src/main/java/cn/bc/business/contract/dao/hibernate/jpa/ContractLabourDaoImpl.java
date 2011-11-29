@@ -465,5 +465,19 @@ public class ContractLabourDaoImpl extends HibernateCrudJpaDao<Contract4Labour> 
 		return list;
 	}
 
+	/**
+	 * 根据司机ID查找关联的司机否存在劳动合同
+	 * @parma carManId 
+	 * @return
+	 */
+	public List<Map<String, Object>> findCarManIsExistContract(Long carManId) {
+		List<Map<String,Object>> list = null;
+		String sql = "select  c.* from BS_CONTRACT c"+
+					" inner join BS_CARMAN_CONTRACT cc ON c.id = cc.contract_id where cc.man_id="+carManId;
+		
+		list = this.jdbcTemplate.queryForList(sql);
+		return list;
+	}
+
 
 }
