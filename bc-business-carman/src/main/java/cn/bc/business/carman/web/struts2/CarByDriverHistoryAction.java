@@ -118,8 +118,7 @@ public class CarByDriverHistoryAction extends
 	@Override
 	public String edit() throws Exception {
 		String result = super.edit();
-		// CarByDriverHistory e = new CarByDriverHistory();
-		// e = this.getCrudService().load(this.getE().getId());
+		moveTypeValueList = this.getMoveType();
 		this.motorcadeList = this.motorcadeService.find4Option();
 		return this.getFormName(this.getE().getMoveType());
 	}

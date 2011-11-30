@@ -257,12 +257,6 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 	}
 
 	@Override
-	protected String[] getGridSearchFields() {
-		return new String[] { "c.plate_type", "c.plate_no", "b.name",
-				"d.classes" };
-	}
-
-	@Override
 	protected String getFormActionName() {
 		return "carByDriverHistory";
 	}
@@ -276,6 +270,13 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 	@Override
 	protected String getGridRowLabelExpression() {
 		return "['plate'] ";
+	}
+
+	@Override
+	protected String[] getGridSearchFields() {
+		return new String[] { "m.name", "nc.plate_type", "nc.plate_no",
+				"nm.name", "d.to_unit", "oc.plate_type", "oc.plate_no",
+				"om.name", "d.from_unit", "m.cert_fwzg" };
 	}
 
 	@Override
@@ -367,8 +368,18 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 	protected Toolbar getHtmlPageToolbar() {
 		Toolbar tb = new Toolbar();
 
-		tb.addButton(new ToolbarButton().setIcon("ui-icon-document")
-				.setText("新建").setClick("bc.business.MoveTypeList.select"));
+		tb.addButton(
+				new ToolbarButton().setIcon("ui-icon-document").setText("新建")
+						.setClick("bc.business.MoveTypeList.select"))
+				.addButton(
+						new ToolbarButton().setIcon("ui-icon-pencil")
+								.setText("编辑").setAction("edit"))
+				.addButton(
+						new ToolbarButton().setIcon("ui-icon-trash")
+								.setText("删除").setAction("delete"))
+				.addButton(
+						Toolbar.getDefaultSearchToolbarButton(getText("title.click2search")));
+
 		return tb;
 	}
 
