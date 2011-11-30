@@ -82,6 +82,13 @@ public interface ContractLabourService extends CrudService<Contract4Labour> {
 
 	List<Map<String, Object>> selectRelateCarManByCarId(Long carId);
 
+	/**
+	 * 根据司机ID查找关联的司机否存在劳动合同
+	 * @parma carManId 
+	 * @return
+	 */
+	List<Map<String, Object>> findCarManIsExistContract(Long carManId);
+
 
 
 }

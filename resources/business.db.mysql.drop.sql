@@ -4,14 +4,28 @@
 -- 数据转换记录
 drop table if exists DC_RECORD;
 
+-- 同步记录
+drop table if exists BS_SYNC_JIAOWEI_JTWF;
+drop table if exists BS_SYNC_JINDUN_JTWF;
+
 -- 黑名单
 drop table if exists BS_BLACKLIST;
 
 -- 合同
+drop table if exists BS_INDUSTRIAL_INJURY;
 drop table if exists BS_CARMAN_CONTRACT;
+drop table if exists BS_CAR_CONTRACT;
 drop table if exists BS_CONTRACT_LABOUR;
 drop table if exists BS_CONTRACT_CHARGER;
 drop table if exists BS_CONTRACT;
+
+-- 营运事件
+DROP TABLE IF EXISTS BS_CASE_ADVICE;
+DROP TABLE IF EXISTS BS_CASE_PRAISE;
+DROP TABLE IF EXISTS BS_CASE_ACCIDENT;
+DROP TABLE IF EXISTS BS_CASE_INFRACT_TRAFFIC;
+DROP TABLE IF EXISTS BS_CASE_INFRACT_BUSINESS;
+DROP TABLE IF EXISTS BS_CASE_BASE;
 
 -- 司机迁移历史
 drop table if exists BS_CARMAN_HISTORY;

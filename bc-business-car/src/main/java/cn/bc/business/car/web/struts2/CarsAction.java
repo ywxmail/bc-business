@@ -31,6 +31,7 @@ import cn.bc.web.ui.html.grid.IdColumn4MapKey;
 import cn.bc.web.ui.html.grid.TextColumn4MapKey;
 import cn.bc.web.ui.html.page.PageOption;
 import cn.bc.web.ui.html.toolbar.Toolbar;
+import cn.bc.web.ui.html.toolbar.ToolbarMenuButton;
 import cn.bc.web.ui.json.Json;
 
 /**
@@ -68,7 +69,7 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer sql = new StringBuffer();
-		sql.append("select c.id,c.status_,c.plate_type,c.plate_no,c.driver,c.charger,c.factory_type,c.factory_model");
+		sql.append("select c.id,c.status_,c.plate_type,c.plate_no,c.engine_no,c.driver,c.charger,c.factory_type,c.factory_model");
 		sql.append(",c.cert_no2,c.register_date,c.bs_type,c.code,c.origin_no,c.vin");
 		sql.append(",c.motorcade_id,m.name");
 		sql.append(" from bs_car c");
@@ -87,6 +88,7 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 				map.put("status_", rs[i++]);
 				map.put("plate_type", rs[i++]);
 				map.put("plate_no", rs[i++]);
+				map.put("engine_no", rs[i++]);
 				map.put("driver", rs[i++]);
 				map.put("charger", rs[i++]);
 				map.put("factory_type", rs[i++]);
@@ -143,6 +145,8 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 								+ car.get("plate_no");
 					}
 				}));
+		columns.add(new TextColumn4MapKey("c.engine_no", "engine_no",
+				getText("car.engineNo"), 80));
 		columns.add(new TextColumn4MapKey("c.bs_type", "bs_type",
 				getText("car.businessType"), 100));
 		columns.add(new TextColumn4MapKey("c.origin_no", "origin_no",
@@ -226,9 +230,23 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 	@Override
 	protected Toolbar getHtmlPageToolbar() {
 		return super.getHtmlPageToolbar()
+				// 状态单选按钮组
 				.addButton(
 						Toolbar.getDefaultToolbarRadioGroup(
 								this.getBSStatuses1(), "status", 0,
-								getText("title.click2changeSearchStatus")));
+								getText("title.click2changeSearchStatus")))
+				// 辅助操作
+				.addButton(
+						new ToolbarMenuButton("辅助操作")
+								.addMenuItem("金盾网交通违法查询：跳转",
+										"jinDun-jiaoTongWeiFa")
+								.addMenuItem("金盾网交通违法查询：抓取",
+										"jinDun-jiaoTongWeiFa-spider")
+								.setChange("bs.carView.selectMenuButtonItem"));
+	}
+
+	@Override
+	protected String getHtmlPageJs() {
+		return this.getContextPath() + "/bc-business/car/view.js";
 	}
 }

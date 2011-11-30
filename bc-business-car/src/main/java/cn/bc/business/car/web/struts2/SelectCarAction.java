@@ -26,6 +26,7 @@ import cn.bc.web.formater.AbstractFormater;
 import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.struts2.AbstractSelectPageAction;
 import cn.bc.web.ui.html.grid.Column;
+import cn.bc.web.ui.html.grid.HiddenColumn4MapKey;
 import cn.bc.web.ui.html.grid.IdColumn4MapKey;
 import cn.bc.web.ui.html.grid.TextColumn4MapKey;
 import cn.bc.web.ui.html.page.HtmlPage;
@@ -40,7 +41,8 @@ import cn.bc.web.ui.json.Json;
  */
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 @Controller
-public class SelectCarAction extends AbstractSelectPageAction<Map<String, Object>> {
+public class SelectCarAction extends
+		AbstractSelectPageAction<Map<String, Object>> {
 	private static final long serialVersionUID = 1L;
 	public String status = String.valueOf(Entity.STATUS_ENABLED); // 车辆的状态，多个用逗号连接
 
@@ -87,7 +89,7 @@ public class SelectCarAction extends AbstractSelectPageAction<Map<String, Object
 	@Override
 	protected List<Column> getGridColumns() {
 		List<Column> columns = new ArrayList<Column>();
-		columns.add(new IdColumn4MapKey("c.id","id"));
+		columns.add(new IdColumn4MapKey("c.id", "id"));
 		columns.add(new TextColumn4MapKey("c.plate_no", "plate_no",
 				getText("car.plate"), 80).setUseTitleFromLabel(true)
 				.setValueFormater(new AbstractFormater<String>() {
@@ -105,6 +107,7 @@ public class SelectCarAction extends AbstractSelectPageAction<Map<String, Object
 		columns.add(new TextColumn4MapKey("m.name", "motorcade_name",
 				getText("car.motorcade")).setSortable(true)
 				.setUseTitleFromLabel(true));
+		columns.add(new HiddenColumn4MapKey("motorcadeId", "['motorcade_id']"));
 		return columns;
 	}
 
@@ -130,7 +133,8 @@ public class SelectCarAction extends AbstractSelectPageAction<Map<String, Object
 
 	@Override
 	protected HtmlPage buildHtmlPage() {
-		return super.buildHtmlPage().setNamespace(this.getHtmlPageNamespace() + "/selectCar");
+		return super.buildHtmlPage().setNamespace(
+				this.getHtmlPageNamespace() + "/selectCar");
 	}
 
 	@Override

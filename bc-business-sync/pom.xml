@@ -1,0 +1,37 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>cn.bc.business</groupId>
+		<artifactId>bc-business-parent</artifactId>
+		<version>0.2-SNAPSHOT</version>
+		<relativePath>../bc-business-parent/pom.xml</relativePath>
+	</parent>
+	<artifactId>bc-business-sync</artifactId>
+	<description>接口同步</description>
+	<dependencies>
+		<!-- 平台的模块 -->
+		<dependency>
+			<groupId>cn.bc</groupId>
+			<artifactId>bc-sync</artifactId>
+			<version>${framework.version}</version>
+		</dependency>
+		
+		<!-- 本子系统的公共模块 -->
+		<dependency>
+			<groupId>cn.bc.business</groupId>
+			<artifactId>bc-business-base</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>cn.bc.business</groupId>
+			<artifactId>bc-business-ws</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>cn.bc.business</groupId>
+			<artifactId>bc-business-spider</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+	</dependencies>
+</project>
