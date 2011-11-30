@@ -14,6 +14,13 @@
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>
 		</dependency>
+		
+		<!-- 平台的模块 -->
+		<dependency>
+			<groupId>cn.bc</groupId>
+			<artifactId>bc-sync</artifactId>
+			<version>${framework.version}</version>
+		</dependency>
 
 		<!-- 本子系统的公共模块 -->
 		<dependency>

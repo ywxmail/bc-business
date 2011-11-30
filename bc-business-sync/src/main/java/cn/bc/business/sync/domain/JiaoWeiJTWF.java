@@ -17,8 +17,8 @@ import cn.bc.sync.domain.SyncBase;
  * @author dragon
  */
 @Entity
-@Table(name = "BS_SYNC_INFRACT_TRAFFIC")
-public class Sync4InfractTraffic extends SyncBase {
+@Table(name = "BS_SYNC_JIAOWEI_JTWF")
+public class JiaoWeiJTWF extends SyncBase {
 	private static final long serialVersionUID = 1L;
 	/** UUID的前缀，实际的uid使用KEY_UID + "-" + id */
 	public static final String KEY_UID = SyncBase.class.getSimpleName();

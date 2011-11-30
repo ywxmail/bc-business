@@ -165,12 +165,13 @@ public class JinDunSpider4JiaoTongWeiFaAction extends
 
 	@Override
 	protected List<Map<String, Object>> findList() {
-		Map<String, List<Map<String, Object>>> map = bsSpiderService
-				.findJinDunJiaoTongWeiZhang(carIds);
-		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
-		for (Entry<String, List<Map<String, Object>>> e : map.entrySet()) {
-			list.addAll(e.getValue());
-		}
-		return list;
+//		Map<String, List<Map<String, Object>>> map = bsSpiderService
+//				.findJinDunJiaoTongWeiZhang(carIds);
+//		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
+//		for (Entry<String, List<Map<String, Object>>> e : map.entrySet()) {
+//			list.addAll(e.getValue());
+//		}
+//		return list;
+		return null;
 	}
 }

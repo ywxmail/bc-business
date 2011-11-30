@@ -13,5 +13,5 @@
         http://www.springframework.org/schema/aop/spring-aop-3.0.xsd">
 
 	<!-- WSMiddle的WebService接口实现 -->
-	<bean id="bsSpiderService" class="cn.bc.business.spider.service.BsSpiderServiceImpl"/>
+	<bean id="spider4JinDunJTWF" class="cn.bc.business.spider.Spider4JinDunJTWF"/>
 </beans>

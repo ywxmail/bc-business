@@ -3,14 +3,16 @@ package cn.bc.business.sync.service;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import cn.bc.business.sync.domain.Sync4InfractTraffic;
+import cn.bc.business.spider.Spider4JinDunJTWF;
+import cn.bc.business.spider.domain.JinDunJTWF;
+import cn.bc.business.sync.domain.JiaoWeiJTWF;
 import cn.bc.business.ws.service.WSMiddle;
-import cn.bc.core.service.DefaultCrudService;
 import cn.bc.identity.domain.ActorHistory;
 import cn.bc.option.service.OptionService;
 import cn.bc.sync.domain.SyncBase;
@@ -24,13 +26,11 @@ import cn.bc.web.ws.dotnet.Row;
  * @author rongjih
  * 
  */
-public class Sync4InfractTrafficServiceImpl extends
-		DefaultCrudService<Sync4InfractTraffic> implements
-		Sync4InfractTrafficService {
-	protected final Log logger = LogFactory
-			.getLog(Sync4InfractTrafficServiceImpl.class);
+public class BsSyncServiceImpl implements BsSyncService {
+	protected final Log logger = LogFactory.getLog(BsSyncServiceImpl.class);
 	private OptionService optionService;
 	private WSMiddle wsMiddle;// 交委接口
+	private Spider4JinDunJTWF spider4JinDunJTWF;// 金盾交通违法抓取器
 	private SyncBaseService syncBaseService;
 
 	@Autowired
@@ -44,12 +44,17 @@ public class Sync4InfractTrafficServiceImpl extends
 	}
 
 	@Autowired
+	public void setSpider4JinDunJTWF(Spider4JinDunJTWF spider4JinDunJTWF) {
+		this.spider4JinDunJTWF = spider4JinDunJTWF;
+	}
+
+	@Autowired
 	public void setSyncBaseService(SyncBaseService syncBaseService) {
 		this.syncBaseService = syncBaseService;
 	}
 
-	public int doSync(ActorHistory syncer, Calendar fromDate, Calendar toDate,
-			StringBuffer strMsg) {
+	public int doSync4JiaoWeiJTWF(ActorHistory syncer, Calendar fromDate,
+			Calendar toDate, StringBuffer strMsg) {
 		// 交委接口的宝城企业ID
 		String jiaoWei_qyid_baocheng = this.optionService.getItemValue("sync",
 				"jiaowei.ws.qyid.baocheng");
@@ -68,15 +73,16 @@ public class Sync4InfractTrafficServiceImpl extends
 			return 0;
 
 		// 循环每一条数据作处理
-		Sync4InfractTraffic domain;
+		JiaoWeiJTWF domain;
 		Calendar now = Calendar.getInstance();
 		ActorHistory author = syncer;
-		String syncType = Sync4InfractTraffic.class.getSimpleName();
+		String syncType = JiaoWeiJTWF.class.getSimpleName();
 		String syncFrom = jiaoWei_ws_uri + "#" + jiaoWei_ws_method;
 		List<SyncBase> toSaveDomains = new ArrayList<SyncBase>();
 		if (dataSet.getRows() != null) {
 			for (Row row : dataSet.getRows()) {
-				domain = rowToDomain(row, author, now, syncFrom, syncType);
+				domain = dataSetRow2JiaoWeiJTWF(row, author, now, syncFrom,
+						syncType);
 				if (!this.syncBaseService.hadSync(syncType,
 						domain.getSyncCode())) {// 没有同步过的记录
 					toSaveDomains.add(domain);
@@ -94,7 +100,7 @@ public class Sync4InfractTrafficServiceImpl extends
 	}
 
 	/**
-	 * 根据同步数据生成相应的Domain
+	 * 数据集行数据到交委交通违法信息的转换
 	 * 
 	 * @param row
 	 * @param author
@@ -103,11 +109,11 @@ public class Sync4InfractTrafficServiceImpl extends
 	 * @param syncType
 	 * @return
 	 */
-	private Sync4InfractTraffic rowToDomain(Row row, ActorHistory author,
+	private JiaoWeiJTWF dataSetRow2JiaoWeiJTWF(Row row, ActorHistory author,
 			Calendar createDate, String syncFrom, String syncType) {
-		Sync4InfractTraffic domain = new Sync4InfractTraffic();
+		JiaoWeiJTWF domain = new JiaoWeiJTWF();
 		domain.setAuthor(author);
-		domain.setStatus(Sync4InfractTraffic.STATUS_NEW);
+		domain.setStatus(JiaoWeiJTWF.STATUS_NEW);
 		domain.setSyncDate(createDate);
 		domain.setSyncType(syncType);
 		domain.setSyncFrom(syncFrom);
@@ -122,5 +128,78 @@ public class Sync4InfractTrafficServiceImpl extends
 		domain.setJeom(Float.parseFloat(row.getCellStringValue("本次扣分")));
 
 		return domain;
+	}
+
+	public int doSync4JinDunJTWF(ActorHistory syncer,
+			List<Map<String, Object>> cars, StringBuffer strMsg) {
+		if (logger.isDebugEnabled()) {
+			logger.debug("cars=" + cars);
+		}
+
+		boolean hasError = false;
+		List<JinDunJTWF> all = new ArrayList<JinDunJTWF>();
+
+		// 循环每台车执行抓取
+		this.spider4JinDunJTWF.setSyncer(syncer);
+		this.spider4JinDunJTWF.setCarType("02");
+		for (Map<String, Object> car : cars) {
+			this.spider4JinDunJTWF.setCarPlate(car.get("plateType").toString()
+					+ car.get("plateNo").toString());
+			if (car.get("engineNo") != null) {
+				this.spider4JinDunJTWF.setEngineNo(car.get("engineNo")
+						.toString());
+			} else {
+				logger.warn("车辆'" + car.get("plateType").toString()
+						+ car.get("plateNo").toString() + "'没有设置发动机号，忽略抓取！");
+			}
+
+			try {
+				all.addAll(this.spider4JinDunJTWF.excute());
+			} catch (Exception e) {
+				// 抓取异常就停止
+				logger.error(e.getMessage());
+				hasError = true;
+			}
+		}
+
+		if (all.isEmpty())
+			return 0;
+
+		// 获取新的记录
+		List<SyncBase> news = new ArrayList<SyncBase>();
+		List<SyncBase> olds = new ArrayList<SyncBase>();
+		String syncType = JinDunJTWF.class.getSimpleName();
+		for (JinDunJTWF jtwf : all) {
+			if (!this.syncBaseService.hadSync(syncType, jtwf.getSyncCode())) {
+				news.add(jtwf);
+			} else {
+				olds.add(jtwf);
+			}
+		}
+
+		// 如果抓取没有异常，就将所有现有的其他未处理记录设置为已处理
+		if (!hasError) {
+			List<String> newSyncCodes = new ArrayList<String>();
+			for (SyncBase syncBase : news) {
+				newSyncCodes.add(syncBase.getSyncCode());
+			}
+			this.syncBaseService.updateNewStatus2Done4ExcludeCode(syncType,
+					newSyncCodes);
+		}
+
+		// 将已经存在的旧记录的状态更新为未处理
+		if (!olds.isEmpty()) {
+			List<String> oldSyncCodes = new ArrayList<String>();
+			for (SyncBase syncBase : olds) {
+				oldSyncCodes.add(syncBase.getSyncCode());
+			}
+			this.syncBaseService.updateStatus2New(syncType, oldSyncCodes);
+		}
+
+		// 保存新增的记录
+		if (!news.isEmpty())
+			this.syncBaseService.save(news);
+
+		return news.size();
 	}
 }

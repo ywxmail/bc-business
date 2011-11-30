@@ -14,7 +14,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.orm.jpa.JpaTemplate;
 
 import cn.bc.business.car.domain.Car;
-import cn.bc.business.spider.JinDunSpider4JiaoTongWeiFa;
+import cn.bc.business.spider.Spider4JinDunJTWF;
+import cn.bc.business.spider.domain.JinDunJTWF;
 import cn.bc.core.cache.Cache;
 import cn.bc.core.query.condition.Direction;
 import cn.bc.core.query.condition.impl.AndCondition;
@@ -35,7 +36,7 @@ public class BsSpiderServiceImpl implements BsSpiderService {
 	private static Log logger = LogFactory.getLog(BsSpiderServiceImpl.class);
 	private final static String CACHE_KEY_JINDUN_JTWZ = "JinDunJiaoTongWeiZhang";
 	private Cache cache;
-	private JinDunSpider4JiaoTongWeiFa jinDunSpider4JiaoTongWeiFa;
+	private Spider4JinDunJTWF spider4JinDunJTWF;
 	private JpaTemplate jpaTemplate;
 
 	public JpaTemplate getJpaTemplate() {
@@ -53,26 +54,27 @@ public class BsSpiderServiceImpl implements BsSpiderService {
 		this.cache = cache;
 	}
 
-	public Map<String, List<Map<String, Object>>> findJinDunJiaoTongWeiZhang(
-			String carIds) {
-		Map<String, List<Map<String, Object>>> all = findAll();
+	public List<JinDunJTWF> findJinDunJiaoTongWeiZhang(String carIds) {
+		List<JinDunJTWF> all = findAll();
 
 		if (carIds == null || carIds.length() == 0)
 			return all;
 
 		String[] ids = carIds.split(",");
-		Map<String, List<Map<String, Object>>> need = new HashMap<String, List<Map<String, Object>>>();
+		List<JinDunJTWF> need = new ArrayList<JinDunJTWF>();
 		for (String id : ids) {
-			if (all.containsKey(id))
-				need.put(id, all.get(id));
+			for (JinDunJTWF jtwf : all) {
+				if (jtwf.getCarPlate().equalsIgnoreCase(""))
+					need.add(jtwf);
+			}
 		}
 		return need;
 	}
 
-	public Map<String, List<Map<String, Object>>> findAll() {
+	public List<JinDunJTWF> findAll() {
 		if (cache.get(CACHE_KEY_JINDUN_JTWZ) == null) {
 			logger.warn("Find all from jinDun and cache them.");
-			Map<String, List<Map<String, Object>>> all = this.doSpider();
+			List<JinDunJTWF> all = this.doSpider();
 			cache.put(CACHE_KEY_JINDUN_JTWZ, all);
 			return all;
 		} else {
@@ -82,9 +84,9 @@ public class BsSpiderServiceImpl implements BsSpiderService {
 		}
 	}
 
-	private Map<String, List<Map<String, Object>>> doSpider() {
-		if (jinDunSpider4JiaoTongWeiFa == null) {
-			jinDunSpider4JiaoTongWeiFa = new JinDunSpider4JiaoTongWeiFa();
+	private List<JinDunJTWF> doSpider() {
+		if (spider4JinDunJTWF == null) {
+			spider4JinDunJTWF = new Spider4JinDunJTWF();
 		}
 
 		// 获取所有在案车辆的信息
@@ -99,56 +101,58 @@ public class BsSpiderServiceImpl implements BsSpiderService {
 			logger.warn("在案车辆数=" + all.size());
 		}
 
-		Map<String, List<Map<String, Object>>> all4Map = new LinkedHashMap<String, List<Map<String, Object>>>();
+		List<JinDunJTWF> all4Map = new ArrayList<JinDunJTWF>();
 
 		// 循环每部车从金盾网获取未处理的交通违法信息
-		List<Map<String, Object>> details;
-		Map<String, Object> detail;
-		int i = 0, j = 0;
-		Date fromDate = new Date();
-		try {
-			String plateNo, engineNo;
-			for (Map<String, Object> one : all) {
-				j++;
-				plateNo = one.get("plate_no").toString();
-				engineNo = one.get("engine_no") != null ? one.get("engine_no")
-						.toString() : null;
-				if (engineNo == null || engineNo.length() < 4) {
-					logger.warn("不规范的机动车号，忽略不处理：plateNo=" + plateNo);
-					continue;
-				}
-				List<Map<String, Object>> jtwf = jinDunSpider4JiaoTongWeiFa
-						.setPlateNo(plateNo).setEngineNo(engineNo).excute();
-
-				if (jtwf != null && !jtwf.isEmpty()) {
-					details = new ArrayList<Map<String, Object>>();
-					for (Map<String, Object> map : jtwf) {
-						detail = new LinkedHashMap<String, Object>();
-						details.add(detail);
-
-						// 合并one和map到detail
-						detail.putAll(one);
-						detail.putAll(map);
-						if (logger.isInfoEnabled()) {
-							logger.info((i++) + ":" + detail);
-						}
-					}
-					all4Map.put(one.get("id").toString(), details);
-				} else {
-					if (logger.isDebugEnabled()) {
-						logger.debug(j + ":" + one.get("plate_no")
-								+ " 没有未处理的交通违法信息");
-					}
-				}
-			}
-		} catch (Exception e) {
-			// 产生异常就终止抓取
-			logger.error("连接异常，终止了连接(toNum=" + j + ")。" + e.getMessage(), e);
-		}
-		if (logger.isWarnEnabled()) {
-			logger.warn("从金盾网获取在案车辆的未处理交通违法信息总耗时："
-					+ DateUtils.getWasteTime(fromDate));
-		}
+//		List<JinDunJTWF> details;
+//		Map<String, Object> detail;
+//		int i = 0, j = 0;
+//		Date fromDate = new Date();
+//		try {
+//			String plateNo, engineNo;
+//			for (Map<String, Object> one : all) {
+//				j++;
+//				plateNo = one.get("plate_no").toString();
+//				engineNo = one.get("engine_no") != null ? one.get("engine_no")
+//						.toString() : null;
+//				if (engineNo == null || engineNo.length() < 4) {
+//					logger.warn("不规范的机动车号，忽略不处理：plateNo=" + plateNo);
+//					continue;
+//				}
+//				spider4JinDunJTWF.setCarPlate(plateNo);
+//				spider4JinDunJTWF.setEngineNo(engineNo);
+//				spider4JinDunJTWF.setCarType("02");
+//				Map<String, JinDunJTWF> jtwfs = spider4JinDunJTWF.excute();
+//
+//				if (jtwfs != null && !jtwfs.isEmpty()) {
+//					details = new ArrayList<JinDunJTWF>();
+//					for (JinDunJTWF map : jtwfs.values()) {
+//						detail = new LinkedHashMap<String, Object>();
+//						details.add(detail);
+//
+//						// 合并one和map到detail
+//						detail.putAll(one);
+//						detail.putAll(map);
+//						if (logger.isInfoEnabled()) {
+//							logger.info((i++) + ":" + detail);
+//						}
+//					}
+//					all4Map.put(one.get("id").toString(), details);
+//				} else {
+//					if (logger.isDebugEnabled()) {
+//						logger.debug(j + ":" + one.get("plate_no")
+//								+ " 没有未处理的交通违法信息");
+//					}
+//				}
+//			}
+//		} catch (Exception e) {
+//			// 产生异常就终止抓取
+//			logger.error("连接异常，终止了连接(toNum=" + j + ")。" + e.getMessage(), e);
+//		}
+//		if (logger.isWarnEnabled()) {
+//			logger.warn("从金盾网获取在案车辆的未处理交通违法信息总耗时："
+//					+ DateUtils.getWasteTime(fromDate));
+//		}
 
 		return all4Map;
 	}

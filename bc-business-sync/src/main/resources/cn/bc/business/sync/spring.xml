@@ -13,12 +13,19 @@
         http://www.springframework.org/schema/aop/spring-aop-3.0.xsd">
 
 	<!-- 需要在主配置文件配置entityManagerFactory和transactionManager的实现 -->
-
-	<!-- sync4InfractTraffic -->
-	<bean id="sync4InfractTrafficDao" class="cn.bc.orm.hibernate.jpa.HibernateCrudJpaDao"
-		p:entityClass="cn.bc.business.sync.domain.Sync4InfractTraffic"
-		p:entityManagerFactory-ref="entityManagerFactory" />
-	<bean id="sync4InfractTrafficService"
-		class="cn.bc.business.sync.service.Sync4InfractTrafficServiceImpl"
-		p:crudDao-ref="sync4InfractTrafficDao" />
+	<!-- bsSyncService -->
+	<aop:config>
+		<!-- http://static.springsource.org/spring/docs/3.0.x/spring-framework-reference/html/aop.html#aop-pointcuts
+			包或实现类使用within关键字，接口实现使用this关键字
+		 -->
+		<aop:pointcut id="bsSyncServiceMethod"
+			expression="this(cn.bc.business.sync.service.BsSyncService)" />
+		<aop:advisor pointcut-ref="bsSyncServiceMethod" advice-ref="bsSyncServiceTxAdvice" />
+	</aop:config>
+	<tx:advice id="bsSyncServiceTxAdvice" transaction-manager="transactionManager">
+		<tx:attributes>
+			<tx:method name="do*" propagation="REQUIRED" read-only="false" />
+		</tx:attributes>
+	</tx:advice>
+	<bean id="bsSyncService" class="cn.bc.business.sync.service.BsSyncServiceImpl" />
 </beans>
