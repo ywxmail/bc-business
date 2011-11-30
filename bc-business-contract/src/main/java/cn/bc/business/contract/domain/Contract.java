@@ -28,9 +28,45 @@ public class Contract extends RichFileEntityImpl {
 	public static final int TYPE_LABOUR 	= 1;
 	/**合同类型：责任人合同*/
 	public static final int TYPE_CHARGER 	= 2;
+	
+	/**状态：正常*/
+	public static final int STATUS_NORMAL	= 0;
+	/**状态：失效*/
+	public static final int STATUS_FAILURE	= 1;
+	/**状态：离职*/
+	public static final int STATUS_RESGIN	= 2;
+	
+	/**操作类型  新建*/
+	public static final int OPTYPE_CREATE	= 1;
+	/**操作类型  维护*/
+	public static final int OPTYPE_EDIT		= 2;
+	/**操作类型 转车*/
+	public static final int OPTYPE_TRANSFER	= 3;
+	/**操作类型  续约*/
+	public static final int OPTYPE_RENEW	= 4;
+	/**操作类型  离职*/
+	public static final int OPTYPE_RESIGN	= 5;
+	
+	/**主版本号默认值*/
+	public static final int MAJOR_DEFALUT	= 1;
+	/**次版本号默认值*/
+	public static final int MINOR_DEFALUT	= 0;
+	
+	/**主体当前版本*/
+	public static final int MAIN_NOW	    = 0;
+	/**主体历史版本*/
+	public static final int MAIN_HISTORY 	= 1;
+	
 
 	private String code;// 合同编号
 	private int    type;// 合同类型：如劳动合同、承包合同等
+	private Long   Pid;// 父级ID
+	private Integer verMajor;//主版本号
+	private Integer verMinor;//次版本号
+	private int     main; //主体： 0-当前版本,1-历史版本
+	private String  patchNo;//批号 
+	private int     opType; //操作类型：1-新建,2-维护,3-转车,4-续约,5-离职
+	
 	private String wordNo;// 文书号
 	private Long transactorId;// 经办人ID
 	private String transactorName;// 经办人姓名
@@ -71,6 +107,58 @@ public class Contract extends RichFileEntityImpl {
 
 	public void setType(int type) {
 		this.type = type;
+	}
+
+	public Long getPid() {
+		return Pid;
+	}
+
+	public void setPid(Long pid) {
+		Pid = pid;
+	}
+
+	@Column(name = "VER_MAJOR")
+	public Integer getVerMajor() {
+		return verMajor;
+	}
+
+	public void setVerMajor(Integer verMajor) {
+		this.verMajor = verMajor;
+	}
+
+	@Column(name = "VER_MINOR")
+	public Integer getVerMinor() {
+		return verMinor;
+	}
+
+	public void setVerMinor(Integer verMinor) {
+		this.verMinor = verMinor;
+	}
+
+	public int getMain() {
+		return main;
+	}
+
+	public void setMain(int main) {
+		this.main = main;
+	}
+
+	@Column(name = "PATCH_NO")
+	public String getPatchNo() {
+		return patchNo;
+	}
+
+	public void setPatchNo(String patchNo) {
+		this.patchNo = patchNo;
+	}
+
+	@Column(name = "OP_TYPE")
+	public int getOpType() {
+		return opType;
+	}
+
+	public void setOpType(int opType) {
+		this.opType = opType;
 	}
 
 	@Column(name = "TRANSACTOR_ID")
