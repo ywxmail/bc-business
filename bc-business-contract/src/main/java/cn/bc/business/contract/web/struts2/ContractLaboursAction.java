@@ -380,9 +380,7 @@ public class ContractLaboursAction extends ViewAction<Map<String, Object>> {
 		if (contractId != null) {
 			idCondition = new EqualsCondition("c.id", contractId);
 		}
-		//return ConditionUtils.mix2AndCondition(statusCondition,mainsCondition,pIdCondition);
-		//测试用
-		return ConditionUtils.mix2AndCondition(statusCondition,idCondition);
+		return ConditionUtils.mix2AndCondition(statusCondition,mainsCondition,idCondition);
 	}
 	
 	@Override

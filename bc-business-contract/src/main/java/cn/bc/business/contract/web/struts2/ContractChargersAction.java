@@ -15,7 +15,6 @@ import org.springframework.stereotype.Controller;
 
 import cn.bc.business.contract.domain.Contract;
 import cn.bc.business.web.struts2.ViewAction;
-import cn.bc.core.Entity;
 import cn.bc.core.query.condition.Direction;
 import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.core.util.StringUtils;
@@ -42,7 +41,7 @@ import cn.bc.web.ui.json.Json;
 @Controller
 public class ContractChargersAction extends ViewAction<Map<String, Object>> {
 	private static final long serialVersionUID = 1L;
-	public String status = String.valueOf(Entity.STATUS_ENABLED)+","+String.valueOf(Entity.STATUS_DISABLED); // 交通违章的状态，多个用逗号连接
+	public String status = String.valueOf(Contract.STATUS_NORMAL);
 	public String type = String.valueOf(Contract.TYPE_CHARGER);
 
 	@Override
