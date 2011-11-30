@@ -5,7 +5,8 @@
 drop table if exists DC_RECORD;
 
 -- 同步记录
-drop table if exists BS_SYNC_INFRACT_TRAFFIC;
+drop table if exists BS_SYNC_JIAOWEI_JTWF;
+drop table if exists BS_SYNC_JINDUN_JTWF;
 
 -- 黑名单
 drop table if exists BS_BLACKLIST;
