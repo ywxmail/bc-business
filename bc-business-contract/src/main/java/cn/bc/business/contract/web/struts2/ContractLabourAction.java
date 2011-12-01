@@ -302,7 +302,7 @@ public class ContractLabourAction extends FileEntityAction<Long, Contract4Labour
 			saveSwitch(true);
 		}else{
 			saveSwitch(false);
-			if(this.getE().getOpType() == Contract.OPTYPE_RESIGN){
+			if(this.getE().getOpType() == Contract.OPTYPE_RESIGN){	//提示离职成功信息
 				json = new Json();
 				json.put("id",  this.getE().getId()+"");
 				json.put("msg", getText("contract.labour.resign.success"));
@@ -355,10 +355,11 @@ public class ContractLabourAction extends FileEntityAction<Long, Contract4Labour
 			if(e.getPid() != null){
 				Contract4Labour oldE = contractLabourService.load(e.getPid());
 				if(oldE != null){
-					if(e.getOpType() == Contract.OPTYPE_RENEW){	//如果是续约操作类型,把旧的合同状态改为注销并保存
-						oldE.setStatus(Contract.STATUS_FAILURE);
-					}
-					oldE.setMain(Contract.MAIN_HISTORY);
+//					if(e.getOpType() != Contract.OPTYPE_RENEW){	//如果是续约操作类型,把旧的合同状态改为注销并保存
+//						oldE.setStatus(Contract.STATUS_FAILURE);
+//					}
+					oldE.setStatus(Contract.STATUS_FAILURE); //把旧的合同状态改为注销并保存
+					oldE.setMain(Contract.MAIN_HISTORY); //设定为历史标识
 					//保存旧的记录
 					this.getCrudService().save(oldE);
 				}
