@@ -29,19 +29,19 @@ public class JiaoTongWeiZhangWSTest extends WSBaseConfig {
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("qyid", id4baoCheng);
 		//日期格式不能带时分秒
-		params.put("StartTime", "2011-01-01");// 起始日期
-		params.put("EndTime", "2011-01-31");// 结束日期
+		params.put("StartTime", "2011-11-01");// 起始日期
+		params.put("EndTime", "2011-11-30");// 结束日期
 		params.put("strMsg", "");
 		return params;
 	}
 
 	@Test
 	public void test() {
-//		DataSet dataSet = this.runWs4DataSet();
-//		Assert.assertNotNull(dataSet);
-//		Assert.assertNotNull(dataSet.getRows());
-//		Assert.assertTrue(!dataSet.getRows().isEmpty());
-//		System.out.println(dataSet);
-//		//System.out.println(this.runWs4Xml());
+		DataSet dataSet = this.runWs4DataSet();
+		Assert.assertNotNull(dataSet);
+		Assert.assertNotNull(dataSet.getRows());
+		Assert.assertTrue(!dataSet.getRows().isEmpty());
+		System.out.println(dataSet);
+		//System.out.println(this.runWs4Xml());
 	}
 }

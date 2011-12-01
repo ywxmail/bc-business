@@ -27,7 +27,6 @@ import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.docs.service.AttachService;
 import cn.bc.docs.web.ui.html.AttachWidget;
 import cn.bc.identity.web.SystemContext;
-import cn.bc.option.domain.OptionItem;
 import cn.bc.option.service.OptionService;
 import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.formater.CalendarRangeFormater;
@@ -48,25 +47,25 @@ import cn.bc.web.ui.html.page.PageOption;
 @Controller
 public class ContractChargerAction extends FileEntityAction<Long, Contract4Charger> {
 	// private static Log logger = LogFactory.getLog(ContractAction.class);
-	private static final long 		serialVersionUID 			= 1L;
-	private ContractChargerService 	contractChargerService;
-	private ContractLabourService   contractLabourService;
-	private AttachService 			attachService;
-	private OptionService			optionService;
-	public	Long					carId; 
-	public	Long					carManId;								
-	private	Long 					oldCarId;								//记录旧有的carId
-	public 	AttachWidget 			attachsUI;
+	private static final long 			serialVersionUID 			= 1L;
+	private ContractChargerService 		contractChargerService;
+	private ContractLabourService   	contractLabourService;
+	private AttachService 				attachService;
+	private OptionService				optionService;
+	public	Long						carId; 
+	public	Long						carManId;								
+	private	Long 						oldCarId;								//记录旧有的carId
+	public 	AttachWidget 				attachsUI;
 	
-	public 	Map<String,String>		statusesValue;
-	public	Map<String,String>		chargerInfoMap;							//责任人Map
+	public 	Map<String,String>			statusesValue;
+	public	Map<String,String>			chargerInfoMap;							//责任人Map
 	
-	public  List<OptionItem>		signTypeList;							//可选签约类型
-	public  List<OptionItem>		businessTypeList;						//可选营运性质列表
-	public	String					assignChargerIds;						//多个责任人Id
-	public  String					assignChargerNames;						//多个责任人name
-	public  String []				chargerNameAry;							
-	public  Map<String,Object>	 	carInfoMap;								//车辆Map
+	public  List<Map<String, String>>	signTypeList;							//可选签约类型
+	public  List<Map<String, String>>	businessTypeList;						//可选营运性质列表
+	public	String						assignChargerIds;						//多个责任人Id
+	public  String						assignChargerNames;						//多个责任人name
+	public  String []					chargerNameAry;							
+	public  Map<String,Object>	 		carInfoMap;								//车辆Map
 //	public	Long 					carManId;
 //	public  String 					certCode;
 //	public 	ContractService 		contractService;
@@ -379,10 +378,18 @@ public class ContractChargerAction extends FileEntityAction<Long, Contract4Charg
 	
 	// 表单可选项的加载
 	public void initSelects(){
+		
+		// 批量加载可选项列表
+		Map<String, List<Map<String, String>>> optionItems = this.optionService
+				.findOptionItemByGroupKeys(new String[] {
+						OptionConstants.CONTRACT_SIGNTYPE,
+						OptionConstants.CAR_BUSINESS_NATURE,
+			});
+		
 		// 加载可选签约类型
-		this.signTypeList		=	this.optionService.findOptionItemByGroupKey(OptionConstants.CONTRACT_SIGNTYPE);
+		this.signTypeList		=	 optionItems.get(OptionConstants.CONTRACT_SIGNTYPE);
 		// 加载可选营运性质列表
-		this.businessTypeList	=	this.optionService.findOptionItemByGroupKey(OptionConstants.CAR_BUSINESS_NATURE);
+		this.businessTypeList	=	 optionItems.get(OptionConstants.CAR_BUSINESS_NATURE);
 
 	}
 	

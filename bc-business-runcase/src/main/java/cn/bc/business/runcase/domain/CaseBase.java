@@ -69,7 +69,8 @@ public class CaseBase extends RichFileEntityImpl {
 	private String driverName;// 司机名称
 	private String driverCert;// 司机服务资格证
 
-	private String syncId;// 数据同步ID
+	private String syncUid;// 旧数据同步的UID
+	private Long syncId;// 数据同步ID
 
 	@Column(name = "CASE_NO")
 	public String getCaseNo() {
@@ -239,11 +240,20 @@ public class CaseBase extends RichFileEntityImpl {
 	}
 
 	@Column(name = "SYNC_ID")
-	public String getSyncId() {
+	public Long getSyncId() {
 		return syncId;
 	}
 
-	public void setSyncId(String syncId) {
+	public void setSyncId(Long syncId) {
 		this.syncId = syncId;
+	}
+
+	@Column(name = "SYNC_UID")
+	public String getSyncUid() {
+		return syncUid;
+	}
+
+	public void setSyncUid(String syncUid) {
+		this.syncUid = syncUid;
 	}
 }

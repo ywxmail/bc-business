@@ -32,7 +32,7 @@ public class ContractDaoImpl extends HibernateCrudJpaDao<Contract> implements Co
 		
 		hql.append("select contract.id,contract.type, contract.ext_str1, contract.ext_str2, contract.signDate,contract.startDate,contract.endDate,contract.transactorName,contract.code")
 		   .append(" from Car car join car.contracts contract")
-		   .append(" where car.id=?");
+		   .append(" where contract.main=0 and car.id=?");
 		
 		if(carId != null && carId > 0){
 			args.add(carId);
@@ -91,7 +91,7 @@ public class ContractDaoImpl extends HibernateCrudJpaDao<Contract> implements Co
 		
 		hql.append("select contract.id,contract.type, contract.ext_str1, contract.ext_str2, contract.signDate,contract.startDate,contract.endDate,contract.transactorName,contract.code")
 		   .append(" from CarMan carman join carman.contracts contract")
-		   .append(" where carman.id=?");
+		   .append(" where contract.main=0 and carman.id=?");
 		
 		if(carManId != null && carManId > 0){
 			args.add(carManId);
