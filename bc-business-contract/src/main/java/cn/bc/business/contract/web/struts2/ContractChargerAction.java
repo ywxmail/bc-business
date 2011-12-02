@@ -21,7 +21,6 @@ import cn.bc.business.contract.service.ContractChargerService;
 import cn.bc.business.contract.service.ContractLabourService;
 import cn.bc.business.web.struts2.FileEntityAction;
 import cn.bc.core.Page;
-import cn.bc.core.RichEntityImpl;
 import cn.bc.core.exception.CoreException;
 import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.docs.service.AttachService;
@@ -121,7 +120,6 @@ public class ContractChargerAction extends FileEntityAction<Long, Contract4Charg
 				getText("key.role.bc.admin"));
 	}
 	
-	@SuppressWarnings("static-access")
 	public String create() throws Exception {
 		String r = super.create();
 
@@ -139,11 +137,13 @@ public class ContractChargerAction extends FileEntityAction<Long, Contract4Charg
 		}
 		
 		
-		
-		this.getE().setUid(this.getIdGeneratorService().next(this.getE().ATTACH_TYPE));
+		this.getE().setPatchNo(this.getIdGeneratorService().next(Contract4Charger.KEY_UID));
+		this.getE().setOpType(Contract.OPTYPE_CREATE);
+		this.getE().setMain(Contract.MAIN_NOW);
+		this.getE().setUid(this.getIdGeneratorService().next(Contract4Charger.KEY_UID));
 		this.getE().setCode(this.getIdGeneratorService().nextSN4Month(Contract4Charger.KEY_CODE));
 		this.getE().setType(Contract.TYPE_CHARGER);
-		this.getE().setStatus(RichEntityImpl.STATUS_ENABLED);
+		this.getE().setStatus(Contract.STATUS_NORMAL);
 		statusesValue		=	this.getEntityStatuses();
 		
 		attachsUI = buildAttachsUI(true);

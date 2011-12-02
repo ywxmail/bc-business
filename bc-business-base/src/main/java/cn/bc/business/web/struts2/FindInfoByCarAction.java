@@ -103,7 +103,7 @@ public class FindInfoByCarAction extends ActionSupport {
 				driver.put("cert4IDENTITY", info.get("driverCert4IDENTITY"));
 				driver.put("origin", info.get("driverOrigin"));
 				driver.put("houseType", info.get("driverHouseType"));
-				driver.put("birthDate", info.get("driverBirthDate"));
+				driver.put("birthDate", getDateToString(info.get("driverBirthDate")));
 				driver.put("age", getBirthDateToString(info.get("driverBirthDate")));
 				
 				drivers.add(driver);

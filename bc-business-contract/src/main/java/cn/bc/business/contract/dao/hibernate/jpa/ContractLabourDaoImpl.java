@@ -65,7 +65,7 @@ public class ContractLabourDaoImpl extends HibernateCrudJpaDao<Contract4Labour> 
 	 */	
 	public void deleteCarManNContract(Long contractId) {
 		if(contractId != null){
-			String sql = "delete BS_CARMAN_CONTRACT carmancontract where carmancontract.contract_id ="+contractId;
+			String sql = "delete from BS_CARMAN_CONTRACT where BS_CARMAN_CONTRACT.contract_id ="+contractId;
 			this.jdbcTemplate.execute(sql);
 		}
 	}
@@ -78,7 +78,7 @@ public class ContractLabourDaoImpl extends HibernateCrudJpaDao<Contract4Labour> 
 	public void deleteCarManNContract(Long[] contractIds) {
 		ArrayList<Object> args = new ArrayList<Object>();
 		StringBuffer sql = new StringBuffer();
-		sql.append("delete BS_CARMAN_CONTRACT carmancontract where carmancontract.contract_id in");
+		sql.append("delete from BS_CARMAN_CONTRACT where BS_CARMAN_CONTRACT.contract_id in");
 		if(contractIds != null && contractIds.length > 0){
 			StringBuffer sf = new StringBuffer();
 			sf.append("(?");
@@ -121,7 +121,7 @@ public class ContractLabourDaoImpl extends HibernateCrudJpaDao<Contract4Labour> 
 			this.jdbcTemplate.execute(insertSql);
 		}else{
 			//删除BS_CARMAN_CONTRACT中间表重复数据
-			String	delSql = "delete from BS_CARMAN_CONTRACT cc where cc.contract_id="+contractId;
+			String	delSql = "delete from BS_CARMAN_CONTRACT where BS_CARMAN_CONTRACT.contract_id="+contractId;
 			this.jdbcTemplate.execute(delSql);
 			
 			//插入BS_CARMAN_CONTRACT中间表
@@ -143,7 +143,7 @@ public class ContractLabourDaoImpl extends HibernateCrudJpaDao<Contract4Labour> 
 			this.jdbcTemplate.execute(insertSql);
 		}else{
 			//删除BS_CAR_CONTRACT中间表重复数据
-			String	delSql = "delete from BS_CAR_CONTRACT cc where cc.contract_id="+contractId;
+			String	delSql = "delete from BS_CAR_CONTRACT where BS_CAR_CONTRACT.contract_id="+contractId;
 			this.jdbcTemplate.execute(delSql);
 			
 			//插入BS_CAR_CONTRACT中间表
@@ -472,7 +472,7 @@ public class ContractLabourDaoImpl extends HibernateCrudJpaDao<Contract4Labour> 
 	 */
 	public List<Map<String, Object>> findCarManIsExistContract(Long carManId) {
 		List<Map<String,Object>> list = null;
-		String sql = "select  c.* from BS_CONTRACT c"+
+		String sql = "select c.* from BS_CONTRACT c"+
 					" inner join BS_CARMAN_CONTRACT cc ON c.id = cc.contract_id where cc.man_id="+carManId;
 		
 		list = this.jdbcTemplate.queryForList(sql);
