@@ -56,11 +56,11 @@ public class Case4Accident extends CaseBase {
 	private String carHurt;// 车损情况
 	private String thirdParty;// 第三者情况
 	private boolean rob;// 是否抢劫：1-是
-	private String hurtCount;// 受伤人数
-	private String deadCount;// 死亡人数
-	private String actualLoss;// 实际损失
+	private Long hurtCount;// 受伤人数
+	private Long deadCount;// 死亡人数
+	private Long actualLoss;// 实际损失
 	private boolean innerFix;// 是否修理厂内修
-	private String fixCost;// 修理厂内修金额
+	private Long fixCost;// 修理厂内修金额
 	private String costDetail;// 损失明细
 
 	@Column(name = "RECEIVE_DATE")
@@ -347,30 +347,56 @@ public class Case4Accident extends CaseBase {
 		this.rob = rob;
 	}
 
+	// @Column(name = "HURT_COUNT")
+	// public String getHurtCount() {
+	// return hurtCount;
+	// }
+	//
+	// public void setHurtCount(String hurtCount) {
+	// this.hurtCount = hurtCount;
+	// }
+	//
+	// @Column(name = "DEAD_COUNT")
+	// public String getDeadCount() {
+	// return deadCount;
+	// }
+	//
+	// public void setDeadCount(String deadCount) {
+	// this.deadCount = deadCount;
+	// }
+	//
+	// @Column(name = "ACTUAL_LOSS")
+	// public String getActualLoss() {
+	// return actualLoss;
+	// }
+	//
+	// public void setActualLoss(String actualLoss) {
+	// this.actualLoss = actualLoss;
+	// }
 	@Column(name = "HURT_COUNT")
-	public String getHurtCount() {
+	public Long getHurtCount() {
 		return hurtCount;
 	}
 
-	public void setHurtCount(String hurtCount) {
+	public void setHurtCount(Long hurtCount) {
 		this.hurtCount = hurtCount;
 	}
 
 	@Column(name = "DEAD_COUNT")
-	public String getDeadCount() {
+	public Long getDeadCount() {
 		return deadCount;
 	}
 
-	public void setDeadCount(String deadCount) {
+	public void setDeadCount(Long deadCount) {
 		this.deadCount = deadCount;
 	}
 
 	@Column(name = "ACTUAL_LOSS")
-	public String getActualLoss() {
+	public Long getActualLoss() {
 		return actualLoss;
 	}
 
-	public void setActualLoss(String actualLoss) {
+	public void setActualLoss(Long actualLoss) {
 		this.actualLoss = actualLoss;
 	}
 
@@ -383,12 +409,20 @@ public class Case4Accident extends CaseBase {
 		this.innerFix = innerFix;
 	}
 
+	// @Column(name = "FIX_COST")
+	// public String getFixCost() {
+	// return fixCost;
+	// }
+	//
+	// public void setFixCost(String fixCost) {
+	// this.fixCost = fixCost;
+	// }
 	@Column(name = "FIX_COST")
-	public String getFixCost() {
+	public Long getFixCost() {
 		return fixCost;
 	}
 
-	public void setFixCost(String fixCost) {
+	public void setFixCost(Long fixCost) {
 		this.fixCost = fixCost;
 	}
 
