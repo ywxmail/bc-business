@@ -20,5 +20,7 @@
 		
 		<!-- 通过车辆id或车牌号查询相关信息 -->
 		<action name="findInfoByCar" class="findInfoByCarAction"/>
+		<!-- 通过司机id或名字查询相关信息 -->
+		<action name="findInfoByDriver" class="findInfoByDriverAction"/>
 	</package>
 </struts>

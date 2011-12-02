@@ -52,14 +52,6 @@ public class FindInfoByDriverAction extends ActionSupport {
 	public Json json;// 返回的json信息
 	protected JpaTemplate jpaTemplate;
 
-	// public Long getCarId() {
-	// return carId;
-	// }
-	//
-	// public void setCarId(Long carId) {
-	// this.carId = carId;
-	// }
-
 	@Autowired
 	public void setJpaTemplate(JpaTemplate jpaTemplate) {
 		this.jpaTemplate = jpaTemplate;
