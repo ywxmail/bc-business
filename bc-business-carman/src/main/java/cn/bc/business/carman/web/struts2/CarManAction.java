@@ -14,6 +14,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
 import cn.bc.business.OptionConstants;
+import cn.bc.business.car.domain.Car;
 import cn.bc.business.carman.domain.CarMan;
 import cn.bc.business.carman.service.CarManService;
 import cn.bc.business.web.struts2.FileEntityAction;
@@ -89,6 +90,9 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 		this.getE().setStatus(RichEntity.STATUS_ENABLED);
 		statusesValue = this.getBSStatuses1();
 		this.getE().setUid(this.getIdGeneratorService().next(CarMan.KEY_UID));
+		this.getE().setOrderNo(
+				this.getIdGeneratorService().nextSN4Month(Car.KEY_CODE));
+
 		this.getE().setSex(ActorDetail.SEX_MAN);
 		this.initSelects();
 		// 获取相片的连接
