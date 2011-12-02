@@ -269,7 +269,7 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected String getGridRowLabelExpression() {
-		return "['plate'] ";
+		return "name";
 	}
 
 	@Override

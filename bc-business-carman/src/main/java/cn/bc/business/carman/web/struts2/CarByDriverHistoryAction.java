@@ -17,11 +17,13 @@ import cn.bc.business.car.service.CarService;
 import cn.bc.business.carman.domain.CarByDriverHistory;
 import cn.bc.business.carman.service.CarByDriverHistoryService;
 import cn.bc.business.carman.service.CarManService;
+import cn.bc.business.motorcade.domain.Motorcade;
 import cn.bc.business.motorcade.service.MotorcadeService;
 import cn.bc.business.web.struts2.FileEntityAction;
 import cn.bc.core.query.condition.Direction;
 import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.identity.web.SystemContext;
+import cn.bc.option.domain.OptionItem;
 import cn.bc.web.ui.html.grid.Column;
 import cn.bc.web.ui.html.grid.GridData;
 import cn.bc.web.ui.html.page.ButtonOption;
@@ -120,6 +122,24 @@ public class CarByDriverHistoryAction extends
 		String result = super.edit();
 		moveTypeValueList = this.getMoveType();
 		this.motorcadeList = this.motorcadeService.find4Option();
+		if (this.getE().getToMotorcadeId() != null) {
+			Motorcade tom = this.motorcadeService.load(this.getE()
+					.getToMotorcadeId());
+			if (tom != null) {
+				List<Map<String, String>> insertIfNotExist = OptionItem
+						.insertIfNotExist(this.motorcadeList, tom.getId()
+								.toString(), tom.getName());
+			}
+		}
+		if (this.getE().getFromMotorcadeId() != null) {
+			Motorcade frm = this.motorcadeService.load(this.getE()
+					.getFromMotorcadeId());
+			if (frm != null) {
+				List<Map<String, String>> insertIfNotExist = OptionItem
+						.insertIfNotExist(this.motorcadeList, frm.getId()
+								.toString(), frm.getName());
+			}
+		}
 		return this.getFormName(this.getE().getMoveType());
 	}
 
