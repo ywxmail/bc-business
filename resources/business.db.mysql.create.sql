@@ -701,7 +701,7 @@ CREATE TABLE BS_CASE_BASE(
    SOURCE               INT(1) NOT NULL COMMENT '数据来源：1-用户创建、2-接口导入',
    FROM_                VARCHAR(255)  COMMENT '来源(用户填写)',
    SUBJECT              VARCHAR(1000) COMMENT '标题',
-   ADDRESS              VARCHAR(1000) NOT NULL COMMENT '事发地点',
+   ADDRESS              VARCHAR(1000) COMMENT '事发地点',
    HAPPEN_DATE          DATETIME NOT NULL COMMENT '事发时间',
    MOTORCADE_ID         BIGINT COMMENT '车队ID',
    MOTORCADE_NAME       VARCHAR(255) COMMENT '车队名称',
