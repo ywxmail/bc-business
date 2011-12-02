@@ -632,7 +632,7 @@ CREATE TABLE BS_CONTRACT
    OP_TYPE              NUMBER(1)            NOT NULL,
    TRANSACTOR_ID        NUMBER(19),
    TRANSACTOR_NAME      VARCHAR2(255),
-   SIGN_DATE            DATE                 NOT NULL,
+   SIGN_DATE            DATE,
    START_DATE           DATE                 NOT NULL,
    END_DATE             DATE                 NOT NULL,
    CONTENT              VARCHAR2(4000),
