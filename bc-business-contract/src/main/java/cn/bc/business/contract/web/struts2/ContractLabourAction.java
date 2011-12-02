@@ -258,7 +258,7 @@ public class ContractLabourAction extends FileEntityAction<Long, Contract4Labour
 		this.getE().setVerMinor(Contract.MINOR_DEFALUT);
 		this.getE().setInsuranceType(getText("contract.wujin"));
 		this.getE().setBuyUnit(getText("contract.baocheng"));
-		this.getE().setStatus(Contract4Labour.STATUS_NORMAL);
+		this.getE().setStatus(Contract.STATUS_NORMAL);
 		
 		statusesValue  =	this.getEntityStatuses();
 		
