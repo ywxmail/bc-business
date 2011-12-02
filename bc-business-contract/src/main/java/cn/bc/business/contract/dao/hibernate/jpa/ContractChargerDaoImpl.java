@@ -69,7 +69,7 @@ public class ContractChargerDaoImpl extends HibernateCrudJpaDao<Contract4Charger
 	 */
 	public void deleteCarNContract(Long contractId) {
 		if(contractId != null){
-			String sql = "delete BS_CAR_CONTRACT carcontract where carcontract.contract_id ="+contractId;
+			String sql = "delete from BS_CAR_CONTRACT where BS_CAR_CONTRACT.contract_id ="+contractId;
 			this.jdbcTemplate.execute(sql);
 		}
 	}
@@ -82,7 +82,7 @@ public class ContractChargerDaoImpl extends HibernateCrudJpaDao<Contract4Charger
 	public void deleteCarNContract(Long[] contractIds) {
 		ArrayList<Object> args = new ArrayList<Object>();
 		StringBuffer sql = new StringBuffer();
-		sql.append("delete BS_CAR_CONTRACT carcontract where carcontract.contract_id in");
+		sql.append("delete from BS_CAR_CONTRACT where BS_CAR_CONTRACT.contract_id in");
 		if(contractIds != null && contractIds.length > 0){
 			StringBuffer sf = new StringBuffer();
 			sf.append("(?");
@@ -124,7 +124,7 @@ public class ContractChargerDaoImpl extends HibernateCrudJpaDao<Contract4Charger
 			this.jdbcTemplate.execute(insertSql);
 		}else{
 			//删除BS_CAR_CONTRACT中间表重复数据
-			String	delSql = "delete from BS_CAR_CONTRACT cc where cc.contract_id="+contractId;
+			String	delSql = "delete from BS_CAR_CONTRACT where BS_CAR_CONTRACT.contract_id="+contractId;
 			this.jdbcTemplate.execute(delSql);
 			
 			//插入BS_CAR_CONTRACT中间表
@@ -382,7 +382,7 @@ public class ContractChargerDaoImpl extends HibernateCrudJpaDao<Contract4Charger
 			}
 		}else{
 			//删除BS_CARMAN_CONTRACT中间表重复数据
-			String	delSql = "delete from BS_CARMAN_CONTRACT cc where cc.contract_id="+contractId;
+			String	delSql = "delete from BS_CARMAN_CONTRACT where BS_CARMAN_CONTRACT.contract_id="+contractId;
 			this.jdbcTemplate.execute(delSql);
 			
 			//插入BS_CARMAN_CONTRACT中间表

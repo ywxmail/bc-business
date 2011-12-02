@@ -364,8 +364,10 @@ public class ContractLaboursAction extends ViewAction<Map<String, Object>> {
 		if (contractId == null) {
 			statusCondition = ConditionUtils.toConditionByComma4IntegerValue(this.status,
 					"c.status_");
-			mainsCondition = ConditionUtils.toConditionByComma4IntegerValue(this.mains,
-					"c.main");
+			if(this.status.length() <= 0){ //显示全部状态的时候只显示最新版本的记录
+				mainsCondition = ConditionUtils.toConditionByComma4IntegerValue(this.mains,
+						"c.main");
+			}
 		}
 		
 		// contractId条件
