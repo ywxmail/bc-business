@@ -347,32 +347,6 @@ public class Case4Accident extends CaseBase {
 		this.rob = rob;
 	}
 
-	// @Column(name = "HURT_COUNT")
-	// public String getHurtCount() {
-	// return hurtCount;
-	// }
-	//
-	// public void setHurtCount(String hurtCount) {
-	// this.hurtCount = hurtCount;
-	// }
-	//
-	// @Column(name = "DEAD_COUNT")
-	// public String getDeadCount() {
-	// return deadCount;
-	// }
-	//
-	// public void setDeadCount(String deadCount) {
-	// this.deadCount = deadCount;
-	// }
-	//
-	// @Column(name = "ACTUAL_LOSS")
-	// public String getActualLoss() {
-	// return actualLoss;
-	// }
-	//
-	// public void setActualLoss(String actualLoss) {
-	// this.actualLoss = actualLoss;
-	// }
 	@Column(name = "HURT_COUNT")
 	public Long getHurtCount() {
 		return hurtCount;
@@ -409,14 +383,6 @@ public class Case4Accident extends CaseBase {
 		this.innerFix = innerFix;
 	}
 
-	// @Column(name = "FIX_COST")
-	// public String getFixCost() {
-	// return fixCost;
-	// }
-	//
-	// public void setFixCost(String fixCost) {
-	// this.fixCost = fixCost;
-	// }
 	@Column(name = "FIX_COST")
 	public Long getFixCost() {
 		return fixCost;
