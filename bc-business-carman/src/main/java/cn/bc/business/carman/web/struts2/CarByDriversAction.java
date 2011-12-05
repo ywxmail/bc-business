@@ -203,7 +203,7 @@ public class CarByDriversAction extends ViewAction<Map<String, Object>> {
 		}
 		// classes条件
 		Condition classesCondition = null;
-		if (classes != null) {
+		if (classes != null && classes.length() > 0) {
 			carIdCondition = new EqualsCondition("d.classes", classes);
 		}
 		// 合并条件
