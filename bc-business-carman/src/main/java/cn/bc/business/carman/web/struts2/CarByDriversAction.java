@@ -45,6 +45,7 @@ import cn.bc.web.ui.json.Json;
 public class CarByDriversAction extends ViewAction<Map<String, Object>> {
 	private static final long serialVersionUID = 1L;
 	public String status = String.valueOf(Entity.STATUS_ENABLED); // 车辆的状态，多个用逗号连接
+	public String classes = String.valueOf(CarByDriver.TYPE_ZHENGBAN);// 正班
 	public Long carManId;
 	public Long carId;
 
@@ -189,7 +190,7 @@ public class CarByDriversAction extends ViewAction<Map<String, Object>> {
 				statusCondition = new InCondition("d.status_",
 						StringUtils.stringArray2IntegerArray(ss));
 			}
-		} 
+		}
 		// carManId条件
 		Condition carManIdCondition = null;
 		if (carManId != null) {
@@ -200,9 +201,14 @@ public class CarByDriversAction extends ViewAction<Map<String, Object>> {
 		if (carId != null) {
 			carIdCondition = new EqualsCondition("d.car_id", carId);
 		}
+		// classes条件
+		Condition classesCondition = null;
+		if (classes != null) {
+			carIdCondition = new EqualsCondition("d.classes", classes);
+		}
 		// 合并条件
 		return new AndCondition().add(statusCondition).add(carManIdCondition)
-				.add(carIdCondition);
+				.add(carIdCondition).add(classesCondition);
 	}
 
 	@Override
@@ -230,25 +236,44 @@ public class CarByDriversAction extends ViewAction<Map<String, Object>> {
 	 */
 	protected Map<String, String> getType() {
 		Map<String, String> type = new HashMap<String, String>();
-		type = new HashMap<String, String>();
+		type = getBaseType();
 		type.put(String.valueOf(CarByDriver.TYPE_WEIDINGYI),
 				getText("carByDriver.classes.weidingyi"));
-		type.put(String.valueOf(CarByDriver.TYPE_ZHENGBAN),
-				getText("carByDriver.classes.zhengban"));
+		return type;
+	}
+
+	/**
+	 * 营运班次基本类型：正班，顶班，副班
+	 * 
+	 * @return
+	 */
+	private Map<String, String> getBaseType() {
+		Map<String, String> type;
+		type = new HashMap<String, String>();
 		type.put(String.valueOf(CarByDriver.TYPE_FUBAN),
 				getText("carByDriver.classes.fuban"));
 		type.put(String.valueOf(CarByDriver.TYPE_DINGBAN),
 				getText("carByDriver.classes.dingban"));
+		type.put(String.valueOf(CarByDriver.TYPE_ZHENGBAN),
+				getText("carByDriver.classes.zhengban"));
+		return type;
+	}
+
+	/**分组按钮的营运班次类型
+	 * @return
+	 */
+	protected Map<String, String> getToolbarClassesType() {
+		Map<String, String> type = new HashMap<String, String>();
+		type = getBaseType();
+		type.put("", getText("carByDriver.classes.quanbu"));
 		return type;
 	}
 
 	@Override
 	protected Toolbar getHtmlPageToolbar() {
-		return super.getHtmlPageToolbar()
-				.addButton(
-						Toolbar.getDefaultToolbarRadioGroup(
-								this.getBSStatuses1(), "status", 0,
-								getText("title.click2changeSearchStatus")));
+		return super.getHtmlPageToolbar().addButton(
+				Toolbar.getDefaultToolbarRadioGroup(getToolbarClassesType(), "classes", 3,
+						getText("title.click2changeSearchClasses")));
 	}
 
 }
