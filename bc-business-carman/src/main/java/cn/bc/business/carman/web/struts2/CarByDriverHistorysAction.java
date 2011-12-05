@@ -269,7 +269,7 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected String getGridRowLabelExpression() {
-		return "name";
+		return "['driver']";
 	}
 
 	@Override
@@ -315,7 +315,7 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 		}
 		// carId条件
 		if (carId != null) {
-			json.put("carId", carId);
+			json.put("toCarId", carId);
 		}
 		return json.isEmpty() ? null : json;
 	}
@@ -371,6 +371,7 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 		tb.addButton(
 				new ToolbarButton().setIcon("ui-icon-document").setText("新建")
 						.setClick("bc.business.MoveTypeList.select"))
+
 				.addButton(
 						new ToolbarButton().setIcon("ui-icon-pencil")
 								.setText("编辑").setAction("edit"))

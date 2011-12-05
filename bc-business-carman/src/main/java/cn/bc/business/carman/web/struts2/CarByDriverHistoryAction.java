@@ -90,6 +90,9 @@ public class CarByDriverHistoryAction extends
 		this.motorcadeList = this.motorcadeService.find4Option();
 		statusesValueList = this.getBSStatuses1();
 		moveTypeValueList = this.getMoveType();
+		// if (carManId != null) {
+		// this.getE().getDriver().setId(carManId);
+		// }
 		SystemContext context = this.getSystyemContext();
 		this.getE().setAuthor(context.getUserHistory());
 		this.getE().setFileDate(Calendar.getInstance());
@@ -126,18 +129,16 @@ public class CarByDriverHistoryAction extends
 			Motorcade tom = this.motorcadeService.load(this.getE()
 					.getToMotorcadeId());
 			if (tom != null) {
-				List<Map<String, String>> insertIfNotExist = OptionItem
-						.insertIfNotExist(this.motorcadeList, tom.getId()
-								.toString(), tom.getName());
+				OptionItem.insertIfNotExist(this.motorcadeList, tom.getId()
+						.toString(), tom.getName());
 			}
 		}
 		if (this.getE().getFromMotorcadeId() != null) {
 			Motorcade frm = this.motorcadeService.load(this.getE()
 					.getFromMotorcadeId());
 			if (frm != null) {
-				List<Map<String, String>> insertIfNotExist = OptionItem
-						.insertIfNotExist(this.motorcadeList, frm.getId()
-								.toString(), frm.getName());
+				OptionItem.insertIfNotExist(this.motorcadeList, frm.getId()
+						.toString(), frm.getName());
 			}
 		}
 		return this.getFormName(this.getE().getMoveType());
