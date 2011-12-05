@@ -3,7 +3,6 @@
  */
 package cn.bc.business.injury.web.struts2;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
@@ -101,14 +100,12 @@ public class InjuryAction extends FileEntityAction<Long, Injury> {
 
 	@Override
 	protected String[] getSearchFields() {
-//		return new String[] { "contract.code", "contract.wordNo",
-//				"contract.ext_str1", "contract.ext_str2" };
-		return null;
+		return new String[] { "injury.code" };
 	}
 
 	@Override
 	protected List<Column> buildGridColumns() {
-		List<Column> columns = new ArrayList<Column>();
+		List<Column> columns = super.buildGridColumns();
 		columns.add(new TextColumn("compensation",
 				getText("injury.compensation"), 90));
 		columns.add(new TextColumn("happenDate",
@@ -124,79 +121,17 @@ public class InjuryAction extends FileEntityAction<Long, Injury> {
 						return injury.getEndDate();
 					}
 				}));
-		columns.add(new TextColumn("code", getText("injury.code"), 120)
+		columns.add(new TextColumn("code", getText("injury.code"), 80)
 				.setUseTitleFromLabel(true));
 		return columns;
 	}
-
-//	/** 构建视图页面的表格 */
-//	protected Grid buildGrid() {
-//		List<Column> columns = this.buildGridColumns();
-//
-//		// id列
-//		Grid grid = new Grid();
-//		grid.setGridHeader(this.buildGridHeader(columns));
-//		grid.setGridData(this.buildGridData(columns));
-//		grid.setRemoteSort("true"
-//				.equalsIgnoreCase(getText("app.grid.remoteSort")));
-//		grid.setColumns(columns);
-//		// name属性设为bean的名称
-//		grid.setName(getText(StringUtils.uncapitalize(getEntityConfigName())));
-//
-//		// 单选及双击行编辑
-//		grid.setSingleSelect(false).setDblClickRow("bc.contractList.edit");
-//
-//		// 分页条
-//		grid.setFooter(buildGridFooter(grid));
-//
-//		return grid;
-//	}
-
-//	// 自定义视图加载的js
-//	@Override
-//	protected String getJs() {
-//		return contextPath + "/bc-business/contract/list.js";
-//	}
-//
-//	@Override
-//	protected Toolbar buildToolbar() {
-//		isManager = isReadonly();
-//		Toolbar tb = new Toolbar();
-//
-//		if (!isManager) {
-//			// 新建按钮
-//			tb.addButton(new ToolbarButton().setIcon("ui-icon-document")
-//					.setText(getText("label.create"))
-//					.setClick("bc.contractList.create"));
-//
-//			// 编辑按钮
-//			tb.addButton(new ToolbarButton().setIcon("ui-icon-document")
-//					.setText(getText("label.edit"))
-//					.setClick("bc.contractList.edit"));
-//
-//			// 删除按钮
-//			// tb.addButton(getDefaultDeleteToolbarButton());
-//			tb.addButton(new ToolbarButton().setIcon("ui-icon-document")
-//					.setText(getText("label.delete"))
-//					.setClick("bc.contractList.del"));
-//		} else {// 普通用户
-//			// 查看按钮
-//			tb.addButton(getDefaultOpenToolbarButton());
-//		}
-//
-//		// 搜索按钮
-//		tb.addButton(getDefaultSearchToolbarButton());
-//
-//		return tb;
-//	}
 
 	 // 视图特殊条件
 	 @Override
 	 protected Condition getSpecalCondition() {
 		 if (this.contractId != null) {
 			 return new EqualsCondition("contractId", this.contractId);
-		 }
-		 else {
+		 }else {
 			 return null;
 		 }
 	 }

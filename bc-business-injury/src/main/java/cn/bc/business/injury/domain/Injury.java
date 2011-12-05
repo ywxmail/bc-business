@@ -47,6 +47,7 @@ public class Injury extends RichFileEntityImpl {
 		this.code = code;
 	}
 	
+	@Column(name = "CONTRACT_ID")
 	public Long getContractId() {
 		return contractId;
 	}
@@ -109,7 +110,7 @@ public class Injury extends RichFileEntityImpl {
 		this.oAS = oAS;
 	}
 	
-	@Column(name = "IS_INHOSPITAL")
+	@Column(name = "IS_IN_HOSPITAL")
 	public boolean isInHospital() {
 		return inHospital;
 	}

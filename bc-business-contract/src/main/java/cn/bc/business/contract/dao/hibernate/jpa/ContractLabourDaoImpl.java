@@ -479,5 +479,48 @@ public class ContractLabourDaoImpl extends HibernateCrudJpaDao<Contract4Labour> 
 		return list;
 	}
 
+	/**
+	 * 删除单个Injury
+	 * @parma contractId
+	 * @return
+	 */
+	public void deleteInjury(Long contractId) {
+		if(contractId != null){
+			String sql = "delete from BS_INDUSTRIAL_INJURY where BS_INDUSTRIAL_INJURY.contract_id ="+contractId;
+			this.jdbcTemplate.execute(sql);
+		}
+	}
+
+	/**
+	 * 删除批量Injury
+	 * @parma contractIds[] 
+	 * @return
+	 */
+	public void deleteInjury(Long[] contractIds) {
+		ArrayList<Object> args = new ArrayList<Object>();
+		StringBuffer sql = new StringBuffer();
+		sql.append("delete from BS_INDUSTRIAL_INJURY where BS_INDUSTRIAL_INJURY.contract_id in");
+		if(contractIds != null && contractIds.length > 0){
+			StringBuffer sf = new StringBuffer();
+			sf.append("(?");
+			for(int i=1;i < contractIds.length;i++){
+				sf.append(",?");
+			}
+			sf.append(")");
+			sql.append(sf.toString());
+			for(int i=0;i < contractIds.length;i++){
+				args.add(contractIds[i]);
+			}
+		}
+		
+		if (logger.isDebugEnabled()) {
+			logger.debug("sql=" + sql.toString());
+			logger.debug("args="
+					+ StringUtils.collectionToCommaDelimitedString(args));
+		}
+		//this.jdbcTemplate.execute(sql.toString(),args);
+		this.jdbcTemplate.update(sql.toString(),args.toArray());
+	}
+
 
 }

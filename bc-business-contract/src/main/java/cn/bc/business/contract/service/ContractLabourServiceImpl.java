@@ -165,4 +165,26 @@ public class ContractLabourServiceImpl extends DefaultCrudService<Contract4Labou
 		return list;
 	}
 
+	/**
+	 * 删除单个Injury
+	 * @parma contractId
+	 * @return
+	 */
+	public void deleteInjury(Long contractId) {
+		if(contractId != null){
+			contractLabourDao.deleteInjury(contractId);
+		}
+	}
+	
+	/**
+	 * 删除批量Injury
+	 * @parma contractIds[] 
+	 * @return
+	 */
+	public void deleteInjury(Long[] contractIds) {
+		if(contractIds != null && contractIds.length>0){
+			this.contractLabourDao.deleteInjury(contractIds);
+		}
+	}
+
 }
