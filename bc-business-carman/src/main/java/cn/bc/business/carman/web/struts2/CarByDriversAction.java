@@ -32,6 +32,7 @@ import cn.bc.web.ui.html.grid.IdColumn4MapKey;
 import cn.bc.web.ui.html.grid.TextColumn4MapKey;
 import cn.bc.web.ui.html.page.PageOption;
 import cn.bc.web.ui.html.toolbar.Toolbar;
+import cn.bc.web.ui.html.toolbar.ToolbarButton;
 import cn.bc.web.ui.json.Json;
 
 /**
@@ -259,7 +260,9 @@ public class CarByDriversAction extends ViewAction<Map<String, Object>> {
 		return type;
 	}
 
-	/**分组按钮的营运班次类型
+	/**
+	 * 分组按钮的营运班次类型
+	 * 
 	 * @return
 	 */
 	protected Map<String, String> getToolbarClassesType() {
@@ -272,8 +275,49 @@ public class CarByDriversAction extends ViewAction<Map<String, Object>> {
 	@Override
 	protected Toolbar getHtmlPageToolbar() {
 		return super.getHtmlPageToolbar().addButton(
-				Toolbar.getDefaultToolbarRadioGroup(getToolbarClassesType(), "classes", 3,
+				Toolbar.getDefaultToolbarRadioGroup(getToolbarClassesType(),
+						"classes", 3,
 						getText("title.click2changeSearchClasses")));
 	}
 
+	protected Toolbar getHtmlPageToolbar(boolean useDisabledReplaceDelete) {
+		Toolbar tb = new Toolbar();
+
+		if (this.isReadonly()) {
+			// 查看按钮
+			tb.addButton(Toolbar
+					.getDefaultEditToolbarButton(getText("label.read")));
+		} else {
+			// 新建按钮
+			tb.addButton(Toolbar
+					.getDefaultCreateToolbarButton(getText("label.create")));
+			// 批量处理顶班按钮
+			tb.addButton(new ToolbarButton().setIcon("ui-icon-document")
+					.setText("批量处理顶班").setClick(""));
+
+			// 编辑按钮
+			tb.addButton(Toolbar
+					.getDefaultEditToolbarButton(getText("label.edit")));
+
+			if (useDisabledReplaceDelete) {
+				// 禁用按钮
+				tb.addButton(Toolbar
+						.getDefaultDisabledToolbarButton(getText("label.disabled")));
+			} else {
+				// 删除按钮
+				tb.addButton(Toolbar
+						.getDefaultDeleteToolbarButton(getText("label.delete")));
+			}
+		}
+
+		// 搜索按钮
+		tb.addButton(Toolbar
+				.getDefaultSearchToolbarButton(getText("title.click2search")));
+
+		return tb;
+	}
+	protected String getHtmlPageJs() {
+		return this.getContextPath()
+				+ "/bc-business/carByDriver/dingBan.js";
+	}
 }

@@ -101,6 +101,13 @@ public class CarByDriverAction extends FileEntityAction<Long, CarByDriver> {
 		statusesValueList = this.getBSStatuses1();
 		return result;
 	}
+	
+	//批量处理顶班
+	public String chuLiDingBan() throws Exception {
+		String result = super.create();
+		statusesValueList = this.getBSStatuses1();
+		return "dingBan";
+	}
 
 	// 视图特殊条件
 	@Override

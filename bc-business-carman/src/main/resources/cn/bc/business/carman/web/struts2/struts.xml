@@ -31,6 +31,16 @@
 			<result>/bc-business/carByDriverHistory/selectMoveType/select.jsp</result>
 		</action>
 	</package>
+	<package name="carByDriver" extends="bc-default" namespace="/bc-business/carByDriver">
+		<action name="chuLiDingBan" class="carByDriverAction" method="chuLiDingBan">
+			<result name="dingBan">/bc-business/carByDriver/form2.jsp</result>
+		</action>
+		<action name="save" class="carByDriverAction" method="save" />
+		<action name="data" class="carByDriverAction" method="data" />
+		<action name="delete" class="carByDriverAction" method="delete" />
+		<action name="create" class="carByDriverAction" method="create" />
+		<action name="edit" class="carByDriverAction" method="edit" />
+	</package>
 	 <package name="carByDriverHistory" extends="bc-default" namespace="/bc-business/carByDriverHistory">
 		<action name="create" class="carByDriverHistoryAction" method="create">
 			<result name="zhuanChe" >/bc-business/carByDriverHistory/zhuanCheForm.jsp</result>
