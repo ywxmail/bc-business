@@ -31,15 +31,16 @@
 			<result>/bc-business/carByDriverHistory/selectMoveType/select.jsp</result>
 		</action>
 	</package>
-	<package name="carByDriver" extends="bc-default" namespace="/bc-business/carByDriver">
-		<action name="chuLiDingBan" class="carByDriverAction" method="chuLiDingBan">
-			<result name="dingBan">/bc-business/carByDriver/form2.jsp</result>
+	<package name="shiftworkByDriver" extends="bc-default" namespace="/bc-business/shiftworkByDriver">
+		<action name="save" class="shiftworkByDriverAction" method="save" />
+		<action name="data" class="shiftworkByDriverAction" method="data" />
+		<action name="delete" class="shiftworkByDriverAction" method="delete" />
+		<action name="create" class="shiftworkByDriverAction" method="create" >
+		    <result name="create">/bc-business/carByDriver/dingBanForm.jsp</result>
 		</action>
-		<action name="save" class="carByDriverAction" method="save" />
-		<action name="data" class="carByDriverAction" method="data" />
-		<action name="delete" class="carByDriverAction" method="delete" />
-		<action name="create" class="carByDriverAction" method="create" />
-		<action name="edit" class="carByDriverAction" method="edit" />
+		<action name="edit" class="carByDriverAction" method="edit" >
+		    <result name="form">/bc-business/carByDriver/dingBanForm.jsp</result>
+		</action>
 	</package>
 	 <package name="carByDriverHistory" extends="bc-default" namespace="/bc-business/carByDriverHistory">
 		<action name="create" class="carByDriverHistoryAction" method="create">
