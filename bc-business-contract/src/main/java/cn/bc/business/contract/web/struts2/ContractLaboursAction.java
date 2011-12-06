@@ -171,13 +171,13 @@ public class ContractLaboursAction extends ViewAction<Map<String, Object>> {
 		List<Column> columns = new ArrayList<Column>();
 		columns.add(new IdColumn4MapKey("cl.id","id"));
 		columns.add(new TextColumn4MapKey("c.status_", "status_",
-				getText("contract.status"), 30).setSortable(true).setValueFormater(
+				getText("contract.status"), 50).setSortable(true).setValueFormater(
 				new EntityStatusFormater(getEntityStatuses())));
 		columns.add(new TextColumn4MapKey("c.type_", "type_",
 				getText("contract.type"), 60).setSortable(true).setValueFormater(
 				new EntityStatusFormater(getEntityTypes()))); 
 		columns.add(new TextColumn4MapKey("c.ver_major", "ver_major",
-				getText("contract.labour.ver"),40).setValueFormater(new AbstractFormater<String>() {
+				getText("contract.labour.ver"),50).setValueFormater(new AbstractFormater<String>() {
 					@SuppressWarnings("unchecked")
 					@Override
 					public String format(Object context, Object value) {
@@ -193,7 +193,7 @@ public class ContractLaboursAction extends ViewAction<Map<String, Object>> {
 					}
 				}));
 		columns.add(new TextColumn4MapKey("c.op_type", "op_type",
-				getText("contract.labour.optype"),50).setSortable(true).setValueFormater(
+				getText("contract.labour.optype"),60).setSortable(true).setValueFormater(
 				new EntityStatusFormater(getEntityOpTypes())));
 		columns.add(new TextColumn4MapKey("c.ext_str1", "ext_str1",
 				getText("contract.car"), 80).setUseTitleFromLabel(true)
@@ -210,7 +210,7 @@ public class ContractLaboursAction extends ViewAction<Map<String, Object>> {
 							}
 						}));
 		columns.add(new TextColumn4MapKey("c.ext_str2", "ext_str2",
-				getText("contract.labour.driver"), 80).setUseTitleFromLabel(true)
+				getText("contract.labour.driver"), 55).setUseTitleFromLabel(true)
 				.setValueFormater(
 						new LinkFormater4Id(this.getContextPath()
 								+ "/bc-business/carMan/edit?id={0}", "carMan") {
@@ -226,7 +226,7 @@ public class ContractLaboursAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("cl.cert_no", "cert_no",
 					getText("contract.labour.certNo"),60));
 		columns.add(new TextColumn4MapKey("iah.name", "name",
-				getText("contract.author"), 80).setUseTitleFromLabel(true));
+				getText("contract.author"), 55).setUseTitleFromLabel(true));
 //		columns.add(new TextColumn4MapKey("c.sign_date", "sign_date",
 //				getText("contract.signDate"), 90).setSortable(true)
 //				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
@@ -240,7 +240,7 @@ public class ContractLaboursAction extends ViewAction<Map<String, Object>> {
 					}
 				}));
 		columns.add(new TextColumn4MapKey("cl.insurance_type", "insurance_type",
-				getText("contract.labour.insuranceType")));
+				getText("contract.labour.insuranceType"),80));
 		columns.add(new TextColumn4MapKey("cl.joinDate", "joinDate",
 				getText("contract.labour.joinDate"), 80)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));

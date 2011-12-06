@@ -26,6 +26,9 @@ public class Injury extends RichFileEntityImpl {
 	public static final String KEY_UID = Injury.class.getSimpleName();
 	public static final String KEY_CODE = "injury.code";
 	
+	public static final int STATUS_NORMAL  = 0;
+	public static final int STATUS_DISABLE = 1;
+	
 	private String	code; // 工伤编号
 	private Long	contractId; //合同ID
 	private Calendar happenDate; //工伤时间

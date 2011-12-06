@@ -25,6 +25,7 @@ import cn.bc.web.formater.CalendarRangeFormater;
 import cn.bc.web.ui.html.grid.Column;
 import cn.bc.web.ui.html.grid.GridData;
 import cn.bc.web.ui.html.grid.TextColumn;
+import cn.bc.web.ui.html.page.ButtonOption;
 import cn.bc.web.ui.html.page.HtmlPage;
 import cn.bc.web.ui.html.page.PageOption;
 import cn.bc.web.ui.json.Json;
@@ -64,23 +65,44 @@ public class InjuryAction extends FileEntityAction<Long, Injury> {
 	@SuppressWarnings("static-access")
 	@Override
 	public String create() throws Exception {
-		 Injury e = this.injuryService.create();
-		 this.setE(e);
+		Injury e = this.injuryService.create();
+		this.setE(e);
+		this.getE().setStatus(Injury.STATUS_NORMAL);
+		this.getE().setContractId(this.contractId);
+		// 自动生成UID
+		this.getE().setUid(this.getIdGeneratorService().next(this.getE().KEY_UID));
+		// 自动生成合同编号
+		this.getE().setCode(this.getIdGeneratorService().nextSN4Month(Injury.KEY_CODE));
 		
-		 this.getE().setUid(
-		 this.getIdGeneratorService().next(this.getE().KEY_UID));
-		 this.formPageOption = super.buildFormPageOption();
+		// 设置创建人信息
+		SystemContext context = this.getSystyemContext();
+		this.getE().setFileDate(Calendar.getInstance());
+		this.getE().setAuthor(context.getUserHistory());
+		this.formPageOption = 	buildFormPageOption();
+		statusesValue		=	this.getEntityStatuses();
 
 		return "form";
 	}
+	
+	@Override
+	public String edit() throws Exception {
+		this.setE(this.getCrudService().load(this.getId()));
+		
+		this.formPageOption = 	buildFormPageOption();
+		statusesValue		=	this.getEntityStatuses();
+		
+		return "form";
+	}
 
-//	@Override
-//	protected PageOption buildFormPageOption() {
-//		PageOption option = new PageOption().setWidth(150).setMinWidth(250)
-//				.setMinHeight(170).setModal(false);
-//		option.addButton(new ButtonOption(getText("label.save"), "save"));
-//		return option;
-//	}
+	@Override
+	protected PageOption buildFormPageOption() {
+		PageOption option =	super.buildFormPageOption().setWidth(735).setHeight(360)
+				.setMinWidth(250).setMinHeight(170).setModal(false);
+		if (!this.isReadonly()) {
+			option.addButton(new ButtonOption(getText("label.save"), "save"));
+		}
+		return option;
+	}
 
 	@Override
 	protected GridData buildGridData(List<Column> columns) {
@@ -100,7 +122,7 @@ public class InjuryAction extends FileEntityAction<Long, Injury> {
 
 	@Override
 	protected String[] getSearchFields() {
-		return new String[] { "injury.code" };
+		return new String[] { "code" };
 	}
 
 	@Override
