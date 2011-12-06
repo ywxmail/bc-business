@@ -162,7 +162,7 @@ public class CertJspxAction extends FileEntityAction<Long, Cert4DriverEducation>
 
 	@Override
 	protected PageOption buildFormPageOption() {
-		PageOption option = super.buildFormPageOption().setWidth(800).setMinWidth(250)
+		PageOption option = super.buildFormPageOption().setWidth(720).setMinWidth(250)
 				.setMinHeight(160);
 		if (!this.isReadonly()) {
 			option.addButton(new ButtonOption(getText("label.save"), "save"));

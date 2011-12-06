@@ -222,7 +222,7 @@ public class CertVehicelicenseAction extends FileEntityAction<Long, Cert4VehiceL
 
 	@Override
 	protected PageOption buildFormPageOption() {
-		PageOption option = super.formPageOption.setWidth(750).setMinWidth(250).setHeight(450)
+		PageOption option = super.buildFormPageOption().setWidth(750).setMinWidth(250).setHeight(450)
 				.setMinHeight(160);
 		if (!this.isReadonly()) {
 			option.addButton(new ButtonOption(getText("label.save"), "save"));
