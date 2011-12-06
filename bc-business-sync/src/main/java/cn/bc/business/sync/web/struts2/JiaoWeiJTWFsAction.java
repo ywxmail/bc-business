@@ -175,6 +175,9 @@ public class JiaoWeiJTWFsAction extends SyncViewAction {
 			// --同步本月的数据
 			menuButton.addMenuItem(getText("label.sync.type.thisMonth"),
 					"sync.thisMonth");
+			// --同步上月的数据
+			menuButton.addMenuItem(getText("label.sync.type.lastMonth"),
+					"sync.lastMonth");
 		}
 
 		// 状态单选按钮组
@@ -194,11 +197,14 @@ public class JiaoWeiJTWFsAction extends SyncViewAction {
 	@Override
 	protected int doSync(StringBuffer strMsg) {
 		// 计算同步的起始日期和结束日期
-		Calendar fromDate;
-		Calendar toDate;
-		fromDate = Calendar.getInstance();
-		toDate = Calendar.getInstance();
+		Calendar fromDate = Calendar.getInstance();
+		Calendar toDate = Calendar.getInstance();
 		if ("thisMonth".equalsIgnoreCase(dateType)) {// 本月
+			DateUtils.setToFirstDayOfMonth(fromDate);
+			DateUtils.setToLastDayOfMonth(toDate);
+		} else if ("lastMonth".equalsIgnoreCase(dateType)) {// 上月
+			fromDate.add(Calendar.MONTH, -1);
+			toDate.add(Calendar.MONTH, -1);
 			DateUtils.setToFirstDayOfMonth(fromDate);
 			DateUtils.setToLastDayOfMonth(toDate);
 		} else if ("lastest10days".equalsIgnoreCase(dateType)) {// 最近10天

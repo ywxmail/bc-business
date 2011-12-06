@@ -38,22 +38,27 @@ public class Spider4JinDunJTWF implements Spider<List<JinDunJTWF>> {
 	private HttpContext httpContext = new BasicHttpContext();
 	private HttpClient httpClient = new DefaultHttpClient();
 	private String carType;// 号牌种类：02-小型汽车
-	private String carPlate;// 车牌号码
+	private String carPlateType;// 车牌归属，如“粤A”
+	private String carPlateNo;// 车牌号码，如“C4X74”
 	private String engineNo;// 发动机号
 	private ActorHistory syncer;// 执行同步操作的用户
 
-	private String getCarPlate() {
+	private String getCarPlateInner() {
 		// 去除首个中文字符,如"粤"
-		return carPlate.substring(1);
+		return carPlateType.substring(1) + carPlateNo;
 	}
-	
-	private String getEngineNo() {
+
+	private String getEngineNoInner() {
 		// 发动机号的末4位
 		return engineNo.substring(engineNo.length() - 4);
 	}
 
-	public void setCarPlate(String carPlate) {
-		this.carPlate = carPlate;
+	public void setCarPlateType(String carPlateType) {
+		this.carPlateType = carPlateType;
+	}
+
+	public void setCarPlateNo(String carPlateNo) {
+		this.carPlateNo = carPlateNo;
 	}
 
 	public void setEngineNo(String engineNo) {
@@ -72,9 +77,10 @@ public class Spider4JinDunJTWF implements Spider<List<JinDunJTWF>> {
 	}
 
 	public Spider4JinDunJTWF(ActorHistory syncer, String carType,
-			String carPlate, String engineNo) {
+			String carPlateType, String carPlateNo, String engineNo) {
 		this.carType = carType;
-		this.carPlate = carPlate;
+		this.carPlateType = carPlateType;
+		this.carPlateNo = carPlateNo;
 		this.engineNo = engineNo;
 		this.syncer = syncer;
 	}
@@ -89,10 +95,12 @@ public class Spider4JinDunJTWF implements Spider<List<JinDunJTWF>> {
 		String url = "http://www.gzjd.gov.cn/gzwfcx/chaxunservlet?ywlx=cxlist";
 		String url4detail = "http://www.gzjd.gov.cn/gzwfcx/chaxunservlet?ywlx=cxdetail";
 		url += "&hpzl=" + this.carType;
-		String plate = this.getCarPlate();
-		url += "&hphm=" + plate;
-		url += "&fdjh=" + this.getEngineNo();
-		url += "&jm=156756dfgd75sdfsdf123fasdfsdfsdf" + plate + engineNo;
+		String plateInner = this.getCarPlateInner();
+		String engineNoInner = this.getEngineNoInner();
+		url += "&hphm=" + plateInner;
+		url += "&fdjh=" + engineNoInner;
+		url += "&jm=156756dfgd75sdfsdf123fasdfsdfsdf" + plateInner
+				+ engineNoInner;
 
 		String html = getRequestHtml(url);
 		Document doc = Jsoup.parse(html);
@@ -106,7 +114,9 @@ public class Spider4JinDunJTWF implements Spider<List<JinDunJTWF>> {
 			jtwf.setSyncType(JinDunJTWF.class.getSimpleName());
 
 			tds = tr.children();
-			jtwf.setCarPlate(this.carPlate);
+			jtwf.setCarType("02");
+			jtwf.setCarPlateType(this.carPlateType);
+			jtwf.setCarPlateNo(this.carPlateNo);
 			jtwf.setDecisionNo(tds.get(1).html().trim());// 决定书编号
 			// 违法时间,格式为2011-11-06 22:33
 			jtwf.setHappenDate(DateUtils.getCalendar(tds.get(2).html().trim()));
@@ -127,11 +137,11 @@ public class Spider4JinDunJTWF implements Spider<List<JinDunJTWF>> {
 			String url2 = url4detail;
 			url2 += "&tmpwfsxh=" + jtwf.getSyncCode();
 			url2 += "&tmpwslb=" + jtwf.getDecisionType();
-			url2 += "&hphm=" + plate;
+			url2 += "&hphm=" + plateInner;
 			url2 += "&mm=adfsdfasdfasdfasdfadfadfdfa" + jtwf.getSyncCode()
-					+ plate;
+					+ plateInner;
 			jtwf.setSyncFrom(url2);
-			this.getDetail(url2, plate, jtwf);
+			this.getDetail(url2, plateInner, jtwf);
 
 			list.add(jtwf);
 		}
@@ -178,13 +188,13 @@ public class Spider4JinDunJTWF implements Spider<List<JinDunJTWF>> {
 			// HTTP请求
 			HttpUriRequest request = new HttpGet(url);
 
-			if (logger.isInfoEnabled()) {
-				logger.info("url=" + url);
-				logger.info("requestLine=" + request.getRequestLine());
-				logger.info("before request.headers:");
+			logger.info("url=" + url);
+			if (logger.isDebugEnabled()) {
+				logger.debug("requestLine=" + request.getRequestLine());
+				logger.debug("before request.headers:");
 				for (HeaderIterator itor = request.headerIterator(); itor
 						.hasNext();) {
-					logger.info("  " + itor.next());
+					logger.debug("  " + itor.next());
 				}
 			}
 
@@ -192,19 +202,19 @@ public class Spider4JinDunJTWF implements Spider<List<JinDunJTWF>> {
 			HttpResponse response = httpClient.execute(request, httpContext);
 			HttpEntity entity = response.getEntity();
 			if (entity != null) {
-				if (logger.isInfoEnabled()) {
-					logger.info("after request.headers:");
+				if (logger.isDebugEnabled()) {
+					logger.debug("after request.headers:");
 					for (HeaderIterator itor = request.headerIterator(); itor
 							.hasNext();) {
-						logger.info("  " + itor.next());
+						logger.debug("  " + itor.next());
 					}
 
-					logger.info("response.statusCode="
+					logger.debug("response.statusCode="
 							+ response.getStatusLine().getStatusCode());
-					logger.info("response.headers:");
+					logger.debug("response.headers:");
 					for (HeaderIterator itor = response.headerIterator(); itor
 							.hasNext();) {
-						logger.info("  " + itor.next());
+						logger.debug("  " + itor.next());
 					}
 				}
 				String html = EntityUtils.toString(entity);

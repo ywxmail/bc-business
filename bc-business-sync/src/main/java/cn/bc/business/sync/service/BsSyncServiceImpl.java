@@ -8,11 +8,13 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import cn.bc.business.spider.Spider4JinDunJTWF;
 import cn.bc.business.spider.domain.JinDunJTWF;
 import cn.bc.business.sync.domain.JiaoWeiJTWF;
 import cn.bc.business.ws.service.WSMiddle;
+import cn.bc.core.cache.Cache;
 import cn.bc.identity.domain.ActorHistory;
 import cn.bc.option.service.OptionService;
 import cn.bc.sync.domain.SyncBase;
@@ -32,6 +34,12 @@ public class BsSyncServiceImpl implements BsSyncService {
 	private WSMiddle wsMiddle;// 交委接口
 	private Spider4JinDunJTWF spider4JinDunJTWF;// 金盾交通违法抓取器
 	private SyncBaseService syncBaseService;
+	private Cache jinDunCache;// 金盾网交通违法抓取的缓存
+
+	@Autowired
+	public void setJinDunCache(@Qualifier("jinDunCache") Cache jinDunCache) {
+		this.jinDunCache = jinDunCache;
+	}
 
 	@Autowired
 	public void setOptionService(OptionService optionService) {
@@ -142,25 +150,52 @@ public class BsSyncServiceImpl implements BsSyncService {
 		// 循环每台车执行抓取
 		this.spider4JinDunJTWF.setSyncer(syncer);
 		this.spider4JinDunJTWF.setCarType("02");
+		int i = 0;
+		List<String> carSpideHistory = this.jinDunCache.get("carSpideHistory");
+		String carId;
 		for (Map<String, Object> car : cars) {
-			this.spider4JinDunJTWF.setCarPlate(car.get("plateType").toString()
-					+ car.get("plateNo").toString());
-			if (car.get("engineNo") != null) {
-				this.spider4JinDunJTWF.setEngineNo(car.get("engineNo")
-						.toString());
+			carId = car.get("id").toString();
+			i++;
+			// if(i > 10) break;
+			if (carSpideHistory != null && carSpideHistory.contains(carId)) {
+				logger.info("(" + i + "/" + cars.size() + ")" + "车辆'"
+						+ car.get("plateType").toString()
+						+ car.get("plateNo").toString() + "'存在抓取缓存，忽略频繁的抓取！");
+				continue;
 			} else {
-				logger.warn("车辆'" + car.get("plateType").toString()
-						+ car.get("plateNo").toString() + "'没有设置发动机号，忽略抓取！");
-			}
+				this.spider4JinDunJTWF.setCarPlateType(car.get("plateType")
+						.toString());
+				this.spider4JinDunJTWF.setCarPlateNo(car.get("plateNo")
+						.toString());
+				if (car.get("engineNo") != null) {
+					logger.warn("(" + i + "/" + cars.size() + ")" + "开始抓取'"
+							+ car.get("plateType").toString() + "."
+							+ car.get("plateNo").toString() + "'的交通违法信息...");
+					this.spider4JinDunJTWF.setEngineNo(car.get("engineNo")
+							.toString());
+				} else {
+					logger.warn("(" + i + "/" + cars.size() + ")" + "车辆'"
+							+ car.get("plateType").toString()
+							+ car.get("plateNo").toString() + "'没有设置发动机号，忽略抓取！");
+					continue;
+				}
 
-			try {
-				all.addAll(this.spider4JinDunJTWF.excute());
-			} catch (Exception e) {
-				// 抓取异常就停止
-				logger.error(e.getMessage());
-				hasError = true;
+				try {
+					all.addAll(this.spider4JinDunJTWF.excute());
+
+					// 添加到缓存记录
+					if (carSpideHistory == null)
+						carSpideHistory = new ArrayList<String>();
+					carSpideHistory.remove(carId);
+					carSpideHistory.add(carId);
+				} catch (Exception e) {
+					// 抓取异常就停止
+					logger.error(e.getMessage());
+					hasError = true;
+				}
 			}
 		}
+		this.jinDunCache.put("carSpideHistory", carSpideHistory);
 
 		if (all.isEmpty())
 			return 0;

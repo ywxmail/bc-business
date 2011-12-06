@@ -25,11 +25,14 @@ import cn.bc.db.jdbc.SqlObject;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.orm.hibernate.jpa.HibernateJpaNativeQuery;
 import cn.bc.sync.domain.SyncBase;
+import cn.bc.web.formater.AbstractFormater;
 import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.formater.KeyValueFormater;
+import cn.bc.web.formater.NubmerFormater;
 import cn.bc.web.ui.html.grid.Column;
 import cn.bc.web.ui.html.grid.IdColumn4MapKey;
 import cn.bc.web.ui.html.grid.TextColumn4MapKey;
+import cn.bc.web.ui.html.page.PageOption;
 import cn.bc.web.ui.html.toolbar.Toolbar;
 import cn.bc.web.ui.html.toolbar.ToolbarButton;
 import cn.bc.web.ui.html.toolbar.ToolbarMenuButton;
@@ -66,13 +69,18 @@ public class JinDunJTWFsAction extends SyncViewAction {
 	}
 
 	@Override
+	protected PageOption getHtmlPageOption() {
+		return super.getHtmlPageOption().setWidth(900);
+	}
+
+	@Override
 	protected SqlObject<Map<String, Object>> getSqlObject() {
 		SqlObject<Map<String, Object>> sqlObject = new SqlObject<Map<String, Object>>();
 
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer sql = new StringBuffer();
 		sql.append("select b.id,b.status_,b.sync_type,b.sync_code,b.sync_from,b.sync_date");
-		sql.append(",t.happen_date,t.address,t.car_type,t.car_plate,t.engine_no,t.source");
+		sql.append(",t.happen_date,t.address,t.car_type,t.car_plate_type,t.car_plate_no,t.engine_no,t.source");
 		sql.append(",t.driver_name,t.decision_no,t.decision_type,t.traffic,t.break_type");
 		sql.append(",t.jeom,t.penalty,t.overdue_payment");
 		sql.append(" from bs_sync_jindun_jtwf t");
@@ -96,7 +104,8 @@ public class JinDunJTWFsAction extends SyncViewAction {
 				map.put("happenDate", rs[i++]);
 				map.put("address", rs[i++]);
 				map.put("carType", rs[i++]);
-				map.put("carPlate", rs[i++]);
+				map.put("carPlateType", rs[i++]);
+				map.put("carPlateNo", rs[i++]);
 				map.put("engineNo", rs[i++]);
 				map.put("source", rs[i++]);
 				map.put("driverName", rs[i++]);
@@ -124,40 +133,53 @@ public class JinDunJTWFsAction extends SyncViewAction {
 				getText("jinDunJTWF.syncCode"), 120).setSortable(true)
 				.setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("t.happen_date", "happenDate",
-				getText("jinDunJTWF.happenDate"), 90).setSortable(true)
-				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
-		columns.add(new TextColumn4MapKey("t.car_plate", "carPlate",
-				getText("jinDunJTWF.carPlate"), 80).setSortable(true));
+				getText("jinDunJTWF.happenDate"), 130).setSortable(true)
+				.setValueFormater(new CalendarFormater("yyyy-MM-dd HH:mm")));
+		columns.add(new TextColumn4MapKey("t.car_plate", "carPlateNo",
+				getText("jinDunJTWF.carPlate"), 80).setSortable(true)
+				.setValueFormater(new AbstractFormater<String>() {
+					@SuppressWarnings("unchecked")
+					@Override
+					public String format(Object context, Object value) {
+						Map<String, Object> map = (Map<String, Object>) context;
+						return map.get("carPlateType") + "."
+								+ map.get("carPlateNo");
+					}
+				}));
 		columns.add(new TextColumn4MapKey("t.address", "address",
-				getText("jinDunJTWF.address")).setSortable(true));
+				getText("jinDunJTWF.address")).setSortable(true)
+				.setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("t.source", "source",
 				getText("jinDunJTWF.source"), 80).setSortable(true));
 		columns.add(new TextColumn4MapKey("t.driver_name", "driverName",
 				getText("jinDunJTWF.driverName"), 80).setSortable(true));
 		columns.add(new TextColumn4MapKey("t.jeom", "jeom",
-				getText("jinDunJTWF.jeom"), 75).setSortable(true));
+				getText("jinDunJTWF.jeom"), 75).setSortable(true)
+				.setValueFormater(new NubmerFormater("#.#")));
 		columns.add(new TextColumn4MapKey("t.penalty", "penalty",
-				getText("jinDunJTWF.penalty"), 60).setUseTitleFromLabel(true));
+				getText("jinDunJTWF.penalty"), 60).setUseTitleFromLabel(true)
+				.setValueFormater(new NubmerFormater("#.#")));
 		columns.add(new TextColumn4MapKey("t.overdue_payment",
 				"overduePayment", getText("jinDunJTWF.overduePayment"), 60)
-				.setSortable(true));
+				.setSortable(true).setValueFormater(new NubmerFormater("#.#")));
 		columns.add(new TextColumn4MapKey("t.traffic", "traffic",
 				getText("jinDunJTWF.traffic"), 80).setSortable(true));
 		columns.add(new TextColumn4MapKey("t.break_type", "breakType",
 				getText("jinDunJTWF.breakType"), 80).setSortable(true));
 		columns.add(new TextColumn4MapKey("t.decision_no", "decisionNo",
-				getText("jinDunJTWF.decisionNo"), 80).setSortable(true));
+				getText("jinDunJTWF.decisionNo"), 80).setSortable(true)
+				.setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("t.decision_type", "decisionType",
 				getText("jinDunJTWF.decisionType"), 80).setSortable(true));
 		columns.add(new TextColumn4MapKey("b.sync_date", "syncDate",
-				getText("syncBase.syncDate"), 90).setSortable(true)
-				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+				getText("syncBase.syncDate"), 130).setSortable(true)
+				.setValueFormater(new CalendarFormater("yyyy-MM-dd HH:mm")));
 		return columns;
 	}
 
 	@Override
 	protected String[] getGridSearchFields() {
-		return new String[] { "b.sync_code", "t.car_plate", "t.driver_name",
+		return new String[] { "b.sync_code", "t.car_plate_no", "t.driver_name",
 				"t.engine_no", "t.address", "t.source" };
 	}
 
