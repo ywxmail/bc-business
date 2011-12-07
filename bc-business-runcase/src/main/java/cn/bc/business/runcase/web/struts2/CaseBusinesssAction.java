@@ -23,6 +23,7 @@ import cn.bc.core.util.StringUtils;
 import cn.bc.db.jdbc.RowMapper;
 import cn.bc.db.jdbc.SqlObject;
 import cn.bc.identity.web.SystemContext;
+import cn.bc.web.formater.AbstractFormater;
 import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.formater.EntityStatusFormater;
 import cn.bc.web.formater.LinkFormater4Id;
@@ -69,7 +70,7 @@ public class CaseBusinesssAction extends ViewAction<Map<String, Object>> {
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer sql = new StringBuffer();
 		sql.append("select cit.id,c.status_,c.subject,c.motorcade_name,c.car_plate,c.driver_name,c.closer_name,c.happen_date");
-		sql.append(",c.close_date,c.address,c.from_,c.driver_cert,c.case_no,c.driver_id,c.car_id");
+		sql.append(",c.close_date,c.address,c.from_,c.source,c.driver_cert,c.case_no,c.driver_id,c.car_id");
 		sql.append(" from bs_case_infract_business cit inner join BS_CASE_BASE c on cit.id=c.id");
 		sqlObject.setSql(sql.toString());
 		
@@ -92,6 +93,7 @@ public class CaseBusinesssAction extends ViewAction<Map<String, Object>> {
 				map.put("close_date", rs[i++]);
 				map.put("address", rs[i++]);
 				map.put("from_", rs[i++]);
+				map.put("source", rs[i++]);
 				map.put("driver_cert", rs[i++]);
 				map.put("case_no", rs[i++]);
 				map.put("driver_id", rs[i++]);
@@ -110,6 +112,23 @@ public class CaseBusinesssAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("c.status_", "status_",
 				getText("runcase.status"), 50).setSortable(true).setValueFormater(
 				new EntityStatusFormater(getCaseStatuses()))); 
+		columns.add(new TextColumn4MapKey("c.source", "source",
+				getText("runcase.source"), 60).setSortable(true).setUseTitleFromLabel(true)
+				.setValueFormater(new AbstractFormater<String>() {
+					@Override
+					public String format(Object context, Object value) {
+						// 从上下文取出元素Map
+						@SuppressWarnings("unchecked")
+						Map<String, Object> obj = (Map<String, Object>) context;
+						if(null != obj.get("from_") && obj.get("from_").toString().length() > 0){
+							return getSourceStatuses().get(obj.get("source")+"") + " - " + obj.get("from_");
+						}else if(null != obj.get("source") && obj.get("source").toString().length() > 0){
+							return getSourceStatuses().get(obj.get("source")+"");
+						}else{
+							return "";
+						}
+					}
+				}));
 		columns.add(new TextColumn4MapKey("c.subject", "subject",
 				getText("runcase.subject"), 120).setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("c.motorcade_name", "motorcade_name",
@@ -140,8 +159,6 @@ public class CaseBusinesssAction extends ViewAction<Map<String, Object>> {
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
 		columns.add(new TextColumn4MapKey("c.address", "address",
 				getText("runcase.address"), 120));
-		columns.add(new TextColumn4MapKey("c.from_", "from_",
-				getText("runcase.source"), 60).setSortable(true));
 		columns.add(new TextColumn4MapKey("c.driver_cert", "driver_cert",
 				getText("runcase.driverCert"), 80));
 		columns.add(new TextColumn4MapKey("c.case_no", "case_no",
@@ -237,9 +254,9 @@ public class CaseBusinesssAction extends ViewAction<Map<String, Object>> {
 		statuses.put(String.valueOf(CaseBase.SOURCE_SYS),
 				getText("runcase.select.source.sys"));
 		statuses.put(String.valueOf(CaseBase.SOURCE_SYNC),
-				getText("runcase.select.source.sync"));
-		statuses.put(String.valueOf(CaseBase.SOURCE_FROM_DRIVER),
-				getText("runcase.select.source.fromdriver"));
+				getText("runcase.select.source.sync.auto"));
+		statuses.put(String.valueOf(CaseBase.SOURCE_GENERATION),
+				getText("runcase.select.source.sync.auto"));
 		return statuses;
 	}
 
