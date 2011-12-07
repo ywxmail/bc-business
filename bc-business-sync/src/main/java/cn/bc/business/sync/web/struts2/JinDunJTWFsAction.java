@@ -135,7 +135,7 @@ public class JinDunJTWFsAction extends SyncViewAction {
 		columns.add(new TextColumn4MapKey("t.happen_date", "happenDate",
 				getText("jinDunJTWF.happenDate"), 130).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd HH:mm")));
-		columns.add(new TextColumn4MapKey("t.car_plate", "carPlateNo",
+		columns.add(new TextColumn4MapKey("t.car_plate_no", "carPlateNo",
 				getText("jinDunJTWF.carPlate"), 80).setSortable(true)
 				.setValueFormater(new AbstractFormater<String>() {
 					@SuppressWarnings("unchecked")
@@ -171,6 +171,8 @@ public class JinDunJTWFsAction extends SyncViewAction {
 				.setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("t.decision_type", "decisionType",
 				getText("jinDunJTWF.decisionType"), 80).setSortable(true));
+		columns.add(new TextColumn4MapKey("t.engine_no", "engineNo",
+				getText("jinDunJTWF.engineNo"), 60).setSortable(true));
 		columns.add(new TextColumn4MapKey("b.sync_date", "syncDate",
 				getText("syncBase.syncDate"), 130).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd HH:mm")));
@@ -206,6 +208,9 @@ public class JinDunJTWFsAction extends SyncViewAction {
 					getText("label.operate"))
 					.setChange("bs.jinDunJTWFView.selectMenuButtonItem");
 			tb.addButton(menuButton);
+
+			// --跳转到金盾网的查询页面
+			menuButton.addMenuItem(getText("bs.jindun.opento"), "opento");
 
 			// --标记为已处理
 			menuButton.addMenuItem(getText("label.mark.done"), "mark."

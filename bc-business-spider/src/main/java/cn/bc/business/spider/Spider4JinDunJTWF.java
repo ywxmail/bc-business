@@ -117,6 +117,7 @@ public class Spider4JinDunJTWF implements Spider<List<JinDunJTWF>> {
 			jtwf.setCarType("02");
 			jtwf.setCarPlateType(this.carPlateType);
 			jtwf.setCarPlateNo(this.carPlateNo);
+			jtwf.setEngineNo(this.engineNo);
 			jtwf.setDecisionNo(tds.get(1).html().trim());// 决定书编号
 			// 违法时间,格式为2011-11-06 22:33
 			jtwf.setHappenDate(DateUtils.getCalendar(tds.get(2).html().trim()));
