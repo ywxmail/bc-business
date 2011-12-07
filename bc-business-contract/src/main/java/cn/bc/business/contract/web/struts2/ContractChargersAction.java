@@ -23,7 +23,6 @@ import cn.bc.db.jdbc.SqlObject;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.formater.DateRangeFormater;
-import cn.bc.web.formater.EntityStatusFormater;
 import cn.bc.web.formater.LinkFormater4Id;
 import cn.bc.web.ui.html.grid.Column;
 import cn.bc.web.ui.html.grid.IdColumn4MapKey;
@@ -65,12 +64,12 @@ public class ContractChargersAction extends ViewAction<Map<String, Object>> {
 
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer sql = new StringBuffer();
-		sql.append("select cc.id,c.type_,c.ext_str1,c.ext_str2,c.transactor_name,c.sign_date,c.start_date,c.end_date,c.code");
+		sql.append("select cc.id,cc.bs_type,c.ext_str1,c.ext_str2,c.transactor_name,c.sign_date,c.start_date,c.end_date,c.code");
 		sql.append(",car.id carId");
 		sql.append(" from BS_CONTRACT_CHARGER cc");
-		sql.append(" inner join BS_CONTRACT c on cc.id = c.id");
-		sql.append(" inner join BS_CAR_CONTRACT carc on c.id = carc.contract_id");
-		sql.append(" inner join BS_Car car on carc.car_id = car.id");
+		sql.append(" left join BS_CONTRACT c on cc.id = c.id");
+		sql.append(" left join BS_CAR_CONTRACT carc on c.id = carc.contract_id");
+		sql.append(" left join BS_Car car on carc.car_id = car.id");
 		sqlObject.setSql(sql.toString());
 		
 		// 注入参数
@@ -82,7 +81,7 @@ public class ContractChargersAction extends ViewAction<Map<String, Object>> {
 				Map<String, Object> map = new HashMap<String, Object>();
 				int i = 0;
 				map.put("id", rs[i++]);
-				map.put("type_", rs[i++]);
+				map.put("bs_type", rs[i++]);
 				map.put("ext_str1", rs[i++]);
 				map.put("ext_str2", rs[i++]);
 				map.put("transactor_name", rs[i++]);
@@ -100,10 +99,9 @@ public class ContractChargersAction extends ViewAction<Map<String, Object>> {
 	@Override
 	protected List<Column> getGridColumns() {
 		List<Column> columns = new ArrayList<Column>();
-		columns.add(new IdColumn4MapKey("cit.id","id"));
-		columns.add(new TextColumn4MapKey("c.type_", "type_",
-				getText("contract.type"), 80).setSortable(true).setValueFormater(
-				new EntityStatusFormater(getEntityTypes()))); 
+		columns.add(new IdColumn4MapKey("cc.id","id"));
+		columns.add(new TextColumn4MapKey("cc.bs_type", "bs_type",
+				getText("contract.charger.businessType"),60));
 		columns.add(new TextColumn4MapKey("c.ext_str1", "ext_str1",
 				getText("contract.car"), 80).setUseTitleFromLabel(true)
 				.setValueFormater(
@@ -120,11 +118,6 @@ public class ContractChargersAction extends ViewAction<Map<String, Object>> {
 						}));
 		columns.add(new TextColumn4MapKey("c.ext_str2", "ext_str2",
 				getText("contract.charger.charger")).setUseTitleFromLabel(true));
-		columns.add(new TextColumn4MapKey("c.transactor_name", "transactor_name",
-				getText("contract.transactor"), 60).setUseTitleFromLabel(true));
-		columns.add(new TextColumn4MapKey("c.sign_date", "sign_date",
-				getText("contract.signDate"), 90).setSortable(true)
-				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
 		columns.add(new TextColumn4MapKey("c.start_date", "start_date", getText("contract.deadline"), 180)
 				.setValueFormater(new DateRangeFormater("yyyy-MM-dd") {
 					@Override
@@ -134,8 +127,13 @@ public class ContractChargersAction extends ViewAction<Map<String, Object>> {
 						return (Date) contract.get("end_date");
 					}
 				}));
+		columns.add(new TextColumn4MapKey("c.sign_date", "sign_date",
+				getText("contract.signDate"), 90).setSortable(true)
+				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
 		columns.add(new TextColumn4MapKey("c.code", "code",
 				getText("contract.code"),120));
+		columns.add(new TextColumn4MapKey("c.transactor_name", "transactor_name",
+				getText("contract.transactor"), 60).setUseTitleFromLabel(true));
 		
 		return columns;
 	}
