@@ -11,7 +11,7 @@ import cn.bc.orm.hibernate.jpa.HibernateCrudJpaDao;
 /**
  * 工伤Dao的hibernate jpa实现
  * 
- * @author dragon
+ * @author wis
  */
 public class InjuryDaoImpl extends HibernateCrudJpaDao<Injury> implements InjuryDao{
 	//private static Log logger = LogFactory.getLog(InjuryDaoImpl.class);

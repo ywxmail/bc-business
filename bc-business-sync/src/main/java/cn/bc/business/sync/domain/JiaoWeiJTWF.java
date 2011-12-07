@@ -8,6 +8,7 @@ import java.util.Calendar;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import cn.bc.sync.domain.SyncBase;
 
@@ -27,7 +28,8 @@ public class JiaoWeiJTWF extends SyncBase {
 
 	private Calendar happenDate;// 违章时间
 	private String content;// 违章内容
-	private String carPlate;// 车牌号码
+	private String carPlateType;// 车牌归属，如“粤A”
+	private String carPlateNo;// 车牌号码，如“C4X74”
 	private String driverName;// 当事司机姓名
 	private String driverCert;// 服务资格证
 	private Float jeom;// 本次扣分
@@ -50,13 +52,27 @@ public class JiaoWeiJTWF extends SyncBase {
 		this.content = content;
 	}
 
-	@Column(name = "CAR_PLATE")
-	public String getCarPlate() {
-		return carPlate;
+	@Column(name = "CAR_PLATE_NO")
+	public String getCarPlateNo() {
+		return carPlateNo;
 	}
 
-	public void setCarPlate(String carPlate) {
-		this.carPlate = carPlate;
+	public void setCarPlateNo(String carPlateNo) {
+		this.carPlateNo = carPlateNo;
+	}
+
+	@Column(name = "CAR_PLATE_TYPE")
+	public String getCarPlateType() {
+		return carPlateType;
+	}
+
+	public void setCarPlateType(String carPlateType) {
+		this.carPlateType = carPlateType;
+	}
+
+	@Transient
+	public String getCarPlate() {
+		return this.carPlateType + "." + this.carPlateNo;
 	}
 
 	@Column(name = "DRIVER_NAME")

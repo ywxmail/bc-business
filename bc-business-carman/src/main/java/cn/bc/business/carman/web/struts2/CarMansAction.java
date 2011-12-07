@@ -17,6 +17,7 @@ import cn.bc.business.web.struts2.ViewAction;
 import cn.bc.core.Entity;
 import cn.bc.core.query.condition.Condition;
 import cn.bc.core.query.condition.Direction;
+import cn.bc.core.query.condition.impl.AndCondition;
 import cn.bc.core.query.condition.impl.EqualsCondition;
 import cn.bc.core.query.condition.impl.InCondition;
 import cn.bc.core.query.condition.impl.OrderCondition;
@@ -149,17 +150,21 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected Condition getGridSpecalCondition() {
+		// 状态条件
+		Condition statusCondition = null;
 		if (status != null && status.length() > 0) {
 			String[] ss = status.split(",");
 			if (ss.length == 1) {
-				return new EqualsCondition("c.status_", new Integer(ss[0]));
+				statusCondition = new EqualsCondition("d.status_", new Integer(
+						ss[0]));
 			} else {
-				return new InCondition("c.status_",
+				statusCondition = new InCondition("d.status_",
 						StringUtils.stringArray2IntegerArray(ss));
 			}
 		} else {
 			return null;
 		}
+		return new AndCondition().add(statusCondition);
 	}
 
 	@Override

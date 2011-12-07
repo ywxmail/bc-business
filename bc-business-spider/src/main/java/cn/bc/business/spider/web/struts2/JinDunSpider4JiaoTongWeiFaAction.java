@@ -6,21 +6,16 @@ package cn.bc.business.spider.web.struts2;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
-import cn.bc.business.spider.service.BsSpiderService;
 import cn.bc.business.web.struts2.ViewAction;
 import cn.bc.core.util.StringUtils;
 import cn.bc.db.jdbc.SqlObject;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.web.formater.AbstractFormater;
-import cn.bc.web.formater.CalendarFormater;
-import cn.bc.web.formater.EntityStatusFormater;
 import cn.bc.web.formater.LinkFormater4Id;
 import cn.bc.web.ui.html.grid.Column;
 import cn.bc.web.ui.html.grid.Grid;
@@ -31,7 +26,7 @@ import cn.bc.web.ui.html.toolbar.Toolbar;
 import cn.bc.web.ui.html.toolbar.ToolbarButton;
 
 /**
- * 车辆视图Action
+ * Action
  * 
  * @author dragon
  * 
@@ -42,12 +37,6 @@ public class JinDunSpider4JiaoTongWeiFaAction extends
 		ViewAction<Map<String, Object>> {
 	private static final long serialVersionUID = 1L;
 	public String carIds;
-	public BsSpiderService bsSpiderService;
-
-	@Autowired
-	public void setBsSpiderService(BsSpiderService bsSpiderService) {
-		this.bsSpiderService = bsSpiderService;
-	}
 
 	@Override
 	public boolean isReadonly() {

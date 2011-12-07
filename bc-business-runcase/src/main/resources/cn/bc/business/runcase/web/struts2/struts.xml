@@ -10,6 +10,12 @@
 		</action>
 		<action name="caseTraffic/selectCarMansInfo" class="caseTrafficAction" method="selectCarMansInfo">
 		</action>
+		<action name="caseTraffic/createFromJinDun" class="caseTrafficAction" method="create">
+			<result name="form" >/bc-business/caseTraffic/form.jsp</result>
+		</action>
+		<action name="caseTraffic/createFromJiaoWei" class="caseTrafficAction" method="create">
+			<result name="form" >/bc-business/caseTraffic/form.jsp</result>
+		</action>
 	</package>
 	
 	<!-- 营运违章 -->
