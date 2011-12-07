@@ -395,6 +395,8 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 				getText("runcase.select.status.active"));
 		statuses.put(String.valueOf(CaseBase.STATUS_CLOSED),
 				getText("runcase.select.status.closed"));
+		statuses.put(String.valueOf(CaseBase.SOURCE_GENERATION),
+				getText("runcase.select.status.closed"));
 		return statuses;
 	}
 
@@ -408,9 +410,9 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 		statuses.put(String.valueOf(CaseBase.SOURCE_SYS),
 				getText("runcase.select.source.sys"));
 		statuses.put(String.valueOf(CaseBase.SOURCE_SYNC),
-				getText("runcase.select.source.sync"));
-		statuses.put(String.valueOf(CaseBase.SOURCE_FROM_DRIVER),
-				getText("runcase.select.source.fromdriver"));
+				getText("runcase.select.source.sync.auto"));
+		statuses.put(String.valueOf(CaseBase.SOURCE_GENERATION),
+				getText("runcase.select.source.sync.gen"));
 		return statuses;
 	}
 
