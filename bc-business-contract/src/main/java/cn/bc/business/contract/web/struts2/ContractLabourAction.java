@@ -393,6 +393,8 @@ public class ContractLabourAction extends FileEntityAction<Long, Contract4Labour
 	 */
 	public void deleteAll(Long id){
 		Contract c = this.contractLabourService.load(id);
+		//单个删除工伤表industrial_injury表
+		this.contractLabourService.deleteInjury(id);
 		//单个删除中间表carman_contract表
 		this.contractLabourService.deleteCarManNContract(id);
 		//单个删除中间表car_contract表
@@ -415,6 +417,8 @@ public class ContractLabourAction extends FileEntityAction<Long, Contract4Labour
 			Contract c = this.contractLabourService.load(id);
 			objList.add(c);
 		}
+		//批量删除工伤表industrial_injury表
+		this.contractLabourService.deleteInjury(ids);
 		//批量删除中间表carman_contract表
 		this.contractLabourService.deleteCarManNContract(ids);
 		//批量删除中间表car_contract表

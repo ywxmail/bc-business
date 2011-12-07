@@ -12,6 +12,7 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
+import cn.bc.business.runcase.domain.CaseBase;
 import cn.bc.business.web.struts2.ViewAction;
 import cn.bc.core.Entity;
 import cn.bc.core.query.condition.Condition;
@@ -24,6 +25,7 @@ import cn.bc.core.util.StringUtils;
 import cn.bc.db.jdbc.RowMapper;
 import cn.bc.db.jdbc.SqlObject;
 import cn.bc.identity.web.SystemContext;
+import cn.bc.web.formater.AbstractFormater;
 import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.formater.EntityStatusFormater;
 import cn.bc.web.ui.html.grid.Column;
@@ -68,7 +70,7 @@ public class CasePraisesAction extends ViewAction<Map<String, Object>> {
 
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer sql = new StringBuffer();
-		sql.append("select b.id,b.status_,b.from_,b.code,b.motorcade_name,b.car_plate,b.driver_name,b.driver_cert,b.happen_date");
+		sql.append("select b.id,b.status_,b.from_,b.source,b.code,b.motorcade_name,b.car_plate,b.driver_name,b.driver_cert,b.happen_date");
 		sql.append(",b.subject,b.address ,p.advisor_name ");
 		sql.append(" from BS_CASE_PRAISE p inner join BS_CASE_BASE b on b.id=p.id");
 		sqlObject.setSql(sql.toString());
@@ -84,6 +86,7 @@ public class CasePraisesAction extends ViewAction<Map<String, Object>> {
 				map.put("id", rs[i++]);
 				map.put("status_", rs[i++]);
 				map.put("from_", rs[i++]);
+				map.put("source", rs[i++]);
 				map.put("code", rs[i++]);
 				map.put("motorcade_name", rs[i++]);
 				map.put("car_plate", rs[i++]);
@@ -107,11 +110,25 @@ public class CasePraisesAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("b.status_", "status_",
 				getText("runcase.status"), 50).setSortable(true)
 				.setValueFormater(new EntityStatusFormater(getBSStatuses2())));
-		columns.add(new TextColumn4MapKey("b.code", "code",
-				getText("runcase.code"), 130).setSortable(true));
-		columns.add(new TextColumn4MapKey("b.from_", "from_",
-				getText("runcase.source"), 70).setSortable(true)
-				.setUseTitleFromLabel(true));
+		columns.add(new TextColumn4MapKey("b.source", "source",
+				getText("runcase.source"), 60).setSortable(true).setUseTitleFromLabel(true)
+				.setValueFormater(new AbstractFormater<String>() {
+					@Override
+					public String format(Object context, Object value) {
+						// 从上下文取出元素Map
+						@SuppressWarnings("unchecked")
+						Map<String, Object> obj = (Map<String, Object>) context;
+						if(null != obj.get("from_") && obj.get("from_").toString().length() > 0){
+							return getSourceStatuses().get(obj.get("source")+"") + " - " + obj.get("from_");
+						}else if(null != obj.get("source") && obj.get("source").toString().length() > 0){
+							return getSourceStatuses().get(obj.get("source")+"");
+						}else{
+							return "";
+						}
+					}
+				}));
+		columns.add(new TextColumn4MapKey("b.subject", "subject",
+				getText("runcase.subject"), 120).setSortable(true));
 		columns.add(new TextColumn4MapKey("b.motorcade_name", "motorcade_name",
 				getText("runcase.motorcadeName"), 80).setSortable(true));
 		if (carId == null) {
@@ -128,13 +145,13 @@ public class CasePraisesAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("b.happen_date", "happen_date",
 				getText("runcase.happenDate"), 100).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
-		columns.add(new TextColumn4MapKey("b.subject", "subject",
-				getText("runcase.subject"), 120).setSortable(true));
 		columns.add(new TextColumn4MapKey("b.address", "address",
 				getText("runcase.address"), 100).setSortable(true)
 				.setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("p.advisor_name", "advisor_name",
 				getText("runcase.praiseName"), 70).setSortable(true));
+		columns.add(new TextColumn4MapKey("b.code", "code",
+				getText("runcase.code"), 130).setSortable(true));
 
 		return columns;
 	}
@@ -216,6 +233,22 @@ public class CasePraisesAction extends ViewAction<Map<String, Object>> {
 						Toolbar.getDefaultToolbarRadioGroup(
 								this.getBSStatuses2(), "status", 0,
 								getText("title.click2changeSearchStatus")));
+	}
+	
+	/**
+	 * 获取Entity的来源转换列表
+	 * 
+	 * @return
+	 */
+	protected Map<String, String> getSourceStatuses() {
+		Map<String, String> statuses = new HashMap<String, String>();
+		statuses.put(String.valueOf(CaseBase.SOURCE_SYS),
+				getText("runcase.select.source.sys"));
+		statuses.put(String.valueOf(CaseBase.SOURCE_SYNC),
+				getText("runcase.select.source.sync.auto"));
+		statuses.put(String.valueOf(CaseBase.SOURCE_GENERATION),
+				getText("runcase.select.source.sync.auto"));
+		return statuses;
 	}
 
 }

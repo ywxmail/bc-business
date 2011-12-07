@@ -89,6 +89,20 @@ public interface ContractLabourService extends CrudService<Contract4Labour> {
 	 */
 	List<Map<String, Object>> findCarManIsExistContract(Long carManId);
 
+	/**
+	 * 删除单个Injury
+	 * @parma contractId
+	 * @return
+	 */
+	void deleteInjury(Long contractId);
+	
+	/**
+	 * 删除批量Injury
+	 * @parma contractIds[] 
+	 * @return
+	 */
+	void deleteInjury(Long[] contractIds);
+
 
 
 }
