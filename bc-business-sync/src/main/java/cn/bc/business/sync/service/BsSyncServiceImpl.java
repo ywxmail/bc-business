@@ -222,21 +222,24 @@ public class BsSyncServiceImpl implements BsSyncService {
 
 		// 如果抓取没有异常，就将所有现有的其他未处理记录设置为已处理
 		if (!hasError) {
-			List<String> newSyncCodes = new ArrayList<String>();
-			for (SyncBase syncBase : news) {
-				newSyncCodes.add(syncBase.getSyncCode());
-			}
-			this.syncBaseService.updateNewStatus2Done4ExcludeCode(syncType,
-					newSyncCodes);
+//			List<String> newSyncCodes = new ArrayList<String>();
+//			for (SyncBase syncBase : news) {
+//				newSyncCodes.add(syncBase.getSyncCode());
+//			}
+//			this.syncBaseService.updateNewStatus2Done4ExcludeCode(syncType,
+//					newSyncCodes);
 		}
 
 		// 将已经存在的旧记录的状态更新为未处理
 		if (!olds.isEmpty()) {
-			List<String> oldSyncCodes = new ArrayList<String>();
-			for (SyncBase syncBase : olds) {
-				oldSyncCodes.add(syncBase.getSyncCode());
-			}
-			this.syncBaseService.updateStatus2New(syncType, oldSyncCodes);
+//			List<String> oldSyncCodes = new ArrayList<String>();
+//			for (SyncBase syncBase : olds) {
+//				oldSyncCodes.add(syncBase.getSyncCode());
+//			}
+//			int u2 = this.syncBaseService.updateStatus2New(syncType, oldSyncCodes);
+//			if(u2 > 0){
+//				logger.warn("将" + u2 + "条信息重新更新为未处理状态！");
+//			}
 		}
 
 		// 保存新增的记录
