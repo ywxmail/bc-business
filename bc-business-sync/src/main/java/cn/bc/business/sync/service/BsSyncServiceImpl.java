@@ -2,6 +2,7 @@ package cn.bc.business.sync.service;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -15,6 +16,7 @@ import cn.bc.business.spider.domain.JinDunJTWF;
 import cn.bc.business.sync.domain.JiaoWeiJTWF;
 import cn.bc.business.ws.service.WSMiddle;
 import cn.bc.core.cache.Cache;
+import cn.bc.core.util.DateUtils;
 import cn.bc.identity.domain.ActorHistory;
 import cn.bc.option.service.OptionService;
 import cn.bc.sync.domain.SyncBase;
@@ -63,6 +65,7 @@ public class BsSyncServiceImpl implements BsSyncService {
 
 	public int doSync4JiaoWeiJTWF(ActorHistory syncer, Calendar fromDate,
 			Calendar toDate, StringBuffer strMsg) {
+		Date startTime = new Date();
 		// 交委接口的宝城企业ID
 		String jiaoWei_qyid_baocheng = this.optionService.getItemValue("sync",
 				"jiaowei.ws.qyid.baocheng");
@@ -103,6 +106,8 @@ public class BsSyncServiceImpl implements BsSyncService {
 			if (!toSaveDomains.isEmpty())
 				this.syncBaseService.save(toSaveDomains);
 		}
+		if (logger.isInfoEnabled())
+			logger.info("从交委交通违法接口获取数据总耗时：" + DateUtils.getWasteTime(startTime) + ",newCount=" + toSaveDomains.size());
 
 		return toSaveDomains.size();
 	}
@@ -148,6 +153,7 @@ public class BsSyncServiceImpl implements BsSyncService {
 
 	public int doSync4JinDunJTWF(ActorHistory syncer,
 			List<Map<String, Object>> cars, StringBuffer strMsg) {
+		Date startTime = new Date();
 		if (logger.isDebugEnabled()) {
 			logger.debug("cars=" + cars);
 		}
@@ -245,6 +251,8 @@ public class BsSyncServiceImpl implements BsSyncService {
 		// 保存新增的记录
 		if (!news.isEmpty())
 			this.syncBaseService.save(news);
+		if (logger.isInfoEnabled())
+			logger.info("从金盾网抓取交通违法信息总耗时：" + DateUtils.getWasteTime(startTime) + ",newCount=" + news.size());
 
 		return news.size();
 	}
