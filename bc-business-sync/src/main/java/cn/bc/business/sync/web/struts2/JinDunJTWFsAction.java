@@ -172,7 +172,7 @@ public class JinDunJTWFsAction extends SyncViewAction {
 		columns.add(new TextColumn4MapKey("t.decision_type", "decisionType",
 				getText("jinDunJTWF.decisionType"), 80).setSortable(true));
 		columns.add(new TextColumn4MapKey("t.engine_no", "engineNo",
-				getText("jinDunJTWF.engineNo"), 60).setSortable(true));
+				getText("jinDunJTWF.engineNo"), 100).setSortable(true));
 		columns.add(new TextColumn4MapKey("b.sync_date", "syncDate",
 				getText("syncBase.syncDate"), 130).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd HH:mm")));
@@ -288,5 +288,15 @@ public class JinDunJTWFsAction extends SyncViewAction {
 		return this.bsSyncService.doSync4JinDunJTWF(
 				((SystemContext) this.getContext()).getUserHistory(), cars,
 				strMsg);
+	}
+
+	@Override
+	protected String getSyncFailedMsg(int newCount, String strMsg) {
+		if (newCount > 0) {
+			return getText("jinDunJTWF.sync.finishedWithError", new String[] {
+					String.valueOf(newCount), strMsg });
+		} else {
+			return super.getSyncFailedMsg(newCount, strMsg);
+		}
 	}
 }

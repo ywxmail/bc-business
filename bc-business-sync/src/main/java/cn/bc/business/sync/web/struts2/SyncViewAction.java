@@ -118,10 +118,8 @@ public abstract class SyncViewAction extends ViewAction<Map<String, Object>> {
 			// 发生异常就直接退出
 			if (strMsg.length() > 0) {
 				json.put("success", false);
-				json.put(
-						"msg",
-						getText("bs.sync.failed",
-								new String[] { strMsg.toString() }));
+				json.put("msg",
+						this.getSyncFailedMsg(newCount, strMsg.toString()));
 			} else {
 				json.put("success", true);
 				json.put(
@@ -137,6 +135,21 @@ public abstract class SyncViewAction extends ViewAction<Map<String, Object>> {
 
 		this.json = json.toString();
 		return "json";
+	}
+
+	/**
+	 * 获取同步失败的提示信息
+	 * 
+	 * @param strMsg
+	 * @return
+	 */
+	protected String getSyncFailedMsg(int newCount, String strMsg) {
+		if (newCount > 0) {
+			return getText("bs.sync.finishedWithError",
+					new String[] { String.valueOf(newCount), strMsg });
+		} else {
+			return getText("bs.sync.failed", new String[] { strMsg });
+		}
 	}
 
 	protected abstract int doSync(StringBuffer strMsg);

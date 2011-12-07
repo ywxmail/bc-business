@@ -167,6 +167,7 @@ public class BsSyncServiceImpl implements BsSyncService {
 		int i = 0;
 		List<String> carSpideHistory = this.jinDunCache.get("carSpideHistory");
 		String carId;
+		int errorCount = 0;
 		for (Map<String, Object> car : cars) {
 			carId = car.get("id").toString();
 			i++;
@@ -206,6 +207,7 @@ public class BsSyncServiceImpl implements BsSyncService {
 					// 抓取异常就停止
 					logger.error(e.getMessage());
 					hasError = true;
+					errorCount ++;
 				}
 			}
 		}
@@ -254,6 +256,9 @@ public class BsSyncServiceImpl implements BsSyncService {
 		if (logger.isInfoEnabled())
 			logger.info("从金盾网抓取交通违法信息总耗时：" + DateUtils.getWasteTime(startTime) + ",newCount=" + news.size());
 
+		if(errorCount > 0){
+			strMsg.append(errorCount);//记录发生异常的数目
+		}
 		return news.size();
 	}
 }
