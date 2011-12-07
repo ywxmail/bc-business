@@ -8,6 +8,7 @@ import java.util.Calendar;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import cn.bc.sync.domain.SyncBase;
 
@@ -88,6 +89,11 @@ public class JinDunJTWF extends SyncBase {
 
 	public void setCarPlateNo(String carPlateNo) {
 		this.carPlateNo = carPlateNo;
+	}
+
+	@Transient
+	public String getCarPlate() {
+		return this.carPlateType + "." + this.carPlateNo;
 	}
 
 	@Column(name = "ENGINE_NO")

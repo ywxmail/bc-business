@@ -56,6 +56,8 @@ public abstract class SyncViewAction extends ViewAction<Map<String, Object>> {
 				getText("bs.sync.status.new"));
 		statuses.put(String.valueOf(SyncBase.STATUS_DONE),
 				getText("bs.sync.status.done"));
+		statuses.put(String.valueOf(SyncBase.STATUS_GEN),
+				getText("bs.sync.status.gen"));
 		statuses.put("", getText("bs.status.all"));
 		return statuses;
 	}

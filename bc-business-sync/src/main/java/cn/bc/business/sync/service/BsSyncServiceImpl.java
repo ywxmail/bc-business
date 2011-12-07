@@ -127,7 +127,15 @@ public class BsSyncServiceImpl implements BsSyncService {
 		domain.setSyncFrom(syncFrom);
 
 		domain.setSyncCode(row.getCellStringValue("违章顺序号"));
-		domain.setCarPlate(row.getCellStringValue("车牌号码"));
+		String plate = row.getCellStringValue("车牌号码");//格式为粤A.XXXX
+		int index = plate.indexOf(".");
+		if (index != -1) {
+			domain.setCarPlateType(plate.substring(0, index));
+			domain.setCarPlateNo(plate.substring(index + 1));
+		} else {
+			domain.setCarPlateType(null);
+			domain.setCarPlateNo(plate);
+		}
 		domain.setDriverName(row.getCellStringValue("当事司机姓名"));
 		domain.setDriverCert(row.getCellStringValue("服务资格证"));
 		domain.setHappenDate(row.getCellCalendarValue("违章时间"));
