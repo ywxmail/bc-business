@@ -37,7 +37,7 @@ ActionSupport {
 	public CarManService carManService;
 	public CarService carService;
 	public Map<Long, String> cars;
-	public Long classes;
+	public Long classes;//班次
 	public String description;// 备注
 
 	@Autowired
