@@ -12,9 +12,12 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceException;
 import javax.persistence.Query;
+import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.orm.jpa.JpaCallback;
 import org.springframework.util.StringUtils;
 
@@ -32,6 +35,12 @@ import cn.bc.orm.hibernate.jpa.HibernateCrudJpaDao;
  */
 public class CarDaoImpl extends HibernateCrudJpaDao<Car> implements CarDao {
 	private static Log logger = LogFactory.getLog(CarDaoImpl.class);
+	private JdbcTemplate jdbcTemplate;
+	
+	@Autowired
+	public void setDataSource(DataSource dataSource) {
+		this.jdbcTemplate = new JdbcTemplate(dataSource);
+	}
 
 	@Override
 	public void delete(Serializable id) {
@@ -307,5 +316,16 @@ public class CarDaoImpl extends HibernateCrudJpaDao<Car> implements CarDao {
 		String hql = "select c.car from CarByDriver c where c.driver.id=? and c.status=?";
 		//0为启用中
 		return this.getJpaTemplate().find(hql, new Object[] { carManId,new Integer( 0 )});
+	}
+
+	/**
+	 * 根据车牌号查找车牌号
+	 * @parma carPlateNo 
+	 * @return Long
+	 */
+	public Long findcarInfoByCarPlateNo(String carPlateNo) {
+		String sql = "select c.Id from BS_CAR c where c.PLATE_NO='"+carPlateNo+"'";
+		Long carId = this.jdbcTemplate.queryForLong(sql);
+		return carId;
 	}
 }
