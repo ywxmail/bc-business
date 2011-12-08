@@ -31,6 +31,17 @@
 			<result>/bc-business/carByDriverHistory/selectMoveType/select.jsp</result>
 		</action>
 	</package>
+	<package name="shiftworkByDriver" extends="bc-default" namespace="/bc-business/shiftworkByDriver">
+		<action name="save" class="shiftworkByDriverAction" method="save" />
+		<action name="data" class="shiftworkByDriverAction" method="data" />
+		<action name="delete" class="shiftworkByDriverAction" method="delete" />
+		<action name="create" class="shiftworkByDriverAction" method="create" >
+		    <result name="create">/bc-business/carByDriver/dingBanForm.jsp</result>
+		</action>
+		<action name="edit" class="carByDriverAction" method="edit" >
+		    <result name="form">/bc-business/carByDriver/dingBanForm.jsp</result>
+		</action>
+	</package>
 	 <package name="carByDriverHistory" extends="bc-default" namespace="/bc-business/carByDriverHistory">
 		<action name="create" class="carByDriverHistoryAction" method="create">
 			<result name="zhuanChe" >/bc-business/carByDriverHistory/zhuanCheForm.jsp</result>
