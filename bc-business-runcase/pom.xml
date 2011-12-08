@@ -41,5 +41,26 @@
 			<artifactId>bc-option</artifactId>
 			<version>${framework.version}</version>
 		</dependency>
+		
+		<!-- 同步模块 -->
+		<dependency>
+			<groupId>cn.bc</groupId>
+			<artifactId>bc-sync</artifactId>
+			<version>${framework.version}</version>
+		</dependency>
+		
+		<!-- spider -->
+		<dependency>
+			<groupId>cn.bc.business</groupId>
+			<artifactId>bc-business-spider</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		
+		<!-- sync -->
+		<dependency>
+			<groupId>cn.bc.business</groupId>
+			<artifactId>bc-business-sync</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 	</dependencies>
 </project>
