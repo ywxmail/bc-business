@@ -38,4 +38,11 @@ public interface CarService extends CrudService<Car> {
 
 	/** 根据司机ID查找返回状态为启用中相关辆信息 */
 	List<Car> selectAllCarByCarManId(Long id);
+
+	/**
+	 * 根据车牌号查找车牌号
+	 * @parma carPlateNo 
+	 * @return Long
+	 */
+	Long findcarInfoByCarPlateNo(String carPlateNo);
 }
