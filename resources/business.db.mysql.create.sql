@@ -295,6 +295,7 @@ create table BS_CARMAN (
     CERT_DRIVING_START_DATE datetime comment '驾驶证起效日期',
     CERT_DRIVING_END_DATE datetime comment '驾驶证过期日期',
     CERT_FWZG            varchar(255) comment '服务资格证号',
+    CERT_FWZG_ID            varchar(255) comment '服务资格ID',
     CERT_CYZG            varchar(255) comment '从业资格证号',
     DRIVING_STATUS       varchar(255) comment '驾驶状态',
     OLD_UNIT_NAME             varchar(255) comment '分支机构：用于历史数据的保存',

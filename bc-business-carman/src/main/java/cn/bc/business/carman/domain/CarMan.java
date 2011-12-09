@@ -64,6 +64,7 @@ public class CarMan extends RichFileEntityImpl {
 	private Calendar cert4DrivingEndDate;// 驾驶证过期日期
 	private String cert4DrivingArchive;// 驾驶证档案号
 	private String cert4FWZG;// 服务资格证号
+	private String cert4FWZGID;// 服务资格ID
 	private String cert4CYZG;// 从业资格证号
 	private int drivingStatus;// 驾驶状态
 	private String oldUnitName;// 分支机构：用于历史数据的保存
@@ -73,6 +74,15 @@ public class CarMan extends RichFileEntityImpl {
 
 	private Set<Cert> certs;// 拥有的证件
 	private Set<Contract> contracts;// 合同
+
+	@Column(name = "CERT_FWZG_ID")
+	public String getCert4FWZGID() {
+		return cert4FWZGID;
+	}
+
+	public void setCert4FWZGID(String cert4fwzgid) {
+		cert4FWZGID = cert4fwzgid;
+	}
 
 	@Column(name = "DESC_")
 	public String getDescription() {
