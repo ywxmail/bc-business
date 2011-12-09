@@ -28,4 +28,18 @@
 		</tx:attributes>
 	</tx:advice>
 	<bean id="bsSyncService" class="cn.bc.business.sync.service.BsSyncServiceImpl" />
+	
+	<!-- JinDunJTWFService -->
+	<bean id="JinDunJTWFDao" class="cn.bc.business.sync.dao.hibernate.jpa.JinDunJTWFDaoImpl"
+		p:entityManagerFactory-ref="entityManagerFactory" />
+	<bean id="JinDunJTWFService" class="cn.bc.business.sync.service.JinDunJTWFServiceImpl"
+		p:JinDunJTWFDao-ref="JinDunJTWFDao" />
+	
+	<!-- JiaoWeiJTWFService -->
+	<bean id="JiaoWeiJTWFDao" class="cn.bc.business.sync.dao.hibernate.jpa.JiaoWeiJTWFDaoImpl"
+		p:entityManagerFactory-ref="entityManagerFactory" />
+	<bean id="JiaoWeiJTWFService" class="cn.bc.business.sync.service.JiaoWeiJTWFServiceImpl"
+		p:JiaoWeiJTWFDao-ref="JiaoWeiJTWFDao" />
+		
+	
 </beans>

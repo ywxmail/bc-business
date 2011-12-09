@@ -101,7 +101,7 @@ public class CarByDriverAction extends FileEntityAction<Long, CarByDriver> {
 		statusesValueList = this.getBSStatuses1();
 		return result;
 	}
-
+	
 	// 视图特殊条件
 	@Override
 	protected Condition getSpecalCondition() {

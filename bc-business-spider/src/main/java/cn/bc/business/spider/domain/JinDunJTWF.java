@@ -8,6 +8,7 @@ import java.util.Calendar;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import cn.bc.sync.domain.SyncBase;
 
@@ -22,13 +23,17 @@ public class JinDunJTWF extends SyncBase {
 	private static final long serialVersionUID = 1L;
 	/** UUID的前缀，实际的uid使用KEY_UID + "-" + id */
 	public static final String KEY_UID = SyncBase.class.getSimpleName();
+	
+	/** 区分接口同步的类型*/
+	public static final String KEY_TYPE = JinDunJTWF.class.getSimpleName();
 
 	// "处理状态"使用基类的status字段记录；"违法序号"使用基类的syncCode字段记录，作为同类信息的唯一标识
 
 	// 请求发出的参数
 	private String carType;// 号牌种类
 	private String carTypeDesc;// 号牌种类的中文描述
-	private String carPlate;// 车牌号码
+	private String carPlateType;// 车牌归属，如“粤A”
+	private String carPlateNo;// 车牌号码，如“C4X74”
 	private String engineNo;// 发动机号
 
 	// 抓取到的参数
@@ -71,11 +76,29 @@ public class JinDunJTWF extends SyncBase {
 		this.carTypeDesc = carTypeDesc;
 	}
 
-	@Column(name = "CAR_PLATE")
-	public String getCarPlate() {
-		return carPlate;
+	@Column(name = "CAR_PLATE_TYPE")
+	public String getCarPlateType() {
+		return carPlateType;
 	}
 	
+	public void setCarPlateType(String carPlateType) {
+		this.carPlateType = carPlateType;
+	}
+	
+	@Column(name = "CAR_PLATE_NO")
+	public String getCarPlateNo() {
+		return carPlateNo;
+	}
+
+	public void setCarPlateNo(String carPlateNo) {
+		this.carPlateNo = carPlateNo;
+	}
+
+	@Transient
+	public String getCarPlate() {
+		return this.carPlateType + "." + this.carPlateNo;
+	}
+
 	@Column(name = "ENGINE_NO")
 	public String getEngineNo() {
 		return engineNo;
@@ -83,10 +106,6 @@ public class JinDunJTWF extends SyncBase {
 	
 	public void setEngineNo(String engineNo) {
 		this.engineNo = engineNo;
-	}
-
-	public void setCarPlate(String carPlate) {
-		this.carPlate = carPlate;
 	}
 
 	@Column(name = "DRIVER_NAME")

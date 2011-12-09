@@ -418,9 +418,9 @@ public class CasePraiseAction extends FileEntityAction<Long, Case4Praise> {
 		statuses.put(String.valueOf(CaseBase.SOURCE_SYS),
 				getText("runcase.select.source.sys"));
 		statuses.put(String.valueOf(CaseBase.SOURCE_SYNC),
-				getText("runcase.select.source.sync"));
-		statuses.put(String.valueOf(CaseBase.SOURCE_FROM_DRIVER),
-				getText("runcase.select.source.fromdriver"));
+				getText("runcase.select.source.sync.auto"));
+		statuses.put(String.valueOf(CaseBase.SOURCE_GENERATION),
+				getText("runcase.select.source.sync.gen"));
 		return statuses;
 	}
 	

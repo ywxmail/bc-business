@@ -41,17 +41,17 @@ public class CaseBase extends RichFileEntityImpl {
 	/** 事件类型：事故 */
 	public static final int TYPE_ACCIDENT = 5;
 
-	/** 事件来源：用户创建 */
+	/** 事件来源：自建 */
 	public static final int SOURCE_SYS = 0;
-	/** 事件来源：接口同步 */
+	/** 事件来源：接口 */
 	public static final int SOURCE_SYNC = 1;
-	/** 事件来源：司机递交 */
-	public static final int SOURCE_FROM_DRIVER = 2;
+	/** 事件来源：生成 */
+	public static final int SOURCE_GENERATION = 2;
 
 	private String subject;// 标题：事件的简要描述
 	private int type;// 事件类型：参考常数TYPE_XXXX的定义
 	private int source = SOURCE_SYS;// 来源：参考常数SOURCE_xxxx的定义
-	private String from = "电话"; //信息来源(用户填写)
+	private String from; //信息来源(用户填写)
 	private String caseNo;// 案号
 	private String code;// 自编号
 	private String address;// 事发地点

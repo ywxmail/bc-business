@@ -158,10 +158,10 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 		if (status != null && status.length() > 0) {
 			String[] ss = status.split(",");
 			if (ss.length == 1) {
-				statusCondition = new EqualsCondition("d.status_", new Integer(
+				statusCondition = new EqualsCondition("c.status_", new Integer(
 						ss[0]));
 			} else {
-				statusCondition = new InCondition("d.status_",
+				statusCondition = new InCondition("c.status_",
 						StringUtils.stringArray2IntegerArray(ss));
 			}
 		} else {
