@@ -14,5 +14,10 @@ import cn.bc.orm.hibernate.jpa.HibernateCrudJpaDao;
  * @author dragon
  */
 public class CaseBaseDaoImpl extends HibernateCrudJpaDao<CaseBase> implements CaseBaseDao{
+	
+	public CaseBase findCaseBaseBysyncId(Long syncId) {
+		String hql = "from CaseBase c where c.syncId=? ";
+		return (CaseBase) this.getJpaTemplate().find(hql, new Object[] { syncId}).get(0);
+	}
 
 }

@@ -22,6 +22,7 @@ import cn.bc.business.carman.service.CarManService;
 import cn.bc.business.motorcade.service.MotorcadeService;
 import cn.bc.business.runcase.domain.Case4InfractTraffic;
 import cn.bc.business.runcase.domain.CaseBase;
+import cn.bc.business.runcase.service.CaseBaseService;
 import cn.bc.business.runcase.service.CaseTrafficService;
 import cn.bc.business.spider.domain.JinDunJTWF;
 import cn.bc.business.sync.domain.JiaoWeiJTWF;
@@ -61,15 +62,16 @@ public class CaseTrafficAction extends FileEntityAction<Long, Case4InfractTraffi
 	private static 	final long 				serialVersionUID 	= 1L;
 	public  Long 							carId;
 	public  Long 							carManId;
-	public	Long							syncId;			//同步ID
+	private	Long							syncId;			//同步ID
 	public  boolean 						isMoreCar;		//是否存在多个车
 	public  boolean 						isMoreCarMan;	//是否存在多个司机
 	public  boolean 						isNullCar;		//此司机现在没有驾驶任何车辆
 	public  boolean 						isNullCarMan;	//此车辆现在没有任何司机驾驶
-   //public  String							isClosed;	
+	//public 	boolean							isExist;		//判断生成的当前记录是否存在,存在发出提醒
+	//public  String							isClosed;	
 	@SuppressWarnings("unused")
 	private CaseTrafficService				caseTrafficService;
-	//private CaseBaseService				caseBaseService;
+	private CaseBaseService					caseBaseService;
 	private MotorcadeService	 			motorcadeService;
 	private OptionService					optionService;
 	private CarManService 					carManService;
@@ -103,16 +105,24 @@ public class CaseTrafficAction extends FileEntityAction<Long, Case4InfractTraffi
 		this.carManId = carManId;
 	}
 
+	public Long getSyncId() {
+		return syncId;
+	}
+
+	public void setSyncId(Long syncId) {
+		this.syncId = syncId;
+	}
+
 	@Autowired
 	public void setCaseTrafficService(CaseTrafficService caseTrafficService) {
 		this.caseTrafficService = caseTrafficService;
 		this.setCrudService(caseTrafficService);
 	}
 	
-//	@Autowired
-//	public void setCaseBaseService(CaseBaseService caseBaseService) {
-//		this.caseBaseService = caseBaseService;
-//	}
+	@Autowired
+	public void setCaseBaseService(CaseBaseService caseBaseService) {
+		this.caseBaseService = caseBaseService;
+	}
 
 	@Autowired
 	public void setMotorcadeService(MotorcadeService motorcadeService) {
@@ -240,12 +250,21 @@ public class CaseTrafficAction extends FileEntityAction<Long, Case4InfractTraffi
 				this.getE().setCaseNo(jinDunJTWF.getSyncCode());
 				this.getE().setAddress(jinDunJTWF.getAddress());
 				this.getE().setHappenDate(jinDunJTWF.getHappenDate());
+				this.getE().setJeom(jinDunJTWF.getJeom());
 				this.getE().setFrom(getText("runcase.jindun")+jinDunJTWF.getSource());
 			}else{	//交委同步
 				JiaoWeiJTWF jiaoWeiJTWF = this.jiaoWeiJTWFService.load(syncId);
 				findCarId(jiaoWeiJTWF.getCarPlateNo());
+				this.getE().setJeom(jiaoWeiJTWF.getJeom());
+				this.getE().setSubject(jiaoWeiJTWF.getContent());
 				this.getE().setFrom(getText("runcase.jiaowei"));
 			}
+			//设置来源
+			this.getE().setSource(CaseBase.SOURCE_GENERATION);
+			//设置syncId
+			this.getE().setSyncId(syncId);
+			//判断生成的当前记录是否存在,存在发出提醒
+			//isExist = this.syncBaseService.hadGenerate("BS_CASE_BASE", syncId);
 		}
 		
 		this.getE().setUid(this.getIdGeneratorService().next(this.getE().ATTACH_TYPE));
@@ -285,9 +304,7 @@ public class CaseTrafficAction extends FileEntityAction<Long, Case4InfractTraffi
 				this.getE().setDriverId(carMan.get(0).getId());
 				this.getE().setDriverCert(carMan.get(0).getCert4FWZG());
 			} else if (carMan.size() > 1) {
-				if(this.getE().getDriverName().length() <= 0){
 					isMoreCarMan = true;
-				}
 			} else {
 				isNullCarMan = true;
 			}
@@ -296,6 +313,10 @@ public class CaseTrafficAction extends FileEntityAction<Long, Case4InfractTraffi
 		// 初始化信息
 		this.getE().setType  (CaseBase.TYPE_INFRACT_TRAFFIC);
 		this.getE().setStatus(CaseBase.STATUS_ACTIVE);
+		// 来源
+		if(syncId == null){
+			this.getE().setSource(CaseBase.SOURCE_SYS);
+		}
 		statusesValue		=	this.getCaseStatuses();
 		sourcesValue		=	this.getSourceStatuses();
 		// 表单可选项的加载
@@ -316,7 +337,12 @@ public class CaseTrafficAction extends FileEntityAction<Long, Case4InfractTraffi
 	
 	@Override
 	public String edit() throws Exception {
-		this.setE(this.getCrudService().load(this.getId()));
+		if(syncId != null){//根据syncId查找已存在CaseBase的记录
+			CaseBase cb = this.caseBaseService.findCaseBaseBysyncId(syncId);
+			this.setE(this.getCrudService().load(cb.getId()));
+		}else{
+			this.setE(this.getCrudService().load(this.getId()));
+		}
 		// 表单可选项的加载
 		this.formPageOption = 	buildFormPageOption();
 		statusesValue		=	this.getCaseStatuses();
@@ -327,8 +353,13 @@ public class CaseTrafficAction extends FileEntityAction<Long, Case4InfractTraffi
 	
 	@Override
 	public String save() throws Exception{
-		SystemContext context = this.getSystyemContext();
 		
+		if(syncId != null){	//处理相应的来源信息的状态
+			SyncBase sb = this.syncBaseService.load(syncId);
+			sb.setStatus(SyncBase.STATUS_GEN);
+			this.syncBaseService.save(sb);
+		}
+		SystemContext context = this.getSystyemContext();
 		//设置最后更新人的信息
 		Case4InfractTraffic e = this.getE();
 		e.setModifier(context.getUserHistory());
