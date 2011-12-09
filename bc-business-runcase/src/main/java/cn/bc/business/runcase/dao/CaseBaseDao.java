@@ -14,4 +14,6 @@ import cn.bc.core.dao.CrudDao;
  */
 public interface CaseBaseDao extends CrudDao<CaseBase> {
 
+	CaseBase findCaseBaseBysyncId(Long syncId);
+
 }
