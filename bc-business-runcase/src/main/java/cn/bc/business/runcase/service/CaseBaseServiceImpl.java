@@ -34,4 +34,12 @@ public class CaseBaseServiceImpl extends DefaultCrudService<CaseBase> implements
 		// TODO Auto-generated method stub
 		
 	}
+
+	public CaseBase findCaseBaseBysyncId(Long syncId) {
+		CaseBase caseBase = null;
+		if(syncId != null){
+			caseBase = this.caseBaseDao.findCaseBaseBysyncId(syncId);
+		}
+		return caseBase;
+	}
 }

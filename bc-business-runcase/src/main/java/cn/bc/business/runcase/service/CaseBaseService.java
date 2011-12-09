@@ -18,4 +18,6 @@ public interface CaseBaseService extends CrudService<CaseBase> {
 
 	void findCarPlateNCertCodeByCarManId(Long carManId);
 
+	CaseBase findCaseBaseBysyncId(Long syncId);
+
 }
