@@ -60,14 +60,15 @@ import cn.bc.web.ui.json.JsonArray;
 public class CaseTrafficAction extends FileEntityAction<Long, Case4InfractTraffic> {
 	// private static Log logger = LogFactory.getLog(CarAction.class);
 	private static 	final long 				serialVersionUID 	= 1L;
-	public  Long 							carId;
-	public  Long 							carManId;
+	private Long 							carId;
+	private Long 							carManId;
 	private	Long							syncId;			//同步ID
 	public  boolean 						isMoreCar;		//是否存在多个车
 	public  boolean 						isMoreCarMan;	//是否存在多个司机
 	public  boolean 						isNullCar;		//此司机现在没有驾驶任何车辆
 	public  boolean 						isNullCarMan;	//此车辆现在没有任何司机驾驶
-	//public 	boolean							isExist;		//判断生成的当前记录是否存在,存在发出提醒
+	public  boolean							isSync;			//是否同步
+	//public  boolean							isExist;		//判断生成的当前记录是否存在,存在发出提醒
 	//public  String							isClosed;	
 	@SuppressWarnings("unused")
 	private CaseTrafficService				caseTrafficService;
@@ -255,8 +256,9 @@ public class CaseTrafficAction extends FileEntityAction<Long, Case4InfractTraffi
 			}else{	//交委同步
 				JiaoWeiJTWF jiaoWeiJTWF = this.jiaoWeiJTWFService.load(syncId);
 				findCarId(jiaoWeiJTWF.getCarPlateNo());
-				this.getE().setJeom(jiaoWeiJTWF.getJeom());
 				this.getE().setSubject(jiaoWeiJTWF.getContent());
+				this.getE().setJeom(jiaoWeiJTWF.getJeom());
+				this.getE().setHappenDate(jiaoWeiJTWF.getHappenDate());
 				this.getE().setFrom(getText("runcase.jiaowei"));
 			}
 			//设置来源
@@ -297,14 +299,13 @@ public class CaseTrafficAction extends FileEntityAction<Long, Case4InfractTraffi
 			this.getE().setCarId(carId);
 			this.getE().setMotorcadeId(car.getMotorcade().getId());
 			this.getE().setMotorcadeName(car.getMotorcade().getName());
-			List<CarMan> carMan = this.carManService
-					.selectAllCarManByCarId(carId);
+			List<CarMan> carMan = this.carManService.selectAllCarManByCarId(carId);
 			if (carMan.size() == 1) {
 				this.getE().setDriverName(carMan.get(0).getName());
 				this.getE().setDriverId(carMan.get(0).getId());
 				this.getE().setDriverCert(carMan.get(0).getCert4FWZG());
 			} else if (carMan.size() > 1) {
-					isMoreCarMan = true;
+				isMoreCarMan = true;
 			} else {
 				isNullCarMan = true;
 			}
@@ -314,7 +315,7 @@ public class CaseTrafficAction extends FileEntityAction<Long, Case4InfractTraffi
 		this.getE().setType  (CaseBase.TYPE_INFRACT_TRAFFIC);
 		this.getE().setStatus(CaseBase.STATUS_ACTIVE);
 		// 来源
-		if(syncId == null){
+		if(syncId == null){ //不是同步过来的信息设为自建
 			this.getE().setSource(CaseBase.SOURCE_SYS);
 		}
 		statusesValue		=	this.getCaseStatuses();
@@ -329,9 +330,7 @@ public class CaseTrafficAction extends FileEntityAction<Long, Case4InfractTraffi
 	public void findCarId(String carPlateNo) {
 		if(carPlateNo.length() > 0){ //判断车牌号是否为空
 			Long tempCarId = this.carService.findcarInfoByCarPlateNo(carPlateNo);
-			if(tempCarId != null){
-				this.carId = tempCarId;
-			}
+			this.carId = tempCarId;
 		}
 	}
 	
