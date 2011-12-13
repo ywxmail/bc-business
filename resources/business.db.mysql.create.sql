@@ -944,6 +944,10 @@ ALTER TABLE BS_CASE_PRAISE ADD CONSTRAINT BSFK_PRAISE_RECEIVER FOREIGN KEY (RECE
 CREATE TABLE BS_CAR_POLICY( 
    ID                                  BIGINT NOT NULL AUTO_INCREMENT,
    UID_                                VARCHAR(36) NOT NULL,
+   VER_MAJOR            BIGINT COMMENT '主版本号',
+   VER_MINOR            BIGINT COMMENT '次版本号',
+   PATCH_NO             VARCHAR(255) NOT NULL COMMENT '批号',
+   MAIN                 INT(1) NOT NULL COMMENT '主体: 0-当前版本,1-历史版本'';',
    STATUS_                             INT(1) NOT NULL COMMENT '状态：0-正常,1-注销',
    CAR_ID                              BIGINT NOT NULL COMMENT '投保车号',
    REGISTER_DATE                       DATETIME COMMENT '初登日期',
@@ -961,6 +965,7 @@ CREATE TABLE BS_CAR_POLICY(
    GREENSLIP_END_DATE                  DATETIME COMMENT '强制险结束日期',
    GREENSLIP_SOURCE                    VARCHAR(255)   COMMENT '强保人来源',
    LIABILITY_NO                        VARCHAR(255) NOT NULL COMMENT '责任险单号',
+   AMOUNT                              DECIMAL(10,2) COMMENT'合计',
    FILE_DATE                           DATETIME NOT NULL COMMENT '创建时间',
    AUTHOR_ID                           BIGINT NOT NULL COMMENT '创建人ID',
    MODIFIER_ID                         BIGINT COMMENT '最后修改人ID',
