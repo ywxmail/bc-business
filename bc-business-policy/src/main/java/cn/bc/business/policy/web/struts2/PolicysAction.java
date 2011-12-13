@@ -5,6 +5,7 @@ package cn.bc.business.policy.web.struts2;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
+import cn.bc.business.policy.domain.Policy;
 import cn.bc.business.web.struts2.ViewAction;
 import cn.bc.core.Entity;
 import cn.bc.core.query.condition.Condition;
@@ -115,17 +117,17 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("p.plate_no", "plate",
 				getText("policy.carId"), 80).setSortable(true));
 		columns.add(new TextColumn4MapKey("p.assured", "assured",
-				getText("policy.assured"), 100));
+				getText("policy.assured"), 180));
 		columns.add(new TextColumn4MapKey("p.register_date", "register_date",
 				getText("policy.registerDate"), 100).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
 		columns.add(new TextColumn4MapKey("p.liability_no", "liability_no",
-				getText("policy.liabilityNo"), 80).setSortable(true)
+				getText("policy.liabilityNo"), 180).setSortable(true)
 				.setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("p.commerial_no", "commerial_no",
-				getText("policy.commerialNo"), 100));
+				getText("policy.commerialNo"), 180).setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("p.commerial_company",
-				"commerial_company", getText("policy.commerialCompany"), 160)
+				"commerial_company", getText("policy.commerialCompany"), 100)
 				.setSortable(true).setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("p.commerial_start_date",
 				"commerial_start_date", getText("policy.commerialStartDate"),
@@ -137,10 +139,12 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 						new CalendarFormater("yyyy-MM-dd")));
 		columns.add(new TextColumn4MapKey("p.ownrisk", "ownrisk",
 				getText("policy.ownrisk"), 80).setSortable(true)
-				.setUseTitleFromLabel(true));
+				.setUseTitleFromLabel(true)
+				.setValueFormater(new EntityStatusFormater(getBooleanValue())));
 		columns.add(new TextColumn4MapKey("p.greenslip", "greenslip",
-				getText("policy.greenslip"), 80).setSortable(true)
-				.setUseTitleFromLabel(true));
+				getText("policy.greenslip"), 120).setSortable(true)
+				.setUseTitleFromLabel(true)
+				.setValueFormater(new EntityStatusFormater(getBooleanValue())));
 		columns.add(new TextColumn4MapKey("p.amount", "amount",
 				getText("policy.amount"), 80).setSortable(true)
 				.setUseTitleFromLabel(true));
@@ -215,6 +219,18 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 						Toolbar.getDefaultToolbarRadioGroup(
 								this.getEntityStatuses(), "status", 0,
 								getText("title.click2changeSearchStatus")));
+	}
+
+	/**
+	 * 布尔值转换列表
+	 * 
+	 * @return
+	 */
+	protected Map<String, String> getBooleanValue() {
+		Map<String, String> statuses = new LinkedHashMap<String, String>();
+		statuses.put(String.valueOf(Policy.BOOLEAN_YES), getText("policy.yes"));
+		statuses.put(String.valueOf(Policy.BOOLEAN_NO), getText("policy.no"));
+		return statuses;
 	}
 
 }

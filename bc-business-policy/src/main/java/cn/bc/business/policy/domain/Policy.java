@@ -28,6 +28,10 @@ import cn.bc.identity.domain.RichFileEntityImpl;
 public class Policy extends RichFileEntityImpl {
 	private static final long serialVersionUID = 1L;
 	public static final String KEY_CODE = "blacklist.code";
+	/** 布尔值：是 */
+	public static final int BOOLEAN_YES = 1;
+	/** 布尔值：否 */
+	public static final int BOOLEAN_NO = 0;
 
 	private Car car;// 投保车号
 	private Calendar registerDate;// 初登日期
