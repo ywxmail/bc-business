@@ -8,10 +8,10 @@ import cn.bc.core.service.CrudService;
 
 
 /**
- * 黑名单Service
+ * 车辆保单Service
  * 
  * @author dragon
  */
-public interface BlacklistService extends CrudService<Policy> {
+public interface PolicyService extends CrudService<Policy> {
 
 }

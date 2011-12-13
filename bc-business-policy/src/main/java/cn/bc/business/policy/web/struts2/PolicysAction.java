@@ -15,6 +15,7 @@ import org.springframework.stereotype.Controller;
 
 import cn.bc.business.policy.domain.Policy;
 import cn.bc.business.web.struts2.ViewAction;
+import cn.bc.core.Entity;
 import cn.bc.core.query.condition.Condition;
 import cn.bc.core.query.condition.Direction;
 import cn.bc.core.query.condition.impl.AndCondition;
@@ -35,16 +36,16 @@ import cn.bc.web.ui.html.toolbar.Toolbar;
 import cn.bc.web.ui.json.Json;
 
 /**
- * 黑名单 Action
+ * 车辆保单 Action
  * 
  * @author dragon
  * 
  */
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 @Controller
-public class BlacklistsAction extends ViewAction<Map<String, Object>> {
+public class PolicysAction extends ViewAction<Map<String, Object>> {
 	private static final long serialVersionUID = 1L;
-	public String status = String.valueOf(Policy.STATUS_LOCK); // 黑名单的状态，多个用逗号连接
+	public String status = String.valueOf(Entity.STATUS_ENABLED); // 车辆保单的状态，多个用逗号连接
 	public Long carManId;
 	public Long carId;
 
@@ -58,8 +59,9 @@ public class BlacklistsAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected OrderCondition getGridDefaultOrderCondition() {
-		// 默认排序方向：创建日期
-		return new OrderCondition("b.file_date", Direction.Desc);
+		// 默认排序方向：状态|创建日期
+		return new OrderCondition("c.status_", Direction.Asc).add(
+				"c.file_date", Direction.Desc);
 	}
 
 	@Override
@@ -112,7 +114,7 @@ public class BlacklistsAction extends ViewAction<Map<String, Object>> {
 		columns.add(new IdColumn4MapKey("b.id", "id"));
 		columns.add(new TextColumn4MapKey("b.status_", "status_",
 				getText("blacklist.status"), 60).setSortable(true)
-				.setValueFormater(new EntityStatusFormater(getBLStatuses())));
+				.setValueFormater(new EntityStatusFormater(getBSStatuses1())));
 		columns.add(new TextColumn4MapKey("b.code", "code",
 				getText("blacklist.code"), 160).setSortable(true));
 		if (carManId == null) {
@@ -230,23 +232,10 @@ public class BlacklistsAction extends ViewAction<Map<String, Object>> {
 		return super.getHtmlPageToolbar()
 				.addButton(
 						Toolbar.getDefaultToolbarRadioGroup(
-								this.getBLStatuses(), "status", 0,
+								this.getEntityStatuses(), "status", 0,
 								getText("title.click2changeSearchStatus")));
 	}
 
-	/**
-	 * 状态值转换列表：锁定|解锁|待锁定|全部
-	 * 
-	 * @return
-	 */
-	protected Map<String, String> getBLStatuses() {
-		Map<String, String> statuses = new LinkedHashMap<String, String>();
-		statuses.put(String.valueOf(Policy.STATUS_LOCK),
-				getText("blacklist.locker"));
-		statuses.put(String.valueOf(Policy.STATUS_UNLOCK),
-				getText("blacklist.unlocker"));
-		statuses.put("", getText("bs.status.all"));
-		return statuses;
-	}
+	
 
 }

@@ -8,10 +8,10 @@ import cn.bc.core.dao.CrudDao;
 
 
 /**
- * 黑名单Dao
+ * 车辆保单Dao
  * 
  * @author dragon
  */
-public interface BlacklistDao extends CrudDao<Policy> {
+public interface PolicyDao extends CrudDao<Policy> {
 
 }

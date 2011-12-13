@@ -15,12 +15,10 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import cn.bc.business.car.domain.Car;
-import cn.bc.business.motorcade.domain.Motorcade;
-import cn.bc.identity.domain.Actor;
 import cn.bc.identity.domain.RichFileEntityImpl;
 
 /**
- * 黑名单
+ * 车辆保单
  * 
  * @author dragon
  */
@@ -31,131 +29,22 @@ public class Policy extends RichFileEntityImpl {
 	private static final long serialVersionUID = 1L;
 	public static final String KEY_CODE = "blacklist.code";
 
-	private Car car;// 车辆
-	private String type;// 类型，如提醒、限制一切业务
-	private String level;// 等级
-	private String code;// 编号
-	private String lockReason;// 锁定原因
-	private String unlockReason;// 解锁原因
-	private Actor locker;// 锁定人
-	private Actor unlocker;// 解锁人
-
-	private Calendar lockDate;// 锁定时间
-	private Calendar unlockDate;// 解锁时间
-
-	private String oldUnitName;// 车属单位
-	private Motorcade motorcade;// 车队
-	
-
-
-	public String getCode() {
-		return code;
-	}
-
-	public void setCode(String code) {
-		this.code = code;
-	}
-
-	@Column(name = "TYPE_")
-	public String getType() {
-		return type;
-	}
-
-	public void setType(String type) {
-		this.type = type;
-	}
-
-	@Column(name = "LEVEL_")
-	public String getLevel() {
-		return level;
-	}
-
-	public void setLevel(String level) {
-		this.level = level;
-	}
-
-	public String getSubject() {
-		return subject;
-	}
-
-	public void setSubject(String subject) {
-		this.subject = subject;
-	}
-
-	@Column(name = "LOCK_REASON")
-	public String getLockReason() {
-		return lockReason;
-	}
-
-	public void setLockReason(String lockReason) {
-		this.lockReason = lockReason;
-	}
-
-	@Column(name = "UNLOCK_REASON")
-	public String getUnlockReason() {
-		return unlockReason;
-	}
-
-	public void setUnlockReason(String unlockReason) {
-		this.unlockReason = unlockReason;
-	}
-
-	@ManyToOne(fetch = FetchType.EAGER, optional = false)
-	@JoinColumn(name = "LOCKER_ID", referencedColumnName = "ID")
-	public Actor getLocker() {
-		return locker;
-	}
-
-	public void setLocker(Actor locker) {
-		this.locker = locker;
-	}
-
-	@ManyToOne(fetch = FetchType.EAGER, optional = true)
-	@JoinColumn(name = "UNLOCKER_ID", referencedColumnName = "ID")
-	public Actor getUnlocker() {
-		return unlocker;
-	}
-
-	public void setUnlocker(Actor unlocker) {
-		this.unlocker = unlocker;
-	}
-
-	@Column(name = "LOCK_DATE")
-	public Calendar getLockDate() {
-		return lockDate;
-	}
-
-	public void setLockDate(Calendar lockDate) {
-		this.lockDate = lockDate;
-	}
-
-	@Column(name = "UNLOCK_DATE")
-	public Calendar getUnlockDate() {
-		return unlockDate;
-	}
-
-	public void setUnlockDate(Calendar unlockDate) {
-		this.unlockDate = unlockDate;
-	}
-
-	@Column(name = "OLD_UNIT_NAME")
-	public String getOldUnitName() {
-		return oldUnitName;
-	}
-
-	public void setOldUnitName(String oldUnitName) {
-		this.oldUnitName = oldUnitName;
-	}
-
-	@ManyToOne(fetch = FetchType.EAGER, optional = true)
-	@JoinColumn(name = "MOTORCADE_ID", referencedColumnName = "ID")
-	public Motorcade getMotorcade() {
-		return motorcade;
-	}
-
-	public void setMotorcade(Motorcade motorcade) {
-		this.motorcade = motorcade;
-	}
+	private Car car;// 投保车号
+	private Calendar registerDate;// 初登日期
+	private Long assured;// 投保人
+	private String commerialNo;// 商业险号
+	private Long commerialCompany;// 商业保险公司
+	private Calendar commerialStartDate;// 商业险开始日期
+	private Calendar commerialEndDate;// 商业险结束日期
+	private boolean ownrisk;// 是否自保
+	private boolean greenslip;// 是否购买了强制险
+	private boolean greenslipSameDate;// 强制险是否与商业险同期
+	private String greenslipNo;// 强险单号
+	private Long greenslipCompany;// 强险保险公司
+	private Calendar greenslipStartDate;// 强制险开始日期
+	private Calendar greenslipEndDate;// 强制险结束日期
+	private String greenslipSource;// 强保人来源
+	private String liabilityNo;// 责任险单号
 
 	@ManyToOne(fetch = FetchType.EAGER, optional = true)
 	@JoinColumn(name = "CAR_ID", referencedColumnName = "ID")
@@ -167,13 +56,136 @@ public class Policy extends RichFileEntityImpl {
 		this.car = car;
 	}
 
-	@ManyToOne(fetch = FetchType.EAGER, optional = true)
-	@JoinColumn(name = "DRIVER_ID", referencedColumnName = "ID")
-	public CarMan getDriver() {
-		return driver;
+	@Column(name = "REGISTER_DATE")
+	public Calendar getRegisterDate() {
+		return registerDate;
 	}
 
-	public void setDriver(CarMan driver) {
-		this.driver = driver;
+	public void setRegisterDate(Calendar registerDate) {
+		this.registerDate = registerDate;
 	}
+
+	public Long getAssured() {
+		return assured;
+	}
+
+	public void setAssured(Long assured) {
+		this.assured = assured;
+	}
+
+	@Column(name = "COMMERIAL_NO")
+	public String getCommerialNo() {
+		return commerialNo;
+	}
+
+	public void setCommerialNo(String commerialNo) {
+		this.commerialNo = commerialNo;
+	}
+
+	@Column(name = "COMMERIAL_COMPANY")
+	public Long getCommerialCompany() {
+		return commerialCompany;
+	}
+
+	public void setCommerialCompany(Long commerialCompany) {
+		this.commerialCompany = commerialCompany;
+	}
+
+	@Column(name = "COMMERIAL_START_DATE")
+	public Calendar getCommerialStartDate() {
+		return commerialStartDate;
+	}
+
+	public void setCommerialStartDate(Calendar commerialStartDate) {
+		this.commerialStartDate = commerialStartDate;
+	}
+
+	@Column(name = "COMMERIAL_END_DATE")
+	public Calendar getCommerialEndDate() {
+		return commerialEndDate;
+	}
+
+	public void setCommerialEndDate(Calendar commerialEndDate) {
+		this.commerialEndDate = commerialEndDate;
+	}
+
+	public boolean isOwnrisk() {
+		return ownrisk;
+	}
+
+	public void setOwnrisk(boolean ownrisk) {
+		this.ownrisk = ownrisk;
+	}
+
+	public boolean isGreenslip() {
+		return greenslip;
+	}
+
+	public void setGreenslip(boolean greenslip) {
+		this.greenslip = greenslip;
+	}
+
+	public boolean isGreenslipSameDate() {
+		return greenslipSameDate;
+	}
+
+	@Column(name = "GREENSLIP_SAME_DATE")
+	public void setGreenslipSameDate(boolean greenslipSameDate) {
+		this.greenslipSameDate = greenslipSameDate;
+	}
+
+	@Column(name = "GREENSLIP_NO")
+	public String getGreenslipNo() {
+		return greenslipNo;
+	}
+
+	public void setGreenslipNo(String greenslipNo) {
+		this.greenslipNo = greenslipNo;
+	}
+
+	@Column(name = "GREENSLIP_COMPANY")
+	public Long getGreenslipCompany() {
+		return greenslipCompany;
+	}
+
+	public void setGreenslipCompany(Long greenslipCompany) {
+		this.greenslipCompany = greenslipCompany;
+	}
+
+	@Column(name = "GREENSLIP_START_DATE")
+	public Calendar getGreenslipStartDate() {
+		return greenslipStartDate;
+	}
+
+	public void setGreenslipStartDate(Calendar greenslipStartDate) {
+		this.greenslipStartDate = greenslipStartDate;
+	}
+
+	@Column(name = "GREENSLIP_END_DATE")
+	public Calendar getGreenslipEndDate() {
+		return greenslipEndDate;
+	}
+
+	public void setGreenslipEndDate(Calendar greenslipEndDate) {
+		this.greenslipEndDate = greenslipEndDate;
+	}
+
+	@Column(name = "GREENSLIP_SOURCE")
+	public String getGreenslipSource() {
+		return greenslipSource;
+	}
+
+	public void setGreenslipSource(String greenslipSource) {
+		this.greenslipSource = greenslipSource;
+	}
+
+	@Column(name = "LIABILITY_NO")
+	public String getLiabilityNo() {
+		return liabilityNo;
+	}
+
+	public void setLiabilityNo(String liabilityNo) {
+		this.liabilityNo = liabilityNo;
+	}
+
 }

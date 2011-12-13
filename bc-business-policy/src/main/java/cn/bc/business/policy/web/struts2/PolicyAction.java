@@ -50,7 +50,7 @@ import cn.bc.web.ui.json.Json;
  */
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 @Controller
-public class BlacklistAction extends FileEntityAction<Long, Policy> {
+public class PolicyAction extends FileEntityAction<Long, Policy> {
 	// private static Log logger = LogFactory.getLog(ContractAction.class);
 	private static final long serialVersionUID = 1L;
 	public BlacklistService blacklistService;
