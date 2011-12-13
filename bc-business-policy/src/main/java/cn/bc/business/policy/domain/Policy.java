@@ -31,16 +31,16 @@ public class Policy extends RichFileEntityImpl {
 
 	private Car car;// 投保车号
 	private Calendar registerDate;// 初登日期
-	private Long assured;// 投保人
+	private String assured;// 投保人
 	private String commerialNo;// 商业险号
-	private Long commerialCompany;// 商业保险公司
+	private String commerialCompany;// 商业保险公司
 	private Calendar commerialStartDate;// 商业险开始日期
 	private Calendar commerialEndDate;// 商业险结束日期
 	private boolean ownrisk;// 是否自保
 	private boolean greenslip;// 是否购买了强制险
 	private boolean greenslipSameDate;// 强制险是否与商业险同期
 	private String greenslipNo;// 强险单号
-	private Long greenslipCompany;// 强险保险公司
+	private String greenslipCompany;// 强险保险公司
 	private Calendar greenslipStartDate;// 强制险开始日期
 	private Calendar greenslipEndDate;// 强制险结束日期
 	private String greenslipSource;// 强保人来源
@@ -66,11 +66,11 @@ public class Policy extends RichFileEntityImpl {
 		this.registerDate = registerDate;
 	}
 
-	public Long getAssured() {
+	public String getAssured() {
 		return assured;
 	}
 
-	public void setAssured(Long assured) {
+	public void setAssured(String assured) {
 		this.assured = assured;
 	}
 
@@ -84,11 +84,11 @@ public class Policy extends RichFileEntityImpl {
 	}
 
 	@Column(name = "COMMERIAL_COMPANY")
-	public Long getCommerialCompany() {
+	public String getCommerialCompany() {
 		return commerialCompany;
 	}
 
-	public void setCommerialCompany(Long commerialCompany) {
+	public void setCommerialCompany(String commerialCompany) {
 		this.commerialCompany = commerialCompany;
 	}
 
@@ -145,11 +145,11 @@ public class Policy extends RichFileEntityImpl {
 	}
 
 	@Column(name = "GREENSLIP_COMPANY")
-	public Long getGreenslipCompany() {
+	public String getGreenslipCompany() {
 		return greenslipCompany;
 	}
 
-	public void setGreenslipCompany(Long greenslipCompany) {
+	public void setGreenslipCompany(String greenslipCompany) {
 		this.greenslipCompany = greenslipCompany;
 	}
 
