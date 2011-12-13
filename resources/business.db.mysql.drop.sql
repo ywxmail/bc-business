@@ -30,6 +30,11 @@ DROP TABLE IF EXISTS BS_CASE_BASE;
 -- 司机迁移历史
 drop table if exists BS_CARMAN_HISTORY;
 
+-- 车辆保单险种
+drop table if exists BS_INSURANCE_TYPE;
+-- 车辆保单
+drop table if exists BS_CAR_POLICY;
+
 -- 迁移记录
 drop table if exists BS_CAR_DRIVER_HISTORY;
 
