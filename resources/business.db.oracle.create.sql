@@ -1488,7 +1488,7 @@ CREATE TABLE BS_CAR_POLICY (
    STATUS_              NUMBER(1)            NOT NULL,
    CAR_ID               NUMBER(19)           NOT NULL,
    REGISTER_DATE        DATE,
-   ASSURED              NUMBER(19),
+   ASSURED              VARCHAR2(255),
    COMMERIAL_NO         VARCHAR2(255),
    COMMERIAL_COMPANY    NUMBER(19),
    COMMERIAL_START_DATE DATE,
