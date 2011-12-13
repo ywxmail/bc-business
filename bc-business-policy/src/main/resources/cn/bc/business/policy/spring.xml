@@ -18,5 +18,5 @@
 	<bean id="policyDao" class="cn.bc.business.policy.dao.hibernate.jpa.PolicyDaoImpl"
 		p:entityManagerFactory-ref="entityManagerFactory" />
 	<bean id="policyService" class="cn.bc.business.policy.service.PolicyServiceImpl"
-		p:blacklistDao-ref="policyDao" />
+		p:policyDao-ref="policyDao" />
 </beans>

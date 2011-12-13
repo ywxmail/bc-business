@@ -1,7 +1,7 @@
 /**
  * 
  */
-package cn.bc.business.policyt.service;
+package cn.bc.business.policy.service;
 
 import cn.bc.business.policy.domain.Policy;
 import cn.bc.core.service.CrudService;

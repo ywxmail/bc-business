@@ -17,12 +17,8 @@ import org.springframework.stereotype.Controller;
 import cn.bc.business.OptionConstants;
 import cn.bc.business.car.domain.Car;
 import cn.bc.business.car.service.CarService;
-import cn.bc.business.carman.domain.CarMan;
-import cn.bc.business.carman.service.CarByDriverService;
-import cn.bc.business.carman.service.CarManService;
 import cn.bc.business.motorcade.domain.Motorcade;
 import cn.bc.business.policy.domain.Policy;
-import cn.bc.business.policyt.service.BlacklistService;
 import cn.bc.business.web.struts2.FileEntityAction;
 import cn.bc.core.query.condition.Condition;
 import cn.bc.core.query.condition.Direction;
@@ -154,55 +150,55 @@ public class PolicyAction extends FileEntityAction<Long, Policy> {
 		return result;
 	}
 
-	@Override
-	protected void afterCreate(Policy entity) {
-		SystemContext context = this.getSystyemContext();
-		// entity.setStatus(Blacklist.STATUS_CREATE);
-		entity.setStatus(Policy.STATUS_LOCK);
-		this.getE().setLocker(context.getUser());
-		this.getE().setLockDate(Calendar.getInstance());
-		this.getE().setCode(
-				this.getIdGeneratorService().nextSN4Month(Policy.KEY_CODE));
+//	@Override
+//	protected void afterCreate(Policy entity) {
+//		SystemContext context = this.getSystyemContext();
+//		// entity.setStatus(Blacklist.STATUS_CREATE);
+//		entity.setStatus(Policy.STATUS_LOCK);
+//		this.getE().setLocker(context.getUser());
+//		this.getE().setLockDate(Calendar.getInstance());
+//		this.getE().setCode(
+//				this.getIdGeneratorService().nextSN4Month(Policy.KEY_CODE));
+//
+//		// 设置创建人信息
+//		entity.setFileDate(Calendar.getInstance());
+//		entity.setAuthor(context.getUserHistory());
+//	}
 
-		// 设置创建人信息
-		entity.setFileDate(Calendar.getInstance());
-		entity.setAuthor(context.getUserHistory());
-	}
+//	@Override
+//	public String save() throws Exception {
+//		SystemContext context = this.getSystyemContext();
+//		// 解决object references an unsaved transient instance 错误，（表单隐藏域以新建一个
+//		// 对象,但没有保存相关的数据而出现的错误）
+//		Policy e = this.getE();
+//		if (e.getUnlocker() != null && e.getUnlocker().getId() == null) {
+//			e.setUnlocker(null);
+//		}
+//
+//		// 设置最后更新人的信息
+//		if (this.getE().getStatus() == Policy.STATUS_LOCK) {
+//			this.getE().setModifier(context.getUserHistory());
+//			this.getE().setModifiedDate(Calendar.getInstance());
+//		} else {
+//			this.getE().setUnlocker(context.getUser());
+//			this.getE().setUnlockDate(Calendar.getInstance());
+//		}
+//		super.save();
+//		return "saveSuccess";
+//	}
 
-	@Override
-	public String save() throws Exception {
-		SystemContext context = this.getSystyemContext();
-		// 解决object references an unsaved transient instance 错误，（表单隐藏域以新建一个
-		// 对象,但没有保存相关的数据而出现的错误）
-		Policy e = this.getE();
-		if (e.getUnlocker() != null && e.getUnlocker().getId() == null) {
-			e.setUnlocker(null);
-		}
-
-		// 设置最后更新人的信息
-		if (this.getE().getStatus() == Policy.STATUS_LOCK) {
-			this.getE().setModifier(context.getUserHistory());
-			this.getE().setModifiedDate(Calendar.getInstance());
-		} else {
-			this.getE().setUnlocker(context.getUser());
-			this.getE().setUnlockDate(Calendar.getInstance());
-		}
-		super.save();
-		return "saveSuccess";
-	}
-
-	@Override
-	public String edit() throws Exception {
-		String result = super.edit();
-		statusesValue = this.getBLStatuses();
-		SystemContext context = this.getSystyemContext();
-		if (this.getE().getStatus() == Policy.STATUS_LOCK) {
-			this.getE().setUnlockDate(Calendar.getInstance());
-			this.getE().setUnlocker(context.getUser());
-		}
-		initSelects();
-		return result;
-	}
+//	@Override
+//	public String edit() throws Exception {
+//		String result = super.edit();
+//		statusesValue = this.getBLStatuses();
+//		SystemContext context = this.getSystyemContext();
+//		if (this.getE().getStatus() == Policy.STATUS_LOCK) {
+//			this.getE().setUnlockDate(Calendar.getInstance());
+//			this.getE().setUnlocker(context.getUser());
+//		}
+//		initSelects();
+//		return result;
+//	}
 
 	@Override
 	protected PageOption buildFormPageOption() {
@@ -216,15 +212,15 @@ public class PolicyAction extends FileEntityAction<Long, Policy> {
 		// null, "bc.business.blacklistForm.lcoker"));
 		// // 状态为锁定时，只显示解锁按钮
 		// }
-		if (isReadonly() == false && this.getE().isNew()) {
-			option.addButton(new ButtonOption(getText("blacklist.locker"),
-					null, "bc.business.blacklistForm.lcoker"));
-			// 状态为锁定时，只显示解锁按钮
-		} else if (isReadonly() == false
-				&& this.getE().getStatus() == Policy.STATUS_LOCK) {
-			option.addButton(new ButtonOption(getText("blacklist.unlocker"),
-					null, "bc.business.blacklistForm.unlcoker"));
-		}
+//		if (isReadonly() == false && this.getE().isNew()) {
+//			option.addButton(new ButtonOption(getText("blacklist.locker"),
+//					null, "bc.business.blacklistForm.lcoker"));
+//			// 状态为锁定时，只显示解锁按钮
+//		} else if (isReadonly() == false
+//				&& this.getE().getStatus() == Policy.STATUS_LOCK) {
+//			option.addButton(new ButtonOption(getText("blacklist.unlocker"),
+//					null, "bc.business.blacklistForm.unlcoker"));
+//		}
 
 		return option;
 	}
@@ -253,139 +249,117 @@ public class PolicyAction extends FileEntityAction<Long, Policy> {
 	}
 
 	@Override
-	protected List<Column> buildGridColumns() {
-		List<Column> columns = super.buildGridColumns();
-		if (carManId == null) {
-			columns.add(new TextColumn("code", getText("blacklist.code"), 120)
-					.setSortable(true));
-			columns.add(new TextColumn("driver.name",
-					getText("blacklist.driver"), 40)
-					.setValueFormater(new AbstractFormater<String>() {
-						@Override
-						public String format(Object context, Object value) {
-							Policy blacklist = (Policy) context;
-							CarMan driver = blacklist.getDriver();
-							if (driver == null) {
-								return null;
-							} else {
-								return blacklist.getDriver().getName();
-							}
+//	protected List<Column> buildGridColumns() {
+//		List<Column> columns = super.buildGridColumns();
+//		if (carManId == null) {
+//			columns.add(new TextColumn("code", getText("blacklist.code"), 120)
+//					.setSortable(true));
+//			columns.add(new TextColumn("driver.name",
+//					getText("blacklist.driver"), 40)
+//					.setValueFormater(new AbstractFormater<String>() {
+//						@Override
+//						public String format(Object context, Object value) {
+//							Policy blacklist = (Policy) context;
+//							CarMan driver = blacklist.getDriver();
+//							if (driver == null) {
+//								return null;
+//							} else {
+//								return blacklist.getDriver().getName();
+//							}
+//
+//						}
+//					}));
+//			columns.add(new TextColumn("motorcade.name",
+//					getText("blacklist.motorcade.name"), 30)
+//					.setValueFormater(new AbstractFormater<String>() {
+//						@Override
+//						public String format(Object context, Object value) {
+//							Policy blacklist = (Policy) context;
+//							Motorcade motorcade = blacklist.getMotorcade();
+//							if (motorcade == null) {
+//								return null;
+//							} else {
+//								return blacklist.getMotorcade().getName();
+//							}
+//						}
+//					}));
+//
+//			columns.add(new TextColumn("car.plateNo",
+//					getText("blacklist.car.plateNo"), 60)
+//					.setValueFormater(new AbstractFormater<String>() {
+//						@Override
+//						public String format(Object context, Object value) {
+//							Policy blacklist = (Policy) context;
+//							return blacklist.getCar().getPlateType() + "."
+//									+ blacklist.getCar().getPlateNo();
+//						}
+//					}));
+//
+//		} else {
+//			columns.add(new TextColumn("code", getText("blacklist.code"), 70)
+//					.setSortable(true));
+//			columns.add(new TextColumn("motorcade.name",
+//					getText("blacklist.motorcade.name"), 50)
+//					.setValueFormater(new AbstractFormater<String>() {
+//						@Override
+//						public String format(Object context, Object value) {
+//							Policy blacklist = (Policy) context;
+//							return blacklist.getMotorcade().getName();
+//
+//						}
+//					}));
+//			columns.add(new TextColumn("car.plateNo",
+//					getText("blacklist.car.plateNo"), 60)
+//					.setValueFormater(new AbstractFormater<String>() {
+//						@Override
+//						public String format(Object context, Object value) {
+//							Policy blacklist = (Policy) context;
+//							return blacklist.getCar().getPlateType() + "."
+//									+ blacklist.getCar().getPlateNo();
+//						}
+//					}));
+//
+//		}
+//		columns.add(new TextColumn("type", getText("blacklist.type"), 70)
+//				.setSortable(true).setUseTitleFromLabel(true));
+//		columns.add(new TextColumn("subject", getText("blacklist.subject"), 110)
+//				.setSortable(true).setUseTitleFromLabel(true));
+//		columns.add(new TextColumn("lockDate", getText("blacklist.lockDate"),
+//				100).setSortable(true).setDir(Direction.Desc)
+//				.setUseTitleFromLabel(true)
+//				.setValueFormater(new CalendarFormater("yyyy-MM-dd HH:mm:ss")));
+//		columns.add(new TextColumn("locker.name",
+//				getText("blacklist.locker.name"), 50)
+//				.setValueFormater(new AbstractFormater<String>() {
+//					@Override
+//					public String format(Object context, Object value) {
+//						Policy blacklist = (Policy) context;
+//						return blacklist.getLocker().getName();
+//					}
+//				}));
+//		columns.add(new TextColumn("unlockDate",
+//				getText("blacklist.unlockDate"), 100).setSortable(true)
+//				.setDir(Direction.Desc).setUseTitleFromLabel(true)
+//				.setValueFormater(new CalendarFormater("yyyy-MM-dd HH:mm:ss")));
+//		columns.add(new TextColumn("unlocker.name",
+//				getText("blacklist.unlocker.name"), 60)
+//				.setValueFormater(new AbstractFormater<String>() {
+//					@Override
+//					public String format(Object context, Object value) {
+//						Policy blacklist = (Policy) context;
+//						Actor locker = blacklist.getUnlocker();
+//						if (locker == null) {
+//							return null;
+//						} else {
+//							return blacklist.getUnlocker().getName();
+//						}
+//					}
+//				}));
+//		return columns;
+//	}
 
-						}
-					}));
-			columns.add(new TextColumn("motorcade.name",
-					getText("blacklist.motorcade.name"), 30)
-					.setValueFormater(new AbstractFormater<String>() {
-						@Override
-						public String format(Object context, Object value) {
-							Policy blacklist = (Policy) context;
-							Motorcade motorcade = blacklist.getMotorcade();
-							if (motorcade == null) {
-								return null;
-							} else {
-								return blacklist.getMotorcade().getName();
-							}
-						}
-					}));
+	
 
-			columns.add(new TextColumn("car.plateNo",
-					getText("blacklist.car.plateNo"), 60)
-					.setValueFormater(new AbstractFormater<String>() {
-						@Override
-						public String format(Object context, Object value) {
-							Policy blacklist = (Policy) context;
-							return blacklist.getCar().getPlateType() + "."
-									+ blacklist.getCar().getPlateNo();
-						}
-					}));
-
-		} else {
-			columns.add(new TextColumn("code", getText("blacklist.code"), 70)
-					.setSortable(true));
-			columns.add(new TextColumn("motorcade.name",
-					getText("blacklist.motorcade.name"), 50)
-					.setValueFormater(new AbstractFormater<String>() {
-						@Override
-						public String format(Object context, Object value) {
-							Policy blacklist = (Policy) context;
-							return blacklist.getMotorcade().getName();
-
-						}
-					}));
-			columns.add(new TextColumn("car.plateNo",
-					getText("blacklist.car.plateNo"), 60)
-					.setValueFormater(new AbstractFormater<String>() {
-						@Override
-						public String format(Object context, Object value) {
-							Policy blacklist = (Policy) context;
-							return blacklist.getCar().getPlateType() + "."
-									+ blacklist.getCar().getPlateNo();
-						}
-					}));
-
-		}
-		columns.add(new TextColumn("type", getText("blacklist.type"), 70)
-				.setSortable(true).setUseTitleFromLabel(true));
-		columns.add(new TextColumn("subject", getText("blacklist.subject"), 110)
-				.setSortable(true).setUseTitleFromLabel(true));
-		columns.add(new TextColumn("lockDate", getText("blacklist.lockDate"),
-				100).setSortable(true).setDir(Direction.Desc)
-				.setUseTitleFromLabel(true)
-				.setValueFormater(new CalendarFormater("yyyy-MM-dd HH:mm:ss")));
-		columns.add(new TextColumn("locker.name",
-				getText("blacklist.locker.name"), 50)
-				.setValueFormater(new AbstractFormater<String>() {
-					@Override
-					public String format(Object context, Object value) {
-						Policy blacklist = (Policy) context;
-						return blacklist.getLocker().getName();
-					}
-				}));
-		columns.add(new TextColumn("unlockDate",
-				getText("blacklist.unlockDate"), 100).setSortable(true)
-				.setDir(Direction.Desc).setUseTitleFromLabel(true)
-				.setValueFormater(new CalendarFormater("yyyy-MM-dd HH:mm:ss")));
-		columns.add(new TextColumn("unlocker.name",
-				getText("blacklist.unlocker.name"), 60)
-				.setValueFormater(new AbstractFormater<String>() {
-					@Override
-					public String format(Object context, Object value) {
-						Policy blacklist = (Policy) context;
-						Actor locker = blacklist.getUnlocker();
-						if (locker == null) {
-							return null;
-						} else {
-							return blacklist.getUnlocker().getName();
-						}
-					}
-				}));
-		return columns;
-	}
-
-	// 返回所选司机的信息
-	public Json json;
-
-	public String carManMess() {
-		Car car = this.carByDriverService
-				.selectCarByCarManId(new Long(carManId));
-		if (car != null) {
-			carId = car.getId();
-			motorcadeId = car.getMotorcade().getId();
-			carPlate = car.getPlateType() + car.getPlateNo();
-			unitName = car.getOldUnitName();
-			motorcadeName = car.getMotorcade().getName();
-		}
-		json = new Json();
-		json.put("carId", carId);
-		json.put("carPlate", carPlate);
-		json.put("motorcadeId", motorcadeId);
-		json.put("unitName", unitName);
-		json.put("motorcadeName", motorcadeName);
-		return "json";
-
-	}
-
-	@Override
 	protected HtmlPage buildHtml4Paging() {
 		HtmlPage page = super.buildHtml4Paging();
 		if (carManId != null)
@@ -423,20 +397,6 @@ public class PolicyAction extends FileEntityAction<Long, Policy> {
 			logger.info("findOptionItem耗时：" + DateUtils.getWasteTime(startTime));
 	}
 
-	/**
-	 * 状态值转换列表：锁定|解锁|全部
-	 * 
-	 * @return
-	 */
-	protected Map<String, String> getBLStatuses() {
-		Map<String, String> statuses = new LinkedHashMap<String, String>();
-		statuses.put(String.valueOf(Policy.STATUS_LOCK),
-				getText("blacklist.locker"));
-		statuses.put(String.valueOf(Policy.STATUS_UNLOCK),
-				getText("blacklist.unlocker"));
-		statuses.put("", getText("bs.status.all"));
-
-		return statuses;
-	}
+	
 
 }

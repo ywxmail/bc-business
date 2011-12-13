@@ -44,7 +44,6 @@ import cn.bc.web.ui.json.Json;
 public class PolicysAction extends ViewAction<Map<String, Object>> {
 	private static final long serialVersionUID = 1L;
 	public String status = String.valueOf(Entity.STATUS_ENABLED); // 车辆保单的状态，多个用逗号连接
-	public Long carManId;
 	public Long carId;
 
 	@Override
@@ -70,8 +69,9 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 		StringBuffer sql = new StringBuffer();
 		sql.append("select p.id,p.status_,c.plate_type,c.plate_no,p.register_date,p.assured,p.commerial_no");
 		sql.append(",p.commerial_company,p.commerial_start_date,p.commerial_end_date");
-		sql.append(" ,p.ownrisk,p.greenslip,p.liability_no,p.file_date");
+		sql.append(" ,p.ownrisk,p.greenslip,p.liability_no,p.amount,p.file_date");
 		sql.append(" from BS_CAR_POLICY p");
+		sql.append(" left join BS_CAR c on c.id=p.car_id");
 		sqlObject.setSql(sql.toString());
 
 		// 注入参数
@@ -97,6 +97,7 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 				map.put("ownrisk", rs[i++]);
 				map.put("greenslip", rs[i++]);
 				map.put("liability_no", rs[i++]);
+				map.put("amount", rs[i++]);
 
 				return map;
 			}
@@ -140,6 +141,9 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("p.greenslip", "greenslip",
 				getText("policy.greenslip"), 80).setSortable(true)
 				.setUseTitleFromLabel(true));
+		columns.add(new TextColumn4MapKey("p.amount", "amount",
+				getText("policy.amount"), 80).setSortable(true)
+				.setUseTitleFromLabel(true));
 
 		return columns;
 	}
@@ -172,10 +176,10 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 		if (status != null && status.length() > 0) {
 			String[] ss = status.split(",");
 			if (ss.length == 1) {
-				statusCondition = new EqualsCondition("b.status_", new Integer(
+				statusCondition = new EqualsCondition("p.status_", new Integer(
 						ss[0]));
 			} else {
-				statusCondition = new InCondition("b.status_",
+				statusCondition = new InCondition("p.status_",
 						StringUtils.stringArray2IntegerArray(ss));
 			}
 		}

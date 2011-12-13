@@ -45,6 +45,7 @@ public class Policy extends RichFileEntityImpl {
 	private Calendar greenslipEndDate;// 强制险结束日期
 	private String greenslipSource;// 强保人来源
 	private String liabilityNo;// 责任险单号
+	private Float amount;// 合计
 
 	@ManyToOne(fetch = FetchType.EAGER, optional = true)
 	@JoinColumn(name = "CAR_ID", referencedColumnName = "ID")
@@ -186,6 +187,14 @@ public class Policy extends RichFileEntityImpl {
 
 	public void setLiabilityNo(String liabilityNo) {
 		this.liabilityNo = liabilityNo;
+	}
+
+	public Float getAmount() {
+		return amount;
+	}
+
+	public void setAmount(Float amount) {
+		this.amount = amount;
 	}
 
 }
