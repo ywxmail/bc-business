@@ -951,7 +951,7 @@ CREATE TABLE BS_CAR_POLICY(
    STATUS_                             INT(1) NOT NULL COMMENT '状态：0-正常,1-注销',
    CAR_ID                              BIGINT NOT NULL COMMENT '投保车号',
    REGISTER_DATE                       DATETIME COMMENT '初登日期',
-   ASSURED                             BIGINT NOT NULL COMMENT '投保人',
+   ASSURED                             VARCHAR(255)  COMMENT '投保人',
    COMMERIAL_NO                        VARCHAR(255)  COMMENT '商业险号',
    COMMERIAL_COMPANY                   BIGINT NOT NULL  COMMENT '商业险保险公司',
    COMMERIAL_START_DATE                DATETIME COMMENT '商业险开始日期',
