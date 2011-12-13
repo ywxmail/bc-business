@@ -28,6 +28,7 @@ import cn.bc.db.jdbc.SqlObject;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.formater.EntityStatusFormater;
+import cn.bc.web.formater.LinkFormater4Id;
 import cn.bc.web.ui.html.grid.Column;
 import cn.bc.web.ui.html.grid.IdColumn4MapKey;
 import cn.bc.web.ui.html.grid.TextColumn4MapKey;
@@ -71,7 +72,7 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 		StringBuffer sql = new StringBuffer();
 		sql.append("select p.id,p.status_,c.plate_type,c.plate_no,p.register_date,p.assured,p.commerial_no");
 		sql.append(",p.commerial_company,p.commerial_start_date,p.commerial_end_date");
-		sql.append(" ,p.ownrisk,p.greenslip,p.liability_no,p.amount,p.file_date");
+		sql.append(" ,p.ownrisk,p.greenslip,p.liability_no,p.amount,c.id carId,p.file_date");
 		sql.append(" from BS_CAR_POLICY p");
 		sql.append(" left join BS_CAR c on c.id=p.car_id");
 		sqlObject.setSql(sql.toString());
@@ -100,6 +101,7 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 				map.put("greenslip", rs[i++]);
 				map.put("liability_no", rs[i++]);
 				map.put("amount", rs[i++]);
+				map.put("carId", rs[i++]);
 
 				return map;
 			}
@@ -114,8 +116,28 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("p.status_", "status_",
 				getText("policy.status"), 60).setSortable(true)
 				.setValueFormater(new EntityStatusFormater(getBSStatuses1())));
+
 		columns.add(new TextColumn4MapKey("p.plate_no", "plate",
-				getText("policy.carId"), 80).setSortable(true));
+				getText("policy.carId"), 80)
+				.setValueFormater(new LinkFormater4Id(this.getContextPath()
+						+ "/bc-business/car/edit?id={0}", "car") {
+					@SuppressWarnings("unchecked")
+					@Override
+					public String getIdValue(Object context, Object value) {
+						return StringUtils
+								.toString(((Map<String, Object>) context)
+										.get("carId"));
+					}
+
+					@Override
+					public String getTaskbarTitle(Object context, Object value) {
+						@SuppressWarnings("unchecked")
+						Map<String, Object> map = (Map<String, Object>) context;
+						return getText("car") + " - " + map.get("plate");
+
+					}
+				}));
+
 		columns.add(new TextColumn4MapKey("p.assured", "assured",
 				getText("policy.assured"), 180));
 		columns.add(new TextColumn4MapKey("p.register_date", "register_date",
