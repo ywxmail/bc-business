@@ -53,16 +53,13 @@ import cn.bc.web.ui.json.Json;
 public class PolicyAction extends FileEntityAction<Long, Policy> {
 	// private static Log logger = LogFactory.getLog(ContractAction.class);
 	private static final long serialVersionUID = 1L;
-	public BlacklistService blacklistService;
 	public Long carManId;
 	public OptionService optionService;
 	public List<Map<String, String>> blackLevelList;// 黑名单等级列表
 	public List<Map<String, String>> blackTypeList;// 黑名单限制项目
-	public CarByDriverService carByDriverService;
 	public String carPlate;// 车牌号码
 	public String unitName;// 车辆所属单位名
 	public String motorcadeName;// 车辆所属车队名
-	public CarManService carManService;
 	private CarService carService;
 	public Long carId;
 	public Long unitId;
@@ -94,26 +91,7 @@ public class PolicyAction extends FileEntityAction<Long, Policy> {
 		this.carService = carService;
 	}
 
-	@Autowired
-	public void setCarManService(CarManService carManService) {
-		this.carManService = carManService;
-	}
-
-	@Autowired
-	public void setCarByDriverService(CarByDriverService carByDriverService) {
-		this.carByDriverService = carByDriverService;
-	}
-
-	@Autowired
-	public void setOptionService(OptionService optionService) {
-		this.optionService = optionService;
-	}
-
-	@Autowired
-	public void setBlacklistService(BlacklistService blacklistService) {
-		this.blacklistService = blacklistService;
-		this.setCrudService(blacklistService);
-	}
+	
 
 	@Override
 	public boolean isReadonly() {
@@ -142,36 +120,36 @@ public class PolicyAction extends FileEntityAction<Long, Policy> {
 		// this.getE().setMotorcade(car.getMotorcade());
 		//
 		// }
-		if (carManId != null) {
-			CarMan driver = this.carManService.load(carManId);
-			List<Car> car = this.carService.selectAllCarByCarManId(carManId);
-			if (car.size() == 1) {
-				this.getE().setCar(car.get(0));
-				this.getE().setMotorcade(car.get(0).getMotorcade());
-			} else if (car.size() > 1) {
-				isMoreCar = true;
-			} else {
-				isNullCar = true;
-			}
-			this.getE().setDriver(driver);
-
-		}
-		if (carId != null) {
-			Car car = this.carService.load(carId);
-			this.getE().setCar(car);
-
-			this.getE().setMotorcade(car.getMotorcade());
-			List<CarMan> carMan = this.carManService
-					.selectAllCarManByCarId(carId);
-			if (carMan.size() == 1) {
-				this.getE().setDriver(carMan.get(0));
-
-			} else if (carMan.size() > 1) {
-				isMoreCarMan = true;
-			} else {
-				isNullCarMan = true;
-			}
-		}
+//		if (carManId != null) {
+//			CarMan driver = this.carManService.load(carManId);
+//			List<Car> car = this.carService.selectAllCarByCarManId(carManId);
+//			if (car.size() == 1) {
+//				this.getE().setCar(car.get(0));
+//				this.getE().setMotorcade(car.get(0).getMotorcade());
+//			} else if (car.size() > 1) {
+//				isMoreCar = true;
+//			} else {
+//				isNullCar = true;
+//			}
+//			this.getE().setDriver(driver);
+//
+//		}
+//		if (carId != null) {
+//			Car car = this.carService.load(carId);
+//			this.getE().setCar(car);
+//
+//			this.getE().setMotorcade(car.getMotorcade());
+//			List<CarMan> carMan = this.carManService
+//					.selectAllCarManByCarId(carId);
+//			if (carMan.size() == 1) {
+//				this.getE().setDriver(carMan.get(0));
+//
+//			} else if (carMan.size() > 1) {
+//				isMoreCarMan = true;
+//			} else {
+//				isNullCarMan = true;
+//			}
+//		}
 		initSelects();
 		return result;
 	}

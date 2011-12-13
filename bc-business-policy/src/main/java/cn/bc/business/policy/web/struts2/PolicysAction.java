@@ -5,7 +5,6 @@ package cn.bc.business.policy.web.struts2;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -13,7 +12,6 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
-import cn.bc.business.policy.domain.Policy;
 import cn.bc.business.web.struts2.ViewAction;
 import cn.bc.core.Entity;
 import cn.bc.core.query.condition.Condition;
@@ -60,8 +58,8 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 	@Override
 	protected OrderCondition getGridDefaultOrderCondition() {
 		// 默认排序方向：状态|创建日期
-		return new OrderCondition("c.status_", Direction.Asc).add(
-				"c.file_date", Direction.Desc);
+		return new OrderCondition("p.status_", Direction.Asc).add(
+				"p.file_date", Direction.Desc);
 	}
 
 	@Override
@@ -70,12 +68,10 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer sql = new StringBuffer();
-		sql.append("select b.id,b.status_,b.code,cm.name drivers,m.name motorcade_name,c.plate_type,c.plate_no,b.type_,b.subject,b.lock_date,l.name locker");
-		sql.append(",b.unlock_date,u.name unlocker,b.locker_id,b.car_id from BS_BLACKLIST b left join BS_CARMAN cm on cm.id=b.driver_id ");
-		sql.append(" left join BS_MOTORCADE m on m.id=b.motorcade_id");
-		sql.append(" left join BS_CAR c on c.id=b.car_id");
-		sql.append(" inner join BC_IDENTITY_ACTOR l on l.id=b.locker_id");
-		sql.append(" left join BC_IDENTITY_ACTOR u on u.id=b.unlocker_id");
+		sql.append("select p.id,p.status_,c.plate_type,c.plate_no,p.register_date,p.assured,p.commerial_no");
+		sql.append(",p.commerial_company,p.commerial_start_date,p.commerial_end_date");
+		sql.append(" ,p.ownrisk,p.greenslip,p.liability_no,p.file_date");
+		sql.append(" from BS_CAR_POLICY p");
 		sqlObject.setSql(sql.toString());
 
 		// 注入参数
@@ -88,19 +84,19 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 				int i = 0;
 				map.put("id", rs[i++]);
 				map.put("status_", rs[i++]);
-				map.put("code", rs[i++]);
-				map.put("drivers", rs[i++]);
-				map.put("motorcade_name", rs[i++]);
 				map.put("plate_type", rs[i++]);
 				map.put("plate_no", rs[i++]);
 				map.put("plate", map.get("plate_type").toString() + "."
 						+ map.get("plate_no").toString());
-				map.put("type_", rs[i++]);
-				map.put("subject", rs[i++]);
-				map.put("lock_date", rs[i++]);
-				map.put("locker", rs[i++]);
-				map.put("unlock_date", rs[i++]);
-				map.put("unlocker", rs[i++]);
+				map.put("register_date", rs[i++]);
+				map.put("assured", rs[i++]);
+				map.put("commerial_no", rs[i++]);
+				map.put("commerial_company", rs[i++]);
+				map.put("commerial_start_date", rs[i++]);
+				map.put("commerial_end_date", rs[i++]);
+				map.put("ownrisk", rs[i++]);
+				map.put("greenslip", rs[i++]);
+				map.put("liability_no", rs[i++]);
 
 				return map;
 			}
@@ -111,38 +107,38 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 	@Override
 	protected List<Column> getGridColumns() {
 		List<Column> columns = new ArrayList<Column>();
-		columns.add(new IdColumn4MapKey("b.id", "id"));
-		columns.add(new TextColumn4MapKey("b.status_", "status_",
-				getText("blacklist.status"), 60).setSortable(true)
+		columns.add(new IdColumn4MapKey("p.id", "id"));
+		columns.add(new TextColumn4MapKey("p.status_", "status_",
+				getText("policy.status"), 60).setSortable(true)
 				.setValueFormater(new EntityStatusFormater(getBSStatuses1())));
-		columns.add(new TextColumn4MapKey("b.code", "code",
-				getText("blacklist.code"), 160).setSortable(true));
-		if (carManId == null) {
-			columns.add(new TextColumn4MapKey("cm.name", "drivers",
-					getText("blacklist.driver"), 60).setSortable(true));
-		}
-		columns.add(new TextColumn4MapKey("m.name", "motorcade_name",
-				getText("blacklist.motorcade.name"), 60).setSortable(true));
-		if (carId == null) {
-			columns.add(new TextColumn4MapKey("c.plate_no", "plate",
-					getText("blacklist.car.plateNo"), 80).setSortable(true));
-		}
-		columns.add(new TextColumn4MapKey("b.type_", "type_",
-				getText("blacklist.type"), 100));
-		columns.add(new TextColumn4MapKey("b.subject", "subject",
-				getText("blacklist.subject"), 160).setSortable(true)
-				.setUseTitleFromLabel(true));
-		columns.add(new TextColumn4MapKey("b.lock_date", "lock_date",
-				getText("blacklist.lockDate"), 100).setSortable(true)
+		columns.add(new TextColumn4MapKey("p.plate_no", "plate",
+				getText("policy.carId"), 80).setSortable(true));
+		columns.add(new TextColumn4MapKey("p.assured", "assured",
+				getText("policy.assured"), 100));
+		columns.add(new TextColumn4MapKey("p.register_date", "register_date",
+				getText("policy.registerDate"), 100).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
-		columns.add(new TextColumn4MapKey("l.name", "locker",
-				getText("blacklist.locker.name"), 80).setSortable(true)
+		columns.add(new TextColumn4MapKey("p.liability_no", "liability_no",
+				getText("policy.liabilityNo"), 80).setSortable(true)
 				.setUseTitleFromLabel(true));
-		columns.add(new TextColumn4MapKey("b.unlock_date", "unlock_date",
-				getText("blacklist.unlockDate"), 100).setSortable(true)
-				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
-		columns.add(new TextColumn4MapKey("u.name", "unlocker",
-				getText("blacklist.unlocker.name"), 80).setSortable(true)
+		columns.add(new TextColumn4MapKey("p.commerial_no", "commerial_no",
+				getText("policy.commerialNo"), 100));
+		columns.add(new TextColumn4MapKey("p.commerial_company",
+				"commerial_company", getText("policy.commerialCompany"), 160)
+				.setSortable(true).setUseTitleFromLabel(true));
+		columns.add(new TextColumn4MapKey("p.commerial_start_date",
+				"commerial_start_date", getText("policy.commerialStartDate"),
+				100).setSortable(true).setValueFormater(
+				new CalendarFormater("yyyy-MM-dd")));
+		columns.add(new TextColumn4MapKey("p.commerial_end_date",
+				"commerial_end_date", getText("policy.commerialEndDate"), 100)
+				.setSortable(true).setValueFormater(
+						new CalendarFormater("yyyy-MM-dd")));
+		columns.add(new TextColumn4MapKey("p.ownrisk", "ownrisk",
+				getText("policy.ownrisk"), 80).setSortable(true)
+				.setUseTitleFromLabel(true));
+		columns.add(new TextColumn4MapKey("p.greenslip", "greenslip",
+				getText("policy.greenslip"), 80).setSortable(true)
 				.setUseTitleFromLabel(true));
 
 		return columns;
@@ -150,13 +146,12 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected String[] getGridSearchFields() {
-		return new String[] { "b.code", "m.name ", "c.plate_type",
-				"c.plate_no", "b.subject", "cm.name ", "l.name ", "u.name " };
+		return new String[] { "p.plate_type", "p.plate_no" };
 	}
 
 	@Override
 	protected String getFormActionName() {
-		return "blacklist";
+		return "policy";
 	}
 
 	@Override
@@ -185,27 +180,12 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 			}
 		}
 
-		// // carManId条件
-		// if (carManId != null) {
-		// return new EqualsCondition("b.driver_id", carManId);
-		// } else if (carId != null) {
-		// return new EqualsCondition("b.car_id", carId);
-		// } else {
-		// return null;
-		// }
-		// carManId条件
-		Condition carManIdCondition = null;
-		if (carManId != null) {
-			carManIdCondition = new EqualsCondition("b.driver_id", carManId);
-		}
-		// carId条件
 		Condition carIdCondition = null;
 		if (carId != null) {
-			carIdCondition = new EqualsCondition("b.car_id", carId);
+			carIdCondition = new EqualsCondition("p.car_id", carId);
 		}
 		// 合并条件
-		return new AndCondition().add(statusCondition).add(carManIdCondition)
-				.add(carIdCondition);
+		return new AndCondition().add(statusCondition).add(carIdCondition);
 
 	}
 
@@ -216,10 +196,7 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 		if (this.status != null || this.status.length() != 0) {
 			json.put("status", status);
 		}
-		// carManId条件
-		if (carManId != null) {
-			json.put("carManId", carManId);
-		}
+
 		// carId条件
 		if (carId != null) {
 			json.put("carId", carId);
@@ -235,7 +212,5 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 								this.getEntityStatuses(), "status", 0,
 								getText("title.click2changeSearchStatus")));
 	}
-
-	
 
 }

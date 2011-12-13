@@ -3,8 +3,5 @@
     "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
     "http://struts.apache.org/dtds/struts-2.0.dtd">
 <struts>
-	<package name="blacklist" extends="bc-default" namespace="/bc-business">
-		<action name="/*/carManMess" class="{1}Action" method="carManMess">
-		</action>
-	</package>
+	
 </struts>

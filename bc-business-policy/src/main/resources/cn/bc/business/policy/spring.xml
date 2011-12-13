@@ -14,9 +14,9 @@
 
 	<!-- 需要在主配置文件配置entityManagerFactory和transactionManager的实现 -->
 
-	<!-- blacklist -->
-	<bean id="blacklistDao" class="cn.bc.business.blacklist.dao.hibernate.jpa.BlacklistDaoImpl"
+	<!-- policy -->
+	<bean id="policyDao" class="cn.bc.business.policy.dao.hibernate.jpa.PolicyDaoImpl"
 		p:entityManagerFactory-ref="entityManagerFactory" />
-	<bean id="blacklistService" class="cn.bc.business.blacklist.service.BlacklistServiceImpl"
-		p:blacklistDao-ref="blacklistDao" />
+	<bean id="policyService" class="cn.bc.business.policy.service.PolicyServiceImpl"
+		p:blacklistDao-ref="policyDao" />
 </beans>
