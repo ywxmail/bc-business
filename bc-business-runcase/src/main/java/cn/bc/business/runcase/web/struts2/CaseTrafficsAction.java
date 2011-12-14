@@ -116,9 +116,10 @@ public class CaseTrafficsAction extends ViewAction<Map<String, Object>> {
 				getText("runcase.source"), 60).setSortable(true).setUseTitleFromLabel(true)
 				.setValueFormater(new AbstractFormater<String>() {
 					@Override
-					public String format(Object context, Object value) {
-						// 从上下文取出元素Map
-						@SuppressWarnings("unchecked")
+					public String format(Object context, Object value) {	//系统来源source: 自建,接口(对应旧数据),生成(区分金盾网,交委接口)
+						// 从上下文取出元素Map									//事件来源from: 由用户自己填写,或者由金盾网提供
+																			//格式: source字段+from字段,如果from字段没有数据则只显示source
+						@SuppressWarnings("unchecked")						//如: 生成 - 金盾网/电子警察
 						Map<String, Object> obj = (Map<String, Object>) context;
 						if(null != obj.get("from_") && obj.get("from_").toString().length() > 0){
 							return getSourceStatuses().get(obj.get("source")+"") + " - " + obj.get("from_");

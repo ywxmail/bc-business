@@ -37,4 +37,11 @@ public interface CarDao extends CrudDao<Car> {
 
 	/** 通过carManId找车辆 */
 	List<Car> findAllcarBycarManId(Long id);
+
+	/**
+	 * 根据车牌号查找车牌号
+	 * @parma carPlateNo 
+	 * @return Long
+	 */
+	Long findcarInfoByCarPlateNo(String carPlateNo);
 }

@@ -23,6 +23,9 @@ public class JinDunJTWF extends SyncBase {
 	private static final long serialVersionUID = 1L;
 	/** UUID的前缀，实际的uid使用KEY_UID + "-" + id */
 	public static final String KEY_UID = SyncBase.class.getSimpleName();
+	
+	/** 区分接口同步的类型*/
+	public static final String KEY_TYPE = JinDunJTWF.class.getSimpleName();
 
 	// "处理状态"使用基类的status字段记录；"违法序号"使用基类的syncCode字段记录，作为同类信息的唯一标识
 
