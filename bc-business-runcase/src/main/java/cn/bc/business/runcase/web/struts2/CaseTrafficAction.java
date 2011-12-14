@@ -190,7 +190,7 @@ public class CaseTrafficAction extends FileEntityAction<Long, Case4InfractTraffi
 				buttonOption.put("id", "bcSaveDlgButton");
 				option.addButton(buttonOption);
 			}
-			option.addButton(new ButtonOption(getText("label.save"), "save"));
+			option.addButton(new ButtonOption(getText("label.save"), null, "bc.caseTrafficForm.save"));
 		}
 		return option;
 	}
@@ -256,6 +256,7 @@ public class CaseTrafficAction extends FileEntityAction<Long, Case4InfractTraffi
 			}else{	//交委同步
 				JiaoWeiJTWF jiaoWeiJTWF = this.jiaoWeiJTWFService.load(syncId);
 				findCarId(jiaoWeiJTWF.getCarPlateNo());
+				this.getE().setCaseNo(jiaoWeiJTWF.getSyncCode());
 				this.getE().setSubject(jiaoWeiJTWF.getContent());
 				this.getE().setJeom(jiaoWeiJTWF.getJeom());
 				this.getE().setHappenDate(jiaoWeiJTWF.getHappenDate());
