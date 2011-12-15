@@ -408,7 +408,7 @@ create table BS_CARMAN (
     DRIVING_STATUS        NUMERIC(1),
     OLD_UNIT_NAME        VARCHAR(255),
     EXT_ZRR              VARCHAR(255),
-    GZ                   NUMERIC(1),
+    GZ                   boolean default false,
     ACCESS_CERTS         VARCHAR(255),
     DESC_                VARCHAR(4000),
     FILE_DATE TIMESTAMP NOT NULL,
