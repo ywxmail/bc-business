@@ -25,6 +25,7 @@
 		<module>bc-business-runcase</module>
 		<module>bc-business-charger</module>
 		<module>bc-business-injury</module>
+		<module>bc-business-arrange</module>
 	</modules>
 	<scm>
 		<connection>scm:git:git@192.168.0.222:bc-business.git</connection>

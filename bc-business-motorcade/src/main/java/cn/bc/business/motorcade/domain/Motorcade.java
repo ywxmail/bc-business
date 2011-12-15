@@ -11,7 +11,7 @@ import cn.bc.identity.domain.Actor;
 import cn.bc.identity.domain.RichFileEntityImpl;
 
 /**
- * 车辆
+ * 车队
  * 
  * @author dragon
  */
