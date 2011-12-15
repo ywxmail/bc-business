@@ -11,10 +11,10 @@ drop table if exists DC_RECORD;
 -- 安全学习和回场检
 drop table if exists BS_ARRANGE_DRIVER;
 drop table if exists BS_ARRANGE_CAR;
-drop table if exists BC_SIGN_RECORD;
-drop table if exists BC_ARRANGE_MEMBER;
-drop table if exists BC_ARRANGE;
-drop table if exists BC_MEMBER;
+drop table if exists BS_SIGN_RECORD;
+drop table if exists BS_ARRANGE_MEMBER;
+drop table if exists BS_ARRANGE;
+drop table if exists BS_MEMBER;
 
 -- 同步记录
 drop table if exists BS_SYNC_JIAOWEI_JTWF;
