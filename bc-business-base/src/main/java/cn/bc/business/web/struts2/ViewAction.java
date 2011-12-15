@@ -12,7 +12,6 @@ import org.springframework.stereotype.Controller;
 
 import cn.bc.business.BSConstants;
 import cn.bc.core.Entity;
-import cn.bc.web.struts2.jpa.ViewActionWithJpa;
 
 /**
  * 营运系统各模块视图Action的基类封装
@@ -22,7 +21,7 @@ import cn.bc.web.struts2.jpa.ViewActionWithJpa;
  */
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 @Controller
-public abstract class ViewAction<T extends Object> extends ViewActionWithJpa<T> {
+public abstract class ViewAction<T extends Object> extends cn.bc.web.struts2.ViewAction<T> {
 	private static final long serialVersionUID = 1L;
 
 	@Override
