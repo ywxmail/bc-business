@@ -28,6 +28,16 @@ import cn.bc.identity.domain.RichFileEntityImpl;
 public class Policy extends RichFileEntityImpl {
 	private static final long serialVersionUID = 1L;
 	public static final String KEY_CODE = "blacklist.code";
+	public static final String POLICY_TYPE = Policy.class.getSimpleName();
+
+	/** 主版本号默认值 */
+	public static final int MAJOR_DEFALUT = 1;
+	/** 次版本号默认值 */
+	public static final int MINOR_DEFALUT = 0;
+	/** 主体当前版本 */
+	public static final int MAIN_NOW = 0;
+	/** 主体历史版本 */
+	public static final int MAIN_HISTORY = 1;
 	/** 布尔值：是 */
 	public static final int BOOLEAN_YES = 1;
 	/** 布尔值：否 */
@@ -50,6 +60,10 @@ public class Policy extends RichFileEntityImpl {
 	private String greenslipSource;// 强保人来源
 	private String liabilityNo;// 责任险单号
 	private Float amount;// 合计
+	private Integer verMajor;// 主版本号
+	private Integer verMinor;// 次版本号
+	private int main; // 主体： 0-当前版本,1-历史版本
+	private String patchNo;// 批号
 
 	@ManyToOne(fetch = FetchType.EAGER, optional = true)
 	@JoinColumn(name = "CAR_ID", referencedColumnName = "ID")
@@ -130,11 +144,11 @@ public class Policy extends RichFileEntityImpl {
 		this.greenslip = greenslip;
 	}
 
+	@Column(name = "GREENSLIP_SAME_DATE")
 	public boolean isGreenslipSameDate() {
 		return greenslipSameDate;
 	}
 
-	@Column(name = "GREENSLIP_SAME_DATE")
 	public void setGreenslipSameDate(boolean greenslipSameDate) {
 		this.greenslipSameDate = greenslipSameDate;
 	}
@@ -199,6 +213,41 @@ public class Policy extends RichFileEntityImpl {
 
 	public void setAmount(Float amount) {
 		this.amount = amount;
+	}
+
+	@Column(name = "VER_MAJOR")
+	public Integer getVerMajor() {
+		return verMajor;
+	}
+
+	public void setVerMajor(Integer verMajor) {
+		this.verMajor = verMajor;
+	}
+
+	@Column(name = "VER_MINOR")
+	public Integer getVerMinor() {
+		return verMinor;
+	}
+
+	public void setVerMinor(Integer verMinor) {
+		this.verMinor = verMinor;
+	}
+
+	public int getMain() {
+		return main;
+	}
+
+	public void setMain(int main) {
+		this.main = main;
+	}
+
+	@Column(name = "PATCH_NO")
+	public String getPatchNo() {
+		return patchNo;
+	}
+
+	public void setPatchNo(String patchNo) {
+		this.patchNo = patchNo;
 	}
 
 }
