@@ -1,5 +1,9 @@
--- bc营运管理子系统的删表脚本
--- 运行此脚本之后再运行平台的删表脚本framework.db.mysql.drop.sql
+-- bc营运管理子系统的 postgresql 删表脚本
+-- 运行此脚本之后再运行平台的删表脚本framework.db.postgresql.drop.sql
+
+-- 用于生成数据转换 id的序列
+drop sequence if exists CORE_SEQUENCE;
+drop sequence if exists DC_SEQUENCE;
 
 -- 数据转换记录
 drop table if exists DC_RECORD;
@@ -7,10 +11,10 @@ drop table if exists DC_RECORD;
 -- 安全学习和回场检
 drop table if exists BS_ARRANGE_DRIVER;
 drop table if exists BS_ARRANGE_CAR;
-drop table if exists BS_SIGN_RECORD;
-drop table if exists BS_ARRANGE_MEMBER;
-drop table if exists BS_ARRANGE;
-drop table if exists BS_MEMBER;
+drop table if exists BC_SIGN_RECORD;
+drop table if exists BC_ARRANGE_MEMBER;
+drop table if exists BC_ARRANGE;
+drop table if exists BC_MEMBER;
 
 -- 同步记录
 drop table if exists BS_SYNC_JIAOWEI_JTWF;

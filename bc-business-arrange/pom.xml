@@ -7,8 +7,8 @@
 		<version>0.3-SNAPSHOT</version>
 		<relativePath>../bc-business-parent/pom.xml</relativePath>
 	</parent>
-	<artifactId>bc-business-motorcade</artifactId>
-	<description>车队管理</description>
+	<artifactId>bc-business-arrange</artifactId>
+	<description>考勤管理</description>
 	
 	<dependencies>
 		<!-- 本子系统的公共模块 -->

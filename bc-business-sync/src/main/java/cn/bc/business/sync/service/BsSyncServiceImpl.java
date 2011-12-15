@@ -205,7 +205,7 @@ public class BsSyncServiceImpl implements BsSyncService {
 					carSpideHistory.add(carId);
 				} catch (Exception e) {
 					// 抓取异常就停止
-					logger.error(e.getMessage());
+					logger.warn(e.getMessage());
 					hasError = true;
 					errorCount ++;
 				}
