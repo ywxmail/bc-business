@@ -1170,7 +1170,7 @@ CREATE TABLE BC_ARRANGE(
    UID_                 VARCHAR(36) NOT NULL,
    TYPE_                INT(1) NOT NULL COMMENT '类型：0-司机安全学习,1-车辆回场检,2-会议安排',
    STATUS_              INT(1) NOT NULL COMMENT '状态：0-正常,1-锁定',
-   UNIT_ID              VARCHAR(255) NOT NULL COMMENT '所属单位ID',
+   UNIT_ID              BIGINT NOT NULL COMMENT '所属单位ID',
    YEAR                 NUMERIC(4,0) NOT NULL COMMENT '所属年份',
    MONTH                NUMERIC(2,0) NOT NULL COMMENT '所属月份',
    START_DATE           DATETIME NOT NULL COMMENT '开始时间',
