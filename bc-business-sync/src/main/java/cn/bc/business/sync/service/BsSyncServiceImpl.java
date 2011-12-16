@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import cn.bc.business.spider.Spider4JinDunJTWF;
 import cn.bc.business.spider.domain.JinDunJTWF;
 import cn.bc.business.sync.domain.JiaoWeiJTWF;
+import cn.bc.business.sync.domain.JiaoWeiYYWZ;
 import cn.bc.business.ws.service.WSMiddle;
 import cn.bc.core.cache.Cache;
 import cn.bc.core.util.DateUtils;
@@ -260,5 +261,97 @@ public class BsSyncServiceImpl implements BsSyncService {
 			strMsg.append(errorCount);//记录发生异常的数目
 		}
 		return news.size();
+	}
+
+	public int doSync4JiaoWeiYYWZ(ActorHistory syncer, Calendar fromDate,
+			Calendar toDate, StringBuffer strMsg) {
+		Date startTime = new Date();
+		// 交委接口的宝城企业ID
+		String jiaoWei_qyid_baocheng = this.optionService.getItemValue("sync",
+				"jiaowei.ws.qyid.baocheng");
+
+		// 交委接口的url
+		String jiaoWei_ws_uri = this.optionService.getItemValue("sync",
+				"jiaowei.ws.soapUrl");
+		String jiaoWei_ws_method = "GetMasterWZ";
+
+		// 从交委接口获取数据
+		DataSet dataSet = wsMiddle.findBreachOfBusiness(jiaoWei_qyid_baocheng,
+				fromDate, toDate, strMsg);
+
+		// 发生异常就直接退出
+		if (strMsg.length() > 0)
+			return 0;
+
+		// 循环每一条数据作处理
+		JiaoWeiYYWZ domain;
+		Calendar now = Calendar.getInstance();
+		ActorHistory author = syncer;
+		String syncType = JiaoWeiYYWZ.class.getSimpleName();
+		String syncFrom = jiaoWei_ws_uri + "#" + jiaoWei_ws_method;
+		List<SyncBase> toSaveDomains = new ArrayList<SyncBase>();
+		if (dataSet.getRows() != null) {
+			for (Row row : dataSet.getRows()) {
+				domain = dataSetRow2JiaoWeiYYWZ(row, author, now, syncFrom,
+						syncType);
+				if (!this.syncBaseService.hadSync(syncType,
+						domain.getSyncCode())) {// 没有同步过的记录
+					toSaveDomains.add(domain);
+				} else {// 已存在同步记录
+					if (logger.isInfoEnabled())
+						logger.info("记录已存在，忽略：syncType=" + syncType
+								+ ",syncCode=" + domain.getSyncCode());
+				}
+			}
+			if (!toSaveDomains.isEmpty())
+				this.syncBaseService.save(toSaveDomains);
+		}
+		if (logger.isInfoEnabled())
+			logger.info("从交委营运违法接口获取数据总耗时：" + DateUtils.getWasteTime(startTime) + ",newCount=" + toSaveDomains.size());
+
+		return toSaveDomains.size();
+	}
+
+	/**
+	 * 数据集行数据到交委营运违法信息的转换
+	 * 
+	 * @param row
+	 * @param author
+	 * @param createDate
+	 * @param syncFrom
+	 * @param syncType
+	 * @return
+	 */
+	private JiaoWeiYYWZ dataSetRow2JiaoWeiYYWZ(Row row, ActorHistory author,
+			Calendar createDate, String syncFrom, String syncType) {
+		JiaoWeiYYWZ domain = new JiaoWeiYYWZ();
+		domain.setAuthor(author);
+		domain.setStatus(JiaoWeiYYWZ.STATUS_NEW);
+		domain.setSyncDate(createDate);
+		domain.setSyncType(syncType);
+		domain.setSyncFrom(syncFrom);
+		
+		domain.setcId(row.getCellStringValue("c_id"));
+		domain.setSyncCode(row.getCellStringValue("案号"));
+		domain.setWzStatus(row.getCellStringValue("状态"));
+		domain.setConfiscateCertNo(row.getCellStringValue("扣件证号"));
+		domain.setOperator(row.getCellStringValue("执法人"));
+		domain.setOperateUnit(row.getCellStringValue("执法分队"));
+		domain.setVideoOP(row.getCellStringValue("摄录员"));
+		domain.setDriverName(row.getCellStringValue("当事人"));
+		domain.setIdcardType(row.getCellStringValue("身份证明类型"));
+		domain.setIdcardCode(row.getCellStringValue("身份证明编号"));
+		domain.setCarPlate(row.getCellStringValue("违章主体"));
+		domain.setCompany(row.getCellStringValue("违章企业"));
+		domain.setAddress(row.getCellStringValue("违章地段"));
+		domain.setOwner(row.getCellStringValue("业户名称"));
+		domain.setOwnerId(row.getCellStringValue("业户ID"));
+		domain.setBsCertNo(row.getCellStringValue("经营许可证号"));
+		domain.setContent(row.getCellStringValue("违章内容"));
+		domain.setHappenDate(row.getCellCalendarValue("违章日期"));
+		domain.setEvidenceUnit(row.getCellStringValue("保存单位"));
+		domain.setDriverCert(row.getCellStringValue("资格证号"));
+
+		return domain;
 	}
 }
