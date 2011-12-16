@@ -42,4 +42,21 @@ public interface BsSyncService {
 	 */
 	int doSync4JinDunJTWF(ActorHistory syncer, List<Map<String, Object>> cars,
 			StringBuffer strMsg);
+
+	/**
+	 * 同步交委接口的营运违法信息
+	 * 
+	 * @param syncer
+	 *            执行同步操作的用户
+	 * @param fromDate
+	 *            起始日期
+	 * @param toDate
+	 *            结束日期
+	 * @param strMsg
+	 *            异常信息
+	 * @return 新同步数据的条目数
+	 */
+	int doSync4JiaoWeiYYWZ(ActorHistory syncer, Calendar fromDate,
+			Calendar toDate, StringBuffer strMsg);
+
 }

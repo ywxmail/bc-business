@@ -28,14 +28,17 @@ public class CarByDriverServiceImpl extends DefaultCrudService<CarByDriver>
 	}
 
 	public Car selectCarByCarManId(Long id) {
-		// TODO Auto-generated method stub
 		return (this.carByDriverDao.findBycarManId(id));
-
-	}
-	/** 更新车辆模块的司机信息 
-	 * @return */
-	public void updateCar4Driver(Long id) {
-		this.carByDriverDao.updateCar4Driver( id);
 	}
 
+	@Override
+	public CarByDriver save(CarByDriver entity) {
+		//默认的保存处理
+		entity = super.save(entity);
+		
+		//更新车辆的司机信息
+		this.carByDriverDao.updateCar4Driver(entity.getCar().getId());
+		
+		return entity;
+	}
 }

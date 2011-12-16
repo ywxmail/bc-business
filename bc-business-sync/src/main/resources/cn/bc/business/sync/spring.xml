@@ -41,5 +41,17 @@
 	<bean id="JiaoWeiJTWFService" class="cn.bc.business.sync.service.JiaoWeiJTWFServiceImpl"
 		p:JiaoWeiJTWFDao-ref="JiaoWeiJTWFDao" />
 		
+	<!-- JiaoWeiYYWZService -->
+	<bean id="JiaoWeiYYWZDao" class="cn.bc.business.sync.dao.hibernate.jpa.JiaoWeiYYWZDaoImpl"
+		p:entityManagerFactory-ref="entityManagerFactory" />
+	<bean id="JiaoWeiYYWZService" class="cn.bc.business.sync.service.JiaoWeiYYWZServiceImpl"
+		p:JiaoWeiYYWZDao-ref="JiaoWeiYYWZDao" />
+		
+	<!-- JiaoWeiADVICEService -->
+	<bean id="JiaoWeiADVICEDao" class="cn.bc.business.sync.dao.hibernate.jpa.JiaoWeiADVICEDaoImpl"
+		p:entityManagerFactory-ref="entityManagerFactory" />
+	<bean id="JiaoWeiADVICEService" class="cn.bc.business.sync.service.JiaoWeiADVICEServiceImpl"
+		p:JiaoWeiADVICEDao-ref="JiaoWeiADVICEDao" />
+		
 	
 </beans>
