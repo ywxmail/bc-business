@@ -252,8 +252,10 @@ public class CarByDriverAction extends FileEntityAction<Long, CarByDriver> {
 		this.getE().setModifier(context.getUserHistory());
 		this.getE().setModifiedDate(Calendar.getInstance());
 
-		super.save();
-		this.carByDriverService.updateCar4Driver(this.getE().getCar().getId());
+		this.beforeSave(this.getE());
+		this.carByDriverService.save(this.getE());
+		this.afterSave(this.getE());
+		//this.carByDriverService.updateCar4Driver(this.getE().getCar().getId());
 		return "saveSuccess";
 	}
 }
