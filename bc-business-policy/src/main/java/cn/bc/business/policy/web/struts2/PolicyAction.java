@@ -148,15 +148,15 @@ public class PolicyAction extends FileEntityAction<Long, Policy> {
 
 	@Override
 	protected PageOption buildFormPageOption() {
-		PageOption option = super.buildFormPageOption().setWidth(726)
+		PageOption option = super.buildFormPageOption().setWidth(740)
 				.setMinWidth(250).setMinHeight(200).setHeight(540);
-		if (!this.isReadonly()) {
-			ButtonOption buttonOption = new ButtonOption(getText("label.save"),
-					"save");
-			buttonOption.put("id", "bcSaveBtn");
-			option.addButton(buttonOption);
-			if (!this.getE().isNew()
-					&& this.getE().getMain() == Policy.MAIN_NOW) {
+		//if (!this.isReadonly()) {
+//			ButtonOption buttonOption = new ButtonOption(getText("label.save"),
+//					"save");
+//			buttonOption.put("id", "bcSaveBtn");
+//			option.addButton(buttonOption);
+//			if (!this.getE().isNew()
+//					&& this.getE().getMain() == Policy.MAIN_NOW) {
 				ToolbarMenuButton toolbarMenuButton = new ToolbarMenuButton(
 						getText("contract.labour.op"));
 				toolbarMenuButton.setId("bcOpBtn");
@@ -172,8 +172,8 @@ public class PolicyAction extends FileEntityAction<Long, Policy> {
 								Contract.OPTYPE_RESIGN + "")
 						.setChange("bc.contractLabourForm.selectMenuButtonItem");
 				option.addButton(toolbarMenuButton);
-			}
-		}
+			//}
+		//}
 		return option;
 	}
 
