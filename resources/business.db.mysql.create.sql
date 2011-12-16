@@ -416,7 +416,7 @@ CREATE TABLE BS_CONTRACT(
    VER_MAJOR            BIGINT COMMENT '主版本号',
    VER_MINOR            BIGINT COMMENT '次版本号',
    PATCH_NO             VARCHAR(255) NOT NULL COMMENT '批号',
-   MAIN                 INT(1) NOT NULL COMMENT '主体: 0-当前版本,1-历史版本'';',
+   MAIN                 INT(1) NOT NULL COMMENT '主体: 0-当前版本,1-历史版本',
    WORD_NO              VARCHAR(255) COMMENT '文书号',
    CODE                 VARCHAR(255) NOT NULL COMMENT '合同号',
    TYPE_                INT(1) NOT NULL COMMENT '合同类型：1-司机劳动合同、2-责任人合同',
@@ -508,9 +508,9 @@ ALTER TABLE BS_CONTRACT_LABOUR ADD CONSTRAINT BSFK_CONTRACT4LABOUR_CONTRACT FORE
 CREATE TABLE BS_CONTRACT_CHARGER(
    ID                   BIGINT NOT NULL,
    SIGN_TYPE            VARCHAR(255) NOT NULL COMMENT '签约类型:如新户',
-   LOGOUT               INT(1) NOT NULL COMMENT '注销:0-未,1-已',
-   TAKEBACK_ORIGIN      INT(1) NOT NULL COMMENT '已经收回原件:0-未1-已',
-   INCLUDE_COST         INT(1) NOT NULL COMMENT '包含检审费用:0-不包含,1-包含',
+   LOGOUT               INT(1) DEFAULT 0 COMMENT '注销:0-未,1-已',
+   TAKEBACK_ORIGIN      INT(1) DEFAULT 0 COMMENT '已经收回原件:0-未1-已',
+   INCLUDE_COST         INT(1) DEFAULT 0 COMMENT '包含检审费用:0-不包含,1-包含',
    OLD_CONTENT          VARCHAR(4000) COMMENT '旧合同内容',
    BS_TYPE              VARCHAR(255) COMMENT '合同性质',
    PRIMARY KEY (ID)
