@@ -116,7 +116,6 @@ public class PolicyAction extends FileEntityAction<Long, Policy> {
 
 	@Override
 	public String create() throws Exception {
-
 		String result = super.create();
 		statusesValue = this.getBSStatuses1();
 		this.getE().setGreenslip(true);
@@ -124,6 +123,7 @@ public class PolicyAction extends FileEntityAction<Long, Policy> {
 		this.getE().setVerMajor(Policy.MAJOR_DEFALUT);
 		this.getE().setUid(
 				this.getIdGeneratorService().next(Policy.POLICY_TYPE));
+		this.getE().setPatchNo(this.getE().getUid());
 		// 构建附件控件
 		attachsUI = buildAttachsUI(true);
 		initSelects();
