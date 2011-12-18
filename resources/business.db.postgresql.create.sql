@@ -1167,9 +1167,9 @@ CREATE TABLE BS_CASE_INFRACT_TRAFFIC (
    SORT                 VARCHAR(255),
    JEOM                 NUMERIC(3,1),
    COMMENT_             VARCHAR(4000),
-   IS_DELIVER           INTEGER            NOT NULL,
+   IS_DELIVER           boolean default false,
    DELIVER_DATE         TIMESTAMP,
-   IS_SIGN              INTEGER            not null,
+   IS_SIGN              boolean default false,
    SIGN_DATE            TIMESTAMP,
    CONSTRAINT BSPK_CASE_INFRACT_TRAFFIC PRIMARY KEY (ID)
 );
