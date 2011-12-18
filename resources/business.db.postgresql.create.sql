@@ -1107,13 +1107,13 @@ CREATE TABLE BS_CASE_INFRACT_BUSINESS (
    OPERATE_UNIT         VARCHAR(255),
    RECEIPT              VARCHAR(255),
    COMMENT_             VARCHAR(4000),
-   IS_INVALID           INTEGER            NOT NULL,
-   IS_SEAL              INTEGER            NOT NULL,
+   IS_INVALID           boolean default false,
+   IS_SEAL              boolean default false,
    SEAL_DATE            TIMESTAMP,
-   IS_DELIVER           INTEGER            NOT NULL,
-   IS_CLOSE             INTEGER            NOT NULL,
-   IS_OVERDUE           INTEGER            NOT NULL,
-   IS_STOP              NUMERIC(1),
+   IS_DELIVER           boolean default false,
+   IS_CLOSE             boolean default false,
+   IS_OVERDUE           boolean default false,
+   IS_STOP              boolean default false,
    CONSTRAINT BSPK_CASE_INFRACT_BUSINESS PRIMARY KEY (ID)
 );
 COMMENT ON TABLE BS_CASE_INFRACT_BUSINESS IS '营运违章';
