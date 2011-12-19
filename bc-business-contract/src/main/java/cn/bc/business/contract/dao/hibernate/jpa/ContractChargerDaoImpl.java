@@ -401,12 +401,12 @@ public class ContractChargerDaoImpl extends HibernateCrudJpaDao<Contract4Charger
 	}
 
 	public void updateCar4dirverName(String assignChargerNames, Long carId) {
-		String sql = "UPDATE BS_CAR car SET car.charger=? WHERE car.id =? AND car.status_ =0";
+		String sql = "UPDATE BS_CAR car SET charger=? WHERE car.id =? AND car.status_ =0";
 		this.jdbcTemplate.update(sql, new Object[]{assignChargerNames,carId});
 	}
 
 	public void updateCarMan4dirverName(String assignChargerNames, Long carId) {
-		String sql = "UPDATE BS_CARMAN man SET man.charger=? WHERE man.id IN("+
+		String sql = "UPDATE BS_CARMAN man SET charger=? WHERE man.id IN("+
 					 "SELECT cd.driver_id FROM BS_CAR_DRIVER cd WHERE cd.car_id=? AND man.status_ =0)";
 		this.jdbcTemplate.update(sql, new Object[]{assignChargerNames,carId});
 	}

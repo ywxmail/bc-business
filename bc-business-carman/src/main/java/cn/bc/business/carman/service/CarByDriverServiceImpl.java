@@ -39,6 +39,8 @@ public class CarByDriverServiceImpl extends DefaultCrudService<CarByDriver>
 		//更新车辆的司机信息
 		this.carByDriverDao.updateCar4Driver(entity.getCar().getId());
 		
+		entity = this.forceLoad(entity.getId());
+		
 		return entity;
 	}
 }
