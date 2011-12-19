@@ -696,8 +696,8 @@ CREATE TABLE BS_CONTRACT_LABOUR
    AGE                  NUMERIC(3),
    ORIGIN               VARCHAR(255),
    HOUSE_TYPE           VARCHAR(255),
-   DOLE                 INTEGER            DEFAULT 0,
-   FUNDING              INTEGER            DEFAULT 0,
+   DOLE                 boolean default false,
+   FUNDING              boolean default false,
    INSURCODE            VARCHAR(255),
    JOINDATE             TIMESTAMP,
    REGISTER_DATE        TIMESTAMP,
@@ -705,13 +705,13 @@ CREATE TABLE BS_CONTRACT_LABOUR
    BS_TYPE              VARCHAR(255),
    BUY_UNIT             VARCHAR(255),
    INSURANCE_TYPE       VARCHAR(255),
-   IS_IQAMA             INTEGER            DEFAULT 0,
-   IS_ACCOUNT_BOOK      INTEGER            DEFAULT 0,
-   IS_IDENTITY_CARDS    INTEGER            DEFAULT 0,
-   IS_FPC               INTEGER            DEFAULT 0,
-   IS_UNEMPLOYED        INTEGER            DEFAULT 0,
-   IS_HEALTHFORM        INTEGER            DEFAULT 0,
-   IS_PHOTO             INTEGER            DEFAULT 0,
+   IS_IQAMA             BOOLEAN            DEFAULT FALSE,
+   IS_ACCOUNT_BOOK      BOOLEAN            DEFAULT FALSE,
+   IS_IDENTITY_CARDS    BOOLEAN            DEFAULT FALSE,
+   IS_FPC               BOOLEAN            DEFAULT FALSE,
+   IS_UNEMPLOYED        BOOLEAN            DEFAULT FALSE,
+   IS_HEALTHFORM        BOOLEAN            DEFAULT FALSE,
+   IS_PHOTO             BOOLEAN            DEFAULT FALSE,
    BREEDING_DATE        TIMESTAMP,
    GET_STARTDATE        TIMESTAMP,
    GET_ENDDATE          TIMESTAMP,
@@ -754,9 +754,9 @@ ALTER TABLE BS_CONTRACT_LABOUR ADD CONSTRAINT BSFK_CONTRACT4LABOUR_CONTRACT FORE
 CREATE TABLE BS_CONTRACT_CHARGER (
    ID                   INTEGER           NOT NULL,
    SIGN_TYPE            VARCHAR(255)        NOT NULL,
-   LOGOUT               INTEGER            NOT NULL,
-   TAKEBACK_ORIGIN      INTEGER            NOT NULL,
-   INCLUDE_COST         INTEGER            NOT NULL,
+   LOGOUT               BOOLEAN            DEFAULT FALSE,
+   TAKEBACK_ORIGIN      BOOLEAN            DEFAULT FALSE,
+   INCLUDE_COST         BOOLEAN            DEFAULT FALSE,
    BS_TYPE		VARCHAR(255),
    OLD_CONTENT          VARCHAR(4000),
    CONSTRAINT BSPK_CONTRACT_CHARGER PRIMARY KEY (ID)
@@ -1107,13 +1107,13 @@ CREATE TABLE BS_CASE_INFRACT_BUSINESS (
    OPERATE_UNIT         VARCHAR(255),
    RECEIPT              VARCHAR(255),
    COMMENT_             VARCHAR(4000),
-   IS_INVALID           INTEGER            NOT NULL,
-   IS_SEAL              INTEGER            NOT NULL,
+   IS_INVALID           boolean default false,
+   IS_SEAL              boolean default false,
    SEAL_DATE            TIMESTAMP,
-   IS_DELIVER           INTEGER            NOT NULL,
-   IS_CLOSE             INTEGER            NOT NULL,
-   IS_OVERDUE           INTEGER            NOT NULL,
-   IS_STOP              NUMERIC(1),
+   IS_DELIVER           boolean default false,
+   IS_CLOSE             boolean default false,
+   IS_OVERDUE           boolean default false,
+   IS_STOP              boolean default false,
    CONSTRAINT BSPK_CASE_INFRACT_BUSINESS PRIMARY KEY (ID)
 );
 COMMENT ON TABLE BS_CASE_INFRACT_BUSINESS IS '营运违章';
@@ -1167,9 +1167,9 @@ CREATE TABLE BS_CASE_INFRACT_TRAFFIC (
    SORT                 VARCHAR(255),
    JEOM                 NUMERIC(3,1),
    COMMENT_             VARCHAR(4000),
-   IS_DELIVER           INTEGER            NOT NULL,
+   IS_DELIVER           boolean default false,
    DELIVER_DATE         TIMESTAMP,
-   IS_SIGN              INTEGER            not null,
+   IS_SIGN              boolean default false,
    SIGN_DATE            TIMESTAMP,
    CONSTRAINT BSPK_CASE_INFRACT_TRAFFIC PRIMARY KEY (ID)
 );
@@ -1211,14 +1211,14 @@ CREATE TABLE BS_CASE_ACCIDENT (
    DRIVER_CLASSES       NUMERIC(1),
    INSURANCE_COMPANY    VARCHAR(255),
    INSURANCE_INFO       VARCHAR(4000),
-   IS_DELIVER           INTEGER            NOT NULL,
+   IS_DELIVER           boolean default false,
    DELIVER_DATE         TIMESTAMP,
    DELIVER_MONEY        NUMERIC(10,2),
-   IS_PAY               INTEGER            NOT NULL,
+   IS_PAY               boolean default false,
    PAY_DATE             TIMESTAMP,
    PAY_MONEY            NUMERIC(10,2),
    PAY_CODE             VARCHAR(255),
-   IS_CLAIM             INTEGER            NOT NULL,
+   IS_CLAIM             boolean default false,
    CLAIM_DATE           TIMESTAMP,
    CLAIM_MONEY          NUMERIC(10,2),
    CLAIM_CODE           VARCHAR(255),
@@ -1227,11 +1227,11 @@ CREATE TABLE BS_CASE_ACCIDENT (
    CASUALTIES           VARCHAR(255),
    CAR_HURT             VARCHAR(255),
    THIRD_PARTY          VARCHAR(255),
-   IS_ROB               NUMERIC(1),
+   IS_ROB               boolean default false,
    HURT_COUNT           NUMERIC(10),
    DEAD_COUNT           NUMERIC(10),
    ACTUAL_LOSS          NUMERIC(10,2),
-   IS_INNER_FIX         NUMERIC(1),
+   IS_INNER_FIX         boolean default false,
    FIX_COST             NUMERIC(10,2),
    COST_DETAIL          VARCHAR(4000),
    CONSTRAINT BSPK_CASE_ACCIDENT PRIMARY KEY (ID)
@@ -1318,7 +1318,7 @@ CREATE TABLE BS_CASE_ADVICE (
    PASSENGER_COUNT_CHILD NUMERIC(1),
    PASSENGER_COUNT      NUMERIC(1),
    DELIVER_DATE         TIMESTAMP,
-   IS_INVALID           INTEGER            NOT NULL,
+   IS_INVALID           boolean default false,
    CONSTRAINT BSPK_CASE_ADVICE PRIMARY KEY (ID)
 );
 COMMENT ON TABLE BS_CASE_ADVICE IS '投诉与建议';
@@ -1494,9 +1494,9 @@ CREATE TABLE BS_CAR_POLICY (
    COMMERIAL_COMPANY    VARCHAR(255),
    COMMERIAL_START_DATE TIMESTAMP,
    COMMERIAL_END_DATE   TIMESTAMP,
-   OWNRISK              NUMERIC(1),
-   GREENSLIP            NUMERIC(1),
-   GREENSLIP_SAME_DATE  NUMERIC(1),
+   OWNRISK              boolean default false,
+   GREENSLIP            boolean default false,
+   GREENSLIP_SAME_DATE  boolean default false,
    GREENSLIP_NO         VARCHAR(255),
    GREENSLIP_COMPANY    VARCHAR(255),
    GREENSLIP_START_DATE               TIMESTAMP,
@@ -1607,7 +1607,6 @@ CREATE INDEX BCIDX_JIAOWEIJTWF_CAR_PLATE ON BS_SYNC_JIAOWEI_JTWF (CAR_PLATE_TYPE
 CREATE TABLE BS_SYNC_JIAOWEI_YYWZ (
     ID			INTEGER NOT NULL,
     C_ID		VARCHAR(255) NOT NULL,
-    CASE_NO		VARCHAR(255) NOT NULL,
     STATUS		VARCHAR(100),
     CERT_KJ		VARCHAR(255),
     OPERATOR		VARCHAR(255),
@@ -1633,7 +1632,7 @@ CREATE TABLE BS_SYNC_JIAOWEI_YYWZ (
     RECEIPT             VARCHAR(255),
     NOTICE		VARCHAR(255),
     CERT_YY             VARCHAR(255),
-    SEATING		NUMERIC(10,1) NOT NULL,
+    SEATING		NUMERIC(10,1),
     OWE_RECORD          VARCHAR(255),
     OWE_SIGNATURE	VARCHAR(255),
     LEAVE_TROOPS	VARCHAR(255),
@@ -1648,7 +1647,6 @@ CREATE TABLE BS_SYNC_JIAOWEI_YYWZ (
     CONSTRAINT BSPK_SYNC_JIAOWEI_YYWZ PRIMARY KEY (ID)
 );
 COMMENT ON TABLE BS_SYNC_JIAOWEI_YYWZ IS '交委WebService接口的营运违章信息';
-COMMENT ON COLUMN BS_SYNC_JIAOWEI_YYWZ.CASE_NO IS '案号';
 COMMENT ON COLUMN BS_SYNC_JIAOWEI_YYWZ.STATUS IS '状态';
 COMMENT ON COLUMN BS_SYNC_JIAOWEI_YYWZ.CERT_KJ IS '扣件证号';
 COMMENT ON COLUMN BS_SYNC_JIAOWEI_YYWZ.OPERATOR IS '执法人';

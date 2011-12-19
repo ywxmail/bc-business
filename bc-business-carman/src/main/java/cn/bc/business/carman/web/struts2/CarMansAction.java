@@ -110,8 +110,8 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 				new KeyValueFormater(getType())));
 		columns.add(new TextColumn4MapKey("c.name", "name",
 				getText("carMan.name"), 80).setSortable(true));
-		columns.add(new TextColumn4MapKey("c.cert_fwzg_id", "cert_fwzg_id",
-				getText("carMan.cert4FWZGID"), 80));
+//		columns.add(new TextColumn4MapKey("c.cert_fwzg_id", "cert_fwzg_id",
+//				getText("carMan.cert4FWZGID"), 80));
 		columns.add(new TextColumn4MapKey("c.cert_fwzg", "cert_fwzg",
 				getText("carMan.cert4FWZG"), 80));
 		columns.add(new TextColumn4MapKey("c.cert_identity", "cert_identity",

@@ -63,7 +63,7 @@ public class MotorcadesAction extends ViewAction<Map<String, Object>> {
 
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer sql = new StringBuffer();
-		sql.append("select m.unit_id unitId,u.name unitName,m.id id,m.name name,m.status_ status,m.code code");
+		sql.append("select m.unit_id unitId,u.name unitName,m.id id,m.name as name,m.status_ status,m.code code");
 		sql.append(",m.principal_id principalId,m.principal_name principalName,m.file_date fileDate,a.actor_name authorName");
 		sql.append(" from bs_motorcade m");
 		sql.append(" inner join bc_identity_actor u on u.id=m.unit_id");

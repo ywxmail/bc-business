@@ -17,8 +17,4 @@ public interface CarByDriverService extends CrudService<CarByDriver> {
 	// 根据司机ID查找返回相关正班车辆信息
 	Car selectCarByCarManId(Long id);
 
-	/** 更新车辆模块的司机信息 
-	 * @return */
-	void updateCar4Driver(Long id);
-
 }

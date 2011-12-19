@@ -5,6 +5,7 @@ package cn.bc.business.carman.web.struts2;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -16,10 +17,9 @@ import cn.bc.business.carman.domain.CarByDriver;
 import cn.bc.business.web.struts2.ViewAction;
 import cn.bc.core.Entity;
 import cn.bc.core.query.condition.Condition;
+import cn.bc.core.query.condition.ConditionUtils;
 import cn.bc.core.query.condition.Direction;
-import cn.bc.core.query.condition.impl.AndCondition;
 import cn.bc.core.query.condition.impl.EqualsCondition;
-import cn.bc.core.query.condition.impl.InCondition;
 import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.core.util.StringUtils;
 import cn.bc.db.jdbc.RowMapper;
@@ -46,7 +46,7 @@ import cn.bc.web.ui.json.Json;
 public class CarByDriversAction extends ViewAction<Map<String, Object>> {
 	private static final long serialVersionUID = 1L;
 	public String status = String.valueOf(Entity.STATUS_ENABLED); // 车辆的状态，多个用逗号连接
-	public String classes = String.valueOf(CarByDriver.TYPE_ZHENGBAN);// 正班
+	public String classes;// 默认全部
 	public Long carManId;
 	public Long carId;
 
@@ -181,35 +181,28 @@ public class CarByDriversAction extends ViewAction<Map<String, Object>> {
 	@Override
 	protected Condition getGridSpecalCondition() {
 		// 状态条件
-		Condition statusCondition = null;
-		if (status != null && status.length() > 0) {
-			String[] ss = status.split(",");
-			if (ss.length == 1) {
-				statusCondition = new EqualsCondition("d.status_", new Integer(
-						ss[0]));
-			} else {
-				statusCondition = new InCondition("d.status_",
-						StringUtils.stringArray2IntegerArray(ss));
-			}
-		}
+		Condition statusCondition = ConditionUtils
+				.toConditionByComma4IntegerValue(status, "d.status_");
+
 		// carManId条件
 		Condition carManIdCondition = null;
 		if (carManId != null) {
 			carManIdCondition = new EqualsCondition("d.driver_id", carManId);
 		}
+
 		// carId条件
 		Condition carIdCondition = null;
 		if (carId != null) {
 			carIdCondition = new EqualsCondition("d.car_id", carId);
 		}
+
 		// classes条件
-		Condition classesCondition = null;
-		if (classes != null && classes.length() > 0) {
-			carIdCondition = new EqualsCondition("d.classes", classes);
-		}
+		Condition classesCondition = ConditionUtils
+				.toConditionByComma4IntegerValue(classes, "d.classes");
+
 		// 合并条件
-		return new AndCondition().add(statusCondition).add(carManIdCondition)
-				.add(carIdCondition).add(classesCondition);
+		return ConditionUtils.mix2AndCondition(statusCondition,
+				carManIdCondition, carIdCondition, classesCondition);
 	}
 
 	@Override
@@ -237,47 +230,42 @@ public class CarByDriversAction extends ViewAction<Map<String, Object>> {
 	 */
 	protected Map<String, String> getType() {
 		Map<String, String> type = new HashMap<String, String>();
-		type = getBaseType();
+		type = getDriverClasses();
 		type.put(String.valueOf(CarByDriver.TYPE_WEIDINGYI),
 				getText("carByDriver.classes.weidingyi"));
 		return type;
 	}
 
 	/**
-	 * 营运班次基本类型：正班，顶班，副班
+	 * 营运班次基本类型：正副班\正班\副班\顶班\全部
 	 * 
 	 * @return
 	 */
-	private Map<String, String> getBaseType() {
+	private Map<String, String> getDriverClasses() {
 		Map<String, String> type;
-		type = new HashMap<String, String>();
+		type = new LinkedHashMap<String, String>();
+		type.put(CarByDriver.TYPE_ZHENGBAN + "," + CarByDriver.TYPE_FUBAN,
+				getText("carByDriver.classes.zhengfuban"));
+		type.put(String.valueOf(CarByDriver.TYPE_ZHENGBAN),
+				getText("carByDriver.classes.zhengban"));
 		type.put(String.valueOf(CarByDriver.TYPE_FUBAN),
 				getText("carByDriver.classes.fuban"));
 		type.put(String.valueOf(CarByDriver.TYPE_DINGBAN),
 				getText("carByDriver.classes.dingban"));
-		type.put(String.valueOf(CarByDriver.TYPE_ZHENGBAN),
-				getText("carByDriver.classes.zhengban"));
-		return type;
-	}
-
-	/**
-	 * 分组按钮的营运班次类型
-	 * 
-	 * @return
-	 */
-	protected Map<String, String> getToolbarClassesType() {
-		Map<String, String> type = new HashMap<String, String>();
-		type = getBaseType();
 		type.put("", getText("carByDriver.classes.quanbu"));
 		return type;
 	}
 
 	@Override
 	protected Toolbar getHtmlPageToolbar() {
-		return super.getHtmlPageToolbar().addButton(
-				Toolbar.getDefaultToolbarRadioGroup(getToolbarClassesType(),
-						"classes", 3,
-						getText("title.click2changeSearchClasses")));
+		if (this.carId != null || this.carManId != null) {
+			return super.getHtmlPageToolbar();
+		} else {
+			return super.getHtmlPageToolbar().addButton(
+					Toolbar.getDefaultToolbarRadioGroup(getDriverClasses(),
+							"classes", 4,
+							getText("title.click2changeSearchClasses")));
+		}
 	}
 
 	protected Toolbar getHtmlPageToolbar(boolean useDisabledReplaceDelete) {
@@ -291,9 +279,11 @@ public class CarByDriversAction extends ViewAction<Map<String, Object>> {
 			// 新建按钮
 			tb.addButton(Toolbar
 					.getDefaultCreateToolbarButton(getText("label.create")));
+
 			// 批量处理顶班按钮
 			tb.addButton(new ToolbarButton().setIcon("ui-icon-document")
-					.setText("批量处理顶班").setClick("bc.business.chuLiDingBan.create"));
+					.setText("批量处理顶班")
+					.setClick("bc.business.chuLiDingBan.create"));
 
 			// 编辑按钮
 			tb.addButton(Toolbar
@@ -316,8 +306,8 @@ public class CarByDriversAction extends ViewAction<Map<String, Object>> {
 
 		return tb;
 	}
+
 	protected String getHtmlPageJs() {
-		return this.getContextPath()
-				+ "/bc-business/carByDriver/dingBan.js";
+		return this.getContextPath() + "/bc-business/carByDriver/dingBan.js";
 	}
 }
