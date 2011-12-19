@@ -175,6 +175,7 @@ public class JiaoWeiADVICE extends SyncBase {
 	public void setReceiveDate(Calendar receiveDate) {
 		this.receiveDate = receiveDate;
 	}
+	@Column(name = "RESULT_")
 	public String getResult() {
 		return result;
 	}
