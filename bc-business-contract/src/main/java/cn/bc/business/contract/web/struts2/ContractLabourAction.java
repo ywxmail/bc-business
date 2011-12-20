@@ -512,7 +512,7 @@ public class ContractLabourAction extends FileEntityAction<Long, Contract4Labour
 
 	@Override
 	protected PageOption buildFormPageOption() {
-		PageOption option =	super.buildFormPageOption().setWidth(735).setHeight(590);
+		PageOption option =	super.buildFormPageOption().setWidth(725).setHeight(460);
 		if (!this.isRole()) {
 			ButtonOption buttonOption = new ButtonOption(getText("label.save"), "save");
 			buttonOption.put("id", "bcSaveBtn");
