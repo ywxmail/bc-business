@@ -317,10 +317,12 @@ public class ContractLabourAction extends FileEntityAction<Long, Contract4Labour
 		
 		//设置最后更新人的信息
 		Contract4Labour e = this.getE();
+		e.setFileDate(Calendar.getInstance());
 		e.setModifier(context.getUserHistory());
 		e.setModifiedDate(Calendar.getInstance());
 		if(e.getOpType() > 0 && e.getOpType() == Contract.OPTYPE_RESIGN){ //操作状态离职的话,把状态设为离职
 			e.setStatus(Contract.STATUS_RESGIN);
+			e.setLeaveDate(Calendar.getInstance());
 		}
 		
 		if(e.getUid().length() <= 0){ //如果UID为空重新设置
@@ -512,7 +514,7 @@ public class ContractLabourAction extends FileEntityAction<Long, Contract4Labour
 
 	@Override
 	protected PageOption buildFormPageOption() {
-		PageOption option =	super.buildFormPageOption().setWidth(725).setHeight(460);
+		PageOption option =	super.buildFormPageOption().setWidth(770).setHeight(460);
 		if (!this.isRole()) {
 			ButtonOption buttonOption = new ButtonOption(getText("label.save"), "save");
 			buttonOption.put("id", "bcSaveBtn");

@@ -56,6 +56,8 @@ public class Contract4Labour extends Contract {
 	private Calendar getStartDate;// 申领开始日期
 	private Calendar getEndDate;// 申领结束日期
 	private String	remark;
+	private Calendar stopDate;//停保日期
+	private Calendar leaveDate;//离职日期
 	
 	
 
@@ -285,6 +287,22 @@ public class Contract4Labour extends Contract {
 
 	public void setRemark(String remark) {
 		this.remark = remark;
+	}
+	
+	public Calendar getStopDate() {
+		return stopDate;
+	}
+
+	public void setStopDate(Calendar stopDate) {
+		this.stopDate = stopDate;
+	}
+
+	public Calendar getLeaveDate() {
+		return leaveDate;
+	}
+
+	public void setLeaveDate(Calendar leaveDate) {
+		this.leaveDate = leaveDate;
 	}
 
 	/**

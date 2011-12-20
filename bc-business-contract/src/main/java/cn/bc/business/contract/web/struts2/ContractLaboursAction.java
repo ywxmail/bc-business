@@ -52,6 +52,7 @@ public class ContractLaboursAction extends ViewAction<Map<String, Object>> {
 	public String type = String.valueOf(Contract.TYPE_CHARGER);
 	
 	public Long contractId;
+	public String patchNo;
 
 	@Override
 	public boolean isReadonly() {
@@ -109,8 +110,12 @@ public class ContractLaboursAction extends ViewAction<Map<String, Object>> {
 	@Override
 	protected OrderCondition getGridDefaultOrderCondition() {
 		// 默认排序方向：状态|登记日期
-		return new OrderCondition("c.status_", Direction.Asc).add(
-				"c.file_date", Direction.Desc);
+		if(contractId == null){//当前版本
+			return new OrderCondition("c.status_", Direction.Asc).add(
+					"c.file_date", Direction.Desc);
+		}else{ //历史版本
+			return new OrderCondition("c.file_date", Direction.Desc);
+		}
 	}
 
 	@Override
@@ -358,13 +363,19 @@ public class ContractLaboursAction extends ViewAction<Map<String, Object>> {
 		//状态条件
 		Condition statusCondition = null;
 		Condition mainsCondition = null;
+		Condition patchCondtion = null;
 		if (contractId == null) {
+			//查看最新合同列表
 			statusCondition = ConditionUtils.toConditionByComma4IntegerValue(this.status,
 					"c.status_");
 			if(this.status.length() <= 0){ //显示全部状态的时候只显示最新版本的记录
 				mainsCondition = ConditionUtils.toConditionByComma4IntegerValue(this.mains,
 						"c.main");
 			}
+		}else{
+			//查看历史版本
+			patchCondtion = new EqualsCondition("c.patch_no", patchNo);
+			mainsCondition = new EqualsCondition("c.main", Contract.MAIN_HISTORY);
 		}
 		
 		// contractId条件
@@ -375,11 +386,7 @@ public class ContractLaboursAction extends ViewAction<Map<String, Object>> {
 //			or = (Condition) ConditionUtils.mix2OrCondition(contractIdCondition,pIdCondition);
 //			
 //		}
-		Condition idCondition = null;
-		if (contractId != null) {
-			idCondition = new EqualsCondition("c.id", contractId);
-		}
-		return ConditionUtils.mix2AndCondition(statusCondition,mainsCondition,idCondition);
+		return ConditionUtils.mix2AndCondition(statusCondition,mainsCondition,patchCondtion);
 	}
 	
 	@Override
