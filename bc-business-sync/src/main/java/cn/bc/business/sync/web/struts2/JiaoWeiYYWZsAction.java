@@ -24,6 +24,7 @@ import cn.bc.identity.web.SystemContext;
 import cn.bc.sync.domain.SyncBase;
 import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.formater.KeyValueFormater;
+import cn.bc.web.formater.NubmerFormater;
 import cn.bc.web.ui.html.grid.Column;
 import cn.bc.web.ui.html.grid.IdColumn4MapKey;
 import cn.bc.web.ui.html.grid.TextColumn4MapKey;
@@ -75,7 +76,7 @@ public class JiaoWeiYYWZsAction extends SyncViewAction {
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer sql = new StringBuffer();
 		sql.append("select b.id,b.status_,b.sync_type,b.sync_code,b.sync_from,b.sync_date");
-		sql.append(",t.happen_date,t.car_plate,t.driver_cert,t.driver_name,t.owner,t.bs_cert_no,t.company,t.content");
+		sql.append(",t.happen_date,t.car_plate,t.driver_cert,t.driver_name,t.owner,t.company,t.content,t.penalty");
 		sql.append(" from bs_sync_jiaowei_yywz t");
 		sql.append(" inner join bc_sync_base b on b.id=t.id");
 		sqlObject.setSql(sql.toString());
@@ -99,9 +100,9 @@ public class JiaoWeiYYWZsAction extends SyncViewAction {
 				map.put("driverCert", rs[i++]);
 				map.put("driverName", rs[i++]);
 				map.put("owner", rs[i++]);
-				map.put("bsCertNo", rs[i++]);
 				map.put("company", rs[i++]);
 				map.put("content", rs[i++]);
+				map.put("penalty", rs[i++]);
 				return map;
 			}
 		});
@@ -123,14 +124,15 @@ public class JiaoWeiYYWZsAction extends SyncViewAction {
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd HH:mm")));
 		columns.add(new TextColumn4MapKey("t.car_plate", "carPlate",
 				getText("jiaoWeiYYWZ.carPlate"), 80).setSortable(true));
-		columns.add(new TextColumn4MapKey("t.bsCertNo", "bs_cert_no",
-				getText("jiaoWeiYYWZ.bsCertNo"), 60).setSortable(true));
-		columns.add(new TextColumn4MapKey("t.content", "content",
-				getText("jiaoWeiYYWZ.content")).setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("t.driver_name", "driverName",
 				getText("jiaoWeiYYWZ.driverName"), 80).setSortable(true));
 		columns.add(new TextColumn4MapKey("t.driver_cert", "driverCert",
 				getText("jiaoWeiYYWZ.driverCert"), 80).setSortable(true));
+		columns.add(new TextColumn4MapKey("t.penalty", "penalty",
+				getText("jiaoWeiYYWZ.penalty"), 60).setSortable(true)
+				.setValueFormater(new NubmerFormater("#.#")));
+		columns.add(new TextColumn4MapKey("t.content", "content",
+				getText("jiaoWeiYYWZ.content")).setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("b.sync_date", "syncDate",
 				getText("syncBase.syncDate"), 130).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd HH:mm")));

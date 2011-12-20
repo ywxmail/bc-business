@@ -23,6 +23,7 @@ import cn.bc.business.motorcade.service.MotorcadeService;
 import cn.bc.business.runcase.domain.Case4InfractBusiness;
 import cn.bc.business.runcase.domain.CaseBase;
 import cn.bc.business.runcase.service.CaseBusinessService;
+import cn.bc.business.sync.service.JiaoWeiYYWZService;
 import cn.bc.business.web.struts2.FileEntityAction;
 import cn.bc.core.query.condition.Condition;
 import cn.bc.core.query.condition.Direction;
@@ -31,6 +32,7 @@ import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.option.domain.OptionItem;
 import cn.bc.option.service.OptionService;
+import cn.bc.sync.service.SyncBaseService;
 import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.formater.EntityStatusFormater;
 import cn.bc.web.ui.html.grid.Column;
@@ -66,8 +68,10 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 	private OptionService						optionService;
 	private CarManService 						carManService;
 	private CarService 							carService;
+	private SyncBaseService 					syncBaseService;				//平台同步基类Serivce
+	private JiaoWeiYYWZService 					jiaoWeiYYWZService;				//平台同步佳通违章Serivce
 
-	public  List<Map<String, String>> 					motorcadeList;					// 可选车队列表
+	public  List<Map<String, String>> 			motorcadeList;					// 可选车队列表
 	public  List<Map<String, String>>			dutyList;						// 可选责任列表
 	public  List<Map<String, String>>			properitesList;					// 可选性质列表
 	public  List<Map<String, String>>			degreeList;						// 可选程度列表
@@ -120,12 +124,24 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 	public void setCarService(CarService carService) {
 		this.carService = carService;
 	}
+	
+	@Autowired
+	public void setSyncBaseService(SyncBaseService syncBaseService) {
+		this.syncBaseService = syncBaseService;
+	}
+	
+	@Autowired
+	public void setJiaoWeiYYWZService(JiaoWeiYYWZService jiaoWeiYYWZService) {
+		this.jiaoWeiYYWZService = jiaoWeiYYWZService;
+	}
 
 	@Override
 	protected OrderCondition getDefaultOrderCondition() {
 		return new OrderCondition("status", Direction.Asc).add("fileDate", Direction.Desc);
 	}
 	
+	
+
 	//复写搜索URL方法
 	protected String getEntityConfigName() {
 		return "caseBusiness";
