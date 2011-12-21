@@ -351,7 +351,23 @@ public class BsSyncServiceImpl implements BsSyncService {
 		domain.setHappenDate(row.getCellCalendarValue("违章日期"));
 		domain.setEvidenceUnit(row.getCellStringValue("保存单位"));
 		domain.setDriverCert(row.getCellStringValue("资格证号"));
-
+		domain.setCommitStatus(row.getCellStringValue("提交状态"));
+		domain.setReceipt(row.getCellStringValue("罚没收据编号"));
+		domain.setNotice(row.getCellStringValue("放行通知书编号"));
+		domain.setBusinessCertNo(row.getCellStringValue("营运证号"));
+		domain.setSeating(Float.parseFloat(row.getCellStringValue("座位数")));
+		domain.setOweRecord(row.getCellStringValue("欠笔录"));
+		domain.setOweSignature(row.getCellStringValue("欠签名"));
+		domain.setLeaveTroops(row.getCellStringValue("留队部"));
+		domain.setArea(row.getCellStringValue("所属区县"));
+		domain.setCloseDate(row.getCellCalendarValue("结案日期"));
+		domain.setDesc(row.getCellStringValue("备注"));
+		domain.setClone(row.getCellStringValue("是否克隆车"));
+		domain.setSubject(row.getCellStringValue("违章项目"));
+		domain.setDetain(row.getCellStringValue("扣留物品"));
+		domain.setPullUnit(row.getCellStringValue("拖车单位"));
+		domain.setPenalty(Float.parseFloat(row.getCellStringValue("罚款")));
+		
 		return domain;
 	}
 }

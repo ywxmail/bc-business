@@ -350,8 +350,8 @@ public class ContractChargerAction extends FileEntityAction<Long, Contract4Charg
 
 	@Override
 	protected PageOption buildFormPageOption() {
-		PageOption option = super.buildFormPageOption().setWidth(728).setMinWidth(250)
-				.setMinHeight(160);
+		PageOption option = super.buildFormPageOption().setWidth(748).setMinWidth(250)
+				.setMinHeight(160).setHeight(450);
 		//option.addButton(new ButtonOption(getText("label.save"), "save"));
 		if (!this.isReadonly()) {
 			option.addButton(new ButtonOption(getText("label.save"), null, "bc.contractChargerForm.save"));
