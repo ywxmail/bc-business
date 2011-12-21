@@ -34,15 +34,12 @@ import cn.bc.web.ui.html.toolbar.ToolbarButton;
 import cn.bc.web.ui.html.toolbar.ToolbarMenuButton;
 
 /**
- * 交委接口的交通违法信息视图Action
+ * 交委接口的营运违章信息视图Action
  * 
- * @author dragon
- * 
- */
-/**
- * @author rongjih
+ * @author wis
  * 
  */
+
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 @Controller
 public class JiaoWeiYYWZsAction extends SyncViewAction {

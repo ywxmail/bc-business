@@ -56,6 +56,8 @@ public class JiaoWeiADVICE extends SyncBase {
 	private String driverSex;//司机性别
 	private String suggestBs;//建议行业
 	private String buslines;//公交线路或站场
+	private String busColor;//车辆颜色
+	private String reply;//是否回复
 	
 	@Column(name = "TIS_RECEIVE_CODE")
 	public String getThsReceiveCode() {
@@ -248,6 +250,20 @@ public class JiaoWeiADVICE extends SyncBase {
 	public void setBuslines(String buslines) {
 		this.buslines = buslines;
 	}
+	@Column(name = "BUS_COLOR")
+	public String getBusColor() {
+		return busColor;
+	}
+	public void setBusColor(String busColor) {
+		this.busColor = busColor;
+	}
+	public String getReply() {
+		return reply;
+	}
+	public void setReply(String reply) {
+		this.reply = reply;
+	}
+	
 
  
 }
