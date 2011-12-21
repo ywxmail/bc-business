@@ -26,6 +26,7 @@ import cn.bc.core.util.StringUtils;
 import cn.bc.db.jdbc.RowMapper;
 import cn.bc.db.jdbc.SqlObject;
 import cn.bc.identity.web.SystemContext;
+import cn.bc.web.formater.BooleanFormater;
 import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.formater.EntityStatusFormater;
 import cn.bc.web.formater.LinkFormater4Id;
@@ -51,9 +52,9 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	public boolean isReadonly() {
-		// 黑名单管理员或系统管理员
+		// 车辆保单管理员或系统管理员
 		SystemContext context = (SystemContext) this.getContext();
-		return !context.hasAnyRole(getText("key.role.bs.blacklist"),
+		return !context.hasAnyRole(getText("key.role.bs.policy"),
 				getText("key.role.bc.admin"));
 	}
 
@@ -162,11 +163,11 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("p.ownrisk", "ownrisk",
 				getText("policy.ownrisk"), 80).setSortable(true)
 				.setUseTitleFromLabel(true)
-				.setValueFormater(new EntityStatusFormater(getBooleanValue())));
+				.setValueFormater(new BooleanFormater()));
 		columns.add(new TextColumn4MapKey("p.greenslip", "greenslip",
 				getText("policy.greenslip"), 120).setSortable(true)
 				.setUseTitleFromLabel(true)
-				.setValueFormater(new EntityStatusFormater(getBooleanValue())));
+				.setValueFormater(new BooleanFormater()));
 		columns.add(new TextColumn4MapKey("p.amount", "amount",
 				getText("policy.amount"), 80).setSortable(true)
 				.setUseTitleFromLabel(true));

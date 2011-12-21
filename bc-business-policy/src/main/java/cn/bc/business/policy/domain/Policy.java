@@ -27,8 +27,15 @@ import cn.bc.identity.domain.RichFileEntityImpl;
 @Inheritance(strategy = InheritanceType.JOINED)
 public class Policy extends RichFileEntityImpl {
 	private static final long serialVersionUID = 1L;
-	public static final String KEY_CODE = "blacklist.code";
+	public static final String KEY_CODE = "policy.code";
 	public static final String POLICY_TYPE = Policy.class.getSimpleName();
+
+	/** 操作类型 维护 */
+	public static final int OPTYPE_EDIT = 1;
+	/** 操作类型 续保 */
+	public static final int OPTYPE_RENEWAL = 2;
+	/** 操作类型 停保 */
+	public static final int OPTYPE_SURRENDERS = 3;
 
 	/** 主版本号默认值 */
 	public static final int MAJOR_DEFALUT = 1;
@@ -64,6 +71,7 @@ public class Policy extends RichFileEntityImpl {
 	private Integer verMinor;// 次版本号
 	private int main; // 主体： 0-当前版本,1-历史版本
 	private String patchNo;// 批号
+	private int opType; // 操作类型：1-新建,2-维护,3-续保,4-停保
 
 	@ManyToOne(fetch = FetchType.EAGER, optional = true)
 	@JoinColumn(name = "CAR_ID", referencedColumnName = "ID")
@@ -248,6 +256,15 @@ public class Policy extends RichFileEntityImpl {
 
 	public void setPatchNo(String patchNo) {
 		this.patchNo = patchNo;
+	}
+
+	@Column(name = "OP_TYPE")
+	public int getOpType() {
+		return opType;
+	}
+
+	public void setOpType(int opType) {
+		this.opType = opType;
 	}
 
 }

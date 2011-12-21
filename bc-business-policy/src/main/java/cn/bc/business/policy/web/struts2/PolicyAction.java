@@ -82,6 +82,14 @@ public class PolicyAction extends FileEntityAction<Long, Policy> {
 		this.attachService = attachService;
 	}
 
+	@Override
+	public boolean isReadonly() {
+		// 车辆保单管理员或系统管理员
+		SystemContext context = (SystemContext) this.getContext();
+		return !context.hasAnyRole(getText("key.role.bs.policy"),
+				getText("key.role.bc.admin"));
+	}
+
 	@SuppressWarnings("static-access")
 	private AttachWidget buildAttachsUI(boolean isNew) {
 		// 构建附件控件
@@ -100,18 +108,6 @@ public class PolicyAction extends FileEntityAction<Long, Policy> {
 				.setMaxSize(Integer.parseInt(getText("app.attachs.maxSize")));
 		attachsUI.setReadOnly(!this.getE().isNew());
 		return attachsUI;
-	}
-
-	@Override
-	public boolean isReadonly() {
-		// if (this.getE() != null) {// 表单
-		// return this.getE().getStatus() != Blacklist.STATUS_DAISUODING;
-		// } else {// 视图
-		// 黑名单管理员或系统管理员
-		SystemContext context = (SystemContext) this.getContext();
-		return !context.hasAnyRole(getText("key.role.bs.policy"),
-				getText("key.role.bc.admin"));
-		// }
 	}
 
 	@Override
@@ -150,30 +146,27 @@ public class PolicyAction extends FileEntityAction<Long, Policy> {
 	protected PageOption buildFormPageOption() {
 		PageOption option = super.buildFormPageOption().setWidth(740)
 				.setMinWidth(250).setMinHeight(200).setHeight(540);
-		//if (!this.isReadonly()) {
-//			ButtonOption buttonOption = new ButtonOption(getText("label.save"),
-//					"save");
-//			buttonOption.put("id", "bcSaveBtn");
-//			option.addButton(buttonOption);
-//			if (!this.getE().isNew()
-//					&& this.getE().getMain() == Policy.MAIN_NOW) {
+		if (!this.isReadonly()) {
+			ButtonOption buttonOption = new ButtonOption(getText("label.save"),
+					"save");
+			buttonOption.put("id", "bcSaveBtn");
+			option.addButton(buttonOption);
+			if (!this.getE().isNew()&& this.getE().getMain() == Policy.MAIN_NOW) {
 				ToolbarMenuButton toolbarMenuButton = new ToolbarMenuButton(
-						getText("contract.labour.op"));
+						getText("policy.labour.op"));
 				toolbarMenuButton.setId("bcOpBtn");
 				toolbarMenuButton
-						.addMenuItem(getText("contract.labour.optype.edit"),
-								Contract.OPTYPE_EDIT + "")
+						.addMenuItem(getText("policy.labour.optype.edit"),
+								Policy.OPTYPE_EDIT + "")
+						.addMenuItem(getText("policy.labour.optype.renewal"),
+								Policy.OPTYPE_RENEWAL + "")
 						.addMenuItem(
-								getText("contract.labour.optype.transfer"),
-								Contract.OPTYPE_TRANSFER + "")
-						.addMenuItem(getText("contract.labour.optype.renew"),
-								Contract.OPTYPE_RENEW + "")
-						.addMenuItem(getText("contract.labour.optype.resign"),
-								Contract.OPTYPE_RESIGN + "")
-						.setChange("bc.contractLabourForm.selectMenuButtonItem");
+								getText("policy.labour.optype.surrenders"),
+								Policy.OPTYPE_SURRENDERS + "")
+						.setChange("bc.policyForm.selectMenuButtonItem");
 				option.addButton(toolbarMenuButton);
-			//}
-		//}
+			}
+		}
 		return option;
 	}
 
