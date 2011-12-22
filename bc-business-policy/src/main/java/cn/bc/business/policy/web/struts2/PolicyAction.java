@@ -15,7 +15,6 @@ import org.springframework.stereotype.Controller;
 
 import cn.bc.business.OptionConstants;
 import cn.bc.business.car.service.CarService;
-import cn.bc.business.contract.domain.Contract;
 import cn.bc.business.policy.domain.Policy;
 import cn.bc.business.policy.service.PolicyService;
 import cn.bc.business.web.struts2.FileEntityAction;
@@ -138,51 +137,42 @@ public class PolicyAction extends FileEntityAction<Long, Policy> {
 
 	@Override
 	public String save() throws Exception {
-		SystemContext context = this.getSystyemContext();
+		// 如果操作类型为续保，执行续保方法
 		if (this.getE().getOpType() == Policy.OPTYPE_RENEWAL) {
 			renewal(true);
 		}
-
 		super.save();
-		System.out.println("保存");
 		return "saveSuccess";
 
 	}
 
 	// 续保
 	protected void renewal(boolean flag) throws Exception {
-		// // 保存旧版本
-		// this.getE().setStatus(Entity.STATUS_DISABLED);
-		// this.getE().setMain(Policy.MAIN_HISTORY);
-		// super.save();
+
 		SystemContext context = this.getSystyemContext();
 		Policy p = this.getE();
+		// 旧车保
+		Policy oldE = policyService.load(p.getPid());
 		// 版本号加1
-		
-//		int oldVerMajor = this.policyService.load(this.getE().getId())
-//				.getVerMajor();
-//		p.setVerMajor(oldVerMajor + 1);
+		int oldVerMajor = oldE.getVerMajor();
+		p.setVerMajor(oldVerMajor + 1);
+		// 标识为当前版本
 		p.setMain(Policy.MAIN_NOW);
+		// 设置创建人和创建时间
 		p.setAuthor(context.getUserHistory());
-		p.setModifier(null);
 		p.setFileDate(Calendar.getInstance());
-		p.setModifiedDate(null);
-
-		// flag为true即(维护,转车,续约) 要做相应处理
+		// 设置UId
+		this.getE().setUid(
+				this.getIdGeneratorService().next(Policy.POLICY_TYPE));
+		// 续保后旧车保要做相应的处理
 		if (p.getPid() != null) {
-			Policy oldE = policyService.load(p.getPid());
 			if (oldE != null) {
-				
-				oldE.setStatus(Entity.STATUS_DISABLED); // 把旧的合同状态改为注销并保存
+				oldE.setStatus(Entity.STATUS_DISABLED); // 把旧的车保状态改为注销
 				oldE.setMain(Policy.MAIN_HISTORY); // 设定为历史标识
 				// 保存旧的记录
 				this.getCrudService().save(oldE);
 			}
 		}
-
-		// 将续保表单的主键设为空
-		this.getE().setId(null);
-		System.out.println("续保");
 
 	}
 
