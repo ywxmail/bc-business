@@ -3,6 +3,7 @@
  */
 package cn.bc.business.policy.web.struts2;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +19,7 @@ import cn.bc.business.contract.domain.Contract;
 import cn.bc.business.policy.domain.Policy;
 import cn.bc.business.policy.service.PolicyService;
 import cn.bc.business.web.struts2.FileEntityAction;
+import cn.bc.core.Entity;
 import cn.bc.core.query.condition.Condition;
 import cn.bc.core.util.DateUtils;
 import cn.bc.docs.service.AttachService;
@@ -82,8 +84,16 @@ public class PolicyAction extends FileEntityAction<Long, Policy> {
 		this.attachService = attachService;
 	}
 
-	@Override
 	public boolean isReadonly() {
+
+		if (!this.getE().isNew()) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	public boolean isRole() {
 		// 车辆保单管理员或系统管理员
 		SystemContext context = (SystemContext) this.getContext();
 		return !context.hasAnyRole(getText("key.role.bs.policy"),
@@ -129,9 +139,51 @@ public class PolicyAction extends FileEntityAction<Long, Policy> {
 	@Override
 	public String save() throws Exception {
 		SystemContext context = this.getSystyemContext();
+		if (this.getE().getOpType() == Policy.OPTYPE_RENEWAL) {
+			renewal(true);
+		}
 
 		super.save();
+		System.out.println("保存");
 		return "saveSuccess";
+
+	}
+
+	// 续保
+	protected void renewal(boolean flag) throws Exception {
+		// // 保存旧版本
+		// this.getE().setStatus(Entity.STATUS_DISABLED);
+		// this.getE().setMain(Policy.MAIN_HISTORY);
+		// super.save();
+		SystemContext context = this.getSystyemContext();
+		Policy p = this.getE();
+		// 版本号加1
+		
+//		int oldVerMajor = this.policyService.load(this.getE().getId())
+//				.getVerMajor();
+//		p.setVerMajor(oldVerMajor + 1);
+		p.setMain(Policy.MAIN_NOW);
+		p.setAuthor(context.getUserHistory());
+		p.setModifier(null);
+		p.setFileDate(Calendar.getInstance());
+		p.setModifiedDate(null);
+
+		// flag为true即(维护,转车,续约) 要做相应处理
+		if (p.getPid() != null) {
+			Policy oldE = policyService.load(p.getPid());
+			if (oldE != null) {
+				
+				oldE.setStatus(Entity.STATUS_DISABLED); // 把旧的合同状态改为注销并保存
+				oldE.setMain(Policy.MAIN_HISTORY); // 设定为历史标识
+				// 保存旧的记录
+				this.getCrudService().save(oldE);
+			}
+		}
+
+		// 将续保表单的主键设为空
+		this.getE().setId(null);
+		System.out.println("续保");
+
 	}
 
 	@Override
@@ -146,12 +198,13 @@ public class PolicyAction extends FileEntityAction<Long, Policy> {
 	protected PageOption buildFormPageOption() {
 		PageOption option = super.buildFormPageOption().setWidth(740)
 				.setMinWidth(250).setMinHeight(200).setHeight(540);
-		if (!this.isReadonly()) {
+		if (!this.isRole()) {
 			ButtonOption buttonOption = new ButtonOption(getText("label.save"),
 					"save");
 			buttonOption.put("id", "bcSaveBtn");
 			option.addButton(buttonOption);
-			if (!this.getE().isNew()&& this.getE().getMain() == Policy.MAIN_NOW) {
+			if (!this.getE().isNew()
+					&& this.getE().getMain() == Policy.MAIN_NOW) {
 				ToolbarMenuButton toolbarMenuButton = new ToolbarMenuButton(
 						getText("policy.labour.op"));
 				toolbarMenuButton.setId("bcOpBtn");

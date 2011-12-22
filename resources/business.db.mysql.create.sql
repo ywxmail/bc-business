@@ -955,6 +955,7 @@ CREATE TABLE BS_CAR_POLICY(
    VER_MINOR            BIGINT COMMENT '次版本号',
    PATCH_NO             VARCHAR(255) NOT NULL COMMENT '批号',
    MAIN                 INT(1) NOT NULL COMMENT '主体: 0-当前版本,1-历史版本'';',
+   OP_TYPE              INT(1) NOT NULL COMMENT '操作类型：1：新建2：维护3：续保4：停保',
    STATUS_                             INT(1) NOT NULL COMMENT '状态：0-正常,1-注销',
    CAR_ID                              BIGINT NOT NULL COMMENT '投保车号',
    REGISTER_DATE                       DATETIME COMMENT '初登日期',

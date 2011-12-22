@@ -13,6 +13,7 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
+import cn.bc.business.contract.domain.Contract;
 import cn.bc.business.policy.domain.Policy;
 import cn.bc.business.web.struts2.ViewAction;
 import cn.bc.core.Entity;
@@ -73,7 +74,7 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 		StringBuffer sql = new StringBuffer();
 		sql.append("select p.id,p.status_,c.plate_type,c.plate_no,p.register_date,p.assured,p.commerial_no");
 		sql.append(",p.commerial_company,p.commerial_start_date,p.commerial_end_date");
-		sql.append(" ,p.ownrisk,p.greenslip,p.liability_no,p.amount,c.id carId,p.file_date");
+		sql.append(" ,p.ownrisk,p.greenslip,p.liability_no,p.amount,c.id carId,p.op_type,p.file_date");
 		sql.append(" from BS_CAR_POLICY p");
 		sql.append(" left join BS_CAR c on c.id=p.car_id");
 		sqlObject.setSql(sql.toString());
@@ -103,6 +104,7 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 				map.put("liability_no", rs[i++]);
 				map.put("amount", rs[i++]);
 				map.put("carId", rs[i++]);
+				map.put("op_type", rs[i++]);
 
 				return map;
 			}
@@ -117,7 +119,9 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("p.status_", "status_",
 				getText("policy.status"), 60).setSortable(true)
 				.setValueFormater(new EntityStatusFormater(getBSStatuses1())));
-
+		columns.add(new TextColumn4MapKey("p.op_type", "op_type",
+				getText("policy.labour.optype"), 60).setSortable(true)
+				.setValueFormater(new EntityStatusFormater(getEntityOpTypes())));
 		columns.add(new TextColumn4MapKey("p.plate_no", "plate",
 				getText("policy.carId"), 80)
 				.setValueFormater(new LinkFormater4Id(this.getContextPath()
@@ -254,6 +258,24 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 		statuses.put(String.valueOf(Policy.BOOLEAN_YES), getText("policy.yes"));
 		statuses.put(String.valueOf(Policy.BOOLEAN_NO), getText("policy.no"));
 		return statuses;
+	}
+
+	/**
+	 * 获取Policy的操作类型列表
+	 * 
+	 * @return
+	 */
+	protected Map<String, String> getEntityOpTypes() {
+		Map<String, String> types = new HashMap<String, String>();
+		types.put(String.valueOf(Policy.OPTYPE_CREATE),
+				getText("policy.labour.optype.create"));
+		types.put(String.valueOf(Policy.OPTYPE_EDIT),
+				getText("policy.labour.optype.edit"));
+		types.put(String.valueOf(Policy.OPTYPE_RENEWAL),
+				getText("policy.labour.optype.renewal"));
+		types.put(String.valueOf(Policy.OPTYPE_SURRENDERS),
+				getText("policy.labour.optype.surrenders"));
+		return types;
 	}
 
 }
