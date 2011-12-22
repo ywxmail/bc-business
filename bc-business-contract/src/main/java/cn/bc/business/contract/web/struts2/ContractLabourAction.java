@@ -334,7 +334,7 @@ public class ContractLabourAction extends FileEntityAction<Long, Contract4Labour
 		
 		//保存合同与车辆的关联表信息
 		if(oldCarId != null){ //避免重复插入做相应处理
-			if((null != e.getPid() && e.getPid() != e.getId()) || 
+			if((null != e.getPid() && null != e.getId()) || 
 				(oldCarId != carId && !oldCarId.equals(carId))){
 				this.contractLabourService.carNContract4Save(carId,getE().getId());
 			}
@@ -343,7 +343,7 @@ public class ContractLabourAction extends FileEntityAction<Long, Contract4Labour
 		}
 		//保存合同与司机的关联表信息
 		if(oldCarManId != null){ //避免重复插入做相应处理
-			if((null != e.getPid() && e.getPid() != e.getId()) || 
+			if((null != e.getPid() && null != e.getId()) || 
 				(oldCarManId != carManId && !oldCarManId.equals(carManId))){
 				this.contractLabourService.carManNContract4Save(carManId,getE().getId());
 			}
