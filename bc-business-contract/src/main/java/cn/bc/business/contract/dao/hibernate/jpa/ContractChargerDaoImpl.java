@@ -338,11 +338,8 @@ public class ContractChargerDaoImpl extends HibernateCrudJpaDao<Contract4Charger
 	 * @return
 	 */
 	public Map<String, Object> findCarInfoByContractId(Long contractId) {
-		// TODO Auto-generated method stub
 		return null;
 	}
-	
-	
 	
 	
 	/**
@@ -355,6 +352,11 @@ public class ContractChargerDaoImpl extends HibernateCrudJpaDao<Contract4Charger
 		hql.append(condition.getExpression());
 	}
 
+	/**
+	 * 根据contractId查找car信息
+	 * @parma contractId 
+	 * @return
+	 */
 	public List<String> findChargerIdByContractId(Long contractId) {
 		String sql = "select cc.man_id from BS_CARMAN_CONTRACT cc where cc.contract_id="+contractId;
 		
@@ -366,6 +368,11 @@ public class ContractChargerDaoImpl extends HibernateCrudJpaDao<Contract4Charger
 		return list;
 	}
 
+	/**
+	 * 根据责任人ID和合同ID.保存到人员与合同中间表,不存在插入新纪录,存在删除.重新插入
+	 * @param assignChargerIds
+	 * @param contractId
+	 */
 	public void carMansNContract4Save(String assignChargerIds, Long contractId) {
 		String sql = "select * from BS_CARMAN_CONTRACT carmancontract where carmancontract.contract_id = ?";
 		String insertSql = "";
@@ -373,19 +380,16 @@ public class ContractChargerDaoImpl extends HibernateCrudJpaDao<Contract4Charger
 		@SuppressWarnings("rawtypes")
 		List list = this.jdbcTemplate.queryForList(sql,new Object[]{contractId});
 		
-		if(list == null || list.size() < 1){
-			//插入BS_CARMAN_CONTRACT中间表
+		if(list == null || list.size() < 1){//不存在插入新纪录
 			String [] carManAry = assignChargerIds.split(",");
 			for(String carManId : carManAry){
 				insertSql = "insert into BS_CARMAN_CONTRACT(man_id,contract_id)values("+carManId+","+contractId+")";
 				this.jdbcTemplate.execute(insertSql);
 			}
-		}else{
-			//删除BS_CARMAN_CONTRACT中间表重复数据
+		}else{ //存在删除.重新插入
 			String	delSql = "delete from BS_CARMAN_CONTRACT where BS_CARMAN_CONTRACT.contract_id="+contractId;
 			this.jdbcTemplate.execute(delSql);
 			
-			//插入BS_CARMAN_CONTRACT中间表
 			String [] carManAry = assignChargerIds.split(",");
 			for(String carManId : carManAry){
 				insertSql = "insert into BS_CARMAN_CONTRACT(man_id,contract_id)values("+carManId+","+contractId+")";
@@ -394,23 +398,43 @@ public class ContractChargerDaoImpl extends HibernateCrudJpaDao<Contract4Charger
 		}
 	}
 	
+	/**
+	 * 根据合同ID查找关联责任人
+	 * @param contractId
+	 * @return
+	 */
 	public Long findCarIdByContractId(Long contractId) {
 		String sql = "select cc.car_id from BS_CAR_CONTRACT cc where cc.contract_id="+contractId;
 		Long carId = this.jdbcTemplate.queryForLong(sql);
 		return carId;
 	}
 
+	/**
+	 * 更新车辆表的负责人信息
+	 * @param assignChargerNames
+	 * @param carId
+	 */
 	public void updateCar4dirverName(String assignChargerNames, Long carId) {
 		String sql = "UPDATE BS_CAR car SET charger=? WHERE car.id =? AND car.status_ =0";
 		this.jdbcTemplate.update(sql, new Object[]{assignChargerNames,carId});
 	}
 
+	/**
+	 * 更新司机表的负责人信息
+	 * @param assignChargerNames
+	 * @param carId
+	 */
 	public void updateCarMan4dirverName(String assignChargerNames, Long carId) {
 		String sql = "UPDATE BS_CARMAN man SET charger=? WHERE man.id IN("+
 					 "SELECT cd.driver_id FROM BS_CAR_DRIVER cd WHERE cd.car_id=? AND man.status_ =0)";
 		this.jdbcTemplate.update(sql, new Object[]{assignChargerNames,carId});
 	}
 
+	/**
+	 * 根据车辆ID查找车辆信息
+	 * @param carId
+	 * @return
+	 */
 	public Map<String, Object> findCarByCarId(Long carId) {
 		Map<String,Object> queryMap = null;
 		String sql = "SELECT car.id,car.plate_type,car.plate_no,car.factory_type,car.factory_model,car.register_date,car.scrap_date,car.level_,car.vin,car.engine_no" +
@@ -428,6 +452,11 @@ public class ContractChargerDaoImpl extends HibernateCrudJpaDao<Contract4Charger
 		return queryMap;
 	}
 
+	/**
+	 * 根据司机ID查找车辆信息
+	 * @param carManId
+	 * @return
+	 */
 	public Map<String, Object> findCarByCarManId(Long carManId) {
 		Map<String,Object> queryMap = null;
 		String sql = "SELECT car.id,car.plate_type,car.plate_no,car.factory_type,car.factory_model,car.register_date,car.scrap_date,car.level_,car.vin,car.engine_no" +

@@ -22,7 +22,9 @@ import cn.bc.business.carman.service.CarManService;
 import cn.bc.business.motorcade.service.MotorcadeService;
 import cn.bc.business.runcase.domain.Case4InfractBusiness;
 import cn.bc.business.runcase.domain.CaseBase;
+import cn.bc.business.runcase.service.CaseBaseService;
 import cn.bc.business.runcase.service.CaseBusinessService;
+import cn.bc.business.sync.domain.JiaoWeiYYWZ;
 import cn.bc.business.sync.service.JiaoWeiYYWZService;
 import cn.bc.business.web.struts2.FileEntityAction;
 import cn.bc.core.query.condition.Condition;
@@ -32,6 +34,7 @@ import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.option.domain.OptionItem;
 import cn.bc.option.service.OptionService;
+import cn.bc.sync.domain.SyncBase;
 import cn.bc.sync.service.SyncBaseService;
 import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.formater.EntityStatusFormater;
@@ -57,6 +60,8 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 	private static 	final long 					serialVersionUID 	= 1L;
 	public  Long								carId;
 	public  Long								carManId;
+	private	Long								syncId;			//同步ID
+	
 	public  boolean 							isMoreCar;
 	public  boolean 							isMoreCarMan;
 	public  boolean 							isNullCar;
@@ -64,6 +69,7 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 	
 	@SuppressWarnings("unused")
 	private CaseBusinessService					caseBusinessService;
+	private CaseBaseService						caseBaseService;
 	private MotorcadeService	 				motorcadeService;
 	private OptionService						optionService;
 	private CarManService 						carManService;
@@ -97,6 +103,14 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 
 	public void setCarManId(Long carManId) {
 		this.carManId = carManId;
+	}
+
+	public Long getSyncId() {
+		return syncId;
+	}
+
+	public void setSyncId(Long syncId) {
+		this.syncId = syncId;
 	}
 
 	@Autowired
@@ -135,6 +149,11 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 		this.jiaoWeiYYWZService = jiaoWeiYYWZService;
 	}
 
+	@Autowired
+	public void setCaseBaseService(CaseBaseService caseBaseService) {
+		this.caseBaseService = caseBaseService;
+	}
+
 	@Override
 	protected OrderCondition getDefaultOrderCondition() {
 		return new OrderCondition("status", Direction.Asc).add("fileDate", Direction.Desc);
@@ -157,7 +176,7 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 	
 	@Override
 	protected PageOption buildFormPageOption() {
-		PageOption option = super.buildFormPageOption().setWidth(840).setMinWidth(250).setHeight(500)
+		PageOption option = super.buildFormPageOption().setWidth(833).setMinWidth(250).setHeight(450)
 				.setMinHeight(200);
 		if (!isReadonly()) {
 			//特殊处理结案按钮
@@ -166,7 +185,7 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 				buttonOption.put("id", "bcSaveDlgButton");
 				option.addButton(buttonOption);
 			}
-			option.addButton(new ButtonOption(getText("label.save"), "save"));
+			option.addButton(new ButtonOption(getText("label.save"), null, "bc.caseBusinessForm.save"));
 		}
 		return option;
 	}
@@ -219,11 +238,34 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 	@Override
 	public String create() throws Exception {
 		String r = super.create();
-		SystemContext context = this.getSystyemContext();
-		this.getE().setUid(this.getIdGeneratorService().next(this.getE().ATTACH_TYPE));
-		// 自动生成自编号
-		this.getE().setCode(
-				this.getIdGeneratorService().nextSN4Month(Case4InfractBusiness.KEY_CODE));
+
+		if(syncId != null){	//判断同步id是否为空
+			JiaoWeiYYWZ jiaoweiYYWZ = this.jiaoWeiYYWZService.load(syncId);
+			String carPlateNo = "";
+			carPlateNo = jiaoweiYYWZ.getCarPlate().replaceAll("粤A.", carPlateNo);
+			findCarId(carPlateNo);
+			this.getE().setCaseNo(jiaoweiYYWZ.getSyncCode());
+			this.getE().setHappenDate(jiaoweiYYWZ.getHappenDate());
+			this.getE().setCloseDate(jiaoweiYYWZ.getCloseDate());
+			this.getE().setDriverCert(jiaoweiYYWZ.getDriverCert());
+			this.getE().setOperator(jiaoweiYYWZ.getOperator());
+			this.getE().setOperateUnit(jiaoweiYYWZ.getOperateUnit());
+			this.getE().setConfiscateCertNo(jiaoweiYYWZ.getConfiscateCertNo());
+			this.getE().setPullUnit(jiaoweiYYWZ.getPullUnit());
+			this.getE().setArea(jiaoweiYYWZ.getArea());
+			this.getE().setPenalty(jiaoweiYYWZ.getPenalty());
+			this.getE().setBusinessCertNo(jiaoweiYYWZ.getBusinessCertNo());
+			this.getE().setAddress(jiaoweiYYWZ.getAddress());
+			this.getE().setSubject(jiaoweiYYWZ.getContent());
+			this.getE().setReceipt(jiaoweiYYWZ.getReceipt());
+			this.getE().setDetain(jiaoweiYYWZ.getDetain());
+			this.getE().setFrom(getText("runcase.jiaowei"));
+			
+			//设置来源
+			this.getE().setSource(CaseBase.SOURCE_GENERATION);
+			//设置syncId
+			this.getE().setSyncId(syncId);
+		}
 		
 		if (carManId != null) {
 			CarMan driver = this.carManService.load(carManId);
@@ -264,11 +306,19 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 		}
 		
 		// 初始化信息
+		this.getE().setUid(this.getIdGeneratorService().next(this.getE().ATTACH_TYPE));
+		// 自动生成自编号
+		this.getE().setCode(
+				this.getIdGeneratorService().nextSN4Month(Case4InfractBusiness.KEY_CODE));
+		SystemContext context = this.getSystyemContext();
 		this.getE().setType  (CaseBase.TYPE_INFRACT_BUSINESS);
 		this.getE().setStatus(CaseBase.STATUS_ACTIVE);
 		this.getE().setReceiverId(context.getUser().getId());
 		this.getE().setReceiverName(context.getUser().getName());
-
+		// 来源
+		if(syncId == null){ //不是同步过来的信息设为自建
+			this.getE().setSource(CaseBase.SOURCE_SYS);
+		}
 		// 表单可选项的加载
 		statusesValue		=	this.getCaseStatuses();
 		sourcesValue		=	this.getSourceStatuses();
@@ -277,9 +327,23 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 		return r; 
 	}
 	
+	/** 根据车牌号查找carId*/
+	public void findCarId(String carPlateNo) {
+		if(carPlateNo.length() > 0){ //判断车牌号是否为空
+			Long tempCarId = this.carService.findcarInfoByCarPlateNo(carPlateNo);
+			this.carId = tempCarId;
+		}
+	}
+	
 	@Override
 	public String edit() throws Exception {
-		this.setE(this.getCrudService().load(this.getId()));
+		if(syncId != null){//根据syncId查找已存在CaseBase的记录
+			CaseBase cb = this.caseBaseService.findCaseBaseBysyncId(syncId);
+			this.setE(this.getCrudService().load(cb.getId()));
+		}else{
+			this.setE(this.getCrudService().load(this.getId()));
+		}
+		
 		this.formPageOption = 	buildFormPageOption();
 
 		// 表单可选项的加载
@@ -291,6 +355,13 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 	
 	@Override
 	public String save() throws Exception{
+		
+		if(syncId != null){	//处理相应的来源信息的状态
+			SyncBase sb = this.syncBaseService.load(syncId);
+			sb.setStatus(SyncBase.STATUS_GEN);
+			this.syncBaseService.save(sb);
+		}
+		
 		SystemContext context = this.getSystyemContext();
 		Case4InfractBusiness e = this.getE();
 		
@@ -438,7 +509,5 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 					.toString());
 		return page;
 	}
-	
-	
 	
 }

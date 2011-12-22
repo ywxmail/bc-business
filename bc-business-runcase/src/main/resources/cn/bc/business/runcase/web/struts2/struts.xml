@@ -24,6 +24,9 @@
 		</action>
 		<action name="caseBusiness/selectCarMansInfo" class="caseBusinessAction" method="selectCarMansInfo">
 		</action>
+		<action name="caseBusiness/createFromJiaoWei" class="caseBusinessAction" method="create">
+			<result name="form" >/bc-business/caseBusiness/form.jsp</result>
+		</action>
 		
 	</package>
 	
@@ -43,6 +46,9 @@
 		<action name="caseAdvice/selectCarMansInfo" class="caseAdviceAction" method="selectCarMansInfo">
 		</action>
 		<action name="caseAdvice/closed" class="caseAdviceAction" method="closed">
+		</action>
+		<action name="caseAdvice/createFromJiaoWei" class="caseAdviceAction" method="create">
+			<result name="form" >/bc-business/caseAdvice/form.jsp</result>
 		</action>
 	</package>
 	

@@ -39,9 +39,9 @@ public class Case4InfractBusiness extends CaseBase {
 	private String businessCertNo;// 营运证号
 
 	private String detain;// 扣留物品
-	private Float jeom;// 扣分
-	private Float penalty;// 罚款金额
-	private Float penalty2;// 违约金
+	private float jeom;// 扣分
+	private float penalty;// 罚款金额
+	private float penalty2;// 违约金
 	private String area;// 所属区县
 	private String pullUnit;// 拖车单位
 	private String operator;// 执法人
@@ -178,27 +178,27 @@ public class Case4InfractBusiness extends CaseBase {
 		this.detain = detain;
 	}
 
-	public Float getJeom() {
+	public float getJeom() {
 		return jeom;
 	}
 
-	public void setJeom(Float jeom) {
+	public void setJeom(float jeom) {
 		this.jeom = jeom;
 	}
 
-	public Float getPenalty() {
+	public float getPenalty() {
 		return penalty;
 	}
 
-	public void setPenalty(Float penalty) {
+	public void setPenalty(float penalty) {
 		this.penalty = penalty;
 	}
 
-	public Float getPenalty2() {
+	public float getPenalty2() {
 		return penalty2;
 	}
 
-	public void setPenalty2(Float penalty2) {
+	public void setPenalty2(float penalty2) {
 		this.penalty2 = penalty2;
 	}
 

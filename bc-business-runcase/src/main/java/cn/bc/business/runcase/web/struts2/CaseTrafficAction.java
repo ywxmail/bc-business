@@ -67,7 +67,7 @@ public class CaseTrafficAction extends FileEntityAction<Long, Case4InfractTraffi
 	public  boolean 						isMoreCarMan;	//是否存在多个司机
 	public  boolean 						isNullCar;		//此司机现在没有驾驶任何车辆
 	public  boolean 						isNullCarMan;	//此车辆现在没有任何司机驾驶
-	public  boolean							isSync;			//是否同步
+	//public  boolean							isSync;			//是否同步
 	//public  boolean							isExist;		//判断生成的当前记录是否存在,存在发出提醒
 	//public  String							isClosed;	
 	@SuppressWarnings("unused")
@@ -270,11 +270,6 @@ public class CaseTrafficAction extends FileEntityAction<Long, Case4InfractTraffi
 			//isExist = this.syncBaseService.hadGenerate("BS_CASE_BASE", syncId);
 		}
 		
-		this.getE().setUid(this.getIdGeneratorService().next(this.getE().ATTACH_TYPE));
-		// 自动生成自编号
-		this.getE().setCode(
-				this.getIdGeneratorService().nextSN4Month(Case4InfractTraffic.KEY_CODE));
-		
 		if (carManId != null) {
 			CarMan driver = this.carManService.load(carManId);
 			List<Car> car = this.carService.selectAllCarByCarManId(carManId);
@@ -313,6 +308,10 @@ public class CaseTrafficAction extends FileEntityAction<Long, Case4InfractTraffi
 		}
 		
 		// 初始化信息
+		this.getE().setUid(this.getIdGeneratorService().next(this.getE().ATTACH_TYPE));
+		// 自动生成自编号
+		this.getE().setCode(
+				this.getIdGeneratorService().nextSN4Month(Case4InfractTraffic.KEY_CODE));
 		this.getE().setType  (CaseBase.TYPE_INFRACT_TRAFFIC);
 		this.getE().setStatus(CaseBase.STATUS_ACTIVE);
 		// 来源
