@@ -58,7 +58,16 @@ public class CarByDriverDaoImpl extends HibernateCrudJpaDao<CarByDriver>
 
 		// 更新车辆的司机信息
 		updateCar4Driver(entity.getCar().getId());
+		
+		//
+		this.insertTest();
 		return entity;
+	}
+
+	//测试使用hibernate的hql语句向数据库插入数据
+	private void insertTest() {
+//		String hql = "insert into Example (name, code) select 'name1','code1' from Dual";
+//		this.executeUpdate(hql,null);
 	}
 
 	/**
