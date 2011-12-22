@@ -320,8 +320,7 @@ public class ContractLabourAction extends FileEntityAction<Long, Contract4Labour
 		e.setFileDate(Calendar.getInstance());
 		e.setModifier(context.getUserHistory());
 		e.setModifiedDate(Calendar.getInstance());
-		if(e.getOpType() > 0 && e.getOpType() == Contract.OPTYPE_RESIGN){ //操作状态离职的话,把状态设为离职
-			e.setStatus(Contract.STATUS_RESGIN);
+		if(e.getStatus() == Contract.STATUS_RESGIN){ //状态等于离职,设置离职时间
 			e.setLeaveDate(Calendar.getInstance());
 		}
 		
@@ -335,7 +334,7 @@ public class ContractLabourAction extends FileEntityAction<Long, Contract4Labour
 		
 		//保存合同与车辆的关联表信息
 		if(oldCarId != null){ //避免重复插入做相应处理
-			if((null != e.getPid() && e.getPid() != e.getId() && !e.getPid().equals(e.getId())) || 
+			if((null != e.getPid() && null != e.getId()) || 
 				(oldCarId != carId && !oldCarId.equals(carId))){
 				this.contractLabourService.carNContract4Save(carId,getE().getId());
 			}
@@ -344,7 +343,7 @@ public class ContractLabourAction extends FileEntityAction<Long, Contract4Labour
 		}
 		//保存合同与司机的关联表信息
 		if(oldCarManId != null){ //避免重复插入做相应处理
-			if((null != e.getPid() && e.getPid() != e.getId() && !e.getPid().equals(e.getId())) || 
+			if((null != e.getPid() && null != e.getId()) || 
 				(oldCarManId != carManId && !oldCarManId.equals(carManId))){
 				this.contractLabourService.carManNContract4Save(carManId,getE().getId());
 			}

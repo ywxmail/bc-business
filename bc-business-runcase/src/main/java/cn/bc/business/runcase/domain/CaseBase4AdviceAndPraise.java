@@ -51,8 +51,8 @@ public class CaseBase4AdviceAndPraise extends CaseBase {
 	private String result;// 处理结果
 
 	private String ticket;// 车票号码
-	private Float machinePrice;// 计费器显示价格
-	private Float charge;// 实际收费
+	private float machinePrice;// 计费器显示价格
+	private float charge;// 实际收费
 	private Calendar ridingStartTime;// 乘车起始时间
 	private Calendar ridingEndTime;// 乘车结束时间
 	private String pathFrom;// 乘车路线(从)
@@ -267,19 +267,19 @@ public class CaseBase4AdviceAndPraise extends CaseBase {
 	}
 
 	@Column(name = "MACHINE_PRICE")
-	public Float getMachinePrice() {
+	public float getMachinePrice() {
 		return machinePrice;
 	}
 
-	public void setMachinePrice(Float machinePrice) {
+	public void setMachinePrice(float machinePrice) {
 		this.machinePrice = machinePrice;
 	}
 
-	public Float getCharge() {
+	public float getCharge() {
 		return charge;
 	}
 
-	public void setCharge(Float charge) {
+	public void setCharge(float charge) {
 		this.charge = charge;
 	}
 

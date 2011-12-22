@@ -115,38 +115,38 @@ public class ContractLabourDaoImpl extends HibernateCrudJpaDao<Contract4Labour> 
 		@SuppressWarnings("rawtypes")
 		List list = this.jdbcTemplate.queryForList(sql,new Object[]{contractId});
 		
-		if(list == null || list.size() < 1){
-			//插入BS_CARMAN_CONTRACT中间表
+		if(list == null || list.size() < 1){  //不存在,插入新的记录
 			insertSql = "insert into BS_CARMAN_CONTRACT(man_id,contract_id)values("+carManId+","+contractId+")";
 			this.jdbcTemplate.execute(insertSql);
-		}else{
-			//删除BS_CARMAN_CONTRACT中间表重复数据
+		}else{ //存在,删除原来的记录,插入新的记录
 			String	delSql = "delete from BS_CARMAN_CONTRACT where BS_CARMAN_CONTRACT.contract_id="+contractId;
 			this.jdbcTemplate.execute(delSql);
 			
-			//插入BS_CARMAN_CONTRACT中间表
 			insertSql = "insert into BS_CARMAN_CONTRACT(man_id,contract_id)values("+carManId+","+contractId+")";
 			this.jdbcTemplate.execute(insertSql);
 		}
 	}
 	
+	/**
+	 * 保存车辆与合同的关联信息
+	 * jdbc查询BS_CAR_CONTRACT表是否存在相应carId和contractId的记录
+	 * @param carId
+	 * @param contractId
+	 */
 	public void carNContract4Save(Long carId, Long contractId) {
 		String sql = "select * from BS_CAR_CONTRACT carcontract where carcontract.contract_id = ?";
 		String insertSql = "";
-		//jdbc查询BS_CAR_CONTRACT表是否存在对应carId和contractId噶记录
+		//jdbc查询BS_CAR_CONTRACT表是否存在相应carId和contractId的记录
 		@SuppressWarnings("rawtypes")
 		List list = this.jdbcTemplate.queryForList(sql,new Object[]{contractId});
 		
-		if(list == null || list.size() < 1){
-			//插入BS_CAR_CONTRACT中间表
+		if(list == null || list.size() < 1){ //不存在,插入新的记录
 			insertSql = "insert into BS_CAR_CONTRACT(car_id,contract_id)values("+carId+","+contractId+")";
 			this.jdbcTemplate.execute(insertSql);
-		}else{
-			//删除BS_CAR_CONTRACT中间表重复数据
+		}else{ //存在,删除原来的记录,插入新的记录
 			String	delSql = "delete from BS_CAR_CONTRACT where BS_CAR_CONTRACT.contract_id="+contractId;
 			this.jdbcTemplate.execute(delSql);
 			
-			//插入BS_CAR_CONTRACT中间表
 			insertSql = "insert into BS_CAR_CONTRACT(car_id,contract_id)values("+carId+","+contractId+")";
 			this.jdbcTemplate.execute(insertSql);
 		}
@@ -381,18 +381,33 @@ public class ContractLabourDaoImpl extends HibernateCrudJpaDao<Contract4Labour> 
 		return queryMap;
 	}
 	
+	/**
+	 * 根据合同ID查找车辆ID
+	 * @param contractId
+	 * @return
+	 */
 	public Long findCarIdByContractId(Long contractId) {
 		String sql = "select cc.car_id from BS_CAR_CONTRACT cc where cc.contract_id="+contractId;
 		Long carId = jdbcTemplate.queryForLong(sql);
 		return carId;
 	}
 	
+	/**
+	 * 根据合同ID查找司机ID
+	 * @param contractId
+	 * @return
+	 */
 	public Long findCarManIdByContractId(Long contractId) {
 		String sql = "select cc.man_id from BS_CARMAN_CONTRACT cc where cc.contract_id="+contractId;
 		Long carManId = jdbcTemplate.queryForLong(sql);
 		return carManId;
 	}
 
+	/**
+	 * 根据车辆Id查找车辆
+	 * @param carId
+	 * @return
+	 */
 	public Map<String, Object> findCarManByCarId(Long carId) {
 		Map<String,Object> queryMap = null;
 		String sql = "SELECT man.id,man.name,man.cert_fwzg FROM BS_CAR_DRIVER cd left join Bs_Carman man on cd.driver_id = man.id"+
@@ -408,7 +423,12 @@ public class ContractLabourDaoImpl extends HibernateCrudJpaDao<Contract4Labour> 
 		
 		return queryMap;
 	}
-
+	
+	/**
+	 * 根据司机ID相应的车
+	 * @param carManId
+	 * @return
+	 */
 	public List<Map<String, Object>> selectRelateCarByCarManId(Long carManId) {
 		List<Map<String,Object>> list = null;
 		String sql = "SELECT car.id,car.plate_type,car.plate_no,car.bs_type,car.factory_type,car.factory_model,car.register_date,car.scrap_date,car.level_,car.vin,car.engine_no" +
@@ -420,6 +440,11 @@ public class ContractLabourDaoImpl extends HibernateCrudJpaDao<Contract4Labour> 
 		return list;
 	}
 
+	/**
+	 * 根据司机ID相应的车
+	 * @param carManId
+	 * @return
+	 */
 	public Map<String, Object> findCarManByCarManId(Long carManId) {
 		Map<String,Object> queryMap = null;
 		String sql = "SELECT man.id,man.name,man.sex,man.cert_fwzg,man.cert_identity,man.origin,man.house_type" +
@@ -437,6 +462,11 @@ public class ContractLabourDaoImpl extends HibernateCrudJpaDao<Contract4Labour> 
 		return queryMap;
 	}
 
+	/**
+	 * 根据司机ID查找车辆
+	 * @param carId
+	 * @return
+	 */
 	public Map<String, Object> findCarByCarManId(Long carId) {
 		Map<String,Object> queryMap = null;
 		String sql = "SELECT car.id,car.plate_type,car.plate_no,car.bs_type,car.factory_type,car.factory_model,car.register_date,car.scrap_date,car.level_,car.vin,car.engine_no" +
@@ -454,6 +484,11 @@ public class ContractLabourDaoImpl extends HibernateCrudJpaDao<Contract4Labour> 
 		return queryMap;
 	}
 
+	/**
+	 * 根据车辆ID查找关联的司机
+	 * @param carId
+	 * @return
+	 */
 	public List<Map<String, Object>> selectRelateCarManByCarId(Long carId) {
 		List<Map<String,Object>> list = null;
 		String sql = "SELECT man.id,man.name,man.sex,man.cert_fwzg,man.cert_identity,man.origin,man.house_type" +

@@ -65,20 +65,53 @@ public interface ContractChargerDao extends CrudDao<Contract4Charger> {
 	 */
 	Map<String, Object> findCarInfoByContractId(Long contractId);
 
-	
+	/**
+	 * 根据contractId查找car信息
+	 * @parma contractId 
+	 * @return
+	 */
 	List<String> findChargerIdByContractId(Long contractId);
 
-	
+	/**
+	 * 根据责任人ID和合同ID.保存到人员与合同中间表,不存在插入新纪录,存在删除.重新插入
+	 * @param assignChargerIds
+	 * @param contractId
+	 */
 	void carMansNContract4Save(String assignChargerIds, Long contractId);
 
+	/**
+	 * 根据合同ID查找关联责任人
+	 * @param contractId
+	 * @return
+	 */
 	public Long findCarIdByContractId(Long contractId);
 
+	/**
+	 * 更新车辆表的负责人信息
+	 * @param assignChargerNames
+	 * @param carId
+	 */
 	void updateCar4dirverName(String assignChargerNames, Long carId);
 
+	/**
+	 * 更新司机表的负责人信息
+	 * @param assignChargerNames
+	 * @param carId
+	 */
 	void updateCarMan4dirverName(String assignChargerNames, Long carId);
 
+	/**
+	 * 根据车辆ID查找车辆信息
+	 * @param carId
+	 * @return
+	 */
 	Map<String, Object> findCarByCarId(Long carId);
 
+	/**
+	 * 根据司机ID查找车辆信息
+	 * @param carManId
+	 * @return
+	 */
 	Map<String, Object> findCarByCarManId(Long carManId);
 
 
