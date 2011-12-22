@@ -30,17 +30,4 @@ public class CarByDriverServiceImpl extends DefaultCrudService<CarByDriver>
 	public Car selectCarByCarManId(Long id) {
 		return (this.carByDriverDao.findBycarManId(id));
 	}
-
-	@Override
-	public CarByDriver save(CarByDriver entity) {
-		//默认的保存处理
-		entity = super.save(entity);
-		
-		//更新车辆的司机信息
-		this.carByDriverDao.updateCar4Driver(entity.getCar().getId());
-		
-		entity = this.forceLoad(entity.getId());
-		
-		return entity;
-	}
 }

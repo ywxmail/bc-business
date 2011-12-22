@@ -3,20 +3,15 @@
  */
 package cn.bc.business.carman.dao.hibernate.jpa;
 
+import java.util.ArrayList;
 import java.util.List;
-
-import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 
 import cn.bc.business.car.domain.Car;
 import cn.bc.business.carman.dao.CarByDriverDao;
 import cn.bc.business.carman.domain.CarByDriver;
-import cn.bc.core.exception.CoreException;
-import cn.bc.db.JdbcUtils;
 import cn.bc.orm.hibernate.jpa.HibernateCrudJpaDao;
 
 /**
@@ -27,12 +22,6 @@ import cn.bc.orm.hibernate.jpa.HibernateCrudJpaDao;
 public class CarByDriverDaoImpl extends HibernateCrudJpaDao<CarByDriver>
 		implements CarByDriverDao {
 	protected final Log logger = LogFactory.getLog(getClass());
-	private JdbcTemplate jdbcTemplate;
-
-	@Autowired
-	public void setDataSource(DataSource dataSource) {
-		this.jdbcTemplate = new JdbcTemplate(dataSource);
-	}
 
 	public Car findBycarManId(Long carManId) {
 		Car car = null;
@@ -58,32 +47,37 @@ public class CarByDriverDaoImpl extends HibernateCrudJpaDao<CarByDriver>
 
 	}
 
+	@Override
+	public CarByDriver save(CarByDriver entity) {
+		// 保存信息
+		entity = super.save(entity);
+
+		// 这句很关键，保证信息先保存，然后再执行下面的更新
+		// 如果不执行这句，实测结果是hibernate先执行了下面的更新语句再执行上面的保存语句而导致司机信息没有更新，比较奇怪
+		this.getJpaTemplate().flush();
+
+		// 更新车辆的司机信息
+		updateCar4Driver(entity.getCar().getId());
+		return entity;
+	}
+
 	/**
 	 * 更新车辆模块的司机信息
 	 * 
-	 * @param id
+	 * @param carId
 	 */
-	public void updateCar4Driver(Long id) {
-		// 根据不同数据库生成相应sql：http://qun.qq.com/air/#6577377/bbs/view/cd/1/td/8
-		String sql = "update BS_CAR as c set driver = (select";
-		String caseStr = "(case when cm.classes=1 then '正班' when cm.classes=2 then '副班' when cm.classes=3 then '顶班' else '无' end)";
-		if (JdbcUtils.DB_MYSQL.equals(JdbcUtils.dbtype)) {
-			sql += " group_concat(concat(m.name,'('," + caseStr + ",')'))";
-		} else if (JdbcUtils.DB_ORACLE.equals(JdbcUtils.dbtype)) {
-			sql += " wmsys.wm_concat(m.name || '(' || " + caseStr + " || ')')";
-		} else if ("mssql".equals(JdbcUtils.dbtype)) {
-		} else if (JdbcUtils.DB_POSTGRESQL.equals(JdbcUtils.dbtype)) {
-			sql += " string_agg(concat(m.name,'('," + caseStr + ",')'),',')";
-		} else {
-			throw new CoreException("unsupport database for updateCar4Driver");
-		}
-		sql += " from BS_CAR_DRIVER cm inner join BS_CARMAN m on m.id = cm.driver_id where cm.status_=0 and cm.car_id = c.id";
-		sql += ") where id = ?";
+	public void updateCar4Driver(Long carId) {
+		// 只适用于对当前在案车辆的处理:getDriverInfoByCarId是自定义的存储函数
+		// 参考：http://qun.qq.com/air/#6577377/bbs/view/cd/1/td/8
+		// 所更新司机字段的格式为：张三(正班),李四(副班),小明(顶班)(先按营运班次正序排序再按司机的入职时间正序排序)
 
+		String hql = "update Car car set car.driver = getDriverInfoByCarId(id) where car.id=?";
+		List<Object> args = new ArrayList<Object>();
+		args.add(carId);
 		if (logger.isDebugEnabled()) {
-			logger.debug("sql=" + sql);
-			logger.debug("id=" + id);
+			logger.debug("hql=" + hql);
+			logger.debug("carId=" + carId);
 		}
-		this.jdbcTemplate.update(sql, new Object[] { id });
+		this.executeUpdate(hql, args);
 	}
 }
