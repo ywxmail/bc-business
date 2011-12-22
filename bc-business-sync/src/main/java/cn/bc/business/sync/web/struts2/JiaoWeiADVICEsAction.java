@@ -56,7 +56,7 @@ public class JiaoWeiADVICEsAction extends SyncViewAction {
 	protected OrderCondition getGridDefaultOrderCondition() {
 		// 默认排序方向：状态|违章时间
 		return new OrderCondition("b.status_", Direction.Asc).add(
-				"t.happen_date", Direction.Desc);
+				"t.receive_date", Direction.Desc);
 	}
 
 	@Override
@@ -71,7 +71,7 @@ public class JiaoWeiADVICEsAction extends SyncViewAction {
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer sql = new StringBuffer();
 		sql.append("select b.id,b.status_,b.sync_type,b.sync_code,b.sync_from,b.sync_date");
-		sql.append(",t.subject,t.happen_date,t.car_plate,t.driver_cert,t.driver_name,t.advisor_name,t.ticket,t.content,t.result_");
+		sql.append(",t.subject,t.receive_date,t.car_plate,t.driver_id,t.advisor_name,t.ticket,t.content,t.result_");
 		sql.append(" from bs_sync_jiaowei_ADVICE t");
 		sql.append(" inner join bc_sync_base b on b.id=t.id");
 		sqlObject.setSql(sql.toString());
@@ -91,10 +91,9 @@ public class JiaoWeiADVICEsAction extends SyncViewAction {
 				map.put("syncFrom", rs[i++]);
 				map.put("syncDate", rs[i++]);
 				map.put("subject", rs[i++]);
-				map.put("happenDate", rs[i++]);
+				map.put("receiveDate", rs[i++]);
 				map.put("carPlate", rs[i++]);
 				map.put("driverCert", rs[i++]);
-				map.put("driverName", rs[i++]);
 				map.put("advisorName", rs[i++]);
 				map.put("ticket", rs[i++]);
 				map.put("content", rs[i++]);
@@ -115,14 +114,12 @@ public class JiaoWeiADVICEsAction extends SyncViewAction {
 		columns.add(new TextColumn4MapKey("b.sync_code", "syncCode",
 				getText("jiaoWeiADVICE.syncCode"), 120).setSortable(true)
 				.setUseTitleFromLabel(true));
-		columns.add(new TextColumn4MapKey("t.happen_date", "happenDate",
-				getText("jiaoWeiADVICE.happenDate"), 130).setSortable(true)
+		columns.add(new TextColumn4MapKey("t.receive_date", "receiveDate",
+				getText("jiaoWeiADVICE.receiveDate"), 130).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd HH:mm")));
 		columns.add(new TextColumn4MapKey("t.car_plate", "carPlate",
 				getText("jiaoWeiADVICE.carPlate"), 80).setSortable(true));
-		columns.add(new TextColumn4MapKey("t.driver_name", "driverName",
-				getText("jiaoWeiADVICE.driverName"), 80));
-		columns.add(new TextColumn4MapKey("t.driver_cert", "driverCert",
+		columns.add(new TextColumn4MapKey("t.driver_id", "driverCert",
 				getText("jiaoWeiADVICE.driverCert"), 80).setSortable(true));
 		columns.add(new TextColumn4MapKey("t.advisor_name", "advisorName",
 				getText("jiaoWeiADVICE.advisorName"), 80));
@@ -222,7 +219,7 @@ public class JiaoWeiADVICEsAction extends SyncViewAction {
 		}
 
 		// 执行同步
-		return this.bsSyncService.doSync4JiaoWeiYYWZ(
+		return this.bsSyncService.doSync4JiaoWeiADVICE(
 				((SystemContext) this.getContext()).getUserHistory(), fromDate,
 				toDate, strMsg);
 	}
