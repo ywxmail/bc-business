@@ -42,6 +42,8 @@ drop table if exists BS_CARMAN_HISTORY;
 
 -- 车辆保单险种
 drop table if exists BS_INSURANCE_TYPE;
+-- 购买车保险种
+drop table if exists BS_BUY_PLANT;
 -- 车辆保单
 drop table if exists BS_CAR_POLICY;
 
