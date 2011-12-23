@@ -67,7 +67,6 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 	public  boolean 							isNullCar;
 	public  boolean 							isNullCarMan;
 	
-	@SuppressWarnings("unused")
 	private CaseBusinessService					caseBusinessService;
 	private CaseBaseService						caseBaseService;
 	private MotorcadeService	 				motorcadeService;
@@ -75,7 +74,7 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 	private CarManService 						carManService;
 	private CarService 							carService;
 	private SyncBaseService 					syncBaseService;				//平台同步基类Serivce
-	private JiaoWeiYYWZService 					jiaoWeiYYWZService;				//平台同步佳通违章Serivce
+	private JiaoWeiYYWZService 					jiaoWeiYYWZService;				//平台同步交通违章Serivce
 
 	public  List<Map<String, String>> 			motorcadeList;					// 可选车队列表
 	public  List<Map<String, String>>			dutyList;						// 可选责任列表
@@ -243,7 +242,11 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 			JiaoWeiYYWZ jiaoweiYYWZ = this.jiaoWeiYYWZService.load(syncId);
 			String carPlateNo = "";
 			carPlateNo = jiaoweiYYWZ.getCarPlate().replaceAll("粤A.", carPlateNo);
-			findCarId(carPlateNo);
+			if(carPlateNo.length() > 0){
+				//根据车牌号码查找carId
+				findCarId(carPlateNo);
+			}
+			//设置从交委同步的信息
 			this.getE().setCaseNo(jiaoweiYYWZ.getSyncCode());
 			this.getE().setHappenDate(jiaoweiYYWZ.getHappenDate());
 			this.getE().setCloseDate(jiaoweiYYWZ.getCloseDate());
@@ -356,12 +359,6 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 	@Override
 	public String save() throws Exception{
 		
-		if(syncId != null){	//处理相应的来源信息的状态
-			SyncBase sb = this.syncBaseService.load(syncId);
-			sb.setStatus(SyncBase.STATUS_GEN);
-			this.syncBaseService.save(sb);
-		}
-		
 		SystemContext context = this.getSystyemContext();
 		Case4InfractBusiness e = this.getE();
 		
@@ -379,10 +376,20 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 		//设置最后更新人的信息
 		e.setModifier(context.getUserHistory());
 		e.setModifiedDate(Calendar.getInstance());
-		this.getCrudService().save(e);
 
-		
+		SyncBase sb = null;
+		if(syncId != null){	//处理相应的来源信息的状态
+			sb = this.syncBaseService.load(syncId);
+			sb.setStatus(SyncBase.STATUS_GEN);
+			this.beforeSave(e);
+			//保存并更新Sycn对象的状态
+			this.caseBusinessService.save(e,sb);
+			this.afterSave(e);
+		}else{
+			this.getCrudService().save(e);
+		}
 		return "saveSuccess";
+		
 	}
 	
 /*	

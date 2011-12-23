@@ -22,7 +22,11 @@ import cn.bc.business.carman.service.CarManService;
 import cn.bc.business.motorcade.service.MotorcadeService;
 import cn.bc.business.runcase.domain.Case4Advice;
 import cn.bc.business.runcase.domain.CaseBase;
+import cn.bc.business.runcase.domain.CaseBase4AdviceAndPraise;
 import cn.bc.business.runcase.service.CaseAdviceService;
+import cn.bc.business.runcase.service.CaseBaseService;
+import cn.bc.business.sync.domain.JiaoWeiADVICE;
+import cn.bc.business.sync.service.JiaoWeiADVICEService;
 import cn.bc.business.web.struts2.FileEntityAction;
 import cn.bc.core.query.condition.Condition;
 import cn.bc.core.query.condition.Direction;
@@ -31,6 +35,8 @@ import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.option.domain.OptionItem;
 import cn.bc.option.service.OptionService;
+import cn.bc.sync.domain.SyncBase;
+import cn.bc.sync.service.SyncBaseService;
 import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.formater.EntityStatusFormater;
 import cn.bc.web.ui.html.grid.Column;
@@ -55,18 +61,22 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 	private static 	final long 				serialVersionUID 	= 1L;
 	public  Long 							carId;
 	public  Long 							carManId;
+	private	Long							syncId;			//同步ID
+	
 	public  boolean 						isMoreCar;
 	public  boolean 						isMoreCarMan;
 	public  boolean 						isNullCar;
 	public  boolean 						isNullCarMan;
 	private	boolean							multiple;
    //public  String							isClosed;	
-	@SuppressWarnings("unused")
 	private CaseAdviceService				caseAdviceService;
 	private MotorcadeService	 			motorcadeService;
 	private OptionService					optionService;
 	private CarManService 					carManService;
 	private CarService 						carService;
+	private SyncBaseService 				syncBaseService;				//平台同步基类Serivce
+	private JiaoWeiADVICEService			jiaoWeiADVICEService;			//平台同步投诉与建议Service
+	private CaseBaseService					caseBaseService;
 
 	public 	List<Map<String, String>> 		motorcadeList;					// 可选车队列表
 	public  List<Map<String, String>>		dutyList;						// 可选责任列表
@@ -105,16 +115,34 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 		this.carManId = carManId;
 	}
 
+	public Long getSyncId() {
+		return syncId;
+	}
+
+	public void setSyncId(Long syncId) {
+		this.syncId = syncId;
+	}
+
 	@Autowired
 	public void setCaseAdviceService(CaseAdviceService caseAdviceService) {
 		this.caseAdviceService = caseAdviceService;
 		this.setCrudService(caseAdviceService);
 	}
 	
-//	@Autowired
-//	public void setCaseBaseService(CaseBaseService caseBaseService) {
-//		this.caseBaseService = caseBaseService;
-//	}
+	@Autowired
+	public void setCaseBaseService(CaseBaseService caseBaseService) {
+		this.caseBaseService = caseBaseService;
+	}
+	
+	@Autowired
+	public void setSyncBaseService(SyncBaseService syncBaseService) {
+		this.syncBaseService = syncBaseService;
+	}
+
+	@Autowired
+	public void setJiaoWeiADVICEService(JiaoWeiADVICEService jiaoWeiADVICEService) {
+		this.jiaoWeiADVICEService = jiaoWeiADVICEService;
+	}
 
 	@Autowired
 	public void setMotorcadeService(MotorcadeService motorcadeService) {
@@ -220,10 +248,51 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 	@Override
 	public String create() throws Exception {
 		String r = super.create();
-		this.getE().setUid(this.getIdGeneratorService().next(this.getE().ATTACH_TYPE));
-		// 自动生成自编号
-		this.getE().setCode(
-				this.getIdGeneratorService().nextSN4Month(Case4Advice.KEY_CODE));
+		
+		if(syncId != null){	//判断同步id是否为空
+			JiaoWeiADVICE jiaoWeiADVICE = this.jiaoWeiADVICEService.load(syncId);
+			String carPlateNo = "";
+			carPlateNo = jiaoWeiADVICE.getCarPlate().replaceAll("粤A.", carPlateNo);
+			if(carPlateNo.length() > 0){
+				//根据车牌号码查找carId
+				findCarId(carPlateNo);
+			}
+			//设置从交委同步的信息
+			this.getE().setCaseNo(jiaoWeiADVICE.getSyncCode());
+			this.getE().setReceiveDate(jiaoWeiADVICE.getReceiveDate());
+			this.getE().setReceiveCode(jiaoWeiADVICE.getReceiveCode());
+			this.getE().setAdvisorName(jiaoWeiADVICE.getAdvisorName());
+			this.getE().setPathFrom(jiaoWeiADVICE.getPathFrom());
+			this.getE().setPathTo(jiaoWeiADVICE.getPathTo());
+			this.getE().setRidingStartTime(jiaoWeiADVICE.getRidingTimeStart());
+			this.getE().setRidingEndTime(jiaoWeiADVICE.getRidingTimeEnd());
+			if(jiaoWeiADVICE.getAdvisorSex().equals("男")){
+				this.getE().setAdvisorSex(CaseBase4AdviceAndPraise.SEX_MAN);
+			}else if(jiaoWeiADVICE.getAdvisorSex().equals("女")){
+				this.getE().setAdvisorSex(CaseBase4AdviceAndPraise.SEX_WOMAN);
+			}
+			if(jiaoWeiADVICE.getAdvisorAge() != null){
+				this.getE().setAdvisorAge(jiaoWeiADVICE.getAdvisorAge().intValue());
+			}
+			this.getE().setAdvisorCert(jiaoWeiADVICE.getAdvisorCert());
+			this.getE().setDriverFeature(jiaoWeiADVICE.getDriverChar());
+			this.getE().setDetail(jiaoWeiADVICE.getContent());
+			this.getE().setResult(jiaoWeiADVICE.getResult());
+			this.getE().setSubject(jiaoWeiADVICE.getSubject());
+			this.getE().setSubject2(jiaoWeiADVICE.getSubject2());
+			if(jiaoWeiADVICE.getMachinePrice() != null && !jiaoWeiADVICE.getMachinePrice().equals("无")){
+				this.getE().setMachinePrice(Float.parseFloat(jiaoWeiADVICE.getMachinePrice()));
+			}
+			this.getE().setTicket(jiaoWeiADVICE.getTicket());
+			if(jiaoWeiADVICE.getCharge() != null && !jiaoWeiADVICE.getCharge().equals("无")){
+				this.getE().setCharge(Float.parseFloat(jiaoWeiADVICE.getCharge()));
+			}
+			this.getE().setCarColor(jiaoWeiADVICE.getBusColor());
+			//设置来源
+			this.getE().setSource(CaseBase.SOURCE_GENERATION);
+			//设置syncId
+			this.getE().setSyncId(syncId);
+		}
 		
 		if (carManId != null) {
 			CarMan driver = this.carManService.load(carManId);
@@ -263,23 +332,44 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 			}
 		}
 		
-		// 表单可选项的加载
-		initSelects();
-		
 		// 初始化信息
 		this.getE().setType  (CaseBase.TYPE_COMPLAIN);
 		this.getE().setStatus(CaseBase.STATUS_ACTIVE);
+		this.getE().setUid(this.getIdGeneratorService().next(this.getE().ATTACH_TYPE));
+		// 自动生成自编号
+		this.getE().setCode(
+				this.getIdGeneratorService().nextSN4Month(Case4Advice.KEY_CODE));
+		
+		// 来源
+		if(syncId == null){ //不是同步过来的信息设为自建
+			this.getE().setSource(CaseBase.SOURCE_SYS);
+		}
+		
 		statusesValue		=	this.getCaseStatuses();
 		sourcesValue		=	this.getSourceStatuses();
 		
-
+		// 表单可选项的加载
+		initSelects();
 		
 		return r; 
 	}
 	
+	/** 根据车牌号查找carId*/
+	public void findCarId(String carPlateNo) {
+		if(carPlateNo.length() > 0){ //判断车牌号是否为空
+			Long tempCarId = this.carService.findcarInfoByCarPlateNo(carPlateNo);
+			this.carId = tempCarId;
+		}
+	}
+	
 	@Override
 	public String edit() throws Exception {
-		this.setE(this.getCrudService().load(this.getId()));
+		if(syncId != null){//根据syncId查找已存在CaseBase的记录
+			CaseBase cb = this.caseBaseService.findCaseBaseBysyncId(syncId);
+			this.setE(this.getCrudService().load(cb.getId()));
+		}else{
+			this.setE(this.getCrudService().load(this.getId()));
+		}
 		// 表单可选项的加载
 		this.formPageOption = 	buildFormPageOption();
 		statusesValue		=	this.getCaseStatuses();
@@ -290,6 +380,7 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 	
 	@Override
 	public String save() throws Exception{
+		
 		SystemContext context = this.getSystyemContext();
 		
 		//设置最后更新人的信息
@@ -305,7 +396,16 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 			e.setCloseDate(Calendar.getInstance(Locale.CHINA));
 		}
 		
-		this.getCrudService().save(e);
+		if(syncId != null){	//处理相应的来源信息的状态
+			SyncBase sb = this.syncBaseService.load(syncId);
+			sb.setStatus(SyncBase.STATUS_GEN);
+			this.beforeSave(e);
+			//保存并更新Sycn对象的状态
+			this.caseAdviceService.save(e,sb);
+			this.afterSave(e);
+		}else{
+			this.getCrudService().save(e);
+		}
 		
 		return "saveSuccess";
 	}

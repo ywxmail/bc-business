@@ -1,5 +1,8 @@
 package cn.bc.business.sync.service;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -394,7 +397,7 @@ public class BsSyncServiceImpl implements BsSyncService {
 		String jiaoWei_ws_method = "GetAccuseByQYID";
 
 		// 从交委接口获取数据
-		DataSet dataSet = wsMiddle.findBreachOfBusiness(jiaoWei_qyid_baocheng,
+		DataSet dataSet = wsMiddle.findAccuseAndAdvice(jiaoWei_qyid_baocheng,
 				fromDate, toDate, strMsg);
 
 		// 发生异常就直接退出
@@ -439,22 +442,21 @@ public class BsSyncServiceImpl implements BsSyncService {
 		domain.setSyncType(syncType);
 		domain.setSyncFrom(syncFrom);
 		
-		int cc = 0;
 		domain.setcId(row.getCellStringValue("c_id"));
-		if(row.getCellStringValue("tis_handle_no") != null && row.getCellStringValue("tis_handle_no").length()>0){
-			domain.setSyncCode(row.getCellStringValue("tis_handle_no"));
-			cc++;
-		}
-		System.out.println("====================  "+cc);
+		domain.setSyncCode(row.getCellStringValue("tis_handle_no"));
 		domain.setReceiveCode(row.getCellStringValue("handle_no"));
 		domain.setAdvisorName(row.getCellStringValue("accuser_name"));
 		domain.setPathFrom(row.getCellStringValue("accuser_route"));
 		domain.setPathTo(row.getCellStringValue("accuser_route_to"));
-		domain.setRidingTimeStart(row.getCellCalendarValue("accuser_time"));
-		domain.setRidingTimeEnd(row.getCellCalendarValue("end_time"));
+		if(row.getCellStringValue("accuser_time") != null && row.getCellStringValue("accuser_time").length()>0){
+			domain.setRidingTimeStart(formatCalendar(row.getCellStringValue("accuser_time")));
+		}
+		if(row.getCellStringValue("end_time") != null && row.getCellStringValue("end_time").length()>0){
+			domain.setRidingTimeEnd(formatCalendar(row.getCellStringValue("end_time")));
+		}
 		domain.setAdvisorSex(row.getCellStringValue("accuser_sex"));
 		if(row.getCellStringValue("accuser_age") != null && row.getCellStringValue("accuser_age").length() > 0){
-			domain.setAdvisorAge(Integer.parseInt(row.getCellStringValue("accuser_age")));
+			domain.setAdvisorAge(Float.parseFloat(row.getCellStringValue("accuser_age")));
 		}
 		domain.setAdvisorPhone(row.getCellStringValue("accuser_tel"));
 		domain.setAdvisorCert(row.getCellStringValue("accuser_id"));
@@ -478,5 +480,19 @@ public class BsSyncServiceImpl implements BsSyncService {
 		domain.setReply(row.getCellStringValue("是否回复"));
 		
 		return domain;
+	}
+	
+	public Calendar formatCalendar(String Date){
+		Calendar calendar = Calendar.getInstance();;
+		String dateStr = Date.replaceAll("/", "-");
+		DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		Date date;
+		try {
+			date = df.parse(dateStr);
+		} catch (ParseException e) {
+			return null;
+		}
+		calendar.setTime(date);
+		return calendar;
 	}
 }
