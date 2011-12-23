@@ -49,6 +49,7 @@ public class ContractAction extends FileEntityAction<Long, Contract> {
 	public boolean isManager;
 	public Long carId;
 	public Long carManId;
+	public Json json;
 
 	public Map<String, String> statusesValue;
 
@@ -117,11 +118,13 @@ public class ContractAction extends FileEntityAction<Long, Contract> {
 		columns.add(new TextColumn("['type']", getText("contract.type"), 80)
 				.setSortable(true).setUseTitleFromLabel(true)
 				.setValueFormater(new KeyValueFormater(getEntityTypes())));
-		if(carManId != null){
-			columns.add(new TextColumn("['ext_str1']", getText("contract.car"), 80));
+		if (carManId != null) {
+			columns.add(new TextColumn("['ext_str1']", getText("contract.car"),
+					80));
 		}
-		if(carId != null){
-			columns.add(new TextColumn("['ext_str2']",getText("contract.labour.driver"), 80));
+		if (carId != null) {
+			columns.add(new TextColumn("['ext_str2']",
+					getText("contract.labour.driver"), 80));
 		}
 		columns.add(new TextColumn("['signDate']",
 				getText("contract.signDate"), 90).setSortable(true)

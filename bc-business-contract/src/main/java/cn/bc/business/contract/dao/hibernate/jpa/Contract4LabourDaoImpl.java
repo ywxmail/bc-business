@@ -23,7 +23,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.orm.jpa.JpaCallback;
 import org.springframework.util.StringUtils;
 
-import cn.bc.business.contract.dao.ContractLabourDao;
+import cn.bc.business.contract.dao.Contract4LabourDao;
 import cn.bc.business.contract.domain.Contract;
 import cn.bc.business.contract.domain.Contract4Labour;
 import cn.bc.core.Page;
@@ -36,7 +36,7 @@ import cn.bc.orm.hibernate.jpa.HibernateCrudJpaDao;
  * 
  * @author dragon
  */
-public class ContractLabourDaoImpl extends HibernateCrudJpaDao<Contract4Labour> implements ContractLabourDao{
+public class Contract4LabourDaoImpl extends HibernateCrudJpaDao<Contract4Labour> implements Contract4LabourDao{
 
 	protected final Log logger =  LogFactory.getLog(getClass());
 	private JdbcTemplate jdbcTemplate;
@@ -123,6 +123,31 @@ public class ContractLabourDaoImpl extends HibernateCrudJpaDao<Contract4Labour> 
 			this.jdbcTemplate.execute(delSql);
 			
 			insertSql = "insert into BS_CARMAN_CONTRACT(man_id,contract_id)values("+carManId+","+contractId+")";
+			this.jdbcTemplate.execute(insertSql);
+		}
+	}
+	
+	/**
+	 * 保存车辆与合同的关联信息
+	 * jdbc查询BS_CAR_CONTRACT表是否存在相应carId和contractId的记录
+	 * @param carId
+	 * @param contractId
+	 */
+	public void updateCarContractRelation(Long carId, Long contractId) {
+		String sql = "select * from BS_CAR_CONTRACT carcontract where carcontract.contract_id = ?";
+		String insertSql = "";
+		//jdbc查询BS_CAR_CONTRACT表是否存在相应carId和contractId的记录
+		@SuppressWarnings("rawtypes")
+		List list = this.jdbcTemplate.queryForList(sql,new Object[]{contractId});
+		
+		if(list == null || list.size() < 1){ //不存在,插入新的记录
+			insertSql = "insert into BS_CAR_CONTRACT(car_id,contract_id)values("+carId+","+contractId+")";
+			this.jdbcTemplate.execute(insertSql);
+		}else{ //存在,删除原来的记录,插入新的记录
+			String	delSql = "delete from BS_CAR_CONTRACT where BS_CAR_CONTRACT.contract_id="+contractId;
+			this.jdbcTemplate.execute(delSql);
+			
+			insertSql = "insert into BS_CAR_CONTRACT(car_id,contract_id)values("+carId+","+contractId+")";
 			this.jdbcTemplate.execute(insertSql);
 		}
 	}

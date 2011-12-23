@@ -7,6 +7,7 @@
 		<action name="contract/create" class="contractAction" method="create">
 			<result name="showdialog" >/bc-business/contract/select.jsp</result>
 		</action>
+		<action name="contract/renew" class="contractAction" method="renew"/>
 	</package>
 	
 	<!-- 劳动合同 -->
@@ -24,6 +25,12 @@
 		</action>
 		<action name="contractLabour/isExistContract" class="contractLabourAction" method="isExistContract">
 		</action>
+	</package>
+	
+	<!-- 劳动合同的版本管理 -->
+	<package name="contract4LabourOperate" extends="bc-default" namespace="/bc-business/contract4LabourOperate">
+		<!-- 续签 -->
+		<action name="renew" class="contract4LabourOperateAction" method="renew"/>
 	</package>
 	
 	<!-- 经济合同 -->

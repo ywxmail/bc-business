@@ -1,42 +1,30 @@
 /**
  * 
  */
-package cn.bc.business.contract.service;
+package cn.bc.business.contract.dao;
 
 import java.util.List;
 import java.util.Map;
 
 import cn.bc.business.contract.domain.Contract4Labour;
 import cn.bc.core.Page;
+import cn.bc.core.dao.CrudDao;
 import cn.bc.core.query.condition.Condition;
-import cn.bc.core.service.CrudService;
 
 
 /**
- * 司机劳动合同Service
+ * 司机劳动合同Dao
  * 
  * @author dragon
  */
-/**
- * @author wis
- *
- */
-/**
- * @author wis
- *
- */
-/**
- * @author wis
- *
- */
-public interface ContractLabourService extends CrudService<Contract4Labour> {
-	
+public interface Contract4LabourDao extends CrudDao<Contract4Labour> {
+
 	/**
 	 * 删除单个CarManNContract
 	 * @parma contractId 
 	 * @return
 	 */
-	void deleteCarManNContract(Long id);
+	void deleteCarManNContract(Long contractId);
 
 	/**
 	 * 删除批量CarManNContract
@@ -44,7 +32,7 @@ public interface ContractLabourService extends CrudService<Contract4Labour> {
 	 * @return
 	 */
 	void deleteCarManNContract(Long[] contractIds);
-	
+
 	/**
 	 * 保存合同与司机的关联表信息
 	 * @parma carManId 
@@ -70,7 +58,6 @@ public interface ContractLabourService extends CrudService<Contract4Labour> {
 	Page<Map<String,Object>> page4carMan(Condition condition, int pageNo,
 			int pageSize);
 
-
 	/**
 	 * 根据carManId查找cert信息
 	 * @parma carManId 
@@ -78,7 +65,6 @@ public interface ContractLabourService extends CrudService<Contract4Labour> {
 	 */
 	Map<String, Object> findCertByCarManId(Long carManId);
 
-	
 	/**
 	 * 保存车辆与合同的关联信息
 	 * jdbc查询BS_CAR_CONTRACT表是否存在相应carId和contractId的记录
@@ -101,7 +87,6 @@ public interface ContractLabourService extends CrudService<Contract4Labour> {
 	 */
 	public Long findCarManIdByContractId(Long contractId);
 
-	
 	/**
 	 * 根据车辆Id查找车辆
 	 * @param carId
@@ -128,8 +113,7 @@ public interface ContractLabourService extends CrudService<Contract4Labour> {
 	 * @param carId
 	 * @return
 	 */
-	Map<String, Object> findCarByCarId(Long carId);
-
+	Map<String, Object> findCarByCarManId(Long carId);
 
 	/**
 	 * 根据车辆ID查找关联的司机
@@ -151,7 +135,7 @@ public interface ContractLabourService extends CrudService<Contract4Labour> {
 	 * @return
 	 */
 	void deleteInjury(Long contractId);
-	
+
 	/**
 	 * 删除批量Injury
 	 * @parma contractIds[] 

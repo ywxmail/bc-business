@@ -59,7 +59,7 @@ public class Contract extends RichFileEntityImpl {
 	
 
 	private String code;// 合同编号
-	private int    type;// 合同类型：如劳动合同、承包合同等
+	private int    type;// 合同类型，参考常数TYPE_XXX的定义，如劳动合同、经济合同等
 	private Long   Pid;// 父级ID
 	private Integer verMajor;//主版本号
 	private Integer verMinor;//次版本号

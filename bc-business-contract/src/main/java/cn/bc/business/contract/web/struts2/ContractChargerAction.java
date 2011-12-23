@@ -18,7 +18,7 @@ import cn.bc.business.OptionConstants;
 import cn.bc.business.contract.domain.Contract;
 import cn.bc.business.contract.domain.Contract4Charger;
 import cn.bc.business.contract.service.ContractChargerService;
-import cn.bc.business.contract.service.ContractLabourService;
+import cn.bc.business.contract.service.Contract4LabourService;
 import cn.bc.business.web.struts2.FileEntityAction;
 import cn.bc.core.Page;
 import cn.bc.core.exception.CoreException;
@@ -48,7 +48,7 @@ public class ContractChargerAction extends FileEntityAction<Long, Contract4Charg
 	// private static Log logger = LogFactory.getLog(ContractAction.class);
 	private static final long 			serialVersionUID 			= 1L;
 	private ContractChargerService 		contractChargerService;
-	private ContractLabourService   	contractLabourService;
+	private Contract4LabourService   	contractLabourService;
 	private AttachService 				attachService;
 	private OptionService				optionService;
 	public	Long						carId; 
@@ -81,7 +81,7 @@ public class ContractChargerAction extends FileEntityAction<Long, Contract4Charg
 	}
 
 	@Autowired
-	public void setContractLabourService(ContractLabourService contractLabourService) {
+	public void setContractLabourService(Contract4LabourService contractLabourService) {
 		this.contractLabourService = contractLabourService;
 	}
 	
