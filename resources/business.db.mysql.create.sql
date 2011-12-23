@@ -1102,7 +1102,7 @@ CREATE TABLE BS_SYNC_JIAOWEI_ADVICE (
     ADVICE_BS		VARCHAR(255) COMMENT '投诉行业',
     SUBJECT             VARCHAR(255) COMMENT '投诉项目大类',
     SUBJECT2            VARCHAR(255) COMMENT '投诉项目小类',
-    MACHINE_PRICE       BIGINT COMMENT '计费器显示价格',
+    MACHINE_PRICE       VARCHAR(255) COMMENT '计费器显示价格',
     TICKET              VARCHAR(255) COMMENT '车票号码',
     CHARGE              VARCHAR(255) COMMENT '实际收费',
     DRIVER_SEX          VARCHAR(10) COMMENT '司机性别',

@@ -22,4 +22,18 @@
 			<result name="form" >/bc-business/sync/jiaoWeiJTWF/form.jsp</result>
 		</action>
 	</package>
+	
+	<!-- 交委营运违章 -->
+	<package name="jiaoWeiYYWZ" extends="bc-default" namespace="/bc-business">
+		<action name="jiaoWeiYYWZ/open" class="jiaoWeiYYWZAction" method="edit">
+			<result name="form" >/bc-business/sync/jiaoWeiYYWZ/form.jsp</result>
+		</action>
+	</package>
+	
+	<!-- 交委投诉与建议 -->
+	<package name="jiaoWeiADVICE" extends="bc-default" namespace="/bc-business">
+		<action name="jiaoWeiADVICE/open" class="jiaoWeiADVICEAction" method="edit">
+			<result name="form" >/bc-business/sync/jiaoWeiADVICE/form.jsp</result>
+		</action>
+	</package>
 </struts>

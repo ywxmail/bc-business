@@ -26,6 +26,12 @@
 	<bean id="caseTrafficService" class="cn.bc.business.runcase.service.CaseTrafficServiceImpl"
 		p:caseTrafficDao-ref="caseTrafficDao" />
 		
+	<!-- syncBaseDao -->
+	<bean id="syncBaseDao" class="cn.bc.sync.dao.hibernate.jpa.SyncBaseDaoImpl"
+		p:entityManagerFactory-ref="entityManagerFactory" />
+	<bean id="syncBaseDaoService" class="cn.bc.sync.service.SyncBaseServiceImpl"
+		p:syncBaseDao-ref="syncBaseDao" />
+		
 	<!-- caseBusinessDao -->
 	<bean id="caseBusinessDao" class="cn.bc.business.runcase.dao.hibernate.jpa.CaseBusinessDaoImpl"
 		p:entityManagerFactory-ref="entityManagerFactory" />

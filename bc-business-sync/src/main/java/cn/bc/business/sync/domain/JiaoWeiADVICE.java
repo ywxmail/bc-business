@@ -36,7 +36,7 @@ public class JiaoWeiADVICE extends SyncBase {
 	private Calendar ridingTimeStart;//乘车起始时间
 	private Calendar ridingTimeEnd;//乘车结束时间
 	private String advisorSex;//投诉人性别
-	private Integer advisorAge;//投诉人年龄
+	private Float advisorAge;//投诉人年龄
 	private String advisorPhone;//投诉人电话
 	private String advisorCert;//投诉人证件号
 	private String oldUnitName;//车属单位
@@ -116,10 +116,10 @@ public class JiaoWeiADVICE extends SyncBase {
 		this.advisorSex = advisorSex;
 	}
 	@Column(name = "ADVISOR_AGE")
-	public Integer getAdvisorAge() {
+	public Float getAdvisorAge() {
 		return advisorAge;
 	}
-	public void setAdvisorAge(Integer advisorAge) {
+	public void setAdvisorAge(Float advisorAge) {
 		this.advisorAge = advisorAge;
 	}
 	@Column(name = "ADVISOR_PHONE")

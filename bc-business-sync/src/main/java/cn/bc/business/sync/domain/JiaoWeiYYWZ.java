@@ -29,7 +29,7 @@ public class JiaoWeiYYWZ extends SyncBase {
 	// 违章顺序号使用基类的SyncId字段记录，作为同类信息的唯一标识
 
 	private String cId;
-	private String wzStatus;// 状态
+	private String wzStatus;// 违章状态
 	private String confiscateCertNo;//扣件证号
 	private String operator;// 执法人
 	private String operateUnit;//执法分队
