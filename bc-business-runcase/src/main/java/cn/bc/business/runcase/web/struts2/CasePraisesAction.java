@@ -16,12 +16,10 @@ import cn.bc.business.runcase.domain.CaseBase;
 import cn.bc.business.web.struts2.ViewAction;
 import cn.bc.core.Entity;
 import cn.bc.core.query.condition.Condition;
+import cn.bc.core.query.condition.ConditionUtils;
 import cn.bc.core.query.condition.Direction;
-import cn.bc.core.query.condition.impl.AndCondition;
 import cn.bc.core.query.condition.impl.EqualsCondition;
-import cn.bc.core.query.condition.impl.InCondition;
 import cn.bc.core.query.condition.impl.OrderCondition;
-import cn.bc.core.util.StringUtils;
 import cn.bc.db.jdbc.RowMapper;
 import cn.bc.db.jdbc.SqlObject;
 import cn.bc.identity.web.SystemContext;
@@ -160,7 +158,7 @@ public class CasePraisesAction extends ViewAction<Map<String, Object>> {
 	protected String[] getGridSearchFields() {
 		return new String[] { "b.case_no", "b.motorcade_name", "b.car_plate",
 				"b.closer_name", "b.driver_name", "b.driver_cert",
-				"a.advisor_name" };
+				"p.advisor_name" };
 	}
 
 	@Override
@@ -182,17 +180,9 @@ public class CasePraisesAction extends ViewAction<Map<String, Object>> {
 	@Override
 	protected Condition getGridSpecalCondition() {
 		// 状态条件
-		Condition statusCondition = null;
-		if (status != null && status.length() > 0) {
-			String[] ss = status.split(",");
-			if (ss.length == 1) {
-				statusCondition = new EqualsCondition("b.status_", new Integer(
-						ss[0]));
-			} else {
-				statusCondition = new InCondition("b.status_",
-						StringUtils.stringArray2IntegerArray(ss));
-			}
-		}
+		Condition statusCondition = ConditionUtils.toConditionByComma4IntegerValue(this.status,
+				"b.status_");
+		
 		// carManId条件
 		Condition carManIdCondition = null;
 		if (carManId != null) {
@@ -204,8 +194,7 @@ public class CasePraisesAction extends ViewAction<Map<String, Object>> {
 			carIdCondition = new EqualsCondition("b.car_id", carId);
 		}
 		// 合并条件
-		return new AndCondition().add(statusCondition).add(carManIdCondition)
-				.add(carIdCondition);
+		return ConditionUtils.mix2AndCondition(statusCondition,carManIdCondition,carIdCondition);
 	}
 
 	@Override

@@ -136,8 +136,17 @@ public class WSMiddleImpl implements WSMiddle, InitializingBean {
 
 	public DataSet findAccuseAndAdvice(String qyId, Calendar fromDate,
 			Calendar toDate, StringBuffer strMsg) {
-		// TODO Auto-generated method stub
-		return null;
+		// 构建请求参数
+		Map<String, String> params = new LinkedHashMap<String, String>();
+		params.put("id", qyId);// 企业id
+		params.put("StartTime", dateFormater.format(fromDate.getTime()));// 起始日期
+		params.put("EndTime", dateFormater.format(toDate.getTime()));// 结束日期
+		params.put("strMsg", strMsg.toString());
+
+		// 所调用的WebService接口方法名
+		String soapMethod = "GetAccuseByQYID";
+
+		return doRequest(soapMethod, params, strMsg);
 	}
 
 	public DataSet findAccuseAndAdvice(String qyId, Calendar fromDate,

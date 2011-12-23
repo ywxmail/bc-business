@@ -70,7 +70,6 @@ public class CaseTrafficAction extends FileEntityAction<Long, Case4InfractTraffi
 	//public  boolean							isSync;			//是否同步
 	//public  boolean							isExist;		//判断生成的当前记录是否存在,存在发出提醒
 	//public  String							isClosed;	
-	@SuppressWarnings("unused")
 	private CaseTrafficService				caseTrafficService;
 	private CaseBaseService					caseBaseService;
 	private MotorcadeService	 			motorcadeService;
@@ -247,6 +246,7 @@ public class CaseTrafficAction extends FileEntityAction<Long, Case4InfractTraffi
 			SyncBase syncBase = this.syncBaseService.load(syncId);
 			if(syncBase.getSyncType().equals(JinDunJTWF.KEY_TYPE)){	//判断是否金盾网同步
 				JinDunJTWF jinDunJTWF = this.jinDunJTWFService.load(syncId);
+				//根据车牌号码查找carId
 				findCarId(jinDunJTWF.getCarPlateNo());
 				this.getE().setCaseNo(jinDunJTWF.getSyncCode());
 				this.getE().setAddress(jinDunJTWF.getAddress());
@@ -352,12 +352,6 @@ public class CaseTrafficAction extends FileEntityAction<Long, Case4InfractTraffi
 	
 	@Override
 	public String save() throws Exception{
-		
-		if(syncId != null){	//处理相应的来源信息的状态
-			SyncBase sb = this.syncBaseService.load(syncId);
-			sb.setStatus(SyncBase.STATUS_GEN);
-			this.syncBaseService.save(sb);
-		}
 		SystemContext context = this.getSystyemContext();
 		//设置最后更新人的信息
 		Case4InfractTraffic e = this.getE();
@@ -372,7 +366,18 @@ public class CaseTrafficAction extends FileEntityAction<Long, Case4InfractTraffi
 			e.setCloseDate(Calendar.getInstance(Locale.CHINA));
 		}
 		
-		this.getCrudService().save(e);
+		SyncBase sb = null;
+		if(syncId != null){	//处理相应的来源信息的状态
+			sb = this.syncBaseService.load(syncId);
+			sb.setStatus(SyncBase.STATUS_GEN);
+			this.beforeSave(e);
+			//保存并更新Sycn对象的状态
+			this.caseTrafficService.save(e,sb);
+			this.afterSave(e);
+		}else{
+			this.getCrudService().save(e);
+		}
+
 		
 		return "saveSuccess";
 	}
