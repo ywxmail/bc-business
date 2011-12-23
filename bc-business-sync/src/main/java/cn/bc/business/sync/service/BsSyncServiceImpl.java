@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 
 import cn.bc.business.spider.Spider4JinDunJTWF;
 import cn.bc.business.spider.domain.JinDunJTWF;
+import cn.bc.business.sync.domain.JiaoWeiADVICE;
 import cn.bc.business.sync.domain.JiaoWeiJTWF;
 import cn.bc.business.sync.domain.JiaoWeiYYWZ;
 import cn.bc.business.ws.service.WSMiddle;
@@ -367,6 +368,114 @@ public class BsSyncServiceImpl implements BsSyncService {
 		domain.setDetain(row.getCellStringValue("扣留物品"));
 		domain.setPullUnit(row.getCellStringValue("拖车单位"));
 		domain.setPenalty(Float.parseFloat(row.getCellStringValue("罚款")));
+		
+		return domain;
+	}
+
+	/**
+	 * 数据集行数据到交委投诉与建议信息的转换
+	 * 
+	 * @param row
+	 * @param author
+	 * @param createDate
+	 * @param syncFrom
+	 * @param syncType
+	 */
+	public int doSync4JiaoWeiADVICE(ActorHistory syncer,
+			Calendar fromDate, Calendar toDate, StringBuffer strMsg) {
+		Date startTime = new Date();
+		// 交委接口的宝城企业ID
+		String jiaoWei_qyid_baocheng = this.optionService.getItemValue("sync",
+				"jiaowei.ws.qyid.baocheng");
+
+		// 交委接口的url
+		String jiaoWei_ws_uri = this.optionService.getItemValue("sync",
+				"jiaowei.ws.soapUrl");
+		String jiaoWei_ws_method = "GetAccuseByQYID";
+
+		// 从交委接口获取数据
+		DataSet dataSet = wsMiddle.findBreachOfBusiness(jiaoWei_qyid_baocheng,
+				fromDate, toDate, strMsg);
+
+		// 发生异常就直接退出
+		if (strMsg.length() > 0)
+			return 0;
+
+		// 循环每一条数据作处理
+		JiaoWeiADVICE domain;
+		Calendar now = Calendar.getInstance();
+		ActorHistory author = syncer;
+		String syncType = JiaoWeiADVICE.class.getSimpleName();
+		String syncFrom = jiaoWei_ws_uri + "#" + jiaoWei_ws_method;
+		List<SyncBase> toSaveDomains = new ArrayList<SyncBase>();
+		if (dataSet.getRows() != null) {
+			for (Row row : dataSet.getRows()) {
+				domain = dataSetRow2JiaoWeiADVICE(row, author, now, syncFrom,
+						syncType);
+				if (!this.syncBaseService.hadSync(syncType,
+						domain.getSyncCode())) {// 没有同步过的记录
+					toSaveDomains.add(domain);
+				} else {// 已存在同步记录
+					if (logger.isInfoEnabled())
+						logger.info("记录已存在，忽略：syncType=" + syncType
+								+ ",syncCode=" + domain.getSyncCode());
+				}
+			}
+			if (!toSaveDomains.isEmpty())
+				this.syncBaseService.save(toSaveDomains);
+		}
+		if (logger.isInfoEnabled())
+			logger.info("从交委投诉与建议接口获取数据总耗时：" + DateUtils.getWasteTime(startTime) + ",newCount=" + toSaveDomains.size());
+
+		return toSaveDomains.size();
+	}
+
+	private JiaoWeiADVICE dataSetRow2JiaoWeiADVICE(Row row,
+			ActorHistory author, Calendar createDate, String syncFrom, String syncType) {
+		JiaoWeiADVICE domain = new JiaoWeiADVICE();
+		domain.setAuthor(author);
+		domain.setStatus(JiaoWeiADVICE.STATUS_NEW);
+		domain.setSyncDate(createDate);
+		domain.setSyncType(syncType);
+		domain.setSyncFrom(syncFrom);
+		
+		int cc = 0;
+		domain.setcId(row.getCellStringValue("c_id"));
+		if(row.getCellStringValue("tis_handle_no") != null && row.getCellStringValue("tis_handle_no").length()>0){
+			domain.setSyncCode(row.getCellStringValue("tis_handle_no"));
+			cc++;
+		}
+		System.out.println("====================  "+cc);
+		domain.setReceiveCode(row.getCellStringValue("handle_no"));
+		domain.setAdvisorName(row.getCellStringValue("accuser_name"));
+		domain.setPathFrom(row.getCellStringValue("accuser_route"));
+		domain.setPathTo(row.getCellStringValue("accuser_route_to"));
+		domain.setRidingTimeStart(row.getCellCalendarValue("accuser_time"));
+		domain.setRidingTimeEnd(row.getCellCalendarValue("end_time"));
+		domain.setAdvisorSex(row.getCellStringValue("accuser_sex"));
+		if(row.getCellStringValue("accuser_age") != null && row.getCellStringValue("accuser_age").length() > 0){
+			domain.setAdvisorAge(Integer.parseInt(row.getCellStringValue("accuser_age")));
+		}
+		domain.setAdvisorPhone(row.getCellStringValue("accuser_tel"));
+		domain.setAdvisorCert(row.getCellStringValue("accuser_id"));
+		domain.setOldUnitName(row.getCellStringValue("taxi_dept"));
+		domain.setCarPlate(row.getCellStringValue("taxi_no"));
+		domain.setDriverCert(row.getCellStringValue("driver_id"));
+		domain.setDriverChar(row.getCellStringValue("driver_char_id"));
+		domain.setContent(row.getCellStringValue("content"));
+		domain.setReceiveDate(row.getCellCalendarValue("handle_time"));
+		domain.setResult(row.getCellStringValue("handle_result"));
+		domain.setAdviceBs(row.getCellStringValue("accuse_type"));
+		domain.setSubject(row.getCellStringValue("c_item"));
+		domain.setSubject2(row.getCellStringValue("c_item_class"));
+		domain.setMachinePrice(row.getCellStringValue("fee_show"));
+		domain.setTicket(row.getCellStringValue("invoice_no"));
+		domain.setCharge(row.getCellStringValue("fee_accepted"));
+		domain.setDriverSex(row.getCellStringValue("driver_sex"));
+		domain.setSuggestBs(row.getCellStringValue("accuse_industry"));
+		domain.setBuslines(row.getCellStringValue("buslineno"));
+		domain.setBusColor(row.getCellStringValue("bus_color"));
+		domain.setReply(row.getCellStringValue("是否回复"));
 		
 		return domain;
 	}

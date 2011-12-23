@@ -24,7 +24,6 @@ import cn.bc.identity.web.SystemContext;
 import cn.bc.sync.domain.SyncBase;
 import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.formater.KeyValueFormater;
-import cn.bc.web.formater.NubmerFormater;
 import cn.bc.web.ui.html.grid.Column;
 import cn.bc.web.ui.html.grid.IdColumn4MapKey;
 import cn.bc.web.ui.html.grid.TextColumn4MapKey;
@@ -34,23 +33,22 @@ import cn.bc.web.ui.html.toolbar.ToolbarButton;
 import cn.bc.web.ui.html.toolbar.ToolbarMenuButton;
 
 /**
- * 交委接口的营运违章信息视图Action
+ * 交委接口的投诉与建议信息视图Action
  * 
- * @author wis
+ * @author wis.ho
  * 
  */
-
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 @Controller
-public class JiaoWeiYYWZsAction extends SyncViewAction {
-	protected final Log logger = LogFactory.getLog(JiaoWeiYYWZsAction.class);
+public class JiaoWeiADVICEsAction extends SyncViewAction {
+	protected final Log logger = LogFactory.getLog(JiaoWeiADVICEsAction.class);
 	private static final long serialVersionUID = 1L;
 
 	@Override
 	public boolean isReadonly() {
 		// 交通违章管理员或系统管理员
 		SystemContext context = (SystemContext) this.getContext();
-		return !context.hasAnyRole(getText("key.role.bs.infractBusiness"),
+		return !context.hasAnyRole(getText("key.role.bs.infractAdvice"),
 				getText("key.role.bc.admin"));
 	}
 
@@ -58,7 +56,7 @@ public class JiaoWeiYYWZsAction extends SyncViewAction {
 	protected OrderCondition getGridDefaultOrderCondition() {
 		// 默认排序方向：状态|违章时间
 		return new OrderCondition("b.status_", Direction.Asc).add(
-				"t.happen_date", Direction.Desc);
+				"t.receive_date", Direction.Desc);
 	}
 
 	@Override
@@ -73,8 +71,8 @@ public class JiaoWeiYYWZsAction extends SyncViewAction {
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer sql = new StringBuffer();
 		sql.append("select b.id,b.status_,b.sync_type,b.sync_code,b.sync_from,b.sync_date");
-		sql.append(",t.happen_date,t.car_plate,t.driver_cert,t.driver_name,t.owner,t.company,t.content,t.penalty");
-		sql.append(" from bs_sync_jiaowei_yywz t");
+		sql.append(",t.subject,t.receive_date,t.car_plate,t.driver_id,t.advisor_name,t.ticket,t.content,t.result_");
+		sql.append(" from bs_sync_jiaowei_ADVICE t");
 		sql.append(" inner join bc_sync_base b on b.id=t.id");
 		sqlObject.setSql(sql.toString());
 
@@ -92,14 +90,14 @@ public class JiaoWeiYYWZsAction extends SyncViewAction {
 				map.put("syncCode", rs[i++]);
 				map.put("syncFrom", rs[i++]);
 				map.put("syncDate", rs[i++]);
-				map.put("happenDate", rs[i++]);
+				map.put("subject", rs[i++]);
+				map.put("receiveDate", rs[i++]);
 				map.put("carPlate", rs[i++]);
 				map.put("driverCert", rs[i++]);
-				map.put("driverName", rs[i++]);
-				map.put("owner", rs[i++]);
-				map.put("company", rs[i++]);
+				map.put("advisorName", rs[i++]);
+				map.put("ticket", rs[i++]);
 				map.put("content", rs[i++]);
-				map.put("penalty", rs[i++]);
+				map.put("result", rs[i++]);
 				return map;
 			}
 		});
@@ -114,22 +112,19 @@ public class JiaoWeiYYWZsAction extends SyncViewAction {
 				getText("bs.sync.status"), 60).setSortable(true)
 				.setValueFormater(new KeyValueFormater(getSyncStatuses())));
 		columns.add(new TextColumn4MapKey("b.sync_code", "syncCode",
-				getText("jiaoWeiYYWZ.syncCode"), 120).setSortable(true)
+				getText("jiaoWeiADVICE.syncCode"), 120).setSortable(true)
 				.setUseTitleFromLabel(true));
-		columns.add(new TextColumn4MapKey("t.happen_date", "happenDate",
-				getText("jiaoWeiYYWZ.happenDate"), 130).setSortable(true)
+		columns.add(new TextColumn4MapKey("t.receive_date", "receiveDate",
+				getText("jiaoWeiADVICE.receiveDate"), 130).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd HH:mm")));
 		columns.add(new TextColumn4MapKey("t.car_plate", "carPlate",
-				getText("jiaoWeiYYWZ.carPlate"), 80).setSortable(true));
-		columns.add(new TextColumn4MapKey("t.driver_name", "driverName",
-				getText("jiaoWeiYYWZ.driverName"), 80).setSortable(true));
-		columns.add(new TextColumn4MapKey("t.driver_cert", "driverCert",
-				getText("jiaoWeiYYWZ.driverCert"), 80).setSortable(true));
-		columns.add(new TextColumn4MapKey("t.penalty", "penalty",
-				getText("jiaoWeiYYWZ.penalty"), 60).setSortable(true)
-				.setValueFormater(new NubmerFormater("#.#")));
+				getText("jiaoWeiADVICE.carPlate"), 80).setSortable(true));
+		columns.add(new TextColumn4MapKey("t.driver_id", "driverCert",
+				getText("jiaoWeiADVICE.driverCert"), 80).setSortable(true));
+		columns.add(new TextColumn4MapKey("t.advisor_name", "advisorName",
+				getText("jiaoWeiADVICE.advisorName"), 80));
 		columns.add(new TextColumn4MapKey("t.content", "content",
-				getText("jiaoWeiYYWZ.content")).setUseTitleFromLabel(true));
+				getText("jiaoWeiADVICE.content")).setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("b.sync_date", "syncDate",
 				getText("syncBase.syncDate"), 130).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd HH:mm")));
@@ -139,12 +134,12 @@ public class JiaoWeiYYWZsAction extends SyncViewAction {
 	@Override
 	protected String[] getGridSearchFields() {
 		return new String[] { "b.sync_code", "t.car_plate", "t.driver_name",
-				"t.driver_cert", "t.content" };
+				"t.driver_cert", "t.content", "t.advisorName" };
 	}
 
 	@Override
 	protected String getFormActionName() {
-		return "jiaoWeiYYWZ";
+		return "jiaoWeiADVICE";
 	}
 
 	@Override
@@ -158,12 +153,12 @@ public class JiaoWeiYYWZsAction extends SyncViewAction {
 			// "生成"按钮
 			tb.addButton(new ToolbarButton().setIcon("ui-icon-document")
 					.setText(getText("label.generate"))
-					.setClick("bs.jiaoWeiYYWZView.generate"));
+					.setClick("bs.jiaoWeiADVICEView.generate"));
 
 			// "更多"按钮
 			ToolbarMenuButton menuButton = new ToolbarMenuButton(
 					getText("label.operate"))
-					.setChange("bs.jiaoWeiYYWZView.selectMenuButtonItem");
+					.setChange("bs.jiaoWeiADVICEView.selectMenuButtonItem");
 			tb.addButton(menuButton);
 
 			// --标记为已处理
@@ -224,7 +219,7 @@ public class JiaoWeiYYWZsAction extends SyncViewAction {
 		}
 
 		// 执行同步
-		return this.bsSyncService.doSync4JiaoWeiYYWZ(
+		return this.bsSyncService.doSync4JiaoWeiADVICE(
 				((SystemContext) this.getContext()).getUserHistory(), fromDate,
 				toDate, strMsg);
 	}
