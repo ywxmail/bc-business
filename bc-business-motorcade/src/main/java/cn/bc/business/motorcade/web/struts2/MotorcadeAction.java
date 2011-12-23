@@ -1,5 +1,6 @@
 package cn.bc.business.motorcade.web.struts2;
 
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -83,10 +84,10 @@ public class MotorcadeAction extends FileEntityAction<Long, Motorcade> {
 	@Override
 	public String edit() throws Exception {
 		String r = super.edit();
-		
+
 		// 表单可选项的加载
 		initSelects();
-		
+
 		return r;
 	}
 
@@ -166,9 +167,12 @@ public class MotorcadeAction extends FileEntityAction<Long, Motorcade> {
 
 	@Override
 	public String delete() throws Exception {
-		// 将状态设置为禁用而不是物理删除
+		SystemContext context = this.getSystyemContext();
+		// 将状态设置为禁用而不是物理删除,更新最后修改人和修改时间
 		Map<String, Object> attributes = new HashMap<String, Object>();
 		attributes.put("status", new Integer(Entity.STATUS_DISABLED));
+		attributes.put("modifier", context.getUserHistory());
+		attributes.put("modifiedDate", Calendar.getInstance());
 
 		if (this.getId() != null) {// 处理一条
 			this.motorcadeService.update(this.getId(), attributes);

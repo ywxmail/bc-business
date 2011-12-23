@@ -108,46 +108,88 @@ public class ContractLabourServiceImpl extends DefaultCrudService<Contract4Labou
 		return queryMap;
 	}
 
+	/**
+	 * 保存车辆与合同的关联信息
+	 * jdbc查询BS_CAR_CONTRACT表是否存在相应carId和contractId的记录
+	 * @parma carId 
+	 * @parma contractId 
+	 * @return
+	 */
 	public void carNContract4Save(Long carId, Long contractId) {
 		this.contractLabourDao.carNContract4Save(carId,contractId);
 	}
 
+	/**
+	 * 根据合同ID查找车辆ID
+	 * @param contractId
+	 * @return
+	 */
 	public Long findCarIdByContractId(Long contractId) {
 		Long carId = null;
 		carId = contractLabourDao.findCarIdByContractId(contractId);
 		return carId;
 	}
 
+	/**
+	 * 根据合同ID查找司机ID
+	 * @param contractId
+	 * @return
+	 */
 	public Long findCarManIdByContractId(Long contractId) {
 		Long carManId = null;
 		carManId = contractLabourDao.findCarManIdByContractId(contractId);
 		return carManId;
 	}
 
+	/**
+	 * 根据车辆Id查找车辆
+	 * @param carId
+	 * @return
+	 */
 	public Map<String, Object> findCarManByCarId(Long carId) {
 		Map<String,Object> queryMap = null;
 		queryMap = this.contractLabourDao.findCarManByCarId(carId);
 		return queryMap;
 	}
 
+	/**
+	 * 根据司机ID相应的车
+	 * @param carManId
+	 * @return
+	 */
 	public List<Map<String, Object>> selectRelateCarByCarManId(Long carManId) {
 		List<Map<String, Object>> list = null;
 		list = this.contractLabourDao.selectRelateCarByCarManId(carManId);
 		return list;
 	}
 
+	/**
+	 * 根据司机ID查找司机
+	 * @param carManId
+	 * @return
+	 */
 	public Map<String, Object> findCarManByCarManId(Long carManId) {
 		Map<String,Object> queryMap = null;
 		queryMap = this.contractLabourDao.findCarManByCarManId(carManId);
 		return queryMap;
 	}
 
+	/**
+	 * 根据车辆ID查找车辆
+	 * @param carId
+	 * @return
+	 */
 	public Map<String, Object> findCarByCarId(Long carId) {
 		Map<String,Object> queryMap = null;
 		queryMap = this.contractLabourDao.findCarByCarManId(carId);
 		return queryMap;
 	}
 
+	/**
+	 * 根据车辆ID查找车辆
+	 * @param carId
+	 * @return
+	 */
 	public List<Map<String, Object>> selectRelateCarManByCarId(Long carId) {
 		List<Map<String, Object>> list = null;
 		list = this.contractLabourDao.selectRelateCarManByCarId(carId);

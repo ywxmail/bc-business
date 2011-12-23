@@ -290,7 +290,7 @@ public class ContractLaboursAction extends ViewAction<Map<String, Object>> {
 	
 	
 	/**
-	 * 状态值转换列表：正常|失效|离职|全部
+	 * 状态值转换列表：正常|注销|离职|全部
 	 * 
 	 * @return
 	 */
@@ -358,7 +358,6 @@ public class ContractLaboursAction extends ViewAction<Map<String, Object>> {
 	
 	@Override
 	protected Condition getGridSpecalCondition() {
-		//状态条件
 		
 		//状态条件
 		Condition statusCondition = null;
@@ -401,7 +400,6 @@ public class ContractLaboursAction extends ViewAction<Map<String, Object>> {
 		if (contractId != null) {
 			json.put("id", contractId);
 		}
-		
 		
 	}
 	

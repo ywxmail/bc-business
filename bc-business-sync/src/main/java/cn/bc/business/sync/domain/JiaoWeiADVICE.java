@@ -28,7 +28,7 @@ public class JiaoWeiADVICE extends SyncBase {
 
 	// 违章顺序号使用基类的SyncId字段记录，作为同类信息的唯一标识
 
-	private String thsReceiveCode;//运政受理号
+	private String cId;
 	private String receiveCode;//电话受理号
 	private String advisorName;//投诉人姓名
 	private String pathFrom;//乘车路线(从)
@@ -56,13 +56,15 @@ public class JiaoWeiADVICE extends SyncBase {
 	private String driverSex;//司机性别
 	private String suggestBs;//建议行业
 	private String buslines;//公交线路或站场
+	private String busColor;//车辆颜色
+	private String reply;//是否回复
 	
-	@Column(name = "TIS_RECEIVE_CODE")
-	public String getThsReceiveCode() {
-		return thsReceiveCode;
+	@Column(name = "C_ID")
+	public String getcId() {
+		return cId;
 	}
-	public void setThsReceiveCode(String thsReceiveCode) {
-		this.thsReceiveCode = thsReceiveCode;
+	public void setcId(String cId) {
+		this.cId = cId;
 	}
 	@Column(name = "RECEIVE_CODE")
 	public String getReceiveCode() {
@@ -148,7 +150,7 @@ public class JiaoWeiADVICE extends SyncBase {
 	public void setCarPlate(String carPlate) {
 		this.carPlate = carPlate;
 	}
-	@Column(name = "DRIVER_CERT")
+	@Column(name = "DRIVER_ID")
 	public String getDriverCert() {
 		return driverCert;
 	}
@@ -248,6 +250,20 @@ public class JiaoWeiADVICE extends SyncBase {
 	public void setBuslines(String buslines) {
 		this.buslines = buslines;
 	}
+	@Column(name = "BUS_COLOR")
+	public String getBusColor() {
+		return busColor;
+	}
+	public void setBusColor(String busColor) {
+		this.busColor = busColor;
+	}
+	public String getReply() {
+		return reply;
+	}
+	public void setReply(String reply) {
+		this.reply = reply;
+	}
+	
 
  
 }

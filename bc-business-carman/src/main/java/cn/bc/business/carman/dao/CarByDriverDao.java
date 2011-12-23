@@ -13,15 +13,13 @@ import cn.bc.core.dao.CrudDao;
  * @author dragon
  */
 public interface CarByDriverDao extends CrudDao<CarByDriver> {
-
 	// 根据司机ID查询营运车辆信息
 	Car findBycarManId(Long id);
 
 	/**
 	 * 更新车辆模块的司机信息
 	 * 
-	 * @param id
+	 * @param carId 车辆的id
 	 */
-	void updateCar4Driver(Long id);
-
+	void updateCar4Driver(Long carId);
 }

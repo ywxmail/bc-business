@@ -17,6 +17,18 @@ import cn.bc.core.service.CrudService;
  * 
  * @author dragon
  */
+/**
+ * @author wis
+ *
+ */
+/**
+ * @author wis
+ *
+ */
+/**
+ * @author wis
+ *
+ */
 public interface ContractLabourService extends CrudService<Contract4Labour> {
 	
 	/**
@@ -66,20 +78,64 @@ public interface ContractLabourService extends CrudService<Contract4Labour> {
 	 */
 	Map<String, Object> findCertByCarManId(Long carManId);
 
+	
+	/**
+	 * 保存车辆与合同的关联信息
+	 * jdbc查询BS_CAR_CONTRACT表是否存在相应carId和contractId的记录
+	 * @param carId
+	 * @param contractId
+	 */
 	void carNContract4Save(Long carId, Long contractId);
 	
+	/**
+	 * 根据合同ID查找车辆ID
+	 * @param contractId
+	 * @return
+	 */
 	public Long findCarIdByContractId(Long contractId);
 	
+	/**
+	 * 根据合同ID查找司机ID
+	 * @param contractId
+	 * @return
+	 */
 	public Long findCarManIdByContractId(Long contractId);
 
+	
+	/**
+	 * 根据车辆Id查找车辆
+	 * @param carId
+	 * @return
+	 */
 	Map<String, Object> findCarManByCarId(Long carId);
 
+	/**
+	 * 根据司机ID相应的车
+	 * @param carManId
+	 * @return
+	 */
 	List<Map<String, Object>> selectRelateCarByCarManId(Long carManId);
 
+	/**
+	 * 根据司机ID查找司机
+	 * @param carManId
+	 * @return
+	 */
 	Map<String, Object> findCarManByCarManId(Long carManId);
 
+	/**
+	 * 根据车辆ID查找车辆
+	 * @param carId
+	 * @return
+	 */
 	Map<String, Object> findCarByCarId(Long carId);
 
+
+	/**
+	 * 根据车辆ID查找关联的司机
+	 * @param carId
+	 * @return
+	 */
 	List<Map<String, Object>> selectRelateCarManByCarId(Long carId);
 
 	/**

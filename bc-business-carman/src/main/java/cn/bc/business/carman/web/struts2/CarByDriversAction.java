@@ -99,11 +99,11 @@ public class CarByDriversAction extends ViewAction<Map<String, Object>> {
 		List<Column> columns = new ArrayList<Column>();
 		columns.add(new IdColumn4MapKey("c.id", "id"));
 		columns.add(new TextColumn4MapKey("d.status_", "status_",
-				getText("carByDriver.statuses"), 100).setSortable(true)
+				getText("carByDriver.statuses"), 60).setSortable(true)
 				.setValueFormater(new EntityStatusFormater(getBSStatuses1())));
 		if (carManId != null || (carManId == null && carId == null)) {
 			columns.add(new TextColumn4MapKey("c.plate_no", "plate",
-					getText("carByDriver.car.plateNo"), 150)
+					getText("carByDriver.car.plateNo"), 100)
 					.setValueFormater(new LinkFormater4Id(this.getContextPath()
 							+ "/bc-business/car/edit?id={0}", "car") {
 						@SuppressWarnings("unchecked")
@@ -151,7 +151,7 @@ public class CarByDriversAction extends ViewAction<Map<String, Object>> {
 				getText("carByDriver.classes"), 100)
 				.setValueFormater(new KeyValueFormater(getType())));
 		columns.add(new TextColumn4MapKey("d.desc_", "desc_",
-				getText("carMan.description"), 270).setSortable(true));
+				getText("carMan.description")).setSortable(true));
 
 		return columns;
 	}
@@ -169,8 +169,8 @@ public class CarByDriversAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected PageOption getHtmlPageOption() {
-		return super.getHtmlPageOption().setWidth(900).setMinWidth(400)
-				.setHeight(550).setMinHeight(300);
+		return super.getHtmlPageOption().setWidth(780).setMinWidth(400)
+				.setHeight(400).setMinHeight(300);
 	}
 
 	@Override
