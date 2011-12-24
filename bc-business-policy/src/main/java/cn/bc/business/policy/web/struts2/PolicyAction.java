@@ -5,9 +5,14 @@ package cn.bc.business.policy.web.struts2;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
@@ -15,6 +20,7 @@ import org.springframework.stereotype.Controller;
 
 import cn.bc.business.OptionConstants;
 import cn.bc.business.car.service.CarService;
+import cn.bc.business.policy.domain.BuyPlant;
 import cn.bc.business.policy.domain.Policy;
 import cn.bc.business.policy.service.PolicyService;
 import cn.bc.business.web.struts2.FileEntityAction;
@@ -53,6 +59,7 @@ public class PolicyAction extends FileEntityAction<Long, Policy> {
 	public Long motorcadeId;
 	public Map<String, String> statusesValue;
 	public List<Map<String, String>> companyList; // 可选保险公司列表
+	public String buyPlants;// 所买险种的json字符串
 
 	@Autowired
 	public void setPolicyService(PolicyService policyService) {
@@ -126,6 +133,7 @@ public class PolicyAction extends FileEntityAction<Long, Policy> {
 		this.getE().setGreenslip(true);
 		this.getE().setGreenslipSameDate(false);
 		this.getE().setVerMajor(Policy.MAJOR_DEFALUT);
+		this.getE().setOpType(Policy.OPTYPE_CREATE);
 		this.getE().setUid(
 				this.getIdGeneratorService().next(Policy.POLICY_TYPE));
 		this.getE().setPatchNo(this.getE().getUid());
@@ -140,6 +148,38 @@ public class PolicyAction extends FileEntityAction<Long, Policy> {
 		// 如果操作类型为续保，执行续保方法
 		if (this.getE().getOpType() == Policy.OPTYPE_RENEWAL) {
 			renewal(true);
+		}
+		// 插入险种值
+		try {
+			Set<BuyPlant> buyPlants = null;
+			if (this.buyPlants != null && this.buyPlants.length() > 0) {
+				buyPlants = new LinkedHashSet<BuyPlant>();
+				BuyPlant resource;
+				JSONArray jsons = new JSONArray(this.buyPlants);
+				JSONObject json;
+				for (int i = 0; i < jsons.length(); i++) {
+					json = jsons.getJSONObject(i);
+					resource = new BuyPlant();
+					if (json.has("id"))
+						resource.setId(json.getLong("id"));
+					resource.setOrderNo(i);
+					resource.setPolicy(this.getE());
+					resource.setName(json.getString("name"));
+					resource.setCoverage(new Float(json.getLong("coverage")));
+					resource.setPremium(new Float(json.getLong("premium")));
+					resource.setDescription(json.getString("description"));
+					buyPlants.add(resource);
+				}
+			}
+			if (this.getE().getBuyPlants() != null) {
+				this.getE().getBuyPlants().clear();
+				this.getE().getBuyPlants().addAll(buyPlants);
+			} else {
+				this.getE().setBuyPlants(buyPlants);
+			}
+		} catch (JSONException e) {
+			logger.error(e.getMessage(), e);
+			throw e;
 		}
 		super.save();
 		return "saveSuccess";
@@ -190,7 +230,7 @@ public class PolicyAction extends FileEntityAction<Long, Policy> {
 				.setMinWidth(250).setMinHeight(200).setHeight(540);
 		if (!this.isRole()) {
 			ButtonOption buttonOption = new ButtonOption(getText("label.save"),
-					"save");
+					null, "bc.policyForm.save");
 			buttonOption.put("id", "bcSaveBtn");
 			option.addButton(buttonOption);
 			if (!this.getE().isNew()

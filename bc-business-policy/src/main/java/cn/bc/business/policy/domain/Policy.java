@@ -4,7 +4,9 @@
 package cn.bc.business.policy.domain;
 
 import java.util.Calendar;
+import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -12,6 +14,8 @@ import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 import javax.persistence.Table;
 
 import cn.bc.business.car.domain.Car;
@@ -75,6 +79,7 @@ public class Policy extends RichFileEntityImpl {
 	private String patchNo;// 批号
 	private int opType; // 操作类型：1-新建,2-维护,3-续保,4-停保
 	private Long Pid;// 父级ID
+	private Set<BuyPlant> buyPlants;// 购买保单险种
 
 	@ManyToOne(fetch = FetchType.EAGER, optional = true)
 	@JoinColumn(name = "CAR_ID", referencedColumnName = "ID")
@@ -276,6 +281,16 @@ public class Policy extends RichFileEntityImpl {
 
 	public void setPid(Long pid) {
 		Pid = pid;
+	}
+
+	@OneToMany(mappedBy = "policy", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+	@OrderBy(value = "orderNo asc")
+	public Set<BuyPlant> getBuyPlants() {
+		return buyPlants;
+	}
+
+	public void setBuyPlants(Set<BuyPlant> buyPlants) {
+		this.buyPlants = buyPlants;
 	}
 
 }
