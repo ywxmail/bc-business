@@ -133,8 +133,8 @@ public class Contract4LabourServiceImpl extends
 		String oldUid = newContract.getUid();
 		newContract.setUid(this.idGeneratorService
 				.next(Contract4Labour.KEY_UID));
-		attachService.doCopy(Contract4Labour.KEY_UID, oldUid,
-				Contract4Labour.KEY_UID, newContract.getUid());
+		attachService.doCopy("/bcdata4test", Contract4Labour.KEY_UID, oldUid,
+				Contract4Labour.KEY_UID, newContract.getUid(), true);//TODO 设置附件的真正路径
 
 		// 返回续签的合同
 		return newContract;
