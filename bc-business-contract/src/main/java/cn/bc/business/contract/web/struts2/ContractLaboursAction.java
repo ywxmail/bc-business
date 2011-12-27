@@ -53,6 +53,8 @@ public class ContractLaboursAction extends ViewAction<Map<String, Object>> {
 	
 	public Long contractId;
 	public String patchNo;
+	
+	
 
 	@Override
 	public boolean isReadonly() {
@@ -100,10 +102,8 @@ public class ContractLaboursAction extends ViewAction<Map<String, Object>> {
 		}
 
 		// 搜索按钮
-		if(contractId == null){
-			tb.addButton(Toolbar
-					.getDefaultSearchToolbarButton(getText("title.click2search")));
-		}
+		tb.addButton(Toolbar
+				.getDefaultSearchToolbarButton(getText("title.click2search")));
 		return tb;
 	}
 	
@@ -398,9 +398,12 @@ public class ContractLaboursAction extends ViewAction<Map<String, Object>> {
 		}
 		
 		if (contractId != null) {
-			json.put("id", contractId);
+			json.put("contractId", contractId);
 		}
 		
+		if (patchNo != null) {
+			json.put("patchNo", patchNo);
+		}
 	}
 	
 	@Override
