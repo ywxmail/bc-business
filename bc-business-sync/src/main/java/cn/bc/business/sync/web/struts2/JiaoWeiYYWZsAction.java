@@ -73,7 +73,7 @@ public class JiaoWeiYYWZsAction extends SyncViewAction {
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer sql = new StringBuffer();
 		sql.append("select b.id,b.status_,b.sync_type,b.sync_code,b.sync_from,b.sync_date");
-		sql.append(",t.happen_date,t.car_plate,t.driver_cert,t.driver_name,t.owner,t.company,t.content,t.penalty");
+		sql.append(",t.happen_date,t.car_plate,t.driver_cert,t.driver_name,t.owner,t.company,t.content,t.penalty,t.detain");
 		sql.append(" from bs_sync_jiaowei_yywz t");
 		sql.append(" inner join bc_sync_base b on b.id=t.id");
 		sqlObject.setSql(sql.toString());
@@ -100,6 +100,7 @@ public class JiaoWeiYYWZsAction extends SyncViewAction {
 				map.put("company", rs[i++]);
 				map.put("content", rs[i++]);
 				map.put("penalty", rs[i++]);
+				map.put("detain", rs[i++]);
 				return map;
 			}
 		});
@@ -114,24 +115,26 @@ public class JiaoWeiYYWZsAction extends SyncViewAction {
 				getText("bs.sync.status"), 60).setSortable(true)
 				.setValueFormater(new KeyValueFormater(getSyncStatuses())));
 		columns.add(new TextColumn4MapKey("b.sync_code", "syncCode",
-				getText("jiaoWeiYYWZ.syncCode"), 120).setSortable(true)
+				getText("jiaoWeiYYWZ.syncCode"), 100)
 				.setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("t.happen_date", "happenDate",
 				getText("jiaoWeiYYWZ.happenDate"), 130).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd HH:mm")));
 		columns.add(new TextColumn4MapKey("t.car_plate", "carPlate",
-				getText("jiaoWeiYYWZ.carPlate"), 80).setSortable(true));
+				getText("jiaoWeiYYWZ.carPlate"), 80));
 		columns.add(new TextColumn4MapKey("t.driver_name", "driverName",
-				getText("jiaoWeiYYWZ.driverName"), 80).setSortable(true));
+				getText("jiaoWeiYYWZ.driverName"), 50));
 		columns.add(new TextColumn4MapKey("t.driver_cert", "driverCert",
-				getText("jiaoWeiYYWZ.driverCert"), 80).setSortable(true));
+				getText("jiaoWeiYYWZ.driverCert"), 80));
 		columns.add(new TextColumn4MapKey("t.penalty", "penalty",
-				getText("jiaoWeiYYWZ.penalty"), 60).setSortable(true)
+				getText("jiaoWeiYYWZ.penalty"), 40).setSortable(true)
 				.setValueFormater(new NubmerFormater("#.#")));
+		columns.add(new TextColumn4MapKey("t.detain", "detain",
+				getText("jiaoWeiYYWZ.detain"), 120).setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("t.content", "content",
 				getText("jiaoWeiYYWZ.content")).setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("b.sync_date", "syncDate",
-				getText("syncBase.syncDate"), 130).setSortable(true)
+				getText("syncBase.syncDate"), 130).setUseTitleFromLabel(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd HH:mm")));
 		return columns;
 	}
