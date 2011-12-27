@@ -15,7 +15,13 @@
 		<action name="contractLabour/create" class="contractLabourAction" method="create">
 			<result name="form">/bc-business/contractLabour/form.jsp</result>
 		</action>		
+		<action name="contractLabour/open" class="contractLabourAction" method="open">
+			<result name="form">/bc-business/contractLabour/form.jsp</result>
+		</action>
 		<action name="contractLabour/edit" class="contractLabourAction" method="edit">
+			<result name="form">/bc-business/contractLabour/form.jsp</result>
+		</action>
+		<action name="contractLabour/doMaintenance" class="contractLabourAction" method="doMaintenance">
 			<result name="form">/bc-business/contractLabour/form.jsp</result>
 		</action>
 		<action name="contractLabour/delete" class="contractLabourAction" method="delete" />
@@ -30,7 +36,11 @@
 	<!-- 劳动合同的版本管理 -->
 	<package name="contract4LabourOperate" extends="bc-default" namespace="/bc-business/contract4LabourOperate">
 		<!-- 续签 -->
-		<action name="renew" class="contract4LabourOperateAction" method="renew"/>
+		<action name="doRenew" class="contract4LabourOperateAction" method="doRenew"/>
+		<!-- 转车 -->
+		<action name="doChangeCar" class="contract4LabourOperateAction" method="doChangeCar"/>
+		<!-- 离职 -->
+		<action name="doResign" class="contract4LabourOperateAction" method="doResign"/>
 	</package>
 	
 	<!-- 经济合同 -->

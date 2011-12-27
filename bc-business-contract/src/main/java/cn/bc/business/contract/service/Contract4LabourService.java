@@ -7,7 +7,6 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
-import cn.bc.business.contract.domain.Contract;
 import cn.bc.business.contract.domain.Contract4Labour;
 import cn.bc.core.Page;
 import cn.bc.core.query.condition.Condition;
@@ -21,15 +20,35 @@ import cn.bc.core.service.CrudService;
  */
 public interface Contract4LabourService extends CrudService<Contract4Labour> {
 	/**
-	 * 合同的续签处理：主版本号加1
+	 * 续签处理：新纪录、主版本号加1
 	 * 
 	 * @parma contractId 原合同id
 	 * @parma newStartDate 续签的开始日期
 	 * @parma newEndDate 续签的结束日期
 	 * @return 续签后的合同信息
 	 */
-	Contract doRenew(Long contractId, Calendar newStartDate,
-			Calendar newEndDate);
+	Contract4Labour doRenew(Long contractId, Calendar newStartDate, Calendar newEndDate);
+
+	/**
+	 * 离职处理：记录不变、次版本号加1
+	 * 
+	 * @param contractId
+	 *            原合同id
+	 * @param resignDate
+	 *            指定的离职日期，为空则使用当前时间
+	 */
+	void doResign(Long contractId, Calendar resignDate);
+
+	/**
+	 * 转车处理：新纪录、主版本号加1
+	 * 
+	 * @param contractId
+	 *            原合同id
+	 * @param newCarId
+	 *            指定新车的id
+	 * @return 转车后的合同信息
+	 */
+	Contract4Labour doChangeCar(Long contractId, Long newCarId);
 
 	/**
 	 * 删除单个CarManNContract

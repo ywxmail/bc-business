@@ -25,20 +25,12 @@ import cn.bc.business.contract.domain.Contract4Labour;
 import cn.bc.business.contract.service.Contract4LabourService;
 import cn.bc.business.contract.service.ContractChargerService;
 import cn.bc.business.web.struts2.FileEntityAction;
-import cn.bc.core.Page;
 import cn.bc.core.exception.CoreException;
-import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.docs.service.AttachService;
 import cn.bc.docs.web.ui.html.AttachWidget;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.option.domain.OptionItem;
 import cn.bc.option.service.OptionService;
-import cn.bc.web.formater.CalendarFormater;
-import cn.bc.web.formater.CalendarRangeFormater;
-import cn.bc.web.formater.KeyValueFormater;
-import cn.bc.web.ui.html.grid.Column;
-import cn.bc.web.ui.html.grid.GridData;
-import cn.bc.web.ui.html.grid.TextColumn;
 import cn.bc.web.ui.html.page.ButtonOption;
 import cn.bc.web.ui.html.page.PageOption;
 import cn.bc.web.ui.html.toolbar.ToolbarMenuButton;
@@ -174,7 +166,7 @@ public class ContractLabourAction extends
 					.selectRelateCarManByCarId(carId);
 
 			if (infoList.size() == 1) {
-				// 填写司机信息
+				// 填写司机信息forceReadOnly
 				carManId = Long.valueOf(isNullObject(infoList.get(0).get(
 						"driver_id")));
 				this.getE().setExt_str2(
@@ -299,15 +291,14 @@ public class ContractLabourAction extends
 	}
 
 	@Override
+	public String open() throws Exception {
+		return super.open();
+	}
+
+	@Override
 	public String edit() throws Exception {
 		this.setE(this.getCrudService().load(this.getId()));
 
-		// 计算年龄
-		// String age =
-		// getBirthDateToString(this.getE().getBirthDate().getTime());
-		// if(age.length() > 0){
-		// this.getE().setAge(Integer.valueOf(age));
-		// }
 		// 表单可选项的加载
 		this.formPageOption = buildFormPageOption();
 		statusesValue = this.getEntityStatuses();
@@ -475,59 +466,6 @@ public class ContractLabourAction extends
 		}
 	}
 
-	/**
-	 * 根据请求的条件查找非分页信息对象
-	 * 
-	 * @return
-	 */
-	@Override
-	protected List<Map<String, Object>> findList() {
-		return this.contract4LabourService.list4carMan(this.getCondition(),
-				carManId);
-	}
-
-	/**
-	 * 根据请求的条件查找分页信息对象
-	 * 
-	 * @return
-	 */
-	protected Page<Map<String, Object>> findPage() {
-		return this.contract4LabourService.page4carMan(this.getCondition(),
-				this.getPage().getPageNo(), this.getPage().getPageSize());
-	}
-
-	@Override
-	protected List<Column> buildGridColumns() {
-		// List<Column> columns = super.buildGridColumns();
-		List<Column> columns = new ArrayList<Column>();
-		columns.add(new TextColumn("['id']", "ID", 20));
-		columns.add(new TextColumn("['type']", getText("contract.type"), 80)
-				.setSortable(true).setUseTitleFromLabel(true)
-				.setValueFormater(new KeyValueFormater(getEntityTypes())));
-		columns.add(new TextColumn("['ext_str1']", getText("contract.car"), 80));
-		columns.add(new TextColumn("['ext_str2']",
-				getText("contract.labour.driver"), 80));
-		columns.add(new TextColumn("['transactorName']",
-				getText("contract.transactor"), 60));
-		columns.add(new TextColumn("['signDate']",
-				getText("contract.signDate"), 90).setSortable(true)
-				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
-		columns.add(new TextColumn("['startDate']",
-				getText("contract.deadline"))
-				.setValueFormater(new CalendarRangeFormater("yyyy-MM-dd") {
-					@SuppressWarnings("rawtypes")
-					@Override
-					public Calendar getToDate(Object context, Object value) {
-						Map contract = (Map) context;
-						return (Calendar) contract.get("endDate");
-					}
-				}));
-		columns.add(new TextColumn("['code']", getText("contract.code"), 120)
-				.setUseTitleFromLabel(true));
-
-		return columns;
-	}
-
 	private AttachWidget buildAttachsUI(boolean isNew) {
 		// 构建附件控件
 		String ptype = "contractLabour.main";
@@ -551,7 +489,7 @@ public class ContractLabourAction extends
 
 	@Override
 	protected PageOption buildFormPageOption() {
-		PageOption option = super.buildFormPageOption().setWidth(770)
+		PageOption option = super.buildFormPageOption().setWidth(775)
 				.setHeight(460);
 		if (!this.isRole()) {
 			ButtonOption buttonOption = new ButtonOption(getText("label.save"),
@@ -564,11 +502,12 @@ public class ContractLabourAction extends
 						getText("contract.labour.op"));
 				toolbarMenuButton.setId("bcOpBtn");
 				toolbarMenuButton
-						.addMenuItem(getText("contract.labour.optype.edit"),
-								Contract.OPTYPE_EDIT + "")
 						.addMenuItem(
-								getText("contract.labour.optype.transfer"),
-								Contract.OPTYPE_TRANSFER + "")
+								getText("contract.labour.optype.maintenance"),
+								Contract.OPTYPE_MAINTENANCE + "")
+						.addMenuItem(
+								getText("contract.labour.optype.changeCar"),
+								Contract.OPTYPE_CHANGECAR + "")
 						.addMenuItem(getText("contract.labour.optype.renew"),
 								Contract.OPTYPE_RENEW + "")
 						.addMenuItem(getText("contract.labour.optype.resign"),
@@ -578,28 +517,6 @@ public class ContractLabourAction extends
 			}
 		}
 		return option;
-	}
-
-	@Override
-	protected GridData buildGridData(List<Column> columns) {
-		return super.buildGridData(columns).setRowLabelExpression("['code']");
-	}
-
-	@Override
-	protected OrderCondition getDefaultOrderCondition() {
-		return null;// new OrderCondition("fileDate", Direction.Desc);
-	}
-
-	@Override
-	protected PageOption buildListPageOption() {
-		return super.buildListPageOption().setWidth(850).setMinWidth(300)
-				.setHeight(400).setMinHeight(300);
-	}
-
-	@Override
-	protected String[] getSearchFields() {
-		return new String[] { "contract.code", "contract.wordNo",
-				"contract.ext_str1", "contract.ext_str2" };
 	}
 
 	public String certInfo() {
@@ -647,20 +564,6 @@ public class ContractLabourAction extends
 		return "json";
 	}
 
-	// 复写搜索URL方法
-	protected String getEntityConfigName() {
-		return "contractLabour";
-	}
-
-	// @Override
-	// protected HtmlPage buildHtml4Paging() {
-	// HtmlPage page = super.buildHtml4Paging();
-	// if (carManId != null)
-	// page.setAttr("data-extras", new Json().put("carManId", carManId)
-	// .toString());
-	// return page;
-	// }
-
 	// 表单可选项的加载
 	public void initSelects() {
 		// 批量加载可选项列表
@@ -707,7 +610,7 @@ public class ContractLabourAction extends
 	 * 
 	 * @return
 	 */
-	protected Map<String, String> getEntityStatuses() {
+	protected Map<String, String> getEntityStatuses1() {
 		Map<String, String> types = new HashMap<String, String>();
 		types.put(String.valueOf(Contract.STATUS_NORMAL),
 				getText("contract.normal"));
@@ -770,5 +673,18 @@ public class ContractLabourAction extends
 			// birthDay = age+"";
 		}
 		return birthDay;
+	}
+
+	/**
+	 * 劳动合同维护
+	 */
+	public String doMaintenance() throws Exception {
+		String r = this.edit();
+
+		// 将次版本号加1
+		this.getE().setVerMinor(this.getE().getVerMinor() + 1);
+
+		// 返回与编辑操作相同的表单
+		return r;
 	}
 }

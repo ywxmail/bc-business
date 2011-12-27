@@ -315,9 +315,9 @@ public class ContractLaboursAction extends ViewAction<Map<String, Object>> {
 		Map<String, String> types = new HashMap<String, String>();
 		types.put(String.valueOf(Contract.OPTYPE_CREATE),
 				getText("contract.labour.optype.create"));
-		types.put(String.valueOf(Contract.OPTYPE_EDIT),
+		types.put(String.valueOf(Contract.OPTYPE_MAINTENANCE),
 				getText("contract.labour.optype.edit"));
-		types.put(String.valueOf(Contract.OPTYPE_TRANSFER),
+		types.put(String.valueOf(Contract.OPTYPE_CHANGECAR),
 				getText("contract.labour.optype.transfer"));
 		types.put(String.valueOf(Contract.OPTYPE_RENEW),
 				getText("contract.labour.optype.renew"));

@@ -58,7 +58,7 @@ public class Contract4LabourServiceImpl extends
 		this.idGeneratorService = idGeneratorService;
 	}
 
-	public Contract doRenew(Long contractId, Calendar newStartDate,
+	public Contract4Labour doRenew(Long contractId, Calendar newStartDate,
 			Calendar newEndDate) {
 		// 获取原来的合同信息
 		Contract4Labour oldContract = this.contract4LabourDao.load(contractId);
@@ -133,11 +133,19 @@ public class Contract4LabourServiceImpl extends
 		String oldUid = newContract.getUid();
 		newContract.setUid(this.idGeneratorService
 				.next(Contract4Labour.KEY_UID));
-		attachService.doCopy("/bcdata4test", Contract4Labour.KEY_UID, oldUid,
-				Contract4Labour.KEY_UID, newContract.getUid(), true);//TODO 设置附件的真正路径
+		attachService.doCopy(Contract4Labour.KEY_UID, oldUid,
+				Contract4Labour.KEY_UID, newContract.getUid(), true);
 
 		// 返回续签的合同
 		return newContract;
+	}
+
+	public void doResign(Long contractId, Calendar resignDate) {
+		throw new CoreException("need implement");
+	}
+
+	public Contract4Labour doChangeCar(Long contractId, Long newCarId) {
+		throw new CoreException("need implement");
 	}
 
 	@Override

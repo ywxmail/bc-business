@@ -162,10 +162,10 @@ public class PolicyAction extends FileEntityAction<Long, Policy> {
 				toolbarMenuButton.setId("bcOpBtn");
 				toolbarMenuButton
 						.addMenuItem(getText("contract.labour.optype.edit"),
-								Contract.OPTYPE_EDIT + "")
+								Contract.OPTYPE_MAINTENANCE + "")
 						.addMenuItem(
 								getText("contract.labour.optype.transfer"),
-								Contract.OPTYPE_TRANSFER + "")
+								Contract.OPTYPE_CHANGECAR + "")
 						.addMenuItem(getText("contract.labour.optype.renew"),
 								Contract.OPTYPE_RENEW + "")
 						.addMenuItem(getText("contract.labour.optype.resign"),
