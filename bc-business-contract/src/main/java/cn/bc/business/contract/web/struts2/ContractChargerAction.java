@@ -224,16 +224,16 @@ public class ContractChargerAction extends FileEntityAction<Long, Contract4Charg
 		if (this.getId() != null) {// 删除一条
 			//单个删除中间表car_contract表
 			this.contractChargerService.deleteCarNContract(this.getId());
-			//单个删除中间表carman_contract表
-			this.contractLabourService.deleteCarManNContract(this.getId());
+			//TODO 单个删除中间表carman_contract表
+			//this.contractLabourService.deleteCarManNContract(this.getId());
 			//单个删除本表
 			this.getCrudService().delete(this.getId());
 		} else {// 删除一批
 			if (this.getIds() != null && this.getIds().length() > 0) {
 				Long[] contractIds = cn.bc.core.util.StringUtils
 						.stringArray2LongArray(this.getIds().split(","));
-				//批量删除中间表car_contract表
-				this.contractLabourService.deleteCarManNContract(contractIds);
+				//TODO 批量删除中间表car_contract表
+				//this.contractLabourService.deleteCarManNContract(contractIds);
 				//批量删除中间表carman_contract表
 				this.contractChargerService.deleteCarNContract(contractIds);
 				//批量删除本表

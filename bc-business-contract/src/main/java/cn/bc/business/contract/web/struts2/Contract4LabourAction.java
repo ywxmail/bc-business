@@ -7,7 +7,6 @@ import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -23,9 +22,7 @@ import cn.bc.business.OptionConstants;
 import cn.bc.business.contract.domain.Contract;
 import cn.bc.business.contract.domain.Contract4Labour;
 import cn.bc.business.contract.service.Contract4LabourService;
-import cn.bc.business.contract.service.ContractChargerService;
 import cn.bc.business.web.struts2.FileEntityAction;
-import cn.bc.core.exception.CoreException;
 import cn.bc.docs.service.AttachService;
 import cn.bc.docs.web.ui.html.AttachWidget;
 import cn.bc.identity.web.SystemContext;
@@ -44,18 +41,15 @@ import cn.bc.web.ui.json.Json;
  */
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 @Controller
-public class ContractLabourAction extends
+public class Contract4LabourAction extends
 		FileEntityAction<Long, Contract4Labour> {
 	// private static Log logger = LogFactory.getLog(ContractAction.class);
 	private static final long serialVersionUID = 1L;
 	private Contract4LabourService contract4LabourService;
-	private ContractChargerService contractChargerService;
 	private OptionService optionService;
 	private AttachService attachService;
-	private Long carManId;
+	private Long driverId;
 	private Long carId;
-	private Long oldCarManId; // 记录旧有的carManId
-	private Long oldCarId; // 记录旧有的carId
 	public String certCode; // 证件编号
 	public AttachWidget attachsUI;
 	public Map<String, String> statusesValue;
@@ -85,12 +79,6 @@ public class ContractLabourAction extends
 	}
 
 	@Autowired
-	public void setContractChargerService(
-			ContractChargerService contractChargerService) {
-		this.contractChargerService = contractChargerService;
-	}
-
-	@Autowired
 	public void setAttachService(AttachService attachService) {
 		this.attachService = attachService;
 	}
@@ -108,44 +96,16 @@ public class ContractLabourAction extends
 		this.carId = carId;
 	}
 
-	public Long getCarManId() {
-		return carManId;
+	public Long getDriverId() {
+		return driverId;
 	}
 
-	public void setCarManId(Long carManId) {
-		this.carManId = carManId;
-	}
-
-	public Long getOldCarManId() {
-		return oldCarManId;
-	}
-
-	public void setOldCarManId(Long oldCarManId) {
-		this.oldCarManId = oldCarManId;
-	}
-
-	public Long getOldCarId() {
-		return oldCarId;
-	}
-
-	public void setOldCarId(Long oldCarId) {
-		this.oldCarId = oldCarId;
+	public void setDriverId(Long carManId) {
+		this.driverId = carManId;
 	}
 
 	@Override
 	public boolean isReadonly() {
-		// 劳动合同管理员或系统管理员
-		// SystemContext context = (SystemContext) this.getContext();
-		// return !context.hasAnyRole(getText("key.role.bs.contract4labour"),
-		// getText("key.role.bc.admin"));
-		if (!this.getE().isNew()) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	public boolean isRole() {
 		// 劳动合同管理员或系统管理员
 		SystemContext context = (SystemContext) this.getContext();
 		return !context.hasAnyRole(getText("key.role.bs.contract4labour"),
@@ -159,7 +119,7 @@ public class ContractLabourAction extends
 		Date date;
 		Calendar date2 = Calendar.getInstance();
 
-		if (carId != null && carManId == null) {
+		if (carId != null && driverId == null) {// 车辆页签中的新建
 			// 根据carId查找车辆以及司机id
 			carInfoMap = this.contract4LabourService.findCarByCarId(carId);
 			infoList = this.contract4LabourService
@@ -167,7 +127,7 @@ public class ContractLabourAction extends
 
 			if (infoList.size() == 1) {
 				// 填写司机信息forceReadOnly
-				carManId = Long.valueOf(isNullObject(infoList.get(0).get(
+				driverId = Long.valueOf(isNullObject(infoList.get(0).get(
 						"driver_id")));
 				this.getE().setExt_str2(
 						isNullObject(infoList.get(0).get("name")));
@@ -210,12 +170,12 @@ public class ContractLabourAction extends
 			this.getE().setBsType(isNullObject(carInfoMap.get("bs_type")));
 		}
 
-		if (carManId != null && carId == null) {
+		if (driverId != null && carId == null) {// 司机页签中的新建
 			// 根据carManId查找司机以及车辆id
 			carManInfoMap = this.contract4LabourService
-					.findCarManByCarManId(carManId);
+					.findCarManByCarManId(driverId);
 			infoList = this.contract4LabourService
-					.selectRelateCarByCarManId(carManId);
+					.selectRelateCarByCarManId(driverId);
 			if (infoList.size() == 1) {
 				carId = Long
 						.valueOf(isNullObject(infoList.get(0).get("car_id")));
@@ -268,9 +228,8 @@ public class ContractLabourAction extends
 		this.getE().setCode(
 				this.getIdGeneratorService().nextSN4Month(
 						Contract4Labour.KEY_CODE));
-		// 自动生成批号
-		this.getE().setPatchNo(
-				this.getIdGeneratorService().next(Contract4Labour.KEY_UID));
+		// 自动生成批号：与uid相同
+		this.getE().setPatchNo(this.getE().getUid());
 		this.getE().setType(Contract.TYPE_LABOUR);
 		this.getE().setOpType(Contract.OPTYPE_CREATE);
 		this.getE().setMain(Contract.MAIN_NOW);
@@ -280,195 +239,82 @@ public class ContractLabourAction extends
 		this.getE().setBuyUnit(getText("contract.baocheng"));
 		this.getE().setStatus(Contract.STATUS_NORMAL);
 
-		statusesValue = this.getEntityStatuses();
-
-		// 表单可选项的加载
-		initSelects();
 		// 构建附件控件
 		attachsUI = buildAttachsUI(true);
 
 		return r;
 	}
 
-	@Override
-	public String open() throws Exception {
-		return super.open();
-	}
-
+	// 合同维护处理
 	@Override
 	public String edit() throws Exception {
-		this.setE(this.getCrudService().load(this.getId()));
-
-		// 表单可选项的加载
-		this.formPageOption = buildFormPageOption();
-		statusesValue = this.getEntityStatuses();
-		initSelects();
+		String r = super.edit();
 
 		// 构建附件控件
 		attachsUI = buildAttachsUI(false);
-		// 根据contractId查找所属的carId
-		carId = this.contract4LabourService.findCarIdByContractId(this.getE()
-				.getId());
-		oldCarId = carId;
-		// 根据contractId查找所属的carManId
-		carManId = this.contract4LabourService.findCarManIdByContractId(this
-				.getE().getId());
-		oldCarManId = carManId;
 
-		return "form";
+		// 将次版本号加1
+		this.getE().setVerMinor(this.getE().getVerMinor() + 1);
+
+		// 操作类型设置为维护
+		this.getE().setOpType(Contract.OPTYPE_MAINTENANCE);
+
+		// 返回与编辑操作相同的表单
+		return r;
+	}
+
+	@Override
+	protected void initForm(boolean editable) {
+		super.initForm(editable);
+
+		// 状态列表
+		statusesValue = this.getContractStatuses();
+
+		// 批量加载可选项列表
+		Map<String, List<Map<String, String>>> optionItems = this.optionService
+				.findOptionItemByGroupKeys(new String[] {
+						OptionConstants.CAR_BUSINESS_NATURE,
+						OptionConstants.LB_INSURANCETYPE,
+						OptionConstants.CARMAN_HOUSETYPE,
+						OptionConstants.LB_BUYUNIT });
+
+		// 加载可选营运性质列表
+		this.businessTypeList = optionItems
+				.get(OptionConstants.CAR_BUSINESS_NATURE);
+		// 加载可选社保险种列表
+		this.insurancetypeList = optionItems
+				.get(OptionConstants.LB_INSURANCETYPE);
+		OptionItem.insertIfNotExist(this.insurancetypeList, this.getE()
+				.getInsuranceType(), null);
+		// 加载可选户口类型列表
+		this.houseTypeList = optionItems.get(OptionConstants.CARMAN_HOUSETYPE);
+		// 加载可选购买单位列表
+		this.buyUnitList = optionItems.get(OptionConstants.LB_BUYUNIT);
+		OptionItem.insertIfNotExist(this.buyUnitList, this.getE().getBuyUnit(),
+				null);
 	}
 
 	@Override
 	public String save() throws Exception {
-		if (this.getE().getOpType() != Contract.OPTYPE_CREATE
-				&& this.getE().getOpType() != Contract.OPTYPE_RESIGN) {
-			saveSwitch(true);
-		} else {
-			saveSwitch(false);
-			if (this.getE().getOpType() == Contract.OPTYPE_RESIGN) { // 提示离职成功信息
-				json = new Json();
-				json.put("id", this.getE().getId() + "");
-				json.put("msg", getText("contract.labour.resign.success"));
-				return "json";
-			}
-		}
-		return "saveSuccess";
-	}
-
-	public void saveSwitch(boolean flag) {
 		SystemContext context = this.getSystyemContext();
+		Contract4Labour e = this.getE();
+		this.beforeSave(e);
 
 		// 设置最后更新人的信息
-		Contract4Labour e = this.getE();
 		e.setFileDate(Calendar.getInstance());
 		e.setModifier(context.getUserHistory());
 		e.setModifiedDate(Calendar.getInstance());
-		if (e.getStatus() == Contract.STATUS_RESGIN) { // 状态等于离职,设置离职时间
-			e.setLeaveDate(Calendar.getInstance());
-		}
 
-		if (e.getUid().length() <= 0) { // 如果UID为空重新设置
-			e.setUid(this.getIdGeneratorService().next(Contract4Labour.KEY_UID));
-			e.setAuthor(context.getUserHistory());
-		}
+		this.contract4LabourService
+				.save(e, this.getCarId(), this.getDriverId());
 
-		// 保存新的记录
-		this.contract4LabourService.save(e);
-
-		// 保存合同与车辆的关联表信息
-		if (oldCarId != null) { // 避免重复插入做相应处理
-			if ((null != e.getPid() && null != e.getId())
-					|| (oldCarId != carId && !oldCarId.equals(carId))) {
-				this.contract4LabourService.carNContract4Save(carId, getE()
-						.getId());
-			}
-		} else {
-			this.contract4LabourService
-					.carNContract4Save(carId, getE().getId());
-		}
-		// 保存合同与司机的关联表信息
-		if (oldCarManId != null) { // 避免重复插入做相应处理
-			if ((null != e.getPid() && null != e.getId())
-					|| (oldCarManId != carManId && !oldCarManId
-							.equals(carManId))) {
-				this.contract4LabourService.carManNContract4Save(carManId,
-						getE().getId());
-			}
-		} else {
-			this.contract4LabourService.carManNContract4Save(carManId, getE()
-					.getId());
-		}
-
-		if (flag) {
-			// flag为true即(维护,转车,续约) 要做相应处理
-			if (e.getPid() != null) {
-				Contract4Labour oldE = contract4LabourService.load(e.getPid());
-				if (oldE != null) {
-					// if(e.getOpType() != Contract.OPTYPE_RENEW){
-					// //如果是续约操作类型,把旧的合同状态改为注销并保存
-					// oldE.setStatus(Contract.STATUS_FAILURE);
-					// }
-					oldE.setStatus(Contract.STATUS_FAILURE); // 把旧的合同状态改为注销并保存
-					oldE.setMain(Contract.MAIN_HISTORY); // 设定为历史标识
-					// 保存旧的记录
-					this.getCrudService().save(oldE);
-				}
-			}
-		}
-
-	}
-
-	// 删除
-	@Override
-	public String delete() throws Exception {
-		if (this.getId() != null) {// 删除一条
-			deleteAll(this.getId());
-		} else {// 删除一批
-			if (this.getIds() != null && this.getIds().length() > 0) {
-				// 批量删除中间表car_contract表
-				Long[] ids = cn.bc.core.util.StringUtils
-						.stringArray2LongArray(this.getIds().split(","));
-				deleteAll(ids);
-			} else {
-				throw new CoreException("must set property id or ids");
-			}
-		}
-		return "deleteSuccess";
-	}
-
-	/**
-	 * 单条删除所有历史版本合同
-	 * 
-	 * @return
-	 */
-	public void deleteAll(Long id) {
-		Contract c = this.contract4LabourService.load(id);
-		// 单个删除工伤表industrial_injury表
-		this.contract4LabourService.deleteInjury(id);
-		// 单个删除中间表carman_contract表
-		this.contract4LabourService.deleteCarManNContract(id);
-		// 单个删除中间表car_contract表
-		this.contractChargerService.deleteCarNContract(id);
-		// 单个删除本表
-		this.getCrudService().delete(id);
-		if (c != null && c.getPid() != null) { // 如有父级ID,递归删除父级记录
-			deleteAll(c.getPid());
-		}
-	}
-
-	/**
-	 * 批量删除所有历史版本合同
-	 * 
-	 * @return
-	 */
-	public void deleteAll(Long[] ids) {
-		List<Contract> objList = new ArrayList<Contract>();
-		for (Long id : ids) {// 通过id查找对应的对象并且存放再objList
-			Contract c = this.contract4LabourService.load(id);
-			objList.add(c);
-		}
-		// 批量删除工伤表industrial_injury表
-		this.contract4LabourService.deleteInjury(ids);
-		// 批量删除中间表carman_contract表
-		this.contract4LabourService.deleteCarManNContract(ids);
-		// 批量删除中间表car_contract表
-		this.contractChargerService.deleteCarNContract(ids);
-		// 批量删除本表
-		this.getCrudService().delete(ids);
-		List<Long> idList = new ArrayList<Long>();
-		for (Contract c : objList) {// 遍历objList里面的对象父级ID是否为空,不为空的放进idList
-			if (c != null && c.getPid() != null) {
-				idList.add(c.getPid());
-			}
-		}
-		if (idList != null && idList.size() > 0) { // idList不为空执行递归批量删除方法
-			deleteAll(idList.toArray(new Long[0]));
-		}
+		this.afterSave(e);
+		return "saveSuccess";
 	}
 
 	private AttachWidget buildAttachsUI(boolean isNew) {
 		// 构建附件控件
-		String ptype = "contractLabour.main";
+		String ptype = "contract4Labour.main";
 		AttachWidget attachsUI = new AttachWidget();
 		attachsUI.setFlashUpload(isFlashUpload());
 		attachsUI.addClazz("formAttachs");
@@ -488,31 +334,37 @@ public class ContractLabourAction extends
 	}
 
 	@Override
-	protected PageOption buildFormPageOption() {
-		PageOption option = super.buildFormPageOption().setWidth(775)
+	protected void addDefaultEditableFormButton(PageOption pageOption) {
+		// 复写基类的方法，不添加默认的保存按钮，改为在buildFormPageOption方法内按情况添加
+	}
+
+	@Override
+	protected PageOption buildFormPageOption(boolean editable) {
+		// 先执行基类的配置
+		PageOption option = super.buildFormPageOption(editable).setWidth(775)
 				.setHeight(460);
-		if (!this.isRole()) {
-			ButtonOption buttonOption = new ButtonOption(getText("label.save"),
-					"save");
-			buttonOption.put("id", "bcSaveBtn");
-			option.addButton(buttonOption);
-			if (!this.getE().isNew()
-					&& this.getE().getMain() == Contract.MAIN_NOW) {
+
+		// 特殊处理的部分
+		if (!this.isReadonly()) {// 有权限
+			if (editable) {// 编辑状态显示保存按钮
+				option.addButton(this.getDefaultSaveButtonOption());
+			} else {// 只读状态显示操作按钮
 				ToolbarMenuButton toolbarMenuButton = new ToolbarMenuButton(
-						getText("contract.labour.op"));
+						getText("contract4Labour.op"));
 				toolbarMenuButton.setId("bcOpBtn");
 				toolbarMenuButton
 						.addMenuItem(
-								getText("contract.labour.optype.maintenance"),
+								getText("contract4Labour.optype.maintenance"),
 								Contract.OPTYPE_MAINTENANCE + "")
 						.addMenuItem(
-								getText("contract.labour.optype.changeCar"),
+								getText("contract4Labour.optype.changeCar"),
 								Contract.OPTYPE_CHANGECAR + "")
-						.addMenuItem(getText("contract.labour.optype.renew"),
+						.addMenuItem(getText("contract4Labour.optype.renew"),
 								Contract.OPTYPE_RENEW + "")
-						.addMenuItem(getText("contract.labour.optype.resign"),
+						.addMenuItem(getText("contract4Labour.optype.resign"),
 								Contract.OPTYPE_RESIGN + "")
-						.setChange("bc.contractLabourForm.selectMenuButtonItem");
+						.setChange(
+								"bc.contract4LabourForm.selectMenuButtonItem");
 				option.addButton(toolbarMenuButton);
 			}
 		}
@@ -520,13 +372,7 @@ public class ContractLabourAction extends
 	}
 
 	public String certInfo() {
-		// Cert cert = this.certService.findCertByCarManId(carManId);
-		// json = new Json();
-		// if(cert != null && cert.getCertCode().length() > 0){
-		// certCode = cert.getCertCode();
-		// json.put("certCode", certCode);
-		// }
-		certInfoMap = this.contract4LabourService.findCertByCarManId(carManId);
+		certInfoMap = this.contract4LabourService.findCertByCarManId(driverId);
 		json = new Json();
 		if (certInfoMap != null && certInfoMap.size() > 0) {
 			certCode = certInfoMap.get("cert_code") + "";
@@ -555,7 +401,7 @@ public class ContractLabourAction extends
 	public String isExistContract() {
 		json = new Json();
 		List<Map<String, Object>> list = this.contract4LabourService
-				.findCarManIsExistContract(carManId);
+				.findCarManIsExistContract(driverId);
 		if (list.size() > 0) {
 			json.put("isExistContract", "true");
 		} else {
@@ -564,64 +410,23 @@ public class ContractLabourAction extends
 		return "json";
 	}
 
-	// 表单可选项的加载
-	public void initSelects() {
-		// 批量加载可选项列表
-		Map<String, List<Map<String, String>>> optionItems = this.optionService
-				.findOptionItemByGroupKeys(new String[] {
-						OptionConstants.CAR_BUSINESS_NATURE,
-						OptionConstants.LB_INSURANCETYPE,
-						OptionConstants.CARMAN_HOUSETYPE,
-						OptionConstants.LB_BUYUNIT });
-
-		// 加载可选营运性质列表
-		this.businessTypeList = optionItems
-				.get(OptionConstants.CAR_BUSINESS_NATURE);
-		// 加载可选社保险种列表
-		this.insurancetypeList = optionItems
-				.get(OptionConstants.LB_INSURANCETYPE);
-		OptionItem.insertIfNotExist(this.insurancetypeList, this.getE()
-				.getInsuranceType(), null);
-		// 加载可选户口类型列表
-		this.houseTypeList = optionItems.get(OptionConstants.CARMAN_HOUSETYPE);
-		// 加载可选购买单位列表
-		this.buyUnitList = optionItems.get(OptionConstants.LB_BUYUNIT);
-		OptionItem.insertIfNotExist(this.buyUnitList, this.getE().getBuyUnit(),
-				null);
-
-	}
-
 	/**
-	 * 获取Contract的合同类型列表
+	 * 获取合同的状态列表
 	 * 
 	 * @return
 	 */
-	protected Map<String, String> getEntityTypes() {
-		Map<String, String> types = new HashMap<String, String>();
-		types.put(String.valueOf(Contract.TYPE_LABOUR),
-				getText("contract.select.labour"));
-		types.put(String.valueOf(Contract.TYPE_CHARGER),
-				getText("contract.select.charger"));
-		return types;
-	}
-
-	/**
-	 * 获取Contract的状态列表
-	 * 
-	 * @return
-	 */
-	protected Map<String, String> getEntityStatuses1() {
+	private Map<String, String> getContractStatuses() {
 		Map<String, String> types = new HashMap<String, String>();
 		types.put(String.valueOf(Contract.STATUS_NORMAL),
-				getText("contract.normal"));
+				getText("contract.status.normal"));
 		types.put(String.valueOf(Contract.STATUS_FAILURE),
-				getText("contract.resign"));
+				getText("contract.status.failure"));
 		types.put(String.valueOf(Contract.STATUS_RESGIN),
-				getText("contract.resign"));
+				getText("contract.status.resign"));
 		return types;
 	}
 
-	public String isNullObject(Object obj) {
+	private String isNullObject(Object obj) {
 		if (null != obj) {
 			return obj.toString();
 		} else {
@@ -634,7 +439,7 @@ public class ContractLabourAction extends
 	 * 
 	 * @return
 	 */
-	public String getDateToString(Object object) {
+	private String getDateToString(Object object) {
 		if (null != object) {
 			DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 			StringBuffer str = new StringBuffer(df.format(object));
@@ -649,7 +454,7 @@ public class ContractLabourAction extends
 	 * 
 	 * @return
 	 */
-	public String getBirthDateToString(Object object) {
+	private String getBirthDateToString(Object object) {
 		String birthDay = getDateToString(object);
 		if (birthDay.length() > 0) {
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -673,18 +478,5 @@ public class ContractLabourAction extends
 			// birthDay = age+"";
 		}
 		return birthDay;
-	}
-
-	/**
-	 * 劳动合同维护
-	 */
-	public String doMaintenance() throws Exception {
-		String r = this.edit();
-
-		// 将次版本号加1
-		this.getE().setVerMinor(this.getE().getVerMinor() + 1);
-
-		// 返回与编辑操作相同的表单
-		return r;
 	}
 }

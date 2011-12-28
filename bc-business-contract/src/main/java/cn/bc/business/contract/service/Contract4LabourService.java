@@ -20,6 +20,16 @@ import cn.bc.core.service.CrudService;
  */
 public interface Contract4LabourService extends CrudService<Contract4Labour> {
 	/**
+	 * 保存劳动合同并处理车辆和司机的关联关系
+	 * 
+	 * @param contract4Labour 要保存的合同信息
+	 * @param carId 要关联的车辆id
+	 * @param driverId 要关联的司机id
+	 * @return 
+	 */
+	Contract4Labour save(Contract4Labour contract4Labour, Long carId, Long driverId);
+
+	/**
 	 * 续签处理：新纪录、主版本号加1
 	 * 
 	 * @parma contractId 原合同id
@@ -27,7 +37,8 @@ public interface Contract4LabourService extends CrudService<Contract4Labour> {
 	 * @parma newEndDate 续签的结束日期
 	 * @return 续签后的合同信息
 	 */
-	Contract4Labour doRenew(Long contractId, Calendar newStartDate, Calendar newEndDate);
+	Contract4Labour doRenew(Long contractId, Calendar newStartDate,
+			Calendar newEndDate);
 
 	/**
 	 * 离职处理：记录不变、次版本号加1
@@ -49,31 +60,6 @@ public interface Contract4LabourService extends CrudService<Contract4Labour> {
 	 * @return 转车后的合同信息
 	 */
 	Contract4Labour doChangeCar(Long contractId, Long newCarId);
-
-	/**
-	 * 删除单个CarManNContract
-	 * 
-	 * @parma contractId
-	 * @return
-	 */
-	void deleteCarManNContract(Long id);
-
-	/**
-	 * 删除批量CarManNContract
-	 * 
-	 * @parma contractIds[]
-	 * @return
-	 */
-	void deleteCarManNContract(Long[] contractIds);
-
-	/**
-	 * 保存合同与司机的关联表信息
-	 * 
-	 * @parma carManId
-	 * @parma contractId
-	 * @return
-	 */
-	void carManNContract4Save(Long carManId, Long contractId);
 
 	/**
 	 * 查找劳动合同列表
@@ -101,14 +87,6 @@ public interface Contract4LabourService extends CrudService<Contract4Labour> {
 	 * @return
 	 */
 	Map<String, Object> findCertByCarManId(Long carManId);
-
-	/**
-	 * 保存车辆与合同的关联信息 jdbc查询BS_CAR_CONTRACT表是否存在相应carId和contractId的记录
-	 * 
-	 * @param carId
-	 * @param contractId
-	 */
-	void carNContract4Save(Long carId, Long contractId);
 
 	/**
 	 * 根据合同ID查找车辆ID
@@ -173,21 +151,4 @@ public interface Contract4LabourService extends CrudService<Contract4Labour> {
 	 * @return
 	 */
 	List<Map<String, Object>> findCarManIsExistContract(Long carManId);
-
-	/**
-	 * 删除单个Injury
-	 * 
-	 * @parma contractId
-	 * @return
-	 */
-	void deleteInjury(Long contractId);
-
-	/**
-	 * 删除批量Injury
-	 * 
-	 * @parma contractIds[]
-	 * @return
-	 */
-	void deleteInjury(Long[] contractIds);
-
 }

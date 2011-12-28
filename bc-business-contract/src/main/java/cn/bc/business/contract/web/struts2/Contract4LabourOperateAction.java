@@ -75,7 +75,7 @@ public class Contract4LabourOperateAction extends ActionSupport {
 		json = new Json();
 		json.put("id", newContract.getId());
 		json.put("oldId", fromContractId);
-		json.put("msg", getText("contract.labour.renew.success"));
+		json.put("msg", getText("contract4Labour.renew.success"));
 		return "json";
 	}
 
@@ -100,7 +100,7 @@ public class Contract4LabourOperateAction extends ActionSupport {
 		this.contract4LabourService.doResign(fromContractId, resignDate);
 		json = new Json();
 		json.put("id", fromContractId);
-		json.put("msg", getText("contract.labour.resign.success"));
+		json.put("msg", getText("contract4Labour.resign.success"));
 		return "json";
 	}
 
@@ -125,7 +125,7 @@ public class Contract4LabourOperateAction extends ActionSupport {
 		this.contract4LabourService.doChangeCar(fromContractId, newCarId);
 		json = new Json();
 		json.put("id", fromContractId);
-		json.put("msg", getText("contract.labour.changeCar.success"));
+		json.put("msg", getText("contract4Labour.changeCar.success"));
 		return "json";
 	}
 

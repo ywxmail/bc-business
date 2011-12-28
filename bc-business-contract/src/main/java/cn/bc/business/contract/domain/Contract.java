@@ -31,7 +31,7 @@ public class Contract extends RichFileEntityImpl {
 	
 	/**状态：正常*/
 	public static final int STATUS_NORMAL	= 0;
-	/**状态：失效*/
+	/**状态：注销*/
 	public static final int STATUS_FAILURE	= 1;
 	/**状态：离职*/
 	public static final int STATUS_RESGIN	= 2;

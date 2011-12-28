@@ -45,16 +45,14 @@ import cn.bc.web.ui.json.Json;
  */
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 @Controller
-public class ContractLaboursAction extends ViewAction<Map<String, Object>> {
+public class Contract4LaboursAction extends ViewAction<Map<String, Object>> {
 	private static final long serialVersionUID = 1L;
 	public String status = String.valueOf(Contract.STATUS_NORMAL); // 合同的状态，多个用逗号连接
-	public String mains = String.valueOf(Contract.MAIN_NOW); //现实当前版本
+	public String mains = String.valueOf(Contract.MAIN_NOW); // 现实当前版本
 	public String type = String.valueOf(Contract.TYPE_CHARGER);
-	
+
 	public Long contractId;
 	public String patchNo;
-	
-	
 
 	@Override
 	public boolean isReadonly() {
@@ -79,7 +77,7 @@ public class ContractLaboursAction extends ViewAction<Map<String, Object>> {
 					.getDefaultEditToolbarButton(getText("label.read")));
 		} else {
 
-			if(contractId == null){
+			if (contractId == null) {
 				// 新建按钮
 				tb.addButton(Toolbar
 						.getDefaultCreateToolbarButton(getText("label.create")));
@@ -87,8 +85,8 @@ public class ContractLaboursAction extends ViewAction<Map<String, Object>> {
 			// 查看按钮
 			tb.addButton(Toolbar
 					.getDefaultEditToolbarButton(getText("label.read")));
-			if(contractId == null){
-				
+			if (contractId == null) {
+
 				if (useDisabledReplaceDelete) {
 					// 禁用按钮
 					tb.addButton(Toolbar
@@ -106,14 +104,14 @@ public class ContractLaboursAction extends ViewAction<Map<String, Object>> {
 				.getDefaultSearchToolbarButton(getText("title.click2search")));
 		return tb;
 	}
-	
+
 	@Override
 	protected OrderCondition getGridDefaultOrderCondition() {
 		// 默认排序方向：状态|登记日期
-		if(contractId == null){//当前版本
+		if (contractId == null) {// 当前版本
 			return new OrderCondition("c.status_", Direction.Asc).add(
 					"c.file_date", Direction.Desc);
-		}else{ //历史版本
+		} else { // 历史版本
 			return new OrderCondition("c.file_date", Direction.Desc);
 		}
 	}
@@ -135,7 +133,7 @@ public class ContractLaboursAction extends ViewAction<Map<String, Object>> {
 		sql.append(" left join BS_CARMAN man on manc.man_id = man.id");
 		sql.append(" left join BC_IDENTITY_ACTOR_HISTORY iah on c.author_id = iah.id");
 		sqlObject.setSql(sql.toString());
-		
+
 		// 注入参数
 		sqlObject.setArgs(null);
 
@@ -171,24 +169,27 @@ public class ContractLaboursAction extends ViewAction<Map<String, Object>> {
 		return sqlObject;
 	}
 
-	@Override 
+	@Override
 	protected List<Column> getGridColumns() {
 		List<Column> columns = new ArrayList<Column>();
-		columns.add(new IdColumn4MapKey("cl.id","id"));
+		columns.add(new IdColumn4MapKey("cl.id", "id"));
 		columns.add(new TextColumn4MapKey("c.status_", "status_",
-				getText("contract.status"), 35).setSortable(true).setValueFormater(
-				new EntityStatusFormater(getEntityStatuses())));
+				getText("contract.status"), 35)
+				.setSortable(true)
+				.setValueFormater(new EntityStatusFormater(getEntityStatuses())));
 		columns.add(new TextColumn4MapKey("c.ver_major", "ver_major",
-				getText("contract.labour.ver"),35).setValueFormater(new AbstractFormater<String>() {
+				getText("contract4Labour.ver"), 35)
+				.setValueFormater(new AbstractFormater<String>() {
 					@SuppressWarnings("unchecked")
 					@Override
 					public String format(Object context, Object value) {
 						Map<String, Object> ver = (Map<String, Object>) context;
-						if(null == ver.get("ver_major")){
+						if (null == ver.get("ver_major")) {
 							return "";
-						}else if(null != ver.get("ver_major") && null == ver.get("ver_minor")){
+						} else if (null != ver.get("ver_major")
+								&& null == ver.get("ver_minor")) {
 							return ver.get("ver_major") + "." + "0";
-						}else{
+						} else {
 							return ver.get("ver_major") + "."
 									+ ver.get("ver_minor");
 						}
@@ -209,25 +210,26 @@ public class ContractLaboursAction extends ViewAction<Map<String, Object>> {
 							}
 						}));
 		columns.add(new TextColumn4MapKey("c.ext_str2", "ext_str2",
-				getText("contract.labour.driver"), 55).setUseTitleFromLabel(true)
-				.setValueFormater(
-						new LinkFormater4Id(this.getContextPath()
-								+ "/bc-business/carMan/edit?id={0}", "carMan") {
-							@SuppressWarnings("unchecked")
-							@Override
-							public String getIdValue(Object context,
-									Object value) {
-								return StringUtils
-										.toString(((Map<String, Object>) context)
-												.get("manId"));
-							}
-						}));
+				getText("contract4Labour.driver"), 55).setUseTitleFromLabel(
+				true).setValueFormater(
+				new LinkFormater4Id(this.getContextPath()
+						+ "/bc-business/carMan/edit?id={0}", "carMan") {
+					@SuppressWarnings("unchecked")
+					@Override
+					public String getIdValue(Object context, Object value) {
+						return StringUtils
+								.toString(((Map<String, Object>) context)
+										.get("manId"));
+					}
+				}));
 		columns.add(new TextColumn4MapKey("cl.cert_no", "cert_no",
-					getText("contract.labour.certNo"),60).setUseTitleFromLabel(true));
-//		columns.add(new TextColumn4MapKey("c.sign_date", "sign_date",
-//				getText("contract.signDate"), 90).setSortable(true)
-//				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
-		columns.add(new TextColumn4MapKey("c.start_date", "start_date", getText("contract.deadline"),180)
+				getText("contract4Labour.certNo"), 60)
+				.setUseTitleFromLabel(true));
+		// columns.add(new TextColumn4MapKey("c.sign_date", "sign_date",
+		// getText("contract.signDate"), 90).setSortable(true)
+		// .setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+		columns.add(new TextColumn4MapKey("c.start_date", "start_date",
+				getText("contract.deadline"), 180)
 				.setValueFormater(new DateRangeFormater("yyyy-MM-dd") {
 					@Override
 					public Date getToDate(Object context, Object value) {
@@ -237,15 +239,17 @@ public class ContractLaboursAction extends ViewAction<Map<String, Object>> {
 					}
 				}));
 		columns.add(new TextColumn4MapKey("cl.insurCode", "insurCode",
-				getText("contract.labour.insurCode"),80).setUseTitleFromLabel(true));
-		columns.add(new TextColumn4MapKey("cl.insurance_type", "insurance_type",
-				getText("contract.labour.insuranceType"),190).setUseTitleFromLabel(true));
+				getText("contract4Labour.insurCode"), 80)
+				.setUseTitleFromLabel(true));
+		columns.add(new TextColumn4MapKey("cl.insurance_type",
+				"insurance_type", getText("contract4Labour.insuranceType"), 190)
+				.setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("cl.joinDate", "joinDate",
-				getText("contract.labour.joinDate"), 90)
+				getText("contract4Labour.joinDate"), 90)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
 		columns.add(new TextColumn4MapKey("c.op_type", "op_type",
-				getText("contract.labour.optype"),60).setSortable(true).setValueFormater(
-				new EntityStatusFormater(getEntityOpTypes())));
+				getText("contract4Labour.op"), 60).setSortable(true)
+				.setValueFormater(new EntityStatusFormater(getEntityOpTypes())));
 		columns.add(new TextColumn4MapKey("iah.name", "name",
 				getText("contract.author"), 55).setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("c.code", "code",
@@ -254,13 +258,20 @@ public class ContractLaboursAction extends ViewAction<Map<String, Object>> {
 	}
 
 	@Override
+	protected String getGridDblRowMethod() {
+		// 强制为只读表单
+		return "bc.page.open";
+	}
+
+	@Override
 	protected String[] getGridSearchFields() {
-		return new String[] { "c.code", "c.ext_str1","c.ext_str2", "cl.insurance_type" };
+		return new String[] { "c.code", "c.ext_str1", "c.ext_str2",
+				"cl.insurance_type" };
 	}
 
 	@Override
 	protected String getFormActionName() {
-		return "contractLabour";
+		return "contract4Labour";
 	}
 
 	@Override
@@ -271,24 +282,9 @@ public class ContractLaboursAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected String getGridRowLabelExpression() {
-		return "['code']";
+		return "['ext_str2']+'的劳动合同'";
 	}
 
-	/**
-	 * 获取Contract的合同类型列表
-	 * 
-	 * @return
-	 */
-	protected Map<String, String> getEntityTypes() {
-		Map<String, String> types = new HashMap<String, String>();
-		types.put(String.valueOf(Contract.TYPE_LABOUR),
-				getText("contract.select.labour"));
-		types.put(String.valueOf(Contract.TYPE_CHARGER),
-				getText("contract.select.charger"));
-		return types;
-	}
-	
-	
 	/**
 	 * 状态值转换列表：正常|注销|离职|全部
 	 * 
@@ -297,97 +293,59 @@ public class ContractLaboursAction extends ViewAction<Map<String, Object>> {
 	protected Map<String, String> getEntityStatuses() {
 		Map<String, String> statuses = new LinkedHashMap<String, String>();
 		statuses.put(String.valueOf(Contract.STATUS_NORMAL),
-				getText("contract.normal"));
+				getText("contract.status.normal"));
 		statuses.put(String.valueOf(Contract.STATUS_FAILURE),
-				getText("contract.failure"));
+				getText("contract.status.failure"));
 		statuses.put(String.valueOf(Contract.STATUS_RESGIN),
-				getText("contract.resign"));
+				getText("contract.status.resign"));
 		statuses.put("", getText("bs.status.all"));
 		return statuses;
 	}
-	
+
 	/**
-	 * 获取Contract的操作类型列表 
+	 * 获取Contract的操作类型列表
 	 * 
 	 * @return
 	 */
 	protected Map<String, String> getEntityOpTypes() {
 		Map<String, String> types = new HashMap<String, String>();
 		types.put(String.valueOf(Contract.OPTYPE_CREATE),
-				getText("contract.labour.optype.create"));
+				getText("contract4Labour.optype.create"));
 		types.put(String.valueOf(Contract.OPTYPE_MAINTENANCE),
-				getText("contract.labour.optype.edit"));
+				getText("contract4Labour.optype.maintenance"));
 		types.put(String.valueOf(Contract.OPTYPE_CHANGECAR),
-				getText("contract.labour.optype.transfer"));
+				getText("contract4Labour.optype.transfer"));
 		types.put(String.valueOf(Contract.OPTYPE_RENEW),
-				getText("contract.labour.optype.renew"));
+				getText("contract4Labour.optype.renew"));
 		types.put(String.valueOf(Contract.OPTYPE_RESIGN),
-				getText("contract.labour.optype.resign"));
+				getText("contract4Labour.optype.resign"));
 		return types;
 	}
-	
-//	@Override
-//	protected Condition getGridSpecalCondition() {
-//
-//		if (type != null && type.length() > 0) {
-//			String[] ss = type.split(",");
-//			if (ss.length == 1) {
-//				return new EqualsCondition("c.type_", new Integer(ss[0]));
-//			} else {
-//				return new InCondition("c.types_",
-//						StringUtils.stringArray2IntegerArray(ss));
-//			}
-//		}else{
-//			return null;
-//		}
-//
-//	}
-	
-//	@Override
-//	protected Json getGridExtrasData() {
-//		if(this.status == null || this.status.length() == 0){
-//			return null;
-//		}else{
-//			Json json = new Json();
-//			if (this.status != null || this.status.length() > 0) {
-//				json.put("status", status);
-//			}
-//			return json;
-//		}
-//	}
-	
+
 	@Override
 	protected Condition getGridSpecalCondition() {
-		
-		//状态条件
+		// 状态条件
 		Condition statusCondition = null;
 		Condition mainsCondition = null;
 		Condition patchCondtion = null;
 		if (contractId == null) {
-			//查看最新合同列表
-			statusCondition = ConditionUtils.toConditionByComma4IntegerValue(this.status,
-					"c.status_");
-			if(this.status.length() <= 0){ //显示全部状态的时候只显示最新版本的记录
-				mainsCondition = ConditionUtils.toConditionByComma4IntegerValue(this.mains,
-						"c.main");
+			// 查看最新合同列表
+			statusCondition = ConditionUtils.toConditionByComma4IntegerValue(
+					this.status, "c.status_");
+			if (this.status.length() <= 0) { // 显示全部状态的时候只显示最新版本的记录
+				mainsCondition = ConditionUtils
+						.toConditionByComma4IntegerValue(this.mains, "c.main");
 			}
-		}else{
-			//查看历史版本
+		} else {
+			// 查看历史版本
 			patchCondtion = new EqualsCondition("c.patch_no", patchNo);
-			mainsCondition = new EqualsCondition("c.main", Contract.MAIN_HISTORY);
+			mainsCondition = new EqualsCondition("c.main",
+					Contract.MAIN_HISTORY);
 		}
-		
-		// contractId条件
-//		Condition or = null;
-//		if (contractId != null) {
-//			Condition contractIdCondition = new EqualsCondition("cl.id", contractId);
-//			Condition pIdCondition = new EqualsCondition("c.pid", contractId);
-//			or = (Condition) ConditionUtils.mix2OrCondition(contractIdCondition,pIdCondition);
-//			
-//		}
-		return ConditionUtils.mix2AndCondition(statusCondition,mainsCondition,patchCondtion);
+		return ConditionUtils.mix2AndCondition(statusCondition, mainsCondition,
+				patchCondtion);
 	}
-	
+
 	@Override
 	protected void extendGridExtrasData(Json json) {
 		super.extendGridExtrasData(json);
@@ -396,28 +354,25 @@ public class ContractLaboursAction extends ViewAction<Map<String, Object>> {
 		if (this.status != null && this.status.trim().length() > 0) {
 			json.put("status", status);
 		}
-		
+
 		if (contractId != null) {
 			json.put("contractId", contractId);
 		}
-		
+
 		if (patchNo != null) {
 			json.put("patchNo", patchNo);
 		}
 	}
-	
+
 	@Override
 	protected Toolbar getHtmlPageToolbar() {
-		if(contractId == null){
-			return super.getHtmlPageToolbar()
-					.addButton(
-							Toolbar.getDefaultToolbarRadioGroup(
-									this.getEntityStatuses(), "status", 0,
-									getText("title.click2changeSearchStatus")));
-		}else{
+		if (contractId == null) {
+			return super.getHtmlPageToolbar().addButton(
+					Toolbar.getDefaultToolbarRadioGroup(
+							this.getEntityStatuses(), "status", 0,
+							getText("title.click2changeSearchStatus")));
+		} else {
 			return super.getHtmlPageToolbar();
 		}
 	}
-	
-
 }
