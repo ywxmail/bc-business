@@ -21,6 +21,7 @@ import cn.bc.db.jdbc.RowMapper;
 import cn.bc.db.jdbc.SqlObject;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.web.formater.EntityStatusFormater;
+import cn.bc.web.formater.NubmerFormater;
 import cn.bc.web.ui.html.grid.Column;
 import cn.bc.web.ui.html.grid.IdColumn4MapKey;
 import cn.bc.web.ui.html.grid.TextColumn4MapKey;
@@ -90,16 +91,19 @@ public class InsuranceTypesAction extends ViewAction<Map<String, Object>> {
 		List<Column> columns = new ArrayList<Column>();
 		columns.add(new IdColumn4MapKey("i.id", "id"));
 		columns.add(new TextColumn4MapKey("i.status_", "status_",
-				getText("label.status"), 60).setSortable(true)
+				getText("label.status"), 60)
+				.setSortable(true)
 				.setValueFormater(new EntityStatusFormater(getEntityStatuses())));
 		columns.add(new TextColumn4MapKey("i.name", "name",
 				getText("insuranceType.name"), 85).setSortable(true)
 				.setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("i.coverage", "coverage",
-				getText("insuranceType.coverage"),80).setSortable(true)
-				.setUseTitleFromLabel(true));
+				getText("insuranceType.coverage"), 80).setSortable(true)
+				.setUseTitleFromLabel(true)
+				.setValueFormater(new NubmerFormater()));
 		columns.add(new TextColumn4MapKey("i.premium", "premium",
-				getText("insuranceType.premium"), 80).setSortable(true));
+				getText("insuranceType.premium"), 80).setSortable(true)
+				.setValueFormater(new NubmerFormater()));
 		columns.add(new TextColumn4MapKey("i.desc_", "desc_",
 				getText("insuranceType.description")).setSortable(true));
 		return columns;
@@ -147,4 +151,5 @@ public class InsuranceTypesAction extends ViewAction<Map<String, Object>> {
 	protected Toolbar getHtmlPageToolbar() {
 		return getHtmlPageToolbar(true);
 	}
+
 }

@@ -22,6 +22,7 @@ import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.core.util.StringUtils;
 import cn.bc.db.jdbc.RowMapper;
 import cn.bc.db.jdbc.SqlObject;
+import cn.bc.web.formater.NubmerFormater;
 import cn.bc.web.struts2.AbstractSelectPageAction;
 import cn.bc.web.ui.html.grid.Column;
 import cn.bc.web.ui.html.grid.IdColumn4MapKey;
@@ -89,9 +90,11 @@ public class SelectInsuranceTypeAction extends
 				.setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("i.coverage", "coverage",
 				getText("insuranceType.coverage"), 80).setSortable(true)
-				.setUseTitleFromLabel(true));
+				.setUseTitleFromLabel(true)
+				.setValueFormater(new NubmerFormater()));
 		columns.add(new TextColumn4MapKey("i.premium", "premium",
-				getText("insuranceType.premium"), 80).setSortable(true));
+				getText("insuranceType.premium"), 80).setSortable(true)
+				.setValueFormater(new NubmerFormater()));
 		columns.add(new TextColumn4MapKey("i.desc_", "desc_",
 				getText("insuranceType.description")).setSortable(true));
 		return columns;
