@@ -73,6 +73,7 @@ public class Policy extends RichFileEntityImpl {
 	private String greenslipSource;// 强保人来源
 	private String liabilityNo;// 责任险单号
 	private Float amount;// 合计
+	private Calendar stopDate;//停保日期
 	private Integer verMajor;// 主版本号
 	private Integer verMinor;// 次版本号
 	private int main; // 主体： 0-当前版本,1-历史版本
@@ -292,5 +293,14 @@ public class Policy extends RichFileEntityImpl {
 	public void setBuyPlants(Set<BuyPlant> buyPlants) {
 		this.buyPlants = buyPlants;
 	}
+
+	public Calendar getStopDate() {
+		return stopDate;
+	}
+
+	public void setStopDate(Calendar stopDate) {
+		this.stopDate = stopDate;
+	}
+	
 
 }
