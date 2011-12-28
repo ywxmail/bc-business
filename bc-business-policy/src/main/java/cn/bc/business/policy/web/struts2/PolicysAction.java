@@ -4,6 +4,7 @@
 package cn.bc.business.policy.web.struts2;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -13,7 +14,6 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
-import cn.bc.business.contract.domain.Contract;
 import cn.bc.business.policy.domain.Policy;
 import cn.bc.business.web.struts2.ViewAction;
 import cn.bc.core.Entity;
@@ -29,6 +29,7 @@ import cn.bc.db.jdbc.SqlObject;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.web.formater.BooleanFormater;
 import cn.bc.web.formater.CalendarFormater;
+import cn.bc.web.formater.DateRangeFormater;
 import cn.bc.web.formater.EntityStatusFormater;
 import cn.bc.web.formater.LinkFormater4Id;
 import cn.bc.web.ui.html.grid.Column;
@@ -157,13 +158,23 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 				"commerial_company", getText("policy.commerialCompany"), 100)
 				.setSortable(true).setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("p.commerial_start_date",
-				"commerial_start_date", getText("policy.commerialStartDate"),
-				100).setSortable(true).setValueFormater(
-				new CalendarFormater("yyyy-MM-dd")));
-		columns.add(new TextColumn4MapKey("p.commerial_end_date",
-				"commerial_end_date", getText("policy.commerialEndDate"), 100)
-				.setSortable(true).setValueFormater(
-						new CalendarFormater("yyyy-MM-dd")));
+				"commerial_start_date", getText("policy.greenslipDeadline"),
+				180).setValueFormater(new DateRangeFormater("yyyy-MM-dd") {
+			@Override
+			public Date getToDate(Object context, Object value) {
+				@SuppressWarnings("rawtypes")
+				Map contract = (Map) context;
+				return (Date) contract.get("commerial_end_date");
+			}
+		}));
+		// columns.add(new TextColumn4MapKey("p.commerial_start_date",
+		// "commerial_start_date", getText("policy.commerialStartDate"),
+		// 100).setSortable(true).setValueFormater(
+		// new CalendarFormater("yyyy-MM-dd")));
+		// columns.add(new TextColumn4MapKey("p.commerial_end_date",
+		// "commerial_end_date", getText("policy.commerialEndDate"), 100)
+		// .setSortable(true).setValueFormater(
+		// new CalendarFormater("yyyy-MM-dd")));
 		columns.add(new TextColumn4MapKey("p.ownrisk", "ownrisk",
 				getText("policy.ownrisk"), 80).setSortable(true)
 				.setUseTitleFromLabel(true)
@@ -181,7 +192,8 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected String[] getGridSearchFields() {
-		return new String[] { "p.plate_type", "p.plate_no" };
+		return new String[] { "c.plate_type", "c.plate_no", "p.commerial_no",
+				"p.liability_no","p.commerial_company" };
 	}
 
 	@Override
@@ -217,7 +229,7 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 
 		Condition carIdCondition = null;
 		if (carId != null) {
-			carIdCondition = new EqualsCondition("p.car_id", carId);
+			carIdCondition = new EqualsCondition("c.id", carId);
 		}
 		// 合并条件
 		return new AndCondition().add(statusCondition).add(carIdCondition);
@@ -244,7 +256,7 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 		return super.getHtmlPageToolbar()
 				.addButton(
 						Toolbar.getDefaultToolbarRadioGroup(
-								this.getEntityStatuses(), "status", 0,
+								this.getBSStatuses1(), "status", 0,
 								getText("title.click2changeSearchStatus")));
 	}
 
