@@ -17,6 +17,7 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.orm.jpa.JpaCallback;
 import org.springframework.util.StringUtils;
@@ -324,8 +325,13 @@ public class CarDaoImpl extends HibernateCrudJpaDao<Car> implements CarDao {
 	 * @return Long
 	 */
 	public Long findcarInfoByCarPlateNo(String carPlateNo) {
+		Long carId = null;
 		String sql = "select c.Id from BS_CAR c where c.PLATE_NO='"+carPlateNo+"'";
-		Long carId = this.jdbcTemplate.queryForLong(sql);
+		try {
+			carId = this.jdbcTemplate.queryForLong(sql);
+		} catch (EmptyResultDataAccessException e) {
+			e.getStackTrace();
+		}
 		return carId;
 	}
 }

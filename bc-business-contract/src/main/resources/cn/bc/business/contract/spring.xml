@@ -20,11 +20,10 @@
 	<bean id="contractService" class="cn.bc.business.contract.service.ContractServiceImpl"
 		p:contractDao-ref="contractDao" />
 		
-	<!-- contractLabour -->
-	<bean id="contractLabourDao" class="cn.bc.business.contract.dao.hibernate.jpa.ContractLabourDaoImpl"
+	<!-- contract4Labour -->
+	<bean id="contract4LabourDao" class="cn.bc.business.contract.dao.hibernate.jpa.Contract4LabourDaoImpl"
 		p:entityManagerFactory-ref="entityManagerFactory" />
-	<bean id="contractLabourService" class="cn.bc.business.contract.service.ContractLabourServiceImpl"
-		p:contractLabourDao-ref="contractLabourDao" />	
+	<bean id="contract4LabourService" class="cn.bc.business.contract.service.Contract4LabourServiceImpl" />	
 	
 	<!-- contractCharger -->
 	<bean id="contractChargerDao" class="cn.bc.business.contract.dao.hibernate.jpa.ContractChargerDaoImpl"

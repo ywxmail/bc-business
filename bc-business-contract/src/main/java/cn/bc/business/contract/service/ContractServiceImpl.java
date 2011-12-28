@@ -29,13 +29,23 @@ public class ContractServiceImpl extends DefaultCrudService<Contract> implements
 		this.setCrudDao(certDao);
 	}
 
-	public List<Map<String,Object>> list4Car(Condition condition,Long carId) {
-		return this.contractDao.list4Car(condition,carId);
+	public Contract doChangeCar(Long contractId, Long newCarId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Contract doMaintain(Contract contract) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public List<Map<String, Object>> list4Car(Condition condition, Long carId) {
+		return this.contractDao.list4Car(condition, carId);
 	}
 
 	public List<Map<String, Object>> list4CarMan(Condition condition,
 			Long carManId) {
-		return this.contractDao.list4CarMan(condition,carManId);
+		return this.contractDao.list4CarMan(condition, carManId);
 	}
-	
+
 }

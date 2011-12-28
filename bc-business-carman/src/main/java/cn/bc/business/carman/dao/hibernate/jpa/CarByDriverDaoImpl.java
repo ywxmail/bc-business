@@ -12,6 +12,7 @@ import org.apache.commons.logging.LogFactory;
 import cn.bc.business.car.domain.Car;
 import cn.bc.business.carman.dao.CarByDriverDao;
 import cn.bc.business.carman.domain.CarByDriver;
+import cn.bc.business.contract.domain.ContractCarRelation;
 import cn.bc.orm.hibernate.jpa.HibernateCrudJpaDao;
 
 /**
@@ -66,6 +67,11 @@ public class CarByDriverDaoImpl extends HibernateCrudJpaDao<CarByDriver>
 
 	//测试使用hibernate的hql语句向数据库插入数据
 	private void insertTest() {
+//		this.getJpaTemplate().persist(new ContractCarRelation(new Long(139440),new Long(108719)));
+//		String hql = "from ContractCarRelation where contractId=139440";
+//		List list = this.getJpaTemplate().find(hql);
+//		System.out.println(list.toString());
+		
 //		String hql = "insert into Example (name, code) select 'name1','code1' from Dual";
 //		this.executeUpdate(hql,null);
 	}

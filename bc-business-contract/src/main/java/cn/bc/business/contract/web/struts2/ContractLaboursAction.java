@@ -53,6 +53,8 @@ public class ContractLaboursAction extends ViewAction<Map<String, Object>> {
 	
 	public Long contractId;
 	public String patchNo;
+	
+	
 
 	@Override
 	public boolean isReadonly() {
@@ -100,10 +102,8 @@ public class ContractLaboursAction extends ViewAction<Map<String, Object>> {
 		}
 
 		// 搜索按钮
-		if(contractId == null){
-			tb.addButton(Toolbar
-					.getDefaultSearchToolbarButton(getText("title.click2search")));
-		}
+		tb.addButton(Toolbar
+				.getDefaultSearchToolbarButton(getText("title.click2search")));
 		return tb;
 	}
 	
@@ -227,7 +227,7 @@ public class ContractLaboursAction extends ViewAction<Map<String, Object>> {
 //		columns.add(new TextColumn4MapKey("c.sign_date", "sign_date",
 //				getText("contract.signDate"), 90).setSortable(true)
 //				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
-		columns.add(new TextColumn4MapKey("c.start_date", "start_date", getText("contract.deadline"),170)
+		columns.add(new TextColumn4MapKey("c.start_date", "start_date", getText("contract.deadline"),180)
 				.setValueFormater(new DateRangeFormater("yyyy-MM-dd") {
 					@Override
 					public Date getToDate(Object context, Object value) {
@@ -239,9 +239,9 @@ public class ContractLaboursAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("cl.insurCode", "insurCode",
 				getText("contract.labour.insurCode"),80).setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("cl.insurance_type", "insurance_type",
-				getText("contract.labour.insuranceType"),80).setUseTitleFromLabel(true));
+				getText("contract.labour.insuranceType"),190).setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("cl.joinDate", "joinDate",
-				getText("contract.labour.joinDate"), 80)
+				getText("contract.labour.joinDate"), 90)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
 		columns.add(new TextColumn4MapKey("c.op_type", "op_type",
 				getText("contract.labour.optype"),60).setSortable(true).setValueFormater(
@@ -398,9 +398,12 @@ public class ContractLaboursAction extends ViewAction<Map<String, Object>> {
 		}
 		
 		if (contractId != null) {
-			json.put("id", contractId);
+			json.put("contractId", contractId);
 		}
 		
+		if (patchNo != null) {
+			json.put("patchNo", patchNo);
+		}
 	}
 	
 	@Override

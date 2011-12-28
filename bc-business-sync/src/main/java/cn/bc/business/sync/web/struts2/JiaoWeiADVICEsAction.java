@@ -71,7 +71,7 @@ public class JiaoWeiADVICEsAction extends SyncViewAction {
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer sql = new StringBuffer();
 		sql.append("select b.id,b.status_,b.sync_type,b.sync_code,b.sync_from,b.sync_date");
-		sql.append(",t.subject,t.receive_date,t.car_plate,t.driver_id,t.advisor_name,t.ticket,t.content,t.result_");
+		sql.append(",t.subject,t.receive_date,t.car_plate,t.driver_id,t.advisor_name,t.ticket,t.content,t.result_,t.subject,t.subject2");
 		sql.append(" from bs_sync_jiaowei_ADVICE t");
 		sql.append(" inner join bc_sync_base b on b.id=t.id");
 		sqlObject.setSql(sql.toString());
@@ -98,6 +98,8 @@ public class JiaoWeiADVICEsAction extends SyncViewAction {
 				map.put("ticket", rs[i++]);
 				map.put("content", rs[i++]);
 				map.put("result", rs[i++]);
+				map.put("subject", rs[i++]);
+				map.put("subject2", rs[i++]);
 				return map;
 			}
 		});
@@ -112,7 +114,7 @@ public class JiaoWeiADVICEsAction extends SyncViewAction {
 				getText("bs.sync.status"), 60).setSortable(true)
 				.setValueFormater(new KeyValueFormater(getSyncStatuses())));
 		columns.add(new TextColumn4MapKey("b.sync_code", "syncCode",
-				getText("jiaoWeiADVICE.syncCode"), 120).setSortable(true)
+				getText("jiaoWeiADVICE.syncCode"), 100).setSortable(true)
 				.setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("t.receive_date", "receiveDate",
 				getText("jiaoWeiADVICE.receiveDate"), 130).setSortable(true)
@@ -122,7 +124,11 @@ public class JiaoWeiADVICEsAction extends SyncViewAction {
 		columns.add(new TextColumn4MapKey("t.driver_id", "driverCert",
 				getText("jiaoWeiADVICE.driverCert"), 80).setSortable(true));
 		columns.add(new TextColumn4MapKey("t.advisor_name", "advisorName",
-				getText("jiaoWeiADVICE.advisorName"), 80));
+				getText("jiaoWeiADVICE.advisorName"), 80).setUseTitleFromLabel(true));
+		columns.add(new TextColumn4MapKey("t.subject", "subject",
+				getText("jiaoWeiADVICE.subject"),100).setUseTitleFromLabel(true));
+		columns.add(new TextColumn4MapKey("t.subject2", "subject2",
+				getText("jiaoWeiADVICE.subject2"),100).setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("t.content", "content",
 				getText("jiaoWeiADVICE.content")).setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("b.sync_date", "syncDate",
