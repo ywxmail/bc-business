@@ -262,6 +262,11 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 			this.getE().setSubject(jiaoweiYYWZ.getContent());
 			this.getE().setReceipt(jiaoweiYYWZ.getReceipt());
 			this.getE().setDetain(jiaoweiYYWZ.getDetain());
+			String str = jiaoweiYYWZ.getDetain();
+			if(str.indexOf("分")>0){	//判断物品扣留是否存在扣分信息
+				str = str.substring(str.lastIndexOf("分")-1,str.lastIndexOf("分"));
+				this.getE().setJeom(Float.parseFloat(str));
+			}
 			this.getE().setFrom(getText("runcase.jiaowei"));
 			
 			//设置来源
