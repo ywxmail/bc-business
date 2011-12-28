@@ -62,30 +62,27 @@ public class Contract4LabourServiceImpl extends
 			Long driverId) {
 		if (contract4Labour == null)
 			return null;
-
-		// 参数有效性验证
-		Assert.notNull(carId);
-		Assert.notNull(driverId);
-
 		boolean isNew = contract4Labour.isNew();
-		// 保存合同信息
-		contract4Labour = this.contract4LabourDao.save(contract4Labour);
 
-		// 只在新建时保存与车辆、司机的关联关系，因为编辑时不允许修改车辆、司机信息
-		if (isNew)
+		if (!isNew) { // 非新建状态，只需简单保存一下即可，因为编辑时不允许修改车辆、司机信息
+			return this.contract4LabourDao.save(contract4Labour);
+		} else { // 在新建时需保存与车辆、司机的关联关系
+			// 参数有效性验证
+			Assert.notNull(carId);
+			Assert.notNull(driverId);
+
+			// 处理与车辆的关联关系
+			ContractCarRelation carRelation = new ContractCarRelation(
+					contract4Labour.getId(), carId);
+			this.contractDao.saveContractCarRelation(carRelation);
+
+			// 处理与司机的关联关系
+			ContractCarManRelation driverRelation = new ContractCarManRelation(
+					contract4Labour.getId(), driverId);
+			this.contractDao.saveContractCarManRelation(driverRelation);
+
 			return contract4Labour;
-
-		// 处理与车辆的关联关系
-		ContractCarRelation carRelation = new ContractCarRelation(
-				contract4Labour.getId(), carId);
-		this.contractDao.saveContractCarRelation(carRelation);
-
-		// 处理与司机的关联关系
-		ContractCarManRelation driverRelation = new ContractCarManRelation(
-				contract4Labour.getId(), driverId);
-		this.contractDao.saveContractCarManRelation(driverRelation);
-
-		return contract4Labour;
+		}
 	}
 
 	public Contract4Labour doRenew(Long contractId, Calendar newStartDate,
@@ -298,15 +295,7 @@ public class Contract4LabourServiceImpl extends
 		return list;
 	}
 
-	/**
-	 * 根据司机ID查找关联的司机否存在劳动合同
-	 * 
-	 * @parma carManId
-	 * @return
-	 */
-	public List<Map<String, Object>> findCarManIsExistContract(Long carManId) {
-		List<Map<String, Object>> list = null;
-		list = this.contract4LabourDao.findCarManIsExistContract(carManId);
-		return list;
+	public boolean isExistContract(Long driverId) {
+		return this.contract4LabourDao.isExistContract(driverId);
 	}
 }

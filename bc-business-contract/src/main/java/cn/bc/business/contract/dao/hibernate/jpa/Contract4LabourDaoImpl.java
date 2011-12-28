@@ -570,19 +570,12 @@ public class Contract4LabourDaoImpl extends
 		return list;
 	}
 
-	/**
-	 * 根据司机ID查找关联的司机否存在劳动合同
-	 * 
-	 * @parma carManId
-	 * @return
-	 */
-	public List<Map<String, Object>> findCarManIsExistContract(Long carManId) {
-		List<Map<String, Object>> list = null;
+	public boolean isExistContract(Long driverId) {
 		String sql = "select c.* from BS_CONTRACT c"
 				+ " inner join BS_CARMAN_CONTRACT cc ON c.id = cc.contract_id where cc.man_id="
-				+ carManId;
+				+ driverId;
 
-		list = this.jdbcTemplate.queryForList(sql);
-		return list;
+		List<Map<String, Object>> list = this.jdbcTemplate.queryForList(sql);
+		return list != null && list.size() > 0;
 	}
 }

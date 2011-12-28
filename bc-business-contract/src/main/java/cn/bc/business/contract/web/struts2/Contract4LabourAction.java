@@ -28,7 +28,6 @@ import cn.bc.docs.web.ui.html.AttachWidget;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.option.domain.OptionItem;
 import cn.bc.option.service.OptionService;
-import cn.bc.web.ui.html.page.ButtonOption;
 import cn.bc.web.ui.html.page.PageOption;
 import cn.bc.web.ui.html.toolbar.ToolbarMenuButton;
 import cn.bc.web.ui.json.Json;
@@ -240,27 +239,28 @@ public class Contract4LabourAction extends
 		this.getE().setStatus(Contract.STATUS_NORMAL);
 
 		// 构建附件控件
-		attachsUI = buildAttachsUI(true);
+		attachsUI = buildAttachsUI(true, false);
 
 		return r;
 	}
 
-	// 合同维护处理
 	@Override
-	public String edit() throws Exception {
-		String r = super.edit();
-
+	protected void afterEdit(Contract4Labour entity) {
+		// == 合同维护处理
 		// 构建附件控件
-		attachsUI = buildAttachsUI(false);
+		attachsUI = buildAttachsUI(false, false);
 
 		// 将次版本号加1
 		this.getE().setVerMinor(this.getE().getVerMinor() + 1);
 
 		// 操作类型设置为维护
 		this.getE().setOpType(Contract.OPTYPE_MAINTENANCE);
+	}
 
-		// 返回与编辑操作相同的表单
-		return r;
+	@Override
+	protected void afterOpen(Contract4Labour entity) {
+		// 构建附件控件
+		attachsUI = buildAttachsUI(false, true);
 	}
 
 	@Override
@@ -312,7 +312,7 @@ public class Contract4LabourAction extends
 		return "saveSuccess";
 	}
 
-	private AttachWidget buildAttachsUI(boolean isNew) {
+	private AttachWidget buildAttachsUI(boolean isNew, boolean forceReadonly) {
 		// 构建附件控件
 		String ptype = "contract4Labour.main";
 		AttachWidget attachsUI = new AttachWidget();
@@ -327,9 +327,9 @@ public class Contract4LabourAction extends
 		attachsUI.addExtension(getText("app.attachs.extensions"))
 				.setMaxCount(Integer.parseInt(getText("app.attachs.maxCount")))
 				.setMaxSize(Integer.parseInt(getText("app.attachs.maxSize")));
-		if (this.isReadonly()) {
-			attachsUI.setReadOnly(true);
-		}
+
+		// 只读控制
+		attachsUI.setReadOnly(forceReadonly ? true : this.isReadonly());
 		return attachsUI;
 	}
 
@@ -382,7 +382,6 @@ public class Contract4LabourAction extends
 	}
 
 	public String carManInfo() {
-
 		json = new Json();
 		infoList = this.contract4LabourService.selectRelateCarManByCarId(carId);
 		if (infoList.size() == 1) {
@@ -397,16 +396,11 @@ public class Contract4LabourAction extends
 		return "json";
 	}
 
-	/** 根据车辆ID查找关联的司机否存在劳动合同 */
+	/** 判断指定的司机是否已经存在劳动合同 */
 	public String isExistContract() {
 		json = new Json();
-		List<Map<String, Object>> list = this.contract4LabourService
-				.findCarManIsExistContract(driverId);
-		if (list.size() > 0) {
-			json.put("isExistContract", "true");
-		} else {
-			json.put("isExistContract", "false");
-		}
+		json.put("isExistContract",
+				this.contract4LabourService.isExistContract(driverId));
 		return "json";
 	}
 
