@@ -27,6 +27,7 @@ import cn.bc.db.jdbc.SqlObject;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.formater.EntityStatusFormater;
+import cn.bc.web.formater.LinkFormater4Id;
 import cn.bc.web.ui.html.grid.Column;
 import cn.bc.web.ui.html.grid.IdColumn4MapKey;
 import cn.bc.web.ui.html.grid.TextColumn4MapKey;
@@ -69,7 +70,7 @@ public class BlacklistsAction extends ViewAction<Map<String, Object>> {
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer sql = new StringBuffer();
 		sql.append("select b.id,b.status_,b.code,cm.name drivers,m.name motorcade_name,c.plate_type,c.plate_no,b.type_,b.subject,b.lock_date,l.name locker");
-		sql.append(",b.unlock_date,u.name unlocker,b.locker_id,b.car_id from BS_BLACKLIST b left join BS_CARMAN cm on cm.id=b.driver_id ");
+		sql.append(",b.unlock_date,u.name unlocker,b.car_id,b.driver_id,b.locker_id from BS_BLACKLIST b left join BS_CARMAN cm on cm.id=b.driver_id ");
 		sql.append(" left join BS_MOTORCADE m on m.id=b.motorcade_id");
 		sql.append(" left join BS_CAR c on c.id=b.car_id");
 		sql.append(" inner join BC_IDENTITY_ACTOR l on l.id=b.locker_id");
@@ -99,6 +100,8 @@ public class BlacklistsAction extends ViewAction<Map<String, Object>> {
 				map.put("locker", rs[i++]);
 				map.put("unlock_date", rs[i++]);
 				map.put("unlocker", rs[i++]);
+				map.put("carId", rs[i++]);
+				map.put("driverId", rs[i++]);
 
 				return map;
 			}
@@ -116,14 +119,60 @@ public class BlacklistsAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("b.code", "code",
 				getText("blacklist.code"), 160).setSortable(true));
 		if (carManId == null) {
+//			columns.add(new TextColumn4MapKey("cm.name", "drivers",
+//					getText("blacklist.driver"), 60).setSortable(true));
+
 			columns.add(new TextColumn4MapKey("cm.name", "drivers",
-					getText("blacklist.driver"), 60).setSortable(true));
+					getText("blacklist.driver"), 100)
+					.setValueFormater(new LinkFormater4Id(this.getContextPath()
+							+ "/bc-business/carMan/edit?id={0}", "drivers") {
+						@SuppressWarnings("unchecked")
+						@Override
+						public String getIdValue(Object context, Object value) {
+							return StringUtils
+									.toString(((Map<String, Object>) context)
+											.get("driverId"));
+						}
+
+						@Override
+						public String getTaskbarTitle(Object context,
+								Object value) {
+							@SuppressWarnings("unchecked")
+							Map<String, Object> map = (Map<String, Object>) context;
+							return getText("blacklist.driver") + " - "
+									+ map.get("drivers");
+						}
+					}));
+
 		}
 		columns.add(new TextColumn4MapKey("m.name", "motorcade_name",
 				getText("blacklist.motorcade.name"), 60).setSortable(true));
 		if (carId == null) {
+//			columns.add(new TextColumn4MapKey("c.plate_no", "plate",
+//					getText("blacklist.car.plateNo"), 80).setSortable(true));
+			
 			columns.add(new TextColumn4MapKey("c.plate_no", "plate",
-					getText("blacklist.car.plateNo"), 80).setSortable(true));
+					getText("blacklist.car.plateNo"), 100)
+					.setValueFormater(new LinkFormater4Id(this.getContextPath()
+							+ "/bc-business/car/edit?id={0}", "car") {
+						@SuppressWarnings("unchecked")
+						@Override
+						public String getIdValue(Object context, Object value) {
+							return StringUtils
+									.toString(((Map<String, Object>) context)
+											.get("carId"));
+						}
+
+						@Override
+						public String getTaskbarTitle(Object context,
+								Object value) {
+							@SuppressWarnings("unchecked")
+							Map<String, Object> map = (Map<String, Object>) context;
+							return getText("blacklist.car.plateNo") + " - " + map.get("plate");
+
+						}
+					}));
+
 		}
 		columns.add(new TextColumn4MapKey("b.type_", "type_",
 				getText("blacklist.type"), 100));
