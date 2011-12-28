@@ -157,7 +157,7 @@ public class CasePraiseAction extends FileEntityAction<Long, Case4Praise> {
 
 	@Override
 	protected PageOption buildFormPageOption() {
-		PageOption option = super.buildFormPageOption().setWidth(820).setMinWidth(250).setHeight(660)
+		PageOption option = super.buildFormPageOption().setWidth(825).setMinWidth(250).setHeight(480)
 				.setMinHeight(200);
 		
 		if (!isReadonly()) {
