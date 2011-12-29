@@ -69,7 +69,7 @@ public class CasePraisesAction extends ViewAction<Map<String, Object>> {
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer sql = new StringBuffer();
 		sql.append("select b.id,b.status_,b.from_,b.source,b.code,b.motorcade_name,b.car_plate,b.driver_name,b.driver_cert,b.happen_date");
-		sql.append(",b.subject,b.address ,p.advisor_name ");
+		sql.append(",b.subject,b.address ,p.advisor_name,p.receive_date ");
 		sql.append(" from BS_CASE_PRAISE p inner join BS_CASE_BASE b on b.id=p.id");
 		sqlObject.setSql(sql.toString());
 
@@ -94,6 +94,7 @@ public class CasePraisesAction extends ViewAction<Map<String, Object>> {
 				map.put("subject", rs[i++]);
 				map.put("address", rs[i++]);
 				map.put("advisor_name", rs[i++]);
+				map.put("receive_date", rs[i++]);
 
 				return map;
 			}
@@ -108,23 +109,9 @@ public class CasePraisesAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("b.status_", "status_",
 				getText("runcase.status"), 50).setSortable(true)
 				.setValueFormater(new EntityStatusFormater(getBSStatuses2())));
-		columns.add(new TextColumn4MapKey("b.source", "source",
-				getText("runcase.source"), 60).setSortable(true).setUseTitleFromLabel(true)
-				.setValueFormater(new AbstractFormater<String>() {
-					@Override
-					public String format(Object context, Object value) {
-						// 从上下文取出元素Map
-						@SuppressWarnings("unchecked")
-						Map<String, Object> obj = (Map<String, Object>) context;
-						if(null != obj.get("from_") && obj.get("from_").toString().length() > 0){
-							return getSourceStatuses().get(obj.get("source")+"") + " - " + obj.get("from_");
-						}else if(null != obj.get("source") && obj.get("source").toString().length() > 0){
-							return getSourceStatuses().get(obj.get("source")+"");
-						}else{
-							return "";
-						}
-					}
-				}));
+		columns.add(new TextColumn4MapKey("p.receive_date", "receive_date",
+				getText("runcase.receiveDate4"), 120).setSortable(true)
+				.setValueFormater(new CalendarFormater("yyyy-MM-dd HH:mm")));
 		columns.add(new TextColumn4MapKey("b.subject", "subject",
 				getText("runcase.subject"), 120).setSortable(true));
 		columns.add(new TextColumn4MapKey("b.motorcade_name", "motorcade_name",
@@ -150,6 +137,23 @@ public class CasePraisesAction extends ViewAction<Map<String, Object>> {
 				getText("runcase.praiseName"), 70).setSortable(true));
 		columns.add(new TextColumn4MapKey("b.code", "code",
 				getText("runcase.code"), 130).setSortable(true));
+		columns.add(new TextColumn4MapKey("b.source", "source",
+				getText("runcase.source"), 60).setSortable(true).setUseTitleFromLabel(true)
+				.setValueFormater(new AbstractFormater<String>() {
+					@Override
+					public String format(Object context, Object value) {
+						// 从上下文取出元素Map
+						@SuppressWarnings("unchecked")
+						Map<String, Object> obj = (Map<String, Object>) context;
+						if(null != obj.get("from_") && obj.get("from_").toString().length() > 0){
+							return getSourceStatuses().get(obj.get("source")+"") + " - " + obj.get("from_");
+						}else if(null != obj.get("source") && obj.get("source").toString().length() > 0){
+							return getSourceStatuses().get(obj.get("source")+"");
+						}else{
+							return "";
+						}
+					}
+				}));
 
 		return columns;
 	}
