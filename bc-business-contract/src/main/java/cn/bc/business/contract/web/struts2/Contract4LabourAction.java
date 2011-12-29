@@ -334,20 +334,11 @@ public class Contract4LabourAction extends
 	}
 
 	@Override
-	protected void addDefaultEditableFormButton(PageOption pageOption) {
-		// 复写基类的方法，不添加默认的保存按钮，改为在buildFormPageOption方法内按情况添加
-	}
-
-	@Override
-	protected PageOption buildFormPageOption(boolean editable) {
-		// 先执行基类的配置
-		PageOption option = super.buildFormPageOption(editable).setWidth(775)
-				.setHeight(460);
-
+	protected void buildFormPageButtons(PageOption pageOption, boolean editable) {
 		// 特殊处理的部分
 		if (!this.isReadonly()) {// 有权限
 			if (editable) {// 编辑状态显示保存按钮
-				option.addButton(this.getDefaultSaveButtonOption());
+				pageOption.addButton(this.getDefaultSaveButtonOption());
 			} else {// 只读状态显示操作按钮
 				ToolbarMenuButton toolbarMenuButton = new ToolbarMenuButton(
 						getText("contract4Labour.op"));
@@ -365,10 +356,14 @@ public class Contract4LabourAction extends
 								Contract.OPTYPE_RESIGN + "")
 						.setChange(
 								"bc.contract4LabourForm.selectMenuButtonItem");
-				option.addButton(toolbarMenuButton);
+				pageOption.addButton(toolbarMenuButton);
 			}
 		}
-		return option;
+	}
+
+	@Override
+	protected PageOption buildFormPageOption(boolean editable) {
+		return super.buildFormPageOption(editable).setWidth(775).setHeight(460);
 	}
 
 	public String certInfo() {

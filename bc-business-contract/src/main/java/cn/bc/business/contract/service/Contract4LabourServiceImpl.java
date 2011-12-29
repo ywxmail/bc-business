@@ -24,6 +24,8 @@ import cn.bc.core.query.condition.Condition;
 import cn.bc.core.service.DefaultCrudService;
 import cn.bc.docs.service.AttachService;
 import cn.bc.identity.service.IdGeneratorService;
+import cn.bc.identity.web.SystemContext;
+import cn.bc.identity.web.SystemContextHolder;
 
 /**
  * 司机劳动合同Service的实现
@@ -114,7 +116,10 @@ public class Contract4LabourServiceImpl extends
 		newContract.setStartDate(newStartDate);
 		newContract.setEndDate(newEndDate);
 
-		// TODO 设置最后修改人信息：从当前线程变量中获取
+		// 设置最后修改人信息
+		SystemContext context = SystemContextHolder.get();
+		newContract.setModifier(context.getUserHistory());
+		newContract.setModifiedDate(Calendar.getInstance());
 
 		// 主版本号 加1
 		newContract.setVerMajor(oldContract.getVerMajor() + 1);
