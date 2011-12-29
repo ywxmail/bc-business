@@ -45,7 +45,7 @@ public class Contract4LabourOperateAction extends ActionSupport {
 		this.id = id;
 	}
 
-	// ========合同续签相关
+	// ========劳动合同续签代码开始========
 	private Calendar newStartDate;
 	private Calendar newEndDate;
 
@@ -66,16 +66,68 @@ public class Contract4LabourOperateAction extends ActionSupport {
 	}
 
 	/**
-	 * 合同续签
+	 * 劳动合同续签
 	 */
-	public String renew() throws Exception {
+	public String doRenew() throws Exception {
 		Long fromContractId = this.getId();
 		Contract newContract = this.contract4LabourService.doRenew(
 				fromContractId, newStartDate, newEndDate);
 		json = new Json();
 		json.put("id", newContract.getId());
 		json.put("oldId", fromContractId);
-		json.put("msg", getText("contract.labour.renew.success"));
+		json.put("msg", getText("contract4Labour.renew.success"));
 		return "json";
 	}
+
+	// ========劳动合同续签代码结束========
+
+	// ========劳动合同离职代码开始========
+	private Calendar resignDate;
+
+	public Calendar getResignDate() {
+		return resignDate;
+	}
+
+	public void setResignDate(Calendar resignDate) {
+		this.resignDate = resignDate;
+	}
+
+	/**
+	 * 劳动合同离职
+	 */
+	public String doResign() throws Exception {
+		Long fromContractId = this.getId();
+		this.contract4LabourService.doResign(fromContractId, resignDate);
+		json = new Json();
+		json.put("id", fromContractId);
+		json.put("msg", getText("contract4Labour.resign.success"));
+		return "json";
+	}
+
+	// ========劳动合同离职代码结束========
+
+	// ========劳动合同转车代码开始========
+	private Long newCarId;
+
+	public Long getNewCarId() {
+		return newCarId;
+	}
+
+	public void setNewCarId(Long newCarId) {
+		this.newCarId = newCarId;
+	}
+
+	/**
+	 * 劳动合同转车
+	 */
+	public String doChangeCar() throws Exception {
+		Long fromContractId = this.getId();
+		this.contract4LabourService.doChangeCar(fromContractId, newCarId);
+		json = new Json();
+		json.put("id", fromContractId);
+		json.put("msg", getText("contract4Labour.changeCar.success"));
+		return "json";
+	}
+
+	// ========劳动合同转车代码结束========
 }
