@@ -133,6 +133,8 @@ public class Contract4LabourServiceImpl extends
 		newContract.setStatus(Contract.STATUS_NORMAL);// 正常
 
 		// 保存新的合同信息以获取id
+		newContract.setUid(this.idGeneratorService
+				.next(Contract4Labour.KEY_UID));
 		newContract = this.contract4LabourDao.save(newContract);
 		Long newId = newContract.getId();
 
@@ -163,8 +165,6 @@ public class Contract4LabourServiceImpl extends
 
 		// 复制原合同的附件给新的合同
 		String oldUid = newContract.getUid();
-		newContract.setUid(this.idGeneratorService
-				.next(Contract4Labour.KEY_UID));
 		attachService.doCopy(Contract4Labour.KEY_UID, oldUid,
 				Contract4Labour.KEY_UID, newContract.getUid(), true);
 
