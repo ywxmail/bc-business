@@ -16,8 +16,8 @@ import org.springframework.stereotype.Controller;
 import cn.bc.business.blacklist.domain.Blacklist;
 import cn.bc.business.web.struts2.ViewAction;
 import cn.bc.core.query.condition.Condition;
+import cn.bc.core.query.condition.ConditionUtils;
 import cn.bc.core.query.condition.Direction;
-import cn.bc.core.query.condition.impl.AndCondition;
 import cn.bc.core.query.condition.impl.EqualsCondition;
 import cn.bc.core.query.condition.impl.InCondition;
 import cn.bc.core.query.condition.impl.OrderCondition;
@@ -119,8 +119,8 @@ public class BlacklistsAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("b.code", "code",
 				getText("blacklist.code"), 160).setSortable(true));
 		if (carManId == null) {
-//			columns.add(new TextColumn4MapKey("cm.name", "drivers",
-//					getText("blacklist.driver"), 60).setSortable(true));
+			// columns.add(new TextColumn4MapKey("cm.name", "drivers",
+			// getText("blacklist.driver"), 60).setSortable(true));
 
 			columns.add(new TextColumn4MapKey("cm.name", "drivers",
 					getText("blacklist.driver"), 100)
@@ -148,9 +148,9 @@ public class BlacklistsAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("m.name", "motorcade_name",
 				getText("blacklist.motorcade.name"), 60).setSortable(true));
 		if (carId == null) {
-//			columns.add(new TextColumn4MapKey("c.plate_no", "plate",
-//					getText("blacklist.car.plateNo"), 80).setSortable(true));
-			
+			// columns.add(new TextColumn4MapKey("c.plate_no", "plate",
+			// getText("blacklist.car.plateNo"), 80).setSortable(true));
+
 			columns.add(new TextColumn4MapKey("c.plate_no", "plate",
 					getText("blacklist.car.plateNo"), 100)
 					.setValueFormater(new LinkFormater4Id(this.getContextPath()
@@ -168,7 +168,8 @@ public class BlacklistsAction extends ViewAction<Map<String, Object>> {
 								Object value) {
 							@SuppressWarnings("unchecked")
 							Map<String, Object> map = (Map<String, Object>) context;
-							return getText("blacklist.car.plateNo") + " - " + map.get("plate");
+							return getText("blacklist.car.plateNo") + " - "
+									+ map.get("plate");
 
 						}
 					}));
@@ -232,15 +233,6 @@ public class BlacklistsAction extends ViewAction<Map<String, Object>> {
 			}
 		}
 
-		// // carManId条件
-		// if (carManId != null) {
-		// return new EqualsCondition("b.driver_id", carManId);
-		// } else if (carId != null) {
-		// return new EqualsCondition("b.car_id", carId);
-		// } else {
-		// return null;
-		// }
-		// carManId条件
 		Condition carManIdCondition = null;
 		if (carManId != null) {
 			carManIdCondition = new EqualsCondition("b.driver_id", carManId);
@@ -251,8 +243,8 @@ public class BlacklistsAction extends ViewAction<Map<String, Object>> {
 			carIdCondition = new EqualsCondition("b.car_id", carId);
 		}
 		// 合并条件
-		return new AndCondition().add(statusCondition).add(carManIdCondition)
-				.add(carIdCondition);
+		return ConditionUtils.mix2AndCondition(statusCondition,
+				carManIdCondition, carIdCondition);
 
 	}
 

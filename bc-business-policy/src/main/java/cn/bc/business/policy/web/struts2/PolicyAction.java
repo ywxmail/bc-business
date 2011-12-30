@@ -239,12 +239,12 @@ public class PolicyAction extends FileEntityAction<Long, Policy> {
 						getText("policy.labour.op"));
 				toolbarMenuButton.setId("bcOpBtn");
 				toolbarMenuButton
-						.addMenuItem(getText("policy.labour.optype.edit"),
+						.addMenuItem(getText("policy.optype.edit"),
 								Policy.OPTYPE_EDIT + "")
-						.addMenuItem(getText("policy.labour.optype.renewal"),
+						.addMenuItem(getText("policy.optype.renewal"),
 								Policy.OPTYPE_RENEWAL + "")
 						.addMenuItem(
-								getText("policy.labour.optype.surrenders"),
+								getText("policy.optype.surrenders"),
 								Policy.OPTYPE_SURRENDERS + "")
 						.setChange("bc.policyForm.selectMenuButtonItem");
 				option.addButton(toolbarMenuButton);

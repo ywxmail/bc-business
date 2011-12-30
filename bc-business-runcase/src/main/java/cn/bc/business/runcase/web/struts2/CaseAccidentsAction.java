@@ -15,8 +15,8 @@ import org.springframework.stereotype.Controller;
 import cn.bc.business.web.struts2.ViewAction;
 import cn.bc.core.Entity;
 import cn.bc.core.query.condition.Condition;
+import cn.bc.core.query.condition.ConditionUtils;
 import cn.bc.core.query.condition.Direction;
-import cn.bc.core.query.condition.impl.AndCondition;
 import cn.bc.core.query.condition.impl.EqualsCondition;
 import cn.bc.core.query.condition.impl.InCondition;
 import cn.bc.core.query.condition.impl.OrderCondition;
@@ -179,8 +179,8 @@ public class CaseAccidentsAction extends ViewAction<Map<String, Object>> {
 			carIdCondition = new EqualsCondition("b.car_id", carId);
 		}
 		// 合并条件
-		return new AndCondition().add(statusCondition).add(carManIdCondition)
-				.add(carIdCondition);
+		return ConditionUtils.mix2AndCondition(statusCondition,
+				carManIdCondition, carIdCondition);
 	}
 
 	@Override

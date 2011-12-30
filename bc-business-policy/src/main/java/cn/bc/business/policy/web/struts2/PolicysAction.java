@@ -18,8 +18,8 @@ import cn.bc.business.policy.domain.Policy;
 import cn.bc.business.web.struts2.ViewAction;
 import cn.bc.core.Entity;
 import cn.bc.core.query.condition.Condition;
+import cn.bc.core.query.condition.ConditionUtils;
 import cn.bc.core.query.condition.Direction;
-import cn.bc.core.query.condition.impl.AndCondition;
 import cn.bc.core.query.condition.impl.EqualsCondition;
 import cn.bc.core.query.condition.impl.InCondition;
 import cn.bc.core.query.condition.impl.OrderCondition;
@@ -75,7 +75,8 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 		StringBuffer sql = new StringBuffer();
 		sql.append("select p.id,p.status_,c.plate_type,c.plate_no,p.register_date,p.assured,p.commerial_no");
 		sql.append(",p.commerial_company,p.commerial_start_date,p.commerial_end_date");
-		sql.append(" ,p.ownrisk,p.greenslip,p.liability_no,p.amount,c.id carId,p.op_type,p.file_date");
+		sql.append(" ,p.ownrisk,p.greenslip,p.liability_no,p.amount,c.id carId,p.op_type");
+		sql.append(" ,p.greenslip_no,p.greenslip_company,p.greenslip_start_date,p.greenslip_end_date,p.stopdate,p.file_date");
 		sql.append(" from BS_CAR_POLICY p");
 		sql.append(" left join BS_CAR c on c.id=p.car_id");
 		sqlObject.setSql(sql.toString());
@@ -106,6 +107,11 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 				map.put("amount", rs[i++]);
 				map.put("carId", rs[i++]);
 				map.put("op_type", rs[i++]);
+				map.put("greenslip_no", rs[i++]);
+				map.put("greenslip_company", rs[i++]);
+				map.put("greenslip_start_date", rs[i++]);
+				map.put("greenslip_end_date", rs[i++]);
+				map.put("stopdate", rs[i++]);
 
 				return map;
 			}
@@ -158,7 +164,7 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 				"commerial_company", getText("policy.commerialCompany"), 100)
 				.setSortable(true).setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("p.commerial_start_date",
-				"commerial_start_date", getText("policy.greenslipDeadline"),
+				"commerial_start_date", getText("policy.commerialDeadline"),
 				180).setValueFormater(new DateRangeFormater("yyyy-MM-dd") {
 			@Override
 			public Date getToDate(Object context, Object value) {
@@ -167,14 +173,6 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 				return (Date) contract.get("commerial_end_date");
 			}
 		}));
-		// columns.add(new TextColumn4MapKey("p.commerial_start_date",
-		// "commerial_start_date", getText("policy.commerialStartDate"),
-		// 100).setSortable(true).setValueFormater(
-		// new CalendarFormater("yyyy-MM-dd")));
-		// columns.add(new TextColumn4MapKey("p.commerial_end_date",
-		// "commerial_end_date", getText("policy.commerialEndDate"), 100)
-		// .setSortable(true).setValueFormater(
-		// new CalendarFormater("yyyy-MM-dd")));
 		columns.add(new TextColumn4MapKey("p.ownrisk", "ownrisk",
 				getText("policy.ownrisk"), 80).setSortable(true)
 				.setUseTitleFromLabel(true)
@@ -183,6 +181,24 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 				getText("policy.greenslip"), 120).setSortable(true)
 				.setUseTitleFromLabel(true)
 				.setValueFormater(new BooleanFormater()));
+		columns.add(new TextColumn4MapKey("p.greenslip_no", "greenslip_no",
+				getText("policy.greenslipNo"), 180).setUseTitleFromLabel(true));
+		columns.add(new TextColumn4MapKey("p.greenslip_company",
+				"greenslip_company", getText("policy.greenslipCompany"), 100)
+				.setSortable(true).setUseTitleFromLabel(true));
+		columns.add(new TextColumn4MapKey("p.greenslip_start_date",
+				"greenslip_start_date", getText("policy.greenslipDeadline"),
+				180).setValueFormater(new DateRangeFormater("yyyy-MM-dd") {
+			@Override
+			public Date getToDate(Object context, Object value) {
+				@SuppressWarnings("rawtypes")
+				Map contract = (Map) context;
+				return (Date) contract.get("greenslip_end_date");
+			}
+		}));
+		columns.add(new TextColumn4MapKey("p.spotdate", "spotdate",
+				getText("policy.stopDate"), 100).setSortable(true)
+				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
 		columns.add(new TextColumn4MapKey("p.amount", "amount",
 				getText("policy.amount"), 80).setSortable(true)
 				.setUseTitleFromLabel(true));
@@ -193,7 +209,7 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 	@Override
 	protected String[] getGridSearchFields() {
 		return new String[] { "c.plate_type", "c.plate_no", "p.commerial_no",
-				"p.liability_no","p.commerial_company" };
+				"p.liability_no", "p.commerial_company" };
 	}
 
 	@Override
@@ -232,7 +248,7 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 			carIdCondition = new EqualsCondition("c.id", carId);
 		}
 		// 合并条件
-		return new AndCondition().add(statusCondition).add(carIdCondition);
+		return ConditionUtils.mix2AndCondition(statusCondition, carIdCondition);
 
 	}
 
@@ -240,7 +256,7 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 	protected Json getGridExtrasData() {
 		Json json = new Json();
 		// 状态条件
-		if (this.status != null || this.status.length() != 0) {
+		if (this.status == null || this.status.length() == 0) {
 			json.put("status", status);
 		}
 
