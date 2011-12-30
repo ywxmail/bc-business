@@ -17,7 +17,7 @@ import cn.bc.core.query.condition.Condition;
  * 
  * @author dragon
  */
-public interface ContractChargerDao extends CrudDao<Contract4Charger> {
+public interface Contract4ChargerDao extends CrudDao<Contract4Charger> {
 
 	/**
 	 * 删除单个CarNContract

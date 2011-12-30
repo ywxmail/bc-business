@@ -42,13 +42,13 @@
 	</package>
 	
 	<!-- 经济合同 -->
-	<package name="contractCharger" extends="bc-default" namespace="/bc-business">
-		<action name="contractCharger/create" class="contractChargerAction" method="create">
+	<package name="contract4Charger" extends="bc-default" namespace="/bc-business">
+		<action name="contract4Charger/create" class="contract4ChargerAction" method="create">
+			<result name="form">/bc-business/contract4Charger/form.jsp</result>
+		</action>
+		<action name="contract4Charger/edit" class="contract4ChargerAction" method="edit">
 			<result name="form">/bc-business/contractCharger/form.jsp</result>
 		</action>
-		<action name="contractCharger/edit" class="contractChargerAction" method="edit">
-			<result name="form">/bc-business/contractCharger/form.jsp</result>
-		</action>
-		<action name="contractCharger/delete" class="contractChargerAction" method="delete" />
+		<action name="contract4Charger/delete" class="contract4ChargerAction" method="delete" />
 	</package>
 </struts>

@@ -38,7 +38,7 @@ import cn.bc.web.ui.json.Json;
  */
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 @Controller
-public class ContractChargersAction extends ViewAction<Map<String, Object>> {
+public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 	private static final long serialVersionUID = 1L;
 	public String status = String.valueOf(Contract.STATUS_NORMAL);
 	public String type = String.valueOf(Contract.TYPE_CHARGER);

@@ -25,7 +25,7 @@ import cn.bc.core.service.CrudService;
  * @author wis
  *
  */
-public interface ContractChargerService extends CrudService<Contract4Charger> {
+public interface Contract4ChargerService extends CrudService<Contract4Charger> {
 
 	/**
 	 * 删除单个CarNContract

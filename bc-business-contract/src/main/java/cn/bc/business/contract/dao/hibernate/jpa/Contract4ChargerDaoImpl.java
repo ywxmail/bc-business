@@ -26,7 +26,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.orm.jpa.JpaCallback;
 import org.springframework.util.StringUtils;
 
-import cn.bc.business.contract.dao.ContractChargerDao;
+import cn.bc.business.contract.dao.Contract4ChargerDao;
 import cn.bc.business.contract.domain.Contract;
 import cn.bc.business.contract.domain.Contract4Charger;
 import cn.bc.core.Page;
@@ -39,7 +39,7 @@ import cn.bc.orm.hibernate.jpa.HibernateCrudJpaDao;
  * 
  * @author dragon
  */
-public class ContractChargerDaoImpl extends HibernateCrudJpaDao<Contract4Charger> implements ContractChargerDao{
+public class Contract4ChargerDaoImpl extends HibernateCrudJpaDao<Contract4Charger> implements Contract4ChargerDao{
 
 	protected final Log logger =  LogFactory.getLog(getClass());
 	private JdbcTemplate jdbcTemplate;

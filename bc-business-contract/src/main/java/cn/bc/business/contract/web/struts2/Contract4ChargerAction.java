@@ -17,10 +17,9 @@ import org.springframework.stereotype.Controller;
 import cn.bc.business.OptionConstants;
 import cn.bc.business.contract.domain.Contract;
 import cn.bc.business.contract.domain.Contract4Charger;
-import cn.bc.business.contract.service.ContractChargerService;
+import cn.bc.business.contract.service.Contract4ChargerService;
 import cn.bc.business.contract.service.Contract4LabourService;
 import cn.bc.business.web.struts2.FileEntityAction;
-import cn.bc.core.Page;
 import cn.bc.core.exception.CoreException;
 import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.docs.service.AttachService;
@@ -44,11 +43,11 @@ import cn.bc.web.ui.html.page.PageOption;
  */
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 @Controller
-public class ContractChargerAction extends FileEntityAction<Long, Contract4Charger> {
+public class Contract4ChargerAction extends FileEntityAction<Long, Contract4Charger> {
 	// private static Log logger = LogFactory.getLog(ContractAction.class);
 	private static final long 			serialVersionUID 			= 1L;
-	private ContractChargerService 		contractChargerService;
-	private Contract4LabourService   	contractLabourService;
+	private Contract4ChargerService 	contract4ChargerService;
+	private Contract4LabourService   	contract4LabourService;
 	private AttachService 				attachService;
 	private OptionService				optionService;
 	public	Long						carId; 
@@ -75,14 +74,14 @@ public class ContractChargerAction extends FileEntityAction<Long, Contract4Charg
 //	}
 	
 	@Autowired
-	public void setContractChargerService(ContractChargerService contractChargerService) {
-		this.contractChargerService = contractChargerService;
-		this.setCrudService(contractChargerService);
+	public void setContract4ChargerService(Contract4ChargerService contract4ChargerService) {
+		this.contract4ChargerService = contract4ChargerService;
+		this.setCrudService(contract4ChargerService);
 	}
 
 	@Autowired
-	public void setContractLabourService(Contract4LabourService contractLabourService) {
-		this.contractLabourService = contractLabourService;
+	public void setContract4LabourService(Contract4LabourService contract4LabourService) {
+		this.contract4LabourService = contract4LabourService;
 	}
 	
 	
@@ -125,13 +124,13 @@ public class ContractChargerAction extends FileEntityAction<Long, Contract4Charg
 
 		if(carId != null){
 			//根据carId查找车辆的车牌号码
-			carInfoMap = this.contractChargerService.findCarByCarId(carId);
+			carInfoMap = this.contract4ChargerService.findCarByCarId(carId);
 			this.getE().setExt_str1(isNullObject(carInfoMap.get("plate_type")+"."+carInfoMap.get("plate_no")));
 		}
 		
 		if(carManId != null){
 			//根据carManId查找车辆的车牌号码
-			carInfoMap = this.contractChargerService.findCarByCarManId(carManId);
+			carInfoMap = this.contract4ChargerService.findCarByCarManId(carManId);
 			this.getE().setExt_str1(isNullObject(carInfoMap.get("plate_type")+"."+carInfoMap.get("plate_no")));
 			carId = Long.valueOf(isNullObject(carInfoMap.get("id")));
 		}
@@ -171,10 +170,10 @@ public class ContractChargerAction extends FileEntityAction<Long, Contract4Charg
 		
 		Contract4Charger e = this.getE();
 		//根据contractId查找所属的carId
-		carId = this.contractChargerService.findCarIdByContractId(e.getId());
+		carId = this.contract4ChargerService.findCarIdByContractId(e.getId());
 		oldCarId = carId;
 		//根据contractId查找所属的carManId列表
-		List<String> chargerIdList = this.contractChargerService.findChargerIdByContractId(e.getId());
+		List<String> chargerIdList = this.contract4ChargerService.findChargerIdByContractId(e.getId());
 		if((chargerIdList != null && chargerIdList.size() > 0) && (e.getExt_str2() != null && e.getExt_str2().length() > 0)){
 			chargerNameAry = this.getE().getExt_str2().split(",");
 			chargerInfoMap = new HashMap<String, String>();
@@ -201,18 +200,18 @@ public class ContractChargerAction extends FileEntityAction<Long, Contract4Charg
 		//保存证件与车辆的关联表信息
 		if(oldCarId != null){
 			if(oldCarId != carId && !oldCarId.equals(carId)){
-				this.contractChargerService.carNContract4Save(carId,getE().getId());
+				this.contract4ChargerService.carNContract4Save(carId,getE().getId());
 			}
 		}else{
-			this.contractChargerService.carNContract4Save(carId,getE().getId());
+			this.contract4ChargerService.carNContract4Save(carId,getE().getId());
 		}
 		
 		//保存证件与责任人的关联表信息
-		this.contractChargerService.carMansNContract4Save(assignChargerIds, getE().getId());
+		this.contract4ChargerService.carMansNContract4Save(assignChargerIds, getE().getId());
 		//更新车辆的chager列显示责任人姓名
-		this.contractChargerService.updateCar4dirverName(assignChargerNames,carId);
+		this.contract4ChargerService.updateCar4dirverName(assignChargerNames,carId);
 		//更新司机的chager列显示责任人姓名
-		this.contractChargerService.updateCarMan4dirverName(assignChargerNames,carId);
+		this.contract4ChargerService.updateCarMan4dirverName(assignChargerNames,carId);
 		
 		return "saveSuccess";
 		
@@ -223,9 +222,9 @@ public class ContractChargerAction extends FileEntityAction<Long, Contract4Charg
 	public String delete() throws Exception {
 		if (this.getId() != null) {// 删除一条
 			//单个删除中间表car_contract表
-			this.contractChargerService.deleteCarNContract(this.getId());
+			this.contract4ChargerService.deleteCarNContract(this.getId());
 			//TODO 单个删除中间表carman_contract表
-			//this.contractLabourService.deleteCarManNContract(this.getId());
+			//this.contract4LabourService.deleteCarManNContract(this.getId());
 			//单个删除本表
 			this.getCrudService().delete(this.getId());
 		} else {// 删除一批
@@ -233,9 +232,9 @@ public class ContractChargerAction extends FileEntityAction<Long, Contract4Charg
 				Long[] contractIds = cn.bc.core.util.StringUtils
 						.stringArray2LongArray(this.getIds().split(","));
 				//TODO 批量删除中间表car_contract表
-				//this.contractLabourService.deleteCarManNContract(contractIds);
+				//this.contract4LabourService.deleteCarManNContract(contractIds);
 				//批量删除中间表carman_contract表
-				this.contractChargerService.deleteCarNContract(contractIds);
+				this.contract4ChargerService.deleteCarNContract(contractIds);
 				//批量删除本表
 				Long[] ids = cn.bc.core.util.StringUtils
 						.stringArray2LongArray(this.getIds().split(","));
@@ -247,26 +246,26 @@ public class ContractChargerAction extends FileEntityAction<Long, Contract4Charg
 		return "deleteSuccess";
 	}
 	
-	/**
-	 * 根据请求的条件查找非分页信息对象
-	 * 
-	 * @return
-	 */
-	@Override
-	protected List<Map<String, Object>> findList() {
-		return this.contractChargerService.list4car(this.getCondition(),carId);
-	}
-	
-	/**
-	 * 根据请求的条件查找分页信息对象
-	 * 
-	 * @return
-	 */
-	protected Page<Map<String,Object>> findPage() {
-		return this.contractChargerService.page4car(
-					this.getCondition(),this.getPage().getPageNo(), 
-					this.getPage().getPageSize());
-	}
+//	/**
+//	 * 根据请求的条件查找非分页信息对象
+//	 * 
+//	 * @return
+//	 */
+//	@Override
+//	protected List<Map<String, Object>> findList() {
+//		return this.contract4ChargerService.list4car(this.getCondition(),carId);
+//	}
+//	
+//	/**
+//	 * 根据请求的条件查找分页信息对象
+//	 * 
+//	 * @return
+//	 */
+//	protected Page<Map<String,Object>> findPage() {
+//		return this.contract4ChargerService.page4car(
+//					this.getCondition(),this.getPage().getPageNo(), 
+//					this.getPage().getPageSize());
+//	}
 	
 	@Override
 	protected List<Column> buildGridColumns() {
@@ -349,7 +348,7 @@ public class ContractChargerAction extends FileEntityAction<Long, Contract4Charg
 	}
 
 	@Override
-	protected PageOption buildFormPageOption() {
+	protected PageOption buildFormPageOption(boolean editable) {
 		PageOption option = super.buildFormPageOption().setWidth(748).setMinWidth(250)
 				.setMinHeight(160).setHeight(450);
 		//option.addButton(new ButtonOption(getText("label.save"), "save"));

@@ -16,7 +16,6 @@ import cn.bc.business.cert.service.CertService;
 import cn.bc.business.web.struts2.FileEntityAction;
 import cn.bc.docs.web.ui.html.AttachWidget;
 import cn.bc.identity.web.SystemContext;
-import cn.bc.web.ui.html.page.PageOption;
 
 /**
  * 证件Action
@@ -39,12 +38,12 @@ public class CertAction extends FileEntityAction<Long, Cert> {
 
 	public AttachWidget attachsUI;
 	
-	// 设置页面的尺寸
-	@Override
-	public PageOption buildListPageOption() {
-		return super.buildListPageOption().setWidth(850).setMinWidth(300)
-				.setHeight(400).setMinHeight(300);
-	}
+//	// 设置页面的尺寸
+//	@Override
+//	public PageOption buildListPageOption() {
+//		return super.buildListPageOption().setWidth(850).setMinWidth(300)
+//				.setHeight(400).setMinHeight(300);
+//	}
 
 	@Override
 	public boolean isReadonly() {

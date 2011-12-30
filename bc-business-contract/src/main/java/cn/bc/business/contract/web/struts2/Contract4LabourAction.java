@@ -111,11 +111,13 @@ public class Contract4LabourAction extends
 				getText("key.role.bc.admin"));
 	}
 
-	public String create() throws Exception {
-		String r = super.create();
-
+	@Override
+	protected void afterCreate(Contract4Labour entity){
+		// 构建附件控件
+		attachsUI = buildAttachsUI(true, false);
+		
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-		Date date;
+		Date date = null;
 		Calendar date2 = Calendar.getInstance();
 
 		if (carId != null && driverId == null) {// 车辆页签中的新建
@@ -144,7 +146,11 @@ public class Contract4LabourAction extends
 				if (this.getE().getAge() == null
 						&& getDateToString(infoList.get(0).get("birthdate"))
 								.length() > 0) {
-					date = sdf.parse(infoList.get(0).get("birthdate") + "");
+					try {
+						date = sdf.parse(infoList.get(0).get("birthdate") + "");
+					} catch (ParseException e) {
+						e.printStackTrace();
+					}
 					date2.setTime(date);
 					this.getE().setBirthDate(date2);
 				}
@@ -162,7 +168,11 @@ public class Contract4LabourAction extends
 					isNullObject(carInfoMap.get("plate_type")) + "."
 							+ isNullObject(carInfoMap.get("plate_no")));
 			if (getDateToString(carInfoMap.get("register_date")).length() > 0) {
-				date = sdf.parse(carInfoMap.get("register_date") + "");
+				try {
+					date = sdf.parse(carInfoMap.get("register_date") + "");
+				} catch (ParseException e) {
+					e.printStackTrace();
+				}
 				date2.setTime(date);
 				this.getE().setRegisterDate(date2);
 			}
@@ -188,7 +198,11 @@ public class Contract4LabourAction extends
 				if (this.getE().getAge() == null
 						&& getDateToString(infoList.get(0).get("register_date"))
 								.length() > 0) {
-					date = sdf.parse(infoList.get(0).get("register_date") + "");
+					try {
+						date = sdf.parse(infoList.get(0).get("register_date") + "");
+					} catch (ParseException e) {
+						e.printStackTrace();
+					}
 					date2.setTime(date);
 					this.getE().setRegisterDate(date2);
 				}
@@ -210,7 +224,11 @@ public class Contract4LabourAction extends
 					isNullObject(carManInfoMap.get("house_type")));
 
 			if (getDateToString(carManInfoMap.get("birthdate")).length() > 0) {
-				date = sdf.parse(carManInfoMap.get("birthdate") + "");
+				try {
+					date = sdf.parse(carManInfoMap.get("birthdate") + "");
+				} catch (ParseException e) {
+					e.printStackTrace();
+				}
 				date2.setTime(date);
 				this.getE().setBirthDate(date2);
 			}
@@ -237,11 +255,7 @@ public class Contract4LabourAction extends
 		this.getE().setInsuranceType(getText("contract.wujin"));
 		this.getE().setBuyUnit(getText("contract.baocheng"));
 		this.getE().setStatus(Contract.STATUS_NORMAL);
-
-		// 构建附件控件
-		attachsUI = buildAttachsUI(true, false);
-
-		return r;
+		
 	}
 
 	@Override
