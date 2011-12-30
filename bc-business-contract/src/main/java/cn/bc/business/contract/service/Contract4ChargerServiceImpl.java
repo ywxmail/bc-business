@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import cn.bc.business.contract.dao.ContractChargerDao;
+import cn.bc.business.contract.dao.Contract4ChargerDao;
 import cn.bc.business.contract.domain.Contract4Charger;
 import cn.bc.core.Page;
 import cn.bc.core.query.condition.Condition;
@@ -20,29 +20,29 @@ import cn.bc.core.service.DefaultCrudService;
  * 
  * @author dragon
  */
-public class ContractChargerServiceImpl extends DefaultCrudService<Contract4Charger> implements
-		ContractChargerService {
-	private ContractChargerDao contractChargerDao;
+public class Contract4ChargerServiceImpl extends DefaultCrudService<Contract4Charger> implements
+		Contract4ChargerService {
+	private Contract4ChargerDao contract4ChargerDao;
 
-	public ContractChargerDao getContractChargerDao() {
-		return contractChargerDao;
+	public Contract4ChargerDao getContract4ChargerDao() {
+		return contract4ChargerDao;
 	}
 
-	public void setContractChargerDao(ContractChargerDao contractChargerDao) {
-		this.contractChargerDao = contractChargerDao;
-		this.setCrudDao(contractChargerDao);
+	public void setContract4ChargerDao(Contract4ChargerDao contract4ChargerDao) {
+		this.contract4ChargerDao = contract4ChargerDao;
+		this.setCrudDao(contract4ChargerDao);
 	}
 	
 	@Override
 	public void delete(Serializable id) {
 		//删除合同
-		this.contractChargerDao.delete(id);
+		this.contract4ChargerDao.delete(id);
 	}
 	
 	@Override
 	public void delete(Serializable[] ids) {
 		//批量合同
-		this.contractChargerDao.delete(ids);
+		this.contract4ChargerDao.delete(ids);
 	}
 
 	/**
@@ -52,7 +52,7 @@ public class ContractChargerServiceImpl extends DefaultCrudService<Contract4Char
 	 */
 	public void deleteCarNContract(Long contractId) {
 		if(contractId != null){
-			this.contractChargerDao.deleteCarNContract(contractId);
+			this.contract4ChargerDao.deleteCarNContract(contractId);
 		}
 		
 	}
@@ -64,7 +64,7 @@ public class ContractChargerServiceImpl extends DefaultCrudService<Contract4Char
 	 */
 	public void deleteCarNContract(Long[] contractIds) {
 		if(contractIds != null && contractIds.length>0){
-			this.contractChargerDao.deleteCarNContract(contractIds);
+			this.contract4ChargerDao.deleteCarNContract(contractIds);
 		}
 	}
 	
@@ -75,7 +75,7 @@ public class ContractChargerServiceImpl extends DefaultCrudService<Contract4Char
 	 * @return
 	 */
 	public void carNContract4Save(Long carId, Long contractId) {
-		this.contractChargerDao.carNContract4Save(carId,contractId);
+		this.contract4ChargerDao.carNContract4Save(carId,contractId);
 	}
 
 	/**
@@ -85,7 +85,7 @@ public class ContractChargerServiceImpl extends DefaultCrudService<Contract4Char
 	 * @return
 	 */
 	public List<Map<String, Object>> list4car(Condition condition, Long carId) {
-		return this.contractChargerDao.list4car(condition,carId);
+		return this.contract4ChargerDao.list4car(condition,carId);
 	}
 
 	/**
@@ -96,7 +96,7 @@ public class ContractChargerServiceImpl extends DefaultCrudService<Contract4Char
 	 */
 	public Page<Map<String,Object>> page4car(Condition condition, int pageNo,
 			int pageSize) {
-		return this.contractChargerDao.page4car(condition,pageNo,pageSize);
+		return this.contract4ChargerDao.page4car(condition,pageNo,pageSize);
 	}
 
 	/**
@@ -106,7 +106,7 @@ public class ContractChargerServiceImpl extends DefaultCrudService<Contract4Char
 	 */
 	public Map<String, Object> findCarInfoByContractId(Long contractId) {
 		Map<String, Object> queryMap = null;
-		queryMap = this.contractChargerDao.findCarInfoByContractId(contractId);
+		queryMap = this.contract4ChargerDao.findCarInfoByContractId(contractId);
 		return queryMap;
 	}
 
@@ -117,7 +117,7 @@ public class ContractChargerServiceImpl extends DefaultCrudService<Contract4Char
 	 */
 	public List<String> findChargerIdByContractId(Long contractId) {
 		List<String> list = new ArrayList<String>();
-		list = this.contractChargerDao.findChargerIdByContractId(contractId);
+		list = this.contract4ChargerDao.findChargerIdByContractId(contractId);
 		return list;
 	}
 
@@ -127,7 +127,7 @@ public class ContractChargerServiceImpl extends DefaultCrudService<Contract4Char
 	 * @param contractId
 	 */
 	public void carMansNContract4Save(String assignChargerIds, Long contractId) {
-		this.contractChargerDao.carMansNContract4Save(assignChargerIds,contractId);
+		this.contract4ChargerDao.carMansNContract4Save(assignChargerIds,contractId);
 	}
 
 	/**
@@ -137,7 +137,7 @@ public class ContractChargerServiceImpl extends DefaultCrudService<Contract4Char
 	 */
 	public Long findCarIdByContractId(Long contractId) {
 		Long carId = null;
-		carId = contractChargerDao.findCarIdByContractId(contractId);
+		carId = contract4ChargerDao.findCarIdByContractId(contractId);
 		return carId;
 	}
 
@@ -147,7 +147,7 @@ public class ContractChargerServiceImpl extends DefaultCrudService<Contract4Char
 	 * @param carId
 	 */
 	public void updateCar4dirverName(String assignChargerNames, Long carId) {
-		this.contractChargerDao.updateCar4dirverName(assignChargerNames,carId);
+		this.contract4ChargerDao.updateCar4dirverName(assignChargerNames,carId);
 	}
 
 	/**
@@ -156,7 +156,7 @@ public class ContractChargerServiceImpl extends DefaultCrudService<Contract4Char
 	 * @param carId
 	 */
 	public void updateCarMan4dirverName(String assignChargerNames, Long carId) {
-		this.contractChargerDao.updateCarMan4dirverName(assignChargerNames,carId);
+		this.contract4ChargerDao.updateCarMan4dirverName(assignChargerNames,carId);
 	}
 
 	/**
@@ -166,7 +166,7 @@ public class ContractChargerServiceImpl extends DefaultCrudService<Contract4Char
 	 */
 	public Map<String, Object> findCarByCarId(Long carId) {
 		Map<String, Object> queryMap = null;
-		queryMap = this.contractChargerDao.findCarByCarId(carId);
+		queryMap = this.contract4ChargerDao.findCarByCarId(carId);
 		return queryMap;
 	}
 
@@ -177,7 +177,7 @@ public class ContractChargerServiceImpl extends DefaultCrudService<Contract4Char
 	 */
 	public Map<String, Object> findCarByCarManId(Long carManId) {
 		Map<String, Object> queryMap = null;
-		queryMap = this.contractChargerDao.findCarByCarManId(carManId);
+		queryMap = this.contract4ChargerDao.findCarByCarManId(carManId);
 		return queryMap;
 	}
 	
