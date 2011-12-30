@@ -5,9 +5,9 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
+import cn.bc.BCConstants;
 import cn.bc.business.arrange.domain.Arrange;
 import cn.bc.business.arrange.service.ArrangeService;
-import cn.bc.core.Entity;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.identity.web.struts2.FileEntityAction;
 import cn.bc.web.ui.html.page.ButtonOption;
@@ -50,7 +50,7 @@ public class ArrangeAction extends FileEntityAction<Long, Arrange> {
 		e.setType(Arrange.TYPE_MEETING);
 
 		// 初始状态
-		e.setStatus(Entity.STATUS_ENABLED);
+		e.setStatus(BCConstants.STATUS_ENABLED);
 
 		return r;
 	}

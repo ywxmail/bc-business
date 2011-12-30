@@ -14,6 +14,7 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
+import cn.bc.BCConstants;
 import cn.bc.business.cert.domain.Cert;
 import cn.bc.business.cert.domain.Cert4VehiceLicense;
 import cn.bc.business.cert.service.CertService;
@@ -126,7 +127,7 @@ public class CertVehicelicenseAction extends FileEntityAction<Long, Cert4VehiceL
 		this.getE().setCertCode(
 				this.getIdGeneratorService().nextSN4Month(Cert4VehiceLicense.KEY_CODE));
 		e.setType(Cert.TYPE_VEHICELICENSE);
-		e.setStatus(RichEntityImpl.STATUS_ENABLED);
+		e.setStatus(BCConstants.STATUS_ENABLED);
 		statusesValue		=	this.getEntityStatuses();
 		
 		attachsUI = buildAttachsUI(true);

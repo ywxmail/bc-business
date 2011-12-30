@@ -12,15 +12,13 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.orm.jpa.JpaTemplate;
 import org.springframework.stereotype.Controller;
 
-import cn.bc.core.Entity;
+import cn.bc.BCConstants;
 import cn.bc.core.query.Query;
 import cn.bc.core.query.condition.Condition;
 import cn.bc.core.query.condition.Direction;
@@ -45,8 +43,6 @@ import com.opensymphony.xwork2.ActionSupport;
 @Controller
 public class FindInfoByCarAction extends ActionSupport {
 	private static final long serialVersionUID = 1L;
-	private final static Log logger = LogFactory
-			.getLog(FindInfoByCarAction.class);
 	private Long carId;// 车辆id
 	public String carPlate;// 车牌号，如"粤A.E1P11"，如果指定了carId将忽略该参数
 	public Json json;// 返回的json信息
@@ -126,7 +122,7 @@ public class FindInfoByCarAction extends ActionSupport {
 		AndCondition and = new AndCondition();
 		and.add(new OrderCondition("cd.classes", Direction.Asc));
 		and.add(new EqualsCondition("cd.status_", new Integer(
-				Entity.STATUS_ENABLED)));
+				BCConstants.STATUS_ENABLED)));
 		if (carId != null) {
 			and.add(new EqualsCondition("c.id", carId));
 		} else {

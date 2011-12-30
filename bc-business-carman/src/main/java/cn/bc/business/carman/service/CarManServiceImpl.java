@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import cn.bc.BCConstants;
 import cn.bc.business.carman.dao.CarManDao;
 import cn.bc.business.carman.domain.CarMan;
 import cn.bc.business.cert.domain.Cert;
@@ -45,7 +46,7 @@ public class CarManServiceImpl extends DefaultCrudService<CarMan> implements
 	public void delete(Serializable id) {
 		// TODO Auto-generated method stub
 		Map<String, Object> attrs = new HashMap<String, Object>();
-		attrs.put("status", RichEntity.STATUS_DELETED);
+		attrs.put("status", BCConstants.STATUS_DELETED);
 		super.update(id, attrs);
 	}
 
@@ -54,7 +55,7 @@ public class CarManServiceImpl extends DefaultCrudService<CarMan> implements
 	public void delete(Serializable[] ids) {
 		// TODO Auto-generated method stub
 		Map<String, Object> attrs = new HashMap<String, Object>();
-		attrs.put("status", RichEntity.STATUS_DELETED);
+		attrs.put("status", BCConstants.STATUS_DELETED);
 		super.update(ids, attrs);
 	}
 

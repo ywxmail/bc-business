@@ -11,6 +11,7 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
+import cn.bc.BCConstants;
 import cn.bc.business.cert.domain.Cert;
 import cn.bc.business.cert.domain.Cert4FuWuZiGe;
 import cn.bc.business.cert.service.CertFwzgService;
@@ -93,7 +94,7 @@ public class CertFwzgAction extends FileEntityAction<Long, Cert4FuWuZiGe> {
 		this.getE().setCertCode(
 				this.getIdGeneratorService().nextSN4Month(Cert4FuWuZiGe.KEY_CODE));
 		this.getE().setType(Cert.TYPE_FWZG);
-		this.getE().setStatus(RichEntityImpl.STATUS_ENABLED);
+		this.getE().setStatus(BCConstants.STATUS_ENABLED);
 		
 		statusesValue		=	this.getEntityStatuses();
 		

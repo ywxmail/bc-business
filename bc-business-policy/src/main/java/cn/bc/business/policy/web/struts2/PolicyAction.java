@@ -18,13 +18,13 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
+import cn.bc.BCConstants;
 import cn.bc.business.OptionConstants;
 import cn.bc.business.car.service.CarService;
 import cn.bc.business.policy.domain.BuyPlant;
 import cn.bc.business.policy.domain.Policy;
 import cn.bc.business.policy.service.PolicyService;
 import cn.bc.business.web.struts2.FileEntityAction;
-import cn.bc.core.Entity;
 import cn.bc.core.query.condition.Condition;
 import cn.bc.core.util.DateUtils;
 import cn.bc.docs.service.AttachService;
@@ -207,7 +207,7 @@ public class PolicyAction extends FileEntityAction<Long, Policy> {
 		// 续保后旧车保要做相应的处理
 		if (p.getPid() != null) {
 			if (oldE != null) {
-				oldE.setStatus(Entity.STATUS_DISABLED); // 把旧的车保状态改为注销
+				oldE.setStatus(BCConstants.STATUS_DISABLED); // 把旧的车保状态改为注销
 				oldE.setMain(Policy.MAIN_HISTORY); // 设定为历史标识
 				// 保存旧的记录
 				this.getCrudService().save(oldE);

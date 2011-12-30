@@ -11,6 +11,7 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
+import cn.bc.BCConstants;
 import cn.bc.business.cert.domain.Cert;
 import cn.bc.business.cert.domain.Cert4DriverEducation;
 import cn.bc.business.cert.service.CertJspxService;
@@ -94,7 +95,7 @@ public class CertJspxAction extends FileEntityAction<Long, Cert4DriverEducation>
 		this.getE().setCertCode(
 				this.getIdGeneratorService().nextSN4Month(Cert4DriverEducation.KEY_CODE));
 		this.getE().setType(Cert.TYPE_JSPX);
-		this.getE().setStatus(RichEntityImpl.STATUS_ENABLED);
+		this.getE().setStatus(BCConstants.STATUS_ENABLED);
 		statusesValue		=	this.getEntityStatuses();
 		
 		attachsUI = buildAttachsUI(true);

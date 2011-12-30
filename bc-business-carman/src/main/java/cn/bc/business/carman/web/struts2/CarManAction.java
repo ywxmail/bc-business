@@ -11,6 +11,7 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
+import cn.bc.BCConstants;
 import cn.bc.business.OptionConstants;
 import cn.bc.business.car.domain.Car;
 import cn.bc.business.carman.domain.CarMan;
@@ -63,7 +64,7 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 		super.afterCreate(entity);
 
 		// 额外参数的设置
-		this.getE().setStatus(RichEntity.STATUS_ENABLED);
+		this.getE().setStatus(BCConstants.STATUS_ENABLED);
 		this.getE().setUid(this.getIdGeneratorService().next(CarMan.KEY_UID));
 		this.getE().setOrderNo(
 				this.getIdGeneratorService().nextSN4Month(Car.KEY_CODE));

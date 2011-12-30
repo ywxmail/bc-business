@@ -11,12 +11,12 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
+import cn.bc.BCConstants;
 import cn.bc.business.cert.domain.Cert;
 import cn.bc.business.cert.domain.Cert4CongYeZiGe;
 import cn.bc.business.cert.service.CertCyzgService;
 import cn.bc.business.cert.service.CertService;
 import cn.bc.business.web.struts2.FileEntityAction;
-import cn.bc.core.RichEntityImpl;
 import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.docs.service.AttachService;
 import cn.bc.docs.web.ui.html.AttachWidget;
@@ -93,7 +93,7 @@ public class CertCyzgAction extends FileEntityAction<Long, Cert4CongYeZiGe> {
 		this.getE().setCertCode(
 				this.getIdGeneratorService().nextSN4Month(Cert4CongYeZiGe.KEY_CODE));
 		this.getE().setType(Cert.TYPE_CYZG);
-		this.getE().setStatus(RichEntityImpl.STATUS_ENABLED);
+		this.getE().setStatus(BCConstants.STATUS_ENABLED);
 		statusesValue		=	this.getEntityStatuses();
 		
 		attachsUI = buildAttachsUI(true);

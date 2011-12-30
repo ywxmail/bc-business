@@ -12,6 +12,7 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
+import cn.bc.BCConstants;
 import cn.bc.business.car.domain.Car;
 import cn.bc.business.car.service.CarService;
 import cn.bc.business.carman.domain.CarByDriver;
@@ -89,7 +90,7 @@ public class CarByDriverAction extends FileEntityAction<Long, CarByDriver> {
 			Car car = this.carService.load(carId);
 			this.getE().setCar(car);
 		}
-		this.getE().setStatus(RichEntity.STATUS_ENABLED);
+		this.getE().setStatus(BCConstants.STATUS_ENABLED);
 		statusesValueList = this.getBSStatuses1();
 		return result;
 	}
