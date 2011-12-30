@@ -7,9 +7,9 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import cn.bc.BCConstants;
 import cn.bc.business.motorcade.dao.MotorcadeDao;
 import cn.bc.business.motorcade.domain.Motorcade;
-import cn.bc.core.Entity;
 import cn.bc.core.query.condition.Direction;
 import cn.bc.core.query.condition.impl.AndCondition;
 import cn.bc.core.query.condition.impl.EqualsCondition;
@@ -28,7 +28,7 @@ public class MotorcadeDaoImpl extends HibernateCrudJpaDao<Motorcade> implements
 				.condition(
 						new AndCondition().add(
 								new EqualsCondition("status",
-										Entity.STATUS_ENABLED)).add(
+										BCConstants.STATUS_ENABLED)).add(
 								new OrderCondition("code", Direction.Asc)))
 				.list();
 	}

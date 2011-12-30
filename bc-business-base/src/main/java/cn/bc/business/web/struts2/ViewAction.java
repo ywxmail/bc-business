@@ -10,8 +10,8 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
+import cn.bc.BCConstants;
 import cn.bc.business.BSConstants;
-import cn.bc.core.Entity;
 
 /**
  * 营运系统各模块视图Action的基类封装
@@ -36,9 +36,9 @@ public abstract class ViewAction<T extends Object> extends cn.bc.web.struts2.Vie
 	 */
 	protected Map<String, String> getBSStatuses1() {
 		Map<String, String> statuses = new LinkedHashMap<String, String>();
-		statuses.put(String.valueOf(Entity.STATUS_ENABLED),
+		statuses.put(String.valueOf(BCConstants.STATUS_ENABLED),
 				getText("bs.status.active"));
-		statuses.put(String.valueOf(Entity.STATUS_DISABLED),
+		statuses.put(String.valueOf(BCConstants.STATUS_DISABLED),
 				getText("bs.status.logout"));
 		statuses.put("", getText("bs.status.all"));
 		return statuses;
@@ -51,9 +51,9 @@ public abstract class ViewAction<T extends Object> extends cn.bc.web.struts2.Vie
 	 */
 	protected Map<String, String> getBSStatuses2() {
 		Map<String, String> statuses = new LinkedHashMap<String, String>();
-		statuses.put(String.valueOf(Entity.STATUS_ENABLED),
+		statuses.put(String.valueOf(BCConstants.STATUS_ENABLED),
 				getText("bs.status.active"));
-		statuses.put(String.valueOf(Entity.STATUS_DISABLED),
+		statuses.put(String.valueOf(BCConstants.STATUS_DISABLED),
 				getText("bs.status.closed"));
 		statuses.put("", getText("bs.status.all"));
 		return statuses;

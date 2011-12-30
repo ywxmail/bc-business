@@ -3,7 +3,6 @@
  */
 package cn.bc.business.contract.service;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -11,6 +10,7 @@ import java.util.Map;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.Assert;
 
 import cn.bc.business.contract.dao.Contract4LabourDao;
 import cn.bc.business.contract.dao.ContractDao;
@@ -24,6 +24,8 @@ import cn.bc.core.query.condition.Condition;
 import cn.bc.core.service.DefaultCrudService;
 import cn.bc.docs.service.AttachService;
 import cn.bc.identity.service.IdGeneratorService;
+import cn.bc.identity.web.SystemContext;
+import cn.bc.identity.web.SystemContextHolder;
 
 /**
  * 司机劳动合同Service的实现
@@ -58,7 +60,34 @@ public class Contract4LabourServiceImpl extends
 		this.idGeneratorService = idGeneratorService;
 	}
 
-	public Contract doRenew(Long contractId, Calendar newStartDate,
+	public Contract4Labour save(Contract4Labour contract4Labour, Long carId,
+			Long driverId) {
+		if (contract4Labour == null)
+			return null;
+		boolean isNew = contract4Labour.isNew();
+
+		if (!isNew) { // 非新建状态，只需简单保存一下即可，因为编辑时不允许修改车辆、司机信息
+			return this.contract4LabourDao.save(contract4Labour);
+		} else { // 在新建时需保存与车辆、司机的关联关系
+			// 参数有效性验证
+			Assert.notNull(carId);
+			Assert.notNull(driverId);
+
+			// 处理与车辆的关联关系
+			ContractCarRelation carRelation = new ContractCarRelation(
+					contract4Labour.getId(), carId);
+			this.contractDao.saveContractCarRelation(carRelation);
+
+			// 处理与司机的关联关系
+			ContractCarManRelation driverRelation = new ContractCarManRelation(
+					contract4Labour.getId(), driverId);
+			this.contractDao.saveContractCarManRelation(driverRelation);
+
+			return contract4Labour;
+		}
+	}
+
+	public Contract4Labour doRenew(Long contractId, Calendar newStartDate,
 			Calendar newEndDate) {
 		// 获取原来的合同信息
 		Contract4Labour oldContract = this.contract4LabourDao.load(contractId);
@@ -87,7 +116,10 @@ public class Contract4LabourServiceImpl extends
 		newContract.setStartDate(newStartDate);
 		newContract.setEndDate(newEndDate);
 
-		// TODO 设置最后修改人信息：从当前线程变量中获取
+		// 设置最后修改人信息
+		SystemContext context = SystemContextHolder.get();
+		newContract.setModifier(context.getUserHistory());
+		newContract.setModifiedDate(Calendar.getInstance());
 
 		// 主版本号 加1
 		newContract.setVerMajor(oldContract.getVerMajor() + 1);
@@ -101,6 +133,8 @@ public class Contract4LabourServiceImpl extends
 		newContract.setStatus(Contract.STATUS_NORMAL);// 正常
 
 		// 保存新的合同信息以获取id
+		newContract.setUid(this.idGeneratorService
+				.next(Contract4Labour.KEY_UID));
 		newContract = this.contract4LabourDao.save(newContract);
 		Long newId = newContract.getId();
 
@@ -131,60 +165,19 @@ public class Contract4LabourServiceImpl extends
 
 		// 复制原合同的附件给新的合同
 		String oldUid = newContract.getUid();
-		newContract.setUid(this.idGeneratorService
-				.next(Contract4Labour.KEY_UID));
 		attachService.doCopy(Contract4Labour.KEY_UID, oldUid,
-				Contract4Labour.KEY_UID, newContract.getUid());
+				Contract4Labour.KEY_UID, newContract.getUid(), true);
 
 		// 返回续签的合同
 		return newContract;
 	}
 
-	@Override
-	public void delete(Serializable id) {
-		// 删除合同
-		this.contract4LabourDao.delete(id);
+	public void doResign(Long contractId, Calendar resignDate) {
+		throw new CoreException("need implement");
 	}
 
-	@Override
-	public void delete(Serializable[] ids) {
-		// 批量合同
-		this.contract4LabourDao.delete(ids);
-	}
-
-	/**
-	 * 删除单个CarManNContract
-	 * 
-	 * @parma contractId
-	 * @return
-	 */
-	public void deleteCarManNContract(Long contractId) {
-		if (contractId != null) {
-			contract4LabourDao.deleteCarManNContract(contractId);
-		}
-	}
-
-	/**
-	 * 删除批量CarManNContract
-	 * 
-	 * @parma contractIds[]
-	 * @return
-	 */
-	public void deleteCarManNContract(Long[] contractIds) {
-		if (contractIds != null && contractIds.length > 0) {
-			this.contract4LabourDao.deleteCarManNContract(contractIds);
-		}
-	}
-
-	/**
-	 * 保存合同与司机的关联表信息
-	 * 
-	 * @parma carManId
-	 * @parma contractId
-	 * @return
-	 */
-	public void carManNContract4Save(Long carManId, Long contractId) {
-		this.contract4LabourDao.carManNContract4Save(carManId, contractId);
+	public Contract4Labour doChangeCar(Long contractId, Long newCarId) {
+		throw new CoreException("need implement");
 	}
 
 	/**
@@ -221,17 +214,6 @@ public class Contract4LabourServiceImpl extends
 		Map<String, Object> queryMap = null;
 		queryMap = this.contract4LabourDao.findCertByCarManId(carManId);
 		return queryMap;
-	}
-
-	/**
-	 * 保存车辆与合同的关联信息 jdbc查询BS_CAR_CONTRACT表是否存在相应carId和contractId的记录
-	 * 
-	 * @parma carId
-	 * @parma contractId
-	 * @return
-	 */
-	public void carNContract4Save(Long carId, Long contractId) {
-		this.contract4LabourDao.carNContract4Save(carId, contractId);
 	}
 
 	/**
@@ -318,40 +300,7 @@ public class Contract4LabourServiceImpl extends
 		return list;
 	}
 
-	/**
-	 * 根据司机ID查找关联的司机否存在劳动合同
-	 * 
-	 * @parma carManId
-	 * @return
-	 */
-	public List<Map<String, Object>> findCarManIsExistContract(Long carManId) {
-		List<Map<String, Object>> list = null;
-		list = this.contract4LabourDao.findCarManIsExistContract(carManId);
-		return list;
+	public boolean isExistContract(Long driverId) {
+		return this.contract4LabourDao.isExistContract(driverId);
 	}
-
-	/**
-	 * 删除单个Injury
-	 * 
-	 * @parma contractId
-	 * @return
-	 */
-	public void deleteInjury(Long contractId) {
-		if (contractId != null) {
-			contract4LabourDao.deleteInjury(contractId);
-		}
-	}
-
-	/**
-	 * 删除批量Injury
-	 * 
-	 * @parma contractIds[]
-	 * @return
-	 */
-	public void deleteInjury(Long[] contractIds) {
-		if (contractIds != null && contractIds.length > 0) {
-			this.contract4LabourDao.deleteInjury(contractIds);
-		}
-	}
-
 }

@@ -9,7 +9,7 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import cn.bc.business.carman.domain.CarByDriver;
+import cn.bc.BCConstants;
 import cn.bc.business.carman.domain.CarMan;
 import cn.bc.business.runcase.dao.CaseAccidentDao;
 import cn.bc.business.runcase.domain.Case4Accident;
@@ -62,7 +62,7 @@ public class CaseAccidentDaoImpl extends HibernateCrudJpaDao<Case4Accident>
 		List list = this.getJpaTemplate()
 				.find(hql,
 						new Object[] { carId,
-								new Integer(CarByDriver.STATUS_ENABLED) });
+								new Integer(BCConstants.STATUS_ENABLED) });
 		if (list.size() == 1) {
 			carman = (CarMan) list.get(0);
 			return carman;

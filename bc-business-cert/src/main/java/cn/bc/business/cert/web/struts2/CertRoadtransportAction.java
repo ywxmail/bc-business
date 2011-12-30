@@ -14,6 +14,7 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
+import cn.bc.BCConstants;
 import cn.bc.business.cert.domain.Cert;
 import cn.bc.business.cert.domain.Cert4RoadTransport;
 import cn.bc.business.cert.service.CertRoadtransportService;
@@ -108,7 +109,7 @@ public class CertRoadtransportAction extends FileEntityAction<Long, Cert4RoadTra
 		this.getE().setCertCode(
 				this.getIdGeneratorService().nextSN4Month(Cert4RoadTransport.KEY_CODE));
 		this.getE().setType(Cert.TYPE_ROADTRANSPORT);
-		this.getE().setStatus(RichEntityImpl.STATUS_ENABLED);
+		this.getE().setStatus(BCConstants.STATUS_ENABLED);
 		statusesValue		=	this.getEntityStatuses();
 		
 		attachsUI = buildAttachsUI(true);

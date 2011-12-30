@@ -12,8 +12,8 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
+import cn.bc.BCConstants;
 import cn.bc.business.BSConstants;
-import cn.bc.core.Entity;
 import cn.bc.core.query.condition.Condition;
 import cn.bc.core.query.condition.Direction;
 import cn.bc.core.query.condition.impl.EqualsCondition;
@@ -42,7 +42,7 @@ import cn.bc.web.ui.json.Json;
 public class SelectInsuranceTypeAction extends
 		AbstractSelectPageAction<Map<String, Object>> {
 	private static final long serialVersionUID = 1L;
-	public String status = String.valueOf(Entity.STATUS_ENABLED); // 车辆保单险种的状态，多个用逗号连接
+	public String status = String.valueOf(BCConstants.STATUS_ENABLED); // 车辆保单险种的状态，多个用逗号连接
 
 	@Override
 	protected OrderCondition getGridDefaultOrderCondition() {

@@ -4,11 +4,8 @@
 package cn.bc.business.web.struts2;
 
 import java.io.Serializable;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 import cn.bc.core.Entity;
-import cn.bc.core.RichEntity;
 
 /**
  * bc-business子系统Entity的CRUD通用Action
@@ -26,6 +23,4 @@ public class EntityAction<K extends Serializable, E extends Entity<K>> extends
 		// 与配置文件对应：src/main/resources/cn/bc/business/web/struts2/struts.xml
 		return PATH_PREFIX;
 	}
-
-	
 }

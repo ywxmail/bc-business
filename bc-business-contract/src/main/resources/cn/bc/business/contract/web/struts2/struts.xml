@@ -11,26 +11,34 @@
 	</package>
 	
 	<!-- 劳动合同 -->
-	<package name="contractLabour" extends="bc-default" namespace="/bc-business">
-		<action name="contractLabour/create" class="contractLabourAction" method="create">
-			<result name="form">/bc-business/contractLabour/form.jsp</result>
+	<package name="contract4Labour" extends="bc-default" namespace="/bc-business/contract4Labour">
+		<action name="create" class="contract4LabourAction" method="create">
+			<result name="form">/bc-business/contract4Labour/form.jsp</result>
 		</action>		
-		<action name="contractLabour/edit" class="contractLabourAction" method="edit">
-			<result name="form">/bc-business/contractLabour/form.jsp</result>
+		<action name="open" class="contract4LabourAction" method="open">
+			<result name="formr">/bc-business/contract4Labour/form.jsp</result>
 		</action>
-		<action name="contractLabour/delete" class="contractLabourAction" method="delete" />
-		<action name="contractLabour/certInfo" class="contractLabourAction" method="certInfo">
+		<action name="edit" class="contract4LabourAction" method="edit">
+			<result name="form">/bc-business/contract4Labour/form.jsp</result>
 		</action>
-		<action name="contractLabour/carManInfo" class="contractLabourAction" method="carManInfo">
+		<action name="save" class="contract4LabourAction" method="save"/>
+		<action name="delete" class="contract4LabourAction" method="delete" />
+		<action name="certInfo" class="contract4LabourAction" method="certInfo">
 		</action>
-		<action name="contractLabour/isExistContract" class="contractLabourAction" method="isExistContract">
+		<action name="carManInfo" class="contract4LabourAction" method="carManInfo">
+		</action>
+		<action name="isExistContract" class="contract4LabourAction" method="isExistContract">
 		</action>
 	</package>
 	
 	<!-- 劳动合同的版本管理 -->
 	<package name="contract4LabourOperate" extends="bc-default" namespace="/bc-business/contract4LabourOperate">
 		<!-- 续签 -->
-		<action name="renew" class="contract4LabourOperateAction" method="renew"/>
+		<action name="doRenew" class="contract4LabourOperateAction" method="doRenew"/>
+		<!-- 转车 -->
+		<action name="doChangeCar" class="contract4LabourOperateAction" method="doChangeCar"/>
+		<!-- 离职 -->
+		<action name="doResign" class="contract4LabourOperateAction" method="doResign"/>
 	</package>
 	
 	<!-- 经济合同 -->

@@ -27,6 +27,7 @@
 		<module>bc-business-injury</module>
 		<module>bc-business-policy</module>
 		<module>bc-business-arrange</module>
+		<module>bc-business-insuranceType</module>
 	</modules>
 	<scm>
 		<connection>scm:git:git@192.168.0.222:bc-business.git</connection>

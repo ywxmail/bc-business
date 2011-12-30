@@ -12,10 +12,10 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
+import cn.bc.BCConstants;
 import cn.bc.business.runcase.domain.Case4Advice;
 import cn.bc.business.runcase.domain.CaseBase;
 import cn.bc.business.web.struts2.ViewAction;
-import cn.bc.core.Entity;
 import cn.bc.core.query.condition.Condition;
 import cn.bc.core.query.condition.ConditionUtils;
 import cn.bc.core.query.condition.Direction;
@@ -45,7 +45,7 @@ import cn.bc.web.ui.json.Json;
 @Controller
 public class CaseAdvicesAction extends ViewAction<Map<String, Object>> {
 	private static final long serialVersionUID = 1L;
-	public String status = String.valueOf(Entity.STATUS_ENABLED); // 车辆的状态，多个用逗号连接
+	public String status = String.valueOf(BCConstants.STATUS_ENABLED); // 车辆的状态，多个用逗号连接
 	public Long carManId;
 	public Long carId;
 
@@ -72,7 +72,7 @@ public class CaseAdvicesAction extends ViewAction<Map<String, Object>> {
 		StringBuffer sql = new StringBuffer();
 		sql.append("select a.id, b.status_,a.advice_type,b.subject,b.motorcade_name,b.car_plate,b.driver_name");
 		sql.append(",b.closer_name,b.close_date,a.advisor_name,b.happen_date,b.address");
-		sql.append(",b.from_,b.source,b.driver_cert,a.receive_code,b.case_no ");
+		sql.append(",b.from_,b.source,b.driver_cert,a.receive_code,b.case_no,a.receive_date ");
 		sql.append(" from BS_CASE_ADVICE a");
 		sql.append(" inner join BS_CASE_BASE b on b.id=a.id");
 		sqlObject.setSql(sql.toString());
@@ -102,6 +102,7 @@ public class CaseAdvicesAction extends ViewAction<Map<String, Object>> {
 				map.put("driver_cert", rs[i++]);
 				map.put("receive_code", rs[i++]);
 				map.put("case_no", rs[i++]);
+				map.put("receive_date", rs[i++]);
 
 				return map;
 			}
@@ -117,25 +118,11 @@ public class CaseAdvicesAction extends ViewAction<Map<String, Object>> {
 				getText("runcase.status"), 50).setSortable(true)
 				.setValueFormater(new EntityStatusFormater(getBSStatuses2())));
 		columns.add(new TextColumn4MapKey("a.advice_type", "advice_type",
-				getText("runcase.adviceType"), 80).setSortable(true)
+				getText("runcase.adviceType"), 40).setSortable(true)
 				.setValueFormater(new KeyValueFormater(getType())));
-		columns.add(new TextColumn4MapKey("b.source", "source",
-				getText("runcase.ifsource"), 60).setSortable(true).setUseTitleFromLabel(true)
-				.setValueFormater(new AbstractFormater<String>() {
-					@Override
-					public String format(Object context, Object value) {
-						// 从上下文取出元素Map
-						@SuppressWarnings("unchecked")
-						Map<String, Object> obj = (Map<String, Object>) context;
-						if(null != obj.get("from_") && obj.get("from_").toString().length() > 0){
-							return getSourceStatuses().get(obj.get("source")+"") + " - " + obj.get("from_");
-						}else if(null != obj.get("source") && obj.get("source").toString().length() > 0){
-							return getSourceStatuses().get(obj.get("source")+"");
-						}else{
-							return "";
-						}
-					}
-				}));
+		columns.add(new TextColumn4MapKey("a.receive_date", "receive_date",
+				getText("runcase.receiveDate3"), 120).setSortable(true)
+				.setValueFormater(new CalendarFormater("yyyy-MM-dd HH:mm")));
 		columns.add(new TextColumn4MapKey("b.subject", "subject",
 				getText("runcase.subject"), 120).setSortable(true));
 		columns.add(new TextColumn4MapKey("b.motorcade_name", "motorcade_name",
@@ -166,6 +153,23 @@ public class CaseAdvicesAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("b.case_no", "case_no",
 				getText("runcase.caseNo2"), 100).setSortable(true)
 				.setUseTitleFromLabel(true));
+		columns.add(new TextColumn4MapKey("b.source", "source",
+				getText("runcase.ifsource"), 60).setSortable(true).setUseTitleFromLabel(true)
+				.setValueFormater(new AbstractFormater<String>() {
+					@Override
+					public String format(Object context, Object value) {
+						// 从上下文取出元素Map
+						@SuppressWarnings("unchecked")
+						Map<String, Object> obj = (Map<String, Object>) context;
+						if(null != obj.get("from_") && obj.get("from_").toString().length() > 0){
+							return getSourceStatuses().get(obj.get("source")+"") + " - " + obj.get("from_");
+						}else if(null != obj.get("source") && obj.get("source").toString().length() > 0){
+							return getSourceStatuses().get(obj.get("source")+"");
+						}else{
+							return "";
+						}
+					}
+				}));
 
 		return columns;
 	}

@@ -22,6 +22,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.orm.jpa.JpaCallback;
 import org.springframework.util.StringUtils;
 
+import cn.bc.BCConstants;
 import cn.bc.business.car.dao.CarDao;
 import cn.bc.business.car.domain.Car;
 import cn.bc.core.Entity;
@@ -47,7 +48,7 @@ public class CarDaoImpl extends HibernateCrudJpaDao<Car> implements CarDao {
 	public void delete(Serializable id) {
 		// 仅将状态标记为注销
 		Map<String, Object> attrs = new HashMap<String, Object>();
-		attrs.put("status", new Integer(Entity.STATUS_DISABLED));
+		attrs.put("status", new Integer(BCConstants.STATUS_DISABLED));
 		this.update(id, attrs);
 	}
 
@@ -55,7 +56,7 @@ public class CarDaoImpl extends HibernateCrudJpaDao<Car> implements CarDao {
 	public void delete(Serializable[] ids) {
 		// 仅将状态标记为为注销
 		Map<String, Object> attrs = new HashMap<String, Object>();
-		attrs.put("status", new Integer(Entity.STATUS_DISABLED));
+		attrs.put("status", new Integer(BCConstants.STATUS_DISABLED));
 		this.update(ids, attrs);
 	}
 

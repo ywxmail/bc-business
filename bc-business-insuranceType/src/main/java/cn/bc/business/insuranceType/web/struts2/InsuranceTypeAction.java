@@ -10,10 +10,10 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
+import cn.bc.BCConstants;
 import cn.bc.business.insuranceType.domain.InsuranceType;
 import cn.bc.business.insuranceType.service.InsuranceTypeService;
 import cn.bc.business.web.struts2.FileEntityAction;
-import cn.bc.core.Entity;
 import cn.bc.core.exception.CoreException;
 import cn.bc.core.query.condition.Direction;
 import cn.bc.core.query.condition.impl.OrderCondition;
@@ -57,7 +57,7 @@ public class InsuranceTypeAction extends FileEntityAction<Long, InsuranceType> {
 		String r = super.create();
 		InsuranceType e = this.getE();
 		// 初始状态
-		e.setStatus(Entity.STATUS_ENABLED);
+		e.setStatus(BCConstants.STATUS_ENABLED);
 		return r;
 	}
 
@@ -97,7 +97,7 @@ public class InsuranceTypeAction extends FileEntityAction<Long, InsuranceType> {
 		SystemContext context = this.getSystyemContext();
 		// 将状态设置为禁用而不是物理删除,更新最后修改人和修改时间
 		Map<String, Object> attributes = new HashMap<String, Object>();
-		attributes.put("status", new Integer(Entity.STATUS_DISABLED));
+		attributes.put("status", new Integer(BCConstants.STATUS_DISABLED));
 		attributes.put("modifier", context.getUserHistory());
 		attributes.put("modifiedDate", Calendar.getInstance());
 

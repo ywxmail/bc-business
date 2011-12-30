@@ -9,8 +9,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-import cn.bc.core.Entity;
-import cn.bc.core.RichEntity;
+import cn.bc.BCConstants;
 import cn.bc.docs.service.AttachService;
 import cn.bc.identity.domain.FileEntity;
 
@@ -47,9 +46,9 @@ public class FileEntityAction<K extends Serializable, E extends FileEntity<K>>
 	 */
 	protected Map<String, String> getBSStatuses1() {
 		Map<String, String> statuses = new LinkedHashMap<String, String>();
-		statuses.put(String.valueOf(RichEntity.STATUS_ENABLED),
+		statuses.put(String.valueOf(BCConstants.STATUS_ENABLED),
 				getText("bs.status.active"));
-		statuses.put(String.valueOf(Entity.STATUS_DISABLED),
+		statuses.put(String.valueOf(BCConstants.STATUS_DISABLED),
 				getText("bs.status.logout"));
 		statuses.put(" ", getText("bs.status.all"));
 		return statuses;
@@ -62,9 +61,9 @@ public class FileEntityAction<K extends Serializable, E extends FileEntity<K>>
 	 */
 	protected Map<String, String> getBSStatuses2() {
 		Map<String, String> statuses = new LinkedHashMap<String, String>();
-		statuses.put(String.valueOf(RichEntity.STATUS_ENABLED),
+		statuses.put(String.valueOf(BCConstants.STATUS_ENABLED),
 				getText("bs.status.active"));
-		statuses.put(String.valueOf(Entity.STATUS_DISABLED),
+		statuses.put(String.valueOf(BCConstants.STATUS_DISABLED),
 				getText("bs.status.closed"));
 		statuses.put(" ", getText("bs.status.all"));
 		return statuses;
