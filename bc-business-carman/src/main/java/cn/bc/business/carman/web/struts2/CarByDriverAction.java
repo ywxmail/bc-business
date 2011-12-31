@@ -4,7 +4,6 @@
 package cn.bc.business.carman.web.struts2;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,21 +19,8 @@ import cn.bc.business.carman.domain.CarMan;
 import cn.bc.business.carman.service.CarByDriverService;
 import cn.bc.business.carman.service.CarManService;
 import cn.bc.business.web.struts2.FileEntityAction;
-import cn.bc.core.RichEntity;
-import cn.bc.core.query.condition.Condition;
-import cn.bc.core.query.condition.Direction;
-import cn.bc.core.query.condition.impl.EqualsCondition;
-import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.identity.web.SystemContext;
-import cn.bc.web.formater.KeyValueFormater;
-import cn.bc.web.formater.LinkFormater4Id;
-import cn.bc.web.ui.html.grid.Column;
-import cn.bc.web.ui.html.grid.GridData;
-import cn.bc.web.ui.html.grid.TextColumn;
-import cn.bc.web.ui.html.page.ButtonOption;
-import cn.bc.web.ui.html.page.HtmlPage;
 import cn.bc.web.ui.html.page.PageOption;
-import cn.bc.web.ui.json.Json;
 
 /**
  * 司机营运车辆Action
@@ -82,7 +68,7 @@ public class CarByDriverAction extends FileEntityAction<Long, CarByDriver> {
 	@Override
 	public String create() throws Exception {
 		String result = super.create();
-		
+
 		if (carManId != null) {
 			CarMan driver = this.carManService.load(carManId);
 			this.getE().setDriver(driver);
@@ -101,128 +87,12 @@ public class CarByDriverAction extends FileEntityAction<Long, CarByDriver> {
 		statusesValueList = this.getBSStatuses1();
 		return result;
 	}
-	
-	// 视图特殊条件
-	@Override
-	protected Condition getSpecalCondition() {
-		if (carManId != null) {
-			return new EqualsCondition("driver.id", carManId);
-		}
-		if (carId != null) {
-			return new EqualsCondition("car.id", carId);
-		} else {
-			return null;
-		}
-	}
-
-	@Override
-	protected PageOption buildFormPageOption() {
-		PageOption option = new PageOption().setWidth(390).setMinWidth(250)
-				.setMinHeight(200);
-		if (!isReadonly()) {
-			option.addButton(new ButtonOption(getText("label.save"), "save"));
-		}
-		return option;
-	}
-
-	@Override
-	protected GridData buildGridData(List<Column> columns) {
-		return super.buildGridData(columns)
-				.setRowLabelExpression("driver.name");
-	}
-
-	@Override
-	protected OrderCondition getDefaultOrderCondition() {
-		return new OrderCondition("fileDate", Direction.Desc);
-	}
 
 	// 设置页面的尺寸
-
 	@Override
-	protected PageOption buildListPageOption() {
-		return super.buildListPageOption().setWidth(800).setMinWidth(300)
-				.setHeight(400).setMinHeight(100);
-	}
-
-	@Override
-	protected List<Column> buildGridColumns() {
-		List<Column> columns = super.buildGridColumns();
-		columns.add(new TextColumn("status", getText("carByDriver.statuses"),
-				100).setSortable(true).setValueFormater(
-				new KeyValueFormater(getEntityStatuses())));
-		if (carManId != null || (carManId == null && carId == null)) {
-			columns.add(new TextColumn("car.plateNo",
-					getText("carByDriver.car.plateNo"), 150)
-					.setValueFormater(new LinkFormater4Id(this.getContextPath()
-							+ "/bc-business/car/edit?id={0}", "car") {
-						@Override
-						public String getIdValue(Object context, Object value) {
-							return ((CarByDriver) context).getCar().getId()
-									.toString();
-						}
-
-						@Override
-						public String getTaskbarTitle(Object context,
-								Object value) {
-							CarByDriver carByDriver = (CarByDriver) context;
-							return getText("car") + " - "
-									+ carByDriver.getCar().getPlate();
-						}
-
-						@Override
-						public String getLinkText(Object context, Object value) {
-							CarByDriver carByDriver = (CarByDriver) context;
-							return carByDriver.getCar().getPlate();
-						}
-					}));
-
-		}
-		if (carId != null || (carManId == null && carId == null)) {
-			columns.add(new TextColumn("driver.name",
-					getText("carByDriver.driver"), 100)
-					.setValueFormater(new LinkFormater4Id(this.getContextPath()
-							+ "/bc-business/carMan/edit?id={0}", "driver") {
-						@Override
-						public String getIdValue(Object context, Object value) {
-							return ((CarByDriver) context).getDriver().getId()
-									.toString();
-						}
-
-						@Override
-						public String getTaskbarTitle(Object context,
-								Object value) {
-							return getText("carMan.type.driver") + " - "
-									+ value;
-						}
-					}));
-		}
-
-		columns.add(new TextColumn("classes", getText("carByDriver.classes"),
-				100).setSortable(true).setValueFormater(
-				new KeyValueFormater(getType())));
-
-		columns.add(new TextColumn("description",
-				getText("carMan.description"), 270).setSortable(true));
-
-		return columns;
-	}
-
-	@Override
-	protected HtmlPage buildHtml4Paging() {
-		HtmlPage page = super.buildHtml4Paging();
-		if (carManId != null)
-			page.setAttr("data-extras", new Json().put("carManId", carManId)
-					.toString());
-		if (carId != null)
-			page.setAttr("data-extras", new Json().put("carId", carId)
-					.toString());
-		return page;
-	}
-
-	@Override
-	protected String[] getSearchFields() {
-		return new String[] { "car.plateType", "car.plateNo", "driver.name",
-				"classes" };
+	protected PageOption buildFormPageOption(boolean editable) {
+		return super.buildFormPageOption(editable).setWidth(390)
+				.setMinWidth(250).setHeight(200);
 	}
 
 	/**
@@ -243,4 +113,13 @@ public class CarByDriverAction extends FileEntityAction<Long, CarByDriver> {
 				getText("carByDriver.classes.dingban"));
 		return type;
 	}
+
+	@Override
+	protected void initForm(boolean editable) {
+		super.initForm(editable);
+
+		// 状态列表
+		statusesValueList = this.getBSStatuses1();
+	}
+
 }

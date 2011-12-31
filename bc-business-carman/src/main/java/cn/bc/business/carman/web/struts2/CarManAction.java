@@ -17,7 +17,6 @@ import cn.bc.business.car.domain.Car;
 import cn.bc.business.carman.domain.CarMan;
 import cn.bc.business.carman.service.CarManService;
 import cn.bc.business.web.struts2.FileEntityAction;
-import cn.bc.core.RichEntity;
 import cn.bc.identity.domain.ActorDetail;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.option.service.OptionService;

@@ -3,7 +3,6 @@
  */
 package cn.bc.business.carman.web.struts2;
 
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,16 +19,9 @@ import cn.bc.business.carman.service.CarManService;
 import cn.bc.business.motorcade.domain.Motorcade;
 import cn.bc.business.motorcade.service.MotorcadeService;
 import cn.bc.business.web.struts2.FileEntityAction;
-import cn.bc.core.query.condition.Direction;
-import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.option.domain.OptionItem;
-import cn.bc.web.ui.html.grid.Column;
-import cn.bc.web.ui.html.grid.GridData;
-import cn.bc.web.ui.html.page.ButtonOption;
-import cn.bc.web.ui.html.page.HtmlPage;
 import cn.bc.web.ui.html.page.PageOption;
-import cn.bc.web.ui.json.Json;
 
 /**
  * 迁移记录Action
@@ -46,7 +38,7 @@ public class CarByDriverHistoryAction extends
 	public CarByDriverHistoryService carByDriverHistoryService;
 	public String portrait;
 	public Map<String, String> statusesValueList;// 状态列表
-	public Map<String, String> moveTypeValueList;// 状态列表
+	public Map<String, String> moveTypeValueList;// 迁移类型列表
 	public List<Map<String, String>> motorcadeList; // 可选车队列表
 	public CarManService carManService;
 	public CarService carService;
@@ -86,20 +78,13 @@ public class CarByDriverHistoryAction extends
 	}
 
 	public String create() throws Exception {
-		// String result = super.create();
-		this.motorcadeList = this.motorcadeService.find4Option();
-		statusesValueList = this.getBSStatuses1();
-		moveTypeValueList = this.getMoveType();
-		// if (carManId != null) {
-		// this.getE().getDriver().setId(carManId);
-		// }
-		SystemContext context = this.getSystyemContext();
-		this.getE().setAuthor(context.getUserHistory());
-		this.getE().setFileDate(Calendar.getInstance());
+		super.create();
+		// 设置迁移类型
 		this.getE().setMoveType(moveType);
 		return this.getFormName(this.getE().getMoveType());
 	}
 
+	// 根据不同的迁移类型转到相关迁移类型jsp
 	private String getFormName(int moveType) {
 		if (moveType == CarByDriverHistory.MOVETYPE_CLDCL) {
 			return "zhuanChe";
@@ -122,70 +107,15 @@ public class CarByDriverHistoryAction extends
 
 	@Override
 	public String edit() throws Exception {
-		String result = super.edit();
-		moveTypeValueList = this.getMoveType();
-		this.motorcadeList = this.motorcadeService.find4Option();
-		if (this.getE().getToMotorcadeId() != null) {
-			Motorcade tom = this.motorcadeService.load(this.getE()
-					.getToMotorcadeId());
-			if (tom != null) {
-				OptionItem.insertIfNotExist(this.motorcadeList, tom.getId()
-						.toString(), tom.getName());
-			}
-		}
-		if (this.getE().getFromMotorcadeId() != null) {
-			Motorcade frm = this.motorcadeService.load(this.getE()
-					.getFromMotorcadeId());
-			if (frm != null) {
-				OptionItem.insertIfNotExist(this.motorcadeList, frm.getId()
-						.toString(), frm.getName());
-			}
-		}
+		super.edit();
 		return this.getFormName(this.getE().getMoveType());
 	}
 
 	@Override
-	protected PageOption buildFormPageOption() {
-		PageOption option = new PageOption().setWidth(390).setMinWidth(250)
-				.setMinHeight(200);
-		if (!isReadonly()) {
-			option.addButton(new ButtonOption(getText("label.save"), "save"));
-		}
-		return option;
-	}
-
-	@Override
-	protected GridData buildGridData(List<Column> columns) {
-		return super.buildGridData(columns)
-				.setRowLabelExpression("driver.name");
-	}
-
-	@Override
-	protected OrderCondition getDefaultOrderCondition() {
-		return new OrderCondition("fileDate", Direction.Desc);
-	}
-
-	@Override
-	protected HtmlPage buildHtml4Paging() {
-		HtmlPage page = super.buildHtml4Paging();
-		if (carManId != null)
-			page.setAttr("data-extras", new Json().put("carManId", carManId)
-					.toString());
-		if (carId != null)
-			page.setAttr("data-extras", new Json().put("carId", carId)
-					.toString());
-		return page;
-	}
-
-	@Override
-	protected String[] getSearchFields() {
-		return new String[] { "car.plateType", "car.plateNo", "driver.name",
-				"classes" };
-	}
-
-	@Override
-	public String save() throws Exception {
+	protected void beforeSave(CarByDriverHistory entity) {
+		super.beforeSave(entity);
 		CarByDriverHistory e = this.getE();
+		// 在个别迁移类型中，可能不给gteToCar,getFromCar,getDriver设值,需将其设为空
 		if (e.getToCar() != null && e.getToCar().getId() == null) {
 			e.setToCar(null);
 		}
@@ -196,14 +126,6 @@ public class CarByDriverHistoryAction extends
 			e.setDriver(null);
 		}
 
-		SystemContext context = this.getSystyemContext();
-		// 设置最后更新人的信息
-		this.getE().setModifier(context.getUserHistory());
-		this.getE().setModifiedDate(Calendar.getInstance());
-
-		super.save();
-
-		return "saveSuccess";
 	}
 
 	/**
@@ -229,6 +151,47 @@ public class CarByDriverHistoryAction extends
 		type.put(String.valueOf(CarByDriverHistory.MOVETYPE_ZCD),
 				getText("carByDriverHistory.moveType.cheduidaochedui"));
 		return type;
+	}
+
+	@Override
+	protected void initForm(boolean editable) {
+		super.initForm(editable);
+
+		// 状态列表
+		statusesValueList = this.getBSStatuses1();
+
+		// 迁移类型列表
+		moveTypeValueList = this.getMoveType();
+
+		// 车队列表
+		this.motorcadeList = this.motorcadeService.find4Option();
+		// 可选车队下拉框显示
+		if (!this.getE().isNew()) {
+			// 新建时不作处理
+			if (this.getE().getToMotorcadeId() != null) {
+				Motorcade tom = this.motorcadeService.load(this.getE()
+						.getToMotorcadeId());
+				if (tom != null) {
+					OptionItem.insertIfNotExist(this.motorcadeList, tom.getId()
+							.toString(), tom.getName());
+				}
+			}
+			if (this.getE().getFromMotorcadeId() != null) {
+				Motorcade frm = this.motorcadeService.load(this.getE()
+						.getFromMotorcadeId());
+				if (frm != null) {
+					OptionItem.insertIfNotExist(this.motorcadeList, frm.getId()
+							.toString(), frm.getName());
+				}
+			}
+		}
+
+	}
+
+	@Override
+	protected PageOption buildFormPageOption(boolean editable) {
+		return super.buildFormPageOption(editable).setWidth(390)
+				.setMinWidth(250).setHeight(590).setMinHeight(200);
 	}
 
 }
