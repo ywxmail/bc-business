@@ -28,22 +28,14 @@ import cn.bc.business.runcase.service.CaseBaseService;
 import cn.bc.business.sync.domain.JiaoWeiADVICE;
 import cn.bc.business.sync.service.JiaoWeiADVICEService;
 import cn.bc.business.web.struts2.FileEntityAction;
-import cn.bc.core.query.condition.Condition;
 import cn.bc.core.query.condition.Direction;
-import cn.bc.core.query.condition.impl.EqualsCondition;
 import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.option.domain.OptionItem;
 import cn.bc.option.service.OptionService;
 import cn.bc.sync.domain.SyncBase;
 import cn.bc.sync.service.SyncBaseService;
-import cn.bc.web.formater.CalendarFormater;
-import cn.bc.web.formater.EntityStatusFormater;
-import cn.bc.web.ui.html.grid.Column;
-import cn.bc.web.ui.html.grid.GridData;
-import cn.bc.web.ui.html.grid.TextColumn;
 import cn.bc.web.ui.html.page.ButtonOption;
-import cn.bc.web.ui.html.page.HtmlPage;
 import cn.bc.web.ui.html.page.PageOption;
 import cn.bc.web.ui.json.Json;
 import cn.bc.web.ui.json.JsonArray;
@@ -183,71 +175,31 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 	}
 
 	@Override
-	protected PageOption buildFormPageOption() {
-		PageOption option = super.buildFormPageOption().setWidth(825).setMinWidth(250).setHeight(480)
+	protected PageOption buildFormPageOption(boolean editable) {
+		return super.buildFormPageOption(editable).setWidth(825).setMinWidth(250).setHeight(480)
 				.setMinHeight(200);
-		
-		if (!isReadonly()) {
+	}
+
+	
+	@Override
+	protected void buildFormPageButtons(PageOption pageOption, boolean editable) {
+		boolean readonly = this.isReadonly();
+		if (editable && !readonly) {
 			//特殊处理结案按钮
 			if(Case4Advice.STATUS_ACTIVE == getE().getStatus() && !getE().isNew()){
 				ButtonOption buttonOption = new ButtonOption(getText("label.closefile"),null,"bc.caseAdviceForm.closefile");
 				buttonOption.put("id", "bcSaveDlgButton");
-				option.addButton(buttonOption);
+				pageOption.addButton(buttonOption);
 			}
-			option.addButton(new ButtonOption(getText("label.save"), "save"));
+			// 添加默认的保存按钮
+			pageOption.addButton(this.getDefaultSaveButtonOption());
 		}
-		return option;
 	}
 
-	@Override
-	protected GridData buildGridData(List<Column> columns) {
-		return super.buildGridData(columns).setRowLabelExpression("caseNo");
-	}
-
-	// 设置页面的尺寸
-	@Override
-	protected PageOption buildListPageOption() {
-		return super.buildListPageOption().setWidth(800).setMinWidth(300)
-				.setHeight(400).setMinHeight(300);
-	}
-
-	//搜索条件
-	@Override
-	protected String[] getSearchFields() {
-		return new String[] { "caseNo", "carPlate" ,"driverName", "driverCert", "motorcadeName","closerName","subject" };
-	}
-	
-	@Override
-	protected List<Column> buildGridColumns() {
-		List<Column> columns = super.buildGridColumns();
-		columns.add(new TextColumn("status",getText("runcase.status"),		50)
-				.setSortable(true).setValueFormater(new EntityStatusFormater(getCaseStatuses())));
-		columns.add(new TextColumn("subject", getText("runcase.subject"),	120));
-		columns.add(new TextColumn("motorcadeName", getText("runcase.motorcadeName"),		80)
-				.setSortable(true));
-		columns.add(new TextColumn("carPlate", getText("runcase.carPlate"),		100)
-				.setSortable(true).setUseTitleFromLabel(true));
-		columns.add(new TextColumn("driverName", getText("runcase.driverName"),70)
-					.setSortable(true));
-		columns.add(new TextColumn("closerName", getText("runcase.closerName"),70)
-				.setSortable(true));
-		columns.add(new TextColumn("advisorName", getText("runcase.advisorName"),70));
-		columns.add(new TextColumn("happenDate", getText("runcase.happenDate"),	120)
-				.setSortable(true).setValueFormater(new CalendarFormater("yyyy-MM-dd")));
-		columns.add(new TextColumn("closeDate", getText("runcase.closeDate"),	120)
-				.setSortable(true).setValueFormater(new CalendarFormater("yyyy-MM-dd")));
-		columns.add(new TextColumn("address", getText("runcase.address"),120));
-		columns.add(new TextColumn("from", getText("runcase.ifsource"),		70).setSortable(true));
-		columns.add(new TextColumn("driverCert", getText("runcase.driverCert"),	80));
-		columns.add(new TextColumn("receiveCode", getText("runcase.receiveCode"),	80));
-		columns.add(new TextColumn("caseNo",	getText("runcase.caseNo2")));
-		return columns;
-	}
-	
 	@SuppressWarnings("static-access")
 	@Override
-	public String create() throws Exception {
-		String r = super.create();
+	protected void afterCreate(Case4Advice entity) {
+		super.afterCreate(entity);
 		
 		if(syncId != null){	//判断同步id是否为空
 			JiaoWeiADVICE jiaoWeiADVICE = this.jiaoWeiADVICEService.load(syncId);
@@ -344,14 +296,6 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 		if(syncId == null){ //不是同步过来的信息设为自建
 			this.getE().setSource(CaseBase.SOURCE_SYS);
 		}
-		
-		statusesValue		=	this.getCaseStatuses();
-		sourcesValue		=	this.getSourceStatuses();
-		
-		// 表单可选项的加载
-		initSelects();
-		
-		return r; 
 	}
 	
 	/** 根据车牌号查找carId*/
@@ -371,10 +315,9 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 			this.setE(this.getCrudService().load(this.getId()));
 		}
 		// 表单可选项的加载
-		this.formPageOption = 	buildFormPageOption();
-		statusesValue		=	this.getCaseStatuses();
-		sourcesValue		=	this.getSourceStatuses();
-		initSelects();
+		this.formPageOption = 	buildFormPageOption(true);
+		// 初始化表单的其他配置
+		this.initForm(true);
 		return "form";
 	}
 	
@@ -462,10 +405,15 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 		return "json";
 	}
 	
-	public String selectSubject(){
-		return "showdialog";
+	@Override
+	protected void initForm(boolean editable) {
+		super.initForm(editable);
+		
+		statusesValue		=	this.getCaseStatuses();
+		sourcesValue		=	this.getSourceStatuses();
+		// 表单可选项的加载
+		initSelects();
 	}
-	
 	
 	// 表单可选项的加载
 	public void initSelects(){
@@ -521,33 +469,6 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 		statuses.put(String.valueOf(CaseBase.SOURCE_GENERATION),
 				getText("runcase.select.source.sync.gen"));
 		return statuses;
-	}
-	
-	
-	// 视图特殊条件
-	@Override
-	protected Condition getSpecalCondition() {
-		if (carId != null) {
-			return new EqualsCondition("carId", carId);
-		}
-		if (carManId != null) {
-			return new EqualsCondition("driverId", carManId);
-		}else {
-			return null;
-		}
-	}
-	
-
-	@Override
-	protected HtmlPage buildHtml4Paging() {
-		HtmlPage page = super.buildHtml4Paging();
-		if (carId != null)
-			page.setAttr("data-extras", new Json().put("carId", carId)
-					.toString());
-		if (carManId != null)
-			page.setAttr("data-extras", new Json().put("carManId", carManId)
-					.toString());
-		return page;
 	}
 	
 }

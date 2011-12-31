@@ -45,18 +45,17 @@ public class JiaoWeiADVICEAction extends EntityAction<Long, JiaoWeiADVICE> {
 
 
 	@Override
-	protected PageOption buildFormPageOption() {
-		PageOption option = super.buildFormPageOption().setWidth(700).setMinWidth(250).setHeight(400)
+	protected PageOption buildFormPageOption(boolean editable) {
+		PageOption option = super.buildFormPageOption(editable).setWidth(700).setMinWidth(250).setHeight(400)
 				.setMinHeight(200);
 		return option;
 	}
 
 	@Override
-	public String edit() throws Exception {
-		this.setE(this.getCrudService().load(this.getId()));
-		this.formPageOption = this.buildFormPageOption();
+	protected void initForm(boolean editable) {
+		super.initForm(editable);
+		// 状态列表
 		statusesValue = this.getSyncStatuses();
-		return "form";
 	}
 	
 	protected Map<String, String> getSyncStatuses() {

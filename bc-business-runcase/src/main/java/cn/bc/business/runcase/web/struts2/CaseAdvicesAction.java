@@ -190,11 +190,12 @@ public class CaseAdvicesAction extends ViewAction<Map<String, Object>> {
 		return super.getHtmlPageOption().setWidth(900).setMinWidth(400)
 				.setHeight(400).setMinHeight(300);
 	}
-
+	
 	@Override
 	protected String getGridRowLabelExpression() {
 		return "['car_plate']";
 	}
+
 
 	@Override
 	protected Condition getGridSpecalCondition() {

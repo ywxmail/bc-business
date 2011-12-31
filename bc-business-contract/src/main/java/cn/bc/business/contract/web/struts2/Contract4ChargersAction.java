@@ -101,7 +101,7 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 		List<Column> columns = new ArrayList<Column>();
 		columns.add(new IdColumn4MapKey("cc.id","id"));
 		columns.add(new TextColumn4MapKey("cc.bs_type", "bs_type",
-				getText("contract.charger.businessType"),60));
+				getText("contract4Charger.businessType"),60));
 		columns.add(new TextColumn4MapKey("c.ext_str1", "ext_str1",
 				getText("contract.car"), 80).setUseTitleFromLabel(true)
 				.setValueFormater(
@@ -117,7 +117,7 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 							}
 						}));
 		columns.add(new TextColumn4MapKey("c.ext_str2", "ext_str2",
-				getText("contract.charger.charger")).setUseTitleFromLabel(true));
+				getText("contract4Charger.charger")).setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("c.start_date", "start_date", getText("contract.deadline"), 180)
 				.setValueFormater(new DateRangeFormater("yyyy-MM-dd") {
 					@Override
@@ -145,7 +145,7 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected String getFormActionName() {
-		return "contractCharger";
+		return "contract4Charger";
 	}
 
 	@Override
