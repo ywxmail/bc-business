@@ -129,27 +129,29 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("p.op_type", "op_type",
 				getText("policy.labour.optype"), 60).setSortable(true)
 				.setValueFormater(new EntityStatusFormater(getEntityOpTypes())));
-		columns.add(new TextColumn4MapKey("p.plate_no", "plate",
-				getText("policy.carId"), 80)
-				.setValueFormater(new LinkFormater4Id(this.getContextPath()
-						+ "/bc-business/car/edit?id={0}", "car") {
-					@SuppressWarnings("unchecked")
-					@Override
-					public String getIdValue(Object context, Object value) {
-						return StringUtils
-								.toString(((Map<String, Object>) context)
-										.get("carId"));
-					}
-
-					@Override
-					public String getTaskbarTitle(Object context, Object value) {
+		if (carId == null) {
+			columns.add(new TextColumn4MapKey("p.plate_no", "plate",
+					getText("policy.carId"), 80)
+					.setValueFormater(new LinkFormater4Id(this.getContextPath()
+							+ "/bc-business/car/edit?id={0}", "car") {
 						@SuppressWarnings("unchecked")
-						Map<String, Object> map = (Map<String, Object>) context;
-						return getText("car") + " - " + map.get("plate");
+						@Override
+						public String getIdValue(Object context, Object value) {
+							return StringUtils
+									.toString(((Map<String, Object>) context)
+											.get("carId"));
+						}
 
-					}
-				}));
+						@Override
+						public String getTaskbarTitle(Object context,
+								Object value) {
+							@SuppressWarnings("unchecked")
+							Map<String, Object> map = (Map<String, Object>) context;
+							return getText("car") + " - " + map.get("plate");
 
+						}
+					}));
+		}
 		columns.add(new TextColumn4MapKey("p.assured", "assured",
 				getText("policy.assured"), 180));
 		columns.add(new TextColumn4MapKey("p.register_date", "register_date",
@@ -296,13 +298,13 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 	protected Map<String, String> getEntityOpTypes() {
 		Map<String, String> types = new HashMap<String, String>();
 		types.put(String.valueOf(Policy.OPTYPE_CREATE),
-				getText("policy.labour.optype.create"));
+				getText("policy.optype.create"));
 		types.put(String.valueOf(Policy.OPTYPE_EDIT),
-				getText("policy.labour.optype.edit"));
+				getText("policy.optype.edit"));
 		types.put(String.valueOf(Policy.OPTYPE_RENEWAL),
-				getText("policy.labour.optype.renewal"));
+				getText("policy.optype.renewal"));
 		types.put(String.valueOf(Policy.OPTYPE_SURRENDERS),
-				getText("policy.labour.optype.surrenders"));
+				getText("policy.optype.surrenders"));
 		return types;
 	}
 
