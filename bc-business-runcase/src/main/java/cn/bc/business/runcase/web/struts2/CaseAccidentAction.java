@@ -26,9 +26,7 @@ import cn.bc.business.runcase.domain.Case4InfractTraffic;
 import cn.bc.business.runcase.domain.CaseBase;
 import cn.bc.business.runcase.service.CaseAccidentService;
 import cn.bc.business.web.struts2.FileEntityAction;
-import cn.bc.core.query.condition.Condition;
 import cn.bc.core.query.condition.Direction;
-import cn.bc.core.query.condition.impl.EqualsCondition;
 import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.core.util.DateUtils;
 import cn.bc.docs.service.AttachService;
@@ -36,13 +34,7 @@ import cn.bc.docs.web.ui.html.AttachWidget;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.option.domain.OptionItem;
 import cn.bc.option.service.OptionService;
-import cn.bc.web.formater.CalendarFormater;
-import cn.bc.web.formater.EntityStatusFormater;
-import cn.bc.web.ui.html.grid.Column;
-import cn.bc.web.ui.html.grid.GridData;
-import cn.bc.web.ui.html.grid.TextColumn;
 import cn.bc.web.ui.html.page.ButtonOption;
-import cn.bc.web.ui.html.page.HtmlPage;
 import cn.bc.web.ui.html.page.PageOption;
 import cn.bc.web.ui.json.Json;
 import cn.bc.web.ui.json.JsonArray;
@@ -60,10 +52,10 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 	private static final long serialVersionUID = 1L;
 	private Long carId;
 	public String isClosed;
-	public boolean isMoreCar;//标识是否一个司机对应有多辆车
-	public boolean isMoreCarMan;//标识是否一辆车对应多个司机
-	public boolean isNullCar;//标识是否没有车和司机对应
-	public boolean isNullCarMan;//标识是否没有司机和车对应
+	public boolean isMoreCar;// 标识是否一个司机对应有多辆车
+	public boolean isMoreCarMan;// 标识是否一辆车对应多个司机
+	public boolean isNullCar;// 标识是否没有车和司机对应
+	public boolean isNullCarMan;// 标识是否没有司机和车对应
 
 	@SuppressWarnings("unused")
 	private CaseAccidentService caseAccidentService;
@@ -170,11 +162,35 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 				getText("key.role.bc.admin"));
 	}
 
+	// @Override
+	// protected PageOption buildFormPageOption() {
+	// PageOption option = new PageOption().setWidth(850).setMinWidth(250)
+	// .setMinHeight(200).setModal(false).setHeight(500);
+	// if (!isReadonly()) {
+	// // 特殊处理结案按钮
+	// if (Case4InfractTraffic.STATUS_ACTIVE == getE().getStatus()
+	// && !getE().isNew()) {
+	// ButtonOption buttonOption = new ButtonOption(
+	// getText("label.closefile"), null,
+	// "bc.caseAccidentForm.closefile");
+	// buttonOption.put("id", "bcSaveDlgButton");
+	// option.addButton(buttonOption);
+	// }
+	// option.addButton(new ButtonOption(getText("label.save"), "save"));
+	// }
+	// return option;
+	// }
+
+	// 设置页面的尺寸
 	@Override
-	protected PageOption buildFormPageOption() {
-		PageOption option = new PageOption().setWidth(850).setMinWidth(250)
-				.setMinHeight(200).setModal(false).setHeight(500);
-		if (!isReadonly()) {
+	protected PageOption buildFormPageOption(boolean editable) {
+		return super.buildFormPageOption(editable).setWidth(830)
+				.setMinWidth(300).setHeight(450).setMinHeight(300);
+	}
+
+	protected void buildFormPageButtons(PageOption pageOption, boolean editable) {
+		boolean readonly = this.isReadonly();
+		if (editable && !readonly) {
 			// 特殊处理结案按钮
 			if (Case4InfractTraffic.STATUS_ACTIVE == getE().getStatus()
 					&& !getE().isNew()) {
@@ -182,64 +198,27 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 						getText("label.closefile"), null,
 						"bc.caseAccidentForm.closefile");
 				buttonOption.put("id", "bcSaveDlgButton");
-				option.addButton(buttonOption);
+				pageOption.addButton(buttonOption);
 			}
-			option.addButton(new ButtonOption(getText("label.save"), "save"));
+			pageOption
+					.addButton(new ButtonOption(getText("label.save"), "save"));
 		}
-		return option;
+
 	}
+//
+//	@SuppressWarnings("static-access")
+//	@Override
+//	public String create() throws Exception {
+//		String r = super.create();
+//
+//		return r;
+//	}
 
 	@Override
-	protected GridData buildGridData(List<Column> columns) {
-		return super.buildGridData(columns).setRowLabelExpression("caseNo");
-	}
-
-	// 设置页面的尺寸
-	@Override
-	protected PageOption buildListPageOption() {
-		return super.buildListPageOption().setWidth(800).setMinWidth(300)
-				.setHeight(400).setMinHeight(300);
-	}
-
-	// 搜索条件
-	@Override
-	protected String[] getSearchFields() {
-		return new String[] { "caseNo", "carPlate", "driverName", "driverCert",
-				"motorcadeName" };
-	}
-
-	@Override
-	protected List<Column> buildGridColumns() {
-		List<Column> columns = super.buildGridColumns();
-		columns.add(new TextColumn("status", getText("runcase.status"), 50)
-				.setSortable(true).setValueFormater(
-						new EntityStatusFormater(getCaseStatuses())));
-		columns.add(new TextColumn("code", getText("runcase.caseNo3"))
-				.setSortable(true));
-		columns.add(new TextColumn("sort", getText("runcase.sort"), 80)
-				.setSortable(true));
-		columns.add(new TextColumn("motorcadeName",
-				getText("runcase.motorcadeName"), 80).setSortable(true));
-
-		columns.add(new TextColumn("carPlate", getText("runcase.carPlate"), 100)
-				.setSortable(true));
-		columns.add(new TextColumn("driverName", getText("runcase.driverName"),
-				70).setSortable(true));
-		columns.add(new TextColumn("happenDate", getText("runcase.happenDate"),
-				150).setSortable(true).setValueFormater(
-				new CalendarFormater("yyyy-MM-dd")));
-		columns.add(new TextColumn("address", getText("runcase.address"), 120)
-				.setSortable(true));
-		columns.add(new TextColumn("driverCert", getText("runcase.driverCert"),
-				80).setSortable(true));
-		return columns;
-	}
-
-	@SuppressWarnings("static-access")
-	@Override
-	public String create() throws Exception {
-		String r = super.create();
+	protected void afterCreate(Case4Accident entity) {
+		super.afterCreate(entity);
 		if (carManId != null) {
+			// 如果司机Id不为空(在司机页签中新建事故理赔表单)
 			CarMan driver = this.carManService.load(carManId);
 			List<Car> car = this.carService.selectAllCarByCarManId(carManId);
 			if (car.size() == 1) {
@@ -259,6 +238,7 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 			this.getE().setDriverClasses(driver.getDrivingStatus());
 		}
 		if (carId != null) {
+			// 如果车辆Id不为空(在司机页签中新建事故理赔表单)
 			Car car = this.carService.load(carId);
 			this.getE()
 					.setCarPlate(car.getPlateType() + "." + car.getPlateNo());
@@ -278,15 +258,6 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 				isNullCarMan = true;
 			}
 		}
-		// departmentList = this.optionService
-		// .findOptionItemByGroupKey(OptionConstants.CA_DEPARTMENT);
-		// companyList = this.optionService
-		// .findOptionItemByGroupKey(OptionConstants.CA_COMPANY);
-		// dutyList = this.optionService
-		// .findOptionItemByGroupKey(OptionConstants.CA_DUTY);
-		// sortList = this.optionService
-		// .findOptionItemByGroupKey(OptionConstants.CA_SORT);
-		this.initSelects();
 		this.getE().setUid(
 				this.getIdGeneratorService().next(this.getE().ATTACH_TYPE));
 
@@ -295,48 +266,31 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 		this.getE().setStatus(CaseBase.STATUS_ACTIVE);
 		statusesValue = this.getBSStatuses2();
 
-		// 表单可选项的加载
-		sourcesValue = this.getSourceStatuses();
-		initSelects();
 		// 构建附件控件
 		attachsUI = buildAttachsUI(true);
-		return r;
 	}
 
-	@Override
-	public String edit() throws Exception {
-		this.setE(this.getCrudService().load(this.getId()));
-		this.formPageOption = buildFormPageOption();
+//	@Override
+//	public String edit() throws Exception {
+//		this.setE(this.getCrudService().load(this.getId()));
+//		this.formPageOption = buildFormPageOption();
+//
+//		// 构建附件控件
+//		attachsUI = buildAttachsUI(false);
+//		return "form";
+//	}
 
-		// 表单可选项的加载
-		statusesValue = this.getCaseStatuses();
-		sourcesValue = this.getSourceStatuses();
-		initSelects();
-
-		// departmentList = this.optionService
-		// .findOptionItemByGroupKey(OptionConstants.CA_DEPARTMENT);
-		// companyList = this.optionService
-		// .findOptionItemByGroupKey(OptionConstants.CA_COMPANY);
-		// dutyList = this.optionService
-		// .findOptionItemByGroupKey(OptionConstants.CA_DUTY);
-		// sortList = this.optionService
-		// .findOptionItemByGroupKey(OptionConstants.CA_SORT);
-
-		// 构建附件控件
-		attachsUI = buildAttachsUI(false);
-		return "form";
-	}
+	// @Override
+	// public String save() throws Exception {
+	//
+	// return "saveSuccess";
+	// }
 
 	@Override
-	public String save() throws Exception {
+	protected void beforeSave(Case4Accident entity) {
+		super.beforeSave(entity);
 		SystemContext context = this.getSystyemContext();
 		Case4Accident e = this.getE();
-
-		// if (e != null && (e.getReceiverId() == null || e.getReceiverId() <
-		// 0)) {
-		// e.setReceiverId(context.getUserHistory().getId());
-		// e.setReceiverName(context.getUserHistory().getName());
-		// }
 
 		// 设置结案信息
 		if (isClosed.length() > 0 && isClosed.equals("1")) {
@@ -351,38 +305,14 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 		e.setModifiedDate(Calendar.getInstance());
 		this.getCrudService().save(e);
 
-		return "saveSuccess";
 	}
 
-	// public Json json;
-
-	// public String closefile() {
-	// this.setE(this.getCrudService().load(this.getId()));
-	// SystemContext context = this.getSystyemContext();
-	// Case4Accident e = this.getE();
-	// // Case4Accident ca=this.getCrudService().load(this.getE().getId());
-	// // this.getE().setAuthor(ca.getAuthor());
-	// // this.getE().setFileDate(ca.getFileDate());
-	// // this.getE().setModifier(ca.getModifier());
-	// // this.getE().setModifiedDate(ca.getModifiedDate());
-	// e.setStatus(CaseBase.STATUS_CLOSED);
-	// e.setCloserId(context.getUser().getId());
-	// e.setCloserName(context.getUser().getName());
-	// e.setCloseDate(Calendar.getInstance(Locale.CHINA));
-	// this.getCrudService().save(e);
-	//
-	// return "form";
-	// // DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-	// // String closeDateStr =
-	// // df.format(this.getE().getCloseDate().getTime());
-	// // json = new Json();
-	// // json.put("status", this.getE().getStatus());
-	// // //结案日期
-	// // json.put("closeDate",Calendar.getInstance(Locale.CHINA).toString());
-	// // json.put("closerId", context.getUser().getId());
-	// // json.put("closerName", context.getUser().getName());
-	// // return "json";
-	// }
+	@Override
+	protected void afterEdit(Case4Accident entity) {
+		super.afterEdit(entity);
+		// 构建附件控件
+		attachsUI = buildAttachsUI(true);
+	}
 
 	/**
 	 * 获取Entity的状态值转换列表
@@ -416,31 +346,6 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 		return statuses;
 	}
 
-	// 视图特殊条件
-	@Override
-	protected Condition getSpecalCondition() {
-		if (carManId != null) {
-			return new EqualsCondition("driverId", carManId);
-		}
-		if (carId != null) {
-			return new EqualsCondition("carId", carId);
-		} else {
-			return null;
-		}
-	}
-
-	@Override
-	protected HtmlPage buildHtml4Paging() {
-		HtmlPage page = super.buildHtml4Paging();
-		if (carManId != null)
-			page.setAttr("data-extras", new Json().put("carManId", carManId)
-					.toString());
-		if (carId != null)
-			page.setAttr("data-extras", new Json().put("carId", carId)
-					.toString());
-		return page;
-	}
-
 	public String json;
 
 	public String selectCarMansInfo() {
@@ -460,26 +365,16 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 		json = jsons.toString();
 		return "json";
 
-		// json = new Json();
-		// if (carMans.size() == 1) {
-		// json.put("name", carMans.get(0).getName());
-		// json.put("id", carMans.get(0).getId());
-		// json.put("cert4fwzg", carMans.get(0).getCert4FWZG());
-		// json.put("region", carMans.get(0).getRegion());
-		// json.put("drivingstaus", carMans.get(0).getDrivingStatus());
-		//
-		// } else if(carMans.size()==0){
-		// isNullCarMan = true;
-		// return "a";
-		// }else{
-		// isMoreCarMan = true;
-		//
-		// }
 	}
 
-	// 表单可选项的加载
-	public void initSelects() {
+	@Override
+	protected void initForm(boolean editable) {
+		super.initForm(editable);
 		Date startTime = new Date();
+		// 表单可选项的加载
+		statusesValue = this.getCaseStatuses();
+		sourcesValue = this.getSourceStatuses();
+
 		// 加载可选车队列表
 		this.motorcadeList = this.motorcadeService.find4Option();
 		if (this.getE().getMotorcadeId() != null)
@@ -506,6 +401,7 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 
 		if (logger.isInfoEnabled())
 			logger.info("findOptionItem耗时：" + DateUtils.getWasteTime(startTime));
+
 	}
 
 }
