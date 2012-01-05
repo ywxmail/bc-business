@@ -3,7 +3,6 @@
  */
 package cn.bc.business.policy.web.struts2;
 
-import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -18,27 +17,21 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
-import cn.bc.BCConstants;
 import cn.bc.business.OptionConstants;
-import cn.bc.business.car.service.CarService;
 import cn.bc.business.policy.domain.BuyPlant;
 import cn.bc.business.policy.domain.Policy;
 import cn.bc.business.policy.service.PolicyService;
 import cn.bc.business.web.struts2.FileEntityAction;
-import cn.bc.core.query.condition.Condition;
 import cn.bc.core.util.DateUtils;
 import cn.bc.docs.service.AttachService;
 import cn.bc.docs.web.ui.html.AttachWidget;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.option.service.OptionService;
 import cn.bc.web.ui.html.page.ButtonOption;
-import cn.bc.web.ui.html.page.HtmlPage;
 import cn.bc.web.ui.html.page.PageOption;
-import cn.bc.web.ui.html.toolbar.ToolbarMenuButton;
-import cn.bc.web.ui.json.Json;
 
 /**
- * 黑名单Action
+ * 车保Action
  * 
  * @author dragon
  * 
@@ -50,8 +43,6 @@ public class PolicyAction extends FileEntityAction<Long, Policy> {
 	private static final long serialVersionUID = 1L;
 	public OptionService optionService;
 	public PolicyService policyService;
-	public String carPlate;// 车牌号码
-	private CarService carService;
 	private AttachService attachService;
 	public AttachWidget attachsUI;
 	public Long carId;
@@ -81,29 +72,16 @@ public class PolicyAction extends FileEntityAction<Long, Policy> {
 	}
 
 	@Autowired
-	public void CarService(CarService carService) {
-		this.carService = carService;
-	}
-
-	@Autowired
 	public void setAttachService(AttachService attachService) {
 		this.attachService = attachService;
 	}
 
 	public boolean isReadonly() {
-
-		if (!this.getE().isNew()) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	public boolean isRole() {
 		// 车辆保单管理员或系统管理员
 		SystemContext context = (SystemContext) this.getContext();
 		return !context.hasAnyRole(getText("key.role.bs.policy"),
 				getText("key.role.bc.admin"));
+
 	}
 
 	@SuppressWarnings("static-access")
@@ -127,28 +105,24 @@ public class PolicyAction extends FileEntityAction<Long, Policy> {
 	}
 
 	@Override
-	public String create() throws Exception {
-		String result = super.create();
-		statusesValue = this.getBSStatuses1();
+	protected void afterCreate(Policy entity) {
+		super.afterCreate(entity);
+		// 默认购买强制险
 		this.getE().setGreenslip(true);
+		// 默认强制险时间与商业险时间不一致
 		this.getE().setGreenslipSameDate(false);
 		this.getE().setVerMajor(Policy.MAJOR_DEFALUT);
 		this.getE().setOpType(Policy.OPTYPE_CREATE);
-		this.getE().setUid(
-				this.getIdGeneratorService().next(Policy.POLICY_TYPE));
+		this.getE().setUid(this.getIdGeneratorService().next(Policy.KEY_UID));
 		this.getE().setPatchNo(this.getE().getUid());
 		// 构建附件控件
 		attachsUI = buildAttachsUI(true);
-		initSelects();
-		return result;
+
 	}
 
 	@Override
-	public String save() throws Exception {
-		// 如果操作类型为续保，执行续保方法
-		if (this.getE().getOpType() == Policy.OPTYPE_RENEWAL) {
-			renewal(true);
-		}
+	protected void beforeSave(Policy entity) {
+		super.beforeSave(entity);
 		// 插入险种值
 		try {
 			Set<BuyPlant> buyPlants = null;
@@ -179,105 +153,39 @@ public class PolicyAction extends FileEntityAction<Long, Policy> {
 			}
 		} catch (JSONException e) {
 			logger.error(e.getMessage(), e);
-			throw e;
+			try {
+				throw e;
+			} catch (JSONException e1) {
+				e1.printStackTrace();
+			}
 		}
-		super.save();
-		return "saveSuccess";
-
 	}
 
-	// 续保
-	protected void renewal(boolean flag) throws Exception {
+	@Override
+	protected void buildFormPageButtons(PageOption pageOption, boolean editable) {
+		boolean readonly = this.isReadonly();
 
-		SystemContext context = this.getSystyemContext();
-		Policy p = this.getE();
-		// 旧车保
-		Policy oldE = policyService.load(p.getPid());
-		// 版本号加1
-		int oldVerMajor = oldE.getVerMajor();
-		p.setVerMajor(oldVerMajor + 1);
-		// 标识为当前版本
-		p.setMain(Policy.MAIN_NOW);
-		// 设置创建人和创建时间
-		p.setAuthor(context.getUserHistory());
-		p.setFileDate(Calendar.getInstance());
-		// 设置UId
-		this.getE().setUid(
-				this.getIdGeneratorService().next(Policy.POLICY_TYPE));
-		// 续保后旧车保要做相应的处理
-		if (p.getPid() != null) {
-			if (oldE != null) {
-				oldE.setStatus(BCConstants.STATUS_DISABLED); // 把旧的车保状态改为注销
-				oldE.setMain(Policy.MAIN_HISTORY); // 设定为历史标识
-				// 保存旧的记录
-				this.getCrudService().save(oldE);
+		if (editable && !readonly) {
+			// 添加默认的保存按钮
+			pageOption.addButton(new ButtonOption(getText("label.save"), null,
+					"bc.policyForm.save"));
+			if (!this.getE().isNew()) {
+				pageOption.addButton(new ButtonOption(
+						getText("policy.optype.renewal"), null,
+						"bc.policyForm.doRenew"));
+				pageOption.addButton(new ButtonOption(
+						getText("policy.optype.surrenders"), null,
+						"bc.policyForm.doRenew"));
 			}
 		}
 
 	}
 
 	@Override
-	public String edit() throws Exception {
-		String result = super.edit();
-		statusesValue = this.getBSStatuses1();
-		initSelects();
-		return result;
-	}
-
-	@Override
-	protected PageOption buildFormPageOption() {
-		PageOption option = super.buildFormPageOption().setWidth(740)
-				.setMinWidth(250).setMinHeight(200).setHeight(540);
-		if (!this.isRole()) {
-			ButtonOption buttonOption = new ButtonOption(getText("label.save"),
-					null, "bc.policyForm.save");
-			buttonOption.put("id", "bcSaveBtn");
-			option.addButton(buttonOption);
-			if (!this.getE().isNew()
-					&& this.getE().getMain() == Policy.MAIN_NOW) {
-				ToolbarMenuButton toolbarMenuButton = new ToolbarMenuButton(
-						getText("policy.labour.op"));
-				toolbarMenuButton.setId("bcOpBtn");
-				toolbarMenuButton
-						.addMenuItem(getText("policy.optype.edit"),
-								Policy.OPTYPE_EDIT + "")
-						.addMenuItem(getText("policy.optype.renewal"),
-								Policy.OPTYPE_RENEWAL + "")
-						.addMenuItem(
-								getText("policy.optype.surrenders"),
-								Policy.OPTYPE_SURRENDERS + "")
-						.setChange("bc.policyForm.selectMenuButtonItem");
-				option.addButton(toolbarMenuButton);
-			}
-		}
-		return option;
-	}
-
-	@Override
-	protected PageOption buildListPageOption() {
-		return super.buildListPageOption().setWidth(700).setMinWidth(300)
-				.setHeight(350).setMinHeight(300);
-	}
-
-	protected HtmlPage buildHtml4Paging() {
-		HtmlPage page = super.buildHtml4Paging();
-		if (carId != null)
-			page.setAttr("data-extras", new Json().put("carManId", carId)
-					.toString());
-		return page;
-	}
-
-	// 视图特殊条件
-	@Override
-	protected Condition getSpecalCondition() {
-		return null;
-
-	}
-
-	// 表单可选项的加载
-	public void initSelects() {
+	protected void initForm(boolean editable) {
+		super.initForm(editable);
 		Date startTime = new Date();
-
+		statusesValue = this.getBSStatuses1();
 		// 批量加载可选项列表
 		Map<String, List<Map<String, String>>> optionItems = this.optionService
 				.findOptionItemByGroupKeys(new String[] { OptionConstants.CA_COMPANY, });
@@ -287,6 +195,13 @@ public class PolicyAction extends FileEntityAction<Long, Policy> {
 
 		if (logger.isInfoEnabled())
 			logger.info("findOptionItem耗时：" + DateUtils.getWasteTime(startTime));
+
+	}
+
+	@Override
+	protected PageOption buildFormPageOption(boolean editable) {
+		return super.buildFormPageOption(editable).setWidth(725)
+				.setMinWidth(300).setHeight(540).setMinHeight(300);
 	}
 
 }

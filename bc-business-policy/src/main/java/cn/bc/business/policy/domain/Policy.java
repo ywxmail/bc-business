@@ -32,7 +32,7 @@ import cn.bc.identity.domain.RichFileEntityImpl;
 public class Policy extends RichFileEntityImpl {
 	private static final long serialVersionUID = 1L;
 	public static final String KEY_CODE = "policy.code";
-	public static final String POLICY_TYPE = Policy.class.getSimpleName();
+	public static final String KEY_UID = Policy.class.getSimpleName();
 
 	/** 操作类型 新建 */
 	public static final int OPTYPE_CREATE = 1;
