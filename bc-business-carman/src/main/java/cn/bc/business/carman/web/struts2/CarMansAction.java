@@ -69,7 +69,7 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer sql = new StringBuffer();
 		sql.append("select c.id,c.status_,c.type_,c.name,c.cert_fwzg,c.cert_fwzg_id,c.cert_identity");
-		sql.append(",c.cert_cyzg,c.work_date,c.origin,c.former_unit,c.file_date from BS_CARMAN c");
+		sql.append(",c.cert_cyzg,c.work_date,c.origin,c.former_unit,c.charger,c.file_date from BS_CARMAN c");
 		sqlObject.setSql(sql.toString());
 
 		// 注入参数
@@ -91,6 +91,7 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 				map.put("work_date", rs[i++]);
 				map.put("origin", rs[i++]);
 				map.put("former_unit", rs[i++]);
+				map.put("charger", rs[i++]);
 				map.put("file_date", rs[i++]);
 				return map;
 			}
@@ -112,6 +113,8 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 				getText("carMan.name"), 80).setSortable(true));
 //		columns.add(new TextColumn4MapKey("c.cert_fwzg_id", "cert_fwzg_id",
 //				getText("carMan.cert4FWZGID"), 80));
+		columns.add(new TextColumn4MapKey("c.charger", "charger",
+				getText("carMan.charger"), 80));
 		columns.add(new TextColumn4MapKey("c.cert_fwzg", "cert_fwzg",
 				getText("carMan.cert4FWZG"), 80));
 		columns.add(new TextColumn4MapKey("c.cert_identity", "cert_identity",

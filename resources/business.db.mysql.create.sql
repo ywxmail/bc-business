@@ -299,7 +299,7 @@ create table BS_CARMAN (
     CERT_CYZG            varchar(255) comment '从业资格证号',
     DRIVING_STATUS       varchar(255) comment '驾驶状态',
     OLD_UNIT_NAME             varchar(255) comment '分支机构：用于历史数据的保存',
-    EXT_ZRR              varchar(255) comment '责任人：用于历史数据的保存',
+    CHARGER	             varchar(255) comment '责任人信息',
     GZ                   int(1) default 0 comment '驾驶证是否广州:0-否,1-是',
     ACCESS_CERTS         varchar(255) comment '已考取证件：历史数据保存',
     DESC_                varchar(4000) comment '备注',
@@ -307,7 +307,6 @@ create table BS_CARMAN (
     AUTHOR_ID BIGINT NOT NULL COMMENT '创建人ID',
     MODIFIER_ID BIGINT COMMENT '最后修改人ID',
     MODIFIED_DATE datetime COMMENT '最后修改时间',
-    CHARGER	  varchar(255) comment '责任人信息',
     primary key (ID)
 ) COMMENT='司机责任人';
 ALTER TABLE BS_CARMAN ADD CONSTRAINT BSFK_CARMAN_AUTHOR FOREIGN KEY (AUTHOR_ID) 
