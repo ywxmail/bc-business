@@ -18,7 +18,6 @@ import cn.bc.business.car.service.CarService;
 import cn.bc.business.motorcade.domain.Motorcade;
 import cn.bc.business.motorcade.service.MotorcadeService;
 import cn.bc.business.web.struts2.FileEntityAction;
-import cn.bc.core.RichEntityImpl;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.option.domain.OptionItem;
 import cn.bc.option.service.OptionService;
@@ -73,7 +72,7 @@ public class CarAction extends FileEntityAction<Long, Car> {
 	@Override
 	protected PageOption buildFormPageOption(boolean editable) {
 		return super.buildFormPageOption(editable).setWidth(790)
-				.setMinWidth(250).setHeight(590).setMinHeight(200);
+				.setMinWidth(250).setHeight(500).setMinHeight(200);
 	}
 
 	@Override

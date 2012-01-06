@@ -150,7 +150,7 @@ public class JiaoWeiADVICE extends SyncBase {
 	public void setCarPlate(String carPlate) {
 		this.carPlate = carPlate;
 	}
-	@Column(name = "DRIVER_ID")
+	@Column(name = "DRIVER_CERT")
 	public String getDriverCert() {
 		return driverCert;
 	}

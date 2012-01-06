@@ -72,7 +72,10 @@ public class Contract4LabourServiceImpl extends
 			// 参数有效性验证
 			Assert.notNull(carId);
 			Assert.notNull(driverId);
-
+			
+			// 保存合同
+			contract4Labour = this.contract4LabourDao.save(contract4Labour);
+			
 			// 处理与车辆的关联关系
 			ContractCarRelation carRelation = new ContractCarRelation(
 					contract4Labour.getId(), carId);
@@ -87,6 +90,9 @@ public class Contract4LabourServiceImpl extends
 		}
 	}
 
+	/**
+	 * 续约
+	 */
 	public Contract4Labour doRenew(Long contractId, Calendar newStartDate,
 			Calendar newEndDate) {
 		// 获取原来的合同信息
@@ -109,8 +115,17 @@ public class Contract4LabourServiceImpl extends
 		newContract.setId(null);
 
 		// 生成新的合同编号
-		newContract.setCode(this.idGeneratorService
-				.nextSN4Month(Contract4Labour.KEY_CODE));
+		String oldContractCode = oldContract.getCode();
+		if(oldContractCode.lastIndexOf("-") > 0){ //判断旧合同编号是否存在字符"-"
+			//将字符"-"后的数字+1
+			int num = Integer.parseInt(oldContractCode.split("-")[1]); 
+			oldContractCode = oldContractCode.split("-")[0]+"-"+ ++num;
+		}else{
+			oldContractCode = oldContractCode+"-1";
+		}
+		newContract.setCode(oldContractCode);
+		//newContract.setCode(this.idGeneratorService
+		//.nextSN4Month(Contract4Labour.KEY_CODE));
 
 		// 设置新的合同期限
 		newContract.setStartDate(newStartDate);
@@ -172,13 +187,110 @@ public class Contract4LabourServiceImpl extends
 		return newContract;
 	}
 
+	/**
+	 * 转车
+	 */
+	public Contract4Labour doChangeCar(Long contractId, Long newCarId, String newCarPlate) {
+		// 获取原来的合同信息
+		Contract4Labour oldContract = this.contract4LabourDao.load(contractId);
+		if (oldContract == null)
+			throw new CoreException("要处理的合同已不存在！contractId=" + contractId);
+
+		// 更新旧合同的相关信息
+		oldContract.setStatus(Contract.STATUS_FAILURE);// 失效
+		oldContract.setMain(Contract.MAIN_HISTORY);// 历史
+		this.contract4LabourDao.save(oldContract);
+
+		// 复制出新的合同
+		Contract4Labour newContract = new Contract4Labour();
+		try {
+			BeanUtils.copyProperties(oldContract, newContract);
+		} catch (Exception e) {
+			throw new CoreException("复制合同信息错误！", e);
+		}
+		newContract.setId(null);
+
+		// 生成新的合同编号
+		String oldContractCode = oldContract.getCode();
+		if(oldContractCode.lastIndexOf("-") > 0){ //判断旧合同编号是否存在字符"-"
+			//将字符"-"后的数字+1
+			int num = Integer.parseInt(oldContractCode.split("-")[1]); 
+			oldContractCode = oldContractCode.split("-")[0]+"-"+ ++num;
+		}else{
+			oldContractCode = oldContractCode+"-1";
+		}
+		newContract.setCode(oldContractCode);
+		//newContract.setCode(this.idGeneratorService
+		//.nextSN4Month(Contract4Labour.KEY_CODE));
+
+		// 设置最后修改人信息
+		SystemContext context = SystemContextHolder.get();
+		newContract.setModifier(context.getUserHistory());
+		newContract.setModifiedDate(Calendar.getInstance());
+
+		// 主版本号 加1
+		newContract.setVerMajor(oldContract.getVerMajor() + 1);
+
+		// 关联 转车合同与原合同
+		newContract.setPid(contractId);
+		
+		// 新合同的车牌号
+		newContract.setExt_str1(newCarPlate);
+
+		// 设置操作类型、状态、main
+		newContract.setOpType(Contract.OPTYPE_RENEW);// 续签
+		newContract.setMain(Contract.MAIN_NOW);// 当前
+		newContract.setStatus(Contract.STATUS_NORMAL);// 正常
+
+		// 保存新的合同信息以获取id
+		newContract.setUid(this.idGeneratorService
+				.next(Contract4Labour.KEY_UID));
+		newContract = this.contract4LabourDao.save(newContract);
+		Long newId = newContract.getId();
+
+		// 新建合同与车辆的关系
+		ContractCarRelation carRelation = new ContractCarRelation(newId,newCarId);
+		this.contractDao.saveContractCarRelation(carRelation);
+
+		// 复制合同与司机的关系：劳动合同
+		// 复制合同与责任人的关系：经济合同
+		List<ContractCarManRelation> oldCMRelations = this.contractDao
+				.findContractCarManRelation(contractId);
+		if (!oldCMRelations.isEmpty()) {
+			List<ContractCarManRelation> copyCMRelations = new ArrayList<ContractCarManRelation>();
+			for (ContractCarManRelation old : oldCMRelations) {
+				copyCMRelations.add(new ContractCarManRelation(newId, old
+						.getCarManId()));
+			}
+			this.contractDao.saveContractCarManRelation(copyCMRelations);
+		}
+
+		// 复制原合同的附件给新的合同
+		String oldUid = newContract.getUid();
+		attachService.doCopy(Contract4Labour.KEY_UID, oldUid,
+				Contract4Labour.KEY_UID, newContract.getUid(), true);
+
+		// 返回转车的合同
+		return newContract;
+	}
+	
+	/**
+	 * 离职
+	 */
 	public void doResign(Long contractId, Calendar resignDate) {
-		throw new CoreException("need implement");
+		// 获取原来的合同信息
+		Contract4Labour contract = this.contract4LabourDao.load(contractId);
+		if (contract == null)
+			throw new CoreException("要处理的合同已不存在！contractId=" + contractId);
+
+		// 更新旧合同的相关信息
+		contract.setStatus(Contract.STATUS_RESGIN);// 离职
+		// 设置离职日期
+		contract.setLeaveDate(resignDate); 
+		this.contract4LabourDao.save(contract);
+		//throw new CoreException("need implement");
 	}
 
-	public Contract4Labour doChangeCar(Long contractId, Long newCarId) {
-		throw new CoreException("need implement");
-	}
 
 	/**
 	 * 查找劳动合同列表
@@ -303,4 +415,5 @@ public class Contract4LabourServiceImpl extends
 	public boolean isExistContract(Long driverId) {
 		return this.contract4LabourDao.isExistContract(driverId);
 	}
+	
 }

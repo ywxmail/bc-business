@@ -26,9 +26,9 @@
 	<bean id="contract4LabourService" class="cn.bc.business.contract.service.Contract4LabourServiceImpl" />	
 	
 	<!-- contractCharger -->
-	<bean id="contractChargerDao" class="cn.bc.business.contract.dao.hibernate.jpa.ContractChargerDaoImpl"
+	<bean id="contract4ChargerDao" class="cn.bc.business.contract.dao.hibernate.jpa.Contract4ChargerDaoImpl"
 		p:entityManagerFactory-ref="entityManagerFactory" />
-	<bean id="contractChargerService" class="cn.bc.business.contract.service.ContractChargerServiceImpl"
-		p:contractChargerDao-ref="contractChargerDao" />	
+	<bean id="contract4ChargerService" class="cn.bc.business.contract.service.Contract4ChargerServiceImpl"
+		p:contract4ChargerDao-ref="contract4ChargerDao" />	
 		
 </beans>

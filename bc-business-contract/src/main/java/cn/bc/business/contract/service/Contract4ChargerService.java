@@ -1,23 +1,32 @@
 /**
  * 
  */
-package cn.bc.business.contract.dao;
+package cn.bc.business.contract.service;
 
+import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
 import cn.bc.business.contract.domain.Contract4Charger;
 import cn.bc.core.Page;
-import cn.bc.core.dao.CrudDao;
 import cn.bc.core.query.condition.Condition;
+import cn.bc.core.service.CrudService;
 
 
 /**
- * 责任人合同Dao
+ * 责任人合同Service
  * 
  * @author dragon
  */
-public interface ContractChargerDao extends CrudDao<Contract4Charger> {
+/**
+ * @author wis
+ *
+ */
+/**
+ * @author wis
+ *
+ */
+public interface Contract4ChargerService extends CrudService<Contract4Charger> {
 
 	/**
 	 * 删除单个CarNContract
@@ -28,19 +37,20 @@ public interface ContractChargerDao extends CrudDao<Contract4Charger> {
 
 	/**
 	 * 删除批量CarNContract
-	 * @parma contractId 
+	 * @parma contractIds 
 	 * @return
 	 */
 	void deleteCarNContract(Long[] contractIds);
 
 	/**
-	 * 保存合同与车辆的关联表信息
+	 * 保存车辆与合同的关联信息
+	 * jdbc查询BS_CAR_CONTRACT表是否存在相应carId和contractId的记录
 	 * @parma carId 
 	 * @parma contractId 
 	 * @return
 	 */
 	void carNContract4Save(Long carId, Long contractId);
-
+	
 	/**
 	 * 查找车辆合同列表
 	 * @parma condition 
@@ -65,9 +75,10 @@ public interface ContractChargerDao extends CrudDao<Contract4Charger> {
 	 */
 	Map<String, Object> findCarInfoByContractId(Long contractId);
 
+	
 	/**
-	 * 根据contractId查找car信息
-	 * @parma contractId 
+	 * 根据合同ID查找关联责任人
+	 * @param contractId
 	 * @return
 	 */
 	List<String> findChargerIdByContractId(Long contractId);
@@ -78,9 +89,9 @@ public interface ContractChargerDao extends CrudDao<Contract4Charger> {
 	 * @param contractId
 	 */
 	void carMansNContract4Save(String assignChargerIds, Long contractId);
-
+	
 	/**
-	 * 根据合同ID查找关联责任人
+	 * 根据合同ID查找车辆ID
 	 * @param contractId
 	 * @return
 	 */
@@ -113,6 +124,36 @@ public interface ContractChargerDao extends CrudDao<Contract4Charger> {
 	 * @return
 	 */
 	Map<String, Object> findCarByCarManId(Long carManId);
+
+	/**
+	 * 保存劳动合同并处理车辆和司机的关联关系
+	 * 
+	 * @param contract4Charger 要保存的合同信息
+	 * @param carId 要关联的车辆id
+	 * @param assignChargerNames 责任人ID列表
+	 * @param assignChargerNames 责任人姓名列表
+	 * @return 
+	 */
+	Contract4Charger save(Contract4Charger e, Long carId, String assignChargerIds, String assignChargerNames);
+
+	/**
+	 * 判断指定的车辆是否已经存在经济合同
+	 * 
+	 * @param carId
+	 * @return
+	 */
+	boolean isExistContract(Long carId);
+
+	/**
+	 * 续签处理：新纪录、主版本号加1
+	 * 
+	 * @parma contractId 原合同id
+	 * @parma newStartDate 续签的开始日期
+	 * @parma newEndDate 续签的结束日期
+	 * @return 续签后的合同信息
+	 */
+	Contract4Charger doRenew(Long fromContractId, Calendar newStartDate,
+			Calendar newEndDate);
 
 
 }

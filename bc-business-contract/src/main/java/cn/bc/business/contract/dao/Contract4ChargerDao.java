@@ -1,31 +1,23 @@
 /**
  * 
  */
-package cn.bc.business.contract.service;
+package cn.bc.business.contract.dao;
 
 import java.util.List;
 import java.util.Map;
 
 import cn.bc.business.contract.domain.Contract4Charger;
 import cn.bc.core.Page;
+import cn.bc.core.dao.CrudDao;
 import cn.bc.core.query.condition.Condition;
-import cn.bc.core.service.CrudService;
 
 
 /**
- * 责任人合同Service
+ * 责任人合同Dao
  * 
  * @author dragon
  */
-/**
- * @author wis
- *
- */
-/**
- * @author wis
- *
- */
-public interface ContractChargerService extends CrudService<Contract4Charger> {
+public interface Contract4ChargerDao extends CrudDao<Contract4Charger> {
 
 	/**
 	 * 删除单个CarNContract
@@ -36,20 +28,19 @@ public interface ContractChargerService extends CrudService<Contract4Charger> {
 
 	/**
 	 * 删除批量CarNContract
-	 * @parma contractIds 
+	 * @parma contractId 
 	 * @return
 	 */
 	void deleteCarNContract(Long[] contractIds);
 
 	/**
-	 * 保存车辆与合同的关联信息
-	 * jdbc查询BS_CAR_CONTRACT表是否存在相应carId和contractId的记录
+	 * 保存合同与车辆的关联表信息
 	 * @parma carId 
 	 * @parma contractId 
 	 * @return
 	 */
 	void carNContract4Save(Long carId, Long contractId);
-	
+
 	/**
 	 * 查找车辆合同列表
 	 * @parma condition 
@@ -74,10 +65,9 @@ public interface ContractChargerService extends CrudService<Contract4Charger> {
 	 */
 	Map<String, Object> findCarInfoByContractId(Long contractId);
 
-	
 	/**
-	 * 根据合同ID查找关联责任人
-	 * @param contractId
+	 * 根据contractId查找car信息
+	 * @parma contractId 
 	 * @return
 	 */
 	List<String> findChargerIdByContractId(Long contractId);
@@ -88,9 +78,9 @@ public interface ContractChargerService extends CrudService<Contract4Charger> {
 	 * @param contractId
 	 */
 	void carMansNContract4Save(String assignChargerIds, Long contractId);
-	
+
 	/**
-	 * 根据合同ID查找车辆ID
+	 * 根据合同ID查找关联责任人
 	 * @param contractId
 	 * @return
 	 */
@@ -104,6 +94,7 @@ public interface ContractChargerService extends CrudService<Contract4Charger> {
 	void updateCar4dirverName(String assignChargerNames, Long carId);
 
 	/**
+	 * JDBC
 	 * 更新司机表的负责人信息
 	 * @param assignChargerNames
 	 * @param carId
@@ -111,6 +102,7 @@ public interface ContractChargerService extends CrudService<Contract4Charger> {
 	void updateCarMan4dirverName(String assignChargerNames, Long carId);
 
 	/**
+	 * JDBC
 	 * 根据车辆ID查找车辆信息
 	 * @param carId
 	 * @return
@@ -123,6 +115,23 @@ public interface ContractChargerService extends CrudService<Contract4Charger> {
 	 * @return
 	 */
 	Map<String, Object> findCarByCarManId(Long carManId);
+
+	/**
+	 * 更新司机表的负责人信息
+	 * @param assignChargerNames
+	 * @param carId
+	 */
+	void updateCar4ChargerName(String assignChargerNames, Long carId);
+
+	/**
+	 * 更新司机表的负责人信息
+	 * @param assignChargerNames
+	 * @param carId
+	 */
+	void updateCarMan4ChargerName(String assignChargerNames, Long carId);
+
+	/** 判断指定的车辆是否已经存在经济合同*/
+	boolean isExistContract(Long carId);
 
 
 }

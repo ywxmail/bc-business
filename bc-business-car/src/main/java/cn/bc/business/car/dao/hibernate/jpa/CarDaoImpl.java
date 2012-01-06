@@ -25,7 +25,6 @@ import org.springframework.util.StringUtils;
 import cn.bc.BCConstants;
 import cn.bc.business.car.dao.CarDao;
 import cn.bc.business.car.domain.Car;
-import cn.bc.core.Entity;
 import cn.bc.core.Page;
 import cn.bc.core.query.condition.Condition;
 import cn.bc.orm.hibernate.jpa.HibernateCrudJpaDao;

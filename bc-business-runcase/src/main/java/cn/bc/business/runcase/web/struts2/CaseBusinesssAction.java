@@ -58,9 +58,9 @@ public class CaseBusinesssAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected OrderCondition getGridDefaultOrderCondition() {
-		// 默认排序方向：状态|登记日期
-		return new OrderCondition("c.status_", Direction.Asc).add(
-				"c.file_date", Direction.Desc);
+		// 默认排序方向：登记日期|状态
+		return new OrderCondition("c.file_date", Direction.Desc).add(
+				"c.status_", Direction.Asc);
 	}
 
 	@Override
