@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.StringUtils;
 
 import cn.bc.business.contract.domain.Contract;
 import cn.bc.business.contract.service.ContractService;
@@ -24,14 +23,9 @@ import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.formater.CalendarRangeFormater;
 import cn.bc.web.formater.KeyValueFormater;
 import cn.bc.web.ui.html.grid.Column;
-import cn.bc.web.ui.html.grid.Grid;
-import cn.bc.web.ui.html.grid.GridData;
 import cn.bc.web.ui.html.grid.TextColumn;
 import cn.bc.web.ui.html.page.ButtonOption;
-import cn.bc.web.ui.html.page.HtmlPage;
 import cn.bc.web.ui.html.page.PageOption;
-import cn.bc.web.ui.html.toolbar.Toolbar;
-import cn.bc.web.ui.html.toolbar.ToolbarButton;
 import cn.bc.web.ui.json.Json;
 
 /**
@@ -89,21 +83,21 @@ public class ContractAction extends FileEntityAction<Long, Contract> {
 		return option;
 	}
 
-	@Override
-	protected GridData buildGridData(List<Column> columns) {
-		return super.buildGridData(columns).setRowLabelExpression("['code']");
-	}
+//	@Override
+//	protected GridData buildGridData(List<Column> columns) {
+//		return super.buildGridData(columns).setRowLabelExpression("['code']");
+//	}
 
 	@Override
 	protected OrderCondition getDefaultOrderCondition() {
 		return null;// new OrderCondition("fileDate", Direction.Desc);
 	}
 
-	@Override
-	protected PageOption buildListPageOption() {
-		return super.buildListPageOption().setWidth(800).setMinWidth(300)
-				.setHeight(400).setMinHeight(300);
-	}
+//	@Override
+//	protected PageOption buildListPageOption() {
+//		return super.buildListPageOption().setWidth(800).setMinWidth(300)
+//				.setHeight(400).setMinHeight(300);
+//	}
 
 	@Override
 	protected String[] getSearchFields() {
@@ -124,7 +118,7 @@ public class ContractAction extends FileEntityAction<Long, Contract> {
 		}
 		if (carId != null) {
 			columns.add(new TextColumn("['ext_str2']",
-					getText("contract.labour.driver"), 80));
+					getText("contract.driver.charger"), 80));
 		}
 		columns.add(new TextColumn("['signDate']",
 				getText("contract.signDate"), 90).setSortable(true)
@@ -145,84 +139,84 @@ public class ContractAction extends FileEntityAction<Long, Contract> {
 		return columns;
 	}
 
-	/** 构建视图页面的表格 */
-	protected Grid buildGrid() {
-		List<Column> columns = this.buildGridColumns();
+//	/** 构建视图页面的表格 */
+//	protected Grid buildGrid() {
+//		List<Column> columns = this.buildGridColumns();
+//
+//		// id列
+//		Grid grid = new Grid();
+//		grid.setGridHeader(this.buildGridHeader(columns));
+//		grid.setGridData(this.buildGridData(columns));
+//		grid.setRemoteSort("true"
+//				.equalsIgnoreCase(getText("app.grid.remoteSort")));
+//		grid.setColumns(columns);
+//		// name属性设为bean的名称
+//		grid.setName(getText(StringUtils.uncapitalize(getEntityConfigName())));
+//
+//		// 单选及双击行编辑
+//		grid.setSingleSelect(false).setDblClickRow("bc.contractList.edit");
+//
+//		// 分页条
+//		grid.setFooter(buildGridFooter(grid));
+//
+//		return grid;
+//	}
 
-		// id列
-		Grid grid = new Grid();
-		grid.setGridHeader(this.buildGridHeader(columns));
-		grid.setGridData(this.buildGridData(columns));
-		grid.setRemoteSort("true"
-				.equalsIgnoreCase(getText("app.grid.remoteSort")));
-		grid.setColumns(columns);
-		// name属性设为bean的名称
-		grid.setName(getText(StringUtils.uncapitalize(getEntityConfigName())));
+//	// 自定义视图加载的js
+//	@Override
+//	protected String getJs() {
+//		return contextPath + "/bc-business/contract/list.js";
+//	}
+//
+//	@Override
+//	protected Toolbar buildToolbar() {
+//		isManager = isReadonly();
+//		Toolbar tb = new Toolbar();
+//
+//		if (!isManager) {
+//			// 新建按钮
+//			tb.addButton(new ToolbarButton().setIcon("ui-icon-document")
+//					.setText(getText("label.create"))
+//					.setClick("bc.contractList.create"));
+//
+//			// 编辑按钮
+//			tb.addButton(new ToolbarButton().setIcon("ui-icon-document")
+//					.setText(getText("label.edit"))
+//					.setClick("bc.contractList.edit"));
+//
+//			// 删除按钮
+//			// tb.addButton(getDefaultDeleteToolbarButton());
+//			tb.addButton(new ToolbarButton().setIcon("ui-icon-document")
+//					.setText(getText("label.delete"))
+//					.setClick("bc.contractList.del"));
+//		} else {// 普通用户
+//			// 查看按钮
+//			tb.addButton(getDefaultOpenToolbarButton());
+//		}
+//
+//		// 搜索按钮
+//		tb.addButton(getDefaultSearchToolbarButton());
+//
+//		return tb;
+//	}
 
-		// 单选及双击行编辑
-		grid.setSingleSelect(false).setDblClickRow("bc.contractList.edit");
-
-		// 分页条
-		grid.setFooter(buildGridFooter(grid));
-
-		return grid;
-	}
-
-	// 自定义视图加载的js
-	@Override
-	protected String getJs() {
-		return contextPath + "/bc-business/contract/list.js";
-	}
-
-	@Override
-	protected Toolbar buildToolbar() {
-		isManager = isReadonly();
-		Toolbar tb = new Toolbar();
-
-		if (!isManager) {
-			// 新建按钮
-			tb.addButton(new ToolbarButton().setIcon("ui-icon-document")
-					.setText(getText("label.create"))
-					.setClick("bc.contractList.create"));
-
-			// 编辑按钮
-			tb.addButton(new ToolbarButton().setIcon("ui-icon-document")
-					.setText(getText("label.edit"))
-					.setClick("bc.contractList.edit"));
-
-			// 删除按钮
-			// tb.addButton(getDefaultDeleteToolbarButton());
-			tb.addButton(new ToolbarButton().setIcon("ui-icon-document")
-					.setText(getText("label.delete"))
-					.setClick("bc.contractList.del"));
-		} else {// 普通用户
-			// 查看按钮
-			tb.addButton(getDefaultOpenToolbarButton());
-		}
-
-		// 搜索按钮
-		tb.addButton(getDefaultSearchToolbarButton());
-
-		return tb;
-	}
-
-	/**
-	 * 根据请求的条件查找非分页信息对象
-	 * 
-	 * @return
-	 */
-	@Override
-	protected List<Map<String, Object>> findList() {
-		List<Map<String, Object>> list = null;
-		if (carId != null) {
-			list = this.contractService.list4Car(this.getCondition(), carId);
-		}
-		if (carManId != null) {
-			list = this.contractService.list4CarMan(this.getCondition(),
-					carManId);
-		}
-		return list;
-	}
+//	/**
+//	 * 根据请求的条件查找非分页信息对象
+//	 * 
+//	 * @return
+//	 */
+//	@Override
+//	protected List<Map<String, Object>> findList() {
+//		List<Map<String, Object>> list = null;
+//		if (carId != null) {
+//			list = this.contractService.list4Car(this.getCondition(), carId);
+//		}
+//		if (carManId != null) {
+//			list = this.contractService.list4CarMan(this.getCondition(),
+//					carManId);
+//		}
+//		return list;
+//	}
 
 	// // 视图特殊条件
 	// @Override
@@ -237,17 +231,17 @@ public class ContractAction extends FileEntityAction<Long, Contract> {
 	// }
 	// }
 
-	@Override
-	protected HtmlPage buildHtml4Paging() {
-		HtmlPage page = super.buildHtml4Paging();
-		if (carId != null)
-			page.setAttr("data-extras", new Json().put("carId", carId)
-					.toString());
-		if (carManId != null)
-			page.setAttr("data-extras", new Json().put("carManId", carManId)
-					.toString());
-		return page;
-	}
+//	@Override
+//	protected HtmlPage buildHtml4Paging() {
+//		HtmlPage page = super.buildHtml4Paging();
+//		if (carId != null)
+//			page.setAttr("data-extras", new Json().put("carId", carId)
+//					.toString());
+//		if (carManId != null)
+//			page.setAttr("data-extras", new Json().put("carManId", carManId)
+//					.toString());
+//		return page;
+//	}
 
 	/**
 	 * 获取Contract的合同类型列表
