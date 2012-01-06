@@ -1,3 +1,4 @@
+
 -- 创建数据转换用的序列，开始于100000
 CREATE sequence DC_SEQUENCE
     minvalue 1
@@ -1025,7 +1026,7 @@ CREATE TABLE BS_CASE_BASE (
    MOTORCADE_NAME       VARCHAR(255),
    CAR_ID               INTEGER,
    CAR_PLATE            VARCHAR(255),
-   DRIVER_CERT          INTEGER,
+   DRIVER_ID		INTEGER,
    DRIVER_NAME          VARCHAR(255),
    DRIVER_CERT          VARCHAR(255),
    CLOSE_DATE           TIMESTAMP,
