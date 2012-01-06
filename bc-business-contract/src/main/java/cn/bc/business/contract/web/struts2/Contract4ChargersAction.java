@@ -49,7 +49,7 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 	private static final long serialVersionUID = 1L;
 	public String status = String.valueOf(Contract.STATUS_NORMAL);
 	public String mains = String.valueOf(Contract.MAIN_NOW); // 现实当前版本
-	public String type = String.valueOf(Contract.TYPE_CHARGER);
+	public int type = Contract.TYPE_CHARGER;
 
 	public Long contractId;
 	public String patchNo;
