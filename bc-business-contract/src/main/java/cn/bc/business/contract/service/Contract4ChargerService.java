@@ -3,6 +3,7 @@
  */
 package cn.bc.business.contract.service;
 
+import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
@@ -123,6 +124,36 @@ public interface Contract4ChargerService extends CrudService<Contract4Charger> {
 	 * @return
 	 */
 	Map<String, Object> findCarByCarManId(Long carManId);
+
+	/**
+	 * 保存劳动合同并处理车辆和司机的关联关系
+	 * 
+	 * @param contract4Charger 要保存的合同信息
+	 * @param carId 要关联的车辆id
+	 * @param assignChargerNames 责任人ID列表
+	 * @param assignChargerNames 责任人姓名列表
+	 * @return 
+	 */
+	Contract4Charger save(Contract4Charger e, Long carId, String assignChargerIds, String assignChargerNames);
+
+	/**
+	 * 判断指定的车辆是否已经存在经济合同
+	 * 
+	 * @param carId
+	 * @return
+	 */
+	boolean isExistContract(Long carId);
+
+	/**
+	 * 续签处理：新纪录、主版本号加1
+	 * 
+	 * @parma contractId 原合同id
+	 * @parma newStartDate 续签的开始日期
+	 * @parma newEndDate 续签的结束日期
+	 * @return 续签后的合同信息
+	 */
+	Contract4Charger doRenew(Long fromContractId, Calendar newStartDate,
+			Calendar newEndDate);
 
 
 }

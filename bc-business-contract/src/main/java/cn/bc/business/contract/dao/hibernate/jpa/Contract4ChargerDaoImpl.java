@@ -49,19 +49,6 @@ public class Contract4ChargerDaoImpl extends HibernateCrudJpaDao<Contract4Charge
 		this.jdbcTemplate = new JdbcTemplate(dataSource);
 	}
 	
-	//批量物理删除
-	@Override
-	public void delete(Serializable[] ids) {
-		if (ids == null || ids.length == 0)
-			return;
-
-		for (Serializable pk : ids) {
-			Contract4Charger e = this.getJpaTemplate().find(Contract4Charger.class, pk);
-			if (e != null)
-				this.getJpaTemplate().remove(e);
-		}
-	}
-	
 	/**
 	 * 删除单个CarNContract
 	 * @parma contractId 
@@ -410,6 +397,7 @@ public class Contract4ChargerDaoImpl extends HibernateCrudJpaDao<Contract4Charge
 	}
 
 	/**
+	 * JDBC
 	 * 更新车辆表的负责人信息
 	 * @param assignChargerNames
 	 * @param carId
@@ -420,6 +408,7 @@ public class Contract4ChargerDaoImpl extends HibernateCrudJpaDao<Contract4Charge
 	}
 
 	/**
+	 * JDBC
 	 * 更新司机表的负责人信息
 	 * @param assignChargerNames
 	 * @param carId
@@ -472,6 +461,104 @@ public class Contract4ChargerDaoImpl extends HibernateCrudJpaDao<Contract4Charge
 		}
 		
 		return queryMap;
+	}
+
+	/**
+	 * 更新司机表的负责人信息
+	 * @param assignChargerNames
+	 * @param carId
+	 */
+	public void updateCar4ChargerName(String assignChargerNames, Long carId) {
+		ArrayList<Object> args = new ArrayList<Object>();
+		StringBuffer hql = new StringBuffer();
+		hql.append("UPDATE Car c SET c.charger=? WHERE c.id =?");
+		args.add(assignChargerNames);
+		args.add(carId);
+		this.executeUpdate(hql.toString(), args);
+	}
+
+	/**
+	 * 更新司机表的负责人信息
+	 * @param assignChargerNames
+	 * @param carId
+	 */
+	public void updateCarMan4ChargerName(String assignChargerNames, Long carId) {
+		ArrayList<Object> args = new ArrayList<Object>();
+		StringBuffer hql = new StringBuffer();
+		hql.append("UPDATE CarMan man SET man.charger=? WHERE man.id IN(")
+		   .append("SELECT cd.driver.id FROM CarByDriver cd WHERE cd.car.id=?)");
+		args.add(assignChargerNames);
+		args.add(carId);
+		this.executeUpdate(hql.toString(), args);
+	}
+
+	/** 判断指定的车辆是否已经存在经济合同 */
+	public boolean isExistContract(Long carId) {
+		String sql = "select c.* from BS_CONTRACT c"
+				+ " inner join BS_CAR_CONTRACT cc ON c.id = cc.contract_id where cc.car_id="
+				+ carId;
+
+		List<Map<String, Object>> list = this.jdbcTemplate.queryForList(sql);
+		return list != null && list.size() > 0;
+	}
+	
+	@Override
+	public void delete(Serializable[] ids) {
+		if (ids == null || ids.length == 0)
+			return;
+		for (Serializable id : ids) {
+			this.delete(id);
+		}
+	}
+
+	@Override
+	public void delete(Serializable pk) {
+		Long contractId = (Long) pk;
+
+		// 删除合同与司机的关联信息
+		this.deleteDriverRelation(contractId);
+
+		// 删除合同与车辆的关联信息
+		this.deleteCarRelation(contractId);
+
+		// 删除合同自身
+		Contract4Charger c = this.load(contractId);
+		Long pid = c.getPid();
+		this.getJpaTemplate().remove(c);
+//		this.executeUpdate("delete Contract4Labour where id=?",
+//				new Object[] { contractId });
+
+		// 如有父级ID,递归删除父级记录
+		if (pid != null) {
+			delete(pid);
+		}
+	}
+
+	/**
+	 * 删除合同与司机的关联信息
+	 * 
+	 * @parma contractId
+	 * @return
+	 */
+	public void deleteDriverRelation(Long contractId) {
+		if (contractId != null) {
+			this.executeUpdate(
+					"delete ContractCarManRelation where contractId=?",
+					new Object[] { contractId });
+		}
+	}
+
+	/**
+	 * 删除合同与车辆的关联信息
+	 * 
+	 * @parma contractId
+	 * @return
+	 */
+	public void deleteCarRelation(Long contractId) {
+		if (contractId != null) {
+			this.executeUpdate("delete ContractCarRelation where contractId=?",
+					new Object[] { contractId });
+		}
 	}
 
 
