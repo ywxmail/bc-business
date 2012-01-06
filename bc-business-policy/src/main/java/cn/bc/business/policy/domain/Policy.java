@@ -43,6 +43,13 @@ public class Policy extends RichFileEntityImpl {
 	/** 操作类型 停保 */
 	public static final int OPTYPE_SURRENDERS = 4;
 
+	/** 状态：正常 */
+	public static final int STATUS_ENABLED = 0;
+	/** 状态：注销 */
+	public static final int STATUS_DISABLED = 1;
+	/** 状态：停保 */
+	public static final int STATUS_SURRENDER = 2;
+
 	/** 主版本号默认值 */
 	public static final int MAJOR_DEFALUT = 1;
 	/** 次版本号默认值 */
@@ -75,6 +82,7 @@ public class Policy extends RichFileEntityImpl {
 	private Float amount;// 合计
 	private Calendar stopDate;// 停保日期
 	private Integer verMajor;// 主版本号
+	private Integer verMinor;// 次版本号
 	private int main; // 主体： 0-当前版本,1-历史版本
 	private String patchNo;// 批号
 	private int opType; // 操作类型：1-新建,2-维护,3-续保,4-停保
@@ -238,6 +246,15 @@ public class Policy extends RichFileEntityImpl {
 
 	public void setVerMajor(Integer verMajor) {
 		this.verMajor = verMajor;
+	}
+
+	@Column(name = "VER_MINOR")
+	public Integer getVerMinor() {
+		return verMinor;
+	}
+
+	public void setVerMinor(Integer verMinor) {
+		this.verMinor = verMinor;
 	}
 
 	public int getMain() {
