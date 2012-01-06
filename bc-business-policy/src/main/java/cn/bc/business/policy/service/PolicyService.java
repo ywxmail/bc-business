@@ -18,8 +18,7 @@ public interface PolicyService extends CrudService<Policy> {
 	 * 续保处理：新纪录、主版本号加1
 	 * 
 	 * @parma policyId 原车保id
-	 * @parma newStartDate 续保的开始日期
-	 * @parma newEndDate 续保的结束日期
+	 * 
 	 * @return 续签后的合同信息
 	 */
 	Policy doRenew(Long policyId);
