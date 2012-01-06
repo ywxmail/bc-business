@@ -952,6 +952,7 @@ CREATE TABLE BS_CAR_POLICY(
    ID                                  BIGINT NOT NULL AUTO_INCREMENT,
    UID_                                VARCHAR(36) NOT NULL,
    VER_MAJOR            BIGINT COMMENT '主版本号',
+   VER_MINOR            BIGINT COMMENT '次版本号',
    PATCH_NO             VARCHAR(255) NOT NULL COMMENT '批号',
    MAIN                 INT(1) NOT NULL COMMENT '主体: 0-当前版本,1-历史版本',
    PID                  BIGINT COMMENT '父级ID',
