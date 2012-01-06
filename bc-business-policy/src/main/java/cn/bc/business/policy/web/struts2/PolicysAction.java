@@ -124,8 +124,9 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 		List<Column> columns = new ArrayList<Column>();
 		columns.add(new IdColumn4MapKey("p.id", "id"));
 		columns.add(new TextColumn4MapKey("p.status_", "status_",
-				getText("policy.status"), 60).setSortable(true)
-				.setValueFormater(new EntityStatusFormater(getBSStatuses1())));
+				getText("policy.status"), 60)
+				.setSortable(true)
+				.setValueFormater(new EntityStatusFormater(getPolicyStatuses())));
 		columns.add(new TextColumn4MapKey("p.op_type", "op_type",
 				getText("policy.labour.optype"), 60).setSortable(true)
 				.setValueFormater(new EntityStatusFormater(getEntityOpTypes())));
@@ -269,15 +270,6 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 		return json.isEmpty() ? null : json;
 	}
 
-	@Override
-	protected Toolbar getHtmlPageToolbar() {
-		return super.getHtmlPageToolbar()
-				.addButton(
-						Toolbar.getDefaultToolbarRadioGroup(
-								this.getBSStatuses1(), "status", 0,
-								getText("title.click2changeSearchStatus")));
-	}
-
 	/**
 	 * 布尔值转换列表
 	 * 
@@ -306,6 +298,37 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 		types.put(String.valueOf(Policy.OPTYPE_SURRENDERS),
 				getText("policy.optype.surrenders"));
 		return types;
+	}
+
+	/**
+	 * 状态值转换列表：正常|注销|停保|全部
+	 * 
+	 * @return
+	 */
+	protected Map<String, String> getPolicyStatuses() {
+		Map<String, String> statuses = new LinkedHashMap<String, String>();
+		statuses.put(String.valueOf(Policy.STATUS_ENABLED),
+				getText("policy.status.enabled"));
+		statuses.put(String.valueOf(Policy.STATUS_DISABLED),
+				getText("policy.status.disabled"));
+		statuses.put(String.valueOf(Policy.STATUS_SURRENDER),
+				getText("policy.status.surrender"));
+		statuses.put("", getText("bs.status.all"));
+		return statuses;
+	}
+
+	@Override
+	protected Toolbar getHtmlPageToolbar() {
+		return super.getHtmlPageToolbar()
+				.addButton(
+						Toolbar.getDefaultToolbarRadioGroup(
+								getPolicyStatuses(), "status", 0,
+								getText("title.click2changeSearchClasses")));
+	}
+
+	@Override
+	protected String getGridDblRowMethod() {
+		return "bc.page.open";
 	}
 
 }
