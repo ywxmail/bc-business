@@ -27,6 +27,7 @@ import cn.bc.docs.service.AttachService;
 import cn.bc.docs.web.ui.html.AttachWidget;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.option.service.OptionService;
+import cn.bc.web.struts2.EntityAction;
 import cn.bc.web.ui.html.page.ButtonOption;
 import cn.bc.web.ui.html.page.PageOption;
 
@@ -84,12 +85,11 @@ public class PolicyAction extends FileEntityAction<Long, Policy> {
 
 	}
 
-	@SuppressWarnings("static-access")
-	private AttachWidget buildAttachsUI(boolean isNew) {
+	private AttachWidget buildAttachsUI(boolean isNew, boolean forceReadonly) {
 		// 构建附件控件
 		String ptype = "contractLabour.main";
 		AttachWidget attachsUI = new AttachWidget();
-		attachsUI.setFlashUpload(this.isFlashUpload());
+		attachsUI.setFlashUpload(EntityAction.isFlashUpload());
 		attachsUI.addClazz("formAttachs");
 		if (!isNew)
 			attachsUI.addAttach(this.attachService.findByPtype(ptype, this
@@ -100,23 +100,25 @@ public class PolicyAction extends FileEntityAction<Long, Policy> {
 		attachsUI.addExtension(getText("app.attachs.extensions"))
 				.setMaxCount(Integer.parseInt(getText("app.attachs.maxCount")))
 				.setMaxSize(Integer.parseInt(getText("app.attachs.maxSize")));
-		attachsUI.setReadOnly(!this.getE().isNew());
+		attachsUI.setReadOnly(forceReadonly ? true : this.isReadonly());
 		return attachsUI;
 	}
 
 	@Override
 	protected void afterCreate(Policy entity) {
 		super.afterCreate(entity);
+		// 新建时填写表单的默认信息
 		// 默认购买强制险
 		this.getE().setGreenslip(true);
 		// 默认强制险时间与商业险时间不一致
 		this.getE().setGreenslipSameDate(false);
 		this.getE().setVerMajor(Policy.MAJOR_DEFALUT);
+		this.getE().setVerMinor(Policy.MINOR_DEFALUT);
 		this.getE().setOpType(Policy.OPTYPE_CREATE);
 		this.getE().setUid(this.getIdGeneratorService().next(Policy.KEY_UID));
 		this.getE().setPatchNo(this.getE().getUid());
 		// 构建附件控件
-		attachsUI = buildAttachsUI(true);
+		attachsUI = buildAttachsUI(false, true);
 
 	}
 
@@ -165,20 +167,46 @@ public class PolicyAction extends FileEntityAction<Long, Policy> {
 	protected void buildFormPageButtons(PageOption pageOption, boolean editable) {
 		boolean readonly = this.isReadonly();
 
-		if (editable && !readonly) {
+		if (editable) {// edit,create
+			// if (this.getE().isNew()) {
 			// 添加默认的保存按钮
 			pageOption.addButton(new ButtonOption(getText("label.save"), null,
-					"bc.policyForm.save"));
-			if (!this.getE().isNew()) {
+					"bc.policyForm.save").setId("policySave"));
+			// }
+		} else {// open
+			if (!readonly) {
+				pageOption.addButton(new ButtonOption(
+						getText("policy.optype.edit"), null,
+						"bc.policyForm.doMaintenance").setId("policyeEdit"));
 				pageOption.addButton(new ButtonOption(
 						getText("policy.optype.renewal"), null,
-						"bc.policyForm.doRenew"));
+						"bc.policyForm.doRenew").setId("policyDoRenew"));
 				pageOption.addButton(new ButtonOption(
 						getText("policy.optype.surrenders"), null,
-						"bc.policyForm.doRenew"));
+						"bc.policyForm.doSurrender").setId("policySurrenders"));
 			}
 		}
+	}
 
+	@Override
+	protected void afterEdit(Policy entity) {
+		super.afterEdit(entity);
+		// 加载已的附件控件
+		attachsUI = buildAttachsUI(false, false);
+
+		// 维护时对车保信息进行的修改
+		// 次版本号加1
+		Integer verMinor = this.getE().getVerMinor();
+		this.getE().setVerMinor(verMinor + 1);
+		// 操作类型为：维护
+		this.getE().setOpType(Policy.OPTYPE_EDIT);
+	}
+
+	@Override
+	protected void afterOpen(Policy entity) {
+		super.afterOpen(entity);
+		// 构建附件控件
+		attachsUI = buildAttachsUI(false, true);
 	}
 
 	@Override

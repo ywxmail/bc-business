@@ -18,8 +18,11 @@ import cn.bc.business.policy.domain.Policy;
 import cn.bc.business.policy.service.PolicyService;
 import cn.bc.business.web.struts2.FileEntityAction;
 import cn.bc.core.util.DateUtils;
+import cn.bc.docs.service.AttachService;
+import cn.bc.docs.web.ui.html.AttachWidget;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.option.service.OptionService;
+import cn.bc.web.struts2.EntityAction;
 import cn.bc.web.ui.html.page.ButtonOption;
 import cn.bc.web.ui.html.page.PageOption;
 import cn.bc.web.ui.json.Json;
@@ -36,7 +39,9 @@ public class Policy4CarOperateAction extends FileEntityAction<Long, Policy> {
 	private static final long serialVersionUID = 1L;
 	public PolicyService policyService;
 	public OptionService optionService;
+	private AttachService attachService;
 	public Map<String, String> statusesValue;
+	public AttachWidget attachsUI;
 	public List<Map<String, String>> companyList; // 可选保险公司列表
 
 	@Autowired
@@ -47,6 +52,11 @@ public class Policy4CarOperateAction extends FileEntityAction<Long, Policy> {
 	@Autowired
 	public void setPolicyService(PolicyService policyService) {
 		this.policyService = policyService;
+	}
+
+	@Autowired
+	public void setAttachService(AttachService attachService) {
+		this.attachService = attachService;
 	}
 
 	private Long id;
@@ -73,17 +83,19 @@ public class Policy4CarOperateAction extends FileEntityAction<Long, Policy> {
 		return super.buildFormPageOption(editable).setWidth(725)
 				.setMinWidth(300).setHeight(540).setMinHeight(300);
 	}
+
 	@Override
 	protected void buildFormPageButtons(PageOption pageOption, boolean editable) {
 		boolean readonly = this.isReadonly();
 
 		if (editable && !readonly) {
 			// 添加默认的保存按钮
-			pageOption.addButton(new ButtonOption(getText("label.save"),
-					null, "bc.policyForm.save").setId("policySave"));
+			pageOption.addButton(new ButtonOption(getText("label.save"), null,
+					"bc.policyForm.save").setId("policySave"));
 		}
 
 	}
+
 	protected void initForm(boolean editable) {
 		super.initForm(editable);
 		Date startTime = new Date();
@@ -100,6 +112,26 @@ public class Policy4CarOperateAction extends FileEntityAction<Long, Policy> {
 
 	}
 
+	private AttachWidget buildAttachsUI(boolean isNew, boolean forceReadonly,
+			Policy entity) {
+		// 构建附件控件
+		String ptype = "contractLabour.main";
+		AttachWidget attachsUI = new AttachWidget();
+		attachsUI.setFlashUpload(EntityAction.isFlashUpload());
+		attachsUI.addClazz("formAttachs");
+		if (!isNew)
+			attachsUI.addAttach(this.attachService.findByPtype(ptype,
+					entity.getUid()));
+		attachsUI.setPuid(this.getE().getUid()).setPtype(ptype);
+
+		// 上传附件的限制
+		attachsUI.addExtension(getText("app.attachs.extensions"))
+				.setMaxCount(Integer.parseInt(getText("app.attachs.maxCount")))
+				.setMaxSize(Integer.parseInt(getText("app.attachs.maxSize")));
+		attachsUI.setReadOnly(forceReadonly ? true : this.isReadonly());
+		return attachsUI;
+	}
+
 	// ========车辆保单续保代码开始========
 
 	/**
@@ -114,6 +146,8 @@ public class Policy4CarOperateAction extends FileEntityAction<Long, Policy> {
 		this.initForm(true);
 		this.formPageOption = buildFormPageOption(true);
 		this.setE(newPolicy);
+		// 构建附件控件
+		attachsUI = buildAttachsUI(false, false, newPolicy);
 		return "formr";
 	}
 
