@@ -3,7 +3,6 @@
  */
 package cn.bc.business.contract.web.struts2;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -18,22 +17,15 @@ import cn.bc.business.OptionConstants;
 import cn.bc.business.contract.domain.Contract;
 import cn.bc.business.contract.domain.Contract4Charger;
 import cn.bc.business.contract.service.Contract4ChargerService;
-import cn.bc.business.contract.service.Contract4LabourService;
 import cn.bc.business.web.struts2.FileEntityAction;
-import cn.bc.core.exception.CoreException;
-import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.docs.service.AttachService;
 import cn.bc.docs.web.ui.html.AttachWidget;
 import cn.bc.identity.web.SystemContext;
+import cn.bc.option.domain.OptionItem;
 import cn.bc.option.service.OptionService;
-import cn.bc.web.formater.CalendarFormater;
-import cn.bc.web.formater.CalendarRangeFormater;
-import cn.bc.web.formater.KeyValueFormater;
-import cn.bc.web.ui.html.grid.Column;
-import cn.bc.web.ui.html.grid.GridData;
-import cn.bc.web.ui.html.grid.TextColumn;
 import cn.bc.web.ui.html.page.ButtonOption;
 import cn.bc.web.ui.html.page.PageOption;
+import cn.bc.web.ui.json.Json;
 
 /**
  * 经济合同Action
@@ -47,12 +39,11 @@ public class Contract4ChargerAction extends FileEntityAction<Long, Contract4Char
 	// private static Log logger = LogFactory.getLog(ContractAction.class);
 	private static final long 			serialVersionUID 			= 1L;
 	private Contract4ChargerService 	contract4ChargerService;
-	private Contract4LabourService   	contract4LabourService;
+//	private Contract4LabourService   	contract4LabourService;
 	private AttachService 				attachService;
 	private OptionService				optionService;
-	public	Long						carId; 
+	private	Long						carId; 
 	public	Long						carManId;								
-	private	Long 						oldCarId;								//记录旧有的carId
 	public 	AttachWidget 				attachsUI;
 	
 	public 	Map<String,String>			statusesValue;
@@ -64,6 +55,8 @@ public class Contract4ChargerAction extends FileEntityAction<Long, Contract4Char
 	public  String						assignChargerNames;						//多个责任人name
 	public  String []					chargerNameAry;							
 	public  Map<String,Object>	 		carInfoMap;								//车辆Map
+	public 	boolean 					isExistContract;						// 是否存在合同
+	public 	Json 						json;
 //	public	Long 					carManId;
 //	public  String 					certCode;
 //	public 	ContractService 		contractService;
@@ -79,10 +72,10 @@ public class Contract4ChargerAction extends FileEntityAction<Long, Contract4Char
 		this.setCrudService(contract4ChargerService);
 	}
 
-	@Autowired
-	public void setContract4LabourService(Contract4LabourService contract4LabourService) {
-		this.contract4LabourService = contract4LabourService;
-	}
+//	@Autowired
+//	public void setContract4LabourService(Contract4LabourService contract4LabourService) {
+//		this.contract4LabourService = contract4LabourService;
+//	}
 	
 	
 	@Autowired
@@ -103,14 +96,6 @@ public class Contract4ChargerAction extends FileEntityAction<Long, Contract4Char
 		this.carId = carId;
 	}
 	
-	public Long getOldCarId() {
-		return oldCarId;
-	}
-
-	public void setOldCarId(Long oldCarId) {
-		this.oldCarId = oldCarId;
-	}
-
 	@Override
 	public boolean isReadonly() {
 		// 经济合同管理员或系统管理员
@@ -119,59 +104,107 @@ public class Contract4ChargerAction extends FileEntityAction<Long, Contract4Char
 				getText("key.role.bc.admin"));
 	}
 	
-	public String create() throws Exception {
-		String r = super.create();
-
+	@Override
+	protected void afterCreate(Contract4Charger entity){
+		
+		super.afterCreate(entity);
 		if(carId != null){
-			//根据carId查找车辆的车牌号码
-			carInfoMap = this.contract4ChargerService.findCarByCarId(carId);
-			this.getE().setExt_str1(isNullObject(carInfoMap.get("plate_type")+"."+carInfoMap.get("plate_no")));
+			//查找此车辆是否存在经济合同,若存在前台提示
+			isExistContract = this.contract4ChargerService.isExistContract(carId);
+			if(isExistContract == false){
+				//根据carId查找车辆的车牌号码
+				carInfoMap = this.contract4ChargerService.findCarByCarId(carId);
+				entity.setExt_str1(isNullObject(carInfoMap.get("plate_type")+"."+carInfoMap.get("plate_no")));
+			}
 		}
 		
 		if(carManId != null){
 			//根据carManId查找车辆的车牌号码
 			carInfoMap = this.contract4ChargerService.findCarByCarManId(carManId);
-			this.getE().setExt_str1(isNullObject(carInfoMap.get("plate_type")+"."+carInfoMap.get("plate_no")));
+			entity.setExt_str1(isNullObject(carInfoMap.get("plate_type")+"."+carInfoMap.get("plate_no")));
 			carId = Long.valueOf(isNullObject(carInfoMap.get("id")));
 		}
 		
 		
-		this.getE().setPatchNo(this.getIdGeneratorService().next(Contract4Charger.KEY_UID));
-		this.getE().setOpType(Contract.OPTYPE_CREATE);
-		this.getE().setMain(Contract.MAIN_NOW);
-		this.getE().setUid(this.getIdGeneratorService().next(Contract4Charger.KEY_UID));
-		this.getE().setCode(this.getIdGeneratorService().nextSN4Month(Contract4Charger.KEY_CODE));
-		this.getE().setType(Contract.TYPE_CHARGER);
-		this.getE().setStatus(Contract.STATUS_NORMAL);
-		statusesValue		=	this.getEntityStatuses();
-		
-		attachsUI = buildAttachsUI(true);
-		// 表单可选项的加载
-		initSelects();
-		return r;
+		entity.setPatchNo(this.getIdGeneratorService().next(Contract4Charger.KEY_UID));
+		entity.setOpType(Contract.OPTYPE_CREATE);
+		entity.setMain(Contract.MAIN_NOW);
+		entity.setVerMajor(Contract.MAJOR_DEFALUT);
+		entity.setVerMinor(Contract.MINOR_DEFALUT);
+		entity.setUid(this.getIdGeneratorService().next(Contract4Charger.KEY_UID));
+		entity.setCode(this.getIdGeneratorService().nextSN4Month(Contract4Charger.KEY_CODE));
+		entity.setType(Contract.TYPE_CHARGER);
+		entity.setStatus(Contract.STATUS_NORMAL);
 	}
 	
 	@Override
-	public String edit() throws Exception {
-		this.setE(this.getCrudService().load(this.getId()));
+	public String save() throws Exception{
+		SystemContext context = this.getSystyemContext();
+		Contract4Charger e = this.getE();
+		this.beforeSave(e);
+		//设置最后更新人的信息
+		e.setFileDate(Calendar.getInstance());
+		e.setModifier(context.getUserHistory());
+		e.setModifiedDate(Calendar.getInstance());
+		//设置责任人姓名
+		e.setExt_str2(assignChargerNames);
+		
+		this.contract4ChargerService.save(e,this.getCarId(),
+				assignChargerIds,assignChargerNames);
+
+		this.afterSave(e);
+//		//保存证件与车辆的关联表信息
+//		this.contract4ChargerService.carNContract4Save(carId,getE().getId());
+//		
+//		//保存证件与责任人的关联表信息
+//		this.contract4ChargerService.carMansNContract4Save(assignChargerIds, getE().getId());
+//		//更新车辆的chager列显示责任人姓名
+//		this.contract4ChargerService.updateCar4dirverName(assignChargerNames,carId);
+//		//更新司机的chager列显示责任人姓名
+//		this.contract4ChargerService.updateCarMan4dirverName(assignChargerNames,carId);
+		
+		
+		return "saveSuccess";
+		
+	}
+	
+	@Override
+	protected void afterEdit(Contract4Charger e) {
+		// == 合同维护处理
+		setChargerList(e);
+		// 构建附件控件
+		attachsUI = buildAttachsUI(false, false);
+
+		// 将次版本号加1
+		if(e.getVerMinor() != null){
+			e.setVerMinor(e.getVerMinor() + 1);
+		}
+
+		// 操作类型设置为维护
+		e.setOpType(Contract.OPTYPE_MAINTENANCE);
+	}
+	
+	@Override
+	protected void afterOpen(Contract4Charger e) {
+		// == 合同维护处理
+		setChargerList(e);
+		// 构建附件控件
+		attachsUI = buildAttachsUI(false, true);
+	}
+
+	@Override
+	protected void initForm(boolean editable) {
+		super.initForm(editable);
+		
+		// 状态列表
+		statusesValue		=	this.getEntityStatuses();
 		// 表单可选项的加载
 		initSelects();
-		this.formPageOption = 	buildFormPageOption();
-		statusesValue		=	this.getEntityStatuses();
-		// 构建附件控件
-		attachsUI = buildAttachsUI(false);
-		
-		//根据contractId查找car信息
-//		carInfoMap = this.contractService.findCarInfoByContractId(this.getId());
-//		carId = Long.valueOf(carInfoMap.get("id")+"");
-//		this.getE().setExt_str1(carInfoMap.get("plate_type")+" "+carInfoMap.get("plate_no"));
-		
-		
-		
-		Contract4Charger e = this.getE();
+	}
+	
+	private void setChargerList(Contract4Charger e){
 		//根据contractId查找所属的carId
 		carId = this.contract4ChargerService.findCarIdByContractId(e.getId());
-		oldCarId = carId;
 		//根据contractId查找所属的carManId列表
 		List<String> chargerIdList = this.contract4ChargerService.findChargerIdByContractId(e.getId());
 		if((chargerIdList != null && chargerIdList.size() > 0) && (e.getExt_str2() != null && e.getExt_str2().length() > 0)){
@@ -181,121 +214,14 @@ public class Contract4ChargerAction extends FileEntityAction<Long, Contract4Char
 				chargerInfoMap.put(chargerIdList.get(i), chargerNameAry[i]);
 			}
 		}
-
-		return "form";
 	}
 	
-	@Override
-	public String save() throws Exception{
-		SystemContext context = this.getSystyemContext();
-		
-		//设置最后更新人的信息
-		Contract4Charger e = this.getE();
-		e.setModifier(context.getUserHistory());
-		e.setModifiedDate(Calendar.getInstance());
-		
-		e.setExt_str2(assignChargerNames);
-		this.getCrudService().save(e);
-
-		//保存证件与车辆的关联表信息
-		if(oldCarId != null){
-			if(oldCarId != carId && !oldCarId.equals(carId)){
-				this.contract4ChargerService.carNContract4Save(carId,getE().getId());
-			}
-		}else{
-			this.contract4ChargerService.carNContract4Save(carId,getE().getId());
-		}
-		
-		//保存证件与责任人的关联表信息
-		this.contract4ChargerService.carMansNContract4Save(assignChargerIds, getE().getId());
-		//更新车辆的chager列显示责任人姓名
-		this.contract4ChargerService.updateCar4dirverName(assignChargerNames,carId);
-		//更新司机的chager列显示责任人姓名
-		this.contract4ChargerService.updateCarMan4dirverName(assignChargerNames,carId);
-		
-		return "saveSuccess";
-		
-	}
-	
-	// 删除
-	@Override
-	public String delete() throws Exception {
-		if (this.getId() != null) {// 删除一条
-			//单个删除中间表car_contract表
-			this.contract4ChargerService.deleteCarNContract(this.getId());
-			//TODO 单个删除中间表carman_contract表
-			//this.contract4LabourService.deleteCarManNContract(this.getId());
-			//单个删除本表
-			this.getCrudService().delete(this.getId());
-		} else {// 删除一批
-			if (this.getIds() != null && this.getIds().length() > 0) {
-				Long[] contractIds = cn.bc.core.util.StringUtils
-						.stringArray2LongArray(this.getIds().split(","));
-				//TODO 批量删除中间表car_contract表
-				//this.contract4LabourService.deleteCarManNContract(contractIds);
-				//批量删除中间表carman_contract表
-				this.contract4ChargerService.deleteCarNContract(contractIds);
-				//批量删除本表
-				Long[] ids = cn.bc.core.util.StringUtils
-						.stringArray2LongArray(this.getIds().split(","));
-				this.getCrudService().delete(ids);
-			} else {
-				throw new CoreException("must set property id or ids");
-			}
-		}
-		return "deleteSuccess";
-	}
-	
-//	/**
-//	 * 根据请求的条件查找非分页信息对象
-//	 * 
-//	 * @return
-//	 */
-//	@Override
-//	protected List<Map<String, Object>> findList() {
-//		return this.contract4ChargerService.list4car(this.getCondition(),carId);
-//	}
-//	
-//	/**
-//	 * 根据请求的条件查找分页信息对象
-//	 * 
-//	 * @return
-//	 */
-//	protected Page<Map<String,Object>> findPage() {
-//		return this.contract4ChargerService.page4car(
-//					this.getCondition(),this.getPage().getPageNo(), 
-//					this.getPage().getPageSize());
-//	}
-	
-	@Override
-	protected List<Column> buildGridColumns() {
-		//List<Column> columns = super.buildGridColumns();
-		List<Column> columns = new ArrayList<Column>();
-		columns.add(new TextColumn("['id']", "ID",20));
-		columns.add(new TextColumn("['type']", getText("contract.type"),80)
-				.setSortable(true).setUseTitleFromLabel(true)
-				.setValueFormater(new KeyValueFormater(getEntityTypes())));
-		columns.add(new TextColumn("['ext_str1']", getText("contract.car"),80));
-		columns.add(new TextColumn("['ext_str2']", getText("contract.charger.charger"),140));
-		columns.add(new TextColumn("['transactorName']", getText("contract.transactor"),60));
-		columns.add(new TextColumn("['signDate']", getText("contract.signDate"),90)
-				.setSortable(true).setValueFormater(
-						new CalendarFormater("yyyy-MM-dd")));
-		columns.add(new TextColumn("['startDate']", getText("contract.deadline"))
-				.setValueFormater(
-						new CalendarRangeFormater("yyyy-MM-dd") {
-							@SuppressWarnings("rawtypes")
-							@Override
-							public Calendar getToDate(Object context,
-									Object value) {
-								Map contract = (Map) context;
-								return (Calendar) contract.get("endDate");
-							}
-						}));
-		columns.add(new TextColumn("['code']", getText("contract.code"),120)
-				.setUseTitleFromLabel(true));
-
-		return columns;
+	/** 判断指定的车辆是否已经存在经济合同 */
+	public String isExistContract() {
+		json = new Json();
+		json.put("isExistContract",
+				this.contract4ChargerService.isExistContract(carId));
+		return "json";
 	}
 	
 	
@@ -320,15 +246,9 @@ public class Contract4ChargerAction extends FileEntityAction<Long, Contract4Char
 //		}
 //	}
 
-	@Override
-	protected GridData buildGridData(List<Column> columns) {
-		return super.buildGridData(columns).setRowLabelExpression("['code']");
-	}
-
-
-	private AttachWidget buildAttachsUI(boolean isNew) {
+	private AttachWidget buildAttachsUI(boolean isNew, boolean forceReadonly) {
 		// 构建附件控件
-		String ptype = "contractCharger.main";
+		String ptype = "contract4Charger.main";
 		AttachWidget attachsUI = new AttachWidget();
 		attachsUI.setFlashUpload(isFlashUpload());
 		attachsUI.addClazz("formAttachs");
@@ -341,39 +261,44 @@ public class Contract4ChargerAction extends FileEntityAction<Long, Contract4Char
 		attachsUI.addExtension(getText("app.attachs.extensions"))
 				.setMaxCount(Integer.parseInt(getText("app.attachs.maxCount")))
 				.setMaxSize(Integer.parseInt(getText("app.attachs.maxSize")));
-		if (this.isReadonly()) {
-			attachsUI.setReadOnly(true);
-		}
+
+		// 只读控制
+		attachsUI.setReadOnly(forceReadonly ? true : this.isReadonly());
 		return attachsUI;
 	}
 
 	@Override
 	protected PageOption buildFormPageOption(boolean editable) {
-		PageOption option = super.buildFormPageOption().setWidth(748).setMinWidth(250)
+		return super.buildFormPageOption(editable).setWidth(748).setMinWidth(250)
 				.setMinHeight(160).setHeight(450);
 		//option.addButton(new ButtonOption(getText("label.save"), "save"));
-		if (!this.isReadonly()) {
-			option.addButton(new ButtonOption(getText("label.save"), null, "bc.contractChargerForm.save"));
-		}
-		return option;
-	}
-
-	@Override
-	protected OrderCondition getDefaultOrderCondition() {
-		return null;// new OrderCondition("fileDate", Direction.Desc);
-	}
-
-	@Override
-	protected PageOption buildListPageOption() {
-		return super.buildListPageOption().setWidth(850).setMinWidth(300)
-				.setHeight(400).setMinHeight(300);
-	}
-
-	@Override
-	protected String[] getSearchFields() {
-		return new String[] { "contract.code", "contract.wordNo" , "contract.ext_str1", "contract.ext_str2"};
+//		if (!this.isReadonly()) {
+//			option.addButton(new ButtonOption(getText("label.save"), null, "bc.contractChargerForm.save"));
+//		}
+//		return option;
 	}
 	
+	@Override
+	protected void buildFormPageButtons(PageOption pageOption, boolean editable) {
+		// 特殊处理的部分
+		if (!this.isReadonly()) {// 有权限
+			if (editable) {// 编辑状态显示保存按钮
+				pageOption.addButton(new ButtonOption(getText("label.save"),
+						null, "bc.contract4ChargerForm.save"));
+			} else {// 只读状态显示操作按钮
+				if(this.getE().getMain() == Contract.MAIN_NOW){
+					pageOption.addButton(new ButtonOption(
+							getText("contract4Labour.optype.maintenance"), null,
+							"bc.contract4ChargerForm.doMaintenance"));
+					pageOption.addButton(new ButtonOption(
+							getText("contract4Labour.optype.renew"), null,
+							"bc.contract4ChargerForm.doRenew"));
+				}
+			}
+		}
+	}
+
+
 	
 	// 表单可选项的加载
 	public void initSelects(){
@@ -387,35 +312,14 @@ public class Contract4ChargerAction extends FileEntityAction<Long, Contract4Char
 		
 		// 加载可选签约类型
 		this.signTypeList		=	 optionItems.get(OptionConstants.CONTRACT_SIGNTYPE);
+		if(!this.getE().isNew() && this.getE().getSignType().equals(getText("contract4Labour.optype.renew"))){
+			OptionItem.insertIfNotExist(signTypeList, getText("contract4Labour.optype.renew"), getText("contract4Labour.optype.renew"));
+		}
 		// 加载可选营运性质列表
 		this.businessTypeList	=	 optionItems.get(OptionConstants.CAR_BUSINESS_NATURE);
 
 	}
 	
-	//复写搜索URL方法
-	protected String getEntityConfigName() {
-		return "contractCharger";
-	}
-	
-//	// 视图特殊条件
-//	@Override
-//	protected Condition getSpecalCondition() {
-//		if (carId != null) {
-//			return new EqualsCondition("carId", carId);
-//		} else {
-//			return null;
-//		}
-//	}
-//	
-//
-/*	@Override
-	protected HtmlPage buildHtml4Paging() {
-		HtmlPage page = super.buildHtml4Paging();
-		if (carId != null)
-			page.setAttr("data-extras", new Json().put("carId", carId)
-					.toString());
-		return page;
-	}*/
 	
 	/**
 	 * 获取Contract的合同类型列表

@@ -7,7 +7,6 @@
 		<action name="contract/create" class="contractAction" method="create">
 			<result name="showdialog" >/bc-business/contract/select.jsp</result>
 		</action>
-		<action name="contract/renew" class="contractAction" method="renew"/>
 	</package>
 	
 	<!-- 劳动合同 -->
@@ -42,13 +41,25 @@
 	</package>
 	
 	<!-- 经济合同 -->
-	<package name="contract4Charger" extends="bc-default" namespace="/bc-business">
-		<action name="contract4Charger/create" class="contract4ChargerAction" method="create">
+	<package name="contract4Charger" extends="bc-default" namespace="/bc-business/contract4Charger">
+		<action name="create" class="contract4ChargerAction" method="create">
 			<result name="form">/bc-business/contract4Charger/form.jsp</result>
 		</action>
-		<action name="contract4Charger/edit" class="contract4ChargerAction" method="edit">
-			<result name="form">/bc-business/contractCharger/form.jsp</result>
+		<action name="open" class="contract4ChargerAction" method="open">
+			<result name="formr">/bc-business/contract4Charger/form.jsp</result>
 		</action>
-		<action name="contract4Charger/delete" class="contract4ChargerAction" method="delete" />
+		<action name="edit" class="contract4ChargerAction" method="edit">
+			<result name="form">/bc-business/contract4Charger/form.jsp</result>
+		</action>
+		<action name="delete" class="contract4ChargerAction" method="delete" />
+		<action name="save" class="contract4ChargerAction" method="save"/>
+		<action name="isExistContract" class="contract4ChargerAction" method="isExistContract">
+		</action>
+	</package>
+	
+	<!-- 劳动合同的版本管理 -->
+	<package name="contract4ChargerOperate" extends="bc-default" namespace="/bc-business/contract4ChargerOperate">
+		<!-- 续签 -->
+		<action name="doRenew" class="contract4ChargerOperateAction" method="doRenew"/>
 	</package>
 </struts>

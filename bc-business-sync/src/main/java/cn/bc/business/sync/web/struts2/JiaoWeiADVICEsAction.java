@@ -71,7 +71,7 @@ public class JiaoWeiADVICEsAction extends SyncViewAction {
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer sql = new StringBuffer();
 		sql.append("select b.id,b.status_,b.sync_type,b.sync_code,b.sync_from,b.sync_date");
-		sql.append(",t.subject,t.receive_date,t.car_plate,t.driver_id,t.advisor_name,t.ticket,t.content,t.result_,t.subject,t.subject2");
+		sql.append(",t.subject,t.receive_date,t.car_plate,t.driver_cert,t.advisor_name,t.ticket,t.content,t.result_,t.subject,t.subject2");
 		sql.append(" from bs_sync_jiaowei_ADVICE t");
 		sql.append(" inner join bc_sync_base b on b.id=t.id");
 		sqlObject.setSql(sql.toString());
@@ -121,7 +121,7 @@ public class JiaoWeiADVICEsAction extends SyncViewAction {
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd HH:mm")));
 		columns.add(new TextColumn4MapKey("t.car_plate", "carPlate",
 				getText("jiaoWeiADVICE.carPlate"), 80).setSortable(true));
-		columns.add(new TextColumn4MapKey("t.driver_id", "driverCert",
+		columns.add(new TextColumn4MapKey("t.driver_cert", "driverCert",
 				getText("jiaoWeiADVICE.driverCert"), 80).setSortable(true));
 		columns.add(new TextColumn4MapKey("t.advisor_name", "advisorName",
 				getText("jiaoWeiADVICE.advisorName"), 80).setUseTitleFromLabel(true));

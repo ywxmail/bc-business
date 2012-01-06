@@ -94,6 +94,7 @@ public interface Contract4ChargerDao extends CrudDao<Contract4Charger> {
 	void updateCar4dirverName(String assignChargerNames, Long carId);
 
 	/**
+	 * JDBC
 	 * 更新司机表的负责人信息
 	 * @param assignChargerNames
 	 * @param carId
@@ -101,6 +102,7 @@ public interface Contract4ChargerDao extends CrudDao<Contract4Charger> {
 	void updateCarMan4dirverName(String assignChargerNames, Long carId);
 
 	/**
+	 * JDBC
 	 * 根据车辆ID查找车辆信息
 	 * @param carId
 	 * @return
@@ -113,6 +115,23 @@ public interface Contract4ChargerDao extends CrudDao<Contract4Charger> {
 	 * @return
 	 */
 	Map<String, Object> findCarByCarManId(Long carManId);
+
+	/**
+	 * 更新司机表的负责人信息
+	 * @param assignChargerNames
+	 * @param carId
+	 */
+	void updateCar4ChargerName(String assignChargerNames, Long carId);
+
+	/**
+	 * 更新司机表的负责人信息
+	 * @param assignChargerNames
+	 * @param carId
+	 */
+	void updateCarMan4ChargerName(String assignChargerNames, Long carId);
+
+	/** 判断指定的车辆是否已经存在经济合同*/
+	boolean isExistContract(Long carId);
 
 
 }

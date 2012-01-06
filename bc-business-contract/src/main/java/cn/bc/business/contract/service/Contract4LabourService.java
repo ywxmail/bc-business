@@ -57,9 +57,11 @@ public interface Contract4LabourService extends CrudService<Contract4Labour> {
 	 *            原合同id
 	 * @param newCarId
 	 *            指定新车的id
+	 * @param newCarPlate
+	 *            指定新车的车牌
 	 * @return 转车后的合同信息
 	 */
-	Contract4Labour doChangeCar(Long contractId, Long newCarId);
+	Contract4Labour doChangeCar(Long contractId, Long newCarId, String newCarPlate);
 
 	/**
 	 * 查找劳动合同列表

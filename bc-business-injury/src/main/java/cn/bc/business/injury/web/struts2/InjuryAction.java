@@ -3,8 +3,6 @@
  */
 package cn.bc.business.injury.web.struts2;
 
-import java.util.Calendar;
-import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,20 +13,8 @@ import org.springframework.stereotype.Controller;
 import cn.bc.business.injury.domain.Injury;
 import cn.bc.business.injury.service.InjuryService;
 import cn.bc.business.web.struts2.FileEntityAction;
-import cn.bc.core.query.condition.Condition;
-import cn.bc.core.query.condition.Direction;
-import cn.bc.core.query.condition.impl.EqualsCondition;
-import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.identity.web.SystemContext;
-import cn.bc.web.formater.CalendarFormater;
-import cn.bc.web.formater.CalendarRangeFormater;
-import cn.bc.web.ui.html.grid.Column;
-import cn.bc.web.ui.html.grid.GridData;
-import cn.bc.web.ui.html.grid.TextColumn;
-import cn.bc.web.ui.html.page.ButtonOption;
-import cn.bc.web.ui.html.page.HtmlPage;
 import cn.bc.web.ui.html.page.PageOption;
-import cn.bc.web.ui.json.Json;
 
 /**
  * 工伤Action
@@ -61,110 +47,32 @@ public class InjuryAction extends FileEntityAction<Long, Injury> {
 				getText("key.role.bs.contract4labour"),
 				getText("key.role.bc.admin"));
 	}
-
+	
 	@SuppressWarnings("static-access")
 	@Override
-	public String create() throws Exception {
-		Injury e = this.injuryService.create();
-		this.setE(e);
-		this.getE().setStatus(Injury.STATUS_NORMAL);
-		this.getE().setContractId(this.contractId);
-		// 自动生成UID
-		this.getE().setUid(this.getIdGeneratorService().next(this.getE().KEY_UID));
-		// 自动生成合同编号
-		this.getE().setCode(this.getIdGeneratorService().nextSN4Month(Injury.KEY_CODE));
+	protected void afterCreate(Injury entity){
+		super.afterCreate(entity);
 		
-		// 设置创建人信息
-		SystemContext context = this.getSystyemContext();
-		this.getE().setFileDate(Calendar.getInstance());
-		this.getE().setAuthor(context.getUserHistory());
-		this.formPageOption = 	buildFormPageOption();
-		statusesValue		=	this.getEntityStatuses();
-
-		return "form";
+		entity.setStatus(Injury.STATUS_NORMAL);
+		entity.setContractId(this.contractId);
+		// 自动生成UID
+		entity.setUid(this.getIdGeneratorService().next(this.getE().KEY_UID));
+		// 自动生成合同编号
+		entity.setCode(this.getIdGeneratorService().nextSN4Month(Injury.KEY_CODE));
+		
 	}
 	
 	@Override
-	public String edit() throws Exception {
-		this.setE(this.getCrudService().load(this.getId()));
-		
-		this.formPageOption = 	buildFormPageOption();
+	protected void initForm(boolean editable) {
+		super.initForm(editable);
+		// 状态列表
 		statusesValue		=	this.getEntityStatuses();
-		
-		return "form";
 	}
 
 	@Override
-	protected PageOption buildFormPageOption() {
-		PageOption option =	super.buildFormPageOption().setWidth(735).setHeight(360)
-				.setMinWidth(250).setMinHeight(170).setModal(false);
-		if (!this.isReadonly()) {
-			option.addButton(new ButtonOption(getText("label.save"), "save"));
-		}
-		return option;
-	}
-
-	@Override
-	protected GridData buildGridData(List<Column> columns) {
-		return super.buildGridData(columns).setRowLabelExpression("code");
-	}
-
-	@Override
-	protected OrderCondition getDefaultOrderCondition() {
-		return new OrderCondition("fileDate", Direction.Desc);
-	}
-
-	@Override
-	protected PageOption buildListPageOption() {
-		return super.buildListPageOption().setWidth(800).setMinWidth(300)
-				.setHeight(400).setMinHeight(300);
-	}
-
-	@Override
-	protected String[] getSearchFields() {
-		return new String[] { "code" };
-	}
-
-	@Override
-	protected List<Column> buildGridColumns() {
-		List<Column> columns = super.buildGridColumns();
-		columns.add(new TextColumn("compensation",
-				getText("injury.compensation"), 90));
-		columns.add(new TextColumn("happenDate",
-				getText("injury.happenDate"), 90).setValueFormater(new CalendarFormater("yyyy-MM-dd")));
-		columns.add(new TextColumn("confirmDate",
-				getText("injury.confirmDate"), 90).setValueFormater(new CalendarFormater("yyyy-MM-dd")));
-		columns.add(new TextColumn("startDate",
-				getText("injury.startDate"))
-				.setValueFormater(new CalendarRangeFormater("yyyy-MM-dd") {
-					@Override
-					public Calendar getToDate(Object context, Object value) {
-						Injury injury = (Injury) context;
-						return injury.getEndDate();
-					}
-				}));
-		columns.add(new TextColumn("code", getText("injury.code"), 80)
-				.setUseTitleFromLabel(true));
-		return columns;
-	}
-
-	 // 视图特殊条件
-	 @Override
-	 protected Condition getSpecalCondition() {
-		 if (this.contractId != null) {
-			 return new EqualsCondition("contractId", this.contractId);
-		 }else {
-			 return null;
-		 }
-	 }
-
-	@Override
-	protected HtmlPage buildHtml4Paging() {
-		HtmlPage page = super.buildHtml4Paging();
-		if (this.contractId != null)
-			page.setAttr("data-extras", new Json().put("contractId", this.contractId)
-					.toString());
-		return page;
+	protected PageOption buildFormPageOption(boolean editable) {
+		return	super.buildFormPageOption(editable).setWidth(735).setHeight(360)
+				.setMinWidth(250).setMinHeight(170);
 	}
 
 
