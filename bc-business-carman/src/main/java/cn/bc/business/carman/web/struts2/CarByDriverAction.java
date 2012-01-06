@@ -91,8 +91,8 @@ public class CarByDriverAction extends FileEntityAction<Long, CarByDriver> {
 	// 设置页面的尺寸
 	@Override
 	protected PageOption buildFormPageOption(boolean editable) {
-		return super.buildFormPageOption(editable).setWidth(390)
-				.setMinWidth(250).setHeight(200);
+		return super.buildFormPageOption(editable).setWidth(460)
+				.setMinWidth(250).setHeight(350);
 	}
 
 	/**
