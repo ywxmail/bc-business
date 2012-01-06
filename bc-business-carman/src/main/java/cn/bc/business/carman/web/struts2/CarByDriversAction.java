@@ -16,7 +16,6 @@ import org.springframework.stereotype.Controller;
 import cn.bc.BCConstants;
 import cn.bc.business.carman.domain.CarByDriver;
 import cn.bc.business.web.struts2.ViewAction;
-import cn.bc.core.Entity;
 import cn.bc.core.query.condition.Condition;
 import cn.bc.core.query.condition.ConditionUtils;
 import cn.bc.core.query.condition.Direction;
@@ -159,8 +158,7 @@ public class CarByDriversAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected String[] getGridSearchFields() {
-		return new String[] { "c.plate_type", "c.plate_no", "b.name",
-				"d.classes" };
+		return new String[] { "c.plate_type", "c.plate_no", "b.name" };
 	}
 
 	@Override

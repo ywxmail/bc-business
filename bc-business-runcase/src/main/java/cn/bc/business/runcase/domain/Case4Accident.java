@@ -18,7 +18,7 @@ import javax.persistence.Table;
 @Table(name = "BS_CASE_ACCIDENT")
 public class Case4Accident extends CaseBase {
 	private static final long serialVersionUID = 1L;
-	public static final String ATTACH_TYPE = Case4Accident.class
+	public final String ATTACH_TYPE = Case4Accident.class
 			.getSimpleName();
 
 	private Calendar receiveDate;// 受理时间

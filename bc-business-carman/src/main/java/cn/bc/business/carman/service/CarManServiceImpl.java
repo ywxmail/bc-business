@@ -12,7 +12,6 @@ import cn.bc.BCConstants;
 import cn.bc.business.carman.dao.CarManDao;
 import cn.bc.business.carman.domain.CarMan;
 import cn.bc.business.cert.domain.Cert;
-import cn.bc.core.RichEntity;
 import cn.bc.core.service.DefaultCrudService;
 
 /**

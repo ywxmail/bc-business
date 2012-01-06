@@ -12,7 +12,6 @@ import org.apache.commons.logging.LogFactory;
 import cn.bc.business.car.domain.Car;
 import cn.bc.business.carman.dao.CarByDriverDao;
 import cn.bc.business.carman.domain.CarByDriver;
-import cn.bc.business.contract.domain.ContractCarRelation;
 import cn.bc.orm.hibernate.jpa.HibernateCrudJpaDao;
 
 /**

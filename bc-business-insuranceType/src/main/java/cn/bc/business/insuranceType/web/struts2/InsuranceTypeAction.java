@@ -2,7 +2,6 @@ package cn.bc.business.insuranceType.web.struts2;
 
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,12 +14,7 @@ import cn.bc.business.insuranceType.domain.InsuranceType;
 import cn.bc.business.insuranceType.service.InsuranceTypeService;
 import cn.bc.business.web.struts2.FileEntityAction;
 import cn.bc.core.exception.CoreException;
-import cn.bc.core.query.condition.Direction;
-import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.identity.web.SystemContext;
-import cn.bc.web.ui.html.grid.Column;
-import cn.bc.web.ui.html.grid.GridData;
-import cn.bc.web.ui.html.page.ButtonOption;
 import cn.bc.web.ui.html.page.PageOption;
 import cn.bc.web.ui.json.Json;
 
@@ -62,32 +56,9 @@ public class InsuranceTypeAction extends FileEntityAction<Long, InsuranceType> {
 	}
 
 	@Override
-	protected PageOption buildFormPageOption() {
-		PageOption option = new PageOption().setWidth(500).setMinWidth(300)
-				.setMinHeight(250).setModal(false);
-
-		if (!this.isReadonly()) {
-			option.addButton(new ButtonOption(getText("label.save"), "save"));
-		}
-		return option;
-	}
-
-	@Override
-	protected GridData buildGridData(List<Column> columns) {
-		return super.buildGridData(columns).setRowLabelExpression("name");
-	}
-
-	@Override
-	protected OrderCondition getDefaultOrderCondition() {
-		return new OrderCondition("status", Direction.Asc).add("code",
-				Direction.Asc);
-	}
-
-	// 设置页面的尺寸
-	@Override
-	protected PageOption buildListPageOption() {
-		return super.buildListPageOption().setWidth(600).setMinWidth(300)
-				.setHeight(500).setMinHeight(300);
+	protected PageOption buildFormPageOption(boolean editable) {
+		return super.buildFormPageOption(editable).setWidth(420)
+				.setMinWidth(300).setHeight(340).setMinHeight(200);
 	}
 
 	public Json json;

@@ -297,8 +297,6 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 		if (carId != null) {
 			oldCarIdCondition = new EqualsCondition("d.from_car_id", carId);
 		}
-		// Condition carIdCondition = new OrCondition().add(newCarIdCondition)
-		// .add(oldCarIdCondition);
 		// 合并条件
 		return ConditionUtils.mix2AndCondition(carManIdCondition,
 				ConditionUtils.mix2OrCondition(newCarIdCondition,

@@ -4,6 +4,7 @@
 package cn.bc.business.carman.web.struts2;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,10 +16,8 @@ import org.springframework.stereotype.Controller;
 import cn.bc.BCConstants;
 import cn.bc.business.carman.domain.CarMan;
 import cn.bc.business.web.struts2.ViewAction;
-import cn.bc.core.Entity;
 import cn.bc.core.query.condition.Condition;
 import cn.bc.core.query.condition.Direction;
-import cn.bc.core.query.condition.impl.AndCondition;
 import cn.bc.core.query.condition.impl.EqualsCondition;
 import cn.bc.core.query.condition.impl.InCondition;
 import cn.bc.core.query.condition.impl.OrderCondition;
@@ -27,6 +26,7 @@ import cn.bc.db.jdbc.RowMapper;
 import cn.bc.db.jdbc.SqlObject;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.web.formater.CalendarFormater;
+import cn.bc.web.formater.DateRangeFormater;
 import cn.bc.web.formater.EntityStatusFormater;
 import cn.bc.web.formater.KeyValueFormater;
 import cn.bc.web.ui.html.grid.Column;
@@ -70,7 +70,8 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer sql = new StringBuffer();
 		sql.append("select c.id,c.status_,c.type_,c.name,c.cert_fwzg,c.cert_fwzg_id,c.cert_identity");
-		sql.append(",c.cert_cyzg,c.work_date,c.origin,c.former_unit,c.file_date from BS_CARMAN c");
+		sql.append(",c.cert_cyzg,c.work_date,c.origin,c.former_unit,c.charger,c.cert_driving_first_date");
+		sql.append(",c.cert_driving,c.cert_driving_start_date,c.cert_driving_end_date,c.file_date from BS_CARMAN c");
 		sqlObject.setSql(sql.toString());
 
 		// 注入参数
@@ -92,6 +93,11 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 				map.put("work_date", rs[i++]);
 				map.put("origin", rs[i++]);
 				map.put("former_unit", rs[i++]);
+				map.put("charger", rs[i++]);
+				map.put("cert_driving_first_date", rs[i++]);
+				map.put("cert_driving", rs[i++]);
+				map.put("cert_driving_start_date", rs[i++]);
+				map.put("cert_driving_end_date", rs[i++]);
 				map.put("file_date", rs[i++]);
 				return map;
 			}
@@ -111,14 +117,33 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 				new KeyValueFormater(getType())));
 		columns.add(new TextColumn4MapKey("c.name", "name",
 				getText("carMan.name"), 80).setSortable(true));
-//		columns.add(new TextColumn4MapKey("c.cert_fwzg_id", "cert_fwzg_id",
-//				getText("carMan.cert4FWZGID"), 80));
+		// columns.add(new TextColumn4MapKey("c.cert_fwzg_id", "cert_fwzg_id",
+		// getText("carMan.cert4FWZGID"), 80));
+		columns.add(new TextColumn4MapKey("c.charger", "charger",
+				getText("carMan.charger"), 80));
 		columns.add(new TextColumn4MapKey("c.cert_fwzg", "cert_fwzg",
 				getText("carMan.cert4FWZG"), 80));
 		columns.add(new TextColumn4MapKey("c.cert_identity", "cert_identity",
 				getText("carMan.cert4Indentity"), 160).setSortable(true));
 		columns.add(new TextColumn4MapKey("c.cert_cyzg", "cert_cyzg",
 				getText("carMan.cert4CYZG"), 120));
+		columns.add(new TextColumn4MapKey("c.cert_driving", "cert_driving",
+				getText("carMan.cert4Driving"), 160));
+		columns.add(new TextColumn4MapKey("c.cert_driving_first_date",
+				"cert_driving_first_date",
+				getText("carMan.cert4DrivingFirstDateView"), 120).setSortable(
+				true).setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+		columns.add(new TextColumn4MapKey("c.cert_driving_start_date",
+				"cert_driving_start_date",
+				getText("carMan.cert4DrivingDeadline"), 180)
+				.setValueFormater(new DateRangeFormater("yyyy-MM-dd") {
+					@Override
+					public Date getToDate(Object context, Object value) {
+						@SuppressWarnings("rawtypes")
+						Map contract = (Map) context;
+						return (Date) contract.get("cert_driving_end_date");
+					}
+				}));
 		columns.add(new TextColumn4MapKey("c.work_date", "work_date",
 				getText("carMan.workDate"), 120).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
@@ -168,7 +193,7 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 		} else {
 			return null;
 		}
-		return new AndCondition().add(statusCondition);
+		return statusCondition;
 	}
 
 	@Override
