@@ -49,7 +49,7 @@ public class Contract4LaboursAction extends ViewAction<Map<String, Object>> {
 	private static final long serialVersionUID = 1L;
 	public String status = String.valueOf(Contract.STATUS_NORMAL); // 合同的状态，多个用逗号连接
 	public String mains = String.valueOf(Contract.MAIN_NOW); // 现实当前版本
-	public String type = String.valueOf(Contract.TYPE_CHARGER);
+	public String type = String.valueOf(Contract.TYPE_LABOUR);
 
 	public Long contractId;
 	public String patchNo;
@@ -109,8 +109,8 @@ public class Contract4LaboursAction extends ViewAction<Map<String, Object>> {
 	protected OrderCondition getGridDefaultOrderCondition() {
 		// 默认排序方向：状态|登记日期
 		if (contractId == null) {// 当前版本
-			return new OrderCondition("c.status_", Direction.Asc).add(
-					"c.file_date", Direction.Desc);
+			return new OrderCondition("c.file_date", Direction.Desc).add(
+					"c.status_", Direction.Asc);
 		} else { // 历史版本
 			return new OrderCondition("c.file_date", Direction.Desc);
 		}
@@ -122,11 +122,11 @@ public class Contract4LaboursAction extends ViewAction<Map<String, Object>> {
 
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer sql = new StringBuffer();
-		sql.append("select cl.id,c.type_,c.status_,c.ext_str1,c.ext_str2,c.transactor_name,c.sign_date,c.start_date,c.end_date,c.code,cl.joinDate,cl.insurCode,cl.insurance_type,cl.cert_no,c.author_id,c.ver_major,c.ver_minor,c.op_type,iah.actor_name");
+		sql.append("select cl.id,c.type_,c.status_,c.ext_str1,c.ext_str2,c.transactor_name,c.sign_date,c.start_date,c.end_date,c.code,cl.joinDate,cl.insurCode,cl.insurance_type,cl.cert_no,cl.leaveDate,c.author_id,c.ver_major,c.ver_minor,c.op_type,iah.actor_name");
 		sql.append(",car.id carId");
 		sql.append(",man.id manId");
 		sql.append(" from BS_CONTRACT_LABOUR cl");
-		sql.append(" left join BS_CONTRACT c on cl.id = c.id");
+		sql.append(" inner join BS_CONTRACT c on cl.id = c.id");
 		sql.append(" left join BS_CAR_CONTRACT carc on c.id = carc.contract_id");
 		sql.append(" left join BS_Car car on carc.car_id = car.id");
 		sql.append(" left join BS_CARMAN_CONTRACT manc on c.id = manc.contract_id");
@@ -156,6 +156,7 @@ public class Contract4LaboursAction extends ViewAction<Map<String, Object>> {
 				map.put("insurCode", rs[i++]);
 				map.put("insurance_type", rs[i++]);
 				map.put("cert_no", rs[i++]);
+				map.put("leaveDate", rs[i++]);
 				map.put("author_id", rs[i++]);
 				map.put("ver_major", rs[i++]);
 				map.put("ver_minor", rs[i++]);
@@ -178,7 +179,7 @@ public class Contract4LaboursAction extends ViewAction<Map<String, Object>> {
 				.setSortable(true)
 				.setValueFormater(new EntityStatusFormater(getEntityStatuses())));
 		columns.add(new TextColumn4MapKey("c.ver_major", "ver_major",
-				getText("contract4Labour.ver"), 35)
+				getText("contract4Labour.ver"), 30)
 				.setValueFormater(new AbstractFormater<String>() {
 					@SuppressWarnings("unchecked")
 					@Override
@@ -246,6 +247,9 @@ public class Contract4LaboursAction extends ViewAction<Map<String, Object>> {
 				.setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("cl.joinDate", "joinDate",
 				getText("contract4Labour.joinDate"), 90)
+				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+		columns.add(new TextColumn4MapKey("cl.leaveDate", "leaveDate",
+				getText("contract4Labour.leaveDate"), 90)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
 		columns.add(new TextColumn4MapKey("c.op_type", "op_type",
 				getText("contract4Labour.op"), 60).setSortable(true)
@@ -328,21 +332,23 @@ public class Contract4LaboursAction extends ViewAction<Map<String, Object>> {
 		Condition statusCondition = null;
 		Condition mainsCondition = null;
 		Condition patchCondtion = null;
+		Condition typeCondtion = new EqualsCondition("c.type_", type);
+		
 		if (contractId == null) {
 			// 查看最新合同列表
 			statusCondition = ConditionUtils.toConditionByComma4IntegerValue(
 					this.status, "c.status_");
-			if (this.status.length() <= 0) { // 显示全部状态的时候只显示最新版本的记录
-				mainsCondition = ConditionUtils
-						.toConditionByComma4IntegerValue(this.mains, "c.main");
-			}
+			//if (this.status.length() <= 0) { // 显示全部状态的时候只显示最新版本的记录
+			mainsCondition = ConditionUtils
+					.toConditionByComma4IntegerValue(this.mains, "c.main");
+			//}
 		} else {
 			// 查看历史版本
 			patchCondtion = new EqualsCondition("c.patch_no", patchNo);
 			mainsCondition = new EqualsCondition("c.main",
 					Contract.MAIN_HISTORY);
 		}
-		return ConditionUtils.mix2AndCondition(statusCondition, mainsCondition,
+		return ConditionUtils.mix2AndCondition(typeCondtion,statusCondition, mainsCondition,
 				patchCondtion);
 	}
 
@@ -362,6 +368,8 @@ public class Contract4LaboursAction extends ViewAction<Map<String, Object>> {
 		if (patchNo != null) {
 			json.put("patchNo", patchNo);
 		}
+		
+		json.put("type", type);
 	}
 
 	@Override

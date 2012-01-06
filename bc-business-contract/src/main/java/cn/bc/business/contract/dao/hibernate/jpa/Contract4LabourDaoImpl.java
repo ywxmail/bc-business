@@ -80,9 +80,11 @@ public class Contract4LabourDaoImpl extends
 		this.deleteCarRelation(contractId);
 
 		// 删除合同自身
-		Long pid = this.load(contractId).getPid();
-		this.executeUpdate("delete Contract4Labour where id=?",
-				new Object[] { contractId });
+		Contract4Labour c = this.load(contractId);
+		Long pid = c.getPid();
+		this.getJpaTemplate().remove(c);
+//		this.executeUpdate("delete Contract4Labour where id=?",
+//				new Object[] { contractId });
 
 		// 如有父级ID,递归删除父级记录
 		if (pid != null) {
