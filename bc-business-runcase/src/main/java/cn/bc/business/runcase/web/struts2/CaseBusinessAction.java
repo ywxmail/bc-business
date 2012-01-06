@@ -215,8 +215,8 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 			this.getE().setReceipt(jiaoweiYYWZ.getReceipt());
 			this.getE().setDetain(jiaoweiYYWZ.getDetain());
 			String str = jiaoweiYYWZ.getDetain();
-			if(str.split("分").length == 1){	//检查字符串是否存在一个"分"字,如出现多个"分"字不处理
-				str = str.substring(str.lastIndexOf("分")-1,str.lastIndexOf("分"));
+			if(str.lastIndexOf("分") > 0){	//检查字符串是否存在一个"分"字,如出现多个"分"字取最后一个
+				str = str.substring(str.lastIndexOf("分")-2,str.lastIndexOf("分")).trim();
 				this.getE().setJeom(Float.parseFloat(str));
 			}
 			this.getE().setFrom(getText("runcase.jiaowei"));
