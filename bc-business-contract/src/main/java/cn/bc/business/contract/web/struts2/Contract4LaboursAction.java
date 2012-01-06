@@ -49,7 +49,7 @@ public class Contract4LaboursAction extends ViewAction<Map<String, Object>> {
 	private static final long serialVersionUID = 1L;
 	public String status = String.valueOf(Contract.STATUS_NORMAL); // 合同的状态，多个用逗号连接
 	public String mains = String.valueOf(Contract.MAIN_NOW); // 现实当前版本
-	public String type = String.valueOf(Contract.TYPE_LABOUR);
+	public int type = Contract.TYPE_LABOUR;
 
 	public Long contractId;
 	public String patchNo;
