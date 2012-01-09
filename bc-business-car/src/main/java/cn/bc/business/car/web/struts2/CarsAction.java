@@ -13,6 +13,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
 import cn.bc.BCConstants;
+import cn.bc.business.web.struts2.LinkFormater4DriverInfo;
 import cn.bc.business.web.struts2.ViewAction;
 import cn.bc.core.query.condition.Condition;
 import cn.bc.core.query.condition.ConditionUtils;
@@ -155,7 +156,9 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("c.cert_no2", "cert_no2",
 				getText("car.certNo2"), 100));
 		columns.add(new TextColumn4MapKey("c.driver", "driver",
-				getText("car.carMan")).setUseTitleFromLabel(true));
+				getText("car.carMan"))
+				.setValueFormater(new LinkFormater4DriverInfo(this
+						.getContextPath())));
 		columns.add(new TextColumn4MapKey("c.charger", "charger",
 				getText("car.charger"), 100).setUseTitleFromLabel(true));
 

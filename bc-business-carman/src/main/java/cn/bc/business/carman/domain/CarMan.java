@@ -68,7 +68,7 @@ public class CarMan extends RichFileEntityImpl {
 	private String cert4CYZG;// 从业资格证号
 	private int drivingStatus;// 驾驶状态
 	private String oldUnitName;// 分支机构：用于历史数据的保存
-	private String charger;// 责任人：用于历史数据的保存CHARGER
+	private String charger;// 责任人信息：[责任人1姓名,责任人1id;责任人2姓名d,责任人2id;...]
 	private boolean gz;// 驾驶证是否广州:0-否,1-是
 	private String accessCerts;// 已考取证件：历史数据保存
 

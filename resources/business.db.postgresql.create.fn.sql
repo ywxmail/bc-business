@@ -1,4 +1,4 @@
--- ##营运子系统的 postgresql 自定义函数和存储过程##
+﻿-- ##营运子系统的 postgresql 自定义函数和存储过程##
 
 -- 获取指定车辆实时的营运司机信息,只适用于对当前在案车辆的处理
 -- 返回值的格式为：张三(正班),李四(副班),小明(顶班)
@@ -9,9 +9,9 @@ DECLARE
 	--定义变量
 	driverInfo varchar(4000);
 BEGIN
-	select string_agg(concat(name,'(',(case when classes=1 then '正班' when classes=2 then '副班' when classes=3 then '顶班' else '无' end),')'),',')
+	select string_agg(concat(name,',',(case when classes=1 then '正班' when classes=2 then '副班' when classes=3 then '顶班' else '无' end),',',id),';')
 		into driverInfo
-		from (select m.name as name,cm.classes as classes 
+		from (select m.id as id,m.name as name,cm.classes as classes 
 			from BS_CAR_DRIVER cm
 			inner join BS_CARMAN m on m.id=cm.driver_id
 			where cm.status_=0 and cm.car_id=cid
@@ -29,8 +29,8 @@ DECLARE
 	--定义变量
 	principalInfo varchar(4000);
 BEGIN
-	select string_agg(name,',') into principalInfo
-		from (SELECT m.name as name
+	select string_agg(concat(name,',',id),';') into principalInfo
+		from (SELECT m.name as name,m.id as id
 			FROM bs_car_contract cc
 			inner join bs_carman_contract cm on cm.contract_id=cc.contract_id
 			inner join bs_carman m on m.id=cm.man_id
@@ -49,8 +49,8 @@ DECLARE
 	--定义变量
 	principalInfo varchar(4000);
 BEGIN
-	select string_agg(name,',') into principalInfo
-		from (SELECT distinct p.name as name,p.file_date
+	select string_agg(concat(name,',',id),';') into principalInfo
+		from (SELECT distinct p.name as name,p.id as id,p.file_date
 			FROM bs_car_driver cd
 			inner join bs_car_contract cc on cc.car_id=cd.car_id
 			inner join bs_contract c on c.id=cc.contract_id
