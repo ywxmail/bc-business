@@ -185,9 +185,6 @@ public class ContractDaoImpl extends HibernateCrudJpaDao<Contract> implements
 		@SuppressWarnings("unchecked")
 		List<ContractCarManRelation> olds = this.getJpaTemplate().find(
 				"from ContractCarManRelation where contractId=?", contractId);
-		System.out.println("contractId="+contractId);
-		System.out.println("olds="+olds);
-		System.out.println("carManIds="+StringUtils.arrayToCommaDelimitedString(carManIds));
 		if (carManIds != null && carManIds.length > 0) {
 			// 分离出没有改变的关系和需要新增的关系
 			List<ContractCarManRelation> sames = new ArrayList<ContractCarManRelation>();// 没有改变的

@@ -76,7 +76,6 @@ public class Contract4ChargerServiceImpl extends DefaultCrudService<Contract4Cha
 			contract4Charger = this.contract4ChargerDao.save(contract4Charger);
 			// 处理与责任人的关联关系
 			this.contractDao.updateContractCarManRelation(contract4Charger.getId(),chargerIdAry);
-			return contract4Charger;
 		} else { // 在新建时需保存与车辆、责任人的关联关系
 			// 参数有效性验证
 			Assert.notNull(carId);
@@ -99,15 +98,16 @@ public class Contract4ChargerServiceImpl extends DefaultCrudService<Contract4Cha
 				chargerRelationList.add(driverRelation);
 			}
 			this.contractDao.saveContractCarManRelation(chargerRelationList);
-			
-			//更新车辆视图的chager列显示责任人姓名
-			this.contract4ChargerDao.updateCar4ChargerName(assignChargerNames,carId);
-			//更新司机视图的chager列显示责任人姓名
-			this.contract4ChargerDao.updateCarMan4ChargerName(assignChargerNames,carId);
 //			ContractCarManRelation driverRelation = new ContractCarManRelation(
 //					contract4Charger.getId(), null);
-			return contract4Charger;
 		}
+		//更新车辆视图的chager列显示责任人姓名
+		this.contract4ChargerDao.updateCar4ChargerName(carId);
+//		this.contract4ChargerDao.updateCar4ChargerName(assignChargerNames,carId);
+		//更新司机视图的chager列显示责任人姓名
+		this.contract4ChargerDao.updateCarMan4ChargerName(carId);
+//		this.contract4ChargerDao.updateCarMan4ChargerName(assignChargerNames,carId);
+		return contract4Charger;
 	}
 	
 	/**
