@@ -9,7 +9,7 @@
 	<groupId>cn.bc.business</groupId>
 	<artifactId>bc-business-parent</artifactId>
 	<packaging>pom</packaging>
-	<version>0.3-SNAPSHOT</version>
+	<version>0.5-SNAPSHOT</version>
 	<name>bc-business-parent</name>
 	<description>营运管理子系统各模块的parent</description>
 	

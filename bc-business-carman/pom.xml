@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>cn.bc.business</groupId>
 		<artifactId>bc-business-parent</artifactId>
-		<version>0.3-SNAPSHOT</version>
+		<version>0.5-SNAPSHOT</version>
 		<relativePath>../bc-business-parent/pom.xml</relativePath>
 	</parent>
 	<artifactId>bc-business-carman</artifactId>
