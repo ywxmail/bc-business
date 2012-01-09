@@ -112,7 +112,7 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 		List<Column> columns = new ArrayList<Column>();
 		columns.add(new IdColumn4MapKey("c.id", "id"));
 		columns.add(new TextColumn4MapKey("c.status_", "status_",
-				getText("car.status"), 60).setSortable(true).setValueFormater(
+				getText("car.status"), 30).setSortable(true).setValueFormater(
 				new EntityStatusFormater(getBSStatuses1())));
 		columns.add(new TextColumn4MapKey("c.register_date", "register_date",
 				getText("car.registerDate"), 100).setSortable(true)
@@ -146,21 +146,18 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 					}
 				}));
 		columns.add(new TextColumn4MapKey("c.engine_no", "engine_no",
-				getText("car.engineNo"), 80));
-		columns.add(new TextColumn4MapKey("c.bs_type", "bs_type",
-				getText("car.businessType"), 100));
-		columns.add(new TextColumn4MapKey("c.origin_no", "origin_no",
-				getText("car.originNo"), 80).setSortable(true)
-				.setUseTitleFromLabel(true));
-		columns.add(new TextColumn4MapKey("c.cert_no2", "cert_no2",
-				getText("car.certNo2"), 100));
+				getText("car.engineNo"), 70).setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("c.driver", "driver",
-				getText("car.carMan")).setUseTitleFromLabel(true));
+				getText("car.carMan"),170).setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("c.charger", "charger",
-				getText("car.charger"), 100).setUseTitleFromLabel(true));
-
+				getText("car.charger"), 120).setUseTitleFromLabel(true));
+		columns.add(new TextColumn4MapKey("c.bs_type", "bs_type",
+				getText("car.businessType"), 80).setUseTitleFromLabel(true));
+		columns.add(new TextColumn4MapKey("c.origin_no", "origin_no",
+				getText("car.originNo"), 55).setSortable(true)
+				.setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("c.factory_type", "factory_type",
-				getText("car.factory"), 120).setUseTitleFromLabel(true)
+				getText("car.factory"), 90).setUseTitleFromLabel(true)
 				.setValueFormater(new AbstractFormater<String>() {
 					@Override
 					public String format(Object context, Object value) {
@@ -180,6 +177,8 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 						}
 					}
 				}));
+		columns.add(new TextColumn4MapKey("c.cert_no2", "cert_no2",
+				getText("car.certNo2"), 100).setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("c.vin", "vin", getText("car.vin"),
 				120).setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("c.code", "code",
