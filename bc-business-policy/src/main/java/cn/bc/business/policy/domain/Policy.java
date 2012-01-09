@@ -43,7 +43,7 @@ public class Policy extends RichFileEntityImpl {
 	/** 操作类型 停保 */
 	public static final int OPTYPE_SURRENDERS = 4;
 
-	/** 状态：正常 */
+	/** 状态：在案 */
 	public static final int STATUS_ENABLED = 0;
 	/** 状态：注销 */
 	public static final int STATUS_DISABLED = 1;
@@ -300,7 +300,7 @@ public class Policy extends RichFileEntityImpl {
 	public void setBuyPlants(Set<BuyPlant> buyPlants) {
 		this.buyPlants = buyPlants;
 	}
-
+	@Column(name = "STOP_DATE")
 	public Calendar getStopDate() {
 		return stopDate;
 	}

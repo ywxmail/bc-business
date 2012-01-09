@@ -975,7 +975,7 @@ CREATE TABLE BS_CAR_POLICY(
    GREENSLIP_SOURCE                    VARCHAR(255)   COMMENT '强保人来源',
    LIABILITY_NO                        VARCHAR(255) NOT NULL COMMENT '责任险单号',
    AMOUNT                              DECIMAL(10,2) COMMENT'合计',
-   STOPDATE                            DATETIME COMMENT '停保日期',
+   STOP_DATE                            DATETIME COMMENT '停保日期',
    FILE_DATE                           DATETIME NOT NULL COMMENT '创建时间',
    AUTHOR_ID                           BIGINT NOT NULL COMMENT '创建人ID',
    MODIFIER_ID                         BIGINT COMMENT '最后修改人ID',
