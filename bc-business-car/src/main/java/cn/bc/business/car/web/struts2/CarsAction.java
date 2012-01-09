@@ -13,6 +13,8 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
 import cn.bc.BCConstants;
+import cn.bc.business.web.struts2.LinkFormater4ChargerInfo;
+import cn.bc.business.web.struts2.LinkFormater4DriverInfo;
 import cn.bc.business.web.struts2.ViewAction;
 import cn.bc.core.query.condition.Condition;
 import cn.bc.core.query.condition.ConditionUtils;
@@ -112,7 +114,7 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 		List<Column> columns = new ArrayList<Column>();
 		columns.add(new IdColumn4MapKey("c.id", "id"));
 		columns.add(new TextColumn4MapKey("c.status_", "status_",
-				getText("car.status"), 30).setSortable(true).setValueFormater(
+				getText("car.status"), 40).setSortable(true).setValueFormater(
 				new EntityStatusFormater(getBSStatuses1())));
 		columns.add(new TextColumn4MapKey("c.register_date", "register_date",
 				getText("car.registerDate"), 100).setSortable(true)
@@ -148,14 +150,19 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("c.engine_no", "engine_no",
 				getText("car.engineNo"), 70).setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("c.driver", "driver",
-				getText("car.carMan"),170).setUseTitleFromLabel(true));
+				getText("car.carMan"), 160)
+				.setValueFormater(new LinkFormater4DriverInfo(this
+						.getContextPath())));
 		columns.add(new TextColumn4MapKey("c.charger", "charger",
-				getText("car.charger"), 120).setUseTitleFromLabel(true));
+				getText("car.charger"), 100)
+				.setValueFormater(new LinkFormater4ChargerInfo(this
+						.getContextPath())));
 		columns.add(new TextColumn4MapKey("c.bs_type", "bs_type",
 				getText("car.businessType"), 80).setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("c.origin_no", "origin_no",
 				getText("car.originNo"), 55).setSortable(true)
 				.setUseTitleFromLabel(true));
+
 		columns.add(new TextColumn4MapKey("c.factory_type", "factory_type",
 				getText("car.factory"), 90).setUseTitleFromLabel(true)
 				.setValueFormater(new AbstractFormater<String>() {
@@ -190,7 +197,7 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 	@Override
 	protected String[] getGridSearchFields() {
 		return new String[] { "c.plate_no", "c.driver", "c.charger",
-				"c.cert_no2", "c.factory_type", "m.name" };
+				"c.cert_no2", "c.factory_type", "m.name", "c.engine_no" };
 	}
 
 	@Override
