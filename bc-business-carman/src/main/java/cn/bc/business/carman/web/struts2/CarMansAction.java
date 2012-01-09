@@ -15,6 +15,7 @@ import org.springframework.stereotype.Controller;
 
 import cn.bc.BCConstants;
 import cn.bc.business.carman.domain.CarMan;
+import cn.bc.business.web.struts2.LinkFormater4ChargerInfo;
 import cn.bc.business.web.struts2.ViewAction;
 import cn.bc.core.query.condition.Condition;
 import cn.bc.core.query.condition.Direction;
@@ -120,7 +121,9 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 		// columns.add(new TextColumn4MapKey("c.cert_fwzg_id", "cert_fwzg_id",
 		// getText("carMan.cert4FWZGID"), 80));
 		columns.add(new TextColumn4MapKey("c.charger", "charger",
-				getText("carMan.charger"), 80));
+				getText("carMan.charger"), 80)
+				.setValueFormater(new LinkFormater4ChargerInfo(this
+						.getContextPath())));
 		columns.add(new TextColumn4MapKey("c.cert_fwzg", "cert_fwzg",
 				getText("carMan.cert4FWZG"), 80));
 		columns.add(new TextColumn4MapKey("c.cert_identity", "cert_identity",
