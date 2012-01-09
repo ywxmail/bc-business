@@ -76,7 +76,7 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 		sql.append("select p.id,p.status_,c.plate_type,c.plate_no,p.register_date,p.assured,p.commerial_no");
 		sql.append(",p.commerial_company,p.commerial_start_date,p.commerial_end_date");
 		sql.append(" ,p.ownrisk,p.greenslip,p.liability_no,p.amount,c.id carId,p.op_type");
-		sql.append(" ,p.greenslip_no,p.greenslip_company,p.greenslip_start_date,p.greenslip_end_date,p.stopdate,p.file_date");
+		sql.append(" ,p.greenslip_no,p.greenslip_company,p.greenslip_start_date,p.greenslip_end_date,p.stop_date,p.file_date");
 		sql.append(" from BS_CAR_POLICY p");
 		sql.append(" left join BS_CAR c on c.id=p.car_id");
 		sqlObject.setSql(sql.toString());
@@ -111,7 +111,7 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 				map.put("greenslip_company", rs[i++]);
 				map.put("greenslip_start_date", rs[i++]);
 				map.put("greenslip_end_date", rs[i++]);
-				map.put("stopdate", rs[i++]);
+				map.put("stop_date", rs[i++]);
 
 				return map;
 			}
@@ -199,7 +199,7 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 				return (Date) contract.get("greenslip_end_date");
 			}
 		}));
-		columns.add(new TextColumn4MapKey("p.spotdate", "spotdate",
+		columns.add(new TextColumn4MapKey("p.stop_date", "stop_date",
 				getText("policy.stopDate"), 100).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
 		columns.add(new TextColumn4MapKey("p.amount", "amount",
@@ -301,7 +301,7 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 	}
 
 	/**
-	 * 状态值转换列表：正常|注销|停保|全部
+	 * 状态值转换列表：在案|注销|停保|全部
 	 * 
 	 * @return
 	 */
