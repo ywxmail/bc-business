@@ -55,6 +55,7 @@
 		<action name="save" class="carByDriverHistoryAction" method="save" />
 		<action name="data" class="carByDriverHistoryAction" method="data" />
 		<action name="delete" class="carByDriverHistoryAction" method="delete" />
+		<action name="open" class="carByDriverHistoryAction" method="open" />
 		<action name="edit" class="carByDriverHistoryAction" method="edit" >
 		    <result name="zhuanChe" >/bc-business/carByDriverHistory/zhuanCheForm.jsp</result>
 			<result name="zhuanGongSi" >/bc-business/carByDriverHistory/zhuanGongSiForm.jsp</result>
