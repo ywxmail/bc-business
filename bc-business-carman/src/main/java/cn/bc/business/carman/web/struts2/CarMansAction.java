@@ -121,7 +121,7 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 		// columns.add(new TextColumn4MapKey("c.cert_fwzg_id", "cert_fwzg_id",
 		// getText("carMan.cert4FWZGID"), 80));
 		columns.add(new TextColumn4MapKey("c.charger", "charger",
-				getText("carMan.charger"), 80)
+				getText("carMan.charger"), 100)
 				.setValueFormater(new LinkFormater4ChargerInfo(this
 						.getContextPath())));
 		columns.add(new TextColumn4MapKey("c.cert_fwzg", "cert_fwzg",
