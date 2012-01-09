@@ -52,7 +52,7 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	public boolean isReadonly() {
-		// 车辆管理员或系统管理员
+		// 车辆管理/司机管理或系统管理员
 		SystemContext context = (SystemContext) this.getContext();
 		return !context.hasAnyRole(getText("key.role.bs.car"),
 				getText("key.role.bs.driver"), getText("key.role.bc.admin"));
@@ -366,18 +366,26 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 	protected Toolbar getHtmlPageToolbar() {
 		Toolbar tb = new Toolbar();
 
-		tb.addButton(
-				new ToolbarButton().setIcon("ui-icon-document").setText("新建")
-						.setClick("bc.business.MoveTypeList.select"))
+		if (this.isReadonly()) {
+			// 查看按钮
+			tb.addButton(Toolbar
+					.getDefaultOpenToolbarButton(getText("label.read")));
+		} else {
 
-				.addButton(
-						new ToolbarButton().setIcon("ui-icon-pencil")
-								.setText("编辑").setAction("edit"))
-				.addButton(
-						new ToolbarButton().setIcon("ui-icon-trash")
-								.setText("删除").setAction("delete"))
-				.addButton(
-						Toolbar.getDefaultSearchToolbarButton(getText("title.click2search")));
+			tb.addButton(
+					new ToolbarButton().setIcon("ui-icon-document")
+							.setText("新建")
+							.setClick("bc.business.MoveTypeList.select"))
+
+					.addButton(
+							new ToolbarButton().setIcon("ui-icon-pencil")
+									.setText("编辑").setAction("edit"))
+					.addButton(
+							new ToolbarButton().setIcon("ui-icon-trash")
+									.setText("删除").setAction("delete"))
+					.addButton(
+							Toolbar.getDefaultSearchToolbarButton(getText("title.click2search")));
+		}
 
 		return tb;
 	}
