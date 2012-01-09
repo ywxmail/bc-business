@@ -24,19 +24,19 @@ $$ LANGUAGE plpgsql;
 -- 返回值的格式为：张三,李四
 -- 返回值是按责任人的入职时间正序排序的
 -- 参数：cid - 车辆的id
-CREATE OR REPLACE FUNCTION getPrincipalInfoByCarId(cid IN integer) RETURNS varchar AS $$
+CREATE OR REPLACE FUNCTION getChargerInfoByCarId(cid IN integer) RETURNS varchar AS $$
 DECLARE
 	--定义变量
-	principalInfo varchar(4000);
+	chargerInfo varchar(4000);
 BEGIN
-	select string_agg(concat(name,',',id),';') into principalInfo
+	select string_agg(concat(name,',',id),';') into chargerInfo
 		from (SELECT m.name as name,m.id as id
 			FROM bs_car_contract cc
 			inner join bs_carman_contract cm on cm.contract_id=cc.contract_id
 			inner join bs_carman m on m.id=cm.man_id
 			where cc.car_id=cid
 			order by m.work_date asc) as t;
-	return principalInfo;
+	return chargerInfo;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -44,12 +44,12 @@ $$ LANGUAGE plpgsql;
 -- 返回值的格式为：张三,李四
 -- 返回值是按责任人的创建时间正序排序的
 -- 参数：did - 司机的id
-CREATE OR REPLACE FUNCTION getPrincipalInfoByDriverId(did IN integer) RETURNS varchar AS $$
+CREATE OR REPLACE FUNCTION getChargerInfoByDriverId(did IN integer) RETURNS varchar AS $$
 DECLARE
 	--定义变量
-	principalInfo varchar(4000);
+	chargerInfo varchar(4000);
 BEGIN
-	select string_agg(concat(name,',',id),';') into principalInfo
+	select string_agg(concat(name,',',id),';') into chargerInfo
 		from (SELECT distinct p.name as name,p.id as id,p.file_date
 			FROM bs_car_driver cd
 			inner join bs_car_contract cc on cc.car_id=cd.car_id
@@ -59,6 +59,6 @@ BEGIN
 			-- 正常的营运班次信息+当前经济合同 条件
 			where cd.status_=0 and c.main=0 and c.type_=2 and cd.driver_id=did
 			order by p.file_date asc) as t;
-	return principalInfo;
+	return chargerInfo;
 END;
 $$ LANGUAGE plpgsql;

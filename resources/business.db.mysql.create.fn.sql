@@ -20,33 +20,33 @@ END $$
 DELIMITER ; 
 
 DELIMITER $$ 
-DROP FUNCTION IF EXISTS getPrincipalInfoByCarId $$ 
+DROP FUNCTION IF EXISTS getChargerInfoByCarId $$ 
 -- 获取指定车辆实时的经济合同责任人信息,只适用于对当前在案车辆的处理
 -- 返回值的格式为：张三,李四
 -- 返回值是按责任人的入职时间正序排序的
 -- 参数：cid - 车辆的id
-CREATE FUNCTION getPrincipalInfoByCarId(cid BIGINT) RETURNS varchar(4000) 
+CREATE FUNCTION getChargerInfoByCarId(cid BIGINT) RETURNS varchar(4000) 
 BEGIN
-	DECLARE principalInfo varchar(4000);
-	select group_concat(DISTINCT m.name order by m.work_date asc separator ',') into principalInfo
+	DECLARE chargerInfo varchar(4000);
+	select group_concat(DISTINCT m.name order by m.work_date asc separator ',') into chargerInfo
 		from bs_car_contract cc
 			inner join bs_carman_contract cm on cm.contract_id=cc.contract_id
 			inner join bs_carman m on m.id=cm.man_id
 			where cc.car_id=cid;
-	return principalInfo;
+	return chargerInfo;
 END $$ 
 DELIMITER ; 
 
 DELIMITER $$ 
-DROP FUNCTION IF EXISTS getPrincipalInfoByDriverId $$ 
+DROP FUNCTION IF EXISTS getChargerInfoByDriverId $$ 
 -- 获取指定司机所营运车辆的经济合同责任人信息,只适用于对当前在案司机的处理
 -- 返回值的格式为：张三,李四
 -- 返回值是按责任人的创建时间正序排序的
 -- 参数：did - 司机的id
-CREATE FUNCTION getPrincipalInfoByDriverId(did BIGINT) RETURNS varchar(4000) 
+CREATE FUNCTION getChargerInfoByDriverId(did BIGINT) RETURNS varchar(4000) 
 BEGIN
-	DECLARE principalInfo varchar(4000);
-	select group_concat(DISTINCT p.name order by p.file_date asc separator ',') into principalInfo
+	DECLARE chargerInfo varchar(4000);
+	select group_concat(DISTINCT p.name order by p.file_date asc separator ',') into chargerInfo
 		from bs_car_driver cd
 			inner join bs_car_contract cc on cc.car_id=cd.car_id
 			inner join bs_contract c on c.id=cc.contract_id
@@ -54,6 +54,6 @@ BEGIN
 			inner join bs_carman p on p.id=pm.man_id
 			-- 正常的营运班次信息+当前经济合同 条件
 			where cd.status_=0 and c.main=0 and c.type_=2 and cd.driver_id=did;
-	return principalInfo;
+	return chargerInfo;
 END $$ 
 DELIMITER ; 
