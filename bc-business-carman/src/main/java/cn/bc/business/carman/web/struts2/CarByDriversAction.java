@@ -289,9 +289,9 @@ public class CarByDriversAction extends ViewAction<Map<String, Object>> {
 					.getDefaultCreateToolbarButton(getText("label.create")));
 
 			// 批量处理顶班按钮
-			tb.addButton(new ToolbarButton().setIcon("ui-icon-document")
-					.setText("批量处理顶班")
-					.setClick("bc.business.chuLiDingBan.create"));
+//			tb.addButton(new ToolbarButton().setIcon("ui-icon-document")
+//					.setText("批量处理顶班")
+//					.setClick("bc.business.chuLiDingBan.create"));
 
 			// 编辑按钮
 			tb.addButton(Toolbar
