@@ -16,15 +16,9 @@ import cn.bc.business.motorcade.domain.Motorcade;
 import cn.bc.business.motorcade.service.MotorcadeService;
 import cn.bc.business.web.struts2.FileEntityAction;
 import cn.bc.core.exception.CoreException;
-import cn.bc.core.query.condition.Direction;
-import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.option.domain.OptionItem;
 import cn.bc.option.service.OptionService;
-import cn.bc.web.formater.KeyValueFormater;
-import cn.bc.web.ui.html.grid.Column;
-import cn.bc.web.ui.html.grid.GridData;
-import cn.bc.web.ui.html.grid.TextColumn;
 import cn.bc.web.ui.html.page.ButtonOption;
 import cn.bc.web.ui.html.page.PageOption;
 import cn.bc.web.ui.json.Json;
@@ -63,8 +57,8 @@ public class MotorcadeAction extends FileEntityAction<Long, Motorcade> {
 	}
 
 	@Override
-	public String create() throws Exception {
-		String r = super.create();
+	protected void afterCreate(Motorcade entity) {
+		super.afterCreate(entity);
 		Motorcade e = this.getE();
 
 		// 所属单位
@@ -74,93 +68,45 @@ public class MotorcadeAction extends FileEntityAction<Long, Motorcade> {
 
 		// 初始状态
 		e.setStatus(BCConstants.STATUS_ENABLED);
-
-		// 表单可选项的加载
-		initSelects();
-
-		return r;
 	}
 
 	@Override
-	public String edit() throws Exception {
-		String r = super.edit();
-
-		// 表单可选项的加载
-		initSelects();
-
-		return r;
+	protected void buildFormPageButtons(PageOption pageOption, boolean editable) {
+		boolean readonly = this.isReadonly();
+		if (editable && !readonly) {
+			// 添加默认的保存按钮
+			pageOption.addButton(this.getDefaultSaveButtonOption());
+			if (!this.getE().isNew()) {
+				pageOption.addButton(new ButtonOption(
+						getText("motorcade.historicalInformation"), null,
+						"bc.business.motorcadeForm.check"));
+			}
+		}
 	}
 
-	private void initSelects() {
+	// 设置页面的尺寸
+	@Override
+	protected PageOption buildFormPageOption(boolean editable) {
+		return super.buildFormPageOption(editable).setWidth(620)
+				.setMinWidth(400).setHeight(360).setMinHeight(300);
+	}
+
+	@Override
+	protected void initForm(boolean editable) {
+		super.initForm(editable);
 		// 加载缴费日列表
 		this.paymentDates = this.optionService
 				.findOptionItemByGroupKey(OptionConstants.MOTORCADE_PAYMENT_DATE);
 	}
 
-	@Override
-	protected PageOption buildFormPageOption() {
-		PageOption option = new PageOption().setWidth(618).setMinWidth(618)
-				.setMinHeight(250).setModal(false);
-		if (!this.getE().isNew()) {
-			option.addButton(new ButtonOption(
-					getText("motorcade.historicalInformation"), null,
-					"bc.business.motorcadeForm.check"));
-		}
-		if (!this.isReadonly()) {
-			option.addButton(new ButtonOption(getText("label.save"), "save"));
-		}
-		return option;
-	}
 
 	@Override
-	protected GridData buildGridData(List<Column> columns) {
-		return super.buildGridData(columns).setRowLabelExpression("name");
-	}
-
-	@Override
-	protected OrderCondition getDefaultOrderCondition() {
-		return new OrderCondition("status", Direction.Asc).add("code",
-				Direction.Asc);
-	}
-
-	// 设置页面的尺寸
-	@Override
-	protected PageOption buildListPageOption() {
-		return super.buildListPageOption().setWidth(600).setMinWidth(300)
-				.setHeight(500).setMinHeight(300);
-	}
-
-	@Override
-	protected String[] getSearchFields() {
-		return new String[] { "code", "name", "unit.name", "principalName" };
-	}
-
-	@Override
-	protected List<Column> buildGridColumns() {
-		List<Column> columns = super.buildGridColumns();
-		columns.add(new TextColumn("status", getText("label.status"), 60)
-				.setSortable(true).setValueFormater(
-						new KeyValueFormater(getEntityStatuses())));
-		columns.add(new TextColumn("unit.name", getText("motorcade.unit"), 120)
-				.setSortable(true).setUseTitleFromLabel(true));
-		columns.add(new TextColumn("principalName",
-				getText("motorcade.principal"), 80).setSortable(true));
-		columns.add(new TextColumn("code", getText("label.code"), 80)
-				.setSortable(true));
-		columns.add(new TextColumn("name", getText("motorcade.name"))
-				.setSortable(true).setUseTitleFromLabel(true));
-		return columns;
-	}
-
-	// 保存
-	public String save() throws Exception {
-		Motorcade e = this.getE();
-
+	protected void beforeSave(Motorcade entity) {
+		super.beforeSave(entity);
 		// 处理所属父类
+		Motorcade e = this.getE();
 		if (e.getParent() != null && e.getParent().getId() == null)
 			e.setParent(null);
-
-		return super.save();
 	}
 
 	public Json json;
