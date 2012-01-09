@@ -150,7 +150,7 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("c.engine_no", "engine_no",
 				getText("car.engineNo"), 70).setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("c.driver", "driver",
-				getText("car.carMan"))
+				getText("car.carMan"), 160)
 				.setValueFormater(new LinkFormater4DriverInfo(this
 						.getContextPath())));
 		columns.add(new TextColumn4MapKey("c.charger", "charger",

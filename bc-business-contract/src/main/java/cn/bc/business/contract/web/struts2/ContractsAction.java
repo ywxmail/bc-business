@@ -247,8 +247,9 @@ public class ContractsAction extends ViewAction<Map<String, Object>> {
 
 		if (this.isReadonly()) {
 			// 查看按钮
-			tb.addButton(Toolbar
-					.getDefaultEditToolbarButton(getText("label.read")).setAction("showdialog"));
+			tb.addButton(new ToolbarButton().setIcon("ui-icon-document")
+					.setText(getText("label.read"))
+					.setClick("bc.contractList.edit"));
 		} else {
 
 			// 新建按钮
@@ -282,7 +283,7 @@ public class ContractsAction extends ViewAction<Map<String, Object>> {
 	@Override
 	/** 获取表格双击行的js处理函数名 */
 	protected String getGridDblRowMethod() {
-		return this.isReadonly() ? "bc.page.open" : "bc.contractList.edit";
+		return "bc.contractList.edit";
 	}
 
 	

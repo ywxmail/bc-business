@@ -70,7 +70,7 @@ public class JinDunJTWFsAction extends SyncViewAction {
 
 	@Override
 	protected PageOption getHtmlPageOption() {
-		return super.getHtmlPageOption().setWidth(900);
+		return super.getHtmlPageOption().setWidth(880);
 	}
 
 	@Override
