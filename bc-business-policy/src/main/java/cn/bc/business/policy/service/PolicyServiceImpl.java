@@ -3,7 +3,6 @@
  */
 package cn.bc.business.policy.service;
 
-import java.io.Serializable;
 import java.util.Calendar;
 import java.util.HashSet;
 import java.util.Set;
@@ -145,18 +144,6 @@ public class PolicyServiceImpl extends DefaultCrudService<Policy> implements
 			this.policyDao.save(oldPolicy);
 		}
 		return super.save(entity);
-	}
-
-	@Override
-	public void delete(Serializable id) {
-		// 获取车保信息
-		Policy policy = this.policyDao.load(id);
-		// 获取车保承保险种的信息
-		Set<BuyPlant> bps = ((Set<BuyPlant>) policy.getBuyPlants());
-		// 删除承保险种
-			bps.clear();
-		// 删除车保
-		super.delete(id);
 	}
 
 }
