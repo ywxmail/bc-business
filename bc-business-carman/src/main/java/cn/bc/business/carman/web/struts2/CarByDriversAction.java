@@ -24,6 +24,7 @@ import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.core.util.StringUtils;
 import cn.bc.db.jdbc.RowMapper;
 import cn.bc.db.jdbc.SqlObject;
+import cn.bc.identity.web.SystemContext;
 import cn.bc.web.formater.EntityStatusFormater;
 import cn.bc.web.formater.KeyValueFormater;
 import cn.bc.web.formater.LinkFormater4Id;
@@ -55,6 +56,14 @@ public class CarByDriversAction extends ViewAction<Map<String, Object>> {
 		// 默认排序方向：状态|创建日期
 		return new OrderCondition("d.status_", Direction.Asc).add(
 				"d.file_date", Direction.Desc);
+	}
+
+	@Override
+	public boolean isReadonly() {
+		// 车辆管理/司机管理或系统管理员
+		SystemContext context = (SystemContext) this.getContext();
+		return !context.hasAnyRole(getText("key.role.bs.car"),
+				getText("key.role.bs.driver"), getText("key.role.bc.admin"));
 	}
 
 	@Override

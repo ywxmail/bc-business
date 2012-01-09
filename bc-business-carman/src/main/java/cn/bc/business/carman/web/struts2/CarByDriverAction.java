@@ -66,9 +66,8 @@ public class CarByDriverAction extends FileEntityAction<Long, CarByDriver> {
 	}
 
 	@Override
-	public String create() throws Exception {
-		String result = super.create();
-
+	protected void afterCreate(CarByDriver entity) {
+		super.afterCreate(entity);
 		if (carManId != null) {
 			CarMan driver = this.carManService.load(carManId);
 			this.getE().setDriver(driver);
@@ -77,15 +76,7 @@ public class CarByDriverAction extends FileEntityAction<Long, CarByDriver> {
 			this.getE().setCar(car);
 		}
 		this.getE().setStatus(BCConstants.STATUS_ENABLED);
-		statusesValueList = this.getBSStatuses1();
-		return result;
-	}
 
-	@Override
-	public String edit() throws Exception {
-		String result = super.edit();
-		statusesValueList = this.getBSStatuses1();
-		return result;
 	}
 
 	// 设置页面的尺寸
