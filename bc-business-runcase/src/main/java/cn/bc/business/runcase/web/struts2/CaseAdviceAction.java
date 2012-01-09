@@ -405,6 +405,10 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 		return "json";
 	}
 	
+	public String selectSubject(){
+		return "showdialog";
+	}
+	
 	@Override
 	protected void initForm(boolean editable) {
 		super.initForm(editable);
