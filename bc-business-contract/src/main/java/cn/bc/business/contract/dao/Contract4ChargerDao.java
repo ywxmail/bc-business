@@ -133,5 +133,17 @@ public interface Contract4ChargerDao extends CrudDao<Contract4Charger> {
 	/** 判断指定的车辆是否已经存在经济合同*/
 	boolean isExistContract(Long carId);
 
+	/**
+	 * 更新车辆表的负责人信息(调用存储过程)
+	 * @param carId
+	 */
+	void updateCar4ChargerName(Long carId);
+
+	/**
+	 * 更新司机表的负责人信息(调用存储过程)
+	 * @param carId
+	 */
+	void updateCarMan4ChargerName(Long carId);
+
 
 }

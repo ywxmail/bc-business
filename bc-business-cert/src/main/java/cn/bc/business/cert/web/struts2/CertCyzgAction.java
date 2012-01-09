@@ -21,7 +21,6 @@ import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.docs.service.AttachService;
 import cn.bc.docs.web.ui.html.AttachWidget;
 import cn.bc.identity.web.SystemContext;
-import cn.bc.web.ui.html.page.ButtonOption;
 import cn.bc.web.ui.html.page.PageOption;
 
 /**
@@ -96,7 +95,7 @@ public class CertCyzgAction extends FileEntityAction<Long, Cert4CongYeZiGe> {
 		this.getE().setStatus(BCConstants.STATUS_ENABLED);
 		statusesValue		=	this.getEntityStatuses();
 		
-		attachsUI = buildAttachsUI(true);
+		attachsUI = buildAttachsUI(true,false);
 		return r;
 	}
 	
@@ -104,7 +103,7 @@ public class CertCyzgAction extends FileEntityAction<Long, Cert4CongYeZiGe> {
 	public String edit() throws Exception {
 		this.setE(this.getCrudService().load(this.getId()));
 		
-		this.formPageOption = 	buildFormPageOption();
+		this.formPageOption = 	buildFormPageOption(false);
 		
 		//根据certId查找carMan信息
 		carManMessMap = this.certService.findCarManMessByCertId(this.getId());
@@ -112,7 +111,7 @@ public class CertCyzgAction extends FileEntityAction<Long, Cert4CongYeZiGe> {
 		this.getE().setName(carManMessMap.get("name")+"");
 		
 		// 构建附件控件
-		attachsUI = buildAttachsUI(false);
+		attachsUI = buildAttachsUI(false,false);
 		return "form";
 	}
 	
@@ -137,7 +136,7 @@ public class CertCyzgAction extends FileEntityAction<Long, Cert4CongYeZiGe> {
 	}
 
 	
-	private AttachWidget buildAttachsUI(boolean isNew) {
+	private AttachWidget buildAttachsUI(boolean isNew, boolean forceReadonly) {
 		// 构建附件控件
 		String ptype = "certCyzg.main";
 		AttachWidget attachsUI = new AttachWidget();
@@ -152,20 +151,14 @@ public class CertCyzgAction extends FileEntityAction<Long, Cert4CongYeZiGe> {
 		attachsUI.addExtension(getText("app.attachs.extensions"))
 				.setMaxCount(Integer.parseInt(getText("app.attachs.maxCount")))
 				.setMaxSize(Integer.parseInt(getText("app.attachs.maxSize")));
-		if (this.isReadonly()) {
-			attachsUI.setReadOnly(true);
-		}
+		// 只读控制
+		attachsUI.setReadOnly(forceReadonly ? true : this.isReadonly());
 		return attachsUI;
 	}
 
 	@Override
-	protected PageOption buildFormPageOption() {
-		PageOption option = super.buildFormPageOption().setWidth(750).setMinWidth(250)
-				.setMinHeight(160);
-		if (!this.isReadonly()) {
-			option.addButton(new ButtonOption(getText("label.save"), "save"));
-		}
-		return option;
+	protected PageOption buildFormPageOption(boolean editable) {
+		return super.buildFormPageOption(editable).setWidth(745).setHeight(380);
 	}
 
 	@Override
@@ -173,11 +166,11 @@ public class CertCyzgAction extends FileEntityAction<Long, Cert4CongYeZiGe> {
 		return null;// new OrderCondition("fileDate", Direction.Desc);
 	}
 
-	@Override
-	protected PageOption buildListPageOption() {
-		return super.buildListPageOption().setWidth(800).setMinWidth(300)
-				.setHeight(400).setMinHeight(300);
-	}
+//	@Override
+//	protected PageOption buildListPageOption() {
+//		return super.buildListPageOption().setWidth(800).setMinWidth(300)
+//				.setHeight(400).setMinHeight(300);
+//	}
 	
     public String isNullObject(Object obj){
     	if(null != obj){
