@@ -497,7 +497,7 @@ public class Contract4ChargerDaoImpl extends HibernateCrudJpaDao<Contract4Charge
 	 * @param carId
 	 */
 	public void updateCar4ChargerName(Long carId) {
-		String hql = "UPDATE Car c SET c.charger=getPrincipalInfoByCarId(id) WHERE c.id =?";
+		String hql = "UPDATE Car c SET c.charger=getChargerInfoByCarId(id) WHERE c.id =?";
 		List<Object> args = new ArrayList<Object>();
 		args.add(carId);
 		if (logger.isDebugEnabled()) {
@@ -512,7 +512,7 @@ public class Contract4ChargerDaoImpl extends HibernateCrudJpaDao<Contract4Charge
 	 * @param carId
 	 */
 	public void updateCarMan4ChargerName(Long carId) {
-		String hql = "UPDATE CarMan man SET man.charger=getPrincipalInfoByDriverId(man.id) WHERE man.id IN(" +
+		String hql = "UPDATE CarMan man SET man.charger=getChargerInfoByDriverId(man.id) WHERE man.id IN(" +
 				"SELECT cd.driver.id FROM CarByDriver cd WHERE cd.car.id=?)";
 		List<Object> args = new ArrayList<Object>();
 		args.add(carId);
