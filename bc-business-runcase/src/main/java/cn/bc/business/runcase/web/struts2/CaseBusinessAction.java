@@ -189,7 +189,8 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 	@SuppressWarnings("static-access")
 	@Override
 	protected void afterCreate(Case4InfractBusiness entity) {
-	
+		super.afterCreate(entity);
+		
 		if(syncId != null){	//判断同步id是否为空
 			JiaoWeiYYWZ jiaoweiYYWZ = this.jiaoWeiYYWZService.load(syncId);
 			String carPlateNo = "";

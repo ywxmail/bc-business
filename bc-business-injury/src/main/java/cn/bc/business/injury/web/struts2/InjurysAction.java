@@ -146,7 +146,10 @@ public class InjurysAction extends ViewAction<Map<String, Object>> {
 	@Override
 	protected Condition getGridSpecalCondition() {
 		// 合同条件
-		Condition idCondtion = new EqualsCondition("i.contract_id", contractId);
+		Condition idCondtion = null;
+		if (contractId != null) {
+			idCondtion = new EqualsCondition("i.contract_id", contractId);
+		}
 
 		return ConditionUtils.mix2AndCondition(idCondtion);
 	}
