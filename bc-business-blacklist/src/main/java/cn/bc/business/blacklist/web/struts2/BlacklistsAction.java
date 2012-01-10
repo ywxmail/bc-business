@@ -92,8 +92,13 @@ public class BlacklistsAction extends ViewAction<Map<String, Object>> {
 				map.put("motorcade_name", rs[i++]);
 				map.put("plate_type", rs[i++]);
 				map.put("plate_no", rs[i++]);
-				map.put("plate", map.get("plate_type").toString() + "."
-						+ map.get("plate_no").toString());
+				if (map.get("plate_type") == null
+						&& map.get("plate_no") == null) {
+					map.put("plate", null);
+				} else {
+					map.put("plate", map.get("plate_type").toString() + "."
+							+ map.get("plate_no").toString());
+				}
 				map.put("type_", rs[i++]);
 				map.put("subject", rs[i++]);
 				map.put("lock_date", rs[i++]);
