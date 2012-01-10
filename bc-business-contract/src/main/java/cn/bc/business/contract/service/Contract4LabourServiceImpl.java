@@ -412,8 +412,12 @@ public class Contract4LabourServiceImpl extends
 		return list;
 	}
 
-	public boolean isExistContract(Long driverId) {
-		return this.contract4LabourDao.isExistContract(driverId);
+	public boolean isExistContractByDriverId(Long driverId) {
+		return this.contract4LabourDao.isExistContractByDriverId(driverId);
+	}
+
+	public boolean isExistContractByCarId(Long carId) {
+		return this.contract4LabourDao.isExistContractByCarId(carId);
 	}
 	
 }

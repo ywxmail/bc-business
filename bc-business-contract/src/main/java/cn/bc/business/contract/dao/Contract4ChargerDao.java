@@ -145,5 +145,12 @@ public interface Contract4ChargerDao extends CrudDao<Contract4Charger> {
 	 */
 	void updateCarMan4ChargerName(Long carId);
 
+	/**
+	 * 根据合同ID查找关联责任人姓名
+	 * @param contractId
+	 * @return
+	 */
+	List<String> findChargerNameByContractId(Long contractId);
+
 
 }

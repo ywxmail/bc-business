@@ -182,7 +182,7 @@ public class CaseTrafficsAction extends ViewAction<Map<String, Object>> {
 	@Override
 	protected PageOption getHtmlPageOption() {
 		return super.getHtmlPageOption().setWidth(900).setMinWidth(400)
-				.setHeight(550).setMinHeight(300);
+				.setHeight(480).setMinHeight(300);
 	}
 
 	@Override
@@ -258,7 +258,7 @@ public class CaseTrafficsAction extends ViewAction<Map<String, Object>> {
 		statuses.put(String.valueOf(CaseBase.SOURCE_SYNC),
 				getText("runcase.select.source.sync.auto"));
 		statuses.put(String.valueOf(CaseBase.SOURCE_GENERATION),
-				getText("runcase.select.source.sync.auto"));
+				getText("runcase.select.source.sync.gen"));
 		return statuses;
 	}
 	

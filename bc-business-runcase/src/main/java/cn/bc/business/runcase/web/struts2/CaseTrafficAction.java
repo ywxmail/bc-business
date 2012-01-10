@@ -71,6 +71,7 @@ public class CaseTrafficAction extends FileEntityAction<Long, Case4InfractTraffi
 	private SyncBaseService 				syncBaseService;				//平台同步基类Serivce
 	private JiaoWeiJTWFService 				jiaoWeiJTWFService;				//交委Service
 	private JinDunJTWFService 				jinDunJTWFService;				//金盾Service
+	private String							sourceStr;
 
 	public 	List<Map<String, String>> 		motorcadeList;					// 可选车队列表
 	public  List<Map<String, String>>		dutyList;						// 可选责任列表
@@ -103,6 +104,14 @@ public class CaseTrafficAction extends FileEntityAction<Long, Case4InfractTraffi
 
 	public void setSyncId(Long syncId) {
 		this.syncId = syncId;
+	}
+	
+	public String getSourceStr() {
+		return sourceStr;
+	}
+
+	public void setSourceStr(String sourceStr) {
+		this.sourceStr = sourceStr;
 	}
 
 	@Autowired
@@ -271,6 +280,8 @@ public class CaseTrafficAction extends FileEntityAction<Long, Case4InfractTraffi
 		if(syncId == null){ //不是同步过来的信息设为自建
 			this.getE().setSource(CaseBase.SOURCE_SYS);
 		}
+		
+		sourceStr = getSourceStatuses().get(this.getE().getSource()+"");
 	}
 
 	/** 根据车牌号查找carId*/
@@ -290,6 +301,7 @@ public class CaseTrafficAction extends FileEntityAction<Long, Case4InfractTraffi
 			this.setE(this.getCrudService().load(this.getId()));
 		}
 		// 表单可选项的加载
+		sourceStr = getSourceStatuses().get(this.getE().getSource()+"");
 		this.formPageOption = 	buildFormPageOption(true);
 		// 初始化表单的其他配置
 		this.initForm(true);

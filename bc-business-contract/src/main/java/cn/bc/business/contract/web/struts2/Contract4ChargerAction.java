@@ -3,7 +3,6 @@
  */
 package cn.bc.business.contract.web.struts2;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -44,7 +43,7 @@ public class Contract4ChargerAction extends FileEntityAction<Long, Contract4Char
 	private AttachService 				attachService;
 	private OptionService				optionService;
 	private	Long						carId; 
-	public	Long						carManId;								
+	public	Long						driverId;								
 	public 	AttachWidget 				attachsUI;
 	
 	public 	Map<String,String>			statusesValue;
@@ -58,7 +57,7 @@ public class Contract4ChargerAction extends FileEntityAction<Long, Contract4Char
 	public  Map<String,Object>	 		carInfoMap;								//车辆Map
 	public 	boolean 					isExistContract;						// 是否存在合同
 	public 	Json 						json;
-//	public	Long 					carManId;
+//	public	Long 					driverId;
 //	public  String 					certCode;
 //	public 	ContractService 		contractService;
 
@@ -119,9 +118,9 @@ public class Contract4ChargerAction extends FileEntityAction<Long, Contract4Char
 			}
 		}
 		
-		if(carManId != null){
-			//根据carManId查找车辆的车牌号码
-			carInfoMap = this.contract4ChargerService.findCarByCarManId(carManId);
+		if(driverId != null){
+			//根据driverId查找车辆的车牌号码
+			carInfoMap = this.contract4ChargerService.findCarByCarManId(driverId);
 			entity.setExt_str1(isNullObject(carInfoMap.get("plate_type")+"."+carInfoMap.get("plate_no")));
 			carId = Long.valueOf(isNullObject(carInfoMap.get("id")));
 		}
@@ -221,23 +220,41 @@ public class Contract4ChargerAction extends FileEntityAction<Long, Contract4Char
 		initSelects();
 	}
 	
+	/** 设置责任人显示列表*/
 	private void setChargerList(Contract4Charger e){
 		//根据contractId查找所属的carId
 		carId = this.contract4ChargerService.findCarIdByContractId(e.getId());
-		//根据contractId查找所属的carManId列表
+		//根据contractId查找所属的责任人ID列表
 		List<String> chargerIdList = this.contract4ChargerService.findChargerIdByContractId(e.getId());
+		//根据contractId查找所属的责任人姓名列表
+		List<String> chargerNameList = this.contract4ChargerService.findChargerNameByContractId(e.getId());
+		//组装责任人信息
 		if((chargerIdList != null && chargerIdList.size() > 0) && (e.getExt_str2() != null && e.getExt_str2().length() > 0)){
-			chargerNameAry = this.getE().getExt_str2().split(";");
 			chargerInfoMap = new HashMap<String, String>();
-			String names = "";
-			List<String> list = new ArrayList<String>();
-			for(int i=0; i<chargerNameAry.length;i++){
-				names = chargerNameAry[i];
-				list.add(names.split(",")[0]);
-				chargerInfoMap.put(chargerIdList.get(i), list.get(i));
+			for(int i=0; i<chargerIdList.size();i++){
+				chargerInfoMap.put(chargerIdList.get(i), chargerNameList.get(i));
 			}
 		}
 	}
+	
+//	/** 设置责任人显示列表*/
+//	private void setChargerList(Contract4Charger e){
+//		//根据contractId查找所属的carId
+//		carId = this.contract4ChargerService.findCarIdByContractId(e.getId());
+//		//根据contractId查找所属的driverId列表
+//		List<String> chargerIdList = this.contract4ChargerService.findChargerIdByContractId(e.getId());
+//		if((chargerIdList != null && chargerIdList.size() > 0) && (e.getExt_str2() != null && e.getExt_str2().length() > 0)){
+//			chargerNameAry = this.getE().getExt_str2().split(";");
+//			chargerInfoMap = new HashMap<String, String>();
+//			String names = "";
+//			List<String> list = new ArrayList<String>();
+//			for(int i=0; i<chargerNameAry.length;i++){
+//				names = chargerNameAry[i];
+//				list.add(names.split(",")[0]);
+//				chargerInfoMap.put(chargerIdList.get(i), list.get(i));
+//			}
+//		}
+//	}
 	
 	/** 判断指定的车辆是否已经存在经济合同 */
 	public String isExistContract() {
@@ -366,20 +383,4 @@ public class Contract4ChargerAction extends FileEntityAction<Long, Contract4Char
     	}
     }
     
-    public static void main(String[] args) {
-		String str = "aa,111;bb,222;cc,333;";
-		String str2 = "";
-		String [] arys = str.split(";");
-		List<String> list = new ArrayList<String>();
-		for(int i=0;i<arys.length;i++){
-			str2 = arys[i];
-			list.add(str2.split(",")[1]);
-//			arys2 = str2.split(",");
-		}
-		for(String fuck : list){
-			System.out.println(fuck);
-		}
-		//System.out.println(str4);
-		//System.out.println(str3);
-	}
 }

@@ -286,7 +286,7 @@ public class Contract4ChargerServiceImpl extends DefaultCrudService<Contract4Cha
 	}
 
 	/**
-	 * 根据contractId查找car信息
+	 * 根据contractId查找责任人信息
 	 * @parma contractId 
 	 * @return
 	 */
@@ -356,8 +356,25 @@ public class Contract4ChargerServiceImpl extends DefaultCrudService<Contract4Cha
 		return queryMap;
 	}
 
+	/**
+	 * 判断指定的车辆是否已经存在经济合同
+	 * 
+	 * @param carId
+	 * @return
+	 */
 	public boolean isExistContract(Long carId) {
 		return this.contract4ChargerDao.isExistContract(carId);
+	}
+
+	/**
+	 * 根据合同ID查找关联责任人
+	 * @param contractId
+	 * @return
+	 */
+	public List<String> findChargerNameByContractId(Long contractId) {
+		List<String> list = new ArrayList<String>();
+		list = this.contract4ChargerDao.findChargerNameByContractId(contractId);
+		return list;
 	}
 
 }

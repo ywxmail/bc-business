@@ -155,5 +155,12 @@ public interface Contract4ChargerService extends CrudService<Contract4Charger> {
 	Contract4Charger doRenew(Long fromContractId, Calendar newStartDate,
 			Calendar newEndDate);
 
+	/**
+	 * 根据合同ID查找关联责任人姓名
+	 * @param contractId
+	 * @return
+	 */
+	List<String> findChargerNameByContractId(Long contractId);
+
 
 }

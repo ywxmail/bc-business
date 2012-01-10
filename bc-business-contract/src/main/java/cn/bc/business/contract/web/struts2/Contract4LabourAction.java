@@ -124,67 +124,72 @@ public class Contract4LabourAction extends
 		Calendar date2 = Calendar.getInstance();
 
 		if (carId != null && driverId == null) {// 车辆页签中的新建
-			// 根据carId查找车辆以及司机id
-			carInfoMap = this.contract4LabourService.findCarByCarId(carId);
-			infoList = this.contract4LabourService
-					.selectRelateCarManByCarId(carId);
-
-			if (infoList.size() == 1) {
-				// 填写司机信息forceReadOnly
-				driverId = Long.valueOf(isNullObject(infoList.get(0).get(
-						"driver_id")));
-				entity.setExt_str2(
-						isNullObject(infoList.get(0).get("name")));
-				entity.setSex(
-						Integer.valueOf(infoList.get(0).get("sex") + ""));
-				entity.setCertNo(
-						isNullObject(infoList.get(0).get("cert_fwzg")));
-				entity.setCertIdentity(
-						isNullObject(infoList.get(0).get("cert_identity")));
-				entity.setOrigin(
-						isNullObject(infoList.get(0).get("origin")));
-				entity.setHouseType(
-						isNullObject(infoList.get(0).get("house_type")));
-
-				if (entity.getAge() == null
-						&& getDateToString(infoList.get(0).get("birthdate"))
-								.length() > 0) {
+			//查找此司机是否存在劳动合同,若存在前台提示
+			isExistContract = this.contract4LabourService.isExistContractByCarId(carId); 
+			
+			if(isExistContract == false){
+				// 根据carId查找车辆以及司机id
+				carInfoMap = this.contract4LabourService.findCarByCarId(carId);
+				infoList = this.contract4LabourService
+						.selectRelateCarManByCarId(carId);
+	
+				if (infoList.size() == 1) {
+					// 填写司机信息forceReadOnly
+					driverId = Long.valueOf(isNullObject(infoList.get(0).get(
+							"driver_id")));
+					entity.setExt_str2(
+							isNullObject(infoList.get(0).get("name")));
+					entity.setSex(
+							Integer.valueOf(infoList.get(0).get("sex") + ""));
+					entity.setCertNo(
+							isNullObject(infoList.get(0).get("cert_fwzg")));
+					entity.setCertIdentity(
+							isNullObject(infoList.get(0).get("cert_identity")));
+					entity.setOrigin(
+							isNullObject(infoList.get(0).get("origin")));
+					entity.setHouseType(
+							isNullObject(infoList.get(0).get("house_type")));
+	
+					if (entity.getAge() == null
+							&& getDateToString(infoList.get(0).get("birthdate"))
+									.length() > 0) {
+						try {
+							date = sdf.parse(infoList.get(0).get("birthdate") + "");
+						} catch (ParseException e) {
+							e.printStackTrace();
+						}
+						date2.setTime(date);
+						entity.setBirthDate(date2);
+					}
+	
+					entity.setAge(
+							Integer.valueOf(getBirthDateToString(infoList.get(0)
+									.get("birthdate"))));
+				} else if (infoList.size() > 1) {
+					isMoreCarMan = true;
+				} else {
+					isNullCarMan = true;
+				}
+				// 填写车辆信息
+				entity.setExt_str1(
+						isNullObject(carInfoMap.get("plate_type")) + "."
+								+ isNullObject(carInfoMap.get("plate_no")));
+				if (getDateToString(carInfoMap.get("register_date")).length() > 0) {
 					try {
-						date = sdf.parse(infoList.get(0).get("birthdate") + "");
+						date = sdf.parse(carInfoMap.get("register_date") + "");
 					} catch (ParseException e) {
 						e.printStackTrace();
 					}
 					date2.setTime(date);
-					entity.setBirthDate(date2);
+					entity.setRegisterDate(date2);
 				}
-
-				entity.setAge(
-						Integer.valueOf(getBirthDateToString(infoList.get(0)
-								.get("birthdate"))));
-			} else if (infoList.size() > 1) {
-				isMoreCarMan = true;
-			} else {
-				isNullCarMan = true;
+				entity.setBsType(isNullObject(carInfoMap.get("bs_type")));
 			}
-			// 填写车辆信息
-			entity.setExt_str1(
-					isNullObject(carInfoMap.get("plate_type")) + "."
-							+ isNullObject(carInfoMap.get("plate_no")));
-			if (getDateToString(carInfoMap.get("register_date")).length() > 0) {
-				try {
-					date = sdf.parse(carInfoMap.get("register_date") + "");
-				} catch (ParseException e) {
-					e.printStackTrace();
-				}
-				date2.setTime(date);
-				entity.setRegisterDate(date2);
-			}
-			entity.setBsType(isNullObject(carInfoMap.get("bs_type")));
 		}
 
 		if (driverId != null && carId == null) {// 司机页签中的新建
 			//查找此司机是否存在劳动合同,若存在前台提示
-			isExistContract = this.contract4LabourService.isExistContract(driverId); 
+			isExistContract = this.contract4LabourService.isExistContractByDriverId(driverId); 
 			
 			if(isExistContract == false){
 				// 根据carManId查找司机以及车辆id
@@ -427,7 +432,7 @@ public class Contract4LabourAction extends
 	public String isExistContract() {
 		json = new Json();
 		json.put("isExistContract",
-				this.contract4LabourService.isExistContract(driverId));
+				this.contract4LabourService.isExistContractByDriverId(driverId));
 		return "json";
 	}
 

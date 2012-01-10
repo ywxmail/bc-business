@@ -59,6 +59,7 @@ public class CasePraiseAction extends FileEntityAction<Long, Case4Praise> {
 	private OptionService					optionService;
 	private CarManService 					carManService;
 	private CarService 						carService;
+	private String							sourceStr;
 
 	//public  List<Map<String, String>>			dutyList;						// 可选责任列表
 	//public  List<Map<String, String>> 		degreeList; 					// 可选程度列表
@@ -96,6 +97,14 @@ public class CasePraiseAction extends FileEntityAction<Long, Case4Praise> {
 
 	public void setCarManId(Long carManId) {
 		this.carManId = carManId;
+	}
+	
+	public String getSourceStr() {
+		return sourceStr;
+	}
+
+	public void setSourceStr(String sourceStr) {
+		this.sourceStr = sourceStr;
 	}
 
 	@Autowired
@@ -219,12 +228,17 @@ public class CasePraiseAction extends FileEntityAction<Long, Case4Praise> {
 		// 自动生成自编号
 		this.getE().setCode(
 				this.getIdGeneratorService().nextSN4Month(Case4Praise.KEY_CODE));
+		
+		sourceStr = getSourceStatuses().get(this.getE().getSource()+"");
+
 	}
 	
 	
 	@Override
 	public String edit() throws Exception {
 		this.setE(this.getCrudService().load(this.getId()));
+		
+		sourceStr = getSourceStatuses().get(this.getE().getSource()+"");
 		// 表单可选项的加载
 		this.formPageOption = 	buildFormPageOption(true);
 		// 初始化表单的其他配置

@@ -572,10 +572,19 @@ public class Contract4LabourDaoImpl extends
 		return list;
 	}
 
-	public boolean isExistContract(Long driverId) {
+	public boolean isExistContractByDriverId(Long driverId) {
 		String sql = "select c.* from BS_CONTRACT c"
-				+ " inner join BS_CARMAN_CONTRACT cc ON c.id = cc.contract_id where cc.man_id="
+				+ " inner join BS_CARMAN_CONTRACT cc ON c.id = cc.contract_id where c.type_="+Contract.TYPE_LABOUR+" and cc.man_id="
 				+ driverId;
+
+		List<Map<String, Object>> list = this.jdbcTemplate.queryForList(sql);
+		return list != null && list.size() > 0;
+	}
+
+	public boolean isExistContractByCarId(Long carId) {
+		String sql = "select c.* from BS_CONTRACT c"
+				+ " inner join BS_CAR_CONTRACT cc ON c.id = cc.contract_id where c.type_="+Contract.TYPE_LABOUR+" and cc.car_id="
+				+ carId;
 
 		List<Map<String, Object>> list = this.jdbcTemplate.queryForList(sql);
 		return list != null && list.size() > 0;

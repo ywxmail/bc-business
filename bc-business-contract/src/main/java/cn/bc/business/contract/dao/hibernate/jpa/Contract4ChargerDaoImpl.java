@@ -526,7 +526,7 @@ public class Contract4ChargerDaoImpl extends HibernateCrudJpaDao<Contract4Charge
 	/** 判断指定的车辆是否已经存在经济合同 */
 	public boolean isExistContract(Long carId) {
 		String sql = "select c.* from BS_CONTRACT c"
-				+ " inner join BS_CAR_CONTRACT cc ON c.id = cc.contract_id where cc.car_id="
+				+ " inner join BS_CAR_CONTRACT cc ON c.id = cc.contract_id where c.type_="+Contract.TYPE_CHARGER+" and cc.car_id="
 				+ carId;
 
 		List<Map<String, Object>> list = this.jdbcTemplate.queryForList(sql);
@@ -590,6 +590,24 @@ public class Contract4ChargerDaoImpl extends HibernateCrudJpaDao<Contract4Charge
 			this.executeUpdate("delete ContractCarRelation where contractId=?",
 					new Object[] { contractId });
 		}
+	}
+
+	/**
+	 * 根据合同ID查找关联责任人
+	 * @param contractId
+	 * @return
+	 */
+	public List<String> findChargerNameByContractId(Long contractId) {
+		String sql = "select c.name from BS_CARMAN_CONTRACT cc" +
+				" inner join BS_CARMAN c on cc.man_id = c.id" +
+				" where cc.contract_id="+contractId;
+		
+		List<String> list = jdbcTemplate.query(sql, new RowMapper<String>(){
+			public String mapRow(ResultSet rs, int rowNum) throws SQLException {
+				return rs.getString("name");
+			}
+		});
+		return list;
 	}
 
 

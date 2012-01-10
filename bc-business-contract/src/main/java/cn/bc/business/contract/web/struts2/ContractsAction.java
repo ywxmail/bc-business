@@ -48,7 +48,7 @@ public class ContractsAction extends ViewAction<Map<String, Object>> {
 	public String status = String.valueOf(Contract.STATUS_NORMAL); // 合同的状态，多个用逗号连接
 	public String mains = String.valueOf(Contract.MAIN_NOW); // 现实当前版本
 	public Long carId;
-	public Long carManId;
+	public Long driverId;
 
 	@Override
 	public boolean isReadonly() {
@@ -77,7 +77,7 @@ public class ContractsAction extends ViewAction<Map<String, Object>> {
 		if(carId != null){
 			sql.append(" left join BS_CAR_CONTRACT carc on c.id = carc.contract_id");
 		}
-		if(carManId != null){
+		if(driverId != null){
 			sql.append(" left join BS_CARMAN_CONTRACT manc on c.id = manc.contract_id");
 		}
 		sqlObject.setSql(sql.toString());
@@ -132,7 +132,7 @@ public class ContractsAction extends ViewAction<Map<String, Object>> {
 						}
 					}
 				}));
-		if (carManId != null) {
+		if (driverId != null) {
 			columns.add(new TextColumn4MapKey("c.ext_str1", "ext_str1",
 					getText("contract.car"), 120).setUseTitleFromLabel(true));
 		}
@@ -201,9 +201,9 @@ public class ContractsAction extends ViewAction<Map<String, Object>> {
 					carId);
 		}
 		
-		if (carManId != null) {
+		if (driverId != null) {
 			carManCondition = new EqualsCondition("manc.man_id",
-					carManId);
+					driverId);
 		}
 		
 		// 查看最新合同列表
@@ -226,8 +226,8 @@ public class ContractsAction extends ViewAction<Map<String, Object>> {
 			json.put("carId", carId);
 		}
 
-		if (carManId != null) {
-			json.put("carManId", carManId);
+		if (driverId != null) {
+			json.put("driverId", driverId);
 		}
 	}
 

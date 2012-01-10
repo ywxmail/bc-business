@@ -67,6 +67,7 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 	private CarService 							carService;
 	private SyncBaseService 					syncBaseService;				//平台同步基类Serivce
 	private JiaoWeiYYWZService 					jiaoWeiYYWZService;				//平台同步交通违章Serivce
+	private String								sourceStr;
 
 	public  List<Map<String, String>> 			motorcadeList;					// 可选车队列表
 	public  List<Map<String, String>>			dutyList;						// 可选责任列表
@@ -102,6 +103,14 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 
 	public void setSyncId(Long syncId) {
 		this.syncId = syncId;
+	}
+
+	public String getSourceStr() {
+		return sourceStr;
+	}
+
+	public void setSourceStr(String sourceStr) {
+		this.sourceStr = sourceStr;
 	}
 
 	@Autowired
@@ -220,7 +229,7 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 				str = str.substring(str.lastIndexOf("分")-2,str.lastIndexOf("分")).trim();
 				this.getE().setJeom(Float.parseFloat(str));
 			}
-			this.getE().setFrom(getText("runcase.jiaowei"));
+//			this.getE().setFrom(getText("runcase.jiaowei"));
 			
 			//设置来源
 			this.getE().setSource(CaseBase.SOURCE_GENERATION);
@@ -280,6 +289,8 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 		if(syncId == null){ //不是同步过来的信息设为自建
 			this.getE().setSource(CaseBase.SOURCE_SYS);
 		}
+		
+		sourceStr = getSourceStatuses().get(this.getE().getSource()+"");
 	}
 	
 	/** 根据车牌号查找carId*/
@@ -304,6 +315,7 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 		// 表单可选项的加载
 		statusesValue		=	this.getCaseStatuses();
 		sourcesValue		=	this.getSourceStatuses();
+		sourceStr = getSourceStatuses().get(this.getE().getSource()+"");
 		initForm(true);
 		return "form";
 	}

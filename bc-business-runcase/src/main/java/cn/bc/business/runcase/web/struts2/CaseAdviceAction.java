@@ -69,6 +69,7 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 	private SyncBaseService 				syncBaseService;				//平台同步基类Serivce
 	private JiaoWeiADVICEService			jiaoWeiADVICEService;			//平台同步投诉与建议Service
 	private CaseBaseService					caseBaseService;
+	private String							sourceStr;
 
 	public 	List<Map<String, String>> 		motorcadeList;					// 可选车队列表
 	public  List<Map<String, String>>		dutyList;						// 可选责任列表
@@ -113,6 +114,14 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 
 	public void setSyncId(Long syncId) {
 		this.syncId = syncId;
+	}
+
+	public String getSourceStr() {
+		return sourceStr;
+	}
+
+	public void setSourceStr(String sourceStr) {
+		this.sourceStr = sourceStr;
 	}
 
 	@Autowired
@@ -296,6 +305,7 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 		if(syncId == null){ //不是同步过来的信息设为自建
 			this.getE().setSource(CaseBase.SOURCE_SYS);
 		}
+		sourceStr = getSourceStatuses().get(this.getE().getSource()+"");
 	}
 	
 	/** 根据车牌号查找carId*/
@@ -318,6 +328,7 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 		this.formPageOption = 	buildFormPageOption(true);
 		// 初始化表单的其他配置
 		this.initForm(true);
+		sourceStr = getSourceStatuses().get(this.getE().getSource()+"");
 		return "form";
 	}
 	
