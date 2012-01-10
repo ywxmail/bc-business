@@ -270,7 +270,7 @@ public class Contract4LaboursAction extends ViewAction<Map<String, Object>> {
 	@Override
 	protected String[] getGridSearchFields() {
 		return new String[] { "c.code", "c.ext_str1", "c.ext_str2",
-				"cl.insurance_type" };
+				"cl.insurance_type", "cl.cert_no", "cl.insurCode" };
 	}
 
 	@Override

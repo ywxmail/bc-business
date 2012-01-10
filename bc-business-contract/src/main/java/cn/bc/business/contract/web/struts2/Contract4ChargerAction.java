@@ -3,6 +3,7 @@
  */
 package cn.bc.business.contract.web.struts2;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -147,7 +148,7 @@ public class Contract4ChargerAction extends FileEntityAction<Long, Contract4Char
 		e.setModifier(context.getUserHistory());
 		e.setModifiedDate(Calendar.getInstance());
 		//设置责任人姓名
-		e.setExt_str2(assignChargerNames);
+		e.setExt_str2(setChargerName(assignChargerIds,assignChargerNames));
 		
 		this.contract4ChargerService.save(e,this.getCarId(),
 				assignChargerIds,assignChargerNames);
@@ -163,9 +164,27 @@ public class Contract4ChargerAction extends FileEntityAction<Long, Contract4Char
 //		//更新司机的chager列显示责任人姓名
 //		this.contract4ChargerService.updateCarMan4dirverName(assignChargerNames,carId);
 		
-		
 		return "saveSuccess";
 		
+	}
+	
+	/**
+	 * 设置责任人姓名
+	 * @param assignChargerIds
+	 * @param assignChargerNames
+	 * @return
+	 */
+	private String setChargerName(String assignChargerIds,String assignChargerNames){
+		String chargerName = "";
+		if(assignChargerIds.length() > 0){
+			String [] ids = assignChargerIds.split(",");
+			String [] names = assignChargerNames.split(",");
+			for(int i=0;i<ids.length;i++){ //设置责任人如:姓名1,id1;姓名2,id2;
+				chargerName += names[i]+",";
+				chargerName += ids[i]+";";
+			}
+		}
+		return chargerName;
 	}
 	
 	@Override
@@ -208,10 +227,14 @@ public class Contract4ChargerAction extends FileEntityAction<Long, Contract4Char
 		//根据contractId查找所属的carManId列表
 		List<String> chargerIdList = this.contract4ChargerService.findChargerIdByContractId(e.getId());
 		if((chargerIdList != null && chargerIdList.size() > 0) && (e.getExt_str2() != null && e.getExt_str2().length() > 0)){
-			chargerNameAry = this.getE().getExt_str2().split(",");
+			chargerNameAry = this.getE().getExt_str2().split(";");
 			chargerInfoMap = new HashMap<String, String>();
-			for(int i=0; i<chargerIdList.size(); i++){
-				chargerInfoMap.put(chargerIdList.get(i), chargerNameAry[i]);
+			String names = "";
+			List<String> list = new ArrayList<String>();
+			for(int i=0; i<chargerNameAry.length;i++){
+				names = chargerNameAry[i];
+				list.add(names.split(",")[0]);
+				chargerInfoMap.put(chargerIdList.get(i), list.get(i));
 			}
 		}
 	}
@@ -342,4 +365,21 @@ public class Contract4ChargerAction extends FileEntityAction<Long, Contract4Char
     		return "";
     	}
     }
+    
+    public static void main(String[] args) {
+		String str = "aa,111;bb,222;cc,333;";
+		String str2 = "";
+		String [] arys = str.split(";");
+		List<String> list = new ArrayList<String>();
+		for(int i=0;i<arys.length;i++){
+			str2 = arys[i];
+			list.add(str2.split(",")[1]);
+//			arys2 = str2.split(",");
+		}
+		for(String fuck : list){
+			System.out.println(fuck);
+		}
+		//System.out.println(str4);
+		//System.out.println(str3);
+	}
 }

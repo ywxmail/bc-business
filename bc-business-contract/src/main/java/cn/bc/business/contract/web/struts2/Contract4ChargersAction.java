@@ -15,6 +15,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
 import cn.bc.business.contract.domain.Contract;
+import cn.bc.business.web.struts2.LinkFormater4ChargerInfo;
 import cn.bc.business.web.struts2.ViewAction;
 import cn.bc.core.query.condition.Condition;
 import cn.bc.core.query.condition.ConditionUtils;
@@ -204,7 +205,9 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 							}
 						}));
 		columns.add(new TextColumn4MapKey("c.ext_str2", "ext_str2",
-				getText("contract4Charger.charger")).setUseTitleFromLabel(true));
+				getText("contract4Charger.charger")).setUseTitleFromLabel(true)
+				.setValueFormater(new LinkFormater4ChargerInfo(this
+						.getContextPath())));
 		columns.add(new TextColumn4MapKey("c.start_date", "start_date", getText("contract.deadline"), 180)
 				.setValueFormater(new DateRangeFormater("yyyy-MM-dd") {
 					@Override
@@ -237,7 +240,7 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected String[] getGridSearchFields() {
-		return new String[] { "c.code", "c.ext_str1","c.ext_str2", "c.word_no" };
+		return new String[] { "c.code", "c.ext_str1","c.ext_str2", "c.word_no", "cc.bs_type" };
 	}
 
 	@Override
