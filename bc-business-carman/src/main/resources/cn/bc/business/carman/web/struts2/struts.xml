@@ -55,7 +55,15 @@
 		<action name="save" class="carByDriverHistoryAction" method="save" />
 		<action name="data" class="carByDriverHistoryAction" method="data" />
 		<action name="delete" class="carByDriverHistoryAction" method="delete" />
-		<action name="open" class="carByDriverHistoryAction" method="open" />
+		<action name="open" class="carByDriverHistoryAction" method="open" >
+		    <result name="zhuanChe" >/bc-business/carByDriverHistory/zhuanCheForm.jsp</result>
+			<result name="zhuanGongSi" >/bc-business/carByDriverHistory/zhuanGongSiForm.jsp</result>
+			<result name="zhuXiao" >/bc-business/carByDriverHistory/zhuXiaoForm.jsp</result>
+			<result name="qianHui" >/bc-business/carByDriverHistory/qianHuiForm.jsp</result>
+			<result name="jiaoHui" >/bc-business/carByDriverHistory/jiaoHuiForm.jsp</result>
+			<result name="xinRuZhi" >/bc-business/carByDriverHistory/xinRuZhiForm.jsp</result>
+			<result name="zhuanCheDui" >/bc-business/carByDriverHistory/zhuanCheDuiForm.jsp</result>
+		</action>
 		<action name="edit" class="carByDriverHistoryAction" method="edit" >
 		    <result name="zhuanChe" >/bc-business/carByDriverHistory/zhuanCheForm.jsp</result>
 			<result name="zhuanGongSi" >/bc-business/carByDriverHistory/zhuanGongSiForm.jsp</result>
