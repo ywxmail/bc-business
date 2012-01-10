@@ -32,7 +32,9 @@ BEGIN
 	select string_agg(concat(name,',',id),';') into chargerInfo
 		from (SELECT m.name as name,m.id as id
 			FROM bs_car_contract cc
-			inner join bs_carman_contract cm on cm.contract_id=cc.contract_id
+			inner join bs_contract c on c.id=cc.contract_id
+			inner join bs_contract_charger c1 on c1.id=c.id
+			inner join bs_carman_contract cm on cm.contract_id=c.id
 			inner join bs_carman m on m.id=cm.man_id
 			where cc.car_id=cid
 			order by m.work_date asc) as t;
