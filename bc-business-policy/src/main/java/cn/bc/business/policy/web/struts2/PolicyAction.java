@@ -18,6 +18,8 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
 import cn.bc.business.OptionConstants;
+import cn.bc.business.car.domain.Car;
+import cn.bc.business.car.service.CarService;
 import cn.bc.business.policy.domain.BuyPlant;
 import cn.bc.business.policy.domain.Policy;
 import cn.bc.business.policy.service.PolicyService;
@@ -45,6 +47,7 @@ public class PolicyAction extends FileEntityAction<Long, Policy> {
 	public OptionService optionService;
 	public PolicyService policyService;
 	private AttachService attachService;
+	public CarService carService;
 	public AttachWidget attachsUI;
 	public Long carId;
 	public Long unitId;
@@ -62,6 +65,11 @@ public class PolicyAction extends FileEntityAction<Long, Policy> {
 	@Autowired
 	public void setOptionService(OptionService optionService) {
 		this.optionService = optionService;
+	}
+
+	@Autowired
+	public void CarService(CarService carService) {
+		this.carService = carService;
 	}
 
 	public Long getCarId() {
@@ -107,6 +115,10 @@ public class PolicyAction extends FileEntityAction<Long, Policy> {
 	@Override
 	protected void afterCreate(Policy entity) {
 		super.afterCreate(entity);
+		if (carId != null) {
+			Car car = this.carService.load(carId);
+			this.getE().setCar(car);
+		}
 		// 新建时填写表单的默认信息
 		// 默认购买强制险
 		this.getE().setGreenslip(true);

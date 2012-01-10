@@ -22,6 +22,7 @@ import cn.bc.core.query.condition.ConditionUtils;
 import cn.bc.core.query.condition.Direction;
 import cn.bc.core.query.condition.impl.EqualsCondition;
 import cn.bc.core.query.condition.impl.InCondition;
+import cn.bc.core.query.condition.impl.NotEqualsCondition;
 import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.core.util.StringUtils;
 import cn.bc.db.jdbc.RowMapper;
@@ -51,6 +52,8 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 	private static final long serialVersionUID = 1L;
 	public String status = String.valueOf(BCConstants.STATUS_ENABLED); // 车辆保单的状态，多个用逗号连接
 	public Long carId;
+	public Long main;// 主体： 0-当前版本,1-历史版本
+	public Long policyId;// 合同ID
 
 	@Override
 	public boolean isReadonly() {
@@ -76,7 +79,7 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 		sql.append("select p.id,p.status_,c.plate_type,c.plate_no,p.register_date,p.assured,p.commerial_no");
 		sql.append(",p.commerial_company,p.commerial_start_date,p.commerial_end_date");
 		sql.append(" ,p.ownrisk,p.greenslip,p.liability_no,p.amount,c.id carId,p.op_type");
-		sql.append(" ,p.greenslip_no,p.greenslip_company,p.greenslip_start_date,p.greenslip_end_date,p.stop_date,p.file_date");
+		sql.append(" ,p.greenslip_no,p.greenslip_company,p.greenslip_start_date,p.greenslip_end_date,p.stop_date,p.main,p.file_date");
 		sql.append(" from BS_CAR_POLICY p");
 		sql.append(" left join BS_CAR c on c.id=p.car_id");
 		sqlObject.setSql(sql.toString());
@@ -112,6 +115,7 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 				map.put("greenslip_start_date", rs[i++]);
 				map.put("greenslip_end_date", rs[i++]);
 				map.put("stop_date", rs[i++]);
+				map.put("main", rs[i++]);
 
 				return map;
 			}
@@ -250,8 +254,22 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 		if (carId != null) {
 			carIdCondition = new EqualsCondition("c.id", carId);
 		}
+		// 历史版本条件
+		Condition mainCondition = null;
+		if (main != null) {
+			mainCondition = new EqualsCondition("p.main", main);
+			// 状态为注销
+			statusCondition = new EqualsCondition("p.status_",
+					Policy.STATUS_DISABLED);
+		}
+		// 历史版本查看历史版本时排除本身
+		Condition policyIdCondition = null;
+		if (policyId != null) {
+			policyIdCondition = new NotEqualsCondition("p.id", policyId);
+		}
 		// 合并条件
-		return ConditionUtils.mix2AndCondition(statusCondition, carIdCondition);
+		return ConditionUtils.mix2AndCondition(statusCondition, carIdCondition,
+				mainCondition,policyIdCondition);
 
 	}
 
@@ -319,11 +337,15 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected Toolbar getHtmlPageToolbar() {
-		return super.getHtmlPageToolbar()
-				.addButton(
-						Toolbar.getDefaultToolbarRadioGroup(
-								getPolicyStatuses(), "status", 0,
-								getText("title.click2changeSearchClasses")));
+		if (this.carId != null) {
+			return super.getHtmlPageToolbar();
+		} else {
+
+			return super.getHtmlPageToolbar().addButton(
+					Toolbar.getDefaultToolbarRadioGroup(getPolicyStatuses(),
+							"status", 0,
+							getText("title.click2changeSearchClasses")));
+		}
 	}
 
 	@Override
