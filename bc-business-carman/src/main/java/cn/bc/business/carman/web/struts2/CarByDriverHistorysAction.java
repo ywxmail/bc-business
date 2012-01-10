@@ -134,7 +134,7 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 	protected List<Column> getGridColumns() {
 		List<Column> columns = new ArrayList<Column>();
 		columns.add(new IdColumn4MapKey("d.id", "id"));
-		columns.add(new TextColumn4MapKey("d.cert_fwzg", "cert_fwzg",
+		columns.add(new TextColumn4MapKey("m.cert_fwzg", "cert_fwzg",
 				getText("carByDriverHistory.cert_fwzg"), 80).setSortable(true));
 		if (carId != null || (carManId == null && carId == null)) {
 			columns.add(new TextColumn4MapKey("d.name", "driver",
@@ -228,8 +228,8 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("d.from_classes", "from_classes",
 				getText("carByDriverHistory.oldDriverState"), 50)
 				.setValueFormater(new KeyValueFormater(getType())));
-		columns.add(new TextColumn4MapKey("d.oldMotoreade", "oldMotoreade",
-				getText("carByDriverHistory.oldMotorcade"), 120)
+		columns.add(new TextColumn4MapKey("d.from_motorcade_id",
+				"oldMotoreade", getText("carByDriverHistory.oldMotorcade"), 120)
 				.setSortable(true)
 				.setUseTitleFromLabel(true)
 				.setValueFormater(
