@@ -62,3 +62,24 @@ BEGIN
 	return chargerInfo;
 END;
 $$ LANGUAGE plpgsql;
+
+-- 获取指定经济合同的责任人信息
+-- 返回值的格式为：张三,id1;李四,id2
+-- 返回值是按责任人的入职时间正序排序的
+-- 参数：cid - 合同的id
+CREATE OR REPLACE FUNCTION getChargerInfoByContractId(cid IN integer) RETURNS varchar AS $$
+DECLARE
+	--定义变量
+	chargerInfo varchar(4000);
+	carId integer;
+BEGIN
+	--获取车辆的id
+	select cc.car_id into carId from bs_car_contract cc
+		inner join bs_contract c on c.id=cc.contract_id
+		inner join bs_contract_charger ch on ch.id=c.id
+		where c.id = cid;
+
+	-- 获取责任人信息
+	return getChargerInfoByCarId(carId);
+END;
+$$ LANGUAGE plpgsql;
