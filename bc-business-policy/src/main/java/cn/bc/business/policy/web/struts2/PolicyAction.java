@@ -95,7 +95,7 @@ public class PolicyAction extends FileEntityAction<Long, Policy> {
 
 	private AttachWidget buildAttachsUI(boolean isNew, boolean forceReadonly) {
 		// 构建附件控件
-		String ptype = "contractLabour.main";
+		String ptype = "policy.main";
 		AttachWidget attachsUI = new AttachWidget();
 		attachsUI.setFlashUpload(EntityAction.isFlashUpload());
 		attachsUI.addClazz("formAttachs");
