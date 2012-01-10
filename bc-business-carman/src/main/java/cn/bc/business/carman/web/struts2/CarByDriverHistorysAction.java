@@ -49,6 +49,7 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 	// 车辆的状态，多个用逗号连接
 	public Long carManId;
 	public Long carId;
+	public Long toCarId;
 
 	@Override
 	public boolean isReadonly() {
@@ -287,20 +288,25 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 		if (carManId != null) {
 			carManIdCondition = new EqualsCondition("d.driver_id", carManId);
 		}
-		// newCarId条件
+		// toCarId条件
 		Condition newCarIdCondition = null;
-		if (carId != null) {
-			newCarIdCondition = new EqualsCondition("d.to_car_id", carId);
+		if (toCarId != null) {
+			newCarIdCondition = new EqualsCondition("d.to_car_id", toCarId);
 		}
 		// newCarId条件
 		Condition oldCarIdCondition = null;
 		if (carId != null) {
 			oldCarIdCondition = new EqualsCondition("d.from_car_id", carId);
 		}
+		// CarId2ToCarId条件
+		Condition carId2ToCarIdCondition = null;
+		if (carId != null) {
+			carId2ToCarIdCondition = new EqualsCondition("d.to_car_id", carId);
+		}
 		// 合并条件
 		return ConditionUtils.mix2AndCondition(carManIdCondition,
 				ConditionUtils.mix2OrCondition(newCarIdCondition,
-						oldCarIdCondition));
+						carId2ToCarIdCondition, oldCarIdCondition));
 	}
 
 	@Override
@@ -314,6 +320,10 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 		// carId条件
 		if (carId != null) {
 			json.put("toCarId", carId);
+		}
+		// toCarId条件
+		if (toCarId != null) {
+			json.put("toCarId", toCarId);
 		}
 		return json.isEmpty() ? null : json;
 	}
