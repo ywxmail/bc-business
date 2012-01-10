@@ -265,7 +265,7 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 	@Override
 	protected PageOption getHtmlPageOption() {
 		return super.getHtmlPageOption().setWidth(900).setMinWidth(400)
-				.setHeight(550).setMinHeight(300);
+				.setHeight(400).setMinHeight(300);
 	}
 
 	@Override
@@ -380,13 +380,16 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 			// 查看按钮
 			tb.addButton(Toolbar
 					.getDefaultOpenToolbarButton(getText("label.read")));
+			// 搜索按钮
+			tb.addButton(Toolbar
+					.getDefaultSearchToolbarButton(getText("title.click2search")));
+
 		} else {
 
 			tb.addButton(
 					new ToolbarButton().setIcon("ui-icon-document")
 							.setText("新建")
 							.setClick("bc.business.MoveTypeList.select"))
-
 					.addButton(
 							new ToolbarButton().setIcon("ui-icon-pencil")
 									.setText("编辑").setAction("edit"))
