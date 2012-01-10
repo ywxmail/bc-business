@@ -59,7 +59,7 @@ BEGIN
 			inner join bs_carman_contract pm on pm.contract_id=cc.contract_id
 			inner join bs_carman p on p.id=pm.man_id
 			-- 正常的营运班次信息+当前经济合同 条件
-			where cd.status_=0 and c.main=0 and c.type_=2 and cd.driver_id=did
+			where cd.status_=0 and c.status_=0 and c.main=0 and c.type_=2 and cd.driver_id=did
 			order by p.file_date asc) as t;
 	return chargerInfo;
 END;
