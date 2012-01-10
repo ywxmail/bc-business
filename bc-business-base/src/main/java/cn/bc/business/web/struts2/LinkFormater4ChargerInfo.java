@@ -61,21 +61,26 @@ public class LinkFormater4ChargerInfo extends LinkFormater {
 				tpl.append(", ");
 
 			vs = vv.split(",");// [0]-责任人姓名,[1]-责任人id
-			labels.add(vs[0]);
 
-			// 链接地址、模块类型、样式控制
-			tpl.append("<a class=\"bc-link\" data-mtype=\"" + this.moduleKey
-					+ "\" href=\"" + this.contextPath + this.urlPattern + vs[1]
-					+ "\"");
+			if (vs.length == 2) {
+				labels.add(vs[0]);
+				// 链接地址、模块类型、样式控制
+				tpl.append("<a class=\"bc-link\" data-mtype=\""
+						+ this.moduleKey + "\" href=\"" + this.contextPath
+						+ this.urlPattern + vs[1] + "\"");
 
-			// 任务栏显示的标题：司机张三
-			tpl.append(" data-title=\"责任人" + vs[0] + "\"");
+				// 任务栏显示的标题：司机张三
+				tpl.append(" data-title=\"责任人" + vs[0] + "\"");
 
-			// 对话框的id
-			tpl.append(" data-mid=\"" + this.moduleKey + vs[1] + "\"");
+				// 对话框的id
+				tpl.append(" data-mid=\"" + this.moduleKey + vs[1] + "\"");
 
-			// 链接显示的文字：张三(正班)
-			tpl.append(">" + vs[0] + "</a>");
+				// 链接显示的文字：张三(正班)
+				tpl.append(">" + vs[0] + "</a>");
+			}else{
+				tpl.append(vv);
+				labels.add(vv);
+			}
 
 			i++;
 		}

@@ -62,22 +62,27 @@ public class LinkFormater4DriverInfo extends LinkFormater {
 				tpl.append(", ");
 
 			vs = vv.split(",");// [0]-司机姓名,[1]-营运班次,[2]-司机id
-			label = vs[0] + "(" + vs[1] + ")";
-			labels.add(label);
+			if (vs.length == 3) {
+				label = vs[0] + "(" + vs[1] + ")";
+				labels.add(label);
 
-			// 链接地址、模块类型、样式控制
-			tpl.append("<a class=\"bc-link\" data-mtype=\"" + this.moduleKey
-					+ "\" href=\"" + this.contextPath + this.urlPattern + vs[2]
-					+ "\"");
+				// 链接地址、模块类型、样式控制
+				tpl.append("<a class=\"bc-link\" data-mtype=\""
+						+ this.moduleKey + "\" href=\"" + this.contextPath
+						+ this.urlPattern + vs[2] + "\"");
 
-			// 任务栏显示的标题：司机张三
-			tpl.append(" data-title=\"司机" + vs[0] + "\"");
+				// 任务栏显示的标题：司机张三
+				tpl.append(" data-title=\"司机" + vs[0] + "\"");
 
-			// 对话框的id
-			tpl.append(" data-mid=\"" + this.moduleKey + vs[2] + "\"");
+				// 对话框的id
+				tpl.append(" data-mid=\"" + this.moduleKey + vs[2] + "\"");
 
-			// 链接显示的文字：张三(正班)
-			tpl.append(">" + vs[0] + "</a>" + "(" + vs[1] + ")");
+				// 链接显示的文字：张三(正班)
+				tpl.append(">" + vs[0] + "</a>" + "(" + vs[1] + ")");
+			} else {
+				tpl.append(vv);
+				labels.add(vv);
+			}
 
 			i++;
 		}
