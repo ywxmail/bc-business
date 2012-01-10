@@ -112,6 +112,12 @@ public class CarByDriverHistoryAction extends
 	}
 
 	@Override
+	public String open() throws Exception {
+		super.open();
+		return this.getFormName(this.getE().getMoveType());
+	}
+
+	@Override
 	protected void beforeSave(CarByDriverHistory entity) {
 		super.beforeSave(entity);
 		CarByDriverHistory e = this.getE();

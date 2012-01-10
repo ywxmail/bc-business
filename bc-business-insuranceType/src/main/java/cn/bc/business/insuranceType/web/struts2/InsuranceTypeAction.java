@@ -47,12 +47,15 @@ public class InsuranceTypeAction extends FileEntityAction<Long, InsuranceType> {
 	}
 
 	@Override
-	public String create() throws Exception {
-		String r = super.create();
+	protected void afterCreate(InsuranceType entity) {
+		super.afterCreate(entity);
 		InsuranceType e = this.getE();
 		// 初始状态
 		e.setStatus(BCConstants.STATUS_ENABLED);
-		return r;
+		// 新建时默认保费保额默认为0
+		e.setCoverage(new Float(0));
+		e.setPremium(new Float(0));
+
 	}
 
 	@Override
