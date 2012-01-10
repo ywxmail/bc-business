@@ -1,3 +1,4 @@
+
 -- 创建数据转换用的序列，开始于100000
 CREATE sequence DC_SEQUENCE
     minvalue 1
@@ -409,7 +410,7 @@ create table BS_CARMAN (
     GZ                   boolean default false,
     ACCESS_CERTS         VARCHAR(255),
     DESC_                VARCHAR(4000),
-    CHARGER		VARCHAR(255),
+    CHARGER		VARCHAR(4000),
     FILE_DATE TIMESTAMP NOT NULL,
     AUTHOR_ID INTEGER NOT NULL,
     MODIFIER_ID INTEGER,
@@ -484,8 +485,8 @@ CREATE TABLE BS_CAR (
    VER_MINOR            NUMERIC(3),
    OLD_UNIT_NAME        VARCHAR(255),
    MOTORCADE_ID         INTEGER,
-   DRIVER		VARCHAR(255),
-   CHARGER		VARCHAR(255),
+   DRIVER		VARCHAR(4000),
+   CHARGER		VARCHAR(4000),
    BS_TYPE              VARCHAR(255),
    CODE                 VARCHAR(255),
    ORIGIN_NO            VARCHAR(255),
@@ -641,7 +642,7 @@ CREATE TABLE BS_CONTRACT
    END_DATE             TIMESTAMP                 NOT NULL,
    CONTENT              VARCHAR(4000),
    EXT_STR1             VARCHAR(255),
-   EXT_STR2             VARCHAR(255),
+   EXT_STR2             VARCHAR(4000),
    EXT_STR3             VARCHAR(255),
    EXT_NUM1             INTEGER,
    EXT_NUM2             INTEGER,
