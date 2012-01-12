@@ -91,8 +91,17 @@ public class Car extends RichFileEntityImpl {
 	private String desc2;// 备注2
 	private String desc3;// 备注3
 
+	private boolean logout;// 启动注销程序:0-未,1-已
+	private Calendar returnDate;// 交车日期
+	private int logoutReason;// 注销原因
+	private String distanceScrapMonth;// 离报废日期
+	private boolean verify;// 主管部门核准:0-未,1-已
+	private Calendar verifyDate;// 核准日期
+	private String logoutRemark;// 注销备注
+	
 	private Set<Cert> certs;// 拥有的证件
 	private Set<Contract> contracts;// 合同
+	
 
 	@ManyToOne(fetch = FetchType.EAGER, optional = false)
 	@JoinColumn(name = "MOTORCADE_ID", referencedColumnName = "ID")
@@ -557,4 +566,69 @@ public class Car extends RichFileEntityImpl {
 	public void setDesc3(String desc3) {
 		this.desc3 = desc3;
 	}
+
+	@Column(name = "IS_LOGOUT")
+	public boolean isLogout() {
+		return logout;
+	}
+
+	public void setLogout(boolean logout) {
+		this.logout = logout;
+	}
+
+	@Column(name = "RETURN_DATE")
+	public Calendar getReturnDate() {
+		return returnDate;
+	}
+
+	public void setReturnDate(Calendar returnDate) {
+		this.returnDate = returnDate;
+	}
+
+	@Column(name = "LOGOUT_REASON")
+	public int getLogoutReason() {
+		return logoutReason;
+	}
+
+	public void setLogoutReason(int logoutReason) {
+		this.logoutReason = logoutReason;
+	}
+
+	@Column(name = "DISTANCE_SCRAP_MONTH")
+	public String getDistanceScrapMonth() {
+		return distanceScrapMonth;
+	}
+
+	public void setDistanceScrapMonth(String distanceScrapMonth) {
+		this.distanceScrapMonth = distanceScrapMonth;
+	}
+
+	@Column(name = "IS_VERIFY")
+	public boolean isVerify() {
+		return verify;
+	}
+
+	public void setVerify(boolean verify) {
+		this.verify = verify;
+	}
+
+	@Column(name = "VERIFY_DATE")
+	public Calendar getVerifyDate() {
+		return verifyDate;
+	}
+
+	public void setVerifyDate(Calendar verifyDate) {
+		this.verifyDate = verifyDate;
+	}
+
+	@Column(name = "LOGOUT_REMARK")
+	public String getLogoutRemark() {
+		return logoutRemark;
+	}
+
+	public void setLogoutRemark(String logoutRemark) {
+		this.logoutRemark = logoutRemark;
+	}
+	
+	
 }
