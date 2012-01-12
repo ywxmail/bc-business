@@ -21,6 +21,15 @@ public class OptionConstants extends cn.bc.option.OptionConstants {
 
 	/** 车辆厂牌 */
 	public final static String CAR_BRAND = "car.brand";
+	
+	/** 所属单位 */
+	public final static String CAR_OLD_UNIT_NAME = "car.old.unit.name";
+	
+	/** 注销原因 */
+	public final static String CAR_LOGOUT_REASON = "car.logout.reason";
+	
+	
+	
 	/** 司机营运班次 */
 	public final static String DRIVER_CLASSES = "driver.classes";
 	/** 司机责任人区域 */
