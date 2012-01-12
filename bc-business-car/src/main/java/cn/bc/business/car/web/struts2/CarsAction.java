@@ -28,6 +28,7 @@ import cn.bc.web.formater.AbstractFormater;
 import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.formater.EntityStatusFormater;
 import cn.bc.web.formater.LinkFormater4Id;
+import cn.bc.web.formater.NubmerFormater;
 import cn.bc.web.ui.html.grid.Column;
 import cn.bc.web.ui.html.grid.IdColumn4MapKey;
 import cn.bc.web.ui.html.grid.TextColumn4MapKey;
@@ -131,15 +132,15 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 				new EntityStatusFormater(getBSStatuses1())));
 		// 公司
 		columns.add(new TextColumn4MapKey("c.old_unit_name", "old_unit_name",
-				getText("car.unit"), 80).setSortable(true)
+				getText("car.unit"), 60).setSortable(true)
 				.setUseTitleFromLabel(true));
 		// 分公司
 		columns.add(new TextColumn4MapKey("unit_name", "unit_name",
-				getText("unitname"), 80).setSortable(true)
+				getText("car.unitname"), 60).setSortable(true)
 				.setUseTitleFromLabel(true));
 		// 车队
 		columns.add(new TextColumn4MapKey("m.name", "motorcade_name",
-				getText("car.motorcade"), 80)
+				getText("car.motorcade"), 60)
 				.setSortable(true)
 				.setUseTitleFromLabel(true)
 				.setValueFormater(
@@ -157,7 +158,7 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 						}));
 		// 自编号
 		columns.add(new TextColumn4MapKey("c.code", "code",
-				getText("car.code"), 80).setSortable(true)
+				getText("car.code"), 55).setSortable(true)
 				.setUseTitleFromLabel(true));
 		// 车牌号码
 		columns.add(new TextColumn4MapKey("c.plate_no", "plate_no",
@@ -171,9 +172,13 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 								+ car.get("plate_no");
 					}
 				}));
+		// 登记日期
+				columns.add(new TextColumn4MapKey("c.register_date", "register_date",
+						getText("car.registerDate"), 90).setSortable(true)
+						.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
 		// 营运司机
 		columns.add(new TextColumn4MapKey("c.driver", "driver",
-				getText("car.carMan"), 160)
+				getText("car.carMan"), 220)
 				.setValueFormater(new LinkFormater4DriverInfo(this
 						.getContextPath())));
 		// 责任人
@@ -183,11 +188,8 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 						.getContextPath())));
 		// 营运性质
 		columns.add(new TextColumn4MapKey("c.bs_type", "bs_type",
-				getText("car.businessType"), 80).setUseTitleFromLabel(true));
-		// 登记日期
-		columns.add(new TextColumn4MapKey("c.register_date", "register_date",
-				getText("car.registerDate"), 100).setSortable(true)
-				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+				getText("car.businessType"), 70).setUseTitleFromLabel(true));
+		
 		// 原车号
 		columns.add(new TextColumn4MapKey("c.origin_no", "origin_no",
 				getText("car.originNo"), 55).setSortable(true)
@@ -202,10 +204,11 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 				getText("car.certNo1"), 80).setUseTitleFromLabel(true));
 		// 强检证号
 		columns.add(new TextColumn4MapKey("c.cert_no3", "cert_no3",
-				getText("car.certNo3"), 80).setUseTitleFromLabel(true));
+				getText("car.certNo3"), 70).setUseTitleFromLabel(true));
 		// 固定资产原值
 		columns.add(new TextColumn4MapKey("c.original_value", "original_value",
-				getText("car.originalValue"), 100).setUseTitleFromLabel(true));
+				getText("car.originalValue"), 100).setUseTitleFromLabel(true)
+				.setValueFormater(new NubmerFormater()));
 		// 车架号
 		columns.add(new TextColumn4MapKey("c.vin", "vin", getText("car.vin"),
 				140).setUseTitleFromLabel(true));
@@ -214,7 +217,7 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 				getText("car.engineNo"), 70).setUseTitleFromLabel(true));
 		// 车型 -厂牌类型、厂牌型号
 		columns.add(new TextColumn4MapKey("c.factory_type", "factory_type",
-				getText("car.factory"), 90).setUseTitleFromLabel(true)
+				getText("car.factory"), 80).setUseTitleFromLabel(true)
 				.setValueFormater(new AbstractFormater<String>() {
 					@Override
 					public String format(Object context, Object value) {
@@ -234,14 +237,14 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 						}
 					}
 				}));
-
+		// 计价器制造厂
+				columns.add(new TextColumn4MapKey("c.taximeter_factory",
+						"taximeter_factory", getText("car.taximeterFactory"), 100)
+						.setUseTitleFromLabel(true));
 		// 计价器出厂编号
 		columns.add(new TextColumn4MapKey("c.taximeter_no", "taximeter_no",
 				getText("car.taximeterNo"), 110).setUseTitleFromLabel(true));
-		// 计价器制造厂
-		columns.add(new TextColumn4MapKey("c.taximeter_factory",
-				"taximeter_factory", getText("car.taximeterFactory"), 100)
-				.setUseTitleFromLabel(true));
+		
 		// 计价器型号
 		columns.add(new TextColumn4MapKey("c.taximeter_type", "taximeter_type",
 				getText("car.taximeterType"), 80).setUseTitleFromLabel(true));
