@@ -75,10 +75,10 @@ public class ContractsAction extends ViewAction<Map<String, Object>> {
 		sql.append("select c.id,c.type_,c.ver_major,c.ver_minor,c.ext_str1,c.ext_str2,c.sign_date,c.start_date,c.end_date,c.code");
 		sql.append(" from BS_CONTRACT c");
 		if(carId != null){
-			sql.append(" left join BS_CAR_CONTRACT carc on c.id = carc.contract_id");
+			sql.append(" inner join BS_CAR_CONTRACT carc on c.id = carc.contract_id");
 		}
 		if(driverId != null){
-			sql.append(" left join BS_CARMAN_CONTRACT manc on c.id = manc.contract_id");
+			sql.append(" inner join BS_CARMAN_CONTRACT manc on c.id = manc.contract_id");
 		}
 		sqlObject.setSql(sql.toString());
 
