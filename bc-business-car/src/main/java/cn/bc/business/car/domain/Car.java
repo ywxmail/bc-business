@@ -33,6 +33,9 @@ public class Car extends RichFileEntityImpl {
 	private static final long serialVersionUID = 1L;
 	public static final String KEY_UID = "car.uid";
 	public static final String KEY_CODE = "car.code";
+	
+	public static final int CAR_STAUTS_NORMAL = 0;
+	public static final int CAR_STAUTS_LOGOUT = 1;
 
 	private Motorcade motorcade;// 所属车队
 	private String driver; // 司机信息：[司机1姓名],[司机1班次],[司机1id];[司机2姓名],[司机2班次],[司机2id];...
@@ -93,7 +96,7 @@ public class Car extends RichFileEntityImpl {
 
 	private boolean logout;// 启动注销程序:0-未,1-已
 	private Calendar returnDate;// 交车日期
-	private int logoutReason;// 注销原因
+	private int logoutReason;// 注销原因 0-"",1-转蓝归公司,2-转蓝归责任人,3-报废,4-被盗,5-被抢,9-其它
 	private String distanceScrapMonth;// 离报废日期
 	private boolean verify;// 主管部门核准:0-未,1-已
 	private Calendar verifyDate;// 核准日期
