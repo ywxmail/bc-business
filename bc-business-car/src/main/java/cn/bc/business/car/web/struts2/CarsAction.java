@@ -71,11 +71,15 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer sql = new StringBuffer();
-		sql.append("select c.id,c.status_,c.plate_type,c.plate_no,c.engine_no,c.driver,c.charger,c.factory_type,c.factory_model");
-		sql.append(",c.cert_no2,c.register_date,c.bs_type,c.code,c.origin_no,c.vin");
-		sql.append(",c.motorcade_id,m.name");
+		sql.append("select c.id,c.status_,c.old_unit_name,bia.name as unit_name,m.name,c.code,c.plate_type,c.plate_no");
+		sql.append(",c.driver,c.charger,c.bs_type,c.register_date,c.origin_no");
+		sql.append(",c.cert_no2,c.cert_no1,c.cert_no3,c.original_value");
+		sql.append(",c.vin ,c.engine_no,c.factory_type,c.factory_model");
+		sql.append(",c.taximeter_no,c.taximeter_factory,c.taximeter_type");
+		sql.append(",m.id as motorcade_id");
 		sql.append(" from bs_car c");
 		sql.append(" inner join bs_motorcade m on m.id=c.motorcade_id");
+		sql.append(" inner join bc_identity_actor bia on bia.id=m.unit_id");
 		sqlObject.setSql(sql.toString());
 
 		// 注入参数
@@ -87,22 +91,30 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 				Map<String, Object> map = new HashMap<String, Object>();
 				int i = 0;
 				map.put("id", rs[i++]);
-				map.put("status_", rs[i++]);
-				map.put("plate_type", rs[i++]);
-				map.put("plate_no", rs[i++]);
-				map.put("engine_no", rs[i++]);
-				map.put("driver", rs[i++]);
-				map.put("charger", rs[i++]);
-				map.put("factory_type", rs[i++]);
-				map.put("factory_model", rs[i++]);
-				map.put("cert_no2", rs[i++]);
-				map.put("register_date", rs[i++]);
-				map.put("bs_type", rs[i++]);
-				map.put("code", rs[i++]);
-				map.put("origin_no", rs[i++]);
-				map.put("vin", rs[i++]);
-				map.put("motorcade_id", rs[i++]);
-				map.put("motorcade_name", rs[i++]);
+				map.put("status_", rs[i++]); // 状态
+				map.put("old_unit_name", rs[i++]);// 公司
+				map.put("unit_name", rs[i++]); // 分公司
+				map.put("motorcade_name", rs[i++]);// 车队
+				map.put("code", rs[i++]); // 自编号
+				map.put("plate_type", rs[i++]); // 车牌号码type
+				map.put("plate_no", rs[i++]); // 车牌号码no
+				map.put("driver", rs[i++]); // 营运司机
+				map.put("charger", rs[i++]); // 责任人
+				map.put("bs_type", rs[i++]); // 营运性质
+				map.put("register_date", rs[i++]);// 登记日期
+				map.put("origin_no", rs[i++]); // 原车号
+				map.put("cert_no2", rs[i++]); // 经营权证
+				map.put("cert_no1", rs[i++]); // 购置税证号
+				map.put("cert_no3", rs[i++]); // 强检证号
+				map.put("original_value", rs[i++]);// 固定资产原值
+				map.put("vin", rs[i++]); // 车架号
+				map.put("engine_no", rs[i++]); // 发动机号
+				map.put("factory_type", rs[i++]); // 厂牌类型
+				map.put("factory_model", rs[i++]);// 厂牌型号
+				map.put("taximeter_no", rs[i++]); // 计价器出厂编号
+				map.put("taximeter_factory", rs[i++]);// 计价器制造厂
+				map.put("taximeter_type", rs[i++]);// 计价器型号
+				map.put("motorcade_id", rs[i++]);// 车队id
 				return map;
 			}
 		});
@@ -113,12 +125,19 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 	protected List<Column> getGridColumns() {
 		List<Column> columns = new ArrayList<Column>();
 		columns.add(new IdColumn4MapKey("c.id", "id"));
+		// 状态
 		columns.add(new TextColumn4MapKey("c.status_", "status_",
 				getText("car.status"), 40).setSortable(true).setValueFormater(
 				new EntityStatusFormater(getBSStatuses1())));
-		columns.add(new TextColumn4MapKey("c.register_date", "register_date",
-				getText("car.registerDate"), 100).setSortable(true)
-				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+		// 公司
+		columns.add(new TextColumn4MapKey("c.old_unit_name", "old_unit_name",
+				getText("car.unit"), 80).setSortable(true)
+				.setUseTitleFromLabel(true));
+		// 分公司
+		columns.add(new TextColumn4MapKey("unit_name", "unit_name",
+				getText("unitname"), 80).setSortable(true)
+				.setUseTitleFromLabel(true));
+		// 车队
 		columns.add(new TextColumn4MapKey("m.name", "motorcade_name",
 				getText("car.motorcade"), 80)
 				.setSortable(true)
@@ -136,6 +155,11 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 												.get("motorcade_id"));
 							}
 						}));
+		// 自编号
+		columns.add(new TextColumn4MapKey("c.code", "code",
+				getText("car.code"), 80).setSortable(true)
+				.setUseTitleFromLabel(true));
+		// 车牌号码
 		columns.add(new TextColumn4MapKey("c.plate_no", "plate_no",
 				getText("car.plate"), 80).setUseTitleFromLabel(true)
 				.setValueFormater(new AbstractFormater<String>() {
@@ -147,22 +171,48 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 								+ car.get("plate_no");
 					}
 				}));
-		columns.add(new TextColumn4MapKey("c.engine_no", "engine_no",
-				getText("car.engineNo"), 70).setUseTitleFromLabel(true));
+		// 营运司机
 		columns.add(new TextColumn4MapKey("c.driver", "driver",
 				getText("car.carMan"), 160)
 				.setValueFormater(new LinkFormater4DriverInfo(this
 						.getContextPath())));
+		// 责任人
 		columns.add(new TextColumn4MapKey("c.charger", "charger",
 				getText("car.charger"), 100)
 				.setValueFormater(new LinkFormater4ChargerInfo(this
 						.getContextPath())));
+		// 营运性质
 		columns.add(new TextColumn4MapKey("c.bs_type", "bs_type",
 				getText("car.businessType"), 80).setUseTitleFromLabel(true));
+		// 登记日期
+		columns.add(new TextColumn4MapKey("c.register_date", "register_date",
+				getText("car.registerDate"), 100).setSortable(true)
+				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+		// 原车号
 		columns.add(new TextColumn4MapKey("c.origin_no", "origin_no",
 				getText("car.originNo"), 55).setSortable(true)
 				.setUseTitleFromLabel(true));
-
+		// 经营权证:权限控制
+		if (!isReadonly()) {
+			columns.add(new TextColumn4MapKey("c.cert_no2", "cert_no2",
+					getText("car.certNo2"), 100).setUseTitleFromLabel(true));
+		}
+		// 购置税证号
+		columns.add(new TextColumn4MapKey("c.cert_no1", "cert_no1",
+				getText("car.certNo1"), 80).setUseTitleFromLabel(true));
+		// 强检证号
+		columns.add(new TextColumn4MapKey("c.cert_no3", "cert_no3",
+				getText("car.certNo3"), 80).setUseTitleFromLabel(true));
+		// 固定资产原值
+		columns.add(new TextColumn4MapKey("c.original_value", "original_value",
+				getText("car.originalValue"), 100).setUseTitleFromLabel(true));
+		// 车架号
+		columns.add(new TextColumn4MapKey("c.vin", "vin", getText("car.vin"),
+				140).setUseTitleFromLabel(true));
+		// 发动机号
+		columns.add(new TextColumn4MapKey("c.engine_no", "engine_no",
+				getText("car.engineNo"), 70).setUseTitleFromLabel(true));
+		// 车型 -厂牌类型、厂牌型号
 		columns.add(new TextColumn4MapKey("c.factory_type", "factory_type",
 				getText("car.factory"), 90).setUseTitleFromLabel(true)
 				.setValueFormater(new AbstractFormater<String>() {
@@ -184,13 +234,17 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 						}
 					}
 				}));
-		columns.add(new TextColumn4MapKey("c.cert_no2", "cert_no2",
-				getText("car.certNo2"), 100).setUseTitleFromLabel(true));
-		columns.add(new TextColumn4MapKey("c.vin", "vin", getText("car.vin"),
-				120).setUseTitleFromLabel(true));
-		columns.add(new TextColumn4MapKey("c.code", "code",
-				getText("car.code"), 60).setSortable(true)
+
+		// 计价器出厂编号
+		columns.add(new TextColumn4MapKey("c.taximeter_no", "taximeter_no",
+				getText("car.taximeterNo"), 110).setUseTitleFromLabel(true));
+		// 计价器制造厂
+		columns.add(new TextColumn4MapKey("c.taximeter_factory",
+				"taximeter_factory", getText("car.taximeterFactory"), 100)
 				.setUseTitleFromLabel(true));
+		// 计价器型号
+		columns.add(new TextColumn4MapKey("c.taximeter_type", "taximeter_type",
+				getText("car.taximeterType"), 80).setUseTitleFromLabel(true));
 		return columns;
 	}
 
