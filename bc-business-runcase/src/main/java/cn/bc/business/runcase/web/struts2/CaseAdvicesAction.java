@@ -53,7 +53,7 @@ public class CaseAdvicesAction extends ViewAction<Map<String, Object>> {
 	public boolean isReadonly() {
 		// 司机管理员或系统管理员
 		SystemContext context = (SystemContext) this.getContext();
-		return !context.hasAnyRole(getText("key.role.bs.driver"),
+		return !context.hasAnyRole(getText("key.role.bs.advice"),
 				getText("key.role.bc.admin"));
 	}
 
