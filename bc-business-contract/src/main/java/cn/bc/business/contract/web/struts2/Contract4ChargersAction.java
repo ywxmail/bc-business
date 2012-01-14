@@ -21,6 +21,7 @@ import cn.bc.core.query.condition.Condition;
 import cn.bc.core.query.condition.ConditionUtils;
 import cn.bc.core.query.condition.Direction;
 import cn.bc.core.query.condition.impl.EqualsCondition;
+import cn.bc.core.query.condition.impl.LikeCondition;
 import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.core.util.StringUtils;
 import cn.bc.db.jdbc.RowMapper;
@@ -114,6 +115,17 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 					"c.status_", Direction.Asc);
 		} else { // 历史版本
 			return new OrderCondition("c.file_date", Direction.Desc);
+		}
+	}
+
+	@Override
+	protected LikeCondition getGridSearchCondition4OneField(String field,
+			String value) {
+		if (field.indexOf("ext_str1") != -1) {// 车牌，忽略大小写
+			return new LikeCondition(field, value != null ? value.toUpperCase()
+					: value);
+		} else {
+			return super.getGridSearchCondition4OneField(field, value);
 		}
 	}
 
