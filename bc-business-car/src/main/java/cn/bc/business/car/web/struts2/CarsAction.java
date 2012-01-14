@@ -173,9 +173,9 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 					}
 				}));
 		// 登记日期
-				columns.add(new TextColumn4MapKey("c.register_date", "register_date",
-						getText("car.registerDate"), 90).setSortable(true)
-						.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+		columns.add(new TextColumn4MapKey("c.register_date", "register_date",
+				getText("car.registerDate"), 90).setSortable(true)
+				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
 		// 营运司机
 		columns.add(new TextColumn4MapKey("c.driver", "driver",
 				getText("car.carMan"), 220)
@@ -189,7 +189,7 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 		// 营运性质
 		columns.add(new TextColumn4MapKey("c.bs_type", "bs_type",
 				getText("car.businessType"), 70).setUseTitleFromLabel(true));
-		
+
 		// 原车号
 		columns.add(new TextColumn4MapKey("c.origin_no", "origin_no",
 				getText("car.originNo"), 55).setSortable(true)
@@ -238,13 +238,13 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 					}
 				}));
 		// 计价器制造厂
-				columns.add(new TextColumn4MapKey("c.taximeter_factory",
-						"taximeter_factory", getText("car.taximeterFactory"), 100)
-						.setUseTitleFromLabel(true));
+		columns.add(new TextColumn4MapKey("c.taximeter_factory",
+				"taximeter_factory", getText("car.taximeterFactory"), 100)
+				.setUseTitleFromLabel(true));
 		// 计价器出厂编号
 		columns.add(new TextColumn4MapKey("c.taximeter_no", "taximeter_no",
 				getText("car.taximeterNo"), 110).setUseTitleFromLabel(true));
-		
+
 		// 计价器型号
 		columns.add(new TextColumn4MapKey("c.taximeter_type", "taximeter_type",
 				getText("car.taximeterType"), 80).setUseTitleFromLabel(true));
@@ -292,20 +292,38 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected Toolbar getHtmlPageToolbar() {
-		return super.getHtmlPageToolbar()
-				// 状态单选按钮组
-				.addButton(
-						Toolbar.getDefaultToolbarRadioGroup(
-								this.getBSStatuses1(), "status", 0,
-								getText("title.click2changeSearchStatus")))
-				// 辅助操作
-				.addButton(
-						new ToolbarMenuButton("辅助操作")
-								.addMenuItem("金盾网交通违法查询：跳转",
-										"jinDun-jiaoTongWeiFa")
-								.addMenuItem("金盾网交通违法查询：抓取",
-										"jinDun-jiaoTongWeiFa-spider")
-								.setChange("bs.carView.selectMenuButtonItem"));
+		Toolbar tb = new Toolbar();
+
+		if (this.isReadonly()) {
+			// 查看按钮
+			tb.addButton(Toolbar
+					.getDefaultOpenToolbarButton(getText("label.read")));
+		} else {
+			// 新建按钮
+			tb.addButton(Toolbar
+					.getDefaultCreateToolbarButton(getText("label.create")));
+
+			// 编辑按钮
+			tb.addButton(Toolbar
+					.getDefaultEditToolbarButton(getText("label.edit")));
+
+			// 取消删除按钮
+		}
+
+		// 搜索按钮
+		tb.addButton(Toolbar
+				.getDefaultSearchToolbarButton(getText("title.click2search")));
+
+		// 状态单选按钮组
+		tb.addButton(Toolbar.getDefaultToolbarRadioGroup(this.getBSStatuses1(),
+				"status", 0, getText("title.click2changeSearchStatus")));
+
+		// 辅助操作
+		tb.addButton(new ToolbarMenuButton("辅助操作")
+				.addMenuItem("金盾网交通违法查询：跳转", "jinDun-jiaoTongWeiFa")
+				.addMenuItem("金盾网交通违法查询：抓取", "jinDun-jiaoTongWeiFa-spider")
+				.setChange("bs.carView.selectMenuButtonItem"));
+		return tb;
 	}
 
 	@Override
