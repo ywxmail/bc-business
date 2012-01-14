@@ -160,7 +160,7 @@ public class CarAction extends FileEntityAction<Long, Car> {
 		
 		// 所属单位列表
 		this.oldUnitList = optionItems.get(OptionConstants.CAR_OLD_UNIT_NAME);
-		OptionItem.insertIfNotExist(oldUnitList,this.getE().getOldUnitName(),getE().getOldUnitName());
+		OptionItem.insertIfNotExist(oldUnitList,null,getE().getOldUnitName());
 		
 		// 注销原因列表
 		this.logoutReasonList = optionItems.get(OptionConstants.CAR_LOGOUT_REASON); 
