@@ -97,6 +97,37 @@ public class LinkFormater4DriverInfo extends LinkFormater {
 	}
 
 	@Override
+	public String getLinkText(Object context, Object value) {
+		String _value = (String) value;
+		if (value == null || _value.trim().length() == 0) {
+			return "&nbsp;";
+		}
+		_value = _value.trim();
+
+		// 分隔出每个司机的配置：[司机1姓名],[司机1班次],[司机1id];[司机2姓名],[司机2班次],[司机2id];...
+		String[] vvs = _value.split(";");
+
+		// 循环每个司机执行格式化处理
+		String[] vs;
+		String labels = "";
+		int i = 0;
+		for (String vv : vvs) {
+			if (i > 0)
+				labels += ",";
+
+			vs = vv.split(",");// [0]-司机姓名,[1]-营运班次,[2]-司机id
+			if (vs.length == 3) {
+				labels += vs[0] + "(" + vs[1] + ")";
+			} else {
+				labels += vv;
+			}
+
+			i++;
+		}
+		return labels;
+	}
+
+	@Override
 	public Object[] getParams(Object context, Object value) {
 		return null;
 	}
