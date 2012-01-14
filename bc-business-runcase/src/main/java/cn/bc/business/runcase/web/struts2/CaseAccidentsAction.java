@@ -24,8 +24,10 @@ import cn.bc.core.util.StringUtils;
 import cn.bc.db.jdbc.RowMapper;
 import cn.bc.db.jdbc.SqlObject;
 import cn.bc.identity.web.SystemContext;
+import cn.bc.web.formater.BooleanFormater;
 import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.formater.EntityStatusFormater;
+import cn.bc.web.formater.NubmerFormater;
 import cn.bc.web.ui.html.grid.Column;
 import cn.bc.web.ui.html.grid.IdColumn4MapKey;
 import cn.bc.web.ui.html.grid.TextColumn4MapKey;
@@ -69,7 +71,17 @@ public class CaseAccidentsAction extends ViewAction<Map<String, Object>> {
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer sql = new StringBuffer();
 		sql.append("select c.id,b.status_,b.code,c.sort,b.motorcade_name,b.driver_name,b.car_plate,b.driver_cert,b.happen_date");
-		sql.append(",b.address,b.driver_id,b.car_id from BS_CASE_ACCIDENT c inner join BS_CASE_BASE b on b.id=c.id");
+		sql.append(",b.address,b.driver_id,b.car_id ");
+		sql.append(",c.carman_cost,c.third_loss,c.third_cost");
+		sql.append(",c.carman_hurt_count,c.third_hurt_count,c.agreement_payment,c.desc_ as acc_desc");
+		sql.append(",c.origin ,c.duty,c.is_inner_fix");
+		sql.append(",b.desc_ ,c.car_hurt,c.actual_loss");
+		sql.append(",c.receiver_name,c.insurance_company");
+		sql.append(",c.is_deliver,c.is_claim,c.is_pay,a.name as unitname");
+		sql.append(" from bs_case_accident c");
+		sql.append(" inner join bs_case_base b on b.id=c.id");
+		sql.append(" left join bs_motorcade m on m.id=b.motorcade_id");
+		sql.append(" left join bc_identity_actor a on a.id=m.unit_id");
 		sqlObject.setSql(sql.toString());
 
 		// 注入参数
@@ -92,6 +104,28 @@ public class CaseAccidentsAction extends ViewAction<Map<String, Object>> {
 				map.put("address", rs[i++]);
 				map.put("driver_id", rs[i++]);
 				map.put("car_id", rs[i++]);
+				map.put("carman_cost", rs[i++]);// 司机拖车费 CARMAN_COST number
+				map.put("third_loss", rs[i++]);// 第三者损失 THIRD_LOSS number
+				map.put("third_cost", rs[i++]);// 第三者拖车费 THIRD_COST number
+				map.put("carman_hurt_count", rs[i++]);// 司机伤人 CARMAN_HURT_COUNT
+														// number
+				map.put("third_hurt_count", rs[i++]);// 第三者伤人 THIRD_HURT_COUNT
+														// number
+				map.put("agreement_payment", rs[i++]);// 协议赔付 AGREEMENT_PAYMENT
+														// number
+				map.put("acc_desc", rs[i++]);// 备注 DESC_ String
+				map.put("origin", rs[i++]);// 籍贯
+				map.put("duty", rs[i++]);// 责任
+				map.put("is_inner_fix", rs[i++]);// 厂修
+				map.put("desc_", rs[i++]);// 经过=基表备注
+				map.put("car_hurt", rs[i++]);// 自车损失=车损情况
+				map.put("actual_loss", rs[i++]);// 总损=实际损失
+				map.put("receiver_name", rs[i++]);// 跟进人员=经办人
+				map.put("insurance_company", rs[i++]);// 保险公司
+				map.put("is_deliver", rs[i++]);// 送保
+				map.put("is_claim", rs[i++]);// 赔付
+				map.put("is_pay", rs[i++]);// 司机受款
+				map.put("unitname", rs[i++]);// 分公司
 
 				return map;
 			}
@@ -108,26 +142,102 @@ public class CaseAccidentsAction extends ViewAction<Map<String, Object>> {
 				.setValueFormater(new EntityStatusFormater(getBSStatuses2())));
 		columns.add(new TextColumn4MapKey("b.code", "code",
 				getText("runcase.caseNo3"), 160).setSortable(true));
-		columns.add(new TextColumn4MapKey("c.sort", "sort",
-				getText("runcase.sort"), 80).setSortable(true));
-		columns.add(new TextColumn4MapKey("b.motorcade_name", "motorcade_name",
-				getText("runcase.motorcadeName"), 80));
-		if (carManId == null) {
-			columns.add(new TextColumn4MapKey("b.driver_name", "driver_name",
-					getText("runcase.driverName"), 80).setSortable(true));
-		}
+		// 事发时间
+		columns.add(new TextColumn4MapKey("b.happen_date", "happen_date",
+				getText("runcase.happenDate"), 140).setSortable(true)
+				.setValueFormater(new CalendarFormater("yyyy-MM-dd hh:mm")));
+		// 车牌
 		if (carId == null) {
 			columns.add(new TextColumn4MapKey("b.car_plate", "car_plate",
-					getText("runcase.carPlate"), 120));
+					getText("runcase.carPlate"), 80));
 		}
+		if (carManId == null) {
+			columns.add(new TextColumn4MapKey("b.driver_name", "driver_name",
+					getText("runcase.driverName"), 60).setSortable(true));
+		}
+		// 籍贯
+		columns.add(new TextColumn4MapKey("c.origin", "origin",
+				getText("runcase.origin"), 80).setUseTitleFromLabel(true));
+		// 责任
+		columns.add(new TextColumn4MapKey("c.duty", "duty",
+				getText("runcase.duty"), 40).setSortable(true));
+		// 厂修
+		columns.add(new TextColumn4MapKey("c.is_inner_fix", "is_inner_fix",
+				getText("runcase.innerFix"), 40).setSortable(true)
+				.setValueFormater(new BooleanFormater()));
+		// 送保
+		columns.add(new TextColumn4MapKey("c.is_deliver", "is_deliver",
+				getText("runcase.deliver3"), 40).setSortable(true)
+				.setValueFormater(new BooleanFormater()));
+		// 赔付
+		columns.add(new TextColumn4MapKey("c.is_claim", "is_claim",
+				getText("runcase.claim"), 90).setSortable(true)
+				.setValueFormater(new BooleanFormater()));
+		// 司机受款
+		columns.add(new TextColumn4MapKey("c.is_pay", "is_pay",
+				getText("runcase.pay"), 60).setSortable(true).setValueFormater(
+				new BooleanFormater()));
+		// 经过=基表备注
+		columns.add(new TextColumn4MapKey("b.desc_", "desc_",
+				getText("runcase.jingguo"), 150).setUseTitleFromLabel(true));
+		columns.add(new TextColumn4MapKey("c.sort", "sort",
+				getText("runcase.sort"), 40).setSortable(true));
+
+		// 自车损失=车损情况
+		columns.add(new TextColumn4MapKey("c.car_hurt", "car_hurt",
+				getText("runcase.carHurt"), 80).setUseTitleFromLabel(true));
+		// 司机拖车费
+		columns.add(new TextColumn4MapKey("c.carman_cost", "carman_cost",
+				getText("runcase.carmancost"), 95).setUseTitleFromLabel(true)
+				.setValueFormater(new NubmerFormater("#.##")));
+		// 第三者损失
+		columns.add(new TextColumn4MapKey("c.third_loss", "third_loss",
+				getText("runcase.thirdloss"), 75).setUseTitleFromLabel(true)
+				.setValueFormater(new NubmerFormater("#.##")));
+		// 第三者拖车费
+		columns.add(new TextColumn4MapKey("c.third_cost", "third_cost",
+				getText("runcase.thirdcost"), 90).setUseTitleFromLabel(true)
+				.setValueFormater(new NubmerFormater("#.##")));
+		// 司机伤人
+		columns.add(new TextColumn4MapKey("c.carman_hurt_count",
+				"carman_hurt_count", getText("runcase.carmanhurtcount"), 60)
+				.setSortable(true));
+		// 第三者伤人
+		columns.add(new TextColumn4MapKey("c.third_hurt_count",
+				"third_hurt_count", getText("runcase.thirdhurtcount"), 75)
+				.setSortable(true));
+		// 协议赔付
+		columns.add(new TextColumn4MapKey("c.agreement_payment",
+				"agreement_payment", getText("runcase.agreementpayment"), 80)
+				.setUseTitleFromLabel(true).setValueFormater(
+						new NubmerFormater("#.##")));
+		// 总损=实际损失
+		columns.add(new TextColumn4MapKey("c.actual_loss", "actual_loss",
+				getText("runcase.actualLoss"), 80).setUseTitleFromLabel(true)
+				.setValueFormater(new NubmerFormater("#.##")));
+		// 跟进人员=经办人
+		columns.add(new TextColumn4MapKey("receiver_name", "receiver_name",
+				getText("runcase.receiverName2"), 60)
+				.setUseTitleFromLabel(true));
+		// 保险公司
+		columns.add(new TextColumn4MapKey("c.insurance_company",
+				"insurance_company", getText("runcase.insuranceCompany"), 60)
+				.setSortable(true));
+		// 分公司
+		columns.add(new TextColumn4MapKey("unitname", "unitname",
+				getText("runcase.unitname"), 60).setSortable(true)
+				.setUseTitleFromLabel(true));
+		columns.add(new TextColumn4MapKey("b.motorcade_name", "motorcade_name",
+				getText("runcase.motorcadeName"), 60).setSortable(true)
+				.setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("b.driver_cert", "driver_cert",
 				getText("runcase.driverCert"), 80).setSortable(true));
-		columns.add(new TextColumn4MapKey("b.happen_date", "happen_date",
-				getText("runcase.happenDate"), 120).setSortable(true)
-				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
 		columns.add(new TextColumn4MapKey("b.address", "address",
 				getText("runcase.address"), 100).setSortable(true)
 				.setUseTitleFromLabel(true));
+		// 备注 DESC_ String
+		columns.add(new TextColumn4MapKey("acc_desc", "acc_desc",
+				getText("runcase.accdesc"), 80).setSortable(true));
 
 		return columns;
 	}
@@ -135,7 +245,7 @@ public class CaseAccidentsAction extends ViewAction<Map<String, Object>> {
 	@Override
 	protected String[] getGridSearchFields() {
 		return new String[] { "b.code", "b.motorcade_name", "b.car_plate",
-				"c.sort", "b.driver_name", "b.driver_cert" };
+				"c.sort", "b.driver_name", "b.driver_cert", "a.name" };
 	}
 
 	@Override
@@ -209,4 +319,5 @@ public class CaseAccidentsAction extends ViewAction<Map<String, Object>> {
 								this.getBSStatuses2(), "status", 0,
 								getText("title.click2changeSearchStatus")));
 	}
+
 }
