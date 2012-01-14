@@ -27,6 +27,7 @@ import cn.bc.identity.web.SystemContext;
 import cn.bc.web.formater.BooleanFormater;
 import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.formater.EntityStatusFormater;
+import cn.bc.web.formater.LinkFormater4Id;
 import cn.bc.web.formater.NubmerFormater;
 import cn.bc.web.ui.html.grid.Column;
 import cn.bc.web.ui.html.grid.IdColumn4MapKey;
@@ -78,6 +79,7 @@ public class CaseAccidentsAction extends ViewAction<Map<String, Object>> {
 		sql.append(",b.desc_ ,c.car_hurt,c.actual_loss");
 		sql.append(",c.receiver_name,c.insurance_company");
 		sql.append(",c.is_deliver,c.is_claim,c.is_pay,a.name as unitname");
+		sql.append(",b.motorcade_id,b.car_id,b.driver_id");
 		sql.append(" from bs_case_accident c");
 		sql.append(" inner join bs_case_base b on b.id=c.id");
 		sql.append(" left join bs_motorcade m on m.id=b.motorcade_id");
@@ -126,7 +128,9 @@ public class CaseAccidentsAction extends ViewAction<Map<String, Object>> {
 				map.put("is_claim", rs[i++]);// 赔付
 				map.put("is_pay", rs[i++]);// 司机受款
 				map.put("unitname", rs[i++]);// 分公司
-
+				map.put("motorcade_id", rs[i++]);// 车队ID
+				map.put("carId", rs[i++]);
+				map.put("driverId", rs[i++]);
 				return map;
 			}
 		});
@@ -138,29 +142,99 @@ public class CaseAccidentsAction extends ViewAction<Map<String, Object>> {
 		List<Column> columns = new ArrayList<Column>();
 		columns.add(new IdColumn4MapKey("c.id", "id"));
 		columns.add(new TextColumn4MapKey("c.status_", "status_",
-				getText("runcase.status"), 60).setSortable(true)
+				getText("runcase.status"), 35).setSortable(true)
 				.setValueFormater(new EntityStatusFormater(getBSStatuses2())));
-		columns.add(new TextColumn4MapKey("b.code", "code",
-				getText("runcase.caseNo3"), 160).setSortable(true));
 		// 事发时间
 		columns.add(new TextColumn4MapKey("b.happen_date", "happen_date",
-				getText("runcase.happenDate"), 140).setSortable(true)
+				getText("runcase.happenDate"), 130).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd hh:mm")));
+		// 分公司
+		columns.add(new TextColumn4MapKey("unitname", "unitname",
+				getText("runcase.unitname"), 60).setSortable(true)
+				.setUseTitleFromLabel(true));
+		// 车队
+		columns.add(new TextColumn4MapKey("m.name", "motorcade_name",
+				getText("runcase.motorcadeName"), 60)
+				.setSortable(true)
+				.setUseTitleFromLabel(true)
+				.setValueFormater(
+						new LinkFormater4Id(this.getContextPath()
+								+ "/bc-business/motorcade/edit?id={0}",
+								"motorcade") {
+							@SuppressWarnings("unchecked")
+							@Override
+							public String getIdValue(Object context,
+									Object value) {
+								return StringUtils
+										.toString(((Map<String, Object>) context)
+												.get("motorcade_id"));
+							}
+						}));
 		// 车牌
 		if (carId == null) {
 			columns.add(new TextColumn4MapKey("b.car_plate", "car_plate",
-					getText("runcase.carPlate"), 80));
+					getText("runcase.carPlate"), 80)
+					.setValueFormater(new LinkFormater4Id(this.getContextPath()
+							+ "/bc-business/car/edit?id={0}", "car") {
+						@SuppressWarnings("unchecked")
+						@Override
+						public String getIdValue(Object context, Object value) {
+							return StringUtils
+									.toString(((Map<String, Object>) context)
+											.get("carId"));
+						}
+					}));
 		}
+
 		if (carManId == null) {
 			columns.add(new TextColumn4MapKey("b.driver_name", "driver_name",
-					getText("runcase.driverName"), 60).setSortable(true));
+					getText("runcase.driverName"), 60).setSortable(true)
+					.setValueFormater(
+							new LinkFormater4Id(this.getContextPath()
+									+ "/bc-business/carMan/edit?id={0}",
+									"drivers") {
+								@SuppressWarnings("unchecked")
+								@Override
+								public String getIdValue(Object context,
+										Object value) {
+									return StringUtils
+											.toString(((Map<String, Object>) context)
+													.get("driverId"));
+								}
+							}));
 		}
+		// 服务资格证
+		columns.add(new TextColumn4MapKey("b.driver_cert", "driver_cert",
+				getText("runcase.driverCert"), 60).setSortable(true));
 		// 籍贯
 		columns.add(new TextColumn4MapKey("c.origin", "origin",
-				getText("runcase.origin"), 80).setUseTitleFromLabel(true));
+				getText("runcase.origin"), 60).setUseTitleFromLabel(true));
 		// 责任
 		columns.add(new TextColumn4MapKey("c.duty", "duty",
 				getText("runcase.duty"), 40).setSortable(true));
+		columns.add(new TextColumn4MapKey("b.address", "address",
+				getText("runcase.address"), 100).setSortable(true)
+				.setUseTitleFromLabel(true));
+		// 经过=基表备注
+		columns.add(new TextColumn4MapKey("b.desc_", "desc_",
+				getText("runcase.jingguo"), 150).setUseTitleFromLabel(true));
+		columns.add(new TextColumn4MapKey("c.sort", "sort",
+				getText("runcase.sort"), 40).setSortable(true));
+		// 自车损失=车损情况
+		columns.add(new TextColumn4MapKey("c.car_hurt", "car_hurt",
+				getText("runcase.carHurt"), 80).setUseTitleFromLabel(true));
+		// 总损=实际损失
+		columns.add(new TextColumn4MapKey("c.actual_loss", "actual_loss",
+				getText("runcase.actualLoss"), 80).setUseTitleFromLabel(true)
+				.setValueFormater(new NubmerFormater("#.##")));
+		// 跟进人员=经办人
+		columns.add(new TextColumn4MapKey("receiver_name", "receiver_name",
+				getText("runcase.receiverName2"), 60)
+				.setUseTitleFromLabel(true));
+		// 保险公司
+		columns.add(new TextColumn4MapKey("c.insurance_company",
+				"insurance_company", getText("runcase.insuranceCompany"), 60)
+				.setSortable(true));
 		// 厂修
 		columns.add(new TextColumn4MapKey("c.is_inner_fix", "is_inner_fix",
 				getText("runcase.innerFix"), 40).setSortable(true)
@@ -177,15 +251,7 @@ public class CaseAccidentsAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("c.is_pay", "is_pay",
 				getText("runcase.pay"), 60).setSortable(true).setValueFormater(
 				new BooleanFormater()));
-		// 经过=基表备注
-		columns.add(new TextColumn4MapKey("b.desc_", "desc_",
-				getText("runcase.jingguo"), 150).setUseTitleFromLabel(true));
-		columns.add(new TextColumn4MapKey("c.sort", "sort",
-				getText("runcase.sort"), 40).setSortable(true));
 
-		// 自车损失=车损情况
-		columns.add(new TextColumn4MapKey("c.car_hurt", "car_hurt",
-				getText("runcase.carHurt"), 80).setUseTitleFromLabel(true));
 		// 司机拖车费
 		columns.add(new TextColumn4MapKey("c.carman_cost", "carman_cost",
 				getText("runcase.carmancost"), 95).setUseTitleFromLabel(true)
@@ -211,30 +277,9 @@ public class CaseAccidentsAction extends ViewAction<Map<String, Object>> {
 				"agreement_payment", getText("runcase.agreementpayment"), 80)
 				.setUseTitleFromLabel(true).setValueFormater(
 						new NubmerFormater("#.##")));
-		// 总损=实际损失
-		columns.add(new TextColumn4MapKey("c.actual_loss", "actual_loss",
-				getText("runcase.actualLoss"), 80).setUseTitleFromLabel(true)
-				.setValueFormater(new NubmerFormater("#.##")));
-		// 跟进人员=经办人
-		columns.add(new TextColumn4MapKey("receiver_name", "receiver_name",
-				getText("runcase.receiverName2"), 60)
-				.setUseTitleFromLabel(true));
-		// 保险公司
-		columns.add(new TextColumn4MapKey("c.insurance_company",
-				"insurance_company", getText("runcase.insuranceCompany"), 60)
-				.setSortable(true));
-		// 分公司
-		columns.add(new TextColumn4MapKey("unitname", "unitname",
-				getText("runcase.unitname"), 60).setSortable(true)
-				.setUseTitleFromLabel(true));
-		columns.add(new TextColumn4MapKey("b.motorcade_name", "motorcade_name",
-				getText("runcase.motorcadeName"), 60).setSortable(true)
-				.setUseTitleFromLabel(true));
-		columns.add(new TextColumn4MapKey("b.driver_cert", "driver_cert",
-				getText("runcase.driverCert"), 80).setSortable(true));
-		columns.add(new TextColumn4MapKey("b.address", "address",
-				getText("runcase.address"), 100).setSortable(true)
-				.setUseTitleFromLabel(true));
+
+		columns.add(new TextColumn4MapKey("b.code", "code",
+				getText("runcase.caseNo3"), 160).setSortable(true));
 		// 备注 DESC_ String
 		columns.add(new TextColumn4MapKey("acc_desc", "acc_desc",
 				getText("runcase.accdesc"), 80).setSortable(true));
