@@ -48,17 +48,17 @@ public class LinkFormater4ChargerInfo extends LinkFormater {
 		}
 		_value = _value.trim();
 
-		// 分隔出每个司机的配置：[责任人1姓名],[责任人1id];[责任人2姓名],[责任人2id];...
+		// 分隔出每个责任人的配置：[责任人1姓名],[责任人1id];[责任人2姓名],[责任人2id];...
 		String[] vvs = _value.split(";");
 
-		// 循环每个司机执行格式化处理
+		// 循环每个责任人执行格式化处理
 		String[] vs;
 		StringBuffer tpl = new StringBuffer();
 		List<String> labels = new ArrayList<String>();
 		int i = 0;
 		for (String vv : vvs) {
 			if (i > 0)
-				tpl.append(", ");
+				tpl.append(",");
 
 			vs = vv.split(",");// [0]-责任人姓名,[1]-责任人id
 
@@ -69,15 +69,15 @@ public class LinkFormater4ChargerInfo extends LinkFormater {
 						+ this.moduleKey + "\" href=\"" + this.contextPath
 						+ this.urlPattern + vs[1] + "\"");
 
-				// 任务栏显示的标题：司机张三
+				// 任务栏显示的标题：责任人张三
 				tpl.append(" data-title=\"责任人" + vs[0] + "\"");
 
 				// 对话框的id
 				tpl.append(" data-mid=\"" + this.moduleKey + vs[1] + "\"");
 
-				// 链接显示的文字：张三(正班)
+				// 链接显示的文字：张三
 				tpl.append(">" + vs[0] + "</a>");
-			}else{
+			} else {
 				tpl.append(vv);
 				labels.add(vv);
 			}
@@ -92,6 +92,37 @@ public class LinkFormater4ChargerInfo extends LinkFormater {
 		} else {
 			return tpl.toString();
 		}
+	}
+
+	@Override
+	public String getLinkText(Object context, Object value) {
+		String _value = (String) value;
+		if (value == null || _value.trim().length() == 0) {
+			return "&nbsp;";
+		}
+		_value = _value.trim();
+
+		// 分隔出每个责任人的配置：[责任人1姓名],[责任人1id];[责任人2姓名],[责任人2id];...
+		String[] vvs = _value.split(";");
+
+		// 循环每个责任人执行格式化处理
+		String[] vs;
+		String labels = "";
+		int i = 0;
+		for (String vv : vvs) {
+			if (i > 0)
+				labels += ",";
+
+			vs = vv.split(",");// [0]-责任人姓名,[1]-责任人id
+			if (vs.length == 2) {
+				labels += vs[0];
+			} else {
+				labels += vv;
+			}
+
+			i++;
+		}
+		return labels;
 	}
 
 	@Override

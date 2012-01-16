@@ -12,6 +12,7 @@ import org.springframework.stereotype.Controller;
 
 import cn.bc.BCConstants;
 import cn.bc.business.BSConstants;
+import cn.bc.core.query.condition.impl.LikeCondition;
 
 /**
  * 营运系统各模块视图Action的基类封装
@@ -21,12 +22,30 @@ import cn.bc.business.BSConstants;
  */
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 @Controller
-public abstract class ViewAction<T extends Object> extends cn.bc.web.struts2.ViewAction<T> {
+public abstract class ViewAction<T extends Object> extends
+		cn.bc.web.struts2.ViewAction<T> {
 	private static final long serialVersionUID = 1L;
 
 	@Override
 	protected String getHtmlPageNamespace() {
 		return this.getContextPath() + BSConstants.NAMESPACE;
+	}
+
+	/**
+	 * 复写基类的查询条件构建方法，使查询车辆号码时不区分大小写：交委规定车牌的字母为大写
+	 * 
+	 * @see cn.bc.web.struts2.AbstractGridPageAction#getGridSearchCondition4OneField(java.lang.String,
+	 *      java.lang.String)
+	 */
+	@Override
+	protected LikeCondition getGridSearchCondition4OneField(String field,
+			String value) {
+		if (field.indexOf("plate_no") != -1) {
+			return new LikeCondition(field, value != null ? value.toUpperCase()
+					: value);
+		} else {
+			return super.getGridSearchCondition4OneField(field, value);
+		}
 	}
 
 	/**

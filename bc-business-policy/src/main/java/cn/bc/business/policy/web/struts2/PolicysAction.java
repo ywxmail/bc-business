@@ -76,12 +76,17 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer sql = new StringBuffer();
-		sql.append("select p.id,p.status_,c.plate_type,c.plate_no,p.register_date,p.assured,p.commerial_no");
+		sql.append("select p.id,p.status_");
+		sql.append(",c.code,c.old_unit_name,bia.name as unit_name,m.name");
+		sql.append(",c.plate_type,c.plate_no,p.register_date,p.assured,p.commerial_no");
 		sql.append(",p.commerial_company,p.commerial_start_date,p.commerial_end_date");
-		sql.append(" ,p.ownrisk,p.greenslip,p.liability_no,p.amount,c.id carId,p.op_type");
-		sql.append(" ,p.greenslip_no,p.greenslip_company,p.greenslip_start_date,p.greenslip_end_date,p.stop_date,p.main,p.file_date");
-		sql.append(" from BS_CAR_POLICY p");
-		sql.append(" left join BS_CAR c on c.id=p.car_id");
+		sql.append(",p.ownrisk,p.greenslip,p.liability_no,p.amount,c.id as carId,p.op_type");
+		sql.append(",p.greenslip_no,p.greenslip_company,p.greenslip_start_date,p.greenslip_end_date,p.stop_date,p.main");
+		sql.append(",m.id as motorcade_id");
+		sql.append(" from bs_car_policy p");
+		sql.append(" inner join bs_car c on c.id=p.car_id");
+		sql.append(" inner join bs_motorcade m on m.id=c.motorcade_id");
+		sql.append(" inner join bc_identity_actor bia on bia.id=m.unit_id");
 		sqlObject.setSql(sql.toString());
 
 		// 注入参数
@@ -94,6 +99,10 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 				int i = 0;
 				map.put("id", rs[i++]);
 				map.put("status_", rs[i++]);
+				map.put("code", rs[i++]);// 自编号
+				map.put("old_unit_name", rs[i++]);// 公司
+				map.put("unit_name", rs[i++]);// 分公司
+				map.put("motorcade_name", rs[i++]);// 车队
 				map.put("plate_type", rs[i++]);
 				map.put("plate_no", rs[i++]);
 				map.put("plate", map.get("plate_type").toString() + "."
@@ -116,7 +125,7 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 				map.put("greenslip_end_date", rs[i++]);
 				map.put("stop_date", rs[i++]);
 				map.put("main", rs[i++]);
-
+				map.put("motorcade_id", rs[i++]);// 车队id
 				return map;
 			}
 		});
@@ -127,14 +136,43 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 	protected List<Column> getGridColumns() {
 		List<Column> columns = new ArrayList<Column>();
 		columns.add(new IdColumn4MapKey("p.id", "id"));
+		// 状态
 		columns.add(new TextColumn4MapKey("p.status_", "status_",
 				getText("policy.status"), 60)
 				.setSortable(true)
 				.setValueFormater(new EntityStatusFormater(getPolicyStatuses())));
-		columns.add(new TextColumn4MapKey("p.op_type", "op_type",
-				getText("policy.labour.optype"), 60).setSortable(true)
-				.setValueFormater(new EntityStatusFormater(getEntityOpTypes())));
-		if (carId == null) {
+		// 公司
+		columns.add(new TextColumn4MapKey("c.old_unit_name", "old_unit_name",
+				getText("car.unit"), 60).setSortable(true)
+				.setUseTitleFromLabel(true));
+		// 分公司
+		columns.add(new TextColumn4MapKey("unit_name", "unit_name",
+				getText("car.unitname"), 60).setSortable(true)
+				.setUseTitleFromLabel(true));
+		// 车队
+		columns.add(new TextColumn4MapKey("m.name", "motorcade_name",
+				getText("car.motorcade"), 60)
+				.setSortable(true)
+				.setUseTitleFromLabel(true)
+				.setValueFormater(
+						new LinkFormater4Id(this.getContextPath()
+								+ "/bc-business/motorcade/edit?id={0}",
+								"motorcade") {
+							@SuppressWarnings("unchecked")
+							@Override
+							public String getIdValue(Object context,
+									Object value) {
+								return StringUtils
+										.toString(((Map<String, Object>) context)
+												.get("motorcade_id"));
+							}
+						}));
+		// 自编号
+		columns.add(new TextColumn4MapKey("c.code", "code",
+				getText("car.code"), 55).setSortable(true)
+				.setUseTitleFromLabel(true));
+		// 车号
+		if (carId == null) {// 车辆页签时不需显示车牌号码
 			columns.add(new TextColumn4MapKey("p.plate_no", "plate",
 					getText("policy.carId"), 80)
 					.setValueFormater(new LinkFormater4Id(this.getContextPath()
@@ -209,14 +247,17 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("p.amount", "amount",
 				getText("policy.amount"), 80).setSortable(true)
 				.setUseTitleFromLabel(true));
-
+		// 操作类型
+		columns.add(new TextColumn4MapKey("p.op_type", "op_type",
+				getText("policy.labour.optype"), 60).setSortable(true)
+				.setValueFormater(new EntityStatusFormater(getEntityOpTypes())));
 		return columns;
 	}
 
 	@Override
 	protected String[] getGridSearchFields() {
 		return new String[] { "c.plate_type", "c.plate_no", "p.commerial_no",
-				"p.liability_no", "p.commerial_company" };
+				"p.liability_no", "p.commerial_company" ,"c.code"};
 	}
 
 	@Override
@@ -269,7 +310,7 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 		}
 		// 合并条件
 		return ConditionUtils.mix2AndCondition(statusCondition, carIdCondition,
-				mainCondition,policyIdCondition);
+				mainCondition, policyIdCondition);
 
 	}
 

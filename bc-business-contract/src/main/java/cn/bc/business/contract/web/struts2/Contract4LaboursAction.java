@@ -20,6 +20,7 @@ import cn.bc.core.query.condition.Condition;
 import cn.bc.core.query.condition.ConditionUtils;
 import cn.bc.core.query.condition.Direction;
 import cn.bc.core.query.condition.impl.EqualsCondition;
+import cn.bc.core.query.condition.impl.LikeCondition;
 import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.core.util.StringUtils;
 import cn.bc.db.jdbc.RowMapper;
@@ -113,6 +114,17 @@ public class Contract4LaboursAction extends ViewAction<Map<String, Object>> {
 					"c.status_", Direction.Asc);
 		} else { // 历史版本
 			return new OrderCondition("c.file_date", Direction.Desc);
+		}
+	}
+
+	@Override
+	protected LikeCondition getGridSearchCondition4OneField(String field,
+			String value) {
+		if (field.indexOf("ext_str1") != -1) {// 车牌，忽略大小写
+			return new LikeCondition(field, value != null ? value.toUpperCase()
+					: value);
+		} else {
+			return super.getGridSearchCondition4OneField(field, value);
 		}
 	}
 
@@ -333,23 +345,23 @@ public class Contract4LaboursAction extends ViewAction<Map<String, Object>> {
 		Condition mainsCondition = null;
 		Condition patchCondtion = null;
 		Condition typeCondtion = new EqualsCondition("c.type_", type);
-		
+
 		if (contractId == null) {
 			// 查看最新合同列表
 			statusCondition = ConditionUtils.toConditionByComma4IntegerValue(
 					this.status, "c.status_");
-			//if (this.status.length() <= 0) { // 显示全部状态的时候只显示最新版本的记录
-			mainsCondition = ConditionUtils
-					.toConditionByComma4IntegerValue(this.mains, "c.main");
-			//}
+			// if (this.status.length() <= 0) { // 显示全部状态的时候只显示最新版本的记录
+			mainsCondition = ConditionUtils.toConditionByComma4IntegerValue(
+					this.mains, "c.main");
+			// }
 		} else {
 			// 查看历史版本
 			patchCondtion = new EqualsCondition("c.patch_no", patchNo);
 			mainsCondition = new EqualsCondition("c.main",
 					Contract.MAIN_HISTORY);
 		}
-		return ConditionUtils.mix2AndCondition(typeCondtion,statusCondition, mainsCondition,
-				patchCondtion);
+		return ConditionUtils.mix2AndCondition(typeCondtion, statusCondition,
+				mainsCondition, patchCondtion);
 	}
 
 	@Override
@@ -368,7 +380,7 @@ public class Contract4LaboursAction extends ViewAction<Map<String, Object>> {
 		if (patchNo != null) {
 			json.put("patchNo", patchNo);
 		}
-		
+
 		json.put("type", type);
 	}
 
