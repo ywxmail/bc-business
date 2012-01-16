@@ -229,10 +229,31 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected Toolbar getHtmlPageToolbar() {
-		return super.getHtmlPageToolbar()
-				.addButton(
-						Toolbar.getDefaultToolbarRadioGroup(
-								this.getBSStatuses1(), "status", 0,
-								getText("title.click2changeSearchStatus")));
+		Toolbar tb = new Toolbar();
+
+		if (this.isReadonly()) {
+			// 查看按钮
+			tb.addButton(Toolbar
+					.getDefaultOpenToolbarButton(getText("label.read")));
+		} else {
+			// 新建按钮
+			tb.addButton(Toolbar
+					.getDefaultCreateToolbarButton(getText("label.create")));
+
+			// 编辑按钮
+			tb.addButton(Toolbar
+					.getDefaultEditToolbarButton(getText("label.edit")));
+
+			// 取消删除按钮
+		}
+
+		// 搜索按钮
+		tb.addButton(Toolbar
+				.getDefaultSearchToolbarButton(getText("title.click2search")));
+
+		// 状态单选按钮组
+		tb.addButton(Toolbar.getDefaultToolbarRadioGroup(this.getBSStatuses1(),
+				"status", 0, getText("title.click2changeSearchStatus")));
+		return tb;
 	}
 }
