@@ -205,7 +205,7 @@ public class CaseAccidentsAction extends ViewAction<Map<String, Object>> {
 		}
 		// 服务资格证
 		columns.add(new TextColumn4MapKey("b.driver_cert", "driver_cert",
-				getText("runcase.driverCert"), 60).setSortable(true));
+				getText("runcase.driverCert"), 90).setSortable(true));
 		// 籍贯
 		columns.add(new TextColumn4MapKey("c.origin", "origin",
 				getText("runcase.origin"), 60).setUseTitleFromLabel(true));
