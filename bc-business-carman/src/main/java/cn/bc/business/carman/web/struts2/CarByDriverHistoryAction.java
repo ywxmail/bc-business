@@ -15,6 +15,7 @@ import org.springframework.stereotype.Controller;
 import cn.bc.business.car.service.CarService;
 import cn.bc.business.carman.domain.CarByDriverHistory;
 import cn.bc.business.carman.service.CarByDriverHistoryService;
+import cn.bc.business.carman.service.CarByDriverService;
 import cn.bc.business.carman.service.CarManService;
 import cn.bc.business.motorcade.domain.Motorcade;
 import cn.bc.business.motorcade.service.MotorcadeService;
@@ -42,6 +43,7 @@ public class CarByDriverHistoryAction extends
 	public List<Map<String, String>> motorcadeList; // 可选车队列表
 	public CarManService carManService;
 	public CarService carService;
+	public CarByDriverService carByDriverService;
 	public Long carManId;
 	public Long carId;
 	public int moveType;
@@ -69,6 +71,11 @@ public class CarByDriverHistoryAction extends
 		this.setCrudService(carByDriverHistoryService);
 	}
 
+	@Autowired
+	public void setCarByDriverService(CarByDriverService carByDriverService) {
+		this.carByDriverService = carByDriverService;
+	}
+
 	@Override
 	public boolean isReadonly() {
 		// 车辆管理/司机管理或系统管理员
@@ -81,7 +88,42 @@ public class CarByDriverHistoryAction extends
 		super.create();
 		// 设置迁移类型
 		this.getE().setMoveType(moveType);
+		// 设置司机信息
+		if (carManId != null) {
+			// 填写迁移类型为：车辆到车辆 ,公司到公司，注销未有去向，交回未注销。司机的原车辆信息
+			if (moveType == CarByDriverHistory.MOVETYPE_CLDCL
+					|| moveType == CarByDriverHistory.MOVETYPE_GSDGSYZX
+					|| moveType == CarByDriverHistory.MOVETYPE_ZXWYQX
+					|| moveType == CarByDriverHistory.MOVETYPE_JHWZX) {
+				setCarInfoByCarManId();
+
+			}
+			this.getE().setDriver(this.carManService.load(carManId));
+		}
 		return this.getFormName(this.getE().getMoveType());
+	}
+
+	/**
+	 * 根据司机Id查找司机最新营运车辆的信息
+	 */
+	private void setCarInfoByCarManId() {
+		CarByDriverHistory carByDriverHistory = this.carByDriverHistoryService
+				.findNewestCarByDriverHistory(carManId);
+		if (carByDriverHistory.getToCar() != null) {
+			// 执行转车操作后执行公司到公司，注销未有去向，交回未注销取回最新的迁移记录
+			this.getE().setFromCar(carByDriverHistory.getToCar());
+			this.getE().setFromMotorcadeId(
+					carByDriverHistory.getToMotorcadeId());
+			// 设置原班次
+			this.getE().setFromClasses(carByDriverHistory.getToClasses());
+		} else {
+			// 执行交回未注销操作后执行公司到公司，注销未有去向，交回未注销取回最新的迁移记录
+			this.getE().setFromCar(carByDriverHistory.getFromCar());
+			this.getE().setFromMotorcadeId(
+					carByDriverHistory.getFromMotorcadeId());
+			// 设置原班次
+			this.getE().setFromClasses(carByDriverHistory.getFromClasses());
+		}
 	}
 
 	// 根据不同的迁移类型转到相关迁移类型jsp

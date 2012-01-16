@@ -17,4 +17,12 @@ public interface CarByDriverService extends CrudService<CarByDriver> {
 	// 根据司机ID查找返回相关正班车辆信息
 	Car selectCarByCarManId(Long id);
 
+	/**
+	 * 根据司机ID查找返回司机营运班次的信息
+	 * 
+	 * @param id
+	 *            司机Id
+	 * @return
+	 */
+	CarByDriver selectCarByDriver4CarManId(Long id);
 }

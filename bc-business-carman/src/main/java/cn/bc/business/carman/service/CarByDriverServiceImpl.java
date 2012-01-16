@@ -15,7 +15,7 @@ import cn.bc.core.service.DefaultCrudService;
  */
 public class CarByDriverServiceImpl extends DefaultCrudService<CarByDriver>
 		implements CarByDriverService {
-	
+
 	private CarByDriverDao carByDriverDao;
 
 	public CarByDriverDao getCarByDriverDao() {
@@ -29,5 +29,9 @@ public class CarByDriverServiceImpl extends DefaultCrudService<CarByDriver>
 
 	public Car selectCarByCarManId(Long id) {
 		return (this.carByDriverDao.findBycarManId(id));
+	}
+
+	public CarByDriver selectCarByDriver4CarManId(Long id) {
+		return (this.carByDriverDao.findCarByDriverBycarManId(id));
 	}
 }

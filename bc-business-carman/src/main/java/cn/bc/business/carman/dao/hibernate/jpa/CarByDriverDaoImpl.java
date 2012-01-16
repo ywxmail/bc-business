@@ -58,21 +58,23 @@ public class CarByDriverDaoImpl extends HibernateCrudJpaDao<CarByDriver>
 
 		// 更新车辆的司机信息
 		updateCar4Driver(entity.getCar().getId());
-		
+
 		//
 		this.insertTest();
 		return entity;
 	}
 
-	//测试使用hibernate的hql语句向数据库插入数据
+	// 测试使用hibernate的hql语句向数据库插入数据
 	private void insertTest() {
-//		this.getJpaTemplate().persist(new ContractCarRelation(new Long(139440),new Long(108719)));
-//		String hql = "from ContractCarRelation where contractId=139440";
-//		List list = this.getJpaTemplate().find(hql);
-//		System.out.println(list.toString());
-		
-//		String hql = "insert into Example (name, code) select 'name1','code1' from Dual";
-//		this.executeUpdate(hql,null);
+		// this.getJpaTemplate().persist(new ContractCarRelation(new
+		// Long(139440),new Long(108719)));
+		// String hql = "from ContractCarRelation where contractId=139440";
+		// List list = this.getJpaTemplate().find(hql);
+		// System.out.println(list.toString());
+
+		// String hql =
+		// "insert into Example (name, code) select 'name1','code1' from Dual";
+		// this.executeUpdate(hql,null);
 	}
 
 	/**
@@ -93,5 +95,27 @@ public class CarByDriverDaoImpl extends HibernateCrudJpaDao<CarByDriver>
 			logger.debug("carId=" + carId);
 		}
 		this.executeUpdate(hql, args);
+	}
+
+	public CarByDriver findCarByDriverBycarManId(Long carManId) {
+		CarByDriver carByDriver = null;
+		String hql = "select c from CarByDriver c where c.driver.id=? and c.status=0";
+		List<?> list = this.getJpaTemplate().find(hql, carManId);
+		if (list.size() == 1) {
+			carByDriver = (CarByDriver) list.get(0);
+			return carByDriver;
+		} else if (list.size() == 0) {
+			if (logger.isDebugEnabled()) {
+				logger.debug("此司机没有在案的营运班次信息！");
+
+			}
+			return null;
+		} else {
+			if (logger.isDebugEnabled()) {
+				logger.debug("此司机有两条或两条以上在案的营运班次信息！");
+
+			}
+			return null;
+		}
 	}
 }

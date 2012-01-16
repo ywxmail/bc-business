@@ -12,8 +12,8 @@ import cn.bc.core.service.DefaultCrudService;
  * 
  * @author dragon
  */
-public class CarManHistoryServiceImpl extends DefaultCrudService<CarManHistory> implements
-		CarManHistoryService {
+public class CarManHistoryServiceImpl extends DefaultCrudService<CarManHistory>
+		implements CarManHistoryService {
 	private CarManHistoryDao carManHistoryDao;
 
 	public CarManHistoryDao getCarManHistoryDao() {
@@ -24,4 +24,10 @@ public class CarManHistoryServiceImpl extends DefaultCrudService<CarManHistory> 
 		this.carManHistoryDao = carManHistoryDao;
 		this.setCrudDao(carManHistoryDao);
 	}
+
+	@Override
+	public CarManHistory save(CarManHistory entity) {
+		return super.save(entity);
+	}
+
 }
