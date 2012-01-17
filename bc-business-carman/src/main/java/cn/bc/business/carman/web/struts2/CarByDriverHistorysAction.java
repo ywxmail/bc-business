@@ -385,21 +385,34 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 					.getDefaultSearchToolbarButton(getText("title.click2search")));
 
 		} else {
-
-			tb.addButton(
-					new ToolbarButton().setIcon("ui-icon-document")
-							.setText("新建")
-							.setClick("bc.business.MoveTypeList.select"))
-					.addButton(
-							new ToolbarButton().setIcon("ui-icon-pencil")
-									.setText("编辑").setAction("edit"))
-					.addButton(
-							new ToolbarButton().setIcon("ui-icon-trash")
-									.setText("删除").setAction("delete"))
-					.addButton(
-							Toolbar.getDefaultSearchToolbarButton(getText("title.click2search")));
+			if (carId != null) {
+				// 如果车辆Id不这空，调用标准的工具条
+				tb.addButton(
+						new ToolbarButton().setIcon("ui-icon-document")
+								.setText("新建").setAction("create"))
+						.addButton(
+								new ToolbarButton().setIcon("ui-icon-pencil")
+										.setText("编辑").setAction("edit"))
+						.addButton(
+								new ToolbarButton().setIcon("ui-icon-trash")
+										.setText("删除").setAction("delete"))
+						.addButton(
+								Toolbar.getDefaultSearchToolbarButton(getText("title.click2search")));
+			} else {
+				tb.addButton(
+						new ToolbarButton().setIcon("ui-icon-document")
+								.setText("新建")
+								.setClick("bc.business.MoveTypeList.select"))
+						.addButton(
+								new ToolbarButton().setIcon("ui-icon-pencil")
+										.setText("编辑").setAction("edit"))
+						.addButton(
+								new ToolbarButton().setIcon("ui-icon-trash")
+										.setText("删除").setAction("delete"))
+						.addButton(
+								Toolbar.getDefaultSearchToolbarButton(getText("title.click2search")));
+			}
 		}
-
 		return tb;
 	}
 
