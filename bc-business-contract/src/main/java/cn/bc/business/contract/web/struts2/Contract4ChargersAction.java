@@ -283,8 +283,8 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 			statusCondition = ConditionUtils.toConditionByComma4IntegerValue(
 					this.status, "c.status_");
 			//if (this.status.length() <= 0) { // 显示全部状态的时候只显示最新版本的记录
-			mainsCondition = ConditionUtils
-					.toConditionByComma4IntegerValue(this.mains, "c.main");
+//			mainsCondition = ConditionUtils // 控制显示最新版本main为0的经济合同
+//					.toConditionByComma4IntegerValue(this.mains, "c.main");
 			//}
 		} else {
 			// 查看历史版本
@@ -292,8 +292,7 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 			mainsCondition = new EqualsCondition("c.main",
 					Contract.MAIN_HISTORY);
 		}
-		return ConditionUtils.mix2AndCondition(typeCondtion,statusCondition, mainsCondition,
-				patchCondtion);
+		return ConditionUtils.mix2AndCondition(typeCondtion,statusCondition,patchCondtion,mainsCondition);
 	}
 	
 	@Override
@@ -358,6 +357,10 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 				getText("contract4Labour.optype.renew"));
 		types.put(String.valueOf(Contract.OPTYPE_RESIGN),
 				getText("contract4Labour.optype.resign"));
+		types.put(String.valueOf(Contract.OPTYPE_CHANGECHARGER),
+				getText("contract4Labour.optype.changeCharger"));
+		types.put(String.valueOf(Contract.OPTYPE_CHANGECHARGER2),
+				getText("contract4Labour.optype.changeCharger2"));
 		return types;
 	}
 	

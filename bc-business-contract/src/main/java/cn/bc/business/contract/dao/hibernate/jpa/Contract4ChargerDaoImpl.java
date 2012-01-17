@@ -554,15 +554,15 @@ public class Contract4ChargerDaoImpl extends HibernateCrudJpaDao<Contract4Charge
 
 		// 删除合同自身
 		Contract4Charger c = this.load(contractId);
-		Long pid = c.getPid();
+//		Long pid = c.getPid();
 		this.getJpaTemplate().remove(c);
 //		this.executeUpdate("delete Contract4Labour where id=?",
 //				new Object[] { contractId });
 
-		// 如有父级ID,递归删除父级记录
-		if (pid != null) {
-			delete(pid);
-		}
+//		// 如有父级ID,递归删除父级记录
+//		if (pid != null) {
+//			delete(pid);
+//		}
 	}
 
 	/**
