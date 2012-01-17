@@ -57,7 +57,7 @@ public class SelectInsuranceTypeAction extends
 
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer sql = new StringBuffer();
-		sql.append("select i.id,i.status_ ,i.name,i.coverage,i.premium,i.desc_,i.file_date");
+		sql.append("select i.id,i.status_ ,i.name,i.coverage,i.desc_,i.file_date");
 		sql.append(" from bs_insurance_type i");
 		sqlObject.setSql(sql.toString());
 
@@ -73,13 +73,12 @@ public class SelectInsuranceTypeAction extends
 				map.put("status_", rs[i++]);
 				map.put("name", rs[i++]);
 				map.put("coverage", rs[i++]);
-				map.put("premium", rs[i++]);
 				map.put("desc_", rs[i++]);
 				return map;
 			}
 		});
 		return sqlObject;
-	}
+	}       
 
 	@Override
 	protected List<Column> getGridColumns() {
@@ -92,11 +91,8 @@ public class SelectInsuranceTypeAction extends
 				getText("insuranceType.coverage"), 80).setSortable(true)
 				.setUseTitleFromLabel(true)
 				.setValueFormater(new NubmerFormater()));
-		columns.add(new TextColumn4MapKey("i.premium", "premium",
-				getText("insuranceType.premium"), 80).setSortable(true)
-				.setValueFormater(new NubmerFormater()));
 		columns.add(new TextColumn4MapKey("i.desc_", "desc_",
-				getText("insuranceType.description")).setSortable(true));
+				getText("insuranceType.description"),100).setSortable(true));
 		return columns;
 	}
 

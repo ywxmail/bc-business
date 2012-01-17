@@ -62,7 +62,7 @@ public class InsuranceTypesAction extends ViewAction<Map<String, Object>> {
 
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer sql = new StringBuffer();
-		sql.append("select i.id,i.status_ ,i.name,i.coverage,i.premium,i.desc_,i.file_date");
+		sql.append("select i.id,i.status_ ,i.name,i.coverage,i.desc_,i.file_date");
 		sql.append(" from bs_insurance_type i");
 		sqlObject.setSql(sql.toString());
 
@@ -78,7 +78,6 @@ public class InsuranceTypesAction extends ViewAction<Map<String, Object>> {
 				map.put("status_", rs[i++]);
 				map.put("name", rs[i++]);
 				map.put("coverage", rs[i++]);
-				map.put("premium", rs[i++]);
 				map.put("desc_", rs[i++]);
 				return map;
 			}
@@ -99,13 +98,9 @@ public class InsuranceTypesAction extends ViewAction<Map<String, Object>> {
 				.setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("i.coverage", "coverage",
 				getText("insuranceType.coverage"), 80).setSortable(true)
-				.setUseTitleFromLabel(true)
-				.setValueFormater(new NubmerFormater()));
-		columns.add(new TextColumn4MapKey("i.premium", "premium",
-				getText("insuranceType.premium"), 80).setSortable(true)
-				.setValueFormater(new NubmerFormater()));
+				.setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("i.desc_", "desc_",
-				getText("insuranceType.description")).setSortable(true));
+				getText("insuranceType.description"),100).setSortable(true));
 		return columns;
 	}
 
@@ -121,7 +116,7 @@ public class InsuranceTypesAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected PageOption getHtmlPageOption() {
-		return super.getHtmlPageOption().setWidth(700).setMinWidth(300)
+		return super.getHtmlPageOption().setWidth(500).setMinWidth(300)
 				.setHeight(400).setMinHeight(300);
 	}
 
