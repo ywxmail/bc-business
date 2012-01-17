@@ -3,6 +3,7 @@
  */
 package cn.bc.business.policy.web.struts2;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -39,6 +40,7 @@ import cn.bc.web.ui.html.page.PageOption;
  * @author dragon
  * 
  */
+@SuppressWarnings("unused")
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 @Controller
 public class PolicyAction extends FileEntityAction<Long, Policy> {
@@ -93,7 +95,7 @@ public class PolicyAction extends FileEntityAction<Long, Policy> {
 
 	}
 
-	private AttachWidget buildAttachsUI(boolean isNew, boolean forceReadonly) {
+	/*private AttachWidget buildAttachsUI(boolean isNew, boolean forceReadonly) {
 		// 构建附件控件
 		String ptype = "policy.main";
 		AttachWidget attachsUI = new AttachWidget();
@@ -110,7 +112,7 @@ public class PolicyAction extends FileEntityAction<Long, Policy> {
 				.setMaxSize(Integer.parseInt(getText("app.attachs.maxSize")));
 		attachsUI.setReadOnly(forceReadonly ? true : this.isReadonly());
 		return attachsUI;
-	}
+	}*/
 
 	@Override
 	protected void afterCreate(Policy entity) {
@@ -129,11 +131,17 @@ public class PolicyAction extends FileEntityAction<Long, Policy> {
 		this.getE().setOpType(Policy.OPTYPE_CREATE);
 		this.getE().setUid(this.getIdGeneratorService().next(Policy.KEY_UID));
 		this.getE().setPatchNo(this.getE().getUid());
+		//创登记日期
+		this.getE().setRegisterDate(Calendar.getInstance());
+		
 		// 构建附件控件
-		attachsUI = buildAttachsUI(false, true);
+		//attachsUI = buildAttachsUI(false, true);
 
 	}
 
+	
+	
+	
 	@Override
 	protected void beforeSave(Policy entity) {
 		super.beforeSave(entity);
@@ -153,8 +161,9 @@ public class PolicyAction extends FileEntityAction<Long, Policy> {
 					resource.setOrderNo(i);
 					resource.setPolicy(this.getE());
 					resource.setName(json.getString("name"));
-					resource.setCoverage(new Float(json.getLong("coverage")));
-					resource.setPremium(new Float(json.getLong("premium")));
+					resource.setCoverage(json.getString("coverage"));
+					System.out.println(json.getString("coverage"));
+					//resource.setPremium(new Float(json.getLong("premium")));
 					resource.setDescription(json.getString("description"));
 					buyPlants.add(resource);
 				}
@@ -175,6 +184,10 @@ public class PolicyAction extends FileEntityAction<Long, Policy> {
 		}
 	}
 
+	
+	
+	
+	
 	@Override
 	protected void buildFormPageButtons(PageOption pageOption, boolean editable) {
 		boolean readonly = this.isReadonly();
@@ -190,9 +203,10 @@ public class PolicyAction extends FileEntityAction<Long, Policy> {
 				pageOption.addButton(new ButtonOption(
 						getText("policy.optype.edit"), null,
 						"bc.policyForm.doMaintenance").setId("policyeEdit"));
-				pageOption.addButton(new ButtonOption(
+				//无续保
+				/*pageOption.addButton(new ButtonOption(
 						getText("policy.optype.renewal"), null,
-						"bc.policyForm.doRenew").setId("policyDoRenew"));
+						"bc.policyForm.doRenew").setId("policyDoRenew"));*/
 				pageOption.addButton(new ButtonOption(
 						getText("policy.optype.surrenders"), null,
 						"bc.policyForm.doSurrender").setId("policySurrenders"));
@@ -204,7 +218,7 @@ public class PolicyAction extends FileEntityAction<Long, Policy> {
 	protected void afterEdit(Policy entity) {
 		super.afterEdit(entity);
 		// 加载已的附件控件
-		attachsUI = buildAttachsUI(false, false);
+		//attachsUI = buildAttachsUI(false, false);
 
 		// 维护时对车保信息进行的修改
 		// 次版本号加1
@@ -216,9 +230,15 @@ public class PolicyAction extends FileEntityAction<Long, Policy> {
 
 	@Override
 	protected void afterOpen(Policy entity) {
+		if(isReadonly()){
+			this.getE().setLiabilityAmount((float)0);
+			this.getE().setCommerialAmount((float)0);
+			this.getE().setGreenslipAmount((float)0);
+		}
+		
 		super.afterOpen(entity);
 		// 构建附件控件
-		attachsUI = buildAttachsUI(false, true);
+		//attachsUI = buildAttachsUI(false, true);
 	}
 
 	@Override
@@ -240,7 +260,7 @@ public class PolicyAction extends FileEntityAction<Long, Policy> {
 
 	@Override
 	protected PageOption buildFormPageOption(boolean editable) {
-		return super.buildFormPageOption(editable).setWidth(725)
+		return super.buildFormPageOption(editable).setWidth(730)
 				.setMinWidth(300).setHeight(540).setMinHeight(300);
 	}
 
