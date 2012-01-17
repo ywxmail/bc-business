@@ -14,6 +14,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
 import cn.bc.business.contract.domain.Contract;
+import cn.bc.business.web.struts2.LinkFormater4ChargerInfo;
 import cn.bc.business.web.struts2.ViewAction;
 import cn.bc.core.query.condition.Condition;
 import cn.bc.core.query.condition.ConditionUtils;
@@ -138,8 +139,9 @@ public class ContractsAction extends ViewAction<Map<String, Object>> {
 		}
 		if (carId != null) {
 		columns.add(new TextColumn4MapKey("c.ext_str2", "ext_str2",
-				getText("contract.driver.charger"), 55).setUseTitleFromLabel(
-				true));
+				getText("contract.driver.charger"), 55).setUseTitleFromLabel(true)
+				.setValueFormater(new LinkFormater4ChargerInfo(this
+						.getContextPath())));
 		}
 		columns.add(new TextColumn4MapKey("c.start_date", "start_date",
 				getText("contract.deadline"), 180)

@@ -37,15 +37,19 @@ public class Contract extends RichFileEntityImpl {
 	public static final int STATUS_RESGIN	= 2;
 	
 	/**操作类型  新建*/
-	public static final int OPTYPE_CREATE	= 1;
+	public static final int OPTYPE_CREATE			= 1;
 	/**操作类型  维护*/
 	public static final int OPTYPE_MAINTENANCE		= 2;
 	/**操作类型 转车*/
-	public static final int OPTYPE_CHANGECAR	= 3;
+	public static final int OPTYPE_CHANGECAR		= 3;
 	/**操作类型  续约*/
-	public static final int OPTYPE_RENEW	= 4;
+	public static final int OPTYPE_RENEW			= 4;
 	/**操作类型  离职*/
-	public static final int OPTYPE_RESIGN	= 5;
+	public static final int OPTYPE_RESIGN			= 5;
+	/**操作类型  过户*/
+	public static final int OPTYPE_CHANGECHARGER	= 6;
+	/**操作类型  重发包*/
+	public static final int OPTYPE_CHANGECHARGER2	= 7;
 	
 	/**主版本号默认值*/
 	public static final int MAJOR_DEFALUT	= 1;

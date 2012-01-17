@@ -135,7 +135,7 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer sql = new StringBuffer();
-		sql.append("select cc.id,cc.bs_type,c.status_,c.ext_str1,c.ext_str2,c.transactor_name,c.sign_date,c.start_date,c.end_date,c.code");
+		sql.append("select cc.id,cc.sign_type,cc.bs_type,cc.contract_version_no,c.status_,c.ext_str1,c.ext_str2,c.transactor_name,c.sign_date,c.start_date,c.end_date,c.code");
 		sql.append(",car.id carId");
 //		sql.append(",man.id manId");
 		sql.append(",c.ver_major,c.ver_minor,c.op_type");
@@ -156,7 +156,9 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 				Map<String, Object> map = new HashMap<String, Object>();
 				int i = 0;
 				map.put("id", rs[i++]);
+				map.put("sign_type", rs[i++]);
 				map.put("bs_type", rs[i++]);
+				map.put("contract_version_no", rs[i++]);
 				map.put("status_", rs[i++]);
 				map.put("ext_str1", rs[i++]);
 				map.put("ext_str2", rs[i++]);
@@ -181,8 +183,7 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 		List<Column> columns = new ArrayList<Column>();
 		columns.add(new IdColumn4MapKey("cc.id","id"));
 		columns.add(new TextColumn4MapKey("c.status_", "status_",
-				getText("contract.status"), 35)
-				.setSortable(true)
+				getText("contract.status"), 35).setSortable(true)
 				.setValueFormater(new EntityStatusFormater(getEntityStatuses())));
 		columns.add(new TextColumn4MapKey("c.ver_major", "ver_major",
 				getText("contract4Labour.ver"), 30)
@@ -202,6 +203,10 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 						}
 					}
 				}));
+		columns.add(new TextColumn4MapKey("cc.sign_type", "sign_type",
+				getText("contract4Charger.signType"), 58).setSortable(true).setUseTitleFromLabel(true));
+		columns.add(new TextColumn4MapKey("cc.bs_type", "bs_type",
+				getText("contract4Charger.businessType"),70).setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("c.ext_str1", "ext_str1",
 				getText("contract.car"), 80).setUseTitleFromLabel(true)
 				.setValueFormater(
@@ -217,7 +222,7 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 							}
 						}));
 		columns.add(new TextColumn4MapKey("c.ext_str2", "ext_str2",
-				getText("contract4Charger.charger")).setUseTitleFromLabel(true)
+				getText("contract4Charger.charger"),140).setUseTitleFromLabel(true)
 				.setValueFormater(new LinkFormater4ChargerInfo(this
 						.getContextPath())));
 		columns.add(new TextColumn4MapKey("c.start_date", "start_date", getText("contract.deadline"), 180)
@@ -232,10 +237,10 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("c.sign_date", "sign_date",
 				getText("contract.signDate"), 90).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
-		columns.add(new TextColumn4MapKey("cc.bs_type", "bs_type",
-				getText("contract4Charger.businessType"),70).setUseTitleFromLabel(true));
+		columns.add(new TextColumn4MapKey("cc.contract_version_no", "contract_version_no",
+				getText("contract4Charger.contractVersionNo")).setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("c.transactor_name", "transactor_name",
-				getText("contract.transactor"), 45).setUseTitleFromLabel(true));
+				getText("contract.transactor"), 50).setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("c.code", "code",
 				getText("contract.code"),60).setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("c.op_type", "op_type",
@@ -283,8 +288,8 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 			statusCondition = ConditionUtils.toConditionByComma4IntegerValue(
 					this.status, "c.status_");
 			//if (this.status.length() <= 0) { // 显示全部状态的时候只显示最新版本的记录
-			mainsCondition = ConditionUtils
-					.toConditionByComma4IntegerValue(this.mains, "c.main");
+//			mainsCondition = ConditionUtils // 控制显示最新版本main为0的经济合同
+//					.toConditionByComma4IntegerValue(this.mains, "c.main");
 			//}
 		} else {
 			// 查看历史版本
@@ -292,8 +297,7 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 			mainsCondition = new EqualsCondition("c.main",
 					Contract.MAIN_HISTORY);
 		}
-		return ConditionUtils.mix2AndCondition(typeCondtion,statusCondition, mainsCondition,
-				patchCondtion);
+		return ConditionUtils.mix2AndCondition(typeCondtion,statusCondition,patchCondtion,mainsCondition);
 	}
 	
 	@Override
@@ -358,6 +362,10 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 				getText("contract4Labour.optype.renew"));
 		types.put(String.valueOf(Contract.OPTYPE_RESIGN),
 				getText("contract4Labour.optype.resign"));
+		types.put(String.valueOf(Contract.OPTYPE_CHANGECHARGER),
+				getText("contract4Labour.optype.changeCharger"));
+		types.put(String.valueOf(Contract.OPTYPE_CHANGECHARGER2),
+				getText("contract4Labour.optype.changeCharger2"));
 		return types;
 	}
 	
@@ -373,8 +381,6 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 		types.put(String.valueOf(Contract.TYPE_CHARGER),
 				getText("contract.select.charger"));
 		return types;
-	}
-	
-	
+	}	
 
 }
