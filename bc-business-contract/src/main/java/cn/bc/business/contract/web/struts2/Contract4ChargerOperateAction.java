@@ -77,7 +77,7 @@ public class Contract4ChargerOperateAction extends ActionSupport {
 		json = new Json();
 		json.put("id", newContract.getId());
 		json.put("oldId", fromContractId);
-		json.put("msg", getText("contract4Labour.renew.success"));
+		json.put("msg", getText("contract4Charger.renew.success"));
 		return "json";
 	}
 
@@ -139,6 +139,11 @@ public class Contract4ChargerOperateAction extends ActionSupport {
 		return "json";
 	}
 	
+	// ========劳动合同过户代码结束========
+	
+	
+	// ========劳动合同重发包代码开始========
+	
 	/**
 	 * 经济合同重发包
 	 */
@@ -155,6 +160,8 @@ public class Contract4ChargerOperateAction extends ActionSupport {
 		json.put("msg", getText("contract4Charger.changeCharger2.success"));
 		return "json";
 	}
+	
+	// ========劳动合同重发包代码结束========
 	
 	/**
 	 * 设置责任人姓名
@@ -174,6 +181,6 @@ public class Contract4ChargerOperateAction extends ActionSupport {
 		}
 		return chargerName;
 	}
-	// ========劳动合同过户代码结束========
+	
 
 }
