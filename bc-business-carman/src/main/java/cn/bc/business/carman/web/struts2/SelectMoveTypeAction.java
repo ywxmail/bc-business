@@ -19,6 +19,7 @@ import com.opensymphony.xwork2.ActionSupport;
 @Controller
 public class SelectMoveTypeAction extends ActionSupport {
 	private static final long serialVersionUID = 1L;
+	public String carManId;
 
 	public String excute() throws Exception {
 		return SUCCESS;
