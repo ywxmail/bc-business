@@ -20,7 +20,7 @@ public class BuyPlant extends EntityImpl {
 	private static final long serialVersionUID = 1L;
 
 	private String name;// 险种名称
-	private Float coverage;// 保额
+	private String coverage;// 保额
 	private Float premium;// 保费
 	private String description;// 备注
 	private int orderNo;// 排序号
@@ -53,11 +53,11 @@ public class BuyPlant extends EntityImpl {
 		this.name = name;
 	}
 
-	public Float getCoverage() {
+	public String getCoverage() {
 		return coverage;
 	}
 
-	public void setCoverage(Float coverage) {
+	public void setCoverage(String coverage) {
 		this.coverage = coverage;
 	}
 

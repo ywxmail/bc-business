@@ -33,6 +33,7 @@ import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.formater.DateRangeFormater;
 import cn.bc.web.formater.EntityStatusFormater;
 import cn.bc.web.formater.LinkFormater4Id;
+import cn.bc.web.formater.NubmerFormater;
 import cn.bc.web.ui.html.grid.Column;
 import cn.bc.web.ui.html.grid.IdColumn4MapKey;
 import cn.bc.web.ui.html.grid.TextColumn4MapKey;
@@ -80,9 +81,9 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 		sql.append(",c.code,c.old_unit_name,bia.name as unit_name,m.name");
 		sql.append(",c.plate_type,c.plate_no,p.register_date,p.assured,p.commerial_no");
 		sql.append(",p.commerial_company,p.commerial_start_date,p.commerial_end_date");
-		sql.append(",p.ownrisk,p.greenslip,p.liability_no,p.amount,c.id as carId,p.op_type");
+		sql.append(",p.ownrisk,p.greenslip,p.liability_no,c.id as carId,p.op_type");
 		sql.append(",p.greenslip_no,p.greenslip_company,p.greenslip_start_date,p.greenslip_end_date,p.stop_date,p.main");
-		sql.append(",m.id as motorcade_id");
+		sql.append(",m.id as motorcade_id,p.liability_amount,p.commerial_amount,p.greenslip_amount");
 		sql.append(" from bs_car_policy p");
 		sql.append(" inner join bs_car c on c.id=p.car_id");
 		sql.append(" inner join bs_motorcade m on m.id=c.motorcade_id");
@@ -116,7 +117,7 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 				map.put("ownrisk", rs[i++]);
 				map.put("greenslip", rs[i++]);
 				map.put("liability_no", rs[i++]);
-				map.put("amount", rs[i++]);
+
 				map.put("carId", rs[i++]);
 				map.put("op_type", rs[i++]);
 				map.put("greenslip_no", rs[i++]);
@@ -126,6 +127,9 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 				map.put("stop_date", rs[i++]);
 				map.put("main", rs[i++]);
 				map.put("motorcade_id", rs[i++]);// 车队id
+				map.put("liability_amount", rs[i++]);// 责任险合计
+				map.put("commerial_amount", rs[i++]);// 商业险合计
+				map.put("greenslip_amount", rs[i++]);// 强制险合计
 				return map;
 			}
 		});
@@ -201,10 +205,20 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 				getText("policy.registerDate"), 100).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
 		columns.add(new TextColumn4MapKey("p.liability_no", "liability_no",
-				getText("policy.liabilityNo"), 180).setSortable(true)
+				getText("policy.liabilityNo"), 190).setSortable(true)
 				.setUseTitleFromLabel(true));
+		columns.add(new TextColumn4MapKey("p.stop_date", "stop_date",
+				getText("policy.stopDate"), 100).setSortable(true)
+				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+		if (!this.isReadonly()) {
+			// 责任险合计
+			columns.add(new TextColumn4MapKey("p.liability_amount",
+					"liability_amount", getText("policy.liabilityAmount"), 105)
+					.setSortable(true).setUseTitleFromLabel(true)
+					.setValueFormater(new NubmerFormater("###,###.##")));
+		}
 		columns.add(new TextColumn4MapKey("p.commerial_no", "commerial_no",
-				getText("policy.commerialNo"), 180).setUseTitleFromLabel(true));
+				getText("policy.commerialNo"), 190).setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("p.commerial_company",
 				"commerial_company", getText("policy.commerialCompany"), 100)
 				.setSortable(true).setUseTitleFromLabel(true));
@@ -218,6 +232,13 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 				return (Date) contract.get("commerial_end_date");
 			}
 		}));
+		if (!this.isReadonly()) {
+			// 商业险合计
+			columns.add(new TextColumn4MapKey("p.commerial_amount",
+					"commerial_amount", getText("policy.commerialAmount"), 105)
+					.setSortable(true).setUseTitleFromLabel(true)
+					.setValueFormater(new NubmerFormater("###,###.##")));
+		}
 		columns.add(new TextColumn4MapKey("p.ownrisk", "ownrisk",
 				getText("policy.ownrisk"), 80).setSortable(true)
 				.setUseTitleFromLabel(true)
@@ -227,7 +248,7 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 				.setUseTitleFromLabel(true)
 				.setValueFormater(new BooleanFormater()));
 		columns.add(new TextColumn4MapKey("p.greenslip_no", "greenslip_no",
-				getText("policy.greenslipNo"), 180).setUseTitleFromLabel(true));
+				getText("policy.greenslipNo"), 190).setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("p.greenslip_company",
 				"greenslip_company", getText("policy.greenslipCompany"), 100)
 				.setSortable(true).setUseTitleFromLabel(true));
@@ -241,12 +262,13 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 				return (Date) contract.get("greenslip_end_date");
 			}
 		}));
-		columns.add(new TextColumn4MapKey("p.stop_date", "stop_date",
-				getText("policy.stopDate"), 100).setSortable(true)
-				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
-		columns.add(new TextColumn4MapKey("p.amount", "amount",
-				getText("policy.amount"), 80).setSortable(true)
-				.setUseTitleFromLabel(true));
+		if (!this.isReadonly()) {
+			// 强制险合计
+			columns.add(new TextColumn4MapKey("p.greenslip_amount",
+					"greenslip_amount", getText("policy.greenslipAmount"), 105)
+					.setSortable(true).setUseTitleFromLabel(true)
+					.setValueFormater(new NubmerFormater("###,###.##")));
+		}
 		// 操作类型
 		columns.add(new TextColumn4MapKey("p.op_type", "op_type",
 				getText("policy.labour.optype"), 60).setSortable(true)
@@ -257,7 +279,7 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 	@Override
 	protected String[] getGridSearchFields() {
 		return new String[] { "c.plate_type", "c.plate_no", "p.commerial_no",
-				"p.liability_no", "p.commerial_company" ,"c.code"};
+				"p.liability_no", "p.commerial_company", "c.code" };
 	}
 
 	@Override

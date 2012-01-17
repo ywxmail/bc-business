@@ -88,6 +88,10 @@ public class Policy extends RichFileEntityImpl {
 	private int opType; // 操作类型：1-新建,2-维护,3-续保,4-停保
 	private Long Pid;// 父级ID
 	private Set<BuyPlant> buyPlants;// 购买保单险种
+	
+	private Float liabilityAmount;// 责任险合计	
+	private Float commerialAmount; //商业险合计字段	  
+	private Float greenslipAmount;//强制险合计字段  GREENSLIP_AMOUNT 
 
 	@ManyToOne(fetch = FetchType.EAGER, optional = true)
 	@JoinColumn(name = "CAR_ID", referencedColumnName = "ID")
@@ -309,4 +313,32 @@ public class Policy extends RichFileEntityImpl {
 		this.stopDate = stopDate;
 	}
 
+	@Column(name ="LIABILITY_AMOUNT")
+	public Float getLiabilityAmount() {
+		return liabilityAmount;
+	}
+
+	public void setLiabilityAmount(Float liabilityAmount) {
+		this.liabilityAmount = liabilityAmount;
+	}
+	@Column(name ="COMMERIAL_AMOUNT")
+	public Float getCommerialAmount() {
+		return commerialAmount;
+	}
+
+	public void setCommerialAmount(Float commerialAmount) {
+		this.commerialAmount = commerialAmount;
+	}
+	@Column(name ="GREENSLIP_AMOUNT")
+	public Float getGreenslipAmount() {
+		return greenslipAmount;
+	}
+
+	public void setGreenslipAmount(Float greenslipAmount) {
+		this.greenslipAmount = greenslipAmount;
+	}
+
+	
+	
+	
 }
