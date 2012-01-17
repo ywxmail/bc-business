@@ -64,7 +64,6 @@ public class Policy extends RichFileEntityImpl {
 	public static final int BOOLEAN_NO = 0;
 
 	private Car car;// 投保车号
-	private Calendar registerDate;// 初登日期
 	private String assured;// 投保人
 	private String commerialNo;// 商业险号
 	private String commerialCompany;// 商业保险公司
@@ -101,15 +100,6 @@ public class Policy extends RichFileEntityImpl {
 
 	public void setCar(Car car) {
 		this.car = car;
-	}
-
-	@Column(name = "REGISTER_DATE")
-	public Calendar getRegisterDate() {
-		return registerDate;
-	}
-
-	public void setRegisterDate(Calendar registerDate) {
-		this.registerDate = registerDate;
 	}
 
 	public String getAssured() {

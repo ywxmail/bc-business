@@ -95,24 +95,6 @@ public class PolicyAction extends FileEntityAction<Long, Policy> {
 
 	}
 
-	/*private AttachWidget buildAttachsUI(boolean isNew, boolean forceReadonly) {
-		// 构建附件控件
-		String ptype = "policy.main";
-		AttachWidget attachsUI = new AttachWidget();
-		attachsUI.setFlashUpload(EntityAction.isFlashUpload());
-		attachsUI.addClazz("formAttachs");
-		if (!isNew)
-			attachsUI.addAttach(this.attachService.findByPtype(ptype, this
-					.getE().getUid()));
-		attachsUI.setPuid(this.getE().getUid()).setPtype(ptype);
-
-		// 上传附件的限制
-		attachsUI.addExtension(getText("app.attachs.extensions"))
-				.setMaxCount(Integer.parseInt(getText("app.attachs.maxCount")))
-				.setMaxSize(Integer.parseInt(getText("app.attachs.maxSize")));
-		attachsUI.setReadOnly(forceReadonly ? true : this.isReadonly());
-		return attachsUI;
-	}*/
 
 	@Override
 	protected void afterCreate(Policy entity) {
@@ -130,18 +112,10 @@ public class PolicyAction extends FileEntityAction<Long, Policy> {
 		this.getE().setVerMinor(Policy.MINOR_DEFALUT);
 		this.getE().setOpType(Policy.OPTYPE_CREATE);
 		this.getE().setUid(this.getIdGeneratorService().next(Policy.KEY_UID));
-		this.getE().setPatchNo(this.getE().getUid());
-		//创登记日期
-		this.getE().setRegisterDate(Calendar.getInstance());
-		
-		// 构建附件控件
-		//attachsUI = buildAttachsUI(false, true);
-
+		this.getE().setPatchNo(this.getE().getUid());	
 	}
 
-	
-	
-	
+
 	@Override
 	protected void beforeSave(Policy entity) {
 		super.beforeSave(entity);
@@ -162,8 +136,6 @@ public class PolicyAction extends FileEntityAction<Long, Policy> {
 					resource.setPolicy(this.getE());
 					resource.setName(json.getString("name"));
 					resource.setCoverage(json.getString("coverage"));
-					System.out.println(json.getString("coverage"));
-					//resource.setPremium(new Float(json.getLong("premium")));
 					resource.setDescription(json.getString("description"));
 					buyPlants.add(resource);
 				}
@@ -217,9 +189,6 @@ public class PolicyAction extends FileEntityAction<Long, Policy> {
 	@Override
 	protected void afterEdit(Policy entity) {
 		super.afterEdit(entity);
-		// 加载已的附件控件
-		//attachsUI = buildAttachsUI(false, false);
-
 		// 维护时对车保信息进行的修改
 		// 次版本号加1
 		Integer verMinor = this.getE().getVerMinor();
@@ -231,14 +200,11 @@ public class PolicyAction extends FileEntityAction<Long, Policy> {
 	@Override
 	protected void afterOpen(Policy entity) {
 		if(isReadonly()){
-			this.getE().setLiabilityAmount((float)0);
-			this.getE().setCommerialAmount((float)0);
-			this.getE().setGreenslipAmount((float)0);
+			this.getE().setLiabilityAmount((float)-1);
+			this.getE().setCommerialAmount((float)-1);
+			this.getE().setGreenslipAmount((float)-1);
 		}
-		
 		super.afterOpen(entity);
-		// 构建附件控件
-		//attachsUI = buildAttachsUI(false, true);
 	}
 
 	@Override
