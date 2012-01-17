@@ -38,11 +38,11 @@ public class CarByDriverHistory extends FileEntityImpl {
 	public static final int MOVETYPE_CLDCL = 0;
 	/** 营运类型：公司到公司(已注销) */
 	public static final int MOVETYPE_GSDGSYZX = 1;
-	/** 营运类型：注销未有去向 */
+	/** 营运类型：注销未有去向 :资格证已交给交委*/
 	public static final int MOVETYPE_ZXWYQX = 2;
 	/** 营运类型：由外公司迁回 */
 	public static final int MOVETYPE_YWGSQH = 3;
-	/** 营运类型：交回未注销 */
+	/** 营运类型：交回未注销 :资格证已交回公司,但未交给交委*/
 	public static final int MOVETYPE_JHWZX = 4;
 	/** 营运类型：新入职 */
 	public static final int MOVETYPE_XRZ = 5;
@@ -62,7 +62,7 @@ public class CarByDriverHistory extends FileEntityImpl {
 	private String fromUnit;// 原单位
 	private String toUnit;// 新单位
 	private Calendar handPapersDate;// 交证日期
-	private String cancelId;// 注销单号
+	private String cancelId;// 注销单号(交委回执单号)
 	private String description;// 备注
 
 	@Column(name = "DESC_")

@@ -117,14 +117,12 @@ public class PolicyServiceImpl extends DefaultCrudService<Policy> implements
 	public void doSurrender(Long policyId, Calendar surrenderDate) {
 		// 获取车保信息
 		Policy policy = this.policyDao.load(policyId);
-		System.out.println("policyId      " + policyId);
 		// 设置停保日期
 		policy.setStopDate(surrenderDate);
 		// 设置操作类型为停保
 		policy.setOpType(Policy.OPTYPE_SURRENDERS);
 		// 设置状态为停保
 		policy.setStatus(Policy.STATUS_SURRENDER);
-		System.out.println("status " + policy.getStatus());
 		this.policyDao.save(policy);
 
 	}
