@@ -95,7 +95,6 @@ public class PolicyAction extends FileEntityAction<Long, Policy> {
 
 	}
 
-
 	@Override
 	protected void afterCreate(Policy entity) {
 		super.afterCreate(entity);
@@ -172,16 +171,20 @@ public class PolicyAction extends FileEntityAction<Long, Policy> {
 			// }
 		} else {// open
 			if (!readonly) {
+			if(this.getE().getStatus()==Policy.STATUS_ENABLED){
+				//维护
 				pageOption.addButton(new ButtonOption(
 						getText("policy.optype.edit"), null,
 						"bc.policyForm.doMaintenance").setId("policyeEdit"));
-				//无续保
-				/*pageOption.addButton(new ButtonOption(
-						getText("policy.optype.renewal"), null,
-						"bc.policyForm.doRenew").setId("policyDoRenew"));*/
+				//注销
+				pageOption.addButton(new ButtonOption(
+						getText("policy.status.disabled"),null,
+						"bc.policyForm.doLogout"));
+				//停保 
 				pageOption.addButton(new ButtonOption(
 						getText("policy.optype.surrenders"), null,
 						"bc.policyForm.doSurrender").setId("policySurrenders"));
+			  }
 			}
 		}
 	}

@@ -117,7 +117,6 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 				map.put("ownrisk", rs[i++]);
 				map.put("greenslip", rs[i++]);
 				map.put("liability_no", rs[i++]);
-
 				map.put("carId", rs[i++]);
 				map.put("op_type", rs[i++]);
 				map.put("greenslip_no", rs[i++]);
@@ -216,7 +215,7 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 			columns.add(new TextColumn4MapKey("p.liability_amount",
 					"liability_amount", getText("policy.liabilityAmount"), 105)
 					.setSortable(true).setUseTitleFromLabel(true)
-					.setValueFormater(new NubmerFormater("###,###.##")));
+					.setValueFormater(new NubmerFormater("###,###.00")));
 		}
 		columns.add(new TextColumn4MapKey("p.commerial_no", "commerial_no",
 				getText("policy.commerialNo"), 190).setUseTitleFromLabel(true));
@@ -238,7 +237,7 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 			columns.add(new TextColumn4MapKey("p.commerial_amount",
 					"commerial_amount", getText("policy.commerialAmount"), 105)
 					.setSortable(true).setUseTitleFromLabel(true)
-					.setValueFormater(new NubmerFormater("###,###.##")));
+					.setValueFormater(new NubmerFormater("###,###.00")));
 		}
 		columns.add(new TextColumn4MapKey("p.ownrisk", "ownrisk",
 				getText("policy.ownrisk"), 80).setSortable(true)
@@ -268,7 +267,7 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 			columns.add(new TextColumn4MapKey("p.greenslip_amount",
 					"greenslip_amount", getText("policy.greenslipAmount"), 105)
 					.setSortable(true).setUseTitleFromLabel(true)
-					.setValueFormater(new NubmerFormater("###,###.##")));
+					.setValueFormater(new NubmerFormater("###,###.00")));
 		}
 		// 操作类型
 		columns.add(new TextColumn4MapKey("p.op_type", "op_type",
