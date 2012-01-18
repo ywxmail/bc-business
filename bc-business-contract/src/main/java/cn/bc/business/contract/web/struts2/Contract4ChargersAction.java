@@ -135,14 +135,16 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer sql = new StringBuffer();
-		sql.append("select cc.id,cc.sign_type,cc.bs_type,cc.contract_version_no,c.status_,c.ext_str1,c.ext_str2,c.transactor_name,c.sign_date,c.start_date,c.end_date,c.code");
+		sql.append("select cc.id,cc.sign_type,cc.bs_type,cc.contract_version_no,c.status_,c.ext_str1,c.ext_str2");
+		sql.append(",c.transactor_name,c.sign_date,c.start_date,c.end_date,c.code,c.logout_id,iah.actor_name,c.logout_date");
 		sql.append(",car.id carId");
 //		sql.append(",man.id manId");
 		sql.append(",c.ver_major,c.ver_minor,c.op_type");
 		sql.append(" from BS_CONTRACT_CHARGER cc");
 		sql.append(" inner join BS_CONTRACT c on cc.id = c.id");
-		sql.append(" left join BS_CAR_CONTRACT carc on c.id = carc.contract_id");
-		sql.append(" left join BS_Car car on carc.car_id = car.id");
+		sql.append(" inner join BS_CAR_CONTRACT carc on c.id = carc.contract_id");
+		sql.append(" inner join BS_Car car on carc.car_id = car.id");
+		sql.append(" left join bc_identity_actor_history iah on c.logout_id = iah.id");
 //		sql.append(" left join BS_CARMAN_CONTRACT manc on c.id = manc.contract_id");
 //		sql.append(" left join BS_CARMAN man on manc.man_id = man.id");
 		sqlObject.setSql(sql.toString());
@@ -167,6 +169,9 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 				map.put("start_date", rs[i++]);
 				map.put("end_date", rs[i++]);
 				map.put("code", rs[i++]);
+				map.put("logout_id", rs[i++]);
+				map.put("actor_name", rs[i++]);
+				map.put("logout_date", rs[i++]);
 				map.put("carId", rs[i++]);
 //				map.put("manId", rs[i++]);
 				map.put("ver_major", rs[i++]);
@@ -241,6 +246,13 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 				getText("contract4Charger.contractVersionNo")).setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("c.transactor_name", "transactor_name",
 				getText("contract.transactor"), 50).setUseTitleFromLabel(true));
+		//if(status.equals(String.valueOf(Contract.STATUS_LOGOUT)) || status.length() == 0){ //控制视图在在案注销下不显示注销人,注销时间
+			columns.add(new TextColumn4MapKey("c.logout_date", "logout_date",
+					getText("contract4Charger.logoutDate"), 90).setSortable(true)
+					.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+			columns.add(new TextColumn4MapKey("iah.actor_name", "actor_name",
+					getText("contract4Charger.logoutId"), 50).setUseTitleFromLabel(true));
+		//}
 		columns.add(new TextColumn4MapKey("c.code", "code",
 				getText("contract.code"),60).setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("c.op_type", "op_type",
@@ -339,7 +351,7 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 		Map<String, String> statuses = new LinkedHashMap<String, String>();
 		statuses.put(String.valueOf(Contract.STATUS_NORMAL),
 				getText("contract.status.normal"));
-		statuses.put(String.valueOf(Contract.STATUS_FAILURE),
+		statuses.put(String.valueOf(Contract.STATUS_LOGOUT),
 				getText("contract.status.failure"));
 		statuses.put("", getText("bs.status.all"));
 		return statuses;
