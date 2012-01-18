@@ -200,16 +200,18 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 		}
 		columns.add(new TextColumn4MapKey("p.assured", "assured",
 				getText("policy.assured"), 180));
-		//创建日期
+		// 创建日期
 		columns.add(new TextColumn4MapKey("p.file_date", "file_date",
 				getText("policy.fileDate"), 100).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
 		columns.add(new TextColumn4MapKey("p.liability_no", "liability_no",
 				getText("policy.liabilityNo"), 190).setSortable(true)
 				.setUseTitleFromLabel(true));
-		/*columns.add(new TextColumn4MapKey("p.stop_date", "stop_date",
-				getText("policy.stopDate"), 100).setSortable(true)
-				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));*/
+		/*
+		 * columns.add(new TextColumn4MapKey("p.stop_date", "stop_date",
+		 * getText("policy.stopDate"), 100).setSortable(true)
+		 * .setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+		 */
 		if (!this.isReadonly()) {
 			// 责任险合计
 			columns.add(new TextColumn4MapKey("p.liability_amount",
@@ -244,7 +246,7 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 				.setUseTitleFromLabel(true)
 				.setValueFormater(new BooleanFormater()));
 		columns.add(new TextColumn4MapKey("p.greenslip", "greenslip",
-				getText("policy.greenslip"),75).setSortable(true)
+				getText("policy.greenslip"), 75).setSortable(true)
 				.setUseTitleFromLabel(true)
 				.setValueFormater(new BooleanFormater()));
 		columns.add(new TextColumn4MapKey("p.greenslip_no", "greenslip_no",
@@ -392,22 +394,42 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 				getText("policy.status.enabled"));
 		statuses.put(String.valueOf(Policy.STATUS_DISABLED),
 				getText("policy.status.disabled"));
-		/*statuses.put(String.valueOf(Policy.STATUS_SURRENDER),
-				getText("policy.status.surrender"));*/
+		/*
+		 * statuses.put(String.valueOf(Policy.STATUS_SURRENDER),
+		 * getText("policy.status.surrender"));
+		 */
 		statuses.put("", getText("bs.status.all"));
 		return statuses;
 	}
 
 	@Override
 	protected Toolbar getHtmlPageToolbar() {
-		if (this.carId != null) {
-			return super.getHtmlPageToolbar();
+		Toolbar tb = new Toolbar();
+		if (this.isReadonly()) {
+			// 查看按钮
+			tb.addButton(Toolbar
+					.getDefaultOpenToolbarButton(getText("label.read")));
 		} else {
+			// 新建按钮
+			tb.addButton(Toolbar
+					.getDefaultCreateToolbarButton(getText("label.create")));
+			// 查看按钮
+			tb.addButton(Toolbar
+					.getDefaultOpenToolbarButton(getText("label.read")));
+			// 删除按钮
+			tb.addButton(Toolbar
+					.getDefaultDeleteToolbarButton(getText("label.delete")));
+		}
+		// 搜索按钮
+		tb.addButton(Toolbar
+				.getDefaultSearchToolbarButton(getText("title.click2search")));
 
-			return super.getHtmlPageToolbar().addButton(
-					Toolbar.getDefaultToolbarRadioGroup(getPolicyStatuses(),
-							"status", 0,
-							getText("title.click2changeSearchClasses")));
+		if (this.carId != null) {
+			return tb;
+		} else {
+			return tb.addButton(Toolbar.getDefaultToolbarRadioGroup(
+					getPolicyStatuses(), "status", 0,
+					getText("title.click2changeSearchClasses")));
 		}
 	}
 
