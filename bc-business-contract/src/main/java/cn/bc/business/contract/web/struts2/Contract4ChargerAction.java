@@ -137,6 +137,9 @@ public class Contract4ChargerAction extends FileEntityAction<Long, Contract4Char
 		entity.setType(Contract.TYPE_CHARGER);
 		entity.setStatus(Contract.STATUS_NORMAL);
 		entity.setSignType(getText("contract4Charger.optype.create"));
+		
+		// 构建附件控件
+		attachsUI = buildAttachsUI(true, false);
 	}
 	
 	@Override
@@ -290,7 +293,7 @@ public class Contract4ChargerAction extends FileEntityAction<Long, Contract4Char
 
 	private AttachWidget buildAttachsUI(boolean isNew, boolean forceReadonly) {
 		// 构建附件控件
-		String ptype = "contract4Charger.main";
+		String ptype = Contract4Charger.KEY_UID;
 		AttachWidget attachsUI = new AttachWidget();
 		attachsUI.setFlashUpload(isFlashUpload());
 		attachsUI.addClazz("formAttachs");

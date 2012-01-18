@@ -116,8 +116,6 @@ public class Contract4LabourAction extends
 	protected void afterCreate(Contract4Labour entity){
 		
 		super.afterCreate(entity);
-		// 构建附件控件
-		attachsUI = buildAttachsUI(true, false);
 		
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		Date date = null;
@@ -269,6 +267,8 @@ public class Contract4LabourAction extends
 		entity.setBuyUnit(getText("contract.baocheng"));
 		entity.setStatus(Contract.STATUS_NORMAL);
 		
+		// 构建附件控件
+		attachsUI = buildAttachsUI(true, false);
 	}
 
 	@Override
@@ -341,7 +341,7 @@ public class Contract4LabourAction extends
 
 	private AttachWidget buildAttachsUI(boolean isNew, boolean forceReadonly) {
 		// 构建附件控件
-		String ptype = "contract4Labour.main";
+		String ptype = Contract4Labour.KEY_UID;
 		AttachWidget attachsUI = new AttachWidget();
 		attachsUI.setFlashUpload(isFlashUpload());
 		attachsUI.addClazz("formAttachs");

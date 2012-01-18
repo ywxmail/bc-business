@@ -191,7 +191,7 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 				getText("contract.status"), 35).setSortable(true)
 				.setValueFormater(new EntityStatusFormater(getEntityStatuses())));
 		columns.add(new TextColumn4MapKey("c.ver_major", "ver_major",
-				getText("contract4Labour.ver"), 30)
+				getText("contract4Labour.ver"), 40)
 				.setValueFormater(new AbstractFormater<String>() {
 					@SuppressWarnings("unchecked")
 					@Override
@@ -255,9 +255,9 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 		//}
 		columns.add(new TextColumn4MapKey("c.code", "code",
 				getText("contract.code"),60).setUseTitleFromLabel(true));
-		columns.add(new TextColumn4MapKey("c.op_type", "op_type",
-				getText("contract4Labour.op"), 35).setSortable(true)
-				.setValueFormater(new EntityStatusFormater(getEntityOpTypes())));
+//		columns.add(new TextColumn4MapKey("c.op_type", "op_type",
+//				getText("contract4Labour.op"), 35).setSortable(true).setUseTitleFromLabel(true)
+//				.setValueFormater(new EntityStatusFormater(getEntityOpTypes())));
 		return columns;
 	}
 	
@@ -352,7 +352,7 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 		statuses.put(String.valueOf(Contract.STATUS_NORMAL),
 				getText("contract.status.normal"));
 		statuses.put(String.valueOf(Contract.STATUS_LOGOUT),
-				getText("contract.status.failure"));
+				getText("contract.status.logout"));
 		statuses.put("", getText("bs.status.all"));
 		return statuses;
 	}
@@ -371,13 +371,13 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 		types.put(String.valueOf(Contract.OPTYPE_CHANGECAR),
 				getText("contract4Labour.optype.transfer"));
 		types.put(String.valueOf(Contract.OPTYPE_RENEW),
-				getText("contract4Labour.optype.renew"));
+				getText("contract4Charger.optype.renew"));
 		types.put(String.valueOf(Contract.OPTYPE_RESIGN),
 				getText("contract4Labour.optype.resign"));
 		types.put(String.valueOf(Contract.OPTYPE_CHANGECHARGER),
-				getText("contract4Labour.optype.changeCharger"));
+				getText("contract4Charger.optype.changeCharger"));
 		types.put(String.valueOf(Contract.OPTYPE_CHANGECHARGER2),
-				getText("contract4Labour.optype.changeCharger2"));
+				getText("contract4Charger.optype.changeCharger2"));
 		return types;
 	}
 	

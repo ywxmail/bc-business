@@ -131,8 +131,10 @@ public class Contract4LabourServiceImpl extends
 		newContract.setStartDate(newStartDate);
 		newContract.setEndDate(newEndDate);
 
-		// 设置最后修改人信息
+		// 设置创建人信息和最后修改人信息
 		SystemContext context = SystemContextHolder.get();
+		newContract.setAuthor(context.getUserHistory());
+		newContract.setFileDate(Calendar.getInstance());
 		newContract.setModifier(context.getUserHistory());
 		newContract.setModifiedDate(Calendar.getInstance());
 
@@ -179,7 +181,7 @@ public class Contract4LabourServiceImpl extends
 		}
 
 		// 复制原合同的附件给新的合同
-		String oldUid = newContract.getUid();
+		String oldUid = oldContract.getUid();
 		attachService.doCopy(Contract4Labour.KEY_UID, oldUid,
 				Contract4Labour.KEY_UID, newContract.getUid(), true);
 
@@ -221,8 +223,10 @@ public class Contract4LabourServiceImpl extends
 		}
 		newContract.setCode(oldContractCode);
 
-		// 设置最后修改人信息
+		// 设置创建人信息和最后修改人信息
 		SystemContext context = SystemContextHolder.get();
+		newContract.setAuthor(context.getUserHistory());
+		newContract.setFileDate(Calendar.getInstance());
 		newContract.setModifier(context.getUserHistory());
 		newContract.setModifiedDate(Calendar.getInstance());
 
@@ -264,7 +268,7 @@ public class Contract4LabourServiceImpl extends
 		}
 
 		// 复制原合同的附件给新的合同
-		String oldUid = newContract.getUid();
+		String oldUid = oldContract.getUid();
 		attachService.doCopy(Contract4Labour.KEY_UID, oldUid,
 				Contract4Labour.KEY_UID, newContract.getUid(), true);
 

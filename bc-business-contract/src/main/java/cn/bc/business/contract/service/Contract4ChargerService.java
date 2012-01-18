@@ -197,12 +197,10 @@ public interface Contract4ChargerService extends CrudService<Contract4Charger> {
 	 * 
 	 * @param logoutId
 	 *            指定的注销人
-	 * @param logoutDate
-	 *            指定的注销日期，为空则使用当前时间
 	 * @param contractId
 	 *            原合同id
 	 */
-	void doLogout(Calendar logoutDate,Long fromContractId);
+	void doLogout(Long fromContractId);
 
 
 }
