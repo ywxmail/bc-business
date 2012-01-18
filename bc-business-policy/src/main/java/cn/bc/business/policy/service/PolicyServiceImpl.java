@@ -126,6 +126,22 @@ public class PolicyServiceImpl extends DefaultCrudService<Policy> implements
 		this.policyDao.save(policy);
 
 	}
+	
+	//注销
+	public void doLogout(Long policyId){
+		// 获取车保信息
+		Policy policy = this.policyDao.load(policyId);
+		// 设置注销日期
+		policy.setLogoutDate(Calendar.getInstance());
+		SystemContext context = SystemContextHolder.get();
+		//设置注销人
+		policy.setLogout(context.getUserHistory());
+		// 设置状态为注销
+		policy.setStatus(Policy.STATUS_DISABLED);
+		this.policyDao.save(policy);
+
+		
+	}
 
 	@Override
 	public Policy save(Policy entity) {
