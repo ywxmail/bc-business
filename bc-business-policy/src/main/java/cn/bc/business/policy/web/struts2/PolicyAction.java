@@ -181,9 +181,9 @@ public class PolicyAction extends FileEntityAction<Long, Policy> {
 						getText("policy.status.disabled"),null,
 						"bc.policyForm.doLogout"));
 				//停保 
-				pageOption.addButton(new ButtonOption(
+				/*pageOption.addButton(new ButtonOption(
 						getText("policy.optype.surrenders"), null,
-						"bc.policyForm.doSurrender").setId("policySurrenders"));
+						"bc.policyForm.doSurrender").setId("policySurrenders"));*/
 			  }
 			}
 		}

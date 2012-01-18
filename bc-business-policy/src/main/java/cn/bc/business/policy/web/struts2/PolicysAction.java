@@ -207,9 +207,9 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("p.liability_no", "liability_no",
 				getText("policy.liabilityNo"), 190).setSortable(true)
 				.setUseTitleFromLabel(true));
-		columns.add(new TextColumn4MapKey("p.stop_date", "stop_date",
+		/*columns.add(new TextColumn4MapKey("p.stop_date", "stop_date",
 				getText("policy.stopDate"), 100).setSortable(true)
-				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));*/
 		if (!this.isReadonly()) {
 			// 责任险合计
 			columns.add(new TextColumn4MapKey("p.liability_amount",
@@ -240,11 +240,11 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 					.setValueFormater(new NubmerFormater("###,###.00")));
 		}
 		columns.add(new TextColumn4MapKey("p.ownrisk", "ownrisk",
-				getText("policy.ownrisk"), 80).setSortable(true)
+				getText("policy.ownrisk"), 40).setSortable(true)
 				.setUseTitleFromLabel(true)
 				.setValueFormater(new BooleanFormater()));
 		columns.add(new TextColumn4MapKey("p.greenslip", "greenslip",
-				getText("policy.greenslip"), 120).setSortable(true)
+				getText("policy.greenslip"),75).setSortable(true)
 				.setUseTitleFromLabel(true)
 				.setValueFormater(new BooleanFormater()));
 		columns.add(new TextColumn4MapKey("p.greenslip_no", "greenslip_no",
@@ -392,8 +392,8 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 				getText("policy.status.enabled"));
 		statuses.put(String.valueOf(Policy.STATUS_DISABLED),
 				getText("policy.status.disabled"));
-		statuses.put(String.valueOf(Policy.STATUS_SURRENDER),
-				getText("policy.status.surrender"));
+		/*statuses.put(String.valueOf(Policy.STATUS_SURRENDER),
+				getText("policy.status.surrender"));*/
 		statuses.put("", getText("bs.status.all"));
 		return statuses;
 	}
