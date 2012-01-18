@@ -150,8 +150,10 @@ public class Contract4ChargerServiceImpl extends DefaultCrudService<Contract4Cha
 		newContract.setStartDate(newStartDate);
 		newContract.setEndDate(newEndDate);
 
-		// 设置最后修改人信息
+		// 设置创建人信息和最后修改人信息
 		SystemContext context = SystemContextHolder.get();
+		newContract.setAuthor(context.getUserHistory());
+		newContract.setFileDate(Calendar.getInstance());
 		newContract.setModifier(context.getUserHistory());
 		newContract.setModifiedDate(Calendar.getInstance());
 
@@ -161,7 +163,8 @@ public class Contract4ChargerServiceImpl extends DefaultCrudService<Contract4Cha
 		// 关联 续签合同与原合同
 		newContract.setPid(contractId);
 
-		// 设置操作类型、状态、main
+		// 设置签约类型、操作类型、状态、main
+		newContract.setSignType("续约");
 		newContract.setOpType(Contract.OPTYPE_RENEW);// 续签
 		newContract.setMain(Contract.MAIN_NOW);// 当前
 		newContract.setStatus(Contract.STATUS_NORMAL);// 正常
@@ -198,7 +201,7 @@ public class Contract4ChargerServiceImpl extends DefaultCrudService<Contract4Cha
 		}
 
 		// 复制原合同的附件给新的合同
-		String oldUid = newContract.getUid();
+		String oldUid = oldContract.getUid();
 		attachService.doCopy(Contract4Charger.KEY_UID, oldUid,
 				Contract4Charger.KEY_UID, newContract.getUid(), true);
 
@@ -254,8 +257,10 @@ public class Contract4ChargerServiceImpl extends DefaultCrudService<Contract4Cha
 		// 设置冗余显示责任人姓名
 		newContract.setExt_str2(assignChargerNames);
 		
-		// 设置最后修改人信息
+		// 设置创建人信息和最后修改人信息
 		SystemContext context = SystemContextHolder.get();
+		newContract.setAuthor(context.getUserHistory());
+		newContract.setFileDate(Calendar.getInstance());
 		newContract.setModifier(context.getUserHistory());
 		newContract.setModifiedDate(Calendar.getInstance());
 
@@ -265,7 +270,8 @@ public class Contract4ChargerServiceImpl extends DefaultCrudService<Contract4Cha
 		// 关联 过户合同与原合同
 		newContract.setPid(contractId);
 
-		// 设置操作类型、状态、main
+		// 设置签约类型、操作类型、状态、main
+		newContract.setSignType("过户");
 		newContract.setOpType(Contract.OPTYPE_CHANGECHARGER);// 过户
 		newContract.setMain(Contract.MAIN_NOW);// 当前
 		newContract.setStatus(Contract.STATUS_NORMAL);// 正常
@@ -277,7 +283,7 @@ public class Contract4ChargerServiceImpl extends DefaultCrudService<Contract4Cha
 		Long newId = newContract.getId();
 		
 		// 复制原合同的附件给新的合同
-		String oldUid = newContract.getUid();
+		String oldUid = oldContract.getUid();
 		attachService.doCopy(Contract4Charger.KEY_UID, oldUid,
 				Contract4Charger.KEY_UID, newContract.getUid(), true);
 		
@@ -361,8 +367,10 @@ public class Contract4ChargerServiceImpl extends DefaultCrudService<Contract4Cha
 		// 设置冗余显示责任人姓名
 		newContract.setExt_str2(assignChargerNames);
 		
-		// 设置最后修改人信息
+		// 设置创建人信息和最后修改人信息
 		SystemContext context = SystemContextHolder.get();
+		newContract.setAuthor(context.getUserHistory());
+		newContract.setFileDate(Calendar.getInstance());
 		newContract.setModifier(context.getUserHistory());
 		newContract.setModifiedDate(Calendar.getInstance());
 
@@ -372,7 +380,8 @@ public class Contract4ChargerServiceImpl extends DefaultCrudService<Contract4Cha
 		// 关联 过户合同与原合同
 		newContract.setPid(contractId);
 
-		// 设置操作类型、状态、main
+		// 设置签约类型、操作类型、状态、main
+		newContract.setSignType("重发包");
 		newContract.setOpType(Contract.OPTYPE_CHANGECHARGER2);// 重发包
 		newContract.setMain(Contract.MAIN_NOW);// 当前
 		newContract.setStatus(Contract.STATUS_NORMAL);// 正常
@@ -384,7 +393,7 @@ public class Contract4ChargerServiceImpl extends DefaultCrudService<Contract4Cha
 		Long newId = newContract.getId();
 		
 		// 复制原合同的附件给新的合同
-		String oldUid = newContract.getUid();
+		String oldUid = oldContract.getUid();
 		attachService.doCopy(Contract4Charger.KEY_UID, oldUid,
 				Contract4Charger.KEY_UID, newContract.getUid(), true);
 		
@@ -423,7 +432,7 @@ public class Contract4ChargerServiceImpl extends DefaultCrudService<Contract4Cha
 	/**
 	 * 注销
 	 */
-	public void doLogout(Calendar logoutDate,Long contractId) {
+	public void doLogout(Long contractId) {
 		// 获取原来的合同信息
 		Contract4Charger contract = this.contract4ChargerDao.load(contractId);
 		if (contract == null)
@@ -434,7 +443,7 @@ public class Contract4ChargerServiceImpl extends DefaultCrudService<Contract4Cha
 		// 设置注销人,注销日期
 		SystemContext context = SystemContextHolder.get();
 		contract.setLogoutId(context.getUserHistory());
-		contract.setLogoutDate(logoutDate); 
+		contract.setLogoutDate(Calendar.getInstance()); 
 		this.contract4ChargerDao.save(contract);
 	}
 	

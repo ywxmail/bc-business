@@ -191,7 +191,7 @@ public class Contract4LaboursAction extends ViewAction<Map<String, Object>> {
 				.setSortable(true)
 				.setValueFormater(new EntityStatusFormater(getEntityStatuses())));
 		columns.add(new TextColumn4MapKey("c.ver_major", "ver_major",
-				getText("contract4Labour.ver"), 30)
+				getText("contract4Labour.ver"), 40)
 				.setValueFormater(new AbstractFormater<String>() {
 					@SuppressWarnings("unchecked")
 					@Override
@@ -311,7 +311,7 @@ public class Contract4LaboursAction extends ViewAction<Map<String, Object>> {
 		statuses.put(String.valueOf(Contract.STATUS_NORMAL),
 				getText("contract.status.normal"));
 		statuses.put(String.valueOf(Contract.STATUS_LOGOUT),
-				getText("contract.status.failure"));
+				getText("contract.status.logout"));
 		statuses.put(String.valueOf(Contract.STATUS_RESGIN),
 				getText("contract.status.resign"));
 		statuses.put("", getText("bs.status.all"));
