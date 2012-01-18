@@ -179,7 +179,7 @@ public class Contract4LabourServiceImpl extends
 		}
 
 		// 复制原合同的附件给新的合同
-		String oldUid = newContract.getUid();
+		String oldUid = oldContract.getUid();
 		attachService.doCopy(Contract4Labour.KEY_UID, oldUid,
 				Contract4Labour.KEY_UID, newContract.getUid(), true);
 

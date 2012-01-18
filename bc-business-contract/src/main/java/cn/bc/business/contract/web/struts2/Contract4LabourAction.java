@@ -341,7 +341,7 @@ public class Contract4LabourAction extends
 
 	private AttachWidget buildAttachsUI(boolean isNew, boolean forceReadonly) {
 		// 构建附件控件
-		String ptype = "contract4Labour.main";
+		String ptype = Contract4Labour.KEY_UID;
 		AttachWidget attachsUI = new AttachWidget();
 		attachsUI.setFlashUpload(isFlashUpload());
 		attachsUI.addClazz("formAttachs");
