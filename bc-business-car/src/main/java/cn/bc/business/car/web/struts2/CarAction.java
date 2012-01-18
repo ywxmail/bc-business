@@ -85,6 +85,8 @@ public class CarAction extends FileEntityAction<Long, Car> {
 
 		// 初始化车辆的状态
 		this.getE().setStatus(Car.CAR_STAUTS_NORMAL);
+		// 初始化车辆定级
+		this.getE().setLevel("一级");
 //		// 设置默认的原归属单位信息
 //		this.getE().setOldUnitName(getText("app.oldUnitName"));
 

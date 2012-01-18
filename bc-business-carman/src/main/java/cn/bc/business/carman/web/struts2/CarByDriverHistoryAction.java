@@ -12,6 +12,7 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
+import cn.bc.business.car.domain.Car;
 import cn.bc.business.car.service.CarService;
 import cn.bc.business.carman.domain.CarByDriverHistory;
 import cn.bc.business.carman.service.CarByDriverHistoryService;
@@ -46,6 +47,8 @@ public class CarByDriverHistoryAction extends
 	public CarByDriverService carByDriverService;
 	public Long carManId;
 	public Long carId;
+	public Long toCarId;
+	public Long fromCarId;
 	public int moveType;
 	private MotorcadeService motorcadeService;
 
@@ -99,8 +102,27 @@ public class CarByDriverHistoryAction extends
 
 			}
 			this.getE().setDriver(this.carManService.load(carManId));
+
 		}
-		return this.getFormName(this.getE().getMoveType());
+		if (toCarId != null || fromCarId != null) {
+			// 如果车辆Id不为空，直接转到转车队页面
+			if (toCarId != null) {
+				// 如果该车辆为执行新入职，由外公司迁入，车辆到车辆操作后则取迁往车辆的Id加载车辆信息[车辆转车辆操作的优先取取迁往车辆的Id]
+				Car fromCar = this.carService.load(toCarId);
+				this.getE().setFromCar(fromCar);
+				this.getE().setFromMotorcadeId(fromCar.getMotorcade().getId());
+			} else {
+				// 如果该车辆为执行公司到公司，交回未注销，注销未有去向操作后则取迁往车辆的Id加载车辆信息
+				Car fromCar = this.carService.load(fromCarId);
+				this.getE().setFromCar(fromCar);
+				this.getE().setFromMotorcadeId(fromCar.getMotorcade().getId());
+			}
+
+			return "zhuanCheDui";
+		} else {
+			return this.getFormName(this.getE().getMoveType());
+		}
+
 	}
 
 	/**
@@ -239,7 +261,8 @@ public class CarByDriverHistoryAction extends
 	@Override
 	protected PageOption buildFormPageOption(boolean editable) {
 		return super.buildFormPageOption(editable).setWidth(390)
-				.setMinWidth(250).setHeight(590).setMinHeight(200);
+				.setMinWidth(250).setHeight(590).setMinHeight(200)
+				.setModal(true);
 	}
 
 }

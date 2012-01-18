@@ -162,5 +162,35 @@ public interface Contract4ChargerService extends CrudService<Contract4Charger> {
 	 */
 	List<String> findChargerNameByContractId(Long contractId);
 
+	/**
+	 * 过户处理：新纪录、主版本号加1
+	 * @parma carId 原车辆id
+	 * @parma takebackOrigin 是否收回原件
+	 * @parma assignChargerIds 多个新责任人id
+	 * @parma assignChargerNames 多个新责任人名
+	 * @parma contractId 原合同id
+	 * @parma newStartDate 续签的开始日期
+	 * @parma newEndDate 续签的结束日期
+	 * @return 过户后的合同信息
+	 */
+	Contract4Charger doChaneCharger(Long carId,Boolean takebackOrigin,String assignChargerIds,
+			String assignChargerNames, Long fromContractId,
+			Calendar newStartDate, Calendar newEndDate);
+
+	 /**
+	 * 重发包处理：新纪录、主版本号加1
+	 * @parma carId 原车辆id
+	 * @parma takebackOrigin 是否收回原件
+	 * @parma assignChargerIds 多个新责任人id
+	 * @parma assignChargerNames 多个新责任人名
+	 * @parma contractId 原合同id
+	 * @parma newStartDate 续签的开始日期
+	 * @parma newEndDate 续签的结束日期
+	 * @return 过户后的合同信息
+	 */
+	Contract4Charger doChaneCharger2(Long carId, Boolean takebackOrigin,
+			String assignChargerIds, String assignChargerNamesStr,
+			Long fromContractId, Calendar newStartDate, Calendar newEndDate);
+
 
 }

@@ -220,8 +220,6 @@ public class Contract4LabourServiceImpl extends
 			oldContractCode = oldContractCode+"-1";
 		}
 		newContract.setCode(oldContractCode);
-		//newContract.setCode(this.idGeneratorService
-		//.nextSN4Month(Contract4Labour.KEY_CODE));
 
 		// 设置最后修改人信息
 		SystemContext context = SystemContextHolder.get();

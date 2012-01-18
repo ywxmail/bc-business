@@ -51,6 +51,7 @@ public class Contract4ChargerAction extends FileEntityAction<Long, Contract4Char
 	
 	public  List<Map<String, String>>	signTypeList;							//可选签约类型
 	public  List<Map<String, String>>	businessTypeList;						//可选营运性质列表
+	public  List<Map<String, String>>	contractVersionNoList;					//可选合同版本号列表
 	public	String						assignChargerIds;						//多个责任人Id
 	public  String						assignChargerNames;						//多个责任人name
 	public  String []					chargerNameAry;							
@@ -110,12 +111,12 @@ public class Contract4ChargerAction extends FileEntityAction<Long, Contract4Char
 		super.afterCreate(entity);
 		if(carId != null){
 			//查找此车辆是否存在经济合同,若存在前台提示
-			isExistContract = this.contract4ChargerService.isExistContract(carId);
-			if(isExistContract == false){
+//			isExistContract = this.contract4ChargerService.isExistContract(carId);
+//			if(isExistContract == false){
 				//根据carId查找车辆的车牌号码
 				carInfoMap = this.contract4ChargerService.findCarByCarId(carId);
 				entity.setExt_str1(isNullObject(carInfoMap.get("plate_type")+"."+carInfoMap.get("plate_no")));
-			}
+//			}
 		}
 		
 		if(driverId != null){
@@ -135,6 +136,7 @@ public class Contract4ChargerAction extends FileEntityAction<Long, Contract4Char
 		entity.setCode(this.getIdGeneratorService().nextSN4Month(Contract4Charger.KEY_CODE));
 		entity.setType(Contract.TYPE_CHARGER);
 		entity.setStatus(Contract.STATUS_NORMAL);
+		entity.setSignType(getText("contract4Charger.optype.create"));
 	}
 	
 	@Override
@@ -333,6 +335,12 @@ public class Contract4ChargerAction extends FileEntityAction<Long, Contract4Char
 					pageOption.addButton(new ButtonOption(
 							getText("contract4Labour.optype.renew"), null,
 							"bc.contract4ChargerForm.doRenew"));
+					pageOption.addButton(new ButtonOption(
+							getText("contract4Charger.optype.changeCharger"), null,
+							"bc.contract4ChargerForm.doChangeCharger"));
+					pageOption.addButton(new ButtonOption(
+							getText("contract4Charger.optype.changeCharger2"), null,
+							"bc.contract4ChargerForm.doChangeCharger2"));
 				}
 			}
 		}
@@ -348,6 +356,7 @@ public class Contract4ChargerAction extends FileEntityAction<Long, Contract4Char
 				.findOptionItemByGroupKeys(new String[] {
 						OptionConstants.CONTRACT_SIGNTYPE,
 						OptionConstants.CAR_BUSINESS_NATURE,
+						OptionConstants.CONTRACT_VERSION_NO,
 			});
 		
 		// 加载可选签约类型
@@ -357,6 +366,8 @@ public class Contract4ChargerAction extends FileEntityAction<Long, Contract4Char
 		}
 		// 加载可选营运性质列表
 		this.businessTypeList	=	 optionItems.get(OptionConstants.CAR_BUSINESS_NATURE);
+		// 加载可选合同版本号列表
+		this.contractVersionNoList = optionItems.get(OptionConstants.CONTRACT_VERSION_NO);
 
 	}
 	

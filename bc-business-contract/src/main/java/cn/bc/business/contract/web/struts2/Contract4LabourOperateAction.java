@@ -131,9 +131,10 @@ public class Contract4LabourOperateAction extends ActionSupport {
 	 */
 	public String doChangeCar() throws Exception {
 		Long fromContractId = this.getId();
-		this.contract4LabourService.doChangeCar(fromContractId, newCarId , newCarPlate);
+		Contract newContract = this.contract4LabourService.doChangeCar(fromContractId, newCarId , newCarPlate);
 		json = new Json();
-		json.put("id", fromContractId);
+		json.put("id", newContract.getId());
+		json.put("oldId", fromContractId);
 		json.put("msg", getText("contract4Labour.changeCar.success"));
 		return "json";
 	}
