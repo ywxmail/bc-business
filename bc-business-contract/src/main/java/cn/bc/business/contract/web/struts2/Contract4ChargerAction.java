@@ -217,7 +217,7 @@ public class Contract4ChargerAction extends FileEntityAction<Long, Contract4Char
 		super.initForm(editable);
 		
 		// 状态列表
-		statusesValue		=	this.getEntityStatuses();
+		statusesValue		=	this.getContractStatuses();
 		// 表单可选项的加载
 		initSelects();
 	}
@@ -328,7 +328,7 @@ public class Contract4ChargerAction extends FileEntityAction<Long, Contract4Char
 				pageOption.addButton(new ButtonOption(getText("label.save"),
 						null, "bc.contract4ChargerForm.save"));
 			} else {// 只读状态显示操作按钮
-				if(this.getE().getMain() == Contract.MAIN_NOW){
+				if(this.getE().getMain() == Contract.MAIN_NOW && this.getE().getStatus() != Contract.STATUS_LOGOUT){
 					pageOption.addButton(new ButtonOption(
 							getText("contract4Labour.optype.maintenance"), null,
 							"bc.contract4ChargerForm.doMaintenance"));
@@ -341,6 +341,9 @@ public class Contract4ChargerAction extends FileEntityAction<Long, Contract4Char
 					pageOption.addButton(new ButtonOption(
 							getText("contract4Charger.optype.changeCharger2"), null,
 							"bc.contract4ChargerForm.doChangeCharger2"));
+					pageOption.addButton(new ButtonOption(
+							getText("contract4Charger.logout"), null,
+							"bc.contract4ChargerForm.doLogout"));
 				}
 			}
 		}
@@ -393,5 +396,21 @@ public class Contract4ChargerAction extends FileEntityAction<Long, Contract4Char
     		return "";
     	}
     }
+    
+	/**
+	 * 获取合同的状态列表
+	 * 
+	 * @return
+	 */
+	private Map<String, String> getContractStatuses() {
+		Map<String, String> types = new HashMap<String, String>();
+		types.put(String.valueOf(Contract.STATUS_NORMAL),
+				getText("contract.status.normal"));
+		types.put(String.valueOf(Contract.STATUS_LOGOUT),
+				getText("contract.status.failure"));
+		types.put(String.valueOf(Contract.STATUS_RESGIN),
+				getText("contract.status.resign"));
+		return types;
+	}
     
 }

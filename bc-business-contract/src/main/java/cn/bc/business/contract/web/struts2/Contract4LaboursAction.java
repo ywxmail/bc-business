@@ -310,7 +310,7 @@ public class Contract4LaboursAction extends ViewAction<Map<String, Object>> {
 		Map<String, String> statuses = new LinkedHashMap<String, String>();
 		statuses.put(String.valueOf(Contract.STATUS_NORMAL),
 				getText("contract.status.normal"));
-		statuses.put(String.valueOf(Contract.STATUS_FAILURE),
+		statuses.put(String.valueOf(Contract.STATUS_LOGOUT),
 				getText("contract.status.failure"));
 		statuses.put(String.valueOf(Contract.STATUS_RESGIN),
 				getText("contract.status.resign"));

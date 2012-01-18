@@ -101,7 +101,7 @@ public class Contract4LabourServiceImpl extends
 			throw new CoreException("要处理的合同已不存在！contractId=" + contractId);
 
 		// 更新旧合同的相关信息
-		oldContract.setStatus(Contract.STATUS_FAILURE);// 失效
+		oldContract.setStatus(Contract.STATUS_LOGOUT);// 失效
 		oldContract.setMain(Contract.MAIN_HISTORY);// 历史
 		this.contract4LabourDao.save(oldContract);
 
@@ -197,7 +197,7 @@ public class Contract4LabourServiceImpl extends
 			throw new CoreException("要处理的合同已不存在！contractId=" + contractId);
 
 		// 更新旧合同的相关信息
-		oldContract.setStatus(Contract.STATUS_FAILURE);// 失效
+		oldContract.setStatus(Contract.STATUS_LOGOUT);// 失效
 		oldContract.setMain(Contract.MAIN_HISTORY);// 历史
 		this.contract4LabourDao.save(oldContract);
 

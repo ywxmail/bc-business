@@ -65,6 +65,8 @@
 		<action name="doChangeCharger" class="contract4ChargerOperateAction" method="doChangeCharger"/>
 		<!-- 重发包-->
 		<action name="doChangeCharger2" class="contract4ChargerOperateAction" method="doChangeCharger2"/>
+		<!-- 注销 -->
+		<action name="doLogout" class="contract4ChargerOperateAction" method="doLogout"/>
 	</package>
 	
 	<!-- 经济合同 选择 -->
