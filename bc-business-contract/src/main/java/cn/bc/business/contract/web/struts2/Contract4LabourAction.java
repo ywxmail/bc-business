@@ -384,7 +384,7 @@ public class Contract4LabourAction extends
 //						.setChange(
 //								"bc.contract4LabourForm.selectMenuButtonItem");
 //				pageOption.addButton(toolbarMenuButton);
-				if(this.getE().getMain() == Contract.MAIN_NOW){
+				if(this.getE().getMain() == Contract.MAIN_NOW && this.getE().getStatus() != Contract.STATUS_LOGOUT){
 					pageOption.addButton(
 							new ButtonOption(getText("contract4Labour.optype.maintenance"),null,"bc.contract4LabourForm.doMaintenance"));
 					pageOption.addButton(
@@ -445,7 +445,7 @@ public class Contract4LabourAction extends
 		Map<String, String> types = new HashMap<String, String>();
 		types.put(String.valueOf(Contract.STATUS_NORMAL),
 				getText("contract.status.normal"));
-		types.put(String.valueOf(Contract.STATUS_FAILURE),
+		types.put(String.valueOf(Contract.STATUS_LOGOUT),
 				getText("contract.status.failure"));
 		types.put(String.valueOf(Contract.STATUS_RESGIN),
 				getText("contract.status.resign"));

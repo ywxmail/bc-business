@@ -120,7 +120,7 @@ public class Contract4ChargerServiceImpl extends DefaultCrudService<Contract4Cha
 			throw new CoreException("要处理的合同已不存在！contractId=" + contractId);
 
 		// 更新旧合同的相关信息
-		oldContract.setStatus(Contract.STATUS_FAILURE);// 失效
+		oldContract.setStatus(Contract.STATUS_LOGOUT);// 失效
 		oldContract.setMain(Contract.MAIN_HISTORY);// 历史
 		this.contract4ChargerDao.save(oldContract);
 
@@ -218,7 +218,7 @@ public class Contract4ChargerServiceImpl extends DefaultCrudService<Contract4Cha
 			throw new CoreException("要处理的合同已不存在！contractId=" + contractId);
 
 		// 更新旧合同的相关信息
-		oldContract.setStatus(Contract.STATUS_FAILURE);// 失效
+		oldContract.setStatus(Contract.STATUS_LOGOUT);// 失效
 		oldContract.setMain(Contract.MAIN_HISTORY);// 历史
 		this.contract4ChargerDao.save(oldContract);
 
@@ -325,7 +325,7 @@ public class Contract4ChargerServiceImpl extends DefaultCrudService<Contract4Cha
 			throw new CoreException("要处理的合同已不存在！contractId=" + contractId);
 
 		// 更新旧合同的相关信息
-		oldContract.setStatus(Contract.STATUS_FAILURE);// 失效
+		oldContract.setStatus(Contract.STATUS_LOGOUT);// 失效
 		oldContract.setMain(Contract.MAIN_HISTORY);// 历史
 		this.contract4ChargerDao.save(oldContract);
 
@@ -418,6 +418,24 @@ public class Contract4ChargerServiceImpl extends DefaultCrudService<Contract4Cha
 		
 		// 返回续签的合同
 		return newContract;
+	}
+	
+	/**
+	 * 注销
+	 */
+	public void doLogout(Calendar logoutDate,Long contractId) {
+		// 获取原来的合同信息
+		Contract4Charger contract = this.contract4ChargerDao.load(contractId);
+		if (contract == null)
+			throw new CoreException("要处理的合同已不存在！contractId=" + contractId);
+
+		// 更新旧合同的相关信息
+		contract.setStatus(Contract.STATUS_LOGOUT);// 注销
+		// 设置注销人,注销日期
+		SystemContext context = SystemContextHolder.get();
+		contract.setLogoutId(context.getUserHistory());
+		contract.setLogoutDate(logoutDate); 
+		this.contract4ChargerDao.save(contract);
 	}
 	
 	@Override
@@ -587,6 +605,5 @@ public class Contract4ChargerServiceImpl extends DefaultCrudService<Contract4Cha
 		list = this.contract4ChargerDao.findChargerNameByContractId(contractId);
 		return list;
 	}
-
 
 }

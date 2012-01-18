@@ -192,5 +192,17 @@ public interface Contract4ChargerService extends CrudService<Contract4Charger> {
 			String assignChargerIds, String assignChargerNamesStr,
 			Long fromContractId, Calendar newStartDate, Calendar newEndDate);
 
+	/**
+	 * 注销处理：记录不变、次版本号不变
+	 * 
+	 * @param logoutId
+	 *            指定的注销人
+	 * @param logoutDate
+	 *            指定的注销日期，为空则使用当前时间
+	 * @param contractId
+	 *            原合同id
+	 */
+	void doLogout(Calendar logoutDate,Long fromContractId);
+
 
 }

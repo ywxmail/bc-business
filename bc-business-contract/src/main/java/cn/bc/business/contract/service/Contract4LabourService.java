@@ -41,7 +41,7 @@ public interface Contract4LabourService extends CrudService<Contract4Labour> {
 			Calendar newEndDate);
 
 	/**
-	 * 离职处理：记录不变、次版本号加1
+	 * 离职处理：记录不变、次版本号不变
 	 * 
 	 * @param contractId
 	 *            原合同id
