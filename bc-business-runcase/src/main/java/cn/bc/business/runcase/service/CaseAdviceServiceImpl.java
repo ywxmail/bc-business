@@ -49,7 +49,6 @@ public class CaseAdviceServiceImpl extends DefaultCrudService<Case4Advice> imple
 			//保存SyncBase对象
 			this.syncBaseDao.save(sb);
 		}
-		e = this.forceLoad(e.getId());
 		return e;
 	}
 }

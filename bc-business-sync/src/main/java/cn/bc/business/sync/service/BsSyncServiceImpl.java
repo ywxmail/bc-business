@@ -359,7 +359,9 @@ public class BsSyncServiceImpl implements BsSyncService {
 		domain.setReceipt(row.getCellStringValue("罚没收据编号"));
 		domain.setNotice(row.getCellStringValue("放行通知书编号"));
 		domain.setBusinessCertNo(row.getCellStringValue("营运证号"));
-		domain.setSeating(Float.parseFloat(row.getCellStringValue("座位数")));
+		if(null !=  row.getCellStringValue("座位数") && row.getCellStringValue("座位数").length() > 0){
+			domain.setSeating(Float.parseFloat(row.getCellStringValue("座位数")));
+		}
 		domain.setOweRecord(row.getCellStringValue("欠笔录"));
 		domain.setOweSignature(row.getCellStringValue("欠签名"));
 		domain.setLeaveTroops(row.getCellStringValue("留队部"));
@@ -370,7 +372,9 @@ public class BsSyncServiceImpl implements BsSyncService {
 		domain.setSubject(row.getCellStringValue("违章项目"));
 		domain.setDetain(row.getCellStringValue("扣留物品"));
 		domain.setPullUnit(row.getCellStringValue("拖车单位"));
-		domain.setPenalty(Float.parseFloat(row.getCellStringValue("罚款")));
+		if(null != row.getCellStringValue("罚款") && row.getCellStringValue("罚款").length() > 0){
+			domain.setPenalty(Float.parseFloat(row.getCellStringValue("罚款")));
+		}
 		
 		return domain;
 	}
