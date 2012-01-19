@@ -3,9 +3,7 @@
  */
 package cn.bc.business.carman.service;
 
-import cn.bc.business.car.domain.Car;
 import cn.bc.business.carman.domain.CarByDriverHistory;
-import cn.bc.business.carman.domain.CarMan;
 import cn.bc.core.service.CrudService;
 
 /**
@@ -21,12 +19,9 @@ public interface CarByDriverHistoryService extends
 	 * 
 	 * @param carManId
 	 *            司机ID
-	 * @param carId
-	 *            新车辆ID
-	 * @param newclasses
-	 *            新营运班次
+	 * 
 	 */
-	void upDateCarByDriver(CarMan carMan, Car car, int newclasses);
+	void upDateCarByDriver(Long carMan);
 
 	/**
 	 * 查找司机最新营运记录
@@ -36,4 +31,12 @@ public interface CarByDriverHistoryService extends
 	 * @return
 	 */
 	CarByDriverHistory findNewestCarByDriverHistory(Long carManId);
+
+	/**
+	 * 更新车辆的营运司机
+	 * 
+	 * @param carId
+	 *            车辆Id
+	 */
+	void upDateDriver4Car(Long carId);
 }

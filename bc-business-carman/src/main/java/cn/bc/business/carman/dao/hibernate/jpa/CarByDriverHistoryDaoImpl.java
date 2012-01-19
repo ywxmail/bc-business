@@ -10,10 +10,8 @@ import javax.persistence.Query;
 
 import org.springframework.orm.jpa.JpaCallback;
 
-import cn.bc.business.car.domain.Car;
 import cn.bc.business.carman.dao.CarByDriverHistoryDao;
 import cn.bc.business.carman.domain.CarByDriverHistory;
-import cn.bc.business.carman.domain.CarMan;
 import cn.bc.orm.hibernate.jpa.HibernateCrudJpaDao;
 
 /**
@@ -25,10 +23,10 @@ public class CarByDriverHistoryDaoImpl extends
 		HibernateCrudJpaDao<CarByDriverHistory> implements
 		CarByDriverHistoryDao {
 
-	public void upDateCar4Driver(CarMan carMan, Car car, int classes) {
-		String hql = "update CarByDriver c set c.car.id=?,c.classes=? where c.driver.id = ?";
-		this.executeUpdate(hql,
-				new Object[] { car.getId(), classes, carMan.getId() });
+	public void upDateCar4Driver(Long carManId) {
+		// 更新该司机之前的营运车辆记录的状态为注销状态
+		String hql = "update CarByDriver c set c.status=1 where c.driver.id = ?";
+		this.executeUpdate(hql, new Object[] { carManId });
 	}
 
 	public CarByDriverHistory findNewestCar(final Long carManId) {
@@ -51,5 +49,10 @@ public class CarByDriverHistoryDaoImpl extends
 					}
 				});
 		return carByDriverHistory;
+	}
+
+	public void updateDriver4Car(Long carId) {
+		String hql = "update Car c set c.driver=getDriverInfoByCarId(c.id) where c.id=?";
+		this.executeUpdate(hql, new Object[] { carId });
 	}
 }

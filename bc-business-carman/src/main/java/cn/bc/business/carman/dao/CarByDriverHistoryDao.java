@@ -3,9 +3,7 @@
  */
 package cn.bc.business.carman.dao;
 
-import cn.bc.business.car.domain.Car;
 import cn.bc.business.carman.domain.CarByDriverHistory;
-import cn.bc.business.carman.domain.CarMan;
 import cn.bc.core.dao.CrudDao;
 
 /**
@@ -16,16 +14,13 @@ import cn.bc.core.dao.CrudDao;
 public interface CarByDriverHistoryDao extends CrudDao<CarByDriverHistory> {
 
 	/**
-	 * 更新该司机的营运车辆
+	 * 更新该司机之前的营运车辆记录为注销状态
 	 * 
 	 * @param carMan
-	 *            司机
-	 * @param car
-	 *            车辆
-	 * @param classes
-	 *            新营运班次
+	 *            司机Id
+	 * 
 	 */
-	void upDateCar4Driver(CarMan carMan, Car car, int classes);
+	void upDateCar4Driver(Long carManId);
 
 	/**
 	 * 查找司机最新营运记录
@@ -35,4 +30,12 @@ public interface CarByDriverHistoryDao extends CrudDao<CarByDriverHistory> {
 	 * @return
 	 */
 	CarByDriverHistory findNewestCar(Long carManId);
+
+	/**
+	 * 更新车辆的营运司机
+	 * 
+	 * @param carId
+	 *            车辆Id
+	 */
+	void updateDriver4Car(Long carId);
 }
