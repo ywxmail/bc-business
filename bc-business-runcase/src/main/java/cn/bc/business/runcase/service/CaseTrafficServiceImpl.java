@@ -50,7 +50,6 @@ public class CaseTrafficServiceImpl extends DefaultCrudService<Case4InfractTraff
 			//保存SyncBase对象
 			this.syncBaseDao.save(sb);
 		}
-		e = this.forceLoad(e.getId());
 		return e;
 	}
 }
