@@ -314,8 +314,8 @@ public class Contract4ChargerAction extends FileEntityAction<Long, Contract4Char
 
 	@Override
 	protected PageOption buildFormPageOption(boolean editable) {
-		return super.buildFormPageOption(editable).setWidth(748).setMinWidth(250)
-				.setMinHeight(160).setHeight(450);
+		return super.buildFormPageOption(editable).setWidth(725).setMinWidth(250)
+				.setMinHeight(160).setHeight(405);
 		//option.addButton(new ButtonOption(getText("label.save"), "save"));
 //		if (!this.isReadonly()) {
 //			option.addButton(new ButtonOption(getText("label.save"), null, "bc.contractChargerForm.save"));
@@ -410,7 +410,7 @@ public class Contract4ChargerAction extends FileEntityAction<Long, Contract4Char
 		types.put(String.valueOf(Contract.STATUS_NORMAL),
 				getText("contract.status.normal"));
 		types.put(String.valueOf(Contract.STATUS_LOGOUT),
-				getText("contract.status.failure"));
+				getText("contract.status.logout"));
 		types.put(String.valueOf(Contract.STATUS_RESGIN),
 				getText("contract.status.resign"));
 		return types;
