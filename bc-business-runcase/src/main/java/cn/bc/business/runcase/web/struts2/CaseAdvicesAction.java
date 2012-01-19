@@ -71,7 +71,7 @@ public class CaseAdvicesAction extends ViewAction<Map<String, Object>> {
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer sql = new StringBuffer();
 		sql.append("select a.id, b.status_,a.advice_type,b.subject,b.motorcade_name,b.car_plate,b.driver_name");
-		sql.append(",b.closer_name,b.close_date,a.advisor_name,b.happen_date,b.address");
+		sql.append(",b.closer_name,b.close_date,a.advisor_name,b.happen_date,a.detail");
 		sql.append(",b.from_,b.source,b.driver_cert,a.receive_code,b.case_no,a.receive_date ");
 		sql.append(" from BS_CASE_ADVICE a");
 		sql.append(" inner join BS_CASE_BASE b on b.id=a.id");
@@ -96,7 +96,7 @@ public class CaseAdvicesAction extends ViewAction<Map<String, Object>> {
 				map.put("close_date", rs[i++]);
 				map.put("advisor_name", rs[i++]);
 				map.put("happen_date", rs[i++]);
-				map.put("address", rs[i++]);
+				map.put("detail", rs[i++]);
 				map.put("from_", rs[i++]);
 				map.put("source", rs[i++]);
 				map.put("driver_cert", rs[i++]);
@@ -121,10 +121,13 @@ public class CaseAdvicesAction extends ViewAction<Map<String, Object>> {
 				getText("runcase.adviceType"), 40).setSortable(true)
 				.setValueFormater(new KeyValueFormater(getType())));
 		columns.add(new TextColumn4MapKey("a.receive_date", "receive_date",
-				getText("runcase.receiveDate3"), 120).setSortable(true)
+				getText("runcase.receiveDate3"), 130).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd HH:mm")));
 		columns.add(new TextColumn4MapKey("b.subject", "subject",
-				getText("runcase.subject"), 120).setSortable(true));
+				getText("runcase.subject2")+getText("runcase.big"), 120).setSortable(true));
+		columns.add(new TextColumn4MapKey("a.detail", "detail",
+				getText("runcase.detail"), 150).setSortable(true)
+				.setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("b.motorcade_name", "motorcade_name",
 				getText("runcase.motorcadeName"), 80).setSortable(true));
 		columns.add(new TextColumn4MapKey("b.car_plate", "car_plate",
@@ -134,16 +137,13 @@ public class CaseAdvicesAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("b.closer_name", "closer_name",
 				getText("runcase.closerName"), 70));
 		columns.add(new TextColumn4MapKey("b.close_date", "close_date",
-				getText("runcase.closeDate"), 120).setSortable(true)
+				getText("runcase.closeDate"), 100).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
 		columns.add(new TextColumn4MapKey("a.advisor_name", "advisor_name",
 				getText("runcase.advisorName"), 70).setSortable(true));
 		columns.add(new TextColumn4MapKey("b.happen_date", "happen_date",
 				getText("runcase.happenDate"), 120).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
-		columns.add(new TextColumn4MapKey("b.address", "address",
-				getText("runcase.address"), 100).setSortable(true)
-				.setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("b.driver_cert", "driver_cert",
 				getText("runcase.FWZGCert"), 100).setSortable(true)
 				.setUseTitleFromLabel(true));

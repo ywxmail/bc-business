@@ -69,7 +69,7 @@ public class CasePraisesAction extends ViewAction<Map<String, Object>> {
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer sql = new StringBuffer();
 		sql.append("select b.id,b.status_,b.from_,b.source,b.code,b.motorcade_name,b.car_plate,b.driver_name,b.driver_cert,b.happen_date");
-		sql.append(",b.subject,b.address ,p.advisor_name,p.receive_date ");
+		sql.append(",b.subject,p.detail ,p.advisor_name,p.receive_date ");
 		sql.append(" from BS_CASE_PRAISE p inner join BS_CASE_BASE b on b.id=p.id");
 		sqlObject.setSql(sql.toString());
 
@@ -92,7 +92,7 @@ public class CasePraisesAction extends ViewAction<Map<String, Object>> {
 				map.put("driver_cert", rs[i++]);
 				map.put("happen_date", rs[i++]);
 				map.put("subject", rs[i++]);
-				map.put("address", rs[i++]);
+				map.put("detail", rs[i++]);
 				map.put("advisor_name", rs[i++]);
 				map.put("receive_date", rs[i++]);
 
@@ -113,7 +113,10 @@ public class CasePraisesAction extends ViewAction<Map<String, Object>> {
 				getText("runcase.receiveDate4"), 120).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd HH:mm")));
 		columns.add(new TextColumn4MapKey("b.subject", "subject",
-				getText("runcase.subject"), 120).setSortable(true));
+				getText("runcase.subject3")+getText("runcase.big"), 120).setSortable(true));
+		columns.add(new TextColumn4MapKey("p.detail", "detail",
+				getText("runcase.detail2"), 150).setSortable(true)
+				.setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("b.motorcade_name", "motorcade_name",
 				getText("runcase.motorcadeName"), 80).setSortable(true));
 		if (carId == null) {
@@ -130,9 +133,6 @@ public class CasePraisesAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("b.happen_date", "happen_date",
 				getText("runcase.happenDate"), 100).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
-		columns.add(new TextColumn4MapKey("b.address", "address",
-				getText("runcase.address"), 100).setSortable(true)
-				.setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("p.advisor_name", "advisor_name",
 				getText("runcase.praiseName"), 70).setSortable(true));
 		columns.add(new TextColumn4MapKey("b.code", "code",
