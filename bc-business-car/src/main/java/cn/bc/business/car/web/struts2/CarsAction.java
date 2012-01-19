@@ -13,6 +13,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
 import cn.bc.BCConstants;
+import cn.bc.business.BSConstants;
 import cn.bc.business.web.struts2.LinkFormater4ChargerInfo;
 import cn.bc.business.web.struts2.LinkFormater4DriverInfo;
 import cn.bc.business.web.struts2.ViewAction;
@@ -311,8 +312,10 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 		}
 
 		// 搜索按钮
-		tb.addButton(Toolbar
-				.getDefaultSearchToolbarButton(getText("title.click2search")));
+		tb.addButton(Toolbar.getDefaultAdvanceSearchToolbarButton(
+				getText("title.click2search"),
+				getText("title.click2advanceSearch"), getContextPath()
+						+ BSConstants.NAMESPACE + "/car/conditions"));
 
 		// 状态单选按钮组
 		tb.addButton(Toolbar.getDefaultToolbarRadioGroup(this.getBSStatuses1(),

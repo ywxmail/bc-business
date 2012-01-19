@@ -87,31 +87,31 @@ public class CarAction extends FileEntityAction<Long, Car> {
 		this.getE().setStatus(Car.CAR_STAUTS_NORMAL);
 		// 初始化车辆定级
 		this.getE().setLevel("一级");
-//		// 设置默认的原归属单位信息
-//		this.getE().setOldUnitName(getText("app.oldUnitName"));
+		// // 设置默认的原归属单位信息
+		// this.getE().setOldUnitName(getText("app.oldUnitName"));
 
-//		// 自动生成自编号
-//		this.getE().setCode(
-//				this.getIdGeneratorService().nextSN4Month(Car.KEY_CODE));
+		// // 自动生成自编号
+		// this.getE().setCode(
+		// this.getIdGeneratorService().nextSN4Month(Car.KEY_CODE));
 
 	}
-	
+
 	@Override
 	protected void afterOpen(Car entity) {
-		if(isReadonly()){
+		if (isReadonly()) {
 			this.getE().setCertNo2("******");
 		}
 	}
-	
+
 	@Override
 	protected void beforeSave(Car entity) {
-		if(entity.isLogout()){
+		if (entity.isLogout()) {
 			entity.setStatus(Car.CAR_STAUTS_LOGOUT);
-		}else{
+		} else {
 			entity.setStatus(Car.CAR_STAUTS_NORMAL);
 		}
 	}
-	
+
 	@Override
 	protected void initForm(boolean editable) {
 		super.initForm(editable);
@@ -131,14 +131,12 @@ public class CarAction extends FileEntityAction<Long, Car> {
 		Map<String, List<Map<String, String>>> optionItems = this.optionService
 				.findOptionItemByGroupKeys(new String[] {
 						OptionConstants.CAR_BUSINESS_NATURE,
-						OptionConstants.CAR_RANK, 
-						OptionConstants.CAR_BRAND,
+						OptionConstants.CAR_RANK, OptionConstants.CAR_BRAND,
 						OptionConstants.CAR_FUEL_TYPE,
 						OptionConstants.CAR_COLOR,
-						OptionConstants.CAR_TAXIMETERFACTORY, 
+						OptionConstants.CAR_TAXIMETERFACTORY,
 						OptionConstants.CAR_OLD_UNIT_NAME,
-						OptionConstants.CAR_LOGOUT_REASON 
-						});
+						OptionConstants.CAR_LOGOUT_REASON });
 
 		// 加载可选营运性质列表
 		this.businessTypeList = optionItems
@@ -155,19 +153,20 @@ public class CarAction extends FileEntityAction<Long, Car> {
 
 		// 加载可选颜色类型列表
 		this.colorTypeList = optionItems.get(OptionConstants.CAR_COLOR);
-		
+
 		// 加载可选 计价器制造厂列表
 		this.taximeterFactoryTypeList = optionItems
 				.get(OptionConstants.CAR_TAXIMETERFACTORY);
-		
+
 		// 所属单位列表
 		this.oldUnitList = optionItems.get(OptionConstants.CAR_OLD_UNIT_NAME);
-		OptionItem.insertIfNotExist(oldUnitList,null,getE().getOldUnitName());
-		
+		OptionItem.insertIfNotExist(oldUnitList, null, getE().getOldUnitName());
+
 		// 注销原因列表
-		this.logoutReasonList = optionItems.get(OptionConstants.CAR_LOGOUT_REASON); 
+		this.logoutReasonList = optionItems
+				.get(OptionConstants.CAR_LOGOUT_REASON);
 	}
-	
+
 	/**
 	 * 状态值转换列表：在案|注销|全部
 	 * 
@@ -181,5 +180,14 @@ public class CarAction extends FileEntityAction<Long, Car> {
 				getText("bs.status.logout"));
 		statuses.put(" ", getText("bs.status.all"));
 		return statuses;
+	}
+
+	/**
+	 * 高级搜索条件窗口
+	 * 
+	 * @return
+	 */
+	public String conditions() {
+		return SUCCESS;
 	}
 }
