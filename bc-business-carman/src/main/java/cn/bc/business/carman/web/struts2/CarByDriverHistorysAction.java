@@ -136,6 +136,9 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 		columns.add(new IdColumn4MapKey("d.id", "id"));
 		columns.add(new TextColumn4MapKey("m.cert_fwzg", "cert_fwzg",
 				getText("carByDriverHistory.cert_fwzg"), 80).setSortable(true));
+		columns.add(new TextColumn4MapKey("d.move_type", "move_type",
+				getText("carByDriverHistory.moveType"), 140)
+				.setValueFormater(new KeyValueFormater(getMoveType())));
 		if (carId != null || (carManId == null && carId == null)) {
 			columns.add(new TextColumn4MapKey("d.name", "driver",
 					getText("carByDriverHistory.driver"), 80)
@@ -247,9 +250,6 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 						}));
 		columns.add(new TextColumn4MapKey("d.from_unit", "from_unit",
 				getText("carByDriverHistory.fromUnit"), 100).setSortable(true));
-		columns.add(new TextColumn4MapKey("d.move_type", "move_type",
-				getText("carByDriverHistory.moveType"), 140)
-				.setValueFormater(new KeyValueFormater(getMoveType())));
 		columns.add(new TextColumn4MapKey("d.move_date", "move_date",
 				getText("carByDriverHistory.moveDate"), 120).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
@@ -296,7 +296,8 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 		// toCar4FromCar条件
 		Condition toCar4FromCarCondition = null;
 		if (toCarId != null) {
-			toCar4FromCarCondition = new EqualsCondition("d.from_car_id", toCarId);
+			toCar4FromCarCondition = new EqualsCondition("d.from_car_id",
+					toCarId);
 		}
 		// newCarId条件
 		Condition oldCarIdCondition = null;
@@ -311,7 +312,8 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 		// 合并条件
 		return ConditionUtils.mix2AndCondition(carManIdCondition,
 				ConditionUtils.mix2OrCondition(newCarIdCondition,
-						carId2ToCarIdCondition, oldCarIdCondition,toCar4FromCarCondition));
+						carId2ToCarIdCondition, oldCarIdCondition,
+						toCar4FromCarCondition));
 	}
 
 	@Override
@@ -374,6 +376,8 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 				getText("carByDriverHistory.moveType.xinruzhi"));
 		type.put(String.valueOf(CarByDriverHistory.MOVETYPE_ZCD),
 				getText("carByDriverHistory.moveType.cheduidaochedui"));
+		type.put(String.valueOf(CarByDriverHistory.MOVETYPE_DINGBAN),
+				getText("carByDriverHistory.moveType.dingban"));
 		return type;
 	}
 
