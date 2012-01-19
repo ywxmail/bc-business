@@ -34,4 +34,11 @@ public interface PolicyService extends CrudService<Policy> {
 	 */
 	void doSurrender(Long policyId, Calendar surrenderDate);
 
+	
+	/**
+	 * 注销处理：记录不变
+	 * 
+	 * @param policyId  原车保id
+	 */
+	void doLogout(Long policyId);
 }

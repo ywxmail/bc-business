@@ -1,7 +1,7 @@
 -- ##营运子系统的 postgresql 自定义函数和存储过程##
 
 -- 获取指定车辆实时的营运司机信息,只适用于对当前在案车辆的处理
--- 返回值的格式为：张三(正班),李四(副班),小明(顶班)
+-- 返回值的格式为：张三,正班,id1;李四,副班,id2;小明,顶班,id3;小军,主挂,id4
 -- 返回值是先按营运班次正序排序再按司机的入职时间正序排序进行合并的
 -- 参数：cid - 车辆的id
 CREATE OR REPLACE FUNCTION getDriverInfoByCarId(cid IN integer) RETURNS varchar AS $$
@@ -9,7 +9,7 @@ DECLARE
 	--定义变量
 	driverInfo varchar(4000);
 BEGIN
-	select string_agg(concat(name,',',(case when classes=1 then '正班' when classes=2 then '副班' when classes=3 then '顶班' else '无' end),',',id),';')
+	select string_agg(concat(name,',',(case when classes=1 then '正班' when classes=2 then '副班' when classes=3 then '顶班' when classes=4 then '主挂' else '无' end),',',id),';')
 		into driverInfo
 		from (select m.id as id,m.name as name,cm.classes as classes 
 			from BS_CAR_DRIVER cm
@@ -65,23 +65,69 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+-- 获取指定经济合同的车辆信息
+-- 返回值的格式为：粤A.xxxx1,id1;粤A.xxxx2,id2
+-- 返回值是按合同的创建时间正序排序的
+-- 参数：cid - 经济合同的id
+CREATE OR REPLACE FUNCTION getCarInfoByChargerContractId(cid IN integer) RETURNS varchar AS $$
+DECLARE
+	--定义变量
+	carInfo varchar(4000);
+BEGIN
+	select string_agg(concat(plateType,'.',plateNo,',',id),';') into carInfo
+		from (SELECT car.plate_type as plateType,car.plate_no as plateNo,car.id as id
+			FROM bs_car_contract cc
+			inner join bs_contract c on c.id=cc.contract_id
+			inner join bs_contract_charger c1 on c1.id=c.id
+			inner join bs_car car on car.id=cc.car_id
+			where cc.contract_id=cid
+			order by c.file_date desc) as t;
+
+	return carInfo;
+END;
+$$ LANGUAGE plpgsql;
+
+
 -- 获取指定经济合同的责任人信息
--- 返回值的格式为：张三,id1;李四,id2
--- 返回值是按责任人的入职时间正序排序的
--- 参数：cid - 合同的id
-CREATE OR REPLACE FUNCTION getChargerInfoByContractId(cid IN integer) RETURNS varchar AS $$
+-- 返回值的格式为：姓名1,id1;姓名2,id2
+-- 返回值是按合同的创建时间正序排序的
+-- 参数：cid - 经济合同的id
+CREATE OR REPLACE FUNCTION getChargerInfoByChargerContractId(cid IN integer) RETURNS varchar AS $$
 DECLARE
 	--定义变量
 	chargerInfo varchar(4000);
-	carId integer;
 BEGIN
-	--获取车辆的id
-	select cc.car_id into carId from bs_car_contract cc
-		inner join bs_contract c on c.id=cc.contract_id
-		inner join bs_contract_charger ch on ch.id=c.id
-		where c.id = cid;
+	select string_agg(concat(name,',',id),';') into chargerInfo
+		from (SELECT p.name as name,p.id as id
+			FROM bs_carman_contract cc
+			inner join bs_contract c on c.id=cc.contract_id
+			inner join bs_contract_charger c1 on c1.id=c.id
+			inner join bs_carman p on p.id=cc.man_id
+			where cc.contract_id=cid
+			order by p.work_date asc) as t;
 
-	-- 获取责任人信息
-	return getChargerInfoByCarId(carId);
+	return chargerInfo;
+END;
+$$ LANGUAGE plpgsql;
+
+-- 获取指定劳动合同的车辆信息
+-- 返回值的格式为：粤A.xxxx1,id1;粤A.xxxx2,id2
+-- 返回值是按合同的创建时间正序排序的
+-- 参数：cid - 劳动合同的id
+CREATE OR REPLACE FUNCTION getCarInfoByLabourContractId(cid IN integer) RETURNS varchar AS $$
+DECLARE
+	--定义变量
+	carInfo varchar(4000);
+BEGIN
+	select string_agg(concat(plateType,'.',plateNo,',',id),';') into carInfo
+		from (SELECT car.plate_type as plateType,car.plate_no as plateNo,car.id as id
+			FROM bs_car_contract cc
+			inner join bs_contract c on c.id=cc.contract_id
+			inner join bs_contract_labour c1 on c1.id=c.id
+			inner join bs_car car on car.id=cc.car_id
+			where cc.contract_id=cid
+			order by c.file_date desc) as t;
+
+	return carInfo;
 END;
 $$ LANGUAGE plpgsql;

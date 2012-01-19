@@ -18,7 +18,6 @@ public class InsuranceType extends FileEntityImpl {
 
 	private String Name;// 险种名称
 	private Float coverage;// 保额
-	private Float premium;// 保费
 	private String description;// 备注
 	private int status;// 状态
 
@@ -36,14 +35,6 @@ public class InsuranceType extends FileEntityImpl {
 
 	public void setCoverage(Float coverage) {
 		this.coverage = coverage;
-	}
-
-	public Float getPremium() {
-		return premium;
-	}
-
-	public void setPremium(Float premium) {
-		this.premium = premium;
 	}
 
 	@Column(name = "DESC_")

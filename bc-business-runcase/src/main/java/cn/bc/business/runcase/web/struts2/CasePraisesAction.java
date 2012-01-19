@@ -125,7 +125,7 @@ public class CasePraisesAction extends ViewAction<Map<String, Object>> {
 					getText("runcase.driverName"), 70).setSortable(true));
 		}
 		columns.add(new TextColumn4MapKey("b.driver_cert", "driver_cert",
-				getText("runcase.driverCert"), 100).setSortable(true)
+				getText("runcase.FWZGCert"), 100).setSortable(true)
 				.setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("b.happen_date", "happen_date",
 				getText("runcase.happenDate"), 100).setSortable(true)

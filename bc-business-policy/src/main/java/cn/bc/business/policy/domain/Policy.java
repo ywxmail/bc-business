@@ -19,6 +19,7 @@ import javax.persistence.OrderBy;
 import javax.persistence.Table;
 
 import cn.bc.business.car.domain.Car;
+import cn.bc.identity.domain.ActorHistory;
 import cn.bc.identity.domain.RichFileEntityImpl;
 
 /**
@@ -64,7 +65,6 @@ public class Policy extends RichFileEntityImpl {
 	public static final int BOOLEAN_NO = 0;
 
 	private Car car;// 投保车号
-	private Calendar registerDate;// 初登日期
 	private String assured;// 投保人
 	private String commerialNo;// 商业险号
 	private String commerialCompany;// 商业保险公司
@@ -88,10 +88,13 @@ public class Policy extends RichFileEntityImpl {
 	private int opType; // 操作类型：1-新建,2-维护,3-续保,4-停保
 	private Long Pid;// 父级ID
 	private Set<BuyPlant> buyPlants;// 购买保单险种
-	
-	private Float liabilityAmount;// 责任险合计	
-	private Float commerialAmount; //商业险合计字段	  
-	private Float greenslipAmount;//强制险合计字段  GREENSLIP_AMOUNT 
+
+	private Float liabilityAmount;// 责任险合计
+	private Float commerialAmount; // 商业险合计字段
+	private Float greenslipAmount;// 强制险合计字段 GREENSLIP_AMOUNT
+
+	private ActorHistory logout;//注销人
+	private Calendar logoutDate; // 注销日期
 
 	@ManyToOne(fetch = FetchType.EAGER, optional = true)
 	@JoinColumn(name = "CAR_ID", referencedColumnName = "ID")
@@ -101,15 +104,6 @@ public class Policy extends RichFileEntityImpl {
 
 	public void setCar(Car car) {
 		this.car = car;
-	}
-
-	@Column(name = "REGISTER_DATE")
-	public Calendar getRegisterDate() {
-		return registerDate;
-	}
-
-	public void setRegisterDate(Calendar registerDate) {
-		this.registerDate = registerDate;
 	}
 
 	public String getAssured() {
@@ -304,6 +298,7 @@ public class Policy extends RichFileEntityImpl {
 	public void setBuyPlants(Set<BuyPlant> buyPlants) {
 		this.buyPlants = buyPlants;
 	}
+
 	@Column(name = "STOP_DATE")
 	public Calendar getStopDate() {
 		return stopDate;
@@ -313,7 +308,7 @@ public class Policy extends RichFileEntityImpl {
 		this.stopDate = stopDate;
 	}
 
-	@Column(name ="LIABILITY_AMOUNT")
+	@Column(name = "LIABILITY_AMOUNT")
 	public Float getLiabilityAmount() {
 		return liabilityAmount;
 	}
@@ -321,7 +316,8 @@ public class Policy extends RichFileEntityImpl {
 	public void setLiabilityAmount(Float liabilityAmount) {
 		this.liabilityAmount = liabilityAmount;
 	}
-	@Column(name ="COMMERIAL_AMOUNT")
+
+	@Column(name = "COMMERIAL_AMOUNT")
 	public Float getCommerialAmount() {
 		return commerialAmount;
 	}
@@ -329,7 +325,8 @@ public class Policy extends RichFileEntityImpl {
 	public void setCommerialAmount(Float commerialAmount) {
 		this.commerialAmount = commerialAmount;
 	}
-	@Column(name ="GREENSLIP_AMOUNT")
+
+	@Column(name = "GREENSLIP_AMOUNT")
 	public Float getGreenslipAmount() {
 		return greenslipAmount;
 	}
@@ -338,7 +335,26 @@ public class Policy extends RichFileEntityImpl {
 		this.greenslipAmount = greenslipAmount;
 	}
 
+
+	@Column(name = "LOGOUT_DATE")
+	public Calendar getLogoutDate() {
+		return logoutDate;
+	}
+
+	public void setLogoutDate(Calendar logoutDate) {
+		this.logoutDate = logoutDate;
+	}
+
 	
-	
+	@ManyToOne(fetch = FetchType.EAGER, optional = true)
+	@JoinColumn(name = "LOGOUT_ID", referencedColumnName = "ID")
+	public ActorHistory getLogout() {
+		return logout;
+	}
+
+	public void setLogout(ActorHistory logout) {
+		this.logout = logout;
+	}
+
 	
 }

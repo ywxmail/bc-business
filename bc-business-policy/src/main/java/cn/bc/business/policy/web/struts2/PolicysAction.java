@@ -79,7 +79,7 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 		StringBuffer sql = new StringBuffer();
 		sql.append("select p.id,p.status_");
 		sql.append(",c.code,c.old_unit_name,bia.name as unit_name,m.name");
-		sql.append(",c.plate_type,c.plate_no,p.register_date,p.assured,p.commerial_no");
+		sql.append(",c.plate_type,c.plate_no,p.file_date,p.assured,p.commerial_no");
 		sql.append(",p.commerial_company,p.commerial_start_date,p.commerial_end_date");
 		sql.append(",p.ownrisk,p.greenslip,p.liability_no,c.id as carId,p.op_type");
 		sql.append(",p.greenslip_no,p.greenslip_company,p.greenslip_start_date,p.greenslip_end_date,p.stop_date,p.main");
@@ -108,7 +108,7 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 				map.put("plate_no", rs[i++]);
 				map.put("plate", map.get("plate_type").toString() + "."
 						+ map.get("plate_no").toString());
-				map.put("register_date", rs[i++]);
+				map.put("file_date", rs[i++]);
 				map.put("assured", rs[i++]);
 				map.put("commerial_no", rs[i++]);
 				map.put("commerial_company", rs[i++]);
@@ -117,7 +117,6 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 				map.put("ownrisk", rs[i++]);
 				map.put("greenslip", rs[i++]);
 				map.put("liability_no", rs[i++]);
-
 				map.put("carId", rs[i++]);
 				map.put("op_type", rs[i++]);
 				map.put("greenslip_no", rs[i++]);
@@ -142,7 +141,7 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 		columns.add(new IdColumn4MapKey("p.id", "id"));
 		// 状态
 		columns.add(new TextColumn4MapKey("p.status_", "status_",
-				getText("policy.status"), 60)
+				getText("policy.status"), 40)
 				.setSortable(true)
 				.setValueFormater(new EntityStatusFormater(getPolicyStatuses())));
 		// 公司
@@ -173,7 +172,7 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 						}));
 		// 自编号
 		columns.add(new TextColumn4MapKey("c.code", "code",
-				getText("car.code"), 55).setSortable(true)
+				getText("car.code"), 75).setSortable(true)
 				.setUseTitleFromLabel(true));
 		// 车号
 		if (carId == null) {// 车辆页签时不需显示车牌号码
@@ -201,21 +200,24 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 		}
 		columns.add(new TextColumn4MapKey("p.assured", "assured",
 				getText("policy.assured"), 180));
-		columns.add(new TextColumn4MapKey("p.register_date", "register_date",
-				getText("policy.registerDate"), 100).setSortable(true)
+		// 创建日期
+		columns.add(new TextColumn4MapKey("p.file_date", "file_date",
+				getText("policy.fileDate"), 100).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
 		columns.add(new TextColumn4MapKey("p.liability_no", "liability_no",
 				getText("policy.liabilityNo"), 190).setSortable(true)
 				.setUseTitleFromLabel(true));
-		columns.add(new TextColumn4MapKey("p.stop_date", "stop_date",
-				getText("policy.stopDate"), 100).setSortable(true)
-				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+		/*
+		 * columns.add(new TextColumn4MapKey("p.stop_date", "stop_date",
+		 * getText("policy.stopDate"), 100).setSortable(true)
+		 * .setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+		 */
 		if (!this.isReadonly()) {
 			// 责任险合计
 			columns.add(new TextColumn4MapKey("p.liability_amount",
 					"liability_amount", getText("policy.liabilityAmount"), 105)
 					.setSortable(true).setUseTitleFromLabel(true)
-					.setValueFormater(new NubmerFormater("###,###.##")));
+					.setValueFormater(new NubmerFormater("###,###.00")));
 		}
 		columns.add(new TextColumn4MapKey("p.commerial_no", "commerial_no",
 				getText("policy.commerialNo"), 190).setUseTitleFromLabel(true));
@@ -237,14 +239,14 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 			columns.add(new TextColumn4MapKey("p.commerial_amount",
 					"commerial_amount", getText("policy.commerialAmount"), 105)
 					.setSortable(true).setUseTitleFromLabel(true)
-					.setValueFormater(new NubmerFormater("###,###.##")));
+					.setValueFormater(new NubmerFormater("###,###.00")));
 		}
 		columns.add(new TextColumn4MapKey("p.ownrisk", "ownrisk",
-				getText("policy.ownrisk"), 80).setSortable(true)
+				getText("policy.ownrisk"), 40).setSortable(true)
 				.setUseTitleFromLabel(true)
 				.setValueFormater(new BooleanFormater()));
 		columns.add(new TextColumn4MapKey("p.greenslip", "greenslip",
-				getText("policy.greenslip"), 120).setSortable(true)
+				getText("policy.greenslip"), 75).setSortable(true)
 				.setUseTitleFromLabel(true)
 				.setValueFormater(new BooleanFormater()));
 		columns.add(new TextColumn4MapKey("p.greenslip_no", "greenslip_no",
@@ -267,7 +269,7 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 			columns.add(new TextColumn4MapKey("p.greenslip_amount",
 					"greenslip_amount", getText("policy.greenslipAmount"), 105)
 					.setSortable(true).setUseTitleFromLabel(true)
-					.setValueFormater(new NubmerFormater("###,###.##")));
+					.setValueFormater(new NubmerFormater("###,###.00")));
 		}
 		// 操作类型
 		columns.add(new TextColumn4MapKey("p.op_type", "op_type",
@@ -392,22 +394,42 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 				getText("policy.status.enabled"));
 		statuses.put(String.valueOf(Policy.STATUS_DISABLED),
 				getText("policy.status.disabled"));
-		statuses.put(String.valueOf(Policy.STATUS_SURRENDER),
-				getText("policy.status.surrender"));
+		/*
+		 * statuses.put(String.valueOf(Policy.STATUS_SURRENDER),
+		 * getText("policy.status.surrender"));
+		 */
 		statuses.put("", getText("bs.status.all"));
 		return statuses;
 	}
 
 	@Override
 	protected Toolbar getHtmlPageToolbar() {
-		if (this.carId != null) {
-			return super.getHtmlPageToolbar();
+		Toolbar tb = new Toolbar();
+		if (this.isReadonly()) {
+			// 查看按钮
+			tb.addButton(Toolbar
+					.getDefaultOpenToolbarButton(getText("label.read")));
 		} else {
+			// 新建按钮
+			tb.addButton(Toolbar
+					.getDefaultCreateToolbarButton(getText("label.create")));
+			// 查看按钮
+			tb.addButton(Toolbar
+					.getDefaultOpenToolbarButton(getText("label.read")));
+			// 删除按钮
+			tb.addButton(Toolbar
+					.getDefaultDeleteToolbarButton(getText("label.delete")));
+		}
+		// 搜索按钮
+		tb.addButton(Toolbar
+				.getDefaultSearchToolbarButton(getText("title.click2search")));
 
-			return super.getHtmlPageToolbar().addButton(
-					Toolbar.getDefaultToolbarRadioGroup(getPolicyStatuses(),
-							"status", 0,
-							getText("title.click2changeSearchClasses")));
+		if (this.carId != null) {
+			return tb;
+		} else {
+			return tb.addButton(Toolbar.getDefaultToolbarRadioGroup(
+					getPolicyStatuses(), "status", 0,
+					getText("title.click2changeSearchClasses")));
 		}
 	}
 

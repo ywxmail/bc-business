@@ -52,9 +52,7 @@ public class InsuranceTypeAction extends FileEntityAction<Long, InsuranceType> {
 		InsuranceType e = this.getE();
 		// 初始状态
 		e.setStatus(BCConstants.STATUS_ENABLED);
-		// 新建时默认保费保额默认为0
-		e.setCoverage(new Float(0));
-		e.setPremium(new Float(0));
+
 
 	}
 

@@ -21,7 +21,6 @@ public class BuyPlant extends EntityImpl {
 
 	private String name;// 险种名称
 	private String coverage;// 保额
-	private Float premium;// 保费
 	private String description;// 备注
 	private int orderNo;// 排序号
 	private Policy policy;// 车辆保单ID
@@ -61,13 +60,6 @@ public class BuyPlant extends EntityImpl {
 		this.coverage = coverage;
 	}
 
-	public Float getPremium() {
-		return premium;
-	}
-
-	public void setPremium(Float premium) {
-		this.premium = premium;
-	}
 
 	@Column(name = "DESC_")
 	public String getDescription() {

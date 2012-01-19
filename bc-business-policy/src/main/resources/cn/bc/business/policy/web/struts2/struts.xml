@@ -11,5 +11,7 @@
 		  </action>
 		<!-- 停保 -->
 		<action name="doSurrender" class="policy4CarOperateAction" method="doSurrender"/>
+		<!-- 注销 -->
+		<action name="doLogout" class="policy4CarOperateAction" method="doLogout"/>
 	</package>
 </struts>

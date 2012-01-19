@@ -51,6 +51,7 @@ public class Contract4ChargerAction extends FileEntityAction<Long, Contract4Char
 	
 	public  List<Map<String, String>>	signTypeList;							//可选签约类型
 	public  List<Map<String, String>>	businessTypeList;						//可选营运性质列表
+	public  List<Map<String, String>>	contractVersionNoList;					//可选合同版本号列表
 	public	String						assignChargerIds;						//多个责任人Id
 	public  String						assignChargerNames;						//多个责任人name
 	public  String []					chargerNameAry;							
@@ -110,12 +111,12 @@ public class Contract4ChargerAction extends FileEntityAction<Long, Contract4Char
 		super.afterCreate(entity);
 		if(carId != null){
 			//查找此车辆是否存在经济合同,若存在前台提示
-			isExistContract = this.contract4ChargerService.isExistContract(carId);
-			if(isExistContract == false){
+//			isExistContract = this.contract4ChargerService.isExistContract(carId);
+//			if(isExistContract == false){
 				//根据carId查找车辆的车牌号码
 				carInfoMap = this.contract4ChargerService.findCarByCarId(carId);
 				entity.setExt_str1(isNullObject(carInfoMap.get("plate_type")+"."+carInfoMap.get("plate_no")));
-			}
+//			}
 		}
 		
 		if(driverId != null){
@@ -135,6 +136,10 @@ public class Contract4ChargerAction extends FileEntityAction<Long, Contract4Char
 		entity.setCode(this.getIdGeneratorService().nextSN4Month(Contract4Charger.KEY_CODE));
 		entity.setType(Contract.TYPE_CHARGER);
 		entity.setStatus(Contract.STATUS_NORMAL);
+		entity.setSignType(getText("contract4Charger.optype.create"));
+		
+		// 构建附件控件
+		attachsUI = buildAttachsUI(true, false);
 	}
 	
 	@Override
@@ -215,7 +220,7 @@ public class Contract4ChargerAction extends FileEntityAction<Long, Contract4Char
 		super.initForm(editable);
 		
 		// 状态列表
-		statusesValue		=	this.getEntityStatuses();
+		statusesValue		=	this.getContractStatuses();
 		// 表单可选项的加载
 		initSelects();
 	}
@@ -288,7 +293,7 @@ public class Contract4ChargerAction extends FileEntityAction<Long, Contract4Char
 
 	private AttachWidget buildAttachsUI(boolean isNew, boolean forceReadonly) {
 		// 构建附件控件
-		String ptype = "contract4Charger.main";
+		String ptype = Contract4Charger.KEY_UID;
 		AttachWidget attachsUI = new AttachWidget();
 		attachsUI.setFlashUpload(isFlashUpload());
 		attachsUI.addClazz("formAttachs");
@@ -309,8 +314,8 @@ public class Contract4ChargerAction extends FileEntityAction<Long, Contract4Char
 
 	@Override
 	protected PageOption buildFormPageOption(boolean editable) {
-		return super.buildFormPageOption(editable).setWidth(748).setMinWidth(250)
-				.setMinHeight(160).setHeight(450);
+		return super.buildFormPageOption(editable).setWidth(725).setMinWidth(250)
+				.setMinHeight(160).setHeight(405);
 		//option.addButton(new ButtonOption(getText("label.save"), "save"));
 //		if (!this.isReadonly()) {
 //			option.addButton(new ButtonOption(getText("label.save"), null, "bc.contractChargerForm.save"));
@@ -326,13 +331,22 @@ public class Contract4ChargerAction extends FileEntityAction<Long, Contract4Char
 				pageOption.addButton(new ButtonOption(getText("label.save"),
 						null, "bc.contract4ChargerForm.save"));
 			} else {// 只读状态显示操作按钮
-				if(this.getE().getMain() == Contract.MAIN_NOW){
+				if(this.getE().getMain() == Contract.MAIN_NOW && this.getE().getStatus() != Contract.STATUS_LOGOUT){
 					pageOption.addButton(new ButtonOption(
 							getText("contract4Labour.optype.maintenance"), null,
 							"bc.contract4ChargerForm.doMaintenance"));
 					pageOption.addButton(new ButtonOption(
 							getText("contract4Labour.optype.renew"), null,
 							"bc.contract4ChargerForm.doRenew"));
+					pageOption.addButton(new ButtonOption(
+							getText("contract4Charger.optype.changeCharger"), null,
+							"bc.contract4ChargerForm.doChangeCharger"));
+					pageOption.addButton(new ButtonOption(
+							getText("contract4Charger.optype.changeCharger2"), null,
+							"bc.contract4ChargerForm.doChangeCharger2"));
+					pageOption.addButton(new ButtonOption(
+							getText("contract4Charger.logout"), null,
+							"bc.contract4ChargerForm.doLogout"));
 				}
 			}
 		}
@@ -348,6 +362,7 @@ public class Contract4ChargerAction extends FileEntityAction<Long, Contract4Char
 				.findOptionItemByGroupKeys(new String[] {
 						OptionConstants.CONTRACT_SIGNTYPE,
 						OptionConstants.CAR_BUSINESS_NATURE,
+						OptionConstants.CONTRACT_VERSION_NO,
 			});
 		
 		// 加载可选签约类型
@@ -357,6 +372,8 @@ public class Contract4ChargerAction extends FileEntityAction<Long, Contract4Char
 		}
 		// 加载可选营运性质列表
 		this.businessTypeList	=	 optionItems.get(OptionConstants.CAR_BUSINESS_NATURE);
+		// 加载可选合同版本号列表
+		this.contractVersionNoList = optionItems.get(OptionConstants.CONTRACT_VERSION_NO);
 
 	}
 	
@@ -382,5 +399,21 @@ public class Contract4ChargerAction extends FileEntityAction<Long, Contract4Char
     		return "";
     	}
     }
+    
+	/**
+	 * 获取合同的状态列表
+	 * 
+	 * @return
+	 */
+	private Map<String, String> getContractStatuses() {
+		Map<String, String> types = new HashMap<String, String>();
+		types.put(String.valueOf(Contract.STATUS_NORMAL),
+				getText("contract.status.normal"));
+		types.put(String.valueOf(Contract.STATUS_LOGOUT),
+				getText("contract.status.logout"));
+		types.put(String.valueOf(Contract.STATUS_RESGIN),
+				getText("contract.status.resign"));
+		return types;
+	}
     
 }

@@ -116,8 +116,6 @@ public class Contract4LabourAction extends
 	protected void afterCreate(Contract4Labour entity){
 		
 		super.afterCreate(entity);
-		// 构建附件控件
-		attachsUI = buildAttachsUI(true, false);
 		
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		Date date = null;
@@ -269,6 +267,8 @@ public class Contract4LabourAction extends
 		entity.setBuyUnit(getText("contract.baocheng"));
 		entity.setStatus(Contract.STATUS_NORMAL);
 		
+		// 构建附件控件
+		attachsUI = buildAttachsUI(true, false);
 	}
 
 	@Override
@@ -341,7 +341,7 @@ public class Contract4LabourAction extends
 
 	private AttachWidget buildAttachsUI(boolean isNew, boolean forceReadonly) {
 		// 构建附件控件
-		String ptype = "contract4Labour.main";
+		String ptype = Contract4Labour.KEY_UID;
 		AttachWidget attachsUI = new AttachWidget();
 		attachsUI.setFlashUpload(isFlashUpload());
 		attachsUI.addClazz("formAttachs");
@@ -384,7 +384,7 @@ public class Contract4LabourAction extends
 //						.setChange(
 //								"bc.contract4LabourForm.selectMenuButtonItem");
 //				pageOption.addButton(toolbarMenuButton);
-				if(this.getE().getMain() == Contract.MAIN_NOW){
+				if(this.getE().getMain() == Contract.MAIN_NOW && this.getE().getStatus() != Contract.STATUS_LOGOUT){
 					pageOption.addButton(
 							new ButtonOption(getText("contract4Labour.optype.maintenance"),null,"bc.contract4LabourForm.doMaintenance"));
 					pageOption.addButton(
@@ -445,8 +445,8 @@ public class Contract4LabourAction extends
 		Map<String, String> types = new HashMap<String, String>();
 		types.put(String.valueOf(Contract.STATUS_NORMAL),
 				getText("contract.status.normal"));
-		types.put(String.valueOf(Contract.STATUS_FAILURE),
-				getText("contract.status.failure"));
+		types.put(String.valueOf(Contract.STATUS_LOGOUT),
+				getText("contract.status.logout"));
 		types.put(String.valueOf(Contract.STATUS_RESGIN),
 				getText("contract.status.resign"));
 		return types;

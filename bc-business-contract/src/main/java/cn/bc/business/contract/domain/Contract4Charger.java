@@ -10,7 +10,7 @@ import javax.persistence.InheritanceType;
 import javax.persistence.Table;
 
 /**
- * 责任人的合同
+ * 经济的合同
  * 
  * @author dragon
  */
@@ -22,11 +22,11 @@ public class Contract4Charger extends Contract {
 	public static final String KEY_UID = Contract4Charger.class.getSimpleName();
 	public static final String KEY_CODE = "contract.code";
 	private String signType;// 签约类型:如新户
-	private boolean logout;// 注销:0-未,1-已
 	private String oldContent;// 旧合同内容
 	private boolean takebackOrigin;// 已经收回原件:0-未1-已
 	private boolean includeCost;// 包含检审费用:0-不包含,1-包含
 	private String businessType;// 合同性质
+	private String contractVersionNo;//合同版本号
 
 	public Contract4Charger() {
 		this.setCode("[经济合同]");
@@ -39,14 +39,6 @@ public class Contract4Charger extends Contract {
 
 	public void setSignType(String signType) {
 		this.signType = signType;
-	}
-
-	public boolean isLogout() {
-		return logout;
-	}
-
-	public void setLogout(boolean additionProtocol) {
-		this.logout = additionProtocol;
 	}
 
 	@Column(name = "OLD_CONTENT")
@@ -85,6 +77,13 @@ public class Contract4Charger extends Contract {
 		this.businessType = businessType;
 	}
 
-	
-	
+	@Column(name = "CONTRACT_VERSION_NO")
+	public String getContractVersionNo() {
+		return contractVersionNo;
+	}
+
+	public void setContractVersionNo(String contractVersionNo) {
+		this.contractVersionNo = contractVersionNo;
+	}
+
 }

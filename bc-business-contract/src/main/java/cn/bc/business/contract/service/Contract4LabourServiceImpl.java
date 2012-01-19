@@ -101,7 +101,7 @@ public class Contract4LabourServiceImpl extends
 			throw new CoreException("要处理的合同已不存在！contractId=" + contractId);
 
 		// 更新旧合同的相关信息
-		oldContract.setStatus(Contract.STATUS_FAILURE);// 失效
+		oldContract.setStatus(Contract.STATUS_LOGOUT);// 失效
 		oldContract.setMain(Contract.MAIN_HISTORY);// 历史
 		this.contract4LabourDao.save(oldContract);
 
@@ -131,8 +131,10 @@ public class Contract4LabourServiceImpl extends
 		newContract.setStartDate(newStartDate);
 		newContract.setEndDate(newEndDate);
 
-		// 设置最后修改人信息
+		// 设置创建人信息和最后修改人信息
 		SystemContext context = SystemContextHolder.get();
+		newContract.setAuthor(context.getUserHistory());
+		newContract.setFileDate(Calendar.getInstance());
 		newContract.setModifier(context.getUserHistory());
 		newContract.setModifiedDate(Calendar.getInstance());
 
@@ -179,7 +181,7 @@ public class Contract4LabourServiceImpl extends
 		}
 
 		// 复制原合同的附件给新的合同
-		String oldUid = newContract.getUid();
+		String oldUid = oldContract.getUid();
 		attachService.doCopy(Contract4Labour.KEY_UID, oldUid,
 				Contract4Labour.KEY_UID, newContract.getUid(), true);
 
@@ -197,7 +199,7 @@ public class Contract4LabourServiceImpl extends
 			throw new CoreException("要处理的合同已不存在！contractId=" + contractId);
 
 		// 更新旧合同的相关信息
-		oldContract.setStatus(Contract.STATUS_FAILURE);// 失效
+		oldContract.setStatus(Contract.STATUS_LOGOUT);// 失效
 		oldContract.setMain(Contract.MAIN_HISTORY);// 历史
 		this.contract4LabourDao.save(oldContract);
 
@@ -220,11 +222,11 @@ public class Contract4LabourServiceImpl extends
 			oldContractCode = oldContractCode+"-1";
 		}
 		newContract.setCode(oldContractCode);
-		//newContract.setCode(this.idGeneratorService
-		//.nextSN4Month(Contract4Labour.KEY_CODE));
 
-		// 设置最后修改人信息
+		// 设置创建人信息和最后修改人信息
 		SystemContext context = SystemContextHolder.get();
+		newContract.setAuthor(context.getUserHistory());
+		newContract.setFileDate(Calendar.getInstance());
 		newContract.setModifier(context.getUserHistory());
 		newContract.setModifiedDate(Calendar.getInstance());
 
@@ -266,7 +268,7 @@ public class Contract4LabourServiceImpl extends
 		}
 
 		// 复制原合同的附件给新的合同
-		String oldUid = newContract.getUid();
+		String oldUid = oldContract.getUid();
 		attachService.doCopy(Contract4Labour.KEY_UID, oldUid,
 				Contract4Labour.KEY_UID, newContract.getUid(), true);
 

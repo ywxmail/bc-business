@@ -7,10 +7,14 @@ import java.util.Calendar;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import cn.bc.identity.domain.ActorHistory;
 import cn.bc.identity.domain.RichFileEntityImpl;
 
 /**
@@ -32,20 +36,24 @@ public class Contract extends RichFileEntityImpl {
 	/**状态：正常*/
 	public static final int STATUS_NORMAL	= 0;
 	/**状态：注销*/
-	public static final int STATUS_FAILURE	= 1;
+	public static final int STATUS_LOGOUT	= 1;
 	/**状态：离职*/
 	public static final int STATUS_RESGIN	= 2;
 	
 	/**操作类型  新建*/
-	public static final int OPTYPE_CREATE	= 1;
+	public static final int OPTYPE_CREATE			= 1;
 	/**操作类型  维护*/
 	public static final int OPTYPE_MAINTENANCE		= 2;
 	/**操作类型 转车*/
-	public static final int OPTYPE_CHANGECAR	= 3;
+	public static final int OPTYPE_CHANGECAR		= 3;
 	/**操作类型  续约*/
-	public static final int OPTYPE_RENEW	= 4;
+	public static final int OPTYPE_RENEW			= 4;
 	/**操作类型  离职*/
-	public static final int OPTYPE_RESIGN	= 5;
+	public static final int OPTYPE_RESIGN			= 5;
+	/**操作类型  过户*/
+	public static final int OPTYPE_CHANGECHARGER	= 6;
+	/**操作类型  重发包*/
+	public static final int OPTYPE_CHANGECHARGER2	= 7;
 	
 	/**主版本号默认值*/
 	public static final int MAJOR_DEFALUT	= 1;
@@ -65,7 +73,7 @@ public class Contract extends RichFileEntityImpl {
 	private Integer verMinor;//次版本号
 	private int     main; //主体： 0-当前版本,1-历史版本
 	private String  patchNo;//批号 
-	private int     opType; //操作类型：1-新建,2-维护,3-转车,4-续约,5-离职
+	private int     opType; //操作类型：1-新建,2-维护,3-转车,4-续约,5-离职,6-过户,7-重发包
 	
 	private String wordNo;// 文书号
 	private Long transactorId;// 经办人ID
@@ -82,6 +90,9 @@ public class Contract extends RichFileEntityImpl {
 	private Integer ext_num1;// 扩展域
 	private Integer ext_num2;// 扩展域
 	private Integer ext_num3;// 扩展域
+	
+	private ActorHistory logoutId;// 注销人
+	private Calendar logoutDate;// 注销时间
 
 	@Column(name = "WORD_NO")
 	public String getWordNo() {
@@ -261,4 +272,25 @@ public class Contract extends RichFileEntityImpl {
 	public void setExt_num3(Integer ext_num3) {
 		this.ext_num3 = ext_num3;
 	}
+
+	@ManyToOne(fetch = FetchType.EAGER, optional = true)
+	@JoinColumn(name = "LOGOUT_ID", referencedColumnName = "ID")
+	public ActorHistory getLogoutId() {
+		return logoutId;
+	}
+
+	public void setLogoutId(ActorHistory logoutId) {
+		this.logoutId = logoutId;
+	}
+
+	@Column(name = "LOGOUT_DATE")
+	public Calendar getLogoutDate() {
+		return logoutDate;
+	}
+
+	public void setLogoutDate(Calendar logoutDate) {
+		this.logoutDate = logoutDate;
+	}
+	
+	
 }

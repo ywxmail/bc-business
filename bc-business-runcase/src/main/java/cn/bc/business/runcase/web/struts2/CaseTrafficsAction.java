@@ -161,7 +161,7 @@ public class CaseTrafficsAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("c.address", "address",
 				getText("runcase.address"), 120));
 		columns.add(new TextColumn4MapKey("c.driver_cert", "driver_cert",
-				getText("runcase.driverCert"), 80));
+				getText("runcase.FWZGCert"), 80));
 		columns.add(new TextColumn4MapKey("c.case_no", "case_no",
 				getText("runcase.caseNo1")));
 		

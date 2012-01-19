@@ -57,9 +57,23 @@
 		</action>
 	</package>
 	
-	<!-- 劳动合同的版本管理 -->
+	<!-- 经济合同的版本管理 -->
 	<package name="contract4ChargerOperate" extends="bc-default" namespace="/bc-business/contract4ChargerOperate">
 		<!-- 续签 -->
 		<action name="doRenew" class="contract4ChargerOperateAction" method="doRenew"/>
+		<!-- 过户-->
+		<action name="doChangeCharger" class="contract4ChargerOperateAction" method="doChangeCharger"/>
+		<!-- 重发包-->
+		<action name="doChangeCharger2" class="contract4ChargerOperateAction" method="doChangeCharger2"/>
+		<!-- 注销 -->
+		<action name="doLogout" class="contract4ChargerOperateAction" method="doLogout"/>
+	</package>
+	
+	<!-- 经济合同 选择 -->
+	<package name="selectDateAndCharger" extends="bc-default" namespace="/bc-business/selectDateAndCharger">
+		<!-- 过户选择 -->
+		<action name="select" class="selectDateAndChargerAction" >
+			<result name="success">/bc-business/contract4Charger/selectDateAndCharger.jsp</result>
+		</action>
 	</package>
 </struts>

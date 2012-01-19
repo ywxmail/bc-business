@@ -145,7 +145,7 @@ public class CaseAdvicesAction extends ViewAction<Map<String, Object>> {
 				getText("runcase.address"), 100).setSortable(true)
 				.setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("b.driver_cert", "driver_cert",
-				getText("runcase.driverCert"), 100).setSortable(true)
+				getText("runcase.FWZGCert"), 100).setSortable(true)
 				.setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("b.receive_code", "receive_code",
 				getText("runcase.receiveCode"), 100).setSortable(true)

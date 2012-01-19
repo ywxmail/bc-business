@@ -177,4 +177,16 @@ public class Policy4CarOperateAction extends FileEntityAction<Long, Policy> {
 
 	// ========车保停保代码结束========
 
+	
+	// ========车保注销代码开始========
+	public String doLogout() throws Exception{		
+		Long fromPolicyId = this.getId();
+		this.policyService.doLogout(fromPolicyId);
+		json = new Json();
+		json.put("msg", getText("policy.logout.success"));
+		return "json";
+	}
+	
+	
+	// ========车保注销代码结束========
 }
