@@ -67,6 +67,8 @@ public class Car extends RichFileEntityImpl {
 	private float power;// 功率，单位kw
 	private String turnType;// 转向方式，如“方向盘”
 	private int tireCount;// 轮胎数
+	private int tireFrontDistance;//前轮距
+	private int tireBehindDistance;//后轮距
 	private String tireStandard;// 轮胎规格
 	private int axisDistance;// 轴距
 	private int axisCount;// 轴数
@@ -362,14 +364,32 @@ public class Car extends RichFileEntityImpl {
 	public void setTireCount(int tireCount) {
 		this.tireCount = tireCount;
 	}
-
+	
 	@Column(name = "TIRE_STANDARD")
 	public String getTireStandard() {
 		return tireStandard;
 	}
-
+	
 	public void setTireStandard(String tireStandard) {
 		this.tireStandard = tireStandard;
+	}
+
+	@Column(name = "TIRE_FRONT_DISTANCE")
+	public int getTireFrontDistance() {
+		return tireFrontDistance;
+	}
+	
+	public void setTireFrontDistance(int tireFrontDistance) {
+		this.tireFrontDistance = tireFrontDistance;
+	}
+	
+	@Column(name = "TIRE_BEHIND_DISTANCE")
+	public int getTireBehindDistance() {
+		return tireBehindDistance;
+	}
+	
+	public void setTireBehindDistance(int tireBehindDistance) {
+		this.tireBehindDistance = tireBehindDistance;
 	}
 
 	@Column(name = "AXIS_DISTANCE")
