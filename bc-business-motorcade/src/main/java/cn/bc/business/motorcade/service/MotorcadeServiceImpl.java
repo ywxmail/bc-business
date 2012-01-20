@@ -42,7 +42,7 @@ public class MotorcadeServiceImpl extends DefaultCrudService<Motorcade> implemen
 		return this.motorcadeDao.findActive();
 	}
 
-	public List<Map<String, String>> find4Option() {
-		return this.motorcadeDao.find4Option();
+	public List<Map<String, String>> findEnabled4Option() {
+		return this.motorcadeDao.findEnabled4Option();
 	}
 }

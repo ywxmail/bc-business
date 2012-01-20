@@ -265,7 +265,7 @@ public class CarByDriverHistoryAction extends
 		moveTypeValueList = this.getMoveType();
 
 		// 车队列表
-		this.motorcadeList = this.motorcadeService.find4Option();
+		this.motorcadeList = this.motorcadeService.findEnabled4Option();
 		// 可选车队下拉框显示
 		if (!this.getE().isNew()) {
 			// 新建时不作处理

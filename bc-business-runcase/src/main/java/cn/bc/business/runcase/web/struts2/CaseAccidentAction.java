@@ -376,7 +376,7 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 		sourcesValue = this.getSourceStatuses();
 
 		// 加载可选车队列表
-		this.motorcadeList = this.motorcadeService.find4Option();
+		this.motorcadeList = this.motorcadeService.findEnabled4Option();
 		if (this.getE().getMotorcadeId() != null)
 			OptionItem.insertIfNotExist(this.motorcadeList, this.getE()
 					.getMotorcadeId().toString(), this.getE()

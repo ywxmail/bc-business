@@ -339,7 +339,7 @@ public class CasePraiseAction extends FileEntityAction<Long, Case4Praise> {
 	// 表单可选项的加载
 	public void initSelects(){
 		// 加载可选车队列表
-		this.motorcadeList = this.motorcadeService.find4Option();
+		this.motorcadeList = this.motorcadeService.findEnabled4Option();
 		if (this.getE().getMotorcadeId() != null)
 			OptionItem.insertIfNotExist(this.motorcadeList, this.getE()
 					.getMotorcadeId().toString(), this.getE()

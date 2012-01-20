@@ -19,5 +19,5 @@ public interface MotorcadeService extends CrudService<Motorcade> {
 	 * 
 	 * @return 返回结果中的元素Map格式为：：id -- Motorcade的id,name -- Motorcade的name
 	 */
-	List<Map<String, String>> find4Option();
+	List<Map<String, String>> findEnabled4Option();
 }
