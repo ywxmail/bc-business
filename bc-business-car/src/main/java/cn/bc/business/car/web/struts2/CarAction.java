@@ -120,7 +120,7 @@ public class CarAction extends FileEntityAction<Long, Car> {
 		statusesValue = this.getCarStatuses();
 
 		// 加载可选车队列表
-		this.motorcadeList = this.motorcadeService.findEnabled4Option();
+		this.motorcadeList = this.motorcadeService.find4Option();
 		Motorcade m = this.getE().getMotorcade();
 		if (m != null) {
 			OptionItem.insertIfNotExist(this.motorcadeList, m.getId()
@@ -182,20 +182,12 @@ public class CarAction extends FileEntityAction<Long, Car> {
 		return statuses;
 	}
 
-	public String motorcades;
 	/**
 	 * 高级搜索条件窗口
 	 * 
 	 * @return
 	 */
 	public String conditions() {
-		// 可选车队列表
-		this.motorcadeList = this.motorcadeService.findEnabled4Option();
-		Motorcade m = this.getE().getMotorcade();
-		if (m != null) {
-			OptionItem.insertIfNotExist(this.motorcadeList, m.getId()
-					.toString(), m.getName());
-		}
 		return SUCCESS;
 	}
 }

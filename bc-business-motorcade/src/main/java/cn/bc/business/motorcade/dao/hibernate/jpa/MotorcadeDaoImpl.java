@@ -38,12 +38,12 @@ public class MotorcadeDaoImpl extends HibernateCrudJpaDao<Motorcade> implements
 	}
 
 	public List<Map<String, String>> find4Option(Integer[] statuses) {
-		String hql = "select m.id,m.name from BS_MOTORCADE m where";
+		String hql = "select m.id,m.name from BS_MOTORCADE m";
 		if (statuses != null && statuses.length > 0) {
 			if (statuses.length == 1) {
-				hql += " status_ = ?";
+				hql += " where status_ = ?";
 			} else {
-				hql += " status_ in (";
+				hql += " where status_ in (";
 				for (int i = 0; i < statuses.length; i++) {
 					hql += (i == 0 ? "?" : ",?");
 				}

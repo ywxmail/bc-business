@@ -9,27 +9,28 @@ import cn.bc.business.motorcade.dao.MotorcadeDao;
 import cn.bc.business.motorcade.domain.Motorcade;
 import cn.bc.core.service.DefaultCrudService;
 
-public class MotorcadeServiceImpl extends DefaultCrudService<Motorcade> implements MotorcadeService{
+public class MotorcadeServiceImpl extends DefaultCrudService<Motorcade>
+		implements MotorcadeService {
 	private MotorcadeDao motorcadeDao;
 	private HistoryCarQuantityDao historyCarQuantityDao;
-	
+
 	public void setMotorcadeDao(MotorcadeDao motorcadeDao) {
 		this.motorcadeDao = motorcadeDao;
 		this.setCrudDao(motorcadeDao);
 	}
 
-	public void setHistoryCarQuantityDao(HistoryCarQuantityDao historyCarQuantityDao) {
+	public void setHistoryCarQuantityDao(
+			HistoryCarQuantityDao historyCarQuantityDao) {
 		this.historyCarQuantityDao = historyCarQuantityDao;
-		
+
 	}
 
 	@Override
 	public void delete(Serializable id) {
-		
-		//删除历史车辆数
+		// 删除历史车辆数
 		this.historyCarQuantityDao.deleteByMotorcade(id);
-		
-		//删除车队		
+
+		// 删除车队
 		this.motorcadeDao.delete(id);
 	}
 
@@ -44,5 +45,9 @@ public class MotorcadeServiceImpl extends DefaultCrudService<Motorcade> implemen
 
 	public List<Map<String, String>> findEnabled4Option() {
 		return this.motorcadeDao.findEnabled4Option();
+	}
+
+	public List<Map<String, String>> find4Option(Integer[] statuses) {
+		return this.motorcadeDao.find4Option(statuses);
 	}
 }
