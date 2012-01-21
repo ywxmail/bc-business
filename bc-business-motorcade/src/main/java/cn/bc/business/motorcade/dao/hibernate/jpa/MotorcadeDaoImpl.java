@@ -33,13 +33,29 @@ public class MotorcadeDaoImpl extends HibernateCrudJpaDao<Motorcade> implements
 				.list();
 	}
 
-	public List<Map<String, String>> find4Option() {
-		String hql = "select m.id,m.name from BS_MOTORCADE m where m.status_ = 0 order by m.code";
+	public List<Map<String, String>> findEnabled4Option() {
+		return this.find4Option(new Integer[] { BCConstants.STATUS_ENABLED });
+	}
+
+	public List<Map<String, String>> find4Option(Integer[] statuses) {
+		String hql = "select m.id,m.name from BS_MOTORCADE m";
+		if (statuses != null && statuses.length > 0) {
+			if (statuses.length == 1) {
+				hql += " where status_ = ?";
+			} else {
+				hql += " where status_ in (";
+				for (int i = 0; i < statuses.length; i++) {
+					hql += (i == 0 ? "?" : ",?");
+				}
+				hql += ")";
+			}
+		}
+		hql += " order by m.code";
 		if (logger.isDebugEnabled()) {
 			logger.debug("hql=" + hql);
 		}
 		return HibernateJpaNativeQuery.executeNativeSql(getJpaTemplate(), hql,
-				null, new RowMapper<Map<String, String>>() {
+				statuses, new RowMapper<Map<String, String>>() {
 					public Map<String, String> mapRow(Object[] rs, int rowNum) {
 						Map<String, String> oi = new HashMap<String, String>();
 						int i = 0;

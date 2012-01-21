@@ -218,14 +218,16 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 			this.getE().setConfiscateCertNo(jiaoweiYYWZ.getConfiscateCertNo());
 			this.getE().setPullUnit(jiaoweiYYWZ.getPullUnit());
 			this.getE().setArea(jiaoweiYYWZ.getArea());
-			this.getE().setPenalty(jiaoweiYYWZ.getPenalty());
+			if(null != jiaoweiYYWZ.getPenalty()){
+				this.getE().setPenalty(jiaoweiYYWZ.getPenalty());
+			}
 			this.getE().setBusinessCertNo(jiaoweiYYWZ.getBusinessCertNo());
 			this.getE().setAddress(jiaoweiYYWZ.getAddress());
 			this.getE().setSubject(jiaoweiYYWZ.getContent());
 			this.getE().setReceipt(jiaoweiYYWZ.getReceipt());
 			this.getE().setDetain(jiaoweiYYWZ.getDetain());
 			String str = jiaoweiYYWZ.getDetain();
-			if(str.lastIndexOf("分") > 0){	//检查字符串是否存在一个"分"字,如出现多个"分"字取最后一个
+			if(null != str && str.length() > 0 && str.lastIndexOf("分") > 0){	//检查字符串是否存在一个"分"字,如出现多个"分"字取最后一个
 				str = str.substring(str.lastIndexOf("分")-2,str.lastIndexOf("分")).trim();
 				this.getE().setJeom(Float.parseFloat(str));
 			}
@@ -410,7 +412,7 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 	// 表单可选项的加载
 	public void initSelects(){
 		// 加载可选车队列表
-		this.motorcadeList = this.motorcadeService.find4Option();
+		this.motorcadeList = this.motorcadeService.findEnabled4Option();
 		if (this.getE().getMotorcadeId() != null)
 			OptionItem.insertIfNotExist(this.motorcadeList, this.getE()
 					.getMotorcadeId().toString(), this.getE()

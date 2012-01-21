@@ -36,10 +36,13 @@
 		<action name="data" class="shiftworkByDriverAction" method="data" />
 		<action name="delete" class="shiftworkByDriverAction" method="delete" />
 		<action name="create" class="shiftworkByDriverAction" method="create" >
-		    <result name="create">/bc-business/carByDriver/dingBanForm.jsp</result>
+		    <result name="form">/bc-business/carByDriverHistory/dingBanForm.jsp</result>
 		</action>
-		<action name="edit" class="carByDriverAction" method="edit" >
-		    <result name="form">/bc-business/carByDriver/dingBanForm.jsp</result>
+		<action name="edit" class="carByDriverHistoryAction" method="edit" >
+		    <result name="dingban">/bc-business/carByDriverHistory/dingBanForm.jsp</result>
+		</action>
+		<action name="open" class="carByDriverHistoryAction" method="open" >
+			<result name="dingban">/bc-business/carByDriverHistory/dingBanForm.jsp</result>
 		</action>
 	</package>
 	 <package name="carByDriverHistory" extends="bc-default" namespace="/bc-business/carByDriverHistory">
@@ -63,6 +66,7 @@
 			<result name="jiaoHui" >/bc-business/carByDriverHistory/jiaoHuiForm.jsp</result>
 			<result name="xinRuZhi" >/bc-business/carByDriverHistory/xinRuZhiForm.jsp</result>
 			<result name="zhuanCheDui" >/bc-business/carByDriverHistory/zhuanCheDuiForm.jsp</result>
+			<result name="dingban">/bc-business/carByDriverHistory/dingBanForm.jsp</result>
 		</action>
 		<action name="edit" class="carByDriverHistoryAction" method="edit" >
 		    <result name="zhuanChe" >/bc-business/carByDriverHistory/zhuanCheForm.jsp</result>
@@ -72,6 +76,7 @@
 			<result name="jiaoHui" >/bc-business/carByDriverHistory/jiaoHuiForm.jsp</result>
 			<result name="xinRuZhi" >/bc-business/carByDriverHistory/xinRuZhiForm.jsp</result>
 			<result name="zhuanCheDui" >/bc-business/carByDriverHistory/zhuanCheDuiForm.jsp</result>
+			<result name="dingban">/bc-business/carByDriverHistory/dingBanForm.jsp</result>
 		</action>
 	</package>
 	<package name="selectNewnestCarByDriver" extends="bc-default" namespace="/bc-business/selectNewnestCarByDriver">

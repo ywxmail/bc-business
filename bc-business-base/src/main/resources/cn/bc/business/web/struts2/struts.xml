@@ -17,6 +17,10 @@
 		<action name="/*/open" class="{1}Action" method="open">
 			<result name="formr">/bc-business/{1}/form.jsp</result>
 		</action>
+		<!-- 高级搜索条件窗口 -->
+		<action name="/*/conditions" class="{1}Action" method="conditions">
+			<result name="success">/bc-business/{1}/conditions.jsp</result>
+		</action>
 		
 		<!-- 通过车辆id或车牌号查询相关信息 -->
 		<action name="findInfoByCar" class="findInfoByCarAction"/>

@@ -50,7 +50,6 @@ public class CaseBusinessServiceImpl extends DefaultCrudService<Case4InfractBusi
 			//保存SyncBase对象
 			this.syncBaseDao.save(sb);
 		}
-		e = this.forceLoad(e.getId());
 		return e;
 	}
 }

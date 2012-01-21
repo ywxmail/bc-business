@@ -180,7 +180,7 @@ public class CaseTrafficAction extends FileEntityAction<Long, Case4InfractTraffi
 
 	@Override
 	protected PageOption buildFormPageOption(boolean editable) {
-		return super.buildFormPageOption(editable).setWidth(820).setMinWidth(250).setHeight(500)
+		return super.buildFormPageOption(editable).setWidth(820).setMinWidth(250).setHeight(473)
 				.setMinHeight(200);
 	}
 	
@@ -330,7 +330,7 @@ public class CaseTrafficAction extends FileEntityAction<Long, Case4InfractTraffi
 			sb.setStatus(SyncBase.STATUS_GEN);
 			this.beforeSave(e);
 			//保存并更新Sycn对象的状态
-			this.caseTrafficService.save(e,sb);
+			e = this.caseTrafficService.save(e,sb);
 			this.afterSave(e);
 		}else{
 			this.getCrudService().save(e);
@@ -406,7 +406,7 @@ public class CaseTrafficAction extends FileEntityAction<Long, Case4InfractTraffi
 	// 表单可选项的加载
 	public void initSelects(){
 		// 加载可选车队列表
-		this.motorcadeList = this.motorcadeService.find4Option();
+		this.motorcadeList = this.motorcadeService.findEnabled4Option();
 		if (this.getE().getMotorcadeId() != null)
 			OptionItem.insertIfNotExist(this.motorcadeList, this.getE()
 					.getMotorcadeId().toString(), this.getE()

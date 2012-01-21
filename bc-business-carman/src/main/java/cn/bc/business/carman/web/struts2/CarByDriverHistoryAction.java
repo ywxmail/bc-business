@@ -23,6 +23,7 @@ import cn.bc.business.motorcade.service.MotorcadeService;
 import cn.bc.business.web.struts2.FileEntityAction;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.option.domain.OptionItem;
+import cn.bc.web.ui.html.page.ButtonOption;
 import cn.bc.web.ui.html.page.PageOption;
 
 /**
@@ -117,7 +118,8 @@ public class CarByDriverHistoryAction extends
 				this.getE().setFromCar(fromCar);
 				this.getE().setFromMotorcadeId(fromCar.getMotorcade().getId());
 			}
-
+			// 设置迁移类型
+			this.getE().setMoveType(CarByDriverHistory.MOVETYPE_ZCD);
 			return "zhuanCheDui";
 		} else {
 			return this.getFormName(this.getE().getMoveType());
@@ -164,6 +166,8 @@ public class CarByDriverHistoryAction extends
 			return "xinRuZhi";
 		} else if (moveType == CarByDriverHistory.MOVETYPE_ZCD) {
 			return "zhuanCheDui";
+		}else if (moveType == CarByDriverHistory.MOVETYPE_DINGBAN) {
+			return "dingban";
 		} else {
 			return null;
 		}
@@ -220,7 +224,34 @@ public class CarByDriverHistoryAction extends
 				getText("carByDriverHistory.moveType.xinruzhi"));
 		type.put(String.valueOf(CarByDriverHistory.MOVETYPE_ZCD),
 				getText("carByDriverHistory.moveType.cheduidaochedui"));
+		type.put(String.valueOf(CarByDriverHistory.MOVETYPE_DINGBAN),
+				getText("carByDriverHistory.moveType.dingban"));
 		return type;
+	}
+
+	@Override
+	protected void buildFormPageButtons(PageOption pageOption, boolean editable) {
+		boolean readonly = this.isReadonly();
+
+		if (editable) {// edit,create
+			// 添加默认的保存按钮
+			pageOption.addButton(this.getDefaultSaveButtonOption());
+			// }
+		} else {// open
+			if (!readonly) {
+				pageOption.addButton(new ButtonOption(
+						getText("carByDriverHistory.optype.doMaintenance"),
+						null,
+						"bc.business.carByDriverHistoryForm.doMaintenance"));
+				// //无续保
+				// /*pageOption.addButton(new ButtonOption(
+				// getText("policy.optype.renewal"), null,
+				// "bc.policyForm.doRenew").setId("policyDoRenew"));*/
+				// pageOption.addButton(new ButtonOption(
+				// getText("policy.optype.surrenders"), null,
+				// "bc.policyForm.doSurrender").setId("policySurrenders"));
+			}
+		}
 	}
 
 	@Override
@@ -234,7 +265,7 @@ public class CarByDriverHistoryAction extends
 		moveTypeValueList = this.getMoveType();
 
 		// 车队列表
-		this.motorcadeList = this.motorcadeService.find4Option();
+		this.motorcadeList = this.motorcadeService.findEnabled4Option();
 		// 可选车队下拉框显示
 		if (!this.getE().isNew()) {
 			// 新建时不作处理
@@ -260,9 +291,10 @@ public class CarByDriverHistoryAction extends
 
 	@Override
 	protected PageOption buildFormPageOption(boolean editable) {
-		return super.buildFormPageOption(editable).setWidth(390)
-				.setMinWidth(250).setHeight(590).setMinHeight(200)
+		return super.buildFormPageOption(editable).setWidth(735)
+				.setMinWidth(320).setHeight(400).setMinHeight(200)
 				.setModal(true);
+
 	}
 
 }
