@@ -3,6 +3,7 @@
  */
 package cn.bc.business.runcase.web.struts2;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -69,7 +70,8 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 	public List<Map<String, String>> sortList; // 可选性质列表
 	public List<Map<String, String>> departmentList; // 可选执法机关列表
 	public List<Map<String, String>> companyList; // 可选保险公司列表
-
+	
+	
 	public Map<String, String> statusesValue;
 	public Map<String, String> sourcesValue;
 
@@ -162,24 +164,6 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 				getText("key.role.bc.admin"));
 	}
 
-	// @Override
-	// protected PageOption buildFormPageOption() {
-	// PageOption option = new PageOption().setWidth(850).setMinWidth(250)
-	// .setMinHeight(200).setModal(false).setHeight(500);
-	// if (!isReadonly()) {
-	// // 特殊处理结案按钮
-	// if (Case4InfractTraffic.STATUS_ACTIVE == getE().getStatus()
-	// && !getE().isNew()) {
-	// ButtonOption buttonOption = new ButtonOption(
-	// getText("label.closefile"), null,
-	// "bc.caseAccidentForm.closefile");
-	// buttonOption.put("id", "bcSaveDlgButton");
-	// option.addButton(buttonOption);
-	// }
-	// option.addButton(new ButtonOption(getText("label.save"), "save"));
-	// }
-	// return option;
-	// }
 
 	// 设置页面的尺寸
 	@Override
@@ -205,14 +189,6 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 		}
 
 	}
-//
-//	@SuppressWarnings("static-access")
-//	@Override
-//	public String create() throws Exception {
-//		String r = super.create();
-//
-//		return r;
-//	}
 
 	@Override
 	protected void afterCreate(Case4Accident entity) {
@@ -270,21 +246,6 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 		attachsUI = buildAttachsUI(true);
 	}
 
-//	@Override
-//	public String edit() throws Exception {
-//		this.setE(this.getCrudService().load(this.getId()));
-//		this.formPageOption = buildFormPageOption();
-//
-//		// 构建附件控件
-//		attachsUI = buildAttachsUI(false);
-//		return "form";
-//	}
-
-	// @Override
-	// public String save() throws Exception {
-	//
-	// return "saveSuccess";
-	// }
 
 	@Override
 	protected void beforeSave(Case4Accident entity) {
@@ -359,13 +320,15 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 			o.put("cert4FWZG", driver.getCert4FWZG());
 			o.put("region", driver.getRegion());
 			o.put("drivingStatus", driver.getDrivingStatus());
-
+			o.put("origin",driver.getOrigin());
 			jsons.add(o);
 		}
+		
 		json = jsons.toString();
 		return "json";
 
 	}
+	
 
 	@Override
 	protected void initForm(boolean editable) {
@@ -401,7 +364,7 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 
 		if (logger.isInfoEnabled())
 			logger.info("findOptionItem耗时：" + DateUtils.getWasteTime(startTime));
-
+	
 	}
 
 }
