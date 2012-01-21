@@ -97,8 +97,10 @@ public class CarAction extends FileEntityAction<Long, Car> {
 
 		// 初始化车辆的状态
 		this.getE().setStatus(Car.CAR_STAUTS_NORMAL);
-		// 初始化车辆定级
-		this.getE().setLevel("一级");
+		// 车辆表单初始化信息
+		this.getE().setLevel("一级");// 车辆定级
+		this.getE().setColor("绿灰");// 车辆颜色
+		this.getE().setFuelType("汽油"); // 燃料类型 
 		// // 设置默认的原归属单位信息
 		// this.getE().setOldUnitName(getText("app.oldUnitName"));
 
@@ -119,6 +121,7 @@ public class CarAction extends FileEntityAction<Long, Car> {
 	protected void beforeSave(Car entity) {
 		if (entity.isLogout()) {
 			entity.setStatus(Car.CAR_STAUTS_LOGOUT);
+			entity.setScrapDate(entity.getReturnDate());
 		} else {
 			entity.setStatus(Car.CAR_STAUTS_NORMAL);
 		}
