@@ -74,7 +74,7 @@ public class CaseAccidentsAction extends ViewAction<Map<String, Object>> {
 		sql.append("select c.id,b.status_,b.code,c.sort,b.motorcade_name,b.driver_name,b.car_plate,b.driver_cert,b.happen_date");
 		sql.append(",b.address,b.driver_id,b.car_id ");
 		sql.append(",c.carman_cost,c.third_loss,c.third_cost");
-		sql.append(",c.carman_hurt_count,c.third_hurt_count,c.agreement_payment,c.desc_ as acc_desc");
+		sql.append(",c.car_wounding,c.third_wounding,c.agreement_payment,c.desc_ as acc_desc");
 		sql.append(",c.origin ,c.duty,c.is_inner_fix");
 		sql.append(",b.desc_ ,c.car_hurt,c.actual_loss");
 		sql.append(",c.receiver_name,c.insurance_company");
@@ -109,9 +109,9 @@ public class CaseAccidentsAction extends ViewAction<Map<String, Object>> {
 				map.put("carman_cost", rs[i++]);// 司机拖车费 CARMAN_COST number
 				map.put("third_loss", rs[i++]);// 第三者损失 THIRD_LOSS number
 				map.put("third_cost", rs[i++]);// 第三者拖车费 THIRD_COST number
-				map.put("carman_hurt_count", rs[i++]);// 司机伤人 CARMAN_HURT_COUNT
+				map.put("car_wounding", rs[i++]);// 司机伤人 CARMAN_HURT_COUNT
 														// number
-				map.put("third_hurt_count", rs[i++]);// 第三者伤人 THIRD_HURT_COUNT
+				map.put("third_wounding", rs[i++]);// 第三者伤人 THIRD_HURT_COUNT
 														// number
 				map.put("agreement_payment", rs[i++]);// 协议赔付 AGREEMENT_PAYMENT
 														// number
@@ -150,7 +150,7 @@ public class CaseAccidentsAction extends ViewAction<Map<String, Object>> {
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd hh:mm")));
 		// 分公司
 		columns.add(new TextColumn4MapKey("unitname", "unitname",
-				getText("runcase.unitname"), 60).setSortable(true)
+				getText("runcase.unitName"), 60).setSortable(true)
 				.setUseTitleFromLabel(true));
 		// 车队
 		columns.add(new TextColumn4MapKey("m.name", "motorcade_name",
@@ -254,27 +254,27 @@ public class CaseAccidentsAction extends ViewAction<Map<String, Object>> {
 
 		// 司机拖车费
 		columns.add(new TextColumn4MapKey("c.carman_cost", "carman_cost",
-				getText("runcase.carmancost"), 95).setUseTitleFromLabel(true)
+				getText("runcase.carmanCost"), 95).setUseTitleFromLabel(true)
 				.setValueFormater(new NubmerFormater("#.##")));
 		// 第三者损失
 		columns.add(new TextColumn4MapKey("c.third_loss", "third_loss",
-				getText("runcase.thirdloss"), 75).setUseTitleFromLabel(true)
+				getText("runcase.thirdLoss"), 75).setUseTitleFromLabel(true)
 				.setValueFormater(new NubmerFormater("#.##")));
 		// 第三者拖车费
 		columns.add(new TextColumn4MapKey("c.third_cost", "third_cost",
-				getText("runcase.thirdcost"), 90).setUseTitleFromLabel(true)
+				getText("runcase.thirdCost"), 90).setUseTitleFromLabel(true)
 				.setValueFormater(new NubmerFormater("#.##")));
 		// 司机伤人
-		columns.add(new TextColumn4MapKey("c.carman_hurt_count",
-				"carman_hurt_count", getText("runcase.carmanhurtcount"), 60)
-				.setSortable(true));
+		columns.add(new TextColumn4MapKey("c.car_wounding",
+				"car_wounding", getText("runcase.carmanHurtCount"), 60)
+				.setSortable(true).setValueFormater(new NubmerFormater("#.##")));
 		// 第三者伤人
-		columns.add(new TextColumn4MapKey("c.third_hurt_count",
-				"third_hurt_count", getText("runcase.thirdhurtcount"), 75)
-				.setSortable(true));
+		columns.add(new TextColumn4MapKey("c.third_wounding",
+				"third_wounding", getText("runcase.thirdHurtCount"), 75)
+				.setSortable(true).setValueFormater(new NubmerFormater("#.##")));
 		// 协议赔付
 		columns.add(new TextColumn4MapKey("c.agreement_payment",
-				"agreement_payment", getText("runcase.agreementpayment"), 80)
+				"agreement_payment", getText("runcase.agreementPayment"), 80)
 				.setUseTitleFromLabel(true).setValueFormater(
 						new NubmerFormater("#.##")));
 
