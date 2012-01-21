@@ -79,6 +79,7 @@ public class Car extends RichFileEntityImpl {
 	private int totalWeight;// 总质量，单位kg
 	private int accessWeight;// 核定承载量，单位kg
 	private int accessCount;// 载客人数
+	private String vehicleRegisterCode;//机动车登记编号
 
 	private float originalValue;// 固定资产原值
 	private String invoiceNo1;// 购车发票号
@@ -408,6 +409,15 @@ public class Car extends RichFileEntityImpl {
 
 	public void setAxisCount(int axisCount) {
 		this.axisCount = axisCount;
+	}
+	
+	@Column(name = "VEHICLE_REGISTER_CODE")
+	public String getVehicleRegisterCode() {
+		return vehicleRegisterCode;
+	}
+
+	public void setVehicleRegisterCode(String vehicleRegisterCode) {
+		this.vehicleRegisterCode = vehicleRegisterCode;
 	}
 
 	@Column(name = "PIECE_COUNT")
