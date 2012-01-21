@@ -61,6 +61,7 @@ drop table if exists BS_CAR_DRIVER;
 drop table if exists BS_CAR_CERT;
 
 -- 车辆
+drop table if exists BS_CAR_MODEL;
 drop table if exists BS_CAR;
 
 -- 车队历史车辆数
