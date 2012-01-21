@@ -60,7 +60,7 @@ public class Case4Accident extends CaseBase {
 	private Long deadCount;// 死亡人数
 	private Long actualLoss;// 实际损失
 	private boolean innerFix;// 是否修理厂内修
-	private Long fixCost;// 修理厂内修金额
+	private Float fixCost;// 修理厂内修金额
 	private String costDetail;// 损失明细
 	
 	private Float claimAmount;//出险金额
@@ -412,11 +412,11 @@ public class Case4Accident extends CaseBase {
 	}
 
 	@Column(name = "FIX_COST")
-	public Long getFixCost() {
+	public Float getFixCost() {
 		return fixCost;
 	}
 
-	public void setFixCost(Long fixCost) {
+	public void setFixCost(Float fixCost) {
 		this.fixCost = fixCost;
 	}
 
