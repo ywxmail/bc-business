@@ -62,7 +62,35 @@ public class Case4Accident extends CaseBase {
 	private boolean innerFix;// 是否修理厂内修
 	private Long fixCost;// 修理厂内修金额
 	private String costDetail;// 损失明细
+	
+	private Float claimAmount;//出险金额
+	private Float carWounding;//自车伤人金额
+	private Float thirdWounding;//第三方伤人金额
+	private Float medicalFee;//第三方医疗费用
+	private String payDriver;//送保的受款司机
+	private boolean deliverSecond;//是否有第二次的送保
+	private boolean deliverTwo;//第二次送保里的是否送保
+	private Calendar deliverDateTwo;//第二次送保里的送保日期
+	private Float deliverMoneyTwo;//第二次送保里的送保金额
+	
+	private boolean claimTwo;//第二次送保里的是否保险公司赔付
+	private Calendar claimDateTwo;//第二次送保里的保险公司赔付日期
+	private Float claimMoneyTwo;//第二次送保里的保险公司赔付金额
+	
+	private boolean payTwo;//第二次送保里的是否司机受款
+	private String payDriverTwo;//第二次送保里的受款司机
+	private Calendar payDateTwo;//第二次送保里的司机受款日期
+	private Float payMoneyTwo;//第二次送保里的司机受款金额
 
+	private String origin;//司机籍贯
+	private Float carmanCost;//拖车费用
+	private Float thirdLoss;//第三者损失
+	private Float thirdCost;//第三者拖车费用
+	private Float agreementPayment;//协议赔付
+	
+	private Long payDiverId;//送保的受款司机ID
+	private Long payDiverIdTwo;//第二次送保里的受款司机ID
+	
 	@Column(name = "RECEIVE_DATE")
 	public Calendar getReceiveDate() {
 		return receiveDate;
@@ -400,4 +428,198 @@ public class Case4Accident extends CaseBase {
 	public void setCostDetail(String costDetail) {
 		this.costDetail = costDetail;
 	}
+	
+	@Column(name="CLAIM_AMOUNT")
+	public Float getClaimAmount() {
+		return claimAmount;
+	}
+
+	public void setClaimAmount(Float claimAmount) {
+		this.claimAmount = claimAmount;
+	}
+	@Column(name="CAR_WOUNDING")
+	public Float getCarWounding() {
+		return carWounding;
+	}
+
+	public void setCarWounding(Float carWounding) {
+		this.carWounding = carWounding;
+	}
+	@Column(name="Medical_Fee")
+	public Float getMedicalFee() {
+		return medicalFee;
+	}
+
+	public void setMedicalFee(Float medicalFee) {
+		this.medicalFee = medicalFee;
+	}
+	@Column(name="PAY_DRIVER")
+	public String getPayDriver() {
+		return payDriver;
+	}
+
+	public void setPayDriver(String payDriver) {
+		this.payDriver = payDriver;
+	}
+	@Column(name="IS_DELIVER_SECOND")
+	public boolean isDeliverSecond() {
+		return deliverSecond;
+	}
+
+	public void setDeliverSecond(boolean deliverSecond) {
+		this.deliverSecond = deliverSecond;
+	}
+	@Column(name="IS_DELIVER_TWO")
+	public boolean isDeliverTwo() {
+		return deliverTwo;
+	}
+
+	public void setDeliverTwo(boolean deliverTwo) {
+		this.deliverTwo = deliverTwo;
+	}
+	@Column(name="DELIVER_DATE_TWO")
+	public Calendar getDeliverDateTwo() {
+		return deliverDateTwo;
+	}
+
+	public void setDeliverDateTwo(Calendar deliverDateTwo) {
+		this.deliverDateTwo = deliverDateTwo;
+	}
+	@Column(name="DELIVER_MONEY_TWO")
+	public Float getDeliverMoneyTwo() {
+		return deliverMoneyTwo;
+	}
+
+	public void setDeliverMoneyTwo(Float deliverMoneyTwo) {
+		this.deliverMoneyTwo = deliverMoneyTwo;
+	}
+	@Column(name="IS_CLAIM_TWO")
+	public boolean isClaimTwo() {
+		return claimTwo;
+	}
+
+	public void setClaimTwo(boolean claimTwo) {
+		this.claimTwo = claimTwo;
+	}
+	@Column(name="CLAIM_DATE_TWO")
+	public Calendar getClaimDateTwo() {
+		return claimDateTwo;
+	}
+
+	public void setClaimDateTwo(Calendar claimDateTwo) {
+		this.claimDateTwo = claimDateTwo;
+	}
+	@Column(name="CLAIM_MONEY_TWO")
+	public Float getClaimMoneyTwo() {
+		return claimMoneyTwo;
+	}
+
+	public void setClaimMoneyTwo(Float claimMoneyTwo) {
+		this.claimMoneyTwo = claimMoneyTwo;
+	}
+	@Column(name="PAY_DRIVER_TWO")
+	public String getPayDriverTwo() {
+		return payDriverTwo;
+	}
+
+	public void setPayDriverTwo(String payDriverTwo) {
+		this.payDriverTwo = payDriverTwo;
+	}
+	@Column(name="PAY_DATE_TWO")
+	public Calendar getPayDateTwo() {
+		return payDateTwo;
+	}
+
+	public void setPayDateTwo(Calendar payDateTwo) {
+		this.payDateTwo = payDateTwo;
+	}
+	@Column(name="PAY_MONEY_TWO")
+	public Float getPayMoneyTwo() {
+		return payMoneyTwo;
+	}
+
+	public void setPayMoneyTwo(Float payMoneyTwo) {
+		this.payMoneyTwo = payMoneyTwo;
+	}
+
+	@Column(name="IS_PAY_TWO")
+	public boolean isPayTwo() {
+		return payTwo;
+	}
+
+	public void setPayTwo(boolean payTwo) {
+		this.payTwo = payTwo;
+	}
+
+	@Column(name="THIRD_WOUNDING")
+	public Float getThirdWounding() {
+		return thirdWounding;
+	}
+
+	public void setThirdWounding(Float thirdWounding) {
+		this.thirdWounding = thirdWounding;
+	}
+
+	public String getOrigin() {
+		return origin;
+	}
+	
+	public void setOrigin(String origin) {
+		this.origin = origin;
+	}
+	
+	@Column(name="CARMAN_COST")
+	public Float getCarmanCost() {
+		return carmanCost;
+	}
+
+	public void setCarmanCost(Float carmanCost) {
+		this.carmanCost = carmanCost;
+	}
+	
+	@Column(name="THIRD_LOSS")
+	public Float getThirdLoss() {
+		return thirdLoss;
+	}
+
+	public void setThirdLoss(Float thirdLoss) {
+		this.thirdLoss = thirdLoss;
+	}
+	
+	@Column(name="THIRD_COST")
+	public Float getThirdCost() {
+		return thirdCost;
+	}
+
+	public void setThirdCost(Float thirdCost) {
+		this.thirdCost = thirdCost;
+	}
+
+	@Column(name="AGREEMENT_PAYMENT")
+	public Float getAgreementPayment() {
+		return agreementPayment;
+	}
+
+	public void setAgreementPayment(Float agreementPayment) {
+		this.agreementPayment = agreementPayment;
+	}
+
+	@Column(name="PAY_DRIVERID")
+	public Long getPayDiverId() {
+		return payDiverId;
+	}
+
+	public void setPayDiverId(Long payDiverId) {
+		this.payDiverId = payDiverId;
+	}
+	@Column(name="PAY_DRIVERID_TWO")
+	public Long getPayDiverIdTwo() {
+		return payDiverIdTwo;
+	}
+
+	public void setPayDiverIdTwo(Long payDiverIdTwo) {
+		this.payDiverIdTwo = payDiverIdTwo;
+	}
+	
+	
 }
