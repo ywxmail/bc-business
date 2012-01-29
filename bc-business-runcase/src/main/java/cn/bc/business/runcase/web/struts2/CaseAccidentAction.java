@@ -3,7 +3,6 @@
  */
 package cn.bc.business.runcase.web.struts2;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -70,8 +69,7 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 	public List<Map<String, String>> sortList; // 可选性质列表
 	public List<Map<String, String>> departmentList; // 可选执法机关列表
 	public List<Map<String, String>> companyList; // 可选保险公司列表
-	
-	
+
 	public Map<String, String> statusesValue;
 	public Map<String, String> sourcesValue;
 
@@ -164,7 +162,6 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 				getText("key.role.bc.admin"));
 	}
 
-
 	// 设置页面的尺寸
 	@Override
 	protected PageOption buildFormPageOption(boolean editable) {
@@ -175,17 +172,25 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 	protected void buildFormPageButtons(PageOption pageOption, boolean editable) {
 		boolean readonly = this.isReadonly();
 		if (editable && !readonly) {
+			//新建时
+			if(getE().isNew()){
+				pageOption
+				.addButton(new ButtonOption(getText("label.save"), "save"));
+			}
 			// 特殊处理结案按钮
-			if (Case4InfractTraffic.STATUS_ACTIVE == getE().getStatus()
-					&& !getE().isNew()) {
+			//状态为在案时
+			if (Case4Accident.STATUS_ACTIVE == getE().getStatus()  &&!getE().isNew()
+					) {
 				ButtonOption buttonOption = new ButtonOption(
 						getText("label.closefile"), null,
 						"bc.caseAccidentForm.closefile");
 				buttonOption.put("id", "bcSaveDlgButton");
 				pageOption.addButton(buttonOption);
+				pageOption
+				.addButton(new ButtonOption(getText("label.save"), "save"));
 			}
-			pageOption
-					.addButton(new ButtonOption(getText("label.save"), "save"));
+			
+			
 		}
 
 	}
@@ -246,31 +251,60 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 		attachsUI = buildAttachsUI(true);
 	}
 
-
+	
 	@Override
-	protected void beforeSave(Case4Accident entity) {
-		super.beforeSave(entity);
+	public String save() throws Exception {
+		String result="saveSuccess";
 		SystemContext context = this.getSystyemContext();
 		Case4Accident e = this.getE();
 
 		// 设置结案信息
 		if (isClosed.length() > 0 && isClosed.equals("1")) {
-			e.setStatus(CaseBase.STATUS_CLOSED);
-			e.setCloserId(context.getUser().getId());
-			e.setCloserName(context.getUser().getName());
-			e.setCloseDate(Calendar.getInstance(Locale.CHINA));
+			this.setCloserInfo(context, e);
+		}
+
+		// 判断状态设置保存时是否结案
+		// 已经送保，已经赔付，已经选择受款司机，没有二次送保
+		if (e.isDeliver() && e.isClaim() && e.isPay() && (!e.isDeliverSecond())) {
+			this.setCloserInfo(context, e);
+			result="json";
+		}
+		// 已经送保，已经赔付，已经选择受款司机，选择二次送保
+		if (e.isDeliver() && e.isClaim() && e.isPay() && e.isDeliverSecond()
+				&& e.isDeliverTwo() && e.isClaimTwo() && e.isPayTwo()) {
+			this.setCloserInfo(context, e);
+			result="json";
 		}
 
 		// 设置最后更新人的信息
 		e.setModifier(context.getUserHistory());
 		e.setModifiedDate(Calendar.getInstance());
 		this.getCrudService().save(e);
+		
+		return result;
+	}
+
+	// 结案信息设置
+	private void setCloserInfo(SystemContext context, Case4Accident e) {
+		e.setStatus(CaseBase.STATUS_CLOSED);
+		e.setCloserId(context.getUser().getId());
+		e.setCloserName(context.getUser().getName());
+		e.setCloseDate(Calendar.getInstance(Locale.CHINA));
+		
+		//{"id":"<@s.property value="e.id"/>","msg":"<@s.text name="form.save.success"/>"}
+		Json o;
+		o = new Json();
+		o.put("id", e.getId());
+		o.put("msg",getText("runcase.close.success"));
+		json =o.toString();
 
 	}
 
 	@Override
 	protected void afterEdit(Case4Accident entity) {
 		super.afterEdit(entity);
+		System.out.println(entity.getId());
+		
 		// 构建附件控件
 		attachsUI = buildAttachsUI(true);
 	}
@@ -320,15 +354,14 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 			o.put("cert4FWZG", driver.getCert4FWZG());
 			o.put("region", driver.getRegion());
 			o.put("drivingStatus", driver.getDrivingStatus());
-			o.put("origin",driver.getOrigin());
+			o.put("origin", driver.getOrigin());
 			jsons.add(o);
 		}
-		
+
 		json = jsons.toString();
 		return "json";
 
 	}
-	
 
 	@Override
 	protected void initForm(boolean editable) {
@@ -364,7 +397,7 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 
 		if (logger.isInfoEnabled())
 			logger.info("findOptionItem耗时：" + DateUtils.getWasteTime(startTime));
-	
+
 	}
 
 }
