@@ -18,6 +18,8 @@ import org.springframework.stereotype.Controller;
 import cn.bc.business.OptionConstants;
 import cn.bc.business.car.domain.Car;
 import cn.bc.business.car.service.CarService;
+import cn.bc.business.carmodel.domain.CarModel;
+import cn.bc.business.carmodel.service.CarModelService;
 import cn.bc.business.motorcade.domain.Motorcade;
 import cn.bc.business.motorcade.service.MotorcadeService;
 import cn.bc.business.web.struts2.FileEntityAction;
@@ -27,6 +29,7 @@ import cn.bc.identity.web.SystemContext;
 import cn.bc.option.domain.OptionItem;
 import cn.bc.option.service.OptionService;
 import cn.bc.web.ui.html.page.PageOption;
+import cn.bc.web.ui.json.Json;
 
 /**
  * 车辆Action
@@ -34,12 +37,21 @@ import cn.bc.web.ui.html.page.PageOption;
  * @author dragon
  * 
  */
+/**
+ * @author wis
+ *
+ */
+/**
+ * @author wis
+ *
+ */
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 @Controller
 public class CarAction extends FileEntityAction<Long, Car> {
 	// private static Log logger = LogFactory.getLog(CarAction.class);
 	private static final long serialVersionUID = 1L;
 	private MotorcadeService motorcadeService;
+	private CarModelService carModelService;
 	private ActorService actorService;
 	private OptionService optionService;
 
@@ -52,7 +64,9 @@ public class CarAction extends FileEntityAction<Long, Car> {
 	public List<Map<String, String>> taximeterFactoryTypeList; // 可选计价器制造厂列表
 	public List<Map<String, String>> oldUnitList; // 所属单位列表
 	public List<Map<String, String>> logoutReasonList; // 注销原因列表
+	public List<Map<String, String>> carModelList; // 车型配置列表
 	public Map<String, String> statusesValue;
+	public Json json;
 
 	@Autowired
 	public void setActorService(
@@ -68,6 +82,11 @@ public class CarAction extends FileEntityAction<Long, Car> {
 	@Autowired
 	public void setMotorcadeService(MotorcadeService motorcadeService) {
 		this.motorcadeService = motorcadeService;
+	}
+	
+	@Autowired
+	public void setCarModelService(CarModelService carModelService) {
+		this.carModelService = carModelService;
 	}
 
 	@Autowired
@@ -141,6 +160,9 @@ public class CarAction extends FileEntityAction<Long, Car> {
 			OptionItem.insertIfNotExist(this.motorcadeList, m.getId()
 					.toString(), m.getName());
 		}
+		
+		// 加载可选车型配置列表
+		this.carModelList = this.carModelService.findEnabled4Option();
 
 		// 批量加载可选项列表
 		Map<String, List<Map<String, String>>> optionItems = this.optionService
@@ -228,4 +250,28 @@ public class CarAction extends FileEntityAction<Long, Car> {
 		}
 		return SUCCESS;
 	}
+	
+	// ======== 通过factoryModel查找车型配置的相关信息开始 ========
+	
+	private String factoryModel;
+	
+	public String getFactoryModel() {
+		return factoryModel;
+	}
+
+	public void setFactoryModel(String factoryModel) {
+		this.factoryModel = factoryModel;
+	}
+
+	public String carModelInfo(){
+		json = new Json();
+		Car car = this.getE();
+		CarModel obj = this.carModelService.findcarModelByFactoryModel(factoryModel);
+		car.setFactoryType(obj.getFactoryType()); // 厂牌类型
+		car.setEngineType(obj.getEngineType());// 发动机类型
+		car.setFuelType(obj.getFuelType());
+		return "json";
+	}
+	
+	// ======== 通过factoryModel查找车型配置的相关信息结束 ========
 }
