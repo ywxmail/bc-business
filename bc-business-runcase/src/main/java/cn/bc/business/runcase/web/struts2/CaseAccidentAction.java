@@ -22,7 +22,6 @@ import cn.bc.business.carman.domain.CarMan;
 import cn.bc.business.carman.service.CarManService;
 import cn.bc.business.motorcade.service.MotorcadeService;
 import cn.bc.business.runcase.domain.Case4Accident;
-import cn.bc.business.runcase.domain.Case4InfractTraffic;
 import cn.bc.business.runcase.domain.CaseBase;
 import cn.bc.business.runcase.service.CaseAccidentService;
 import cn.bc.business.web.struts2.FileEntityAction;
@@ -189,10 +188,7 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 				pageOption
 				.addButton(new ButtonOption(getText("label.save"), "save"));
 			}
-			
-			
 		}
-
 	}
 
 	@Override
@@ -303,8 +299,6 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 	@Override
 	protected void afterEdit(Case4Accident entity) {
 		super.afterEdit(entity);
-		System.out.println(entity.getId());
-		
 		// 构建附件控件
 		attachsUI = buildAttachsUI(true);
 	}

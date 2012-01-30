@@ -226,7 +226,7 @@ public class CaseAccidentsAction extends ViewAction<Map<String, Object>> {
 		// 总损=实际损失
 		columns.add(new TextColumn4MapKey("c.actual_loss", "actual_loss",
 				getText("runcase.actualLoss"), 80).setUseTitleFromLabel(true)
-				.setValueFormater(new NubmerFormater("###,###.00")));
+				.setValueFormater(new NubmerFormater("###,###.##")));
 		// 跟进人员=经办人
 		columns.add(new TextColumn4MapKey("receiver_name", "receiver_name",
 				getText("runcase.receiverName2"), 60)
@@ -255,23 +255,23 @@ public class CaseAccidentsAction extends ViewAction<Map<String, Object>> {
 		// 司机拖车费
 		columns.add(new TextColumn4MapKey("c.carman_cost", "carman_cost",
 				getText("runcase.carmanCost"), 95).setUseTitleFromLabel(true)
-				.setValueFormater(new NubmerFormater("###,###.00")));
+				.setValueFormater(new NubmerFormater("###,###.##")));
 		// 第三者损失
 		columns.add(new TextColumn4MapKey("c.third_loss", "third_loss",
 				getText("runcase.thirdLoss"), 75).setUseTitleFromLabel(true)
-				.setValueFormater(new NubmerFormater("###,###.00")));
+				.setValueFormater(new NubmerFormater("###,###.##")));
 		// 第三者拖车费
 		columns.add(new TextColumn4MapKey("c.third_cost", "third_cost",
 				getText("runcase.thirdCost"), 90).setUseTitleFromLabel(true)
-				.setValueFormater(new NubmerFormater("###,###.00")));
+				.setValueFormater(new NubmerFormater("###,###.##")));
 		// 司机伤人
 		columns.add(new TextColumn4MapKey("c.car_wounding",
 				"car_wounding", getText("runcase.carWounding"), 60)
-				.setSortable(true).setValueFormater(new NubmerFormater("###,###.00")));
+				.setSortable(true).setValueFormater(new NubmerFormater("###,###.##")));
 		// 第三者伤人
 		columns.add(new TextColumn4MapKey("c.third_wounding",
 				"third_wounding", getText("runcase.thirdHurtCount"), 75)
-				.setSortable(true).setValueFormater(new NubmerFormater("###,###.00")));
+				.setSortable(true).setValueFormater(new NubmerFormater("###,###.##")));
 		// 协议赔付
 		columns.add(new TextColumn4MapKey("c.agreement_payment",
 				"agreement_payment", getText("runcase.agreementPayment"), 80)

@@ -88,8 +88,8 @@ public class Case4Accident extends CaseBase {
 	private Float thirdCost;//第三者拖车费用
 	private Float agreementPayment;//协议赔付
 	
-	private Long payDiverId;//送保的受款司机ID
-	private Long payDiverIdTwo;//第二次送保里的受款司机ID
+	private Long payDriverId;//送保的受款司机ID
+	private Long payDriverIdTwo;//第二次送保里的受款司机ID
 	
 	@Column(name = "RECEIVE_DATE")
 	public Calendar getReceiveDate() {
@@ -605,20 +605,20 @@ public class Case4Accident extends CaseBase {
 	}
 
 	@Column(name="PAY_DRIVERID")
-	public Long getPayDiverId() {
-		return payDiverId;
+	public Long getPayDriverId() {
+		return payDriverId;
 	}
 
-	public void setPayDiverId(Long payDiverId) {
-		this.payDiverId = payDiverId;
+	public void setPayDriverId(Long payDriverId) {
+		this.payDriverId = payDriverId;
 	}
 	@Column(name="PAY_DRIVERID_TWO")
-	public Long getPayDiverIdTwo() {
-		return payDiverIdTwo;
+	public Long getPayDriverIdTwo() {
+		return payDriverIdTwo;
 	}
 
-	public void setPayDiverIdTwo(Long payDiverIdTwo) {
-		this.payDiverIdTwo = payDiverIdTwo;
+	public void setPayDriverIdTwo(Long payDriverIdTwo) {
+		this.payDriverIdTwo = payDriverIdTwo;
 	}
 	
 	
