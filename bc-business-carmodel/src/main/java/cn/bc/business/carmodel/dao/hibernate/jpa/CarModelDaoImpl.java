@@ -28,7 +28,7 @@ public class CarModelDaoImpl extends HibernateCrudJpaDao<CarModel> implements Ca
 	
 	public List<Map<String, String>> findEnabled4Option() {
 		String hql = "select cm.id,cm.factory_model from BS_CAR_MODEL cm";
-		hql += " order by cm.id";
+		hql += " order by cm.order_";
 		if (logger.isDebugEnabled()) {
 			logger.debug("hql=" + hql);
 		}

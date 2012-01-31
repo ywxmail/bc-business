@@ -47,8 +47,7 @@ public class CarModelsAction extends ViewAction<Map<String, Object>> {
 	@Override
 	protected OrderCondition getGridDefaultOrderCondition() {
 		// 默认排序方向：登记日期|状态
-		return new OrderCondition("cm.file_date", Direction.Desc).add(
-				"cm.status_", Direction.Asc);
+		return new OrderCondition("cm.order_", Direction.Asc);
 	}
 
 	@Override

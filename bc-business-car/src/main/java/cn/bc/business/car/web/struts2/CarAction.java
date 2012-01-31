@@ -265,11 +265,27 @@ public class CarAction extends FileEntityAction<Long, Car> {
 
 	public String carModelInfo(){
 		json = new Json();
-		Car car = this.getE();
 		CarModel obj = this.carModelService.findcarModelByFactoryModel(factoryModel);
-		car.setFactoryType(obj.getFactoryType()); // 厂牌类型
-		car.setEngineType(obj.getEngineType());// 发动机类型
-		car.setFuelType(obj.getFuelType());
+		
+		json.put("factoryType" ,obj.getFactoryType()); // 厂牌类型
+		json.put("engineType",obj.getEngineType());// 发动机类型
+		json.put("fuelType",obj.getFuelType());// 燃料类型
+		json.put("displacement",obj.getDisplacement());// 排量
+		json.put("power",obj.getPower());// 功率
+		json.put("turnType",obj.getTurnType()); // 转向方式
+		json.put("tireCount",obj.getTireCount());// 轮胎数
+		json.put("tireFrontDistance",obj.getTireFrontDistance());//前轮距
+		json.put("tireBehindDistance",obj.getTireBehindDistance());//后轮距
+		json.put("tireStandard",obj.getTireStandard());// 轮胎规格
+		json.put("axisDistance",obj.getAxisDistance());// 轴距
+		json.put("axisCount",obj.getAxisCount());// 轴数
+		json.put("pieceCount",obj.getPieceCount());// 后轴钢板弹簧片数
+		json.put("dimLen",obj.getDimLen());// 外廓尺寸：长
+		json.put("dimWidth",obj.getDimWidth());// 外廓尺寸：宽
+		json.put("dimHeight",obj.getDimHeight());// 外廓尺寸：高
+		json.put("totalWeight",obj.getTotalWeight());// 总质量
+		json.put("accessWeight",obj.getAccessWeight());// 核定承载量
+		json.put("accessCount",obj.getAccessCount()); // 载客人数
 		return "json";
 	}
 	
