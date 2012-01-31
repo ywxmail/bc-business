@@ -33,7 +33,12 @@
 		</action>
 		<action name="save" class="carAction" method="save"/>
 		<action name="delete" class="carAction" method="delete" />
+		<action name="conditions" class="carAction" method="conditions">
+			<result name="success">/bc-business/car/conditions.jsp</result>
+		</action>
 		<action name="carModelInfo" class="carAction" method="carModelInfo">
+		</action>
+		<action name="autoSetOriginNo" class="carAction" method="autoSetOriginNo">
 		</action>
 	</package>
 </struts>

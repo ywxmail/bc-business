@@ -45,4 +45,11 @@ public interface CarService extends CrudService<Car> {
 	 * @return Long
 	 */
 	Long findcarInfoByCarPlateNo(String carPlateNo);
+
+	/**
+	 * 通过自编号生成原车号
+	 * @param code
+	 * @return
+	 */
+	Car findcarOriginNoByCode(String code);
 }

@@ -334,4 +334,23 @@ public class CarDaoImpl extends HibernateCrudJpaDao<Car> implements CarDao {
 		}
 		return carId;
 	}
+
+	public Car findcarOriginNoByCode(String code) {
+		Car car = null;
+		String hql = "select c from Car c where c.code = ?";
+		hql += " order by c.registerDate Desc";
+		List<?> list = this.getJpaTemplate().find(hql,code);
+		if(list.size() == 1){
+			car = (Car) list.get(0);
+			return car;
+		}else if(list.size() < 1){
+			return null;
+		}else{
+			car = (Car) list.get(0);
+			if(logger.isDebugEnabled()){
+				logger.debug("有两辆或两辆以上的车辆，已选择其第一辆");
+			}
+			return car;
+		}
+	}
 }

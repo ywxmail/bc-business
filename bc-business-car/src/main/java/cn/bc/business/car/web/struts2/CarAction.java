@@ -51,6 +51,7 @@ public class CarAction extends FileEntityAction<Long, Car> {
 	// private static Log logger = LogFactory.getLog(CarAction.class);
 	private static final long serialVersionUID = 1L;
 	private MotorcadeService motorcadeService;
+	private CarService	carService;
 	private CarModelService carModelService;
 	private ActorService actorService;
 	private OptionService optionService;
@@ -77,6 +78,7 @@ public class CarAction extends FileEntityAction<Long, Car> {
 	@Autowired
 	public void setCarService(CarService carService) {
 		this.setCrudService(carService);
+		this.carService = carService;
 	}
 
 	@Autowired
@@ -290,4 +292,33 @@ public class CarAction extends FileEntityAction<Long, Car> {
 	}
 	
 	// ======== 通过factoryModel查找车型配置的相关信息结束 ========
+	
+	
+	// ======== 通过自编号生成原车号开始 ========
+	
+	private String code;
+
+	public String getCode() {
+		return code;
+	}
+
+	public void setCode(String code) {
+		this.code = code;
+	}
+	
+	/**
+	 *	通过自编号是否被其他车辆使用过,并且将使用过此编号的车辆的车牌号生成到新车的原车号.
+	 * 	如果返回多辆车只取最新登记日期那辆车牌号.
+	 */
+	public String autoSetOriginNo(){
+		json = new Json();
+		Car obj = this.carService.findcarOriginNoByCode(code);
+		if(obj != null && obj.getPlateNo() != null){
+			json.put("plateNo", obj.getPlateNo());
+		}
+		return "json";
+	}
+	
+	// ======== 通过自编号生成原车号结束 ========
+	
 }

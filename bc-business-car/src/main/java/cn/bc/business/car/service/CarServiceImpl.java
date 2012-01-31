@@ -88,4 +88,8 @@ public class CarServiceImpl extends DefaultCrudService<Car> implements
 		}
 		return carId;
 	}
+
+	public Car findcarOriginNoByCode(String code) {
+		return this.carDao.findcarOriginNoByCode(code);
+	}
 }
