@@ -12,7 +12,6 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
-import cn.bc.BCConstants;
 import cn.bc.business.web.struts2.ViewAction;
 import cn.bc.core.query.condition.Direction;
 import cn.bc.core.query.condition.impl.OrderCondition;
@@ -34,7 +33,6 @@ import cn.bc.web.ui.html.page.PageOption;
 @Controller
 public class CarModelsAction extends ViewAction<Map<String, Object>> {
 	private static final long serialVersionUID = 1L;
-	public String status = String.valueOf(BCConstants.STATUS_ENABLED); // 合同的状态，多个用逗号连接
 
 	@Override
 	public boolean isReadonly() {
@@ -46,7 +44,7 @@ public class CarModelsAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected OrderCondition getGridDefaultOrderCondition() {
-		// 默认排序方向：登记日期|状态
+		// 默认排序方向：排序号
 		return new OrderCondition("cm.order_", Direction.Asc);
 	}
 
@@ -124,7 +122,7 @@ public class CarModelsAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected String getGridRowLabelExpression() {
-		return "['factoryType']";
+		return "['factory_model']";
 	}
 
 
