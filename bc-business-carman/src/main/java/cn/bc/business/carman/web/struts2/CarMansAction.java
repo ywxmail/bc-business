@@ -26,6 +26,7 @@ import cn.bc.core.util.StringUtils;
 import cn.bc.db.jdbc.RowMapper;
 import cn.bc.db.jdbc.SqlObject;
 import cn.bc.identity.web.SystemContext;
+import cn.bc.identity.web.formater.SexFormater;
 import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.formater.DateRangeFormater;
 import cn.bc.web.formater.EntityStatusFormater;
@@ -72,7 +73,7 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 		StringBuffer sql = new StringBuffer();
 		sql.append("select c.id,c.status_,c.type_,c.name,c.cert_fwzg,c.cert_fwzg_id,c.cert_identity");
 		sql.append(",c.cert_cyzg,c.work_date,c.origin,c.former_unit,c.charger,c.cert_driving_first_date");
-		sql.append(",c.cert_driving,c.cert_driving_start_date,c.cert_driving_end_date,c.file_date from BS_CARMAN c");
+		sql.append(",c.cert_driving,c.cert_driving_start_date,c.cert_driving_end_date,c.file_date,c.phone,c.phone1,c.sex,c.birthdate from BS_CARMAN c");
 		sqlObject.setSql(sql.toString());
 
 		// 注入参数
@@ -100,6 +101,10 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 				map.put("cert_driving_start_date", rs[i++]);
 				map.put("cert_driving_end_date", rs[i++]);
 				map.put("file_date", rs[i++]);
+				map.put("phone1", rs[i++]);
+				map.put("phone2", rs[i++]);
+				map.put("sex", rs[i++]);
+				map.put("birth_date", rs[i++]);
 				return map;
 			}
 		});
@@ -111,31 +116,50 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 		List<Column> columns = new ArrayList<Column>();
 		columns.add(new IdColumn4MapKey("c.id", "id"));
 		columns.add(new TextColumn4MapKey("c.status_", "status_",
-				getText("carMan.status"), 60).setSortable(true)
+				getText("carMan.status"), 40).setSortable(true)
 				.setValueFormater(new EntityStatusFormater(getBSStatuses1())));
+		columns.add(new TextColumn4MapKey("c.file_date", "file_date",
+				getText("carMan.fileDate"), 85).setSortable(true)
+				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+		columns.add(new TextColumn4MapKey("c.work_date", "work_date",
+				getText("carMan.workDate"), 85).setSortable(true)
+				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
 		columns.add(new TextColumn4MapKey("c.type_", "type_",
 				getText("carMan.type"), 80).setSortable(true).setValueFormater(
 				new KeyValueFormater(getType())));
 		columns.add(new TextColumn4MapKey("c.name", "name",
-				getText("carMan.name"), 80).setSortable(true));
-		// columns.add(new TextColumn4MapKey("c.cert_fwzg_id", "cert_fwzg_id",
-		// getText("carMan.cert4FWZGID"), 80));
+				getText("carMan.name"), 60).setSortable(true));
+		columns.add(new TextColumn4MapKey("c.sex", "sex",
+				getText("carMan.sex"), 40).setSortable(true).setValueFormater(
+				new SexFormater()));
+		columns.add(new TextColumn4MapKey("c.birthdate", "birth_date",
+				getText("carMan.birthdate"), 85).setSortable(true)
+				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+		columns.add(new TextColumn4MapKey("c.cert_fwzg", "cert_fwzg",
+				getText("carMan.cert4FWZG"), 80));
+		columns.add(new TextColumn4MapKey("c.phone", "phone1",
+				getText("carMan.phone"), 100).setSortable(false)
+				.setUseTitleFromLabel(true));
+		columns.add(new TextColumn4MapKey("c.origin", "origin",
+				getText("carMan.origin"), 100).setSortable(true)
+				.setUseTitleFromLabel(true));
+		columns.add(new TextColumn4MapKey("c.former_unit", "former_unit",
+				getText("carMan.formerUnit"), 80).setSortable(true)
+				.setUseTitleFromLabel(true));
+		columns.add(new TextColumn4MapKey("c.cert_driving_first_date",
+				"cert_driving_first_date",
+				getText("carMan.cert4DrivingFirstDateView"), 120).setSortable(
+				true).setValueFormater(new CalendarFormater("yyyy-MM-dd")));
 		columns.add(new TextColumn4MapKey("c.charger", "charger",
 				getText("carMan.charger"), 100)
 				.setValueFormater(new LinkFormater4ChargerInfo(this
 						.getContextPath())));
-		columns.add(new TextColumn4MapKey("c.cert_fwzg", "cert_fwzg",
-				getText("carMan.cert4FWZG"), 80));
 		columns.add(new TextColumn4MapKey("c.cert_identity", "cert_identity",
 				getText("carMan.cert4Indentity"), 160).setSortable(true));
 		columns.add(new TextColumn4MapKey("c.cert_cyzg", "cert_cyzg",
 				getText("carMan.cert4CYZG"), 120));
 		columns.add(new TextColumn4MapKey("c.cert_driving", "cert_driving",
 				getText("carMan.cert4Driving"), 160));
-		columns.add(new TextColumn4MapKey("c.cert_driving_first_date",
-				"cert_driving_first_date",
-				getText("carMan.cert4DrivingFirstDateView"), 120).setSortable(
-				true).setValueFormater(new CalendarFormater("yyyy-MM-dd")));
 		columns.add(new TextColumn4MapKey("c.cert_driving_start_date",
 				"cert_driving_start_date",
 				getText("carMan.cert4DrivingDeadline"), 180)
@@ -147,13 +171,6 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 						return (Date) contract.get("cert_driving_end_date");
 					}
 				}));
-		columns.add(new TextColumn4MapKey("c.work_date", "work_date",
-				getText("carMan.workDate"), 120).setSortable(true)
-				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
-		columns.add(new TextColumn4MapKey("c.origin", "origin",
-				getText("carMan.origin"), 100).setSortable(true));
-		columns.add(new TextColumn4MapKey("c.former_unit", "former_unit",
-				getText("carMan.formerUnit"), 80).setSortable(true));
 
 		return columns;
 	}
@@ -161,7 +178,7 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 	@Override
 	protected String[] getGridSearchFields() {
 		return new String[] { "c.name", "c.origin", "c.cert_identity",
-				"c.cert_cyzg", "c.cert_fwzg" };
+				"c.cert_cyzg", "c.cert_fwzg", "c.phone" };
 	}
 
 	@Override
@@ -233,27 +250,28 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 
 		if (this.isReadonly()) {
 			// 查看按钮
-			tb.addButton(Toolbar
-					.getDefaultOpenToolbarButton(getText("label.read")));
+			tb.addButton(this.getDefaultOpenToolbarButton());
 		} else {
 			// 新建按钮
-			tb.addButton(Toolbar
-					.getDefaultCreateToolbarButton(getText("label.create")));
+			tb.addButton(this.getDefaultCreateToolbarButton());
 
 			// 编辑按钮
-			tb.addButton(Toolbar
-					.getDefaultEditToolbarButton(getText("label.edit")));
+			tb.addButton(this.getDefaultEditToolbarButton());
 
 			// 取消删除按钮
 		}
 
 		// 搜索按钮
-		tb.addButton(Toolbar
-				.getDefaultSearchToolbarButton(getText("title.click2search")));
+		tb.addButton(this.getDefaultSearchToolbarButton());
 
 		// 状态单选按钮组
 		tb.addButton(Toolbar.getDefaultToolbarRadioGroup(this.getBSStatuses1(),
 				"status", 0, getText("title.click2changeSearchStatus")));
 		return tb;
+	}
+
+	@Override
+	protected boolean useAdvanceSearch() {
+		return true;
 	}
 }
