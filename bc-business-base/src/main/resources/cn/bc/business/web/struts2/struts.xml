@@ -19,7 +19,7 @@
 		</action>
 		<!-- 高级搜索条件窗口 -->
 		<action name="/*/conditions" class="{1}Action" method="conditions">
-			<result name="success">/bc-business/{1}/conditions.jsp</result>
+			<result name="success">${advanceSearchConditionsJspPath}/conditions.jsp</result>
 		</action>
 		
 		<!-- 通过车辆id或车牌号查询相关信息 -->

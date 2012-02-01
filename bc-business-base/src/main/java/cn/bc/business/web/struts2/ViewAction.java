@@ -77,4 +77,9 @@ public abstract class ViewAction<T extends Object> extends
 		statuses.put("", getText("bs.status.all"));
 		return statuses;
 	}
+
+	@Override
+	public String getAdvanceSearchConditionsJspPath() {
+		return BSConstants.NAMESPACE + "/" + this.getFormActionName();
+	}
 }

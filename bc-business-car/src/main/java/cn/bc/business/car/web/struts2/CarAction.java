@@ -7,10 +7,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
@@ -23,8 +20,6 @@ import cn.bc.business.carmodel.service.CarModelService;
 import cn.bc.business.motorcade.domain.Motorcade;
 import cn.bc.business.motorcade.service.MotorcadeService;
 import cn.bc.business.web.struts2.FileEntityAction;
-import cn.bc.identity.domain.Actor;
-import cn.bc.identity.service.ActorService;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.option.domain.OptionItem;
 import cn.bc.option.service.OptionService;
@@ -53,7 +48,6 @@ public class CarAction extends FileEntityAction<Long, Car> {
 	private MotorcadeService motorcadeService;
 	private CarService	carService;
 	private CarModelService carModelService;
-	private ActorService actorService;
 	private OptionService optionService;
 
 	public List<Map<String, String>> motorcadeList; // 可选车队列表
@@ -68,12 +62,6 @@ public class CarAction extends FileEntityAction<Long, Car> {
 	public List<Map<String, String>> carModelList; // 车型配置列表
 	public Map<String, String> statusesValue;
 	public Json json;
-
-	@Autowired
-	public void setActorService(
-			@Qualifier("actorService") ActorService actorService) {
-		this.actorService = actorService;
-	}
 
 	@Autowired
 	public void setCarService(CarService carService) {
@@ -219,38 +207,6 @@ public class CarAction extends FileEntityAction<Long, Car> {
 				getText("bs.status.logout"));
 		statuses.put(" ", getText("bs.status.all"));
 		return statuses;
-	}
-
-	public JSONArray motorcades;// 车队的下拉列表信息
-	public JSONArray units;// 分公司的下拉列表信息
-
-	/**
-	 * 高级搜索条件窗口
-	 * 
-	 * @return
-	 * @throws Exception
-	 */
-	public String conditions() throws Exception {
-		// 可选车队列表
-		motorcades = new JSONArray();
-		JSONObject json;
-		for (Map<String, String> map : this.motorcadeService.find4Option(null)) {
-			json = new JSONObject();
-			json.put("label", map.get("value"));
-			json.put("value", map.get("key"));
-			motorcades.put(json);
-		}
-
-		// 可选分公司列表
-		units = new JSONArray();
-		for (Map<String, String> map : this.actorService.find4option(
-				new Integer[] { Actor.TYPE_UNIT }, (Integer[]) null)) {
-			json = new JSONObject();
-			json.put("label", map.get("name"));
-			json.put("value", map.get("id"));
-			units.put(json);
-		}
-		return SUCCESS;
 	}
 	
 	// ======== 通过factoryModel查找车型配置的相关信息开始 ========
