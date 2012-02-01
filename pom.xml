@@ -28,6 +28,7 @@
 		<module>bc-business-policy</module>
 		<module>bc-business-arrange</module>
 		<module>bc-business-insuranceType</module>
+		<module>bc-business-carmodel</module>
 	</modules>
 	<scm>
 		<connection>scm:git:git@192.168.0.222:bc-business.git</connection>

@@ -255,7 +255,7 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 	@Override
 	protected String[] getGridSearchFields() {
 		return new String[] { "c.plate_no", "c.driver", "c.charger",
-				"c.cert_no2", "c.factory_type", "m.name", "c.engine_no" };
+				"c.cert_no2", "c.factory_type", "m.name", "c.engine_no", "c.code" };
 	}
 
 	@Override

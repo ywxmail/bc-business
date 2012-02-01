@@ -18,6 +18,8 @@ import org.springframework.stereotype.Controller;
 import cn.bc.business.OptionConstants;
 import cn.bc.business.car.domain.Car;
 import cn.bc.business.car.service.CarService;
+import cn.bc.business.carmodel.domain.CarModel;
+import cn.bc.business.carmodel.service.CarModelService;
 import cn.bc.business.motorcade.domain.Motorcade;
 import cn.bc.business.motorcade.service.MotorcadeService;
 import cn.bc.business.web.struts2.FileEntityAction;
@@ -27,6 +29,7 @@ import cn.bc.identity.web.SystemContext;
 import cn.bc.option.domain.OptionItem;
 import cn.bc.option.service.OptionService;
 import cn.bc.web.ui.html.page.PageOption;
+import cn.bc.web.ui.json.Json;
 
 /**
  * 车辆Action
@@ -34,12 +37,22 @@ import cn.bc.web.ui.html.page.PageOption;
  * @author dragon
  * 
  */
+/**
+ * @author wis
+ *
+ */
+/**
+ * @author wis
+ *
+ */
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 @Controller
 public class CarAction extends FileEntityAction<Long, Car> {
 	// private static Log logger = LogFactory.getLog(CarAction.class);
 	private static final long serialVersionUID = 1L;
 	private MotorcadeService motorcadeService;
+	private CarService	carService;
+	private CarModelService carModelService;
 	private ActorService actorService;
 	private OptionService optionService;
 
@@ -52,7 +65,9 @@ public class CarAction extends FileEntityAction<Long, Car> {
 	public List<Map<String, String>> taximeterFactoryTypeList; // 可选计价器制造厂列表
 	public List<Map<String, String>> oldUnitList; // 所属单位列表
 	public List<Map<String, String>> logoutReasonList; // 注销原因列表
+	public List<Map<String, String>> carModelList; // 车型配置列表
 	public Map<String, String> statusesValue;
+	public Json json;
 
 	@Autowired
 	public void setActorService(
@@ -63,11 +78,17 @@ public class CarAction extends FileEntityAction<Long, Car> {
 	@Autowired
 	public void setCarService(CarService carService) {
 		this.setCrudService(carService);
+		this.carService = carService;
 	}
 
 	@Autowired
 	public void setMotorcadeService(MotorcadeService motorcadeService) {
 		this.motorcadeService = motorcadeService;
+	}
+	
+	@Autowired
+	public void setCarModelService(CarModelService carModelService) {
+		this.carModelService = carModelService;
 	}
 
 	@Autowired
@@ -141,6 +162,9 @@ public class CarAction extends FileEntityAction<Long, Car> {
 			OptionItem.insertIfNotExist(this.motorcadeList, m.getId()
 					.toString(), m.getName());
 		}
+		
+		// 加载可选车型配置列表
+		this.carModelList = this.carModelService.findEnabled4Option();
 
 		// 批量加载可选项列表
 		Map<String, List<Map<String, String>>> optionItems = this.optionService
@@ -228,4 +252,73 @@ public class CarAction extends FileEntityAction<Long, Car> {
 		}
 		return SUCCESS;
 	}
+	
+	// ======== 通过factoryModel查找车型配置的相关信息开始 ========
+	
+	private String factoryModel;
+	
+	public String getFactoryModel() {
+		return factoryModel;
+	}
+
+	public void setFactoryModel(String factoryModel) {
+		this.factoryModel = factoryModel;
+	}
+
+	public String carModelInfo(){
+		json = new Json();
+		CarModel obj = this.carModelService.findcarModelByFactoryModel(factoryModel);
+		
+		json.put("factoryType" ,obj.getFactoryType()); // 厂牌类型
+		json.put("engineType",obj.getEngineType());// 发动机类型
+		json.put("fuelType",obj.getFuelType());// 燃料类型
+		json.put("displacement",obj.getDisplacement());// 排量
+		json.put("power",obj.getPower());// 功率
+		json.put("turnType",obj.getTurnType()); // 转向方式
+		json.put("tireCount",obj.getTireCount());// 轮胎数
+		json.put("tireFrontDistance",obj.getTireFrontDistance());//前轮距
+		json.put("tireBehindDistance",obj.getTireBehindDistance());//后轮距
+		json.put("tireStandard",obj.getTireStandard());// 轮胎规格
+		json.put("axisDistance",obj.getAxisDistance());// 轴距
+		json.put("axisCount",obj.getAxisCount());// 轴数
+		json.put("pieceCount",obj.getPieceCount());// 后轴钢板弹簧片数
+		json.put("dimLen",obj.getDimLen());// 外廓尺寸：长
+		json.put("dimWidth",obj.getDimWidth());// 外廓尺寸：宽
+		json.put("dimHeight",obj.getDimHeight());// 外廓尺寸：高
+		json.put("totalWeight",obj.getTotalWeight());// 总质量
+		json.put("accessWeight",obj.getAccessWeight());// 核定承载量
+		json.put("accessCount",obj.getAccessCount()); // 载客人数
+		return "json";
+	}
+	
+	// ======== 通过factoryModel查找车型配置的相关信息结束 ========
+	
+	
+	// ======== 通过自编号生成原车号开始 ========
+	
+	private String code;
+
+	public String getCode() {
+		return code;
+	}
+
+	public void setCode(String code) {
+		this.code = code;
+	}
+	
+	/**
+	 *	通过自编号是否被其他车辆使用过,并且将使用过此编号的车辆的车牌号生成到新车的原车号.
+	 * 	如果返回多辆车只取最新登记日期那辆车牌号.
+	 */
+	public String autoSetOriginNo(){
+		json = new Json();
+		Car obj = this.carService.findcarOriginNoByCode(code);
+		if(obj != null && obj.getPlateNo() != null){
+			json.put("plateNo", obj.getPlateNo());
+		}
+		return "json";
+	}
+	
+	// ======== 通过自编号生成原车号结束 ========
+	
 }
