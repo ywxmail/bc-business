@@ -21,7 +21,7 @@ import cn.bc.web.formater.LinkFormater;
  * 
  */
 public class LinkFormater4DriverInfo extends LinkFormater {
-	protected String urlPattern = BSConstants.NAMESPACE + "/carMan/open?id=";
+	protected String urlPattern = BSConstants.NAMESPACE + "/carMan/edit?id=";
 	protected String moduleKey = "carMan";
 	private boolean showTip = true;
 	private String contextPath;// 链接的上下文路径
