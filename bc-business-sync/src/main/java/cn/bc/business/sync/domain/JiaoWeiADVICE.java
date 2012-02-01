@@ -58,6 +58,8 @@ public class JiaoWeiADVICE extends SyncBase {
 	private String buslines;//公交线路或站场
 	private String busColor;//车辆颜色
 	private String reply;//是否回复
+	private String unitName;// 分公司
+	private String motorcadeName;// 所属车队
 	
 	@Column(name = "C_ID")
 	public String getcId() {
@@ -264,6 +266,23 @@ public class JiaoWeiADVICE extends SyncBase {
 		this.reply = reply;
 	}
 	
+	@Column(name = "UNIT_NAME")
+	public String getUnitName() {
+		return unitName;
+	}
+
+	public void setUnitName(String unitName) {
+		this.unitName = unitName;
+	}
+
+	@Column(name = "MOTORCADE_NAME")
+	public String getMotorcadeName() {
+		return motorcadeName;
+	}
+
+	public void setMotorcadeName(String motorcadeName) {
+		this.motorcadeName = motorcadeName;
+	}
 
  
 }

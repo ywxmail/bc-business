@@ -66,6 +66,8 @@ public class JiaoWeiYYWZ extends SyncBase {
 	private String detain;//扣留物品
 	private String pullUnit;//拖车单位
 	private Float penalty;//罚款
+	private String unitName;// 分公司
+	private String motorcadeName;// 所属车队
 	
 	@Column(name = "C_ID")
 	public String getcId() {
@@ -321,4 +323,21 @@ public class JiaoWeiYYWZ extends SyncBase {
 		this.penalty = penalty;
 	}
 	
+	@Column(name = "UNIT_NAME")
+	public String getUnitName() {
+		return unitName;
+	}
+
+	public void setUnitName(String unitName) {
+		this.unitName = unitName;
+	}
+
+	@Column(name = "MOTORCADE_NAME")
+	public String getMotorcadeName() {
+		return motorcadeName;
+	}
+
+	public void setMotorcadeName(String motorcadeName) {
+		this.motorcadeName = motorcadeName;
+	}
 }
