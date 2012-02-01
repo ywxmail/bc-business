@@ -211,7 +211,7 @@ public class Driver4CertAction extends CertAction {
 		columns.add(new TextColumn("['id']", "ID",20));
 		columns.add(new TextColumn("['status']",getText("cert.status"),		50)
 				.setSortable(true).setValueFormater(new EntityStatusFormater(getEntityStatuses())));
-		columns.add(new TextColumn("['name']", getText("cert.carMan"),		60)
+		columns.add(new TextColumn("['name']", getText("cert.carMan"),		70)
 				.setSortable(true).setValueFormater(new AbstractFormater<String>() {
 					@Override
 					public String format(Object context, Object value) {
@@ -238,7 +238,7 @@ public class Driver4CertAction extends CertAction {
 						return (Calendar) date.get("endDate");
 					}
 				}));
-		columns.add(new TextColumn("['licencer']",	getText("cert.licencer"),80)
+		columns.add(new TextColumn("['licencer']",	getText("cert.licencer"))
 				.setSortable(true));
 		return columns;
 	}
@@ -282,6 +282,9 @@ public class Driver4CertAction extends CertAction {
 					.toString());
 		return page;
 	}
-	
-	
+
+	@Override
+	protected PageOption buildListPageOption() {
+		return super.buildListPageOption().setWidth(800).setHeight(400);
+	}
 }
