@@ -37,6 +37,8 @@ public class JiaoWeiJTWF extends SyncBase {
 	private String driverCert;// 服务资格证
 	private Float jeom;// 本次扣分
 	private String companyName;// 公司名称
+	private String unitName;// 分公司
+	private String motorcadeName;// 所属车队
 
 	@Column(name = "HAPPEN_DATE")
 	public Calendar getHappenDate() {
@@ -111,5 +113,23 @@ public class JiaoWeiJTWF extends SyncBase {
 
 	public void setCompanyName(String companyName) {
 		this.companyName = companyName;
+	}
+	
+	@Column(name = "UNIT_NAME")
+	public String getUnitName() {
+		return unitName;
+	}
+
+	public void setUnitName(String unitName) {
+		this.unitName = unitName;
+	}
+
+	@Column(name = "MOTORCADE_NAME")
+	public String getMotorcadeName() {
+		return motorcadeName;
+	}
+
+	public void setMotorcadeName(String motorcadeName) {
+		this.motorcadeName = motorcadeName;
 	}
 }

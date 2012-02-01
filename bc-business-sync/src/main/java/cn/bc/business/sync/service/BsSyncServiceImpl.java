@@ -14,6 +14,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
+import cn.bc.business.car.service.CarService;
 import cn.bc.business.spider.Spider4JinDunJTWF;
 import cn.bc.business.spider.domain.JinDunJTWF;
 import cn.bc.business.sync.domain.JiaoWeiADVICE;
@@ -42,6 +43,8 @@ public class BsSyncServiceImpl implements BsSyncService {
 	private Spider4JinDunJTWF spider4JinDunJTWF;// 金盾交通违法抓取器
 	private SyncBaseService syncBaseService;
 	private Cache jinDunCache;// 金盾网交通违法抓取的缓存
+	private CarService carService;
+	public Map<String, Object> carInfoMap;// 车辆信息map
 
 	@Autowired
 	public void setJinDunCache(@Qualifier("jinDunCache") Cache jinDunCache) {
@@ -66,6 +69,11 @@ public class BsSyncServiceImpl implements BsSyncService {
 	@Autowired
 	public void setSyncBaseService(SyncBaseService syncBaseService) {
 		this.syncBaseService = syncBaseService;
+	}
+	
+	@Autowired
+	public void setCarService(CarService carService) {
+		this.carService = carService;
 	}
 
 	public int doSync4JiaoWeiJTWF(ActorHistory syncer, Calendar fromDate,
@@ -145,6 +153,14 @@ public class BsSyncServiceImpl implements BsSyncService {
 		} else {
 			domain.setCarPlateType(null);
 			domain.setCarPlateNo(plate);
+		}
+		//通过车牌号查找此车辆所属的分公司与车队
+		carInfoMap = this.carService.findcarInfoByCarPlateNo2(domain.getCarPlateNo());
+		if(carInfoMap != null && carInfoMap.get("unit_name") != null){
+			domain.setUnitName(carInfoMap.get("unit_name")+""); //设置分公司
+		}
+		if(carInfoMap != null && carInfoMap.get("motorcade_name") != null){
+			domain.setMotorcadeName(carInfoMap.get("motorcade_name")+""); //设置所属车队
 		}
 		domain.setDriverName(row.getCellStringValue("当事司机姓名"));
 		domain.setDriverCert(row.getCellStringValue("服务资格证"));
@@ -346,6 +362,21 @@ public class BsSyncServiceImpl implements BsSyncService {
 		domain.setIdcardType(row.getCellStringValue("身份证明类型"));
 		domain.setIdcardCode(row.getCellStringValue("身份证明编号"));
 		domain.setCarPlate(row.getCellStringValue("违章主体"));
+		
+		String plate = domain.getCarPlate();//格式为粤A.XXXX
+		int index = plate.indexOf(".");
+		if (index != -1) {
+			plate = plate.substring(index + 1);
+		} 
+		//通过车牌号查找此车辆所属的分公司与车队
+		carInfoMap = this.carService.findcarInfoByCarPlateNo2(plate);
+		if(carInfoMap != null && carInfoMap.get("unit_name") != null){
+			domain.setUnitName(carInfoMap.get("unit_name")+""); //设置分公司
+		}
+		if(carInfoMap != null && carInfoMap.get("motorcade_name") != null){
+			domain.setMotorcadeName(carInfoMap.get("motorcade_name")+""); //设置所属车队
+		}
+		
 		domain.setCompany(row.getCellStringValue("违章企业"));
 		domain.setAddress(row.getCellStringValue("违章地段"));
 		domain.setOwner(row.getCellStringValue("业户名称"));
@@ -466,6 +497,21 @@ public class BsSyncServiceImpl implements BsSyncService {
 		domain.setAdvisorCert(row.getCellStringValue("accuser_id"));
 		domain.setOldUnitName(row.getCellStringValue("taxi_dept"));
 		domain.setCarPlate(row.getCellStringValue("taxi_no"));
+		
+		String plate = domain.getCarPlate();//格式为粤A.XXXX
+		int index = plate.indexOf(".");
+		if (index != -1) {
+			plate = plate.substring(index + 1);
+		} 
+		//通过车牌号查找此车辆所属的分公司与车队
+		carInfoMap = this.carService.findcarInfoByCarPlateNo2(plate);
+		if(carInfoMap != null && carInfoMap.get("unit_name") != null){
+			domain.setUnitName(carInfoMap.get("unit_name")+""); //设置分公司
+		}
+		if(carInfoMap != null && carInfoMap.get("motorcade_name") != null){
+			domain.setMotorcadeName(carInfoMap.get("motorcade_name")+""); //设置所属车队
+		}
+
 		domain.setDriverCert(row.getCellStringValue("driver_id"));
 		domain.setDriverChar(row.getCellStringValue("driver_char_id"));
 		domain.setContent(row.getCellStringValue("content"));
