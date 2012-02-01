@@ -48,6 +48,8 @@ public class JinDunJTWF extends SyncBase {
 	private Float overduePayment;// 滞纳金
 	private String traffic;// 交通方式
 	private String breakType;// 违法行为
+	private String unitName;// 分公司
+	private String motorcadeName;// 所属车队
 
 	@Column(name = "HAPPEN_DATE")
 	public Calendar getHappenDate() {
@@ -192,4 +194,24 @@ public class JinDunJTWF extends SyncBase {
 	public void setBreakType(String breakType) {
 		this.breakType = breakType;
 	}
+
+	@Column(name = "UNIT_NAME")
+	public String getUnitName() {
+		return unitName;
+	}
+
+	public void setUnitName(String unitName) {
+		this.unitName = unitName;
+	}
+
+	@Column(name = "MOTORCADE_NAME")
+	public String getMotorcadeName() {
+		return motorcadeName;
+	}
+
+	public void setMotorcadeName(String motorcadeName) {
+		this.motorcadeName = motorcadeName;
+	}
+	
+	
 }

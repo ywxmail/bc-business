@@ -80,7 +80,7 @@ public class JinDunJTWFsAction extends SyncViewAction {
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer sql = new StringBuffer();
 		sql.append("select b.id,b.status_,b.sync_type,b.sync_code,b.sync_from,b.sync_date");
-		sql.append(",t.happen_date,t.address,t.car_type,t.car_plate_type,t.car_plate_no,t.engine_no,t.source");
+		sql.append(",t.happen_date,t.address,t.car_type,t.unit_name,t.motorcade_name,t.car_plate_type,t.car_plate_no,t.engine_no,t.source");
 		sql.append(",t.driver_name,t.decision_no,t.decision_type,t.traffic,t.break_type");
 		sql.append(",t.jeom,t.penalty,t.overdue_payment");
 		sql.append(" from bs_sync_jindun_jtwf t");
@@ -104,6 +104,8 @@ public class JinDunJTWFsAction extends SyncViewAction {
 				map.put("happenDate", rs[i++]);
 				map.put("address", rs[i++]);
 				map.put("carType", rs[i++]);
+				map.put("unitName", rs[i++]);
+				map.put("motorcadeName", rs[i++]);
 				map.put("carPlateType", rs[i++]);
 				map.put("carPlateNo", rs[i++]);
 				map.put("engineNo", rs[i++]);
@@ -135,6 +137,12 @@ public class JinDunJTWFsAction extends SyncViewAction {
 		columns.add(new TextColumn4MapKey("t.happen_date", "happenDate",
 				getText("jinDunJTWF.happenDate"), 130).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd HH:mm")));
+		columns.add(new TextColumn4MapKey("c.unit_name", "unitName",
+				getText("jiaoWeiJTWF.unitName"), 80)
+				.setSortable(true));
+		columns.add(new TextColumn4MapKey("c.motorcade_name", "motorcadeName",
+				getText("jiaoWeiJTWF.motorcadeName"), 80)
+				.setSortable(true));
 		columns.add(new TextColumn4MapKey("t.car_plate_no", "carPlateNo",
 				getText("jinDunJTWF.carPlate"), 80).setSortable(true)
 				.setValueFormater(new AbstractFormater<String>() {

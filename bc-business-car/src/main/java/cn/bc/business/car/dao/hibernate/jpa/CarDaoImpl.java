@@ -353,4 +353,22 @@ public class CarDaoImpl extends HibernateCrudJpaDao<Car> implements CarDao {
 			return car;
 		}
 	}
+
+	public Map<String, Object> findcarInfoByCarPlateNo2(String carPlateNo) {
+		Map<String, Object> queryMap = null;
+		String sql = "SELECT bia.name as unit_name,m.name as motorcade_name"
+				+ " FROM BS_CAR car"
+				+ " inner join bs_motorcade m on m.id=car.motorcade_id"
+				+ " inner join bc_identity_actor bia on bia.id=m.unit_id"
+				+ " where car.plate_no='" + carPlateNo + "'";
+
+		// jdbc查询BS_CAR记录
+		try {
+			queryMap = this.jdbcTemplate.queryForMap(sql);
+		} catch (EmptyResultDataAccessException e) {
+			e.getStackTrace();
+		}
+
+		return queryMap;
+	}
 }

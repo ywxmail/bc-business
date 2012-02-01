@@ -92,4 +92,8 @@ public class CarServiceImpl extends DefaultCrudService<Car> implements
 	public Car findcarOriginNoByCode(String code) {
 		return this.carDao.findcarOriginNoByCode(code);
 	}
+
+	public Map<String, Object> findcarInfoByCarPlateNo2(String carPlateNo) {
+		return this.carDao.findcarInfoByCarPlateNo2(carPlateNo);
+	}
 }
