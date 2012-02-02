@@ -147,8 +147,8 @@ public class Contract4ChargerAction extends FileEntityAction<Long, Contract4Char
 		SystemContext context = this.getSystyemContext();
 		Contract4Charger e = this.getE();
 		this.beforeSave(e);
+		
 		//设置最后更新人的信息
-		e.setFileDate(Calendar.getInstance());
 		e.setModifier(context.getUserHistory());
 		e.setModifiedDate(Calendar.getInstance());
 		//设置责任人姓名
