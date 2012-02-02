@@ -3,6 +3,8 @@
  */
 package cn.bc.business.carman.dao;
 
+import java.util.List;
+
 import cn.bc.business.car.domain.Car;
 import cn.bc.business.carman.domain.CarByDriver;
 import cn.bc.core.dao.CrudDao;
@@ -31,5 +33,12 @@ public interface CarByDriverDao extends CrudDao<CarByDriver> {
 	 * @return
 	 */
 	CarByDriver findCarByDriverBycarManId(Long id);
-	
+
+	/**
+	 * 根据Pid找出与迁移类型为顶班的迁移记录相对应的营运班次
+	 * 
+	 * @param pid
+	 * @return
+	 */
+	List<CarByDriver> find4Shiftwork(Long pid);
 }

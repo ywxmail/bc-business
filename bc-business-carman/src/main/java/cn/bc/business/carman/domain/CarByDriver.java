@@ -45,6 +45,7 @@ public class CarByDriver extends FileEntityImpl {
 	private Car car;// 营运的车辆
 	private CarMan driver;// 营运的司机
 	private String description;// 备注
+	private Long pid;//顶班的迁移记录与营运班次的关系
 
 	@Column(name = "DESC_")
 	public String getDescription() {
@@ -91,4 +92,13 @@ public class CarByDriver extends FileEntityImpl {
 	public void setStatus(int status) {
 		this.status = status;
 	}
+
+	public Long getPid() {
+		return pid;
+	}
+
+	public void setPid(Long pid) {
+		this.pid = pid;
+	}
+	
 }

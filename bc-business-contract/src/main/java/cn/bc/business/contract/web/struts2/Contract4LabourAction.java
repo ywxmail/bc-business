@@ -328,7 +328,6 @@ public class Contract4LabourAction extends
 		this.beforeSave(e);
 
 		// 设置最后更新人的信息
-		e.setFileDate(Calendar.getInstance());
 		e.setModifier(context.getUserHistory());
 		e.setModifiedDate(Calendar.getInstance());
 

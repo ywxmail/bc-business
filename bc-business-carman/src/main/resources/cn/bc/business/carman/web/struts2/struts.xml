@@ -38,10 +38,10 @@
 		<action name="create" class="shiftworkByDriverAction" method="create" >
 		    <result name="form">/bc-business/carByDriverHistory/dingBanForm.jsp</result>
 		</action>
-		<action name="edit" class="carByDriverHistoryAction" method="edit" >
+		<action name="edit" class="shiftworkByDriverAction" method="edit" >
 		    <result name="dingban">/bc-business/carByDriverHistory/dingBanForm.jsp</result>
 		</action>
-		<action name="open" class="carByDriverHistoryAction" method="open" >
+		<action name="open" class="shiftworkByDriverAction" method="open" >
 			<result name="dingban">/bc-business/carByDriverHistory/dingBanForm.jsp</result>
 		</action>
 	</package>
