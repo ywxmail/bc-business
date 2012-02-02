@@ -128,6 +128,7 @@ public class CarAction extends FileEntityAction<Long, Car> {
 
 	@Override
 	protected void beforeSave(Car entity) {
+		super.beforeSave(entity);
 		if (entity.isLogout()) {
 			entity.setStatus(Car.CAR_STAUTS_LOGOUT);
 			entity.setScrapDate(entity.getReturnDate());
