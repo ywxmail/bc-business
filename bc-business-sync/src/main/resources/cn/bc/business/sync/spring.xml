@@ -19,12 +19,17 @@
 			包或实现类使用within关键字，接口实现使用this关键字
 		 -->
 		<aop:pointcut id="bsSyncServiceMethod"
-			expression="this(cn.bc.business.sync.service.BsSyncService)" />
+			expression="within(cn.bc.business.sync.service.BsSyncServiceImpl)" />
 		<aop:advisor pointcut-ref="bsSyncServiceMethod" advice-ref="bsSyncServiceTxAdvice" />
 	</aop:config>
 	<tx:advice id="bsSyncServiceTxAdvice" transaction-manager="transactionManager">
 		<tx:attributes>
-			<tx:method name="do*" propagation="REQUIRED" read-only="false" />
+			<!-- 交委接口同步,同步完毕批量插入数据库-->
+			<tx:method name="doSync4JiaoWeiJTWF" propagation="REQUIRED" read-only="false" />
+			<tx:method name="doSync4JiaoWeiYYWZ" propagation="REQUIRED" read-only="false" />
+			<tx:method name="doSync4JiaoWeiADVICE" propagation="REQUIRED" read-only="false" />
+			<!-- 金盾网抓取,抓取一条数据马上插入一条 -->
+			<tx:method name="doSync4JinDunJTWF" propagation="REQUIRED" read-only="false" />
 		</tx:attributes>
 	</tx:advice>
 	<bean id="bsSyncService" class="cn.bc.business.sync.service.BsSyncServiceImpl" />
