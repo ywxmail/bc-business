@@ -77,7 +77,7 @@ public class JiaoWeiJTWFsAction extends SyncViewAction {
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer sql = new StringBuffer();
 		sql.append("select b.id,b.status_,b.sync_type,b.sync_code,b.sync_from,b.sync_date");
-		sql.append(",t.happen_date,t.car_plate_type,t.car_plate_no,t.driver_cert,t.driver_name,t.jeom,t.content");
+		sql.append(",t.happen_date,t.unit_name,t.motorcade_name,t.car_plate_type,t.car_plate_no,t.driver_cert,t.driver_name,t.jeom,t.content");
 		sql.append(" from bs_sync_jiaowei_jtwf t");
 		sql.append(" inner join bc_sync_base b on b.id=t.id");
 		sqlObject.setSql(sql.toString());
@@ -97,6 +97,8 @@ public class JiaoWeiJTWFsAction extends SyncViewAction {
 				map.put("syncFrom", rs[i++]);
 				map.put("syncDate", rs[i++]);
 				map.put("happenDate", rs[i++]);
+				map.put("unitName", rs[i++]);
+				map.put("motorcadeName", rs[i++]);
 				map.put("carPlateType", rs[i++]);
 				map.put("carPlateNo", rs[i++]);
 				map.put("driverCert", rs[i++]);
@@ -122,6 +124,12 @@ public class JiaoWeiJTWFsAction extends SyncViewAction {
 		columns.add(new TextColumn4MapKey("t.happen_date", "happenDate",
 				getText("jiaoWeiJTWF.happenDate"), 130).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd HH:mm")));
+		columns.add(new TextColumn4MapKey("t.unit_name", "unitName",
+				getText("jiaoWeiJTWF.unitName"), 80)
+				.setSortable(true));
+		columns.add(new TextColumn4MapKey("t.motorcade_name", "motorcadeName",
+				getText("jiaoWeiJTWF.motorcadeName"), 80)
+				.setSortable(true));
 		columns.add(new TextColumn4MapKey("t.car_plate", "carPlateNo",
 				getText("jiaoWeiJTWF.carPlate"), 80).setSortable(true)
 				.setValueFormater(new AbstractFormater<String>() {

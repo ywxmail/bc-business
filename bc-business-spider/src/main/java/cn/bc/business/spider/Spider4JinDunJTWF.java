@@ -3,6 +3,7 @@ package cn.bc.business.spider;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -20,7 +21,9 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.springframework.beans.factory.annotation.Autowired;
 
+import cn.bc.business.car.service.CarService;
 import cn.bc.business.spider.domain.JinDunJTWF;
 import cn.bc.core.exception.CoreException;
 import cn.bc.core.util.DateUtils;
@@ -42,6 +45,8 @@ public class Spider4JinDunJTWF implements Spider<List<JinDunJTWF>> {
 	private String carPlateNo;// 车牌号码，如“C4X74”
 	private String engineNo;// 发动机号
 	private ActorHistory syncer;// 执行同步操作的用户
+	private CarService carService;
+	public Map<String, Object> carInfoMap;// 车辆信息map
 
 	private String getCarPlateInner() {
 		// 去除首个中文字符,如"粤"
@@ -71,6 +76,11 @@ public class Spider4JinDunJTWF implements Spider<List<JinDunJTWF>> {
 
 	public void setSyncer(ActorHistory syncer) {
 		this.syncer = syncer;
+	}
+	
+	@Autowired
+	public void setCarService(CarService carService) {
+		this.carService = carService;
 	}
 
 	public Spider4JinDunJTWF() {
@@ -115,6 +125,14 @@ public class Spider4JinDunJTWF implements Spider<List<JinDunJTWF>> {
 
 			tds = tr.children();
 			jtwf.setCarType("02");
+			//通过车牌号查找此车辆所属的分公司与车队
+			carInfoMap = this.carService.findcarInfoByCarPlateNo2(this.carPlateNo);
+			if(carInfoMap != null && carInfoMap.get("unit_name") != null){
+				jtwf.setUnitName(carInfoMap.get("unit_name")+""); //设置分公司
+			}
+			if(carInfoMap != null && carInfoMap.get("motorcade_name") != null){
+				jtwf.setMotorcadeName(carInfoMap.get("motorcade_name")+""); //设置所属车队
+			}
 			jtwf.setCarPlateType(this.carPlateType);
 			jtwf.setCarPlateNo(this.carPlateNo);
 			jtwf.setEngineNo(this.engineNo);

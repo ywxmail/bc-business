@@ -36,6 +36,8 @@ public class CarMan extends RichFileEntityImpl {
 	public static final int TYPE_CHARGER = 1;
 	/** 类别：司机和责任人 */
 	public static final int TYPE_DRIVER_AND_CHARGER = 2;
+	/** 类别：非编 */
+	public static final int TYPE_FEIBIAN = 3;
 
 	private int type;// 类别
 	private String orderNo;// 排序号

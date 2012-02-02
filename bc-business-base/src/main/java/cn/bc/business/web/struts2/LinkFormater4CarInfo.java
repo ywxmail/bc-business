@@ -16,7 +16,7 @@ import cn.bc.web.formater.LinkFormater;
  * 
  */
 public class LinkFormater4CarInfo extends LinkFormater {
-	protected String urlPattern = BSConstants.NAMESPACE + "/car/open?id=";
+	protected String urlPattern = BSConstants.NAMESPACE + "/car/edit?id=";
 	protected String moduleKey = "car";
 	private boolean showTip = true;
 	private String contextPath;// 链接的上下文路径

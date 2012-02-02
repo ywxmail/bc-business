@@ -210,7 +210,7 @@ public class Car4CertAction extends CertAction {
 		columns.add(new TextColumn("['status']", getText("cert.status"), 50)
 				.setSortable(true).setValueFormater(
 						new EntityStatusFormater(getEntityStatuses())));
-		columns.add(new TextColumn("['plateType']", getText("car"))
+		columns.add(new TextColumn("['plateType']", getText("car"), 80)
 				.setSortable(true).setValueFormater(
 						new AbstractFormater<String>() {
 							@Override
@@ -241,8 +241,7 @@ public class Car4CertAction extends CertAction {
 						return (Calendar) date.get("endDate");
 					}
 				}));
-		columns.add(new TextColumn("['licencer']", getText("cert.licencer"),
-				100).setSortable(true));
+		columns.add(new TextColumn("['licencer']", getText("cert.licencer")).setSortable(true));
 		return columns;
 	}
 
@@ -280,4 +279,8 @@ public class Car4CertAction extends CertAction {
 		return page;
 	}
 
+	@Override
+	protected PageOption buildListPageOption() {
+		return super.buildListPageOption().setWidth(800).setHeight(400);
+	}
 }

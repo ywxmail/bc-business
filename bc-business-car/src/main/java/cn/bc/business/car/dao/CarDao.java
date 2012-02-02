@@ -44,4 +44,18 @@ public interface CarDao extends CrudDao<Car> {
 	 * @return Long
 	 */
 	Long findcarInfoByCarPlateNo(String carPlateNo);
+
+	/**
+	 * 通过自编号生成原车号
+	 * @param code
+	 * @return
+	 */
+	Car findcarOriginNoByCode(String code);
+
+	/**
+	 * 通过车牌号查找此车辆所属的分公司与车队
+	 * @parma carPlateNo 
+	 * @return Map<String, Object>
+	 */
+	Map<String, Object> findcarInfoByCarPlateNo2(String carPlateNo);
 }

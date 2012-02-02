@@ -43,6 +43,7 @@ public class CarModel extends RichFileEntityImpl {
 	private int totalWeight;// 总质量，单位kg
 	private int accessWeight;// 核定承载量，单位kg
 	private int accessCount;// 载客人数
+	private String order;//排序号
 
 	@Column(name = "FACTORY_TYPE")
 	public String getFactoryType() {
@@ -223,4 +224,15 @@ public class CarModel extends RichFileEntityImpl {
 	public void setAccessCount(int accessCount) {
 		this.accessCount = accessCount;
 	}
+
+	@Column(name = "ORDER_")
+	public String getOrder() {
+		return order;
+	}
+
+	public void setOrder(String order) {
+		this.order = order;
+	}
+	
+	
 }
