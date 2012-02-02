@@ -15,6 +15,7 @@ import org.springframework.stereotype.Controller;
 
 import cn.bc.business.carman.domain.CarByDriver;
 import cn.bc.business.carman.domain.CarByDriverHistory;
+import cn.bc.business.web.struts2.LinkFormater4CarInfo;
 import cn.bc.business.web.struts2.ViewAction;
 import cn.bc.core.query.condition.Condition;
 import cn.bc.core.query.condition.ConditionUtils;
@@ -25,7 +26,6 @@ import cn.bc.core.util.StringUtils;
 import cn.bc.db.jdbc.RowMapper;
 import cn.bc.db.jdbc.SqlObject;
 import cn.bc.identity.web.SystemContext;
-import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.formater.DateRangeFormater;
 import cn.bc.web.formater.KeyValueFormater;
 import cn.bc.web.formater.LinkFormater4Id;
@@ -269,9 +269,10 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("d.from_classes", "from_classes",
 				getText("carByDriverHistory.oldDriverState"), 50)
 				.setValueFormater(new KeyValueFormater(getType())));
-		// columns.add(new TextColumn4MapKey("d.shiftwork", "shiftwork",
-		// getText("carByDriverHistory.shiftwork"), 120).setSortable(true)
-		// .setUseTitleFromLabel(true));
+		columns.add(new TextColumn4MapKey("d.shiftwork", "shiftwork",
+				getText("carByDriverHistory.shiftwork"), 200)
+				.setValueFormater(new LinkFormater4CarInfo(this
+						.getContextPath())));
 		return columns;
 	}
 

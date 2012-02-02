@@ -297,8 +297,8 @@ public class CarByDriverHistoryAction extends
 			// 顶班车辆
 			cars = new HashMap<Long, String>();
 			for (int i = 0; i < shiftworks.length; i++) {
-				cars.put(new Long(shiftworks[i].split(",")[0]),
-						shiftworks[i].split(",")[1]);
+				cars.put(new Long(shiftworks[i].split(",")[1]),
+						shiftworks[i].split(",")[0]);
 			}
 		}
 
