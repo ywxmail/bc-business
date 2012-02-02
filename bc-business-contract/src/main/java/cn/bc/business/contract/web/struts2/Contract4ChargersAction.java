@@ -10,10 +10,13 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.json.JSONArray;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
+import cn.bc.business.OptionConstants;
 import cn.bc.business.contract.domain.Contract;
 import cn.bc.business.web.struts2.LinkFormater4ChargerInfo;
 import cn.bc.business.web.struts2.ViewAction;
@@ -27,6 +30,8 @@ import cn.bc.core.util.StringUtils;
 import cn.bc.db.jdbc.RowMapper;
 import cn.bc.db.jdbc.SqlObject;
 import cn.bc.identity.web.SystemContext;
+import cn.bc.option.domain.OptionItem;
+import cn.bc.option.service.OptionService;
 import cn.bc.web.formater.AbstractFormater;
 import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.formater.DateRangeFormater;
@@ -55,7 +60,7 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 
 	public Long contractId;
 	public String patchNo;
-	
+
 	@Override
 	public boolean isReadonly() {
 		// 经济合同管理员或系统管理员
@@ -63,7 +68,7 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 		return !context.hasAnyRole(getText("key.role.bs.contract4charger"),
 				getText("key.role.bc.admin"));
 	}
-	
+
 	/**
 	 * @param useDisabledReplaceDelete
 	 *            控制是使用删除按钮还是禁用按钮
@@ -75,35 +80,29 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 
 		if (this.isReadonly()) {
 			// 查看按钮
-			tb.addButton(Toolbar
-					.getDefaultEditToolbarButton(getText("label.read")));
+			tb.addButton(this.getDefaultOpenToolbarButton());
 		} else {
 
 			if (contractId == null) {
 				// 新建按钮
-				tb.addButton(Toolbar
-						.getDefaultCreateToolbarButton(getText("label.create")));
+				tb.addButton(this.getDefaultCreateToolbarButton());
 			}
 			// 查看按钮
-			tb.addButton(Toolbar
-					.getDefaultEditToolbarButton(getText("label.read")));
+			tb.addButton(this.getDefaultOpenToolbarButton());
 			if (contractId == null) {
 
 				if (useDisabledReplaceDelete) {
 					// 禁用按钮
-					tb.addButton(Toolbar
-							.getDefaultDisabledToolbarButton(getText("label.disabled")));
+					tb.addButton(this.getDefaultDisabledToolbarButton());
 				} else {
 					// 删除按钮
-					tb.addButton(Toolbar
-							.getDefaultDeleteToolbarButton(getText("label.delete")));
+					tb.addButton(this.getDefaultDeleteToolbarButton());
 				}
 			}
 		}
 
 		// 搜索按钮
-		tb.addButton(Toolbar
-				.getDefaultSearchToolbarButton(getText("title.click2search")));
+		tb.addButton(this.getDefaultSearchToolbarButton());
 		return tb;
 	}
 
@@ -138,17 +137,17 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 		sql.append("select cc.id,cc.sign_type,cc.bs_type,cc.contract_version_no,c.status_,c.ext_str1,c.ext_str2");
 		sql.append(",c.transactor_name,c.sign_date,c.start_date,c.end_date,c.code,c.logout_id,iah.actor_name,c.logout_date");
 		sql.append(",car.id carId");
-//		sql.append(",man.id manId");
+		// sql.append(",man.id manId");
 		sql.append(",c.ver_major,c.ver_minor,c.op_type");
 		sql.append(" from BS_CONTRACT_CHARGER cc");
 		sql.append(" inner join BS_CONTRACT c on cc.id = c.id");
 		sql.append(" inner join BS_CAR_CONTRACT carc on c.id = carc.contract_id");
 		sql.append(" inner join BS_Car car on carc.car_id = car.id");
 		sql.append(" left join bc_identity_actor_history iah on c.logout_id = iah.id");
-//		sql.append(" left join BS_CARMAN_CONTRACT manc on c.id = manc.contract_id");
-//		sql.append(" left join BS_CARMAN man on manc.man_id = man.id");
+		// sql.append(" left join BS_CARMAN_CONTRACT manc on c.id = manc.contract_id");
+		// sql.append(" left join BS_CARMAN man on manc.man_id = man.id");
 		sqlObject.setSql(sql.toString());
-		
+
 		// 注入参数
 		sqlObject.setArgs(null);
 
@@ -173,7 +172,7 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 				map.put("actor_name", rs[i++]);
 				map.put("logout_date", rs[i++]);
 				map.put("carId", rs[i++]);
-//				map.put("manId", rs[i++]);
+				// map.put("manId", rs[i++]);
 				map.put("ver_major", rs[i++]);
 				map.put("ver_minor", rs[i++]);
 				map.put("op_type", rs[i++]);
@@ -186,9 +185,10 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 	@Override
 	protected List<Column> getGridColumns() {
 		List<Column> columns = new ArrayList<Column>();
-		columns.add(new IdColumn4MapKey("cc.id","id"));
+		columns.add(new IdColumn4MapKey("cc.id", "id"));
 		columns.add(new TextColumn4MapKey("c.status_", "status_",
-				getText("contract.status"), 35).setSortable(true)
+				getText("contract.status"), 35)
+				.setSortable(true)
 				.setValueFormater(new EntityStatusFormater(getEntityStatuses())));
 		columns.add(new TextColumn4MapKey("c.ver_major", "ver_major",
 				getText("contract4Labour.ver"), 40)
@@ -209,9 +209,11 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 					}
 				}));
 		columns.add(new TextColumn4MapKey("cc.sign_type", "sign_type",
-				getText("contract4Charger.signType"), 58).setSortable(true).setUseTitleFromLabel(true));
+				getText("contract4Charger.signType"), 58).setSortable(true)
+				.setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("cc.bs_type", "bs_type",
-				getText("contract4Charger.businessType"),70).setUseTitleFromLabel(true));
+				getText("contract4Charger.businessType"), 70)
+				.setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("c.ext_str1", "ext_str1",
 				getText("contract.car"), 80).setUseTitleFromLabel(true)
 				.setValueFormater(
@@ -227,11 +229,12 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 							}
 						}));
 		columns.add(new TextColumn4MapKey("c.ext_str2", "ext_str2",
-				getText("contract4Charger.charger"),140).setUseTitleFromLabel(true)
-				.setValueFormater(new LinkFormater4ChargerInfo(this
-						.getContextPath())));
-		columns.add(new TextColumn4MapKey("c.start_date", "start_date", getText("contract.deadline"), 180)
-				.setValueFormater(new DateRangeFormater("yyyy-MM-dd") {
+				getText("contract4Charger.charger"), 140).setUseTitleFromLabel(
+				true).setValueFormater(
+				new LinkFormater4ChargerInfo(this.getContextPath())));
+		columns.add(new TextColumn4MapKey("c.start_date", "start_date",
+				getText("contract.deadline"), 180).setValueFormater(
+				new DateRangeFormater("yyyy-MM-dd") {
 					@Override
 					public Date getToDate(Object context, Object value) {
 						@SuppressWarnings("rawtypes")
@@ -242,25 +245,31 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("c.sign_date", "sign_date",
 				getText("contract.signDate"), 90).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
-		columns.add(new TextColumn4MapKey("cc.contract_version_no", "contract_version_no",
-				getText("contract4Charger.contractVersionNo")).setUseTitleFromLabel(true));
-		columns.add(new TextColumn4MapKey("c.transactor_name", "transactor_name",
-				getText("contract.transactor"), 50).setUseTitleFromLabel(true));
-		//if(status.equals(String.valueOf(Contract.STATUS_LOGOUT)) || status.length() == 0){ //控制视图在在案注销下不显示注销人,注销时间
-			columns.add(new TextColumn4MapKey("c.logout_date", "logout_date",
-					getText("contract4Charger.logoutDate"), 90).setSortable(true)
-					.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
-			columns.add(new TextColumn4MapKey("iah.actor_name", "actor_name",
-					getText("contract4Charger.logoutId"), 50).setUseTitleFromLabel(true));
-		//}
+		columns.add(new TextColumn4MapKey("cc.contract_version_no",
+				"contract_version_no",
+				getText("contract4Charger.contractVersionNo"))
+				.setUseTitleFromLabel(true));
+		columns.add(new TextColumn4MapKey("c.transactor_name",
+				"transactor_name", getText("contract.transactor"), 50)
+				.setUseTitleFromLabel(true));
+		// if(status.equals(String.valueOf(Contract.STATUS_LOGOUT)) ||
+		// status.length() == 0){ //控制视图在在案注销下不显示注销人,注销时间
+		columns.add(new TextColumn4MapKey("c.logout_date", "logout_date",
+				getText("contract4Charger.logoutDate"), 90).setSortable(true)
+				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+		columns.add(new TextColumn4MapKey("iah.actor_name", "actor_name",
+				getText("contract4Charger.logoutId"), 50)
+				.setUseTitleFromLabel(true));
+		// }
 		columns.add(new TextColumn4MapKey("c.code", "code",
-				getText("contract.code"),60).setUseTitleFromLabel(true));
-//		columns.add(new TextColumn4MapKey("c.op_type", "op_type",
-//				getText("contract4Labour.op"), 35).setSortable(true).setUseTitleFromLabel(true)
-//				.setValueFormater(new EntityStatusFormater(getEntityOpTypes())));
+				getText("contract.code"), 60).setUseTitleFromLabel(true));
+		// columns.add(new TextColumn4MapKey("c.op_type", "op_type",
+		// getText("contract4Labour.op"),
+		// 35).setSortable(true).setUseTitleFromLabel(true)
+		// .setValueFormater(new EntityStatusFormater(getEntityOpTypes())));
 		return columns;
 	}
-	
+
 	@Override
 	protected String getGridDblRowMethod() {
 		// 强制为只读表单
@@ -269,7 +278,8 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected String[] getGridSearchFields() {
-		return new String[] { "c.code", "c.ext_str1","c.ext_str2", "c.word_no", "cc.bs_type" };
+		return new String[] { "c.code", "c.ext_str1", "c.ext_str2",
+				"c.word_no", "cc.bs_type" };
 	}
 
 	@Override
@@ -299,19 +309,20 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 			// 查看最新合同列表
 			statusCondition = ConditionUtils.toConditionByComma4IntegerValue(
 					this.status, "c.status_");
-			//if (this.status.length() <= 0) { // 显示全部状态的时候只显示最新版本的记录
-//			mainsCondition = ConditionUtils // 控制显示最新版本main为0的经济合同
-//					.toConditionByComma4IntegerValue(this.mains, "c.main");
-			//}
+			// if (this.status.length() <= 0) { // 显示全部状态的时候只显示最新版本的记录
+			// mainsCondition = ConditionUtils // 控制显示最新版本main为0的经济合同
+			// .toConditionByComma4IntegerValue(this.mains, "c.main");
+			// }
 		} else {
 			// 查看历史版本
 			patchCondtion = new EqualsCondition("c.patch_no", patchNo);
 			mainsCondition = new EqualsCondition("c.main",
 					Contract.MAIN_HISTORY);
 		}
-		return ConditionUtils.mix2AndCondition(typeCondtion,statusCondition,patchCondtion,mainsCondition);
+		return ConditionUtils.mix2AndCondition(typeCondtion, statusCondition,
+				patchCondtion, mainsCondition);
 	}
-	
+
 	@Override
 	protected void extendGridExtrasData(Json json) {
 		super.extendGridExtrasData(json);
@@ -341,7 +352,7 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 			return super.getHtmlPageToolbar();
 		}
 	}
-	
+
 	/**
 	 * 状态值转换列表：正常|注销|离职|全部
 	 * 
@@ -356,7 +367,7 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 		statuses.put("", getText("bs.status.all"));
 		return statuses;
 	}
-	
+
 	/**
 	 * 获取Contract的操作类型列表
 	 * 
@@ -380,7 +391,7 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 				getText("contract4Charger.optype.changeCharger2"));
 		return types;
 	}
-	
+
 	/**
 	 * 获取Contract的合同类型列表
 	 * 
@@ -393,6 +404,48 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 		types.put(String.valueOf(Contract.TYPE_CHARGER),
 				getText("contract.select.charger"));
 		return types;
-	}	
+	}
 
+	// ==高级搜索代码开始==
+
+	private OptionService optionService;
+
+	@Autowired
+	public void setOptionService(OptionService optionService) {
+		this.optionService = optionService;
+	}
+
+	public JSONArray contractVersionNos;// 合同版本号列表
+	public JSONArray businessTypes;// 营运性质列表
+	public JSONArray signTypes;// 签约类型列表
+
+	@Override
+	protected boolean useAdvanceSearch() {
+		return true;
+	}
+
+	@Override
+	protected void initConditionsFrom() throws Exception {
+		// 批量加载可选项列表
+		Map<String, List<Map<String, String>>> optionItems = this.optionService
+				.findOptionItemByGroupKeys(new String[] {
+						OptionConstants.CONTRACT_SIGNTYPE,
+						OptionConstants.CAR_BUSINESS_NATURE,
+						OptionConstants.CONTRACT_VERSION_NO, });
+
+		// 签约类型列表
+		this.signTypes = OptionItem.toLabelValues(
+				optionItems.get(OptionConstants.CONTRACT_SIGNTYPE), "value");
+
+		// 营运性质列表
+		this.businessTypes = OptionItem.toLabelValues(
+				optionItems.get(OptionConstants.CAR_BUSINESS_NATURE), "value");
+
+		// 合同版本号列表
+		this.contractVersionNos = OptionItem.toLabelValues(optionItems
+				.get(OptionConstants.CONTRACT_VERSION_NO));
+
+	}
+
+	// ==高级搜索代码结束==
 }
