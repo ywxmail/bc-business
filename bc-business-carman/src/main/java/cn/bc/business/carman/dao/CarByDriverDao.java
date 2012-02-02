@@ -3,6 +3,7 @@
  */
 package cn.bc.business.carman.dao;
 
+import java.util.Collection;
 import java.util.List;
 
 import cn.bc.business.car.domain.Car;
@@ -41,4 +42,6 @@ public interface CarByDriverDao extends CrudDao<CarByDriver> {
 	 * @return
 	 */
 	List<CarByDriver> find4Shiftwork(Long pid);
+	
+	void save(Collection<CarByDriver> entities);
 }

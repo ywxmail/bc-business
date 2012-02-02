@@ -4,6 +4,7 @@
 package cn.bc.business.carman.dao.hibernate.jpa;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -62,6 +63,21 @@ public class CarByDriverDaoImpl extends HibernateCrudJpaDao<CarByDriver>
 		//
 		this.insertTest();
 		return entity;
+	}
+
+	@Override
+	public void save(Collection<CarByDriver> carByDrivers) {
+		super.save(carByDrivers);
+
+		// 这句很关键，保证信息先保存，然后再执行下面的更新
+		// 如果不执行这句，实测结果是hibernate先执行了下面的更新语句再执行上面的保存语句而导致司机信息没有更新，比较奇怪
+		this.getJpaTemplate().flush();
+
+		// 更新修改过的车辆的营运班次记录
+		for (CarByDriver carByDriver : carByDrivers) {
+			// 更新车辆的司机信息
+			updateCar4Driver(carByDriver.getCar().getId());
+		}
 	}
 
 	// 测试使用hibernate的hql语句向数据库插入数据

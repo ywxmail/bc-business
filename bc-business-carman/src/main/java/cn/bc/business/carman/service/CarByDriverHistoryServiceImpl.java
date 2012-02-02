@@ -169,8 +169,6 @@ public class CarByDriverHistoryServiceImpl extends
 		zhugaCarByDriver.setDescription(entity.getDescription());
 		zhugaCarByDriver.setPid(entity.getId());
 		carByDrivers.add(zhugaCarByDriver);
-		// //保存营运班次
-		// this.carByDriverDao.save(carByDrivers);
 
 		// 原来的营运班次
 		List<CarByDriver> oldArs = this.carByDriverDao.find4Shiftwork(entity
@@ -238,6 +236,11 @@ public class CarByDriverHistoryServiceImpl extends
 						}
 						this.carByDriverDao.delete(toDeleteIds
 								.toArray(new Serializable[0]));
+						// 更新已删除的顶班车辆的营运司机信息
+						for (CarByDriver oldAr : toDeleteArs) {
+							this.carByDriverHistoryDao.updateDriver4Car(oldAr
+									.getCar().getId());
+						}
 					}
 				}
 			}
@@ -245,6 +248,7 @@ public class CarByDriverHistoryServiceImpl extends
 		}
 		// 创建新的营运班次
 		if (!carByDrivers.isEmpty()) {
+			// 保存营运班次
 			this.carByDriverDao.save(carByDrivers);
 		}
 	}
