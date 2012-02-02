@@ -74,35 +74,29 @@ public class Contract4LaboursAction extends ViewAction<Map<String, Object>> {
 
 		if (this.isReadonly()) {
 			// 查看按钮
-			tb.addButton(Toolbar
-					.getDefaultEditToolbarButton(getText("label.read")));
+			tb.addButton(this.getDefaultOpenToolbarButton());
 		} else {
 
 			if (contractId == null) {
 				// 新建按钮
-				tb.addButton(Toolbar
-						.getDefaultCreateToolbarButton(getText("label.create")));
+				tb.addButton(this.getDefaultCreateToolbarButton());
 			}
 			// 查看按钮
-			tb.addButton(Toolbar
-					.getDefaultEditToolbarButton(getText("label.read")));
+			tb.addButton(this.getDefaultOpenToolbarButton());
 			if (contractId == null) {
 
 				if (useDisabledReplaceDelete) {
 					// 禁用按钮
-					tb.addButton(Toolbar
-							.getDefaultDisabledToolbarButton(getText("label.disabled")));
+					tb.addButton(this.getDefaultDisabledToolbarButton());
 				} else {
 					// 删除按钮
-					tb.addButton(Toolbar
-							.getDefaultDeleteToolbarButton(getText("label.delete")));
+					tb.addButton(this.getDefaultDeleteToolbarButton());
 				}
 			}
 		}
 
 		// 搜索按钮
-		tb.addButton(Toolbar
-				.getDefaultSearchToolbarButton(getText("title.click2search")));
+		tb.addButton(this.getDefaultSearchToolbarButton());
 		return tb;
 	}
 
@@ -110,8 +104,8 @@ public class Contract4LaboursAction extends ViewAction<Map<String, Object>> {
 	protected OrderCondition getGridDefaultOrderCondition() {
 		// 默认排序方向：状态|登记日期
 		if (contractId == null) {// 当前版本
-			return new OrderCondition("c.file_date", Direction.Desc).add(
-					"c.status_", Direction.Asc);
+			return new OrderCondition("c.status_", Direction.Asc).add(
+					"c.file_date", Direction.Desc);
 		} else { // 历史版本
 			return new OrderCondition("c.file_date", Direction.Desc);
 		}
@@ -134,7 +128,9 @@ public class Contract4LaboursAction extends ViewAction<Map<String, Object>> {
 
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer sql = new StringBuffer();
-		sql.append("select cl.id,c.type_,c.status_,c.ext_str1,c.ext_str2,c.transactor_name,c.sign_date,c.start_date,c.end_date,c.code,cl.joinDate,cl.insurCode,cl.insurance_type,cl.cert_no,cl.leaveDate,c.author_id,c.ver_major,c.ver_minor,c.op_type,iah.actor_name");
+		sql.append("select cl.id,c.type_,c.status_,c.ext_str1,c.ext_str2,c.transactor_name,c.file_date,c.sign_date");
+		sql.append(",c.start_date,c.end_date,c.code,cl.joinDate,cl.get_startDate,cl.get_endDate,cl.stopDate");
+		sql.append(",cl.insurCode,cl.insurance_type,cl.cert_no,cl.leaveDate,c.author_id,c.ver_major,c.ver_minor,c.op_type,iah.actor_name");
 		sql.append(",car.id carId");
 		sql.append(",man.id manId");
 		sql.append(" from BS_CONTRACT_LABOUR cl");
@@ -160,11 +156,15 @@ public class Contract4LaboursAction extends ViewAction<Map<String, Object>> {
 				map.put("ext_str1", rs[i++]);
 				map.put("ext_str2", rs[i++]);
 				map.put("transactor_name", rs[i++]);
+				map.put("fileDate", rs[i++]);
 				map.put("sign_date", rs[i++]);
 				map.put("start_date", rs[i++]);
 				map.put("end_date", rs[i++]);
 				map.put("code", rs[i++]);
 				map.put("joinDate", rs[i++]);
+				map.put("getStartDate", rs[i++]);
+				map.put("getEndDate", rs[i++]);
+				map.put("stopDate", rs[i++]);
 				map.put("insurCode", rs[i++]);
 				map.put("insurance_type", rs[i++]);
 				map.put("cert_no", rs[i++]);
@@ -190,6 +190,9 @@ public class Contract4LaboursAction extends ViewAction<Map<String, Object>> {
 				getText("contract.status"), 35)
 				.setSortable(true)
 				.setValueFormater(new EntityStatusFormater(getEntityStatuses())));
+		columns.add(new TextColumn4MapKey("c.file_date", "fileDate",
+				getText("label.fileDate"), 90).setSortable(true)
+				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
 		columns.add(new TextColumn4MapKey("c.ver_major", "ver_major",
 				getText("contract4Labour.ver"), 40)
 				.setValueFormater(new AbstractFormater<String>() {
@@ -209,7 +212,7 @@ public class Contract4LaboursAction extends ViewAction<Map<String, Object>> {
 					}
 				}));
 		columns.add(new TextColumn4MapKey("c.ext_str1", "ext_str1",
-				getText("contract.car"), 80).setUseTitleFromLabel(true)
+				getText("contract.car"), 85).setUseTitleFromLabel(true)
 				.setValueFormater(
 						new LinkFormater4Id(this.getContextPath()
 								+ "/bc-business/car/edit?id={0}", "car") {
@@ -259,6 +262,19 @@ public class Contract4LaboursAction extends ViewAction<Map<String, Object>> {
 				.setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("cl.joinDate", "joinDate",
 				getText("contract4Labour.joinDate"), 90)
+				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+		columns.add(new TextColumn4MapKey("cl.get_startDate", "getStartDate",
+				getText("contract4Labour.deadline4shebao"), 180)
+				.setValueFormater(new DateRangeFormater("yyyy-MM-dd") {
+					@Override
+					public Date getToDate(Object context, Object value) {
+						@SuppressWarnings("rawtypes")
+						Map contract = (Map) context;
+						return (Date) contract.get("getEndDate");
+					}
+				}));
+		columns.add(new TextColumn4MapKey("cl.stopDate", "stopDate",
+				getText("contract4Labour.stopDate"), 90)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
 		columns.add(new TextColumn4MapKey("cl.leaveDate", "leaveDate",
 				getText("contract4Labour.leaveDate"), 90)
@@ -395,4 +411,13 @@ public class Contract4LaboursAction extends ViewAction<Map<String, Object>> {
 			return super.getHtmlPageToolbar();
 		}
 	}
+
+	// ==高级搜索代码开始==
+
+	@Override
+	protected boolean useAdvanceSearch() {
+		return true;
+	}
+
+	// ==高级搜索代码结束==
 }
