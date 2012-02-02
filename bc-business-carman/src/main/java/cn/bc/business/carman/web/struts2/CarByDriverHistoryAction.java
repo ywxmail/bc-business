@@ -52,6 +52,7 @@ public class CarByDriverHistoryAction extends
 	public Long fromCarId;
 	public int moveType;
 	private MotorcadeService motorcadeService;
+	public Map<Long, String> cars;// 顶班车辆
 
 	@Autowired
 	public void setMotorcadeService(MotorcadeService motorcadeService) {
@@ -166,7 +167,7 @@ public class CarByDriverHistoryAction extends
 			return "xinRuZhi";
 		} else if (moveType == CarByDriverHistory.MOVETYPE_ZCD) {
 			return "zhuanCheDui";
-		}else if (moveType == CarByDriverHistory.MOVETYPE_DINGBAN) {
+		} else if (moveType == CarByDriverHistory.MOVETYPE_DINGBAN) {
 			return "dingban";
 		} else {
 			return null;
@@ -284,6 +285,20 @@ public class CarByDriverHistoryAction extends
 					OptionItem.insertIfNotExist(this.motorcadeList, frm.getId()
 							.toString(), frm.getName());
 				}
+			}
+		}
+		// 如果迁移类型是顶班时，再初始化cars
+		if (this.getE().getMoveType() == CarByDriverHistory.MOVETYPE_DINGBAN) {
+			// 顶班车辆
+			cars = new HashMap<Long, String>();
+
+			String shiftwork = this.getE().getShiftwork();
+			String[] shiftworks = shiftwork.split(";");
+			// 顶班车辆
+			cars = new HashMap<Long, String>();
+			for (int i = 0; i < shiftworks.length; i++) {
+				cars.put(new Long(shiftworks[i].split(",")[0]),
+						shiftworks[i].split(",")[1]);
 			}
 		}
 

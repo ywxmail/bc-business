@@ -37,7 +37,7 @@ public class ShiftworkByDriverAction extends
 	public Map<Long, String> cars;
 	public Long carManId;
 	public int moveType;// 迁移类型
-	public Map<Long, String> plates;
+	public String shiftwork;// 顶班车辆
 
 	@Autowired
 	public void setCarManService(CarManService carManService) {
@@ -60,13 +60,6 @@ public class ShiftworkByDriverAction extends
 		this.session = session;
 	}
 
-	// public String create() throws Exception {
-	// SystemContext context = (SystemContext) this.session.get(Context.KEY);
-	// // fileDate = Calendar.getInstance();
-	// // author = context.getUserHistory();
-	// cars = new HashMap<Long, String>();
-	// return "create";
-	// }
 
 	@Override
 	protected void afterCreate(CarByDriverHistory entity) {
@@ -80,32 +73,23 @@ public class ShiftworkByDriverAction extends
 		}
 	}
 
-	// public String edit() throws Exception {
-	//
-	// return "edit";
-	// }
-
-	// public String ids;//
-	// public Long driverId;//
-	// public String carIds;//
 
 	public String save() throws Exception {
 		// 创建CarByDriver列表
 		// List<CarByDriver> toSaves = new ArrayList<CarByDriver>();
 		this.beforeSave(this.getE());
 		this.getE().setFromCar(null);
-		// 将顶班车辆组装成字符串赋值给shiftwork字段
-		
-		this.carByDriverHistoryService.save(this.getE());
-		return "saveSuccess";
-	}
 
-	@Override
-	protected void initForm(boolean editable) {
-		super.initForm(editable);
-		// 顶班车辆
-		cars = new HashMap<Long, String>();
-//		plates = new HashMap<Long, String>();
+		// 将顶班车辆组装成字符串赋值给shiftwork字段：id1,plate1;id2,plate2;...
+		String shiftwork = this.getE().getShiftwork();
+		String[] shiftworks = shiftwork.split(";");
+		Long[] carIds = new Long[shiftworks.length];
+			for (int i = 0; i < shiftworks.length; i++) {
+				carIds[i] = new Long(shiftworks[i].split(",")[0]);
+				
+			}
+			this.carByDriverHistoryService.saveShiftwork(this.getE(), carIds);
+		return "saveSuccess";
 	}
 
 }

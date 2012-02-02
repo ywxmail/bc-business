@@ -39,4 +39,6 @@ public interface CarByDriverHistoryService extends
 	 *            车辆Id
 	 */
 	void upDateDriver4Car(Long carId);
+	
+	void saveShiftwork(CarByDriverHistory entity,Long[] carIds);
 }

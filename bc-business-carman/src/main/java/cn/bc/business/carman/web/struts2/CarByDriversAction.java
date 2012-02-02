@@ -259,6 +259,8 @@ public class CarByDriversAction extends ViewAction<Map<String, Object>> {
 				getText("carByDriver.classes.fuban"));
 		type.put(String.valueOf(CarByDriver.TYPE_DINGBAN),
 				getText("carByDriver.classes.dingban"));
+		type.put(String.valueOf(CarByDriver.TYPE_ZHUGUA),
+				getText("carByDriver.classes.zhugua"));
 		type.put("", getText("carByDriver.classes.quanbu"));
 		return type;
 	}
