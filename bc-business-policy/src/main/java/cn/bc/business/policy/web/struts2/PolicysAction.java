@@ -10,11 +10,16 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
 import cn.bc.BCConstants;
+import cn.bc.business.motorcade.service.MotorcadeService;
 import cn.bc.business.policy.domain.Policy;
 import cn.bc.business.web.struts2.ViewAction;
 import cn.bc.core.query.condition.Condition;
@@ -27,6 +32,8 @@ import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.core.util.StringUtils;
 import cn.bc.db.jdbc.RowMapper;
 import cn.bc.db.jdbc.SqlObject;
+import cn.bc.identity.domain.Actor;
+import cn.bc.identity.service.ActorService;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.web.formater.BooleanFormater;
 import cn.bc.web.formater.CalendarFormater;
@@ -280,7 +287,8 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected String[] getGridSearchFields() {
-		return new String[] { "c.plate_type", "c.plate_no", "p.commerial_no",
+		return new String[] { "c.old_unit_name", "bia.name", "m.name",
+				"c.plate_type", "c.plate_no", "p.commerial_no",
 				"p.liability_no", "p.commerial_company", "c.code" };
 	}
 
@@ -407,22 +415,17 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 		Toolbar tb = new Toolbar();
 		if (this.isReadonly()) {
 			// 查看按钮
-			tb.addButton(Toolbar
-					.getDefaultOpenToolbarButton(getText("label.read")));
+			tb.addButton(this.getDefaultOpenToolbarButton());
 		} else {
 			// 新建按钮
-			tb.addButton(Toolbar
-					.getDefaultCreateToolbarButton(getText("label.create")));
+			tb.addButton(this.getDefaultCreateToolbarButton());
 			// 查看按钮
-			tb.addButton(Toolbar
-					.getDefaultOpenToolbarButton(getText("label.read")));
+			tb.addButton(this.getDefaultOpenToolbarButton());
 			// 删除按钮
-			tb.addButton(Toolbar
-					.getDefaultDeleteToolbarButton(getText("label.delete")));
+			tb.addButton(this.getDefaultDeleteToolbarButton());
 		}
 		// 搜索按钮
-		tb.addButton(Toolbar
-				.getDefaultSearchToolbarButton(getText("title.click2search")));
+		tb.addButton(this.getDefaultSearchToolbarButton());
 
 		if (this.carId != null) {
 			return tb;
@@ -438,4 +441,52 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 		return "bc.page.open";
 	}
 
+	// ==高级搜索代码开始==
+	@Override
+	protected boolean useAdvanceSearch() {
+		return true;
+	}
+
+	private MotorcadeService motorcadeService;
+	private ActorService actorService;
+
+	@Autowired
+	public void setActorService(
+			@Qualifier("actorService") ActorService actorService) {
+		this.actorService = actorService;
+	}
+
+	@Autowired
+	public void setMotorcadeService(MotorcadeService motorcadeService) {
+		this.motorcadeService = motorcadeService;
+	}
+
+	public JSONArray motorcades;// 车队的下拉列表信息
+	public JSONArray units;// 分公司的下拉列表信息
+
+	@Override
+	protected void initConditionsFrom() throws Exception {
+		JSONObject json;
+
+		// 可选分公司列表
+		units = new JSONArray();
+		for (Map<String, String> map : this.actorService.find4option(
+				new Integer[] { Actor.TYPE_UNIT }, (Integer[]) null)) {
+			json = new JSONObject();
+			json.put("label", map.get("name"));
+			json.put("value", map.get("id"));
+			units.put(json);
+		}
+
+		// 可选车队列表
+		motorcades = new JSONArray();
+		for (Map<String, String> map : this.motorcadeService.find4Option(null)) {
+			json = new JSONObject();
+			json.put("label", map.get("value"));
+			json.put("value", map.get("key"));
+			motorcades.put(json);
+		}
+	}
+
+	// ==高级搜索代码结束==
 }

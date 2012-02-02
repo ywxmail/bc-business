@@ -179,9 +179,96 @@ public class BsSyncServiceImpl implements BsSyncService {
 			logger.debug("cars=" + cars);
 		}
 
+		JinDunJTWF jtwf = null;
+		
+		int successCount = 0;
+
+		// 循环每台车执行抓取
+		this.spider4JinDunJTWF.setSyncer(syncer);
+		this.spider4JinDunJTWF.setCarType("02");
+		int i = 0;
+		List<String> carSpideHistory = this.jinDunCache.get("carSpideHistory");
+		String carId;
+		int errorCount = 0;
+		for (Map<String, Object> car : cars) {
+			carId = car.get("id").toString();
+			i++;
+			if (carSpideHistory != null && carSpideHistory.contains(carId)) {
+				logger.info("(" + i + "/" + cars.size() + ")" + "车辆'"
+						+ car.get("plateType").toString()
+						+ car.get("plateNo").toString() + "'存在抓取缓存，忽略频繁的抓取！");
+				continue;
+			} else {
+				this.spider4JinDunJTWF.setCarPlateType(car.get("plateType")
+						.toString());
+				this.spider4JinDunJTWF.setCarPlateNo(car.get("plateNo")
+						.toString());
+				if (car.get("engineNo") != null) {
+					logger.warn("(" + i + "/" + cars.size() + ")" + "开始抓取'"
+							+ car.get("plateType").toString() + "."
+							+ car.get("plateNo").toString() + "'的交通违法信息...");
+					this.spider4JinDunJTWF.setEngineNo(car.get("engineNo")
+							.toString());
+				} else {
+					logger.warn("(" + i + "/" + cars.size() + ")" + "车辆'"
+							+ car.get("plateType").toString()
+							+ car.get("plateNo").toString() + "'没有设置发动机号，忽略抓取！");
+					continue;
+				}
+
+				try {
+					jtwf = this.spider4JinDunJTWF.excute();
+					// 添加到缓存记录
+					if (carSpideHistory == null)
+						carSpideHistory = new ArrayList<String>();
+					carSpideHistory.remove(carId);
+					carSpideHistory.add(carId);
+				} catch (Exception e) {
+					// 抓取异常就停止
+					logger.warn(e.getMessage());
+					errorCount ++;
+				}
+				
+				this.jinDunCache.put("carSpideHistory", carSpideHistory);
+
+				if (jtwf == null)
+					continue;
+				
+				String syncType = JinDunJTWF.class.getSimpleName();
+				
+				if (!this.syncBaseService.hadSync(syncType, jtwf.getSyncCode())) {
+					// 保存新增的记录
+					if (jtwf != null){
+						this.syncBaseService.save(jtwf);
+						successCount++;
+					}
+				}
+
+				if (logger.isInfoEnabled())
+					logger.info("从金盾网抓取交通违法信息总耗时：" + DateUtils.getWasteTime(startTime) + ",newCount=" + successCount);
+
+				if(errorCount > 0){
+					strMsg.append(errorCount);//记录发生异常的数目
+				}
+				
+			}
+		}
+
+		return successCount;
+	}
+	
+/*	
+ * 批量抓取
+ * public int doSync4JinDunJTWF(ActorHistory syncer,
+			List<Map<String, Object>> cars, StringBuffer strMsg) {
+		Date startTime = new Date();
+		if (logger.isDebugEnabled()) {
+			logger.debug("cars=" + cars);
+		}
+		
 		boolean hasError = false;
 		List<JinDunJTWF> all = new ArrayList<JinDunJTWF>();
-
+		
 		// 循环每台车执行抓取
 		this.spider4JinDunJTWF.setSyncer(syncer);
 		this.spider4JinDunJTWF.setCarType("02");
@@ -215,10 +302,10 @@ public class BsSyncServiceImpl implements BsSyncService {
 							+ car.get("plateNo").toString() + "'没有设置发动机号，忽略抓取！");
 					continue;
 				}
-
+				
 				try {
 					all.addAll(this.spider4JinDunJTWF.excute());
-
+					
 					// 添加到缓存记录
 					if (carSpideHistory == null)
 						carSpideHistory = new ArrayList<String>();
@@ -233,10 +320,10 @@ public class BsSyncServiceImpl implements BsSyncService {
 			}
 		}
 		this.jinDunCache.put("carSpideHistory", carSpideHistory);
-
+		
 		if (all.isEmpty())
 			return 0;
-
+		
 		// 获取新的记录
 		List<SyncBase> news = new ArrayList<SyncBase>();
 		List<SyncBase> olds = new ArrayList<SyncBase>();
@@ -248,7 +335,7 @@ public class BsSyncServiceImpl implements BsSyncService {
 				olds.add(jtwf);
 			}
 		}
-
+		
 		// 如果抓取没有异常，就将所有现有的其他未处理记录设置为已处理
 		if (!hasError) {
 //			List<String> newSyncCodes = new ArrayList<String>();
@@ -258,7 +345,7 @@ public class BsSyncServiceImpl implements BsSyncService {
 //			this.syncBaseService.updateNewStatus2Done4ExcludeCode(syncType,
 //					newSyncCodes);
 		}
-
+		
 		// 将已经存在的旧记录的状态更新为未处理
 		if (!olds.isEmpty()) {
 //			List<String> oldSyncCodes = new ArrayList<String>();
@@ -270,18 +357,19 @@ public class BsSyncServiceImpl implements BsSyncService {
 //				logger.warn("将" + u2 + "条信息重新更新为未处理状态！");
 //			}
 		}
-
+		
 		// 保存新增的记录
 		if (!news.isEmpty())
 			this.syncBaseService.save(news);
 		if (logger.isInfoEnabled())
 			logger.info("从金盾网抓取交通违法信息总耗时：" + DateUtils.getWasteTime(startTime) + ",newCount=" + news.size());
-
+		
 		if(errorCount > 0){
 			strMsg.append(errorCount);//记录发生异常的数目
 		}
 		return news.size();
 	}
+**/	
 
 	public int doSync4JiaoWeiYYWZ(ActorHistory syncer, Calendar fromDate,
 			Calendar toDate, StringBuffer strMsg) {
@@ -331,7 +419,7 @@ public class BsSyncServiceImpl implements BsSyncService {
 
 		return toSaveDomains.size();
 	}
-
+	
 	/**
 	 * 数据集行数据到交委营运违法信息的转换
 	 * 
