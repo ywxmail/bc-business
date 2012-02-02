@@ -91,7 +91,7 @@ public class CarModelAction extends FileEntityAction<Long, CarModel> {
 	
 	@Override
 	protected PageOption buildFormPageOption(boolean editable) {
-		return	super.buildFormPageOption(editable).setWidth(735).setHeight(350)
+		return	super.buildFormPageOption(editable).setWidth(728).setHeight(370)
 				.setMinWidth(250).setMinHeight(170);
 	}
 
