@@ -138,7 +138,7 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 		sql.append(",c.transactor_name,c.sign_date,c.start_date,c.end_date,c.code,c.logout_id,iah.actor_name,c.logout_date");
 		sql.append(",car.id carId");
 		// sql.append(",man.id manId");
-		sql.append(",c.ver_major,c.ver_minor,c.op_type");
+		sql.append(",c.ver_major,c.ver_minor,c.op_type,c.file_date");
 		sql.append(" from BS_CONTRACT_CHARGER cc");
 		sql.append(" inner join BS_CONTRACT c on cc.id = c.id");
 		sql.append(" inner join BS_CAR_CONTRACT carc on c.id = carc.contract_id");
@@ -176,6 +176,7 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 				map.put("ver_major", rs[i++]);
 				map.put("ver_minor", rs[i++]);
 				map.put("op_type", rs[i++]);
+				map.put("fileDate", rs[i++]);
 				return map;
 			}
 		});
@@ -190,6 +191,9 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 				getText("contract.status"), 35)
 				.setSortable(true)
 				.setValueFormater(new EntityStatusFormater(getEntityStatuses())));
+		columns.add(new TextColumn4MapKey("c.file_date", "fileDate",
+				getText("label.fileDate"), 90).setSortable(true)
+				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
 		columns.add(new TextColumn4MapKey("c.ver_major", "ver_major",
 				getText("contract4Labour.ver"), 40)
 				.setValueFormater(new AbstractFormater<String>() {
@@ -215,7 +219,7 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 				getText("contract4Charger.businessType"), 70)
 				.setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("c.ext_str1", "ext_str1",
-				getText("contract.car"), 80).setUseTitleFromLabel(true)
+				getText("contract.car"), 85).setUseTitleFromLabel(true)
 				.setValueFormater(
 						new LinkFormater4Id(this.getContextPath()
 								+ "/bc-business/car/edit?id={0}", "car") {
