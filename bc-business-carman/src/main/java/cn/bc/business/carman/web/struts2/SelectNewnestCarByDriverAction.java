@@ -40,20 +40,26 @@ public class SelectNewnestCarByDriverAction extends ActionSupport {
 		CarByDriverHistory carByDriverHistory = this.carByDriverHistoryService
 				.findNewestCarByDriverHistory(carManId);
 		json = new Json();
-		if (carByDriverHistory.getToCar() != null) {
-			// 执行转车操作后执行公司到公司，注销未有去向，交回未注销取回最新的迁移记录
-			json.put("fromCarId", carByDriverHistory.getToCar().getId());
-			json.put("plate", carByDriverHistory.getToCar().getPlateType()
-					+ "." + carByDriverHistory.getToCar().getPlateNo());
-			json.put("fromMotorcadeId", carByDriverHistory.getToMotorcadeId());
-			json.put("fromclasses", carByDriverHistory.getToClasses());
-		} else {
-			// 执行交回未注销操作后执行公司到公司，注销未有去向，交回未注销取回最新的迁移记录
-			json.put("fromCarId", carByDriverHistory.getFromCar().getId());
-			json.put("plate", carByDriverHistory.getFromCar().getPlateType()
-					+ "." + carByDriverHistory.getFromCar().getPlateNo());
-			json.put("fromMotorcadeId", carByDriverHistory.getFromMotorcadeId());
-			json.put("fromclasses", carByDriverHistory.getFromClasses());
+		if (carByDriverHistory != null) {
+			if (carByDriverHistory.getToCar() != null) {
+				// 执行转车操作后执行公司到公司，注销未有去向，交回未注销取回最新的迁移记录
+				json.put("fromCarId", carByDriverHistory.getToCar().getId());
+				json.put("plate", carByDriverHistory.getToCar().getPlateType()
+						+ "." + carByDriverHistory.getToCar().getPlateNo());
+				json.put("fromMotorcadeId",
+						carByDriverHistory.getToMotorcadeId());
+				json.put("fromclasses", carByDriverHistory.getToClasses());
+			} else {
+				// 执行交回未注销操作后执行公司到公司，注销未有去向，交回未注销取回最新的迁移记录
+				json.put("fromCarId", carByDriverHistory.getFromCar().getId());
+				json.put("plate", carByDriverHistory.getFromCar()
+						.getPlateType()
+						+ "."
+						+ carByDriverHistory.getFromCar().getPlateNo());
+				json.put("fromMotorcadeId",
+						carByDriverHistory.getFromMotorcadeId());
+				json.put("fromclasses", carByDriverHistory.getFromClasses());
+			}
 		}
 		return "json";
 	}
