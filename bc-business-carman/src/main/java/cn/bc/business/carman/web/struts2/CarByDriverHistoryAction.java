@@ -307,7 +307,7 @@ public class CarByDriverHistoryAction extends
 					.setModal(true);
 		} else {
 			return super.buildFormPageOption(editable).setWidth(735)
-					.setMinWidth(320).setHeight(400).setMinHeight(200)
+					.setMinWidth(320).setHeight(430).setMinHeight(200)
 					.setModal(true);
 		}
 
