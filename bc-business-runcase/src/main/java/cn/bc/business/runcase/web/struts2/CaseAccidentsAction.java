@@ -146,15 +146,15 @@ public class CaseAccidentsAction extends ViewAction<Map<String, Object>> {
 				.setValueFormater(new EntityStatusFormater(getBSStatuses2())));
 		// 事发时间
 		columns.add(new TextColumn4MapKey("b.happen_date", "happen_date",
-				getText("runcase.happenDate"), 130).setSortable(true)
+				getText("runcase.happenDate"), 140).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd hh:mm")));
 		// 分公司
 		columns.add(new TextColumn4MapKey("unitname", "unitname",
-				getText("runcase.unitName"), 60).setSortable(true)
+				getText("runcase.unitName"), 65).setSortable(true)
 				.setUseTitleFromLabel(true));
 		// 车队
 		columns.add(new TextColumn4MapKey("m.name", "motorcade_name",
-				getText("runcase.motorcadeName"), 60)
+				getText("runcase.motorcadeName"), 65)
 				.setSortable(true)
 				.setUseTitleFromLabel(true)
 				.setValueFormater(
