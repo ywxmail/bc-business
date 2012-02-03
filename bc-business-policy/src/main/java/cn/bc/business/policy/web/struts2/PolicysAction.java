@@ -153,15 +153,15 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 				.setValueFormater(new EntityStatusFormater(getPolicyStatuses())));
 		// 公司
 		columns.add(new TextColumn4MapKey("c.old_unit_name", "old_unit_name",
-				getText("car.unit"), 60).setSortable(true)
+				getText("car.unit"), 65).setSortable(true)
 				.setUseTitleFromLabel(true));
 		// 分公司
 		columns.add(new TextColumn4MapKey("unit_name", "unit_name",
-				getText("car.unitname"), 60).setSortable(true)
+				getText("car.unitname"), 65).setSortable(true)
 				.setUseTitleFromLabel(true));
 		// 车队
 		columns.add(new TextColumn4MapKey("m.name", "motorcade_name",
-				getText("car.motorcade"), 60)
+				getText("car.motorcade"), 65)
 				.setSortable(true)
 				.setUseTitleFromLabel(true)
 				.setValueFormater(
@@ -206,7 +206,7 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 					}));
 		}
 		columns.add(new TextColumn4MapKey("p.assured", "assured",
-				getText("policy.assured"), 180));
+				getText("policy.assured"), 190));
 		// 创建日期
 		columns.add(new TextColumn4MapKey("p.file_date", "file_date",
 				getText("policy.fileDate"), 100).setSortable(true)

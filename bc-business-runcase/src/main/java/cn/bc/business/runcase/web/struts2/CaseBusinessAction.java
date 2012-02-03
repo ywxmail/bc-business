@@ -243,6 +243,7 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 			CarMan driver = this.carManService.load(carManId);
 			List<Car> car = this.carService.selectAllCarByCarManId(carManId);
 			if (car.size() == 1) {
+				this.getE().setCarId(car.get(0).getId());
 				this.getE().setCarPlate(
 						car.get(0).getPlateType() + "."
 								+ car.get(0).getPlateNo());
