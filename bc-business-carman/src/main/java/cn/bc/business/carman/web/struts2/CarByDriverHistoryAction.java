@@ -134,20 +134,22 @@ public class CarByDriverHistoryAction extends
 	private void setCarInfoByCarManId() {
 		CarByDriverHistory carByDriverHistory = this.carByDriverHistoryService
 				.findNewestCarByDriverHistory(carManId);
-		if (carByDriverHistory.getToCar() != null) {
-			// 执行转车操作后执行公司到公司，注销未有去向，交回未注销取回最新的迁移记录
-			this.getE().setFromCar(carByDriverHistory.getToCar());
-			this.getE().setFromMotorcadeId(
-					carByDriverHistory.getToMotorcadeId());
-			// 设置原班次
-			this.getE().setFromClasses(carByDriverHistory.getToClasses());
-		} else {
-			// 执行交回未注销操作后执行公司到公司，注销未有去向，交回未注销取回最新的迁移记录
-			this.getE().setFromCar(carByDriverHistory.getFromCar());
-			this.getE().setFromMotorcadeId(
-					carByDriverHistory.getFromMotorcadeId());
-			// 设置原班次
-			this.getE().setFromClasses(carByDriverHistory.getFromClasses());
+		if (carByDriverHistory != null) {
+			if (carByDriverHistory.getToCar() != null) {
+				// 执行转车操作后执行公司到公司，注销未有去向，交回未注销取回最新的迁移记录
+				this.getE().setFromCar(carByDriverHistory.getToCar());
+				this.getE().setFromMotorcadeId(
+						carByDriverHistory.getToMotorcadeId());
+				// 设置原班次
+				this.getE().setFromClasses(carByDriverHistory.getToClasses());
+			} else {
+				// 执行交回未注销操作后执行公司到公司，注销未有去向，交回未注销取回最新的迁移记录
+				this.getE().setFromCar(carByDriverHistory.getFromCar());
+				this.getE().setFromMotorcadeId(
+						carByDriverHistory.getFromMotorcadeId());
+				// 设置原班次
+				this.getE().setFromClasses(carByDriverHistory.getFromClasses());
+			}
 		}
 	}
 
