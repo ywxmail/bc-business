@@ -17,6 +17,8 @@ import cn.bc.business.carman.service.CarByDriverHistoryService;
 import cn.bc.business.carman.service.CarByDriverService;
 import cn.bc.business.carman.service.CarManService;
 import cn.bc.business.web.struts2.FileEntityAction;
+import cn.bc.identity.web.SystemContext;
+import cn.bc.web.ui.html.page.PageOption;
 
 /**
  * 司机营运车辆Action
@@ -60,6 +62,13 @@ public class ShiftworkByDriverAction extends
 		this.session = session;
 	}
 
+	@Override
+	public boolean isReadonly() {
+		// 车辆管理/司机管理或系统管理员
+		SystemContext context = (SystemContext) this.getContext();
+		return !context.hasAnyRole(getText("key.role.bs.car"),
+				getText("key.role.bs.driver"), getText("key.role.bc.admin"));
+	}
 
 	@Override
 	protected void afterCreate(CarByDriverHistory entity) {
@@ -73,7 +82,6 @@ public class ShiftworkByDriverAction extends
 		}
 	}
 
-
 	public String save() throws Exception {
 		// 创建CarByDriver列表
 		// List<CarByDriver> toSaves = new ArrayList<CarByDriver>();
@@ -84,12 +92,19 @@ public class ShiftworkByDriverAction extends
 		String shiftwork = this.getE().getShiftwork();
 		String[] shiftworks = shiftwork.split(";");
 		Long[] carIds = new Long[shiftworks.length];
-			for (int i = 0; i < shiftworks.length; i++) {
-				carIds[i] = new Long(shiftworks[i].split(",")[1]);
-				
-			}
-			this.carByDriverHistoryService.saveShiftwork(this.getE(), carIds);
+		for (int i = 0; i < shiftworks.length; i++) {
+			carIds[i] = new Long(shiftworks[i].split(",")[1]);
+
+		}
+		this.carByDriverHistoryService.saveShiftwork(this.getE(), carIds);
 		return "saveSuccess";
 	}
 
+	@Override
+	protected PageOption buildFormPageOption(boolean editable) {
+		return super.buildFormPageOption(editable).setWidth(430)
+				.setMinWidth(320).setHeight(550).setMinHeight(200)
+				.setModal(true);
+
+	}
 }

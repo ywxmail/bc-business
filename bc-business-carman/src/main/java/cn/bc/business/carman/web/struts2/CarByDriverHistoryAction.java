@@ -244,13 +244,6 @@ public class CarByDriverHistoryAction extends
 						getText("carByDriverHistory.optype.doMaintenance"),
 						null,
 						"bc.business.carByDriverHistoryForm.doMaintenance"));
-				// //无续保
-				// /*pageOption.addButton(new ButtonOption(
-				// getText("policy.optype.renewal"), null,
-				// "bc.policyForm.doRenew").setId("policyDoRenew"));*/
-				// pageOption.addButton(new ButtonOption(
-				// getText("policy.optype.surrenders"), null,
-				// "bc.policyForm.doSurrender").setId("policySurrenders"));
 			}
 		}
 	}
@@ -306,9 +299,15 @@ public class CarByDriverHistoryAction extends
 
 	@Override
 	protected PageOption buildFormPageOption(boolean editable) {
-		return super.buildFormPageOption(editable).setWidth(735)
-				.setMinWidth(320).setHeight(400).setMinHeight(200)
-				.setModal(true);
+		if (this.getE().getMoveType() == CarByDriverHistory.MOVETYPE_DINGBAN) {
+			return super.buildFormPageOption(editable).setWidth(430)
+					.setMinWidth(320).setHeight(550).setMinHeight(200)
+					.setModal(true);
+		} else {
+			return super.buildFormPageOption(editable).setWidth(735)
+					.setMinWidth(320).setHeight(400).setMinHeight(200)
+					.setModal(true);
+		}
 
 	}
 

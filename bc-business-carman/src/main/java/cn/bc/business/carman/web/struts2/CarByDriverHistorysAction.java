@@ -153,7 +153,7 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 						Map contract = (Map) context;
 						return (Date) contract.get("end_date");
 					}
-				}));
+				}.setUseEmptySymbol(true)));
 		// columns.add(new TextColumn4MapKey("d.move_type", "move_type",
 		// getText("carByDriverHistory.moveType"), 140)
 		// .setValueFormater(new KeyValueFormater(getMoveType())));
@@ -461,7 +461,7 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 	protected String getHtmlPageJs() {
 		return this.getContextPath()
 				+ "/bc-business/carByDriverHistory/list.js,"
-				+ this.getContextPath() + "/bc-business/carByDriver/dingBan.js";
+				+ this.getContextPath() + "/bc-business/carByDriverHistory/dingBan.js";
 	}
 
 }
