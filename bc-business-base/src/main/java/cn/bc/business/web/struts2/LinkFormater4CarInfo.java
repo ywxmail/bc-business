@@ -3,13 +3,18 @@
  */
 package cn.bc.business.web.struts2;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.util.StringUtils;
+
 import cn.bc.business.BSConstants;
 import cn.bc.web.formater.LinkFormater;
 
 /**
  * 车辆沉余信息字段的超链接格式化
  * <p>
- * 生成类似&lt;a ...&gt;粤A.XXXXX&lt;/a&gt;的格式
+ * 生成类似&lt;a ...&gt;粤A.XXXX1&lt;/a&gt;,&lt;a ...&gt;粤A.XXXX2&lt;/a&gt;的格式
  * </p>
  * 
  * @author dragon
@@ -41,32 +46,49 @@ public class LinkFormater4CarInfo extends LinkFormater {
 		if (value == null || _value.trim().length() == 0) {
 			return "&nbsp;";
 		}
+		_value = _value.trim();
+
+		// 分隔出每台车的配置：[车牌号1，如粤A.XXXXX],[车辆1id];[车牌号2，如粤A.XXXXX],[车辆2id];...
+		String[] vvs = _value.split(";");
+
+		// 循环每台车执行格式化处理
+		String[] vs;
 		StringBuffer tpl = new StringBuffer();
-		String vv = _value.trim();
-		String[] vs = vv.split(",");// [0]-车牌号，如粤A.XXXXX,[1]-车辆id
-		String label = "";
-		if (vs.length == 2) {
-			label += vs[0];
-			// 链接地址、模块类型、样式控制
-			tpl.append("<a class=\"bc-link\" data-mtype=\"" + this.moduleKey
-					+ "\" href=\"" + this.contextPath + this.urlPattern + vs[1]
-					+ "\"");
+		List<String> labels = new ArrayList<String>();
+		int i = 0;
+		for (String vv : vvs) {
+			if (i > 0)
+				tpl.append(",");
 
-			// 任务栏显示的标题：粤A.XXXXX
-			tpl.append(" data-title=\"" + vs[0] + "\"");
+			vs = vv.split(",");// [0]-车牌号,[1]-车辆id
 
-			// 对话框的id
-			tpl.append(" data-mid=\"" + this.moduleKey + vs[1] + "\"");
+			if (vs.length == 2) {
+				labels.add(vs[0]);
+				// 链接地址、模块类型、样式控制
+				tpl.append("<a class=\"bc-link\" data-mtype=\""
+						+ this.moduleKey + "\" href=\"" + this.contextPath
+						+ this.urlPattern + vs[1] + "\"");
 
-			// 链接显示的文字：粤A.XXXXX
-			tpl.append(">" + vs[0] + "</a>");
-		} else {
-			tpl.append(vv);
-			label += vv;
+				// 任务栏显示的标题：车牌号
+				tpl.append(" data-title=\"" + vs[0] + "\"");
+
+				// 对话框的id
+				tpl.append(" data-mid=\"" + this.moduleKey + vs[1] + "\"");
+
+				// 链接显示的文字：车牌号
+				tpl.append(">" + vs[0] + "</a>");
+			} else {
+				tpl.append(vv);
+				labels.add(vv);
+			}
+
+			i++;
 		}
 
 		if (this.showTip) {
-			return "<div title=\"" + label + "\">" + tpl.toString() + "</div>";
+			return "<div title=\""
+					+ StringUtils.collectionToCommaDelimitedString(labels)
+					+ "\">" + tpl.toString() + "</div>";
 		} else {
 			return tpl.toString();
 		}
@@ -78,15 +100,29 @@ public class LinkFormater4CarInfo extends LinkFormater {
 		if (value == null || _value.trim().length() == 0) {
 			return "&nbsp;";
 		}
-		String vv = _value.trim();
-		String label = "";
-		String[] vs = vv.split(",");// [0]-车牌号，如粤A.XXXXX,[1]-车辆id
-		if (vs.length == 2) {
-			label += vs[0];
-		} else {
-			label += vv;
+		_value = _value.trim();
+
+		// 分隔出每台车的配置：[车牌号1，如粤A.XXXXX],[车辆1id];[车牌号2，如粤A.XXXXX],[车辆2id];...
+		String[] vvs = _value.split(";");
+
+		// 循环每台车执行格式化处理
+		String[] vs;
+		String labels = "";
+		int i = 0;
+		for (String vv : vvs) {
+			if (i > 0)
+				labels += ",";
+
+			vs = vv.split(",");// [0]-车牌号,[1]-车辆id
+			if (vs.length == 2) {
+				labels += vs[0];
+			} else {
+				labels += vv;
+			}
+
+			i++;
 		}
-		return label;
+		return labels;
 	}
 
 	@Override
