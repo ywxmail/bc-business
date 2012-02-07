@@ -243,9 +243,11 @@ public class Contract4LabourAction extends
 					entity.setBirthDate(date2);
 				}
 	
-				entity.setAge(
-						Integer.valueOf(getBirthDateToString(carManInfoMap
-								.get("birthdate"))));
+				if(carManInfoMap.get("birthdate") != null){
+					entity.setAge(
+							Integer.valueOf(getBirthDateToString(carManInfoMap
+									.get("birthdate"))));
+				}
 			}
 		}
 
@@ -277,6 +279,10 @@ public class Contract4LabourAction extends
 		// 构建附件控件
 		attachsUI = buildAttachsUI(false, false);
 
+		//根据合同id查找车辆id和司机id
+		carId = this.contract4LabourService.findCarIdByContractId(entity.getId());
+		driverId = this.contract4LabourService.findCarManIdByContractId(entity.getId());
+		
 		// 将次版本号加1
 		entity.setVerMinor(entity.getVerMinor() + 1);
 

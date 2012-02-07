@@ -74,4 +74,14 @@ public class ContractCarManRelation implements Serializable {
 		return this.contractId != null && this.contractId.equals(contractId)
 				&& this.carManId != null && this.carManId.equals(carManId);
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ (contractId == null ? 0 : contractId.hashCode());
+		result = prime * result + (carManId == null ? 0 : carManId.hashCode());
+		return result;
+	}
 }

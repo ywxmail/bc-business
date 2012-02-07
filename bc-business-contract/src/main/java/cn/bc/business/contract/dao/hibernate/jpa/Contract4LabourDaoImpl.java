@@ -589,4 +589,18 @@ public class Contract4LabourDaoImpl extends
 		List<Map<String, Object>> list = this.jdbcTemplate.queryForList(sql);
 		return list != null && list.size() > 0;
 	}
+
+	/**
+	 * 更新指定司机的户口性质
+	 * @param driverId
+	 * @param houseType
+	 */
+	public void updateCarMan4HouseType(Long driverId, String houseType) {
+		ArrayList<Object> args = new ArrayList<Object>();
+		StringBuffer hql = new StringBuffer();
+		hql.append("UPDATE CarMan c SET c.houseType=? WHERE c.id =?");
+		args.add(houseType);
+		args.add(driverId);
+		this.executeUpdate(hql.toString(), args);
+	}
 }

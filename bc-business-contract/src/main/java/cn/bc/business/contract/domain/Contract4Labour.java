@@ -35,7 +35,7 @@ public class Contract4Labour extends Contract {
 	private Calendar birthDate; //出生日期
 	private Integer	age; //年龄
 	private String origin; //籍贯
-	private	String houseType; //户口类型
+	private	String houseType; //户口性质
 	private boolean dole;// 个人岗位补贴:0-有,1-无
 	private boolean funding;// 对公社保资助:0-有,1-无
 	private String	insurCode;// 社保号

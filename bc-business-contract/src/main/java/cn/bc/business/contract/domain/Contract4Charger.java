@@ -27,6 +27,7 @@ public class Contract4Charger extends Contract {
 	private boolean includeCost;// 包含检审费用:0-不包含,1-包含
 	private String businessType;// 合同性质
 	private String contractVersionNo;//合同版本号
+	private String paymentDate;//缴费日
 
 	public Contract4Charger() {
 		this.setCode("[经济合同]");
@@ -85,5 +86,17 @@ public class Contract4Charger extends Contract {
 	public void setContractVersionNo(String contractVersionNo) {
 		this.contractVersionNo = contractVersionNo;
 	}
+
+	@Column(name = "PAYMENT_DATE")
+	public String getPaymentDate() {
+		return paymentDate;
+	}
+
+	public void setPaymentDate(String paymentDate) {
+		this.paymentDate = paymentDate;
+	}
+
+	
+	
 
 }

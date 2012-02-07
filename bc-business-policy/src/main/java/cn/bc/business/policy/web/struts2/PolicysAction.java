@@ -86,7 +86,7 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 		StringBuffer sql = new StringBuffer();
 		sql.append("select p.id,p.status_");
 		sql.append(",c.code,c.old_unit_name,bia.name as unit_name,m.name");
-		sql.append(",c.plate_type,c.plate_no,p.file_date,p.assured,p.commerial_no");
+		sql.append(",c.plate_type,c.plate_no,c.register_date,p.file_date,p.assured,p.commerial_no");
 		sql.append(",p.commerial_company,p.commerial_start_date,p.commerial_end_date");
 		sql.append(",p.ownrisk,p.greenslip,p.liability_no,c.id as carId,p.op_type");
 		sql.append(",p.greenslip_no,p.greenslip_company,p.greenslip_start_date,p.greenslip_end_date,p.stop_date,p.main");
@@ -113,6 +113,7 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 				map.put("motorcade_name", rs[i++]);// 车队
 				map.put("plate_type", rs[i++]);
 				map.put("plate_no", rs[i++]);
+				map.put("registeDate", rs[i++]);
 				map.put("plate", map.get("plate_type").toString() + "."
 						+ map.get("plate_no").toString());
 				map.put("file_date", rs[i++]);
@@ -205,6 +206,11 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 						}
 					}));
 		}
+		// 车辆登记日期
+		columns.add(new TextColumn4MapKey("c.register_date", "registeDate",
+				getText("policy.carRegisteDate"), 100).setSortable(true)
+				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+
 		columns.add(new TextColumn4MapKey("p.assured", "assured",
 				getText("policy.assured"), 190));
 		// 创建日期
@@ -289,7 +295,8 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 	protected String[] getGridSearchFields() {
 		return new String[] { "c.old_unit_name", "bia.name", "m.name",
 				"c.plate_type", "c.plate_no", "p.commerial_no",
-				"p.liability_no", "p.commerial_company", "c.code" };
+				"p.greenslip_no", "p.liability_no", "p.commerial_company",
+				"c.code" };
 	}
 
 	@Override
