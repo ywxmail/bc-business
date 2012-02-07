@@ -18,6 +18,7 @@ import cn.bc.core.query.condition.Condition;
 import cn.bc.core.query.condition.Direction;
 import cn.bc.core.query.condition.impl.EqualsCondition;
 import cn.bc.core.query.condition.impl.InCondition;
+import cn.bc.core.query.condition.impl.LikeCondition;
 import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.core.util.StringUtils;
 import cn.bc.db.jdbc.RowMapper;
@@ -51,6 +52,17 @@ public class SelectCarAction extends
 		// 默认排序方向：状态|登记日期|车队
 		return new OrderCondition("c.status_", Direction.Asc).add(
 				"c.register_date", Direction.Desc).add("m.name", Direction.Asc);
+	}
+
+	@Override
+	protected LikeCondition getGridSearchCondition4OneField(String field,
+			String value) {
+		if (field.indexOf("plate_no") != -1) {
+			return new LikeCondition(field, value != null ? value.toUpperCase()
+					: value);
+		} else {
+			return super.getGridSearchCondition4OneField(field, value);
+		}
 	}
 
 	@Override
