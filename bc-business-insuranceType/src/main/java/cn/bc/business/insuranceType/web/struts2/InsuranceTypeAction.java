@@ -2,6 +2,7 @@ package cn.bc.business.insuranceType.web.struts2;
 
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,8 @@ public class InsuranceTypeAction extends FileEntityAction<Long, InsuranceType> {
 	// private static Log logger = LogFactory.getLog(MotorcadeAction.class);
 	private static final long serialVersionUID = 1L;
 	public InsuranceTypeService insuranceTypeService;
+	
+	public List<Map<String,String>> templateList;//可选模板列表
 
 	@Autowired
 	public void setInsuranceTypeService(
@@ -89,4 +92,23 @@ public class InsuranceTypeAction extends FileEntityAction<Long, InsuranceType> {
 		return "json";
 	}
 
+	@Override
+	protected void initForm(boolean editable) {
+		super.initForm(editable);
+		templateList=this.insuranceTypeService.findEnabled4Option();
+	}
+
+	@Override
+	protected void beforeSave(InsuranceType entity) {
+		if(entity.getId().equals(entity.getPid())){
+			entity.setPid(null);
+		}
+		if(entity.getType()==InsuranceType.TYPE_TEMPLATE){
+			entity.setCoverage(null);
+		}
+		super.beforeSave(entity);
+	}
+
+	
+	
 }
