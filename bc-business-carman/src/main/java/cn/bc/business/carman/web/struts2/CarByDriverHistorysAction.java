@@ -284,12 +284,12 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 	@Override
 	protected PageOption getHtmlPageOption() {
 		return super.getHtmlPageOption().setWidth(900).setMinWidth(400)
-				.setHeight(400).setMinHeight(300);
+				.setHeight(400).setMinHeight(200);
 	}
 
 	@Override
 	protected String getGridRowLabelExpression() {
-		return "['driver']";
+		return "['driver']!=null ? ['driver']:['oldPlate']";
 	}
 
 	@Override
@@ -397,6 +397,8 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 				getText("carByDriverHistory.moveType.cheduidaochedui"));
 		type.put(String.valueOf(CarByDriverHistory.MOVETYPE_DINGBAN),
 				getText("carByDriverHistory.moveType.dingban"));
+		type.put(String.valueOf(CarByDriverHistory.MOVETYPE_JHZC),
+				getText("carByDriverHistory.moveType.jiaohuizhuanche"));
 		return type;
 	}
 
@@ -461,7 +463,8 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 	protected String getHtmlPageJs() {
 		return this.getContextPath()
 				+ "/bc-business/carByDriverHistory/list.js,"
-				+ this.getContextPath() + "/bc-business/carByDriverHistory/dingBan.js";
+				+ this.getContextPath()
+				+ "/bc-business/carByDriverHistory/dingBan.js";
 	}
 
 }

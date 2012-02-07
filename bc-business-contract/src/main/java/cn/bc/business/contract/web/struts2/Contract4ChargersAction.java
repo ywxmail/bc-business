@@ -216,7 +216,7 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 				getText("contract4Charger.signType"), 58).setSortable(true)
 				.setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("cc.bs_type", "bs_type",
-				getText("contract4Charger.businessType"), 70)
+				getText("contract4Charger.businessType"), 100)
 				.setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("c.ext_str1", "ext_str1",
 				getText("contract.car"), 85).setUseTitleFromLabel(true)

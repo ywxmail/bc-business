@@ -72,8 +72,8 @@ public class CarByDriverHistoryServiceImpl extends
 		entity = super.save(entity);
 
 		if (entity.getDriver() != null) {
+			// 转车队的迁移记录
 			if (entity.getMoveType() == CarByDriverHistory.MOVETYPE_DINGBAN) {
-				// 处理顶班司机的迁移记录
 
 			} else {
 				// 加载该司机的营运班次记录
@@ -123,6 +123,14 @@ public class CarByDriverHistoryServiceImpl extends
 				}
 
 			}
+		}
+		// 转车队的迁移记录
+		if (entity.getMoveType() == CarByDriverHistory.MOVETYPE_ZCD) {
+			// 更新车辆表的所属公司和所属车队信息
+			this.carByDriverHistoryDao.updateCar4UnitAndMotorcade(entity
+					.getFromCar().getId(), entity.getToUnit(), entity
+					.getToMotorcadeId());
+
 		}
 
 		return entity;
