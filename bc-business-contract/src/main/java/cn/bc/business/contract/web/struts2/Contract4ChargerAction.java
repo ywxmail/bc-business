@@ -52,6 +52,7 @@ public class Contract4ChargerAction extends FileEntityAction<Long, Contract4Char
 	public  List<Map<String, String>>	signTypeList;							//可选签约类型
 	public  List<Map<String, String>>	businessTypeList;						//可选营运性质列表
 	public  List<Map<String, String>>	contractVersionNoList;					//可选合同版本号列表
+	public  List<Map<String, String>>	paymentDates;					//// 可选缴费日列表
 	public	String						assignChargerIds;						//多个责任人Id
 	public  String						assignChargerNames;						//多个责任人name
 	public  String []					chargerNameAry;							
@@ -363,6 +364,7 @@ public class Contract4ChargerAction extends FileEntityAction<Long, Contract4Char
 						OptionConstants.CONTRACT_SIGNTYPE,
 						OptionConstants.CAR_BUSINESS_NATURE,
 						OptionConstants.CONTRACT_VERSION_NO,
+						OptionConstants.MOTORCADE_PAYMENT_DATE
 			});
 		
 		// 加载可选签约类型
@@ -374,6 +376,8 @@ public class Contract4ChargerAction extends FileEntityAction<Long, Contract4Char
 		this.businessTypeList	=	 optionItems.get(OptionConstants.CAR_BUSINESS_NATURE);
 		// 加载可选合同版本号列表
 		this.contractVersionNoList = optionItems.get(OptionConstants.CONTRACT_VERSION_NO);
+		// 加载缴费日列表
+		this.paymentDates = optionItems.get(OptionConstants.MOTORCADE_PAYMENT_DATE);
 
 	}
 	
