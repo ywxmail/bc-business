@@ -128,7 +128,7 @@ public class InsuranceTypesAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected String[] getGridSearchFields() {
-		return new String[] { "i.name" };
+		return new String[] { "i.name","n.name" };
 	}
 
 	@Override
