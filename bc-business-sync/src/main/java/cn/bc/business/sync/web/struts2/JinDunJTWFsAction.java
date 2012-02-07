@@ -129,10 +129,10 @@ public class JinDunJTWFsAction extends SyncViewAction {
 		List<Column> columns = new ArrayList<Column>();
 		columns.add(new IdColumn4MapKey("b.id", "id"));
 		columns.add(new TextColumn4MapKey("b.status_", "status",
-				getText("bs.sync.status"), 60).setSortable(true)
+				getText("bs.sync.status"), 55).setSortable(true)
 				.setValueFormater(new KeyValueFormater(getSyncStatuses())));
 		columns.add(new TextColumn4MapKey("b.sync_code", "syncCode",
-				getText("jinDunJTWF.syncCode"), 120).setSortable(true)
+				getText("jinDunJTWF.syncCode"), 133).setSortable(true)
 				.setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("t.happen_date", "happenDate",
 				getText("jinDunJTWF.happenDate"), 130).setSortable(true)
@@ -155,7 +155,7 @@ public class JinDunJTWFsAction extends SyncViewAction {
 					}
 				}));
 		columns.add(new TextColumn4MapKey("t.address", "address",
-				getText("jinDunJTWF.address")).setSortable(true)
+				getText("jinDunJTWF.address"), 150).setSortable(true)
 				.setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("t.source", "source",
 				getText("jinDunJTWF.source"), 80).setSortable(true));
