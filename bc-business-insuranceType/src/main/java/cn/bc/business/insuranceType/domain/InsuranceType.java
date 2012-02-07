@@ -15,11 +15,18 @@ import cn.bc.identity.domain.FileEntityImpl;
 @Table(name = "BS_INSURANCE_TYPE")
 public class InsuranceType extends FileEntityImpl {
 	private static final long serialVersionUID = 1L;
-
+	
+	/** 险种 **/
+	public static final int TYPE_PLANT=0;//
+	/** 模板 **/
+	public static final int TYPE_TEMPLATE=1;//模板
+	
 	private String Name;// 险种名称
-	private Float coverage;// 保额
+	private String coverage;// 保额
 	private String description;// 备注
 	private int status;// 状态
+	private int type;//类型 0-险种，1-模板
+	private Long pid;//所属模板id
 
 	public String getName() {
 		return Name;
@@ -29,11 +36,11 @@ public class InsuranceType extends FileEntityImpl {
 		Name = name;
 	}
 
-	public Float getCoverage() {
+	public String getCoverage() {
 		return coverage;
 	}
 
-	public void setCoverage(Float coverage) {
+	public void setCoverage(String coverage) {
 		this.coverage = coverage;
 	}
 
@@ -55,4 +62,24 @@ public class InsuranceType extends FileEntityImpl {
 		this.status = status;
 	}
 
+	@Column(name = "TYPE_")
+	public int getType() {
+		return type;
+	}
+
+	public void setType(int type) {
+		this.type = type;
+	}
+
+	public Long getPid() {
+		return pid;
+	}
+
+	public void setPid(Long pid) {
+		this.pid = pid;
+	}
+
+	
+
+	
 }
