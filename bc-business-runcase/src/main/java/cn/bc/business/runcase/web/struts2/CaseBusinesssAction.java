@@ -181,7 +181,7 @@ public class CaseBusinesssAction extends ViewAction<Map<String, Object>> {
 	@Override
 	protected PageOption getHtmlPageOption() {
 		return super.getHtmlPageOption().setWidth(900).setMinWidth(400)
-				.setHeight(550).setMinHeight(300);
+				.setHeight(450).setMinHeight(300);
 	}
 
 	@Override

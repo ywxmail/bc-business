@@ -309,7 +309,8 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 		Condition mainsCondition = null;
 		Condition patchCondtion = null;
 		Condition typeCondtion = new EqualsCondition("c.type_", type);
-		if (contractId == null) {
+		
+		if (this.contractId == null) {
 			// 查看最新合同列表
 			statusCondition = ConditionUtils.toConditionByComma4IntegerValue(
 					this.status, "c.status_");
@@ -319,9 +320,16 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 			// }
 		} else {
 			// 查看历史版本
-			patchCondtion = new EqualsCondition("c.patch_no", patchNo);
-			mainsCondition = new EqualsCondition("c.main",
-					Contract.MAIN_HISTORY);
+			if(this.contractId != 0){
+				// 显示实例本身
+				patchCondtion = new EqualsCondition("c.patch_no", patchNo);
+			}else{
+				// 不显示实例本身
+				patchCondtion = new EqualsCondition("c.patch_no", patchNo);
+				mainsCondition = new EqualsCondition("c.main",
+						Contract.MAIN_HISTORY);
+
+			}
 		}
 		return ConditionUtils.mix2AndCondition(typeCondtion, statusCondition,
 				patchCondtion, mainsCondition);

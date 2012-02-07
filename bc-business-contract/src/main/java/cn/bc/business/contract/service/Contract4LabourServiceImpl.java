@@ -67,7 +67,7 @@ public class Contract4LabourServiceImpl extends
 		boolean isNew = contract4Labour.isNew();
 
 		if (!isNew) { // 非新建状态，只需简单保存一下即可，因为编辑时不允许修改车辆、司机信息
-			return this.contract4LabourDao.save(contract4Labour);
+			contract4Labour = this.contract4LabourDao.save(contract4Labour);
 		} else { // 在新建时需保存与车辆、司机的关联关系
 			// 参数有效性验证
 			Assert.notNull(carId);
@@ -85,9 +85,11 @@ public class Contract4LabourServiceImpl extends
 			ContractCarManRelation driverRelation = new ContractCarManRelation(
 					contract4Labour.getId(), driverId);
 			this.contractDao.saveContractCarManRelation(driverRelation);
-
-			return contract4Labour;
+			
 		}
+		//更新司机的户口性质
+		this.contract4LabourDao.updateCarMan4HouseType(driverId,contract4Labour.getHouseType());
+		return contract4Labour;
 	}
 
 	/**
