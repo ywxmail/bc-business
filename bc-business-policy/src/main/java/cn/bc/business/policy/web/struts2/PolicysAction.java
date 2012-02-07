@@ -295,7 +295,8 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 	protected String[] getGridSearchFields() {
 		return new String[] { "c.old_unit_name", "bia.name", "m.name",
 				"c.plate_type", "c.plate_no", "p.commerial_no",
-				"p.liability_no", "p.commerial_company", "c.code" };
+				"p.greenslip_no", "p.liability_no", "p.commerial_company",
+				"c.code" };
 	}
 
 	@Override
