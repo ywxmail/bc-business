@@ -100,7 +100,7 @@ public class LinkFormater4DriverInfo extends LinkFormater {
 	public String getLinkText(Object context, Object value) {
 		String _value = (String) value;
 		if (value == null || _value.trim().length() == 0) {
-			return "&nbsp;";
+			return "";
 		}
 		_value = _value.trim();
 
