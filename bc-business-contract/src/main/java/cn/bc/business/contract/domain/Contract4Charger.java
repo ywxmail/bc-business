@@ -3,6 +3,8 @@
  */
 package cn.bc.business.contract.domain;
 
+import java.util.Calendar;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Inheritance;
@@ -27,6 +29,7 @@ public class Contract4Charger extends Contract {
 	private boolean includeCost;// 包含检审费用:0-不包含,1-包含
 	private String businessType;// 合同性质
 	private String contractVersionNo;//合同版本号
+	private Calendar paymentDate;//缴费日
 
 	public Contract4Charger() {
 		this.setCode("[经济合同]");
@@ -85,5 +88,16 @@ public class Contract4Charger extends Contract {
 	public void setContractVersionNo(String contractVersionNo) {
 		this.contractVersionNo = contractVersionNo;
 	}
+
+	@Column(name = "PAYMENT_DATE")
+	public Calendar getPaymentDate() {
+		return paymentDate;
+	}
+
+	public void setPaymentDate(Calendar paymentDate) {
+		this.paymentDate = paymentDate;
+	}
+	
+	
 
 }
