@@ -14,15 +14,14 @@ import org.springframework.stereotype.Controller;
 
 import cn.bc.BCConstants;
 import cn.bc.business.BSConstants;
+import cn.bc.business.insuranceType.domain.InsuranceType;
 import cn.bc.core.query.condition.Condition;
 import cn.bc.core.query.condition.Direction;
+import cn.bc.core.query.condition.impl.AndCondition;
 import cn.bc.core.query.condition.impl.EqualsCondition;
-import cn.bc.core.query.condition.impl.InCondition;
 import cn.bc.core.query.condition.impl.OrderCondition;
-import cn.bc.core.util.StringUtils;
 import cn.bc.db.jdbc.RowMapper;
 import cn.bc.db.jdbc.SqlObject;
-import cn.bc.web.formater.NubmerFormater;
 import cn.bc.web.struts2.AbstractSelectPageAction;
 import cn.bc.web.ui.html.grid.Column;
 import cn.bc.web.ui.html.grid.IdColumn4MapKey;
@@ -46,18 +45,17 @@ public class SelectInsuranceTypeAction extends
 
 	@Override
 	protected OrderCondition getGridDefaultOrderCondition() {
-		// 默认排序方向：状态|创建日期
-		return new OrderCondition("i.status_", Direction.Asc).add(
-				"i.file_date", Direction.Desc);
+		// 默认排序方向：创建日期
+		return new OrderCondition("i.file_date", Direction.Desc);
 	}
-
+	
 	@Override
 	protected SqlObject<Map<String, Object>> getSqlObject() {
 		SqlObject<Map<String, Object>> sqlObject = new SqlObject<Map<String, Object>>();
 
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer sql = new StringBuffer();
-		sql.append("select i.id,i.status_ ,i.name,i.coverage,i.desc_,i.file_date");
+		sql.append("select i.id,i.name,i.desc_,i.status_,i.type_,i.file_date");
 		sql.append(" from bs_insurance_type i");
 		sqlObject.setSql(sql.toString());
 
@@ -70,9 +68,7 @@ public class SelectInsuranceTypeAction extends
 				Map<String, Object> map = new HashMap<String, Object>();
 				int i = 0;
 				map.put("id", rs[i++]);
-				map.put("status_", rs[i++]);
 				map.put("name", rs[i++]);
-				map.put("coverage", rs[i++]);
 				map.put("desc_", rs[i++]);
 				return map;
 			}
@@ -85,12 +81,8 @@ public class SelectInsuranceTypeAction extends
 		List<Column> columns = new ArrayList<Column>();
 		columns.add(new IdColumn4MapKey("i.id", "id"));
 		columns.add(new TextColumn4MapKey("i.name", "name",
-				getText("insuranceType.name"), 85).setSortable(true)
+				getText("insuranceType.name"), 120).setSortable(true)
 				.setUseTitleFromLabel(true));
-		columns.add(new TextColumn4MapKey("i.coverage", "coverage",
-				getText("insuranceType.coverage"), 80).setSortable(true)
-				.setUseTitleFromLabel(true)
-				.setValueFormater(new NubmerFormater()));
 		columns.add(new TextColumn4MapKey("i.desc_", "desc_",
 				getText("insuranceType.description"),100).setSortable(true));
 		return columns;
@@ -108,7 +100,7 @@ public class SelectInsuranceTypeAction extends
 
 	@Override
 	protected PageOption getHtmlPageOption() {
-		return super.getHtmlPageOption().setWidth(400).setHeight(450);
+		return super.getHtmlPageOption().setWidth(300).setHeight(350);
 	}
 
 	@Override
@@ -129,17 +121,8 @@ public class SelectInsuranceTypeAction extends
 
 	@Override
 	protected Condition getGridSpecalCondition() {
-		if (status != null && status.length() > 0) {
-			String[] ss = status.split(",");
-			if (ss.length == 1) {
-				return new EqualsCondition("i.status_", new Integer(ss[0]));
-			} else {
-				return new InCondition("i.status_",
-						StringUtils.stringArray2IntegerArray(ss));
-			}
-		} else {
-			return null;
-		}
+		return new AndCondition(new EqualsCondition("i.status_", BCConstants.STATUS_ENABLED),
+				new EqualsCondition("i.type_",InsuranceType.TYPE_TEMPLATE));
 	}
 
 	@Override
@@ -162,4 +145,7 @@ public class SelectInsuranceTypeAction extends
 	protected String getHtmlPageNamespace() {
 		return this.getContextPath() + BSConstants.NAMESPACE;
 	}
+	
+	
+	
 }
