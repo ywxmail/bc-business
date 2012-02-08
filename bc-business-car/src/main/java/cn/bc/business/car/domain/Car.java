@@ -40,7 +40,7 @@ public class Car extends RichFileEntityImpl {
 	private Motorcade motorcade;// 所属车队
 	private String driver; // 司机信息：[司机1姓名],[司机1班次],[司机1id];[司机2姓名],[司机2班次],[司机2id];...
 	private String charger; // 责任人信息：[责任人1姓名,责任人1id;责任人2姓名,责任人2id;...]
-	private String oldUnitName;// 所属单位
+	private String oldUnitName;// 所属公司:宝城、广发
 	private String businessType;// 营运性质
 
 	private String code;// 自编号
