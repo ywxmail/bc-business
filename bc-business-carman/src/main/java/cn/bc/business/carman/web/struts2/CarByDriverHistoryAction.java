@@ -45,7 +45,7 @@ public class CarByDriverHistoryAction extends
 	public Map<String, String> statusesValueList;// 状态列表
 	public Map<String, String> moveTypeValueList;// 迁移类型列表
 	public List<Map<String, String>> motorcadeList; // 可选车队列表
-	public List<Map<String, String>> oldUnitList; // 所属单位列表
+	public List<Map<String, String>> companyList; // 所属单位列表
 	public CarManService carManService;
 	public CarService carService;
 	public CarByDriverService carByDriverService;
@@ -124,12 +124,16 @@ public class CarByDriverHistoryAction extends
 				this.getE().setFromMotorcadeId(fromCar.getMotorcade().getId());
 				this.getE().setFromUnit(fromCar.getCompany());
 				this.getE().setToCar(fromCar);
+				this.getE().setToUnit(fromCar.getCompany());
+				this.getE().setToMotorcadeId(fromCar.getMotorcade().getId());
 			} else {
 				Car fromCar = this.carService.load(fromCarId);
 				this.getE().setFromCar(fromCar);
 				this.getE().setFromMotorcadeId(fromCar.getMotorcade().getId());
 				this.getE().setFromUnit(fromCar.getCompany());
 				this.getE().setToCar(fromCar);
+				this.getE().setToUnit(fromCar.getCompany());
+				this.getE().setToMotorcadeId(fromCar.getMotorcade().getId());
 			}
 			// 设置迁移类型
 			this.getE().setMoveType(CarByDriverHistory.MOVETYPE_ZCD);
@@ -222,7 +226,11 @@ public class CarByDriverHistoryAction extends
 		if (e.getDriver() != null && e.getDriver().getId() == null) {
 			e.setDriver(null);
 		}
-
+		if (e.getMoveType() == CarByDriverHistory.MOVETYPE_ZCD) {
+			// 独立模块新建转车队时
+			if (e.getFromCar() != null)
+				e.setToCar(e.getFromCar());
+		}
 	}
 
 	/**
@@ -287,8 +295,8 @@ public class CarByDriverHistoryAction extends
 		// 迁移类型列表
 		moveTypeValueList = this.getMoveType();
 		// 所属单位列表
-		this.oldUnitList = optionItems.get(OptionConstants.CAR_COMPANY);
-		OptionItem.insertIfNotExist(oldUnitList, null, getE().getToUnit());
+		this.companyList = optionItems.get(OptionConstants.CAR_COMPANY);
+		OptionItem.insertIfNotExist(companyList, null, getE().getToUnit());
 
 		// 车队列表
 		this.motorcadeList = this.motorcadeService.findEnabled4Option();

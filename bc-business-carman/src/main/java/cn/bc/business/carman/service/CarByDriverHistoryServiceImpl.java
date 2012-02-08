@@ -72,7 +72,6 @@ public class CarByDriverHistoryServiceImpl extends
 		entity = super.save(entity);
 
 		if (entity.getDriver() != null) {
-			// 转车队的迁移记录
 			if (entity.getMoveType() == CarByDriverHistory.MOVETYPE_DINGBAN) {
 
 			} else {
@@ -142,6 +141,7 @@ public class CarByDriverHistoryServiceImpl extends
 	 */
 	public void saveShiftwork(CarByDriverHistory entity, Long[] carIds) {
 		// 保存迁移记录
+
 		this.carByDriverHistoryDao.save(entity);
 
 		// 保存营运班次信息
