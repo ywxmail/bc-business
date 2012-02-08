@@ -169,7 +169,7 @@ public class BlacklistsAction extends ViewAction<Map<String, Object>> {
 		// 车队
 		columns.add(new TextColumn4MapKey("m.name", "motorcade_name",
 				getText("blacklist.motorcade.name"), 60).setSortable(true));
-		
+
 		if (carId == null) {
 			// columns.add(new TextColumn4MapKey("c.plate_no", "plate",
 			// getText("blacklist.car.plateNo"), 80).setSortable(true));
@@ -223,8 +223,9 @@ public class BlacklistsAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected String[] getGridSearchFields() {
-		return new String[] { "b.code", "m.name ", "c.plate_type",
-				"c.plate_no", "b.subject", "cm.name ", "l.name ", "u.name " };
+		return new String[] { "b.code", "b.company", "unit.name", "m.name",
+				"c.plate_type", "c.plate_no", "b.subject", "b.type_",
+				"cm.name", "l.name", "u.name" };
 	}
 
 	@Override
