@@ -85,7 +85,7 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer sql = new StringBuffer();
 		sql.append("select p.id,p.status_");
-		sql.append(",c.code,c.old_unit_name,bia.name as unit_name,m.name");
+		sql.append(",c.code,c.company,bia.name as unit_name,m.name");
 		sql.append(",c.plate_type,c.plate_no,c.register_date,p.file_date,p.assured,p.commerial_no");
 		sql.append(",p.commerial_company,p.commerial_start_date,p.commerial_end_date");
 		sql.append(",p.ownrisk,p.greenslip,p.liability_no,c.id as carId,p.op_type");
@@ -108,7 +108,7 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 				map.put("id", rs[i++]);
 				map.put("status_", rs[i++]);
 				map.put("code", rs[i++]);// 自编号
-				map.put("old_unit_name", rs[i++]);// 公司
+				map.put("company", rs[i++]);// 公司
 				map.put("unit_name", rs[i++]);// 分公司
 				map.put("motorcade_name", rs[i++]);// 车队
 				map.put("plate_type", rs[i++]);
@@ -153,8 +153,8 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 				.setSortable(true)
 				.setValueFormater(new EntityStatusFormater(getPolicyStatuses())));
 		// 公司
-		columns.add(new TextColumn4MapKey("c.old_unit_name", "old_unit_name",
-				getText("car.unit"), 65).setSortable(true)
+		columns.add(new TextColumn4MapKey("c.company", "company",
+				getText("car.company"), 40).setSortable(true)
 				.setUseTitleFromLabel(true));
 		// 分公司
 		columns.add(new TextColumn4MapKey("unit_name", "unit_name",
@@ -293,7 +293,7 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected String[] getGridSearchFields() {
-		return new String[] { "c.old_unit_name", "bia.name", "m.name",
+		return new String[] { "c.company", "bia.name", "m.name",
 				"c.plate_type", "c.plate_no", "p.commerial_no",
 				"p.greenslip_no", "p.liability_no", "p.commerial_company",
 				"c.code" };
