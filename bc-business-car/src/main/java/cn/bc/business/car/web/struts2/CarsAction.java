@@ -79,7 +79,7 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer sql = new StringBuffer();
-		sql.append("select c.id,c.status_,c.old_unit_name,bia.name as unit_name,m.name,c.code,c.plate_type,c.plate_no");
+		sql.append("select c.id,c.status_,c.company,bia.name as unit_name,m.name,c.code,c.plate_type,c.plate_no");
 		sql.append(",c.driver,c.charger,c.bs_type,c.register_date,c.origin_no");
 		sql.append(",c.cert_no2,c.cert_no1,c.cert_no3,c.original_value");
 		sql.append(",c.vin ,c.engine_no,c.factory_type,c.factory_model");
@@ -100,7 +100,7 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 				int i = 0;
 				map.put("id", rs[i++]);
 				map.put("status_", rs[i++]); // 状态
-				map.put("old_unit_name", rs[i++]);// 公司
+				map.put("company", rs[i++]);// 公司
 				map.put("unit_name", rs[i++]); // 分公司
 				map.put("motorcade_name", rs[i++]);// 车队
 				map.put("code", rs[i++]); // 自编号
@@ -138,8 +138,8 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 				getText("car.status"), 40).setSortable(true).setValueFormater(
 				new EntityStatusFormater(getBSStatuses1())));
 		// 公司
-		columns.add(new TextColumn4MapKey("c.old_unit_name", "old_unit_name",
-				getText("car.unit"), 70).setSortable(true)
+		columns.add(new TextColumn4MapKey("c.company", "company",
+				getText("car.company"), 40).setSortable(true)
 				.setUseTitleFromLabel(true));
 		// 分公司
 		columns.add(new TextColumn4MapKey("unit_name", "unit_name",

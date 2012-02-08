@@ -122,13 +122,13 @@ public class CarByDriverHistoryAction extends
 				Car fromCar = this.carService.load(toCarId);
 				this.getE().setFromCar(fromCar);
 				this.getE().setFromMotorcadeId(fromCar.getMotorcade().getId());
-				this.getE().setFromUnit(fromCar.getOldUnitName());
+				this.getE().setFromUnit(fromCar.getCompany());
 				this.getE().setToCar(fromCar);
 			} else {
 				Car fromCar = this.carService.load(fromCarId);
 				this.getE().setFromCar(fromCar);
 				this.getE().setFromMotorcadeId(fromCar.getMotorcade().getId());
-				this.getE().setFromUnit(fromCar.getOldUnitName());
+				this.getE().setFromUnit(fromCar.getCompany());
 				this.getE().setToCar(fromCar);
 			}
 			// 设置迁移类型
@@ -156,7 +156,7 @@ public class CarByDriverHistoryAction extends
 				this.getE().setFromClasses(carByDriverHistory.getToClasses());
 				// 设置原单位
 				this.getE().setFromUnit(
-						carByDriverHistory.getToCar().getOldUnitName());
+						carByDriverHistory.getToCar().getCompany());
 			} else {
 				// 执行交回未注销操作后执行公司到公司，注销未有去向，交回未注销取回最新的迁移记录
 				this.getE().setFromCar(carByDriverHistory.getFromCar());
@@ -166,7 +166,7 @@ public class CarByDriverHistoryAction extends
 				this.getE().setFromClasses(carByDriverHistory.getFromClasses());
 				// 设置原单位
 				this.getE().setFromUnit(
-						carByDriverHistory.getFromCar().getOldUnitName());
+						carByDriverHistory.getFromCar().getCompany());
 			}
 		}
 	}
@@ -279,7 +279,7 @@ public class CarByDriverHistoryAction extends
 		Map<String, List<Map<String, String>>> optionItems = this.optionService
 				.findOptionItemByGroupKeys(new String[] {
 
-				OptionConstants.CAR_OLD_UNIT_NAME });
+				OptionConstants.CAR_COMPANY });
 
 		// 状态列表
 		statusesValueList = this.getBSStatuses1();
@@ -287,7 +287,7 @@ public class CarByDriverHistoryAction extends
 		// 迁移类型列表
 		moveTypeValueList = this.getMoveType();
 		// 所属单位列表
-		this.oldUnitList = optionItems.get(OptionConstants.CAR_OLD_UNIT_NAME);
+		this.oldUnitList = optionItems.get(OptionConstants.CAR_COMPANY);
 		OptionItem.insertIfNotExist(oldUnitList, null, getE().getToUnit());
 
 		// 车队列表

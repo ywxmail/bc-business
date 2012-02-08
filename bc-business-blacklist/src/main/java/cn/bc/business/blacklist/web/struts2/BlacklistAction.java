@@ -232,7 +232,7 @@ public class BlacklistAction extends FileEntityAction<Long, Blacklist> {
 			carId = car.getId();
 			motorcadeId = car.getMotorcade().getId();
 			carPlate = car.getPlateType() + car.getPlateNo();
-			unitName = car.getOldUnitName();
+			unitName = car.getCompany();
 			motorcadeName = car.getMotorcade().getName();
 		}
 		json = new Json();

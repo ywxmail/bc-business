@@ -72,7 +72,7 @@ public class SelectCarAction extends
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer sql = new StringBuffer();
 		sql.append("select c.id,c.status_,c.plate_type,c.plate_no,c.register_date");
-		sql.append(",c.motorcade_id,m.name,c.old_unit_name");
+		sql.append(",c.motorcade_id,m.name,c.company");
 		sql.append(" from bs_car c");
 		sql.append(" inner join bs_motorcade m on m.id=c.motorcade_id");
 		sqlObject.setSql(sql.toString());
@@ -92,7 +92,7 @@ public class SelectCarAction extends
 				map.put("register_date", rs[i++]);
 				map.put("motorcade_id", rs[i++]);
 				map.put("motorcade_name", rs[i++]);
-				map.put("old_unit_name", rs[i++]);
+				map.put("company", rs[i++]);
 				return map;
 			}
 		});
@@ -120,8 +120,8 @@ public class SelectCarAction extends
 		columns.add(new TextColumn4MapKey("m.name", "motorcade_name",
 				getText("car.motorcade"),80).setSortable(true)
 				.setUseTitleFromLabel(true));
-		columns.add(new TextColumn4MapKey("c.old_unit_name", "old_unit_name",
-				getText("selectCar.old_unit_name"), 60).setSortable(true)
+		columns.add(new TextColumn4MapKey("c.company", "company",
+				getText("selectCar.company"), 60).setSortable(true)
 				.setUseTitleFromLabel(true));
 		columns.add(new HiddenColumn4MapKey("motorcadeId", "motorcade_id"));
 		columns.add(new HiddenColumn4MapKey("motorcadeName", "motorcade_name"));
