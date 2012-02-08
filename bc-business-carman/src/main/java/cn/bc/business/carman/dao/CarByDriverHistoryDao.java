@@ -38,4 +38,13 @@ public interface CarByDriverHistoryDao extends CrudDao<CarByDriverHistory> {
 	 *            车辆Id
 	 */
 	void updateDriver4Car(Long carId);
+
+	/**
+	 * 更新车辆的所属公司和所属车队信息
+	 * 
+	 * @param carId 车辆Id
+	 * @param motorcadeId 车队Id
+	 * @param unit 公司名
+	 */
+	void updateCar4UnitAndMotorcade(Long carId, String unit, Long motorcadeId);
 }

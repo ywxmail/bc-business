@@ -49,6 +49,8 @@ public class SelectNewnestCarByDriverAction extends ActionSupport {
 				json.put("fromMotorcadeId",
 						carByDriverHistory.getToMotorcadeId());
 				json.put("fromclasses", carByDriverHistory.getToClasses());
+				json.put("fromUnit", carByDriverHistory.getToCar()
+						.getCompany());
 			} else {
 				// 执行交回未注销操作后执行公司到公司，注销未有去向，交回未注销取回最新的迁移记录
 				json.put("fromCarId", carByDriverHistory.getFromCar().getId());
@@ -59,6 +61,8 @@ public class SelectNewnestCarByDriverAction extends ActionSupport {
 				json.put("fromMotorcadeId",
 						carByDriverHistory.getFromMotorcadeId());
 				json.put("fromclasses", carByDriverHistory.getFromClasses());
+				json.put("fromUnit", carByDriverHistory.getFromCar()
+						.getCompany());
 			}
 		}
 		return "json";

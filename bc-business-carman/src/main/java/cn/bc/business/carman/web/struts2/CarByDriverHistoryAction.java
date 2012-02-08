@@ -12,6 +12,7 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
+import cn.bc.business.OptionConstants;
 import cn.bc.business.car.domain.Car;
 import cn.bc.business.car.service.CarService;
 import cn.bc.business.carman.domain.CarByDriverHistory;
@@ -23,6 +24,7 @@ import cn.bc.business.motorcade.service.MotorcadeService;
 import cn.bc.business.web.struts2.FileEntityAction;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.option.domain.OptionItem;
+import cn.bc.option.service.OptionService;
 import cn.bc.web.ui.html.page.ButtonOption;
 import cn.bc.web.ui.html.page.PageOption;
 
@@ -43,9 +45,11 @@ public class CarByDriverHistoryAction extends
 	public Map<String, String> statusesValueList;// 状态列表
 	public Map<String, String> moveTypeValueList;// 迁移类型列表
 	public List<Map<String, String>> motorcadeList; // 可选车队列表
+	public List<Map<String, String>> oldUnitList; // 所属单位列表
 	public CarManService carManService;
 	public CarService carService;
 	public CarByDriverService carByDriverService;
+	private OptionService optionService;
 	public Long carManId;
 	public Long carId;
 	public Long toCarId;
@@ -81,6 +85,11 @@ public class CarByDriverHistoryAction extends
 		this.carByDriverService = carByDriverService;
 	}
 
+	@Autowired
+	public void setOptionService(OptionService optionService) {
+		this.optionService = optionService;
+	}
+
 	@Override
 	public boolean isReadonly() {
 		// 车辆管理/司机管理或系统管理员
@@ -95,11 +104,12 @@ public class CarByDriverHistoryAction extends
 		this.getE().setMoveType(moveType);
 		// 设置司机信息
 		if (carManId != null) {
-			// 填写迁移类型为：车辆到车辆 ,公司到公司，注销未有去向，交回未注销。司机的原车辆信息
+			// 填写迁移类型为：车辆到车辆 ,交回转车，公司到公司，注销未有去向，交回未注销。司机的原车辆信息
 			if (moveType == CarByDriverHistory.MOVETYPE_CLDCL
 					|| moveType == CarByDriverHistory.MOVETYPE_GSDGSYZX
 					|| moveType == CarByDriverHistory.MOVETYPE_ZXWYQX
-					|| moveType == CarByDriverHistory.MOVETYPE_JHWZX) {
+					|| moveType == CarByDriverHistory.MOVETYPE_JHWZX
+					|| moveType == CarByDriverHistory.MOVETYPE_JHZC) {
 				setCarInfoByCarManId();
 
 			}
@@ -109,15 +119,17 @@ public class CarByDriverHistoryAction extends
 		if (toCarId != null || fromCarId != null) {
 			// 如果车辆Id不为空，直接转到转车队页面
 			if (toCarId != null) {
-				// 如果该车辆为执行新入职，由外公司迁入，车辆到车辆操作后则取迁往车辆的Id加载车辆信息[车辆转车辆操作的优先取取迁往车辆的Id]
 				Car fromCar = this.carService.load(toCarId);
 				this.getE().setFromCar(fromCar);
 				this.getE().setFromMotorcadeId(fromCar.getMotorcade().getId());
+				this.getE().setFromUnit(fromCar.getCompany());
+				this.getE().setToCar(fromCar);
 			} else {
-				// 如果该车辆为执行公司到公司，交回未注销，注销未有去向操作后则取迁往车辆的Id加载车辆信息
 				Car fromCar = this.carService.load(fromCarId);
 				this.getE().setFromCar(fromCar);
 				this.getE().setFromMotorcadeId(fromCar.getMotorcade().getId());
+				this.getE().setFromUnit(fromCar.getCompany());
+				this.getE().setToCar(fromCar);
 			}
 			// 设置迁移类型
 			this.getE().setMoveType(CarByDriverHistory.MOVETYPE_ZCD);
@@ -142,6 +154,9 @@ public class CarByDriverHistoryAction extends
 						carByDriverHistory.getToMotorcadeId());
 				// 设置原班次
 				this.getE().setFromClasses(carByDriverHistory.getToClasses());
+				// 设置原单位
+				this.getE().setFromUnit(
+						carByDriverHistory.getToCar().getCompany());
 			} else {
 				// 执行交回未注销操作后执行公司到公司，注销未有去向，交回未注销取回最新的迁移记录
 				this.getE().setFromCar(carByDriverHistory.getFromCar());
@@ -149,6 +164,9 @@ public class CarByDriverHistoryAction extends
 						carByDriverHistory.getFromMotorcadeId());
 				// 设置原班次
 				this.getE().setFromClasses(carByDriverHistory.getFromClasses());
+				// 设置原单位
+				this.getE().setFromUnit(
+						carByDriverHistory.getFromCar().getCompany());
 			}
 		}
 	}
@@ -171,6 +189,8 @@ public class CarByDriverHistoryAction extends
 			return "zhuanCheDui";
 		} else if (moveType == CarByDriverHistory.MOVETYPE_DINGBAN) {
 			return "dingban";
+		} else if (moveType == CarByDriverHistory.MOVETYPE_JHZC) {
+			return "jiaohuizhuanche";
 		} else {
 			return null;
 		}
@@ -229,6 +249,8 @@ public class CarByDriverHistoryAction extends
 				getText("carByDriverHistory.moveType.cheduidaochedui"));
 		type.put(String.valueOf(CarByDriverHistory.MOVETYPE_DINGBAN),
 				getText("carByDriverHistory.moveType.dingban"));
+		type.put(String.valueOf(CarByDriverHistory.MOVETYPE_JHZC),
+				getText("carByDriverHistory.moveType.jiaohuizhuanche"));
 		return type;
 	}
 
@@ -253,12 +275,20 @@ public class CarByDriverHistoryAction extends
 	@Override
 	protected void initForm(boolean editable) {
 		super.initForm(editable);
+		// 批量加载可选项列表
+		Map<String, List<Map<String, String>>> optionItems = this.optionService
+				.findOptionItemByGroupKeys(new String[] {
+
+				OptionConstants.CAR_COMPANY });
 
 		// 状态列表
 		statusesValueList = this.getBSStatuses1();
 
 		// 迁移类型列表
 		moveTypeValueList = this.getMoveType();
+		// 所属单位列表
+		this.oldUnitList = optionItems.get(OptionConstants.CAR_COMPANY);
+		OptionItem.insertIfNotExist(oldUnitList, null, getE().getToUnit());
 
 		// 车队列表
 		this.motorcadeList = this.motorcadeService.findEnabled4Option();
@@ -301,16 +331,26 @@ public class CarByDriverHistoryAction extends
 
 	@Override
 	protected PageOption buildFormPageOption(boolean editable) {
+		// 设置批量处理顶班车辆的表单
 		if (this.getE().getMoveType() == CarByDriverHistory.MOVETYPE_DINGBAN) {
 			return super.buildFormPageOption(editable).setWidth(430)
-					.setMinWidth(320).setHeight(550).setMinHeight(200)
+					.setMinWidth(320).setHeight(470).setMinHeight(200)
+					.setModal(true);
+			// 设置迁移类型为交回未注销的表单高度
+		} else if (this.getE().getMoveType() == CarByDriverHistory.MOVETYPE_JHWZX) {
+			return super.buildFormPageOption(editable).setWidth(745)
+					.setMinWidth(320).setHeight(310).setMinHeight(200)
+					.setModal(true);
+			// 设置迁移类型为注销未有去向的表单高度
+		} else if (this.getE().getMoveType() == CarByDriverHistory.MOVETYPE_ZXWYQX) {
+			return super.buildFormPageOption(editable).setWidth(745)
+					.setMinWidth(320).setHeight(340).setMinHeight(200)
 					.setModal(true);
 		} else {
-			return super.buildFormPageOption(editable).setWidth(735)
-					.setMinWidth(320).setHeight(430).setMinHeight(200)
+			return super.buildFormPageOption(editable).setWidth(745)
+					.setMinWidth(320).setHeight(380).setMinHeight(200)
 					.setModal(true);
 		}
 
 	}
-
 }

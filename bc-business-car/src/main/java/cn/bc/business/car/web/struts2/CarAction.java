@@ -57,7 +57,7 @@ public class CarAction extends FileEntityAction<Long, Car> {
 	public List<Map<String, String>> fuelTypeList; // 可选燃料类型列表
 	public List<Map<String, String>> colorTypeList; // 可选颜色类型列表
 	public List<Map<String, String>> taximeterFactoryTypeList; // 可选计价器制造厂列表
-	public List<Map<String, String>> oldUnitList; // 所属单位列表
+	public List<Map<String, String>> companyList; // 所属公司列表（宝城、广发）
 	public List<Map<String, String>> logoutReasonList; // 注销原因列表
 	public List<Map<String, String>> carModelList; // 车型配置列表
 	public Map<String, String> statusesValue;
@@ -163,7 +163,7 @@ public class CarAction extends FileEntityAction<Long, Car> {
 						OptionConstants.CAR_FUEL_TYPE,
 						OptionConstants.CAR_COLOR,
 						OptionConstants.CAR_TAXIMETERFACTORY,
-						OptionConstants.CAR_OLD_UNIT_NAME,
+						OptionConstants.CAR_COMPANY,
 						OptionConstants.CAR_LOGOUT_REASON });
 
 		// 加载可选营运性质列表
@@ -187,8 +187,8 @@ public class CarAction extends FileEntityAction<Long, Car> {
 				.get(OptionConstants.CAR_TAXIMETERFACTORY);
 
 		// 所属单位列表
-		this.oldUnitList = optionItems.get(OptionConstants.CAR_OLD_UNIT_NAME);
-		OptionItem.insertIfNotExist(oldUnitList, null, getE().getOldUnitName());
+		this.companyList = optionItems.get(OptionConstants.CAR_COMPANY);
+		OptionItem.insertIfNotExist(companyList, null, getE().getCompany());
 
 		// 注销原因列表
 		this.logoutReasonList = optionItems
