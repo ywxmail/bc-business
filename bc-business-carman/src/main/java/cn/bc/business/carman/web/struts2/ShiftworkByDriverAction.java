@@ -11,7 +11,9 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
+import cn.bc.business.car.domain.Car;
 import cn.bc.business.car.service.CarService;
+import cn.bc.business.carman.domain.CarByDriver;
 import cn.bc.business.carman.domain.CarByDriverHistory;
 import cn.bc.business.carman.service.CarByDriverHistoryService;
 import cn.bc.business.carman.service.CarByDriverService;
@@ -87,6 +89,12 @@ public class ShiftworkByDriverAction extends
 		// List<CarByDriver> toSaves = new ArrayList<CarByDriver>();
 		this.beforeSave(this.getE());
 		this.getE().setFromCar(null);
+		// 设置迁往主挂车的信息
+		this.getE().setToClasses(CarByDriver.TYPE_ZHUGUA);
+		Car toCar = new Car();
+		toCar = this.carService.load(this.getE().getToCar().getId());
+		this.getE().setToMotorcadeId(toCar.getMotorcade().getId());
+		this.getE().setToUnit(toCar.getOldUnitName());
 
 		// 将顶班车辆组装成字符串赋值给shiftwork字段：plate1,id1;plate2,id2;...
 		String shiftwork = this.getE().getShiftwork();
