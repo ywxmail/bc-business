@@ -69,9 +69,13 @@ public class BlacklistsAction extends ViewAction<Map<String, Object>> {
 
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer sql = new StringBuffer();
-		sql.append("select b.id,b.status_,b.code,cm.name drivers,m.name motorcade_name,c.plate_type,c.plate_no,b.type_,b.subject,b.lock_date,l.name locker");
-		sql.append(",b.unlock_date,u.name unlocker,b.car_id,b.driver_id,b.locker_id from BS_BLACKLIST b left join BS_CARMAN cm on cm.id=b.driver_id ");
+		sql.append("select b.id,b.status_,b.file_date,b.code,cm.name drivers,b.company,unit.name,m.name motorcade_name");
+		sql.append(",c.plate_type,c.plate_no,b.type_,b.subject,b.lock_date,l.name locker");
+		sql.append(",b.unlock_date,u.name unlocker,b.car_id,b.driver_id,b.locker_id");
+		sql.append(" from BS_BLACKLIST b");
+		sql.append(" left join BS_CARMAN cm on cm.id=b.driver_id");
 		sql.append(" left join BS_MOTORCADE m on m.id=b.motorcade_id");
+		sql.append(" inner join bc_identity_actor unit on unit.id=m.unit_id");
 		sql.append(" left join BS_CAR c on c.id=b.car_id");
 		sql.append(" inner join BC_IDENTITY_ACTOR l on l.id=b.locker_id");
 		sql.append(" left join BC_IDENTITY_ACTOR u on u.id=b.unlocker_id");
@@ -87,8 +91,11 @@ public class BlacklistsAction extends ViewAction<Map<String, Object>> {
 				int i = 0;
 				map.put("id", rs[i++]);
 				map.put("status_", rs[i++]);
+				map.put("file_date", rs[i++]);
 				map.put("code", rs[i++]);
 				map.put("drivers", rs[i++]);
+				map.put("company", rs[i++]);
+				map.put("unit_name", rs[i++]);
 				map.put("motorcade_name", rs[i++]);
 				map.put("plate_type", rs[i++]);
 				map.put("plate_no", rs[i++]);
@@ -119,16 +126,17 @@ public class BlacklistsAction extends ViewAction<Map<String, Object>> {
 		List<Column> columns = new ArrayList<Column>();
 		columns.add(new IdColumn4MapKey("b.id", "id"));
 		columns.add(new TextColumn4MapKey("b.status_", "status_",
-				getText("blacklist.status"), 60).setSortable(true)
+				getText("blacklist.status"), 40).setSortable(true)
 				.setValueFormater(new EntityStatusFormater(getBLStatuses())));
-		columns.add(new TextColumn4MapKey("b.code", "code",
-				getText("blacklist.code"), 160).setSortable(true));
+		columns.add(new TextColumn4MapKey("b.file_date", "file_date",
+				getText("label.fileDate"), 85).setSortable(true)
+				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
 		if (carManId == null) {
 			// columns.add(new TextColumn4MapKey("cm.name", "drivers",
 			// getText("blacklist.driver"), 60).setSortable(true));
 
 			columns.add(new TextColumn4MapKey("cm.name", "drivers",
-					getText("blacklist.driver"), 100)
+					getText("blacklist.driver"), 60)
 					.setValueFormater(new LinkFormater4Id(this.getContextPath()
 							+ "/bc-business/carMan/edit?id={0}", "drivers") {
 						@SuppressWarnings("unchecked")
@@ -150,14 +158,24 @@ public class BlacklistsAction extends ViewAction<Map<String, Object>> {
 					}));
 
 		}
+		// 公司
+		columns.add(new TextColumn4MapKey("b.company", "company",
+				getText("label.carCompany"), 40).setSortable(true)
+				.setUseTitleFromLabel(true));
+		// 分公司
+		columns.add(new TextColumn4MapKey("unit.name", "unit_name",
+				getText("label.carUnit"), 70).setSortable(true)
+				.setUseTitleFromLabel(true));
+		// 车队
 		columns.add(new TextColumn4MapKey("m.name", "motorcade_name",
 				getText("blacklist.motorcade.name"), 60).setSortable(true));
+		
 		if (carId == null) {
 			// columns.add(new TextColumn4MapKey("c.plate_no", "plate",
 			// getText("blacklist.car.plateNo"), 80).setSortable(true));
 
 			columns.add(new TextColumn4MapKey("c.plate_no", "plate",
-					getText("blacklist.car.plateNo"), 100)
+					getText("blacklist.car.plateNo"), 80)
 					.setValueFormater(new LinkFormater4Id(this.getContextPath()
 							+ "/bc-business/car/edit?id={0}", "car") {
 						@SuppressWarnings("unchecked")
@@ -197,6 +215,8 @@ public class BlacklistsAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("u.name", "unlocker",
 				getText("blacklist.unlocker.name"), 80).setSortable(true)
 				.setUseTitleFromLabel(true));
+		columns.add(new TextColumn4MapKey("b.code", "code",
+				getText("blacklist.code"), 160).setSortable(true));
 
 		return columns;
 	}
@@ -220,7 +240,7 @@ public class BlacklistsAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected String getGridRowLabelExpression() {
-		return "['plate']";
+		return "'黑名单 ' + ['plate']";
 	}
 
 	@Override
