@@ -55,6 +55,7 @@ public class CaseTrafficAction extends FileEntityAction<Long, Case4InfractTraffi
 	private Long 							carId;
 	private Long 							carManId;
 	private	Long							syncId;			//同步ID
+	private String							syncIds;		//多个同步ID;
 	public  boolean 						isMoreCar;		//是否存在多个车
 	public  boolean 						isMoreCarMan;	//是否存在多个司机
 	public  boolean 						isNullCar;		//此司机现在没有驾驶任何车辆
@@ -81,6 +82,7 @@ public class CaseTrafficAction extends FileEntityAction<Long, Case4InfractTraffi
 	public 	Map<String,String> 				statusesValue;
 	public	Map<String,String>				sourcesValue;
 	private Map<String, List<Map<String, String>>> 			allList;
+	public 	String json;
 
 	public Long getCarId() {
 		return carId;
@@ -288,7 +290,7 @@ public class CaseTrafficAction extends FileEntityAction<Long, Case4InfractTraffi
 	/** 根据车牌号查找carId*/
 	public void findCarId(String carPlateNo) {
 		if(carPlateNo.length() > 0){ //判断车牌号是否为空
-			Long tempCarId = this.carService.findcarInfoByCarPlateNo(carPlateNo);
+			Long tempCarId = this.carService.findcarIdByCarPlateNo(carPlateNo);
 			this.carId = tempCarId;
 		}
 	}
@@ -336,7 +338,6 @@ public class CaseTrafficAction extends FileEntityAction<Long, Case4InfractTraffi
 		}else{
 			this.getCrudService().save(e);
 		}
-
 		
 		return "saveSuccess";
 	}
@@ -350,6 +351,31 @@ public class CaseTrafficAction extends FileEntityAction<Long, Case4InfractTraffi
 		// 表单可选项的加载
 		initSelects();
 	}
+	
+	
+	// ========批量生成交通违法代码开始========
+	public String getSyncIds() {
+		return syncIds;
+	}
+
+	public void setSyncIds(String syncIds) {
+		this.syncIds = syncIds;
+	}
+
+	public String doPatchSave() throws Exception {
+		List<Case4InfractTraffic> traffics = this.caseTrafficService.doPatchSave(syncIds);
+		Json json = new Json();
+		json.put("msg", getText("runcase.doPatchSave.success")+" 共生成 "+traffics.size()+" 条交通违章信息");
+		this.json = json.toString();
+		return "json";
+	}
+	
+	
+	// ========批量生成交通违法代码结束========
+	
+	
+	
+	
 	
 /*
  *  业务变更注释
@@ -385,7 +411,6 @@ public class CaseTrafficAction extends FileEntityAction<Long, Case4InfractTraffi
 	
 */
 	
-	public String json;
 	public String selectCarMansInfo() {
 		List<CarMan> drivers = this.carManService.selectAllCarManByCarId(carId);
 		JsonArray jsons = new JsonArray();

@@ -86,6 +86,7 @@ public class FindInfoByCarAction extends ActionSupport {
 					first.get("carPlateType") + "." + first.get("carPlateNo"));
 			car.put("registerDate", getDateToString(first.get("carRegisterDate")));
 			car.put("bsType", first.get("carBsType"));
+			car.put("company", first.get("carCompany"));
 
 			
 			//营运司机信息
@@ -139,7 +140,7 @@ public class FindInfoByCarAction extends ActionSupport {
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer sql = new StringBuffer();
 		sql.append("select c.id carId,c.status_ carStatus,c.plate_type carPlateType,c.plate_no carPlateNo,c.register_date carRegisterDate,c.bs_type carBsType");
-		sql.append(",c.motorcade_id motorcadeId,m.name motorcadeName");
+		sql.append(",c.company carCompany,c.motorcade_id motorcadeId,m.name motorcadeName");
 		sql.append(",cd.classes driverClasses,cd.driver_id driverId,d.name driverName,d.sex driverSex,d.cert_fwzg driverCert4FWZG");
 		sql.append(",d.cert_identity driverCert4IDENTITY,d.origin driverOrigin,d.house_type driverHouseType,d.birthdate driverBirthDate");
 		sql.append(" from bs_car c");
@@ -162,6 +163,7 @@ public class FindInfoByCarAction extends ActionSupport {
 				map.put("carPlateNo", rs[i++]);
 				map.put("carRegisterDate", rs[i++]);
 				map.put("carBsType", rs[i++]);
+				map.put("carCompany", rs[i++]);
 				map.put("motorcadeId", rs[i++]);
 				map.put("motorcadeName", rs[i++]);
 				map.put("driverClasses", rs[i++]);

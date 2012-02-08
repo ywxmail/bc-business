@@ -85,7 +85,7 @@ public class CaseAccidentsAction extends ViewAction<Map<String, Object>> {
 		sql.append(",c.origin ,c.duty,c.is_inner_fix");
 		sql.append(",b.desc_ ,c.car_hurt,c.actual_loss");
 		sql.append(",c.receiver_name,c.insurance_company");
-		sql.append(",c.is_deliver,c.is_claim,c.is_pay,a.name as unitname");
+		sql.append(",c.is_deliver,c.is_claim,c.is_pay,a.name as unitname,b.company");
 		sql.append(",b.motorcade_id,b.car_id,b.driver_id");
 		sql.append(" from bs_case_accident c");
 		sql.append(" inner join bs_case_base b on b.id=c.id");
@@ -135,6 +135,7 @@ public class CaseAccidentsAction extends ViewAction<Map<String, Object>> {
 				map.put("is_claim", rs[i++]);// 赔付
 				map.put("is_pay", rs[i++]);// 司机受款
 				map.put("unitname", rs[i++]);// 分公司
+				map.put("company", rs[i++]);// 公司
 				map.put("motorcade_id", rs[i++]);// 车队ID
 				map.put("carId", rs[i++]);
 				map.put("driverId", rs[i++]);
@@ -155,8 +156,12 @@ public class CaseAccidentsAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("b.happen_date", "happen_date",
 				getText("runcase.happenDate"), 125).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd hh:mm")));
+		// 公司
+		columns.add(new TextColumn4MapKey("b.company", "company",
+				getText("runcase.company"), 40).setSortable(true)
+				.setUseTitleFromLabel(true));
 		// 分公司
-		columns.add(new TextColumn4MapKey("unitname", "unitname",
+		columns.add(new TextColumn4MapKey("a.name", "unitname",
 				getText("runcase.unitName"), 65).setSortable(true)
 				.setUseTitleFromLabel(true));
 		// 车队

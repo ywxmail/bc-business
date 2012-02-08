@@ -77,14 +77,14 @@ public class CarServiceImpl extends DefaultCrudService<Car> implements
 	}
 
 	/**
-	 * 根据车牌号查找车牌号
+	 * 根据车牌号查找车辆id
 	 * @parma carPlateNo 
 	 * @return Long
 	 */
-	public Long findcarInfoByCarPlateNo(String carPlateNo) {
+	public Long findcarIdByCarPlateNo(String carPlateNo) {
 		Long carId = 0L;
 		if(carPlateNo.length() > 0){
-			carId = this.carDao.findcarInfoByCarPlateNo(carPlateNo);
+			carId = this.carDao.findcarIdByCarPlateNo(carPlateNo);
 		}
 		return carId;
 	}

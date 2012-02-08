@@ -40,11 +40,11 @@ public interface CarService extends CrudService<Car> {
 	List<Car> selectAllCarByCarManId(Long id);
 
 	/**
-	 * 根据车牌号查找车牌号
+	 * 根据车牌号查找车辆id
 	 * @parma carPlateNo 
 	 * @return Long
 	 */
-	Long findcarInfoByCarPlateNo(String carPlateNo);
+	Long findcarIdByCarPlateNo(String carPlateNo);
 
 	/**
 	 * 通过自编号生成原车号

@@ -320,11 +320,11 @@ public class CarDaoImpl extends HibernateCrudJpaDao<Car> implements CarDao {
 	}
 
 	/**
-	 * 根据车牌号查找车牌号
+	 * 根据车牌号查找车辆id
 	 * @parma carPlateNo 
 	 * @return Long
 	 */
-	public Long findcarInfoByCarPlateNo(String carPlateNo) {
+	public Long findcarIdByCarPlateNo(String carPlateNo) {
 		Long carId = null;
 		String sql = "select c.Id from BS_CAR c where c.PLATE_NO='"+carPlateNo+"'";
 		try {

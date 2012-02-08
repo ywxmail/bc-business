@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.json.JSONArray;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -31,6 +30,7 @@ import cn.bc.db.jdbc.SqlObject;
 import cn.bc.identity.domain.Actor;
 import cn.bc.identity.service.ActorService;
 import cn.bc.identity.web.SystemContext;
+import cn.bc.option.domain.OptionItem;
 import cn.bc.web.formater.AbstractFormater;
 import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.formater.EntityStatusFormater;
@@ -79,7 +79,7 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer sql = new StringBuffer();
-		sql.append("select c.id,c.status_,c.old_unit_name,bia.name as unit_name,m.name,c.code,c.plate_type,c.plate_no");
+		sql.append("select c.id,c.status_,c.company,bia.name as unit_name,m.name,c.code,c.plate_type,c.plate_no");
 		sql.append(",c.driver,c.charger,c.bs_type,c.register_date,c.origin_no");
 		sql.append(",c.cert_no2,c.cert_no1,c.cert_no3,c.original_value");
 		sql.append(",c.vin ,c.engine_no,c.factory_type,c.factory_model");
@@ -100,7 +100,7 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 				int i = 0;
 				map.put("id", rs[i++]);
 				map.put("status_", rs[i++]); // 状态
-				map.put("old_unit_name", rs[i++]);// 公司
+				map.put("company", rs[i++]);// 公司
 				map.put("unit_name", rs[i++]); // 分公司
 				map.put("motorcade_name", rs[i++]);// 车队
 				map.put("code", rs[i++]); // 自编号
@@ -138,12 +138,12 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 				getText("car.status"), 40).setSortable(true).setValueFormater(
 				new EntityStatusFormater(getBSStatuses1())));
 		// 公司
-		columns.add(new TextColumn4MapKey("c.old_unit_name", "old_unit_name",
-				getText("car.unit"), 70).setSortable(true)
+		columns.add(new TextColumn4MapKey("c.company", "company",
+				getText("label.carCompany"), 40).setSortable(true)
 				.setUseTitleFromLabel(true));
 		// 分公司
-		columns.add(new TextColumn4MapKey("unit_name", "unit_name",
-				getText("car.unitname"), 70).setSortable(true)
+		columns.add(new TextColumn4MapKey("bia.name", "unit_name",
+				getText("label.carUnit"), 70).setSortable(true)
 				.setUseTitleFromLabel(true));
 		// 车队
 		columns.add(new TextColumn4MapKey("m.name", "motorcade_name",
@@ -360,25 +360,14 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected void initConditionsFrom() throws Exception {
-		// 可选车队列表
-		motorcades = new JSONArray();
-		JSONObject json;
-		for (Map<String, String> map : this.motorcadeService.find4Option(null)) {
-			json = new JSONObject();
-			json.put("label", map.get("value"));
-			json.put("value", map.get("key"));
-			motorcades.put(json);
-		}
-
 		// 可选分公司列表
-		units = new JSONArray();
-		for (Map<String, String> map : this.actorService.find4option(
-				new Integer[] { Actor.TYPE_UNIT }, (Integer[]) null)) {
-			json = new JSONObject();
-			json.put("label", map.get("name"));
-			json.put("value", map.get("id"));
-			units.put(json);
-		}
+		units = OptionItem.toLabelValues(this.actorService.find4option(
+				new Integer[] { Actor.TYPE_UNIT }, (Integer[]) null), "name",
+				"id");
+
+		// 可选车队列表
+		motorcades = OptionItem.toLabelValues(this.motorcadeService
+				.find4Option(null));
 	}
 
 	// ==高级搜索代码结束==

@@ -18,6 +18,7 @@ import cn.bc.core.query.condition.Condition;
 import cn.bc.core.query.condition.Direction;
 import cn.bc.core.query.condition.impl.EqualsCondition;
 import cn.bc.core.query.condition.impl.InCondition;
+import cn.bc.core.query.condition.impl.LikeCondition;
 import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.core.util.StringUtils;
 import cn.bc.db.jdbc.RowMapper;
@@ -54,13 +55,24 @@ public class SelectCarAction extends
 	}
 
 	@Override
+	protected LikeCondition getGridSearchCondition4OneField(String field,
+			String value) {
+		if (field.indexOf("plate_no") != -1) {
+			return new LikeCondition(field, value != null ? value.toUpperCase()
+					: value);
+		} else {
+			return super.getGridSearchCondition4OneField(field, value);
+		}
+	}
+
+	@Override
 	protected SqlObject<Map<String, Object>> getSqlObject() {
 		SqlObject<Map<String, Object>> sqlObject = new SqlObject<Map<String, Object>>();
 
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer sql = new StringBuffer();
 		sql.append("select c.id,c.status_,c.plate_type,c.plate_no,c.register_date");
-		sql.append(",c.motorcade_id,m.name,c.old_unit_name");
+		sql.append(",c.motorcade_id,m.name,c.company");
 		sql.append(" from bs_car c");
 		sql.append(" inner join bs_motorcade m on m.id=c.motorcade_id");
 		sqlObject.setSql(sql.toString());
@@ -80,7 +92,7 @@ public class SelectCarAction extends
 				map.put("register_date", rs[i++]);
 				map.put("motorcade_id", rs[i++]);
 				map.put("motorcade_name", rs[i++]);
-				map.put("old_unit_name", rs[i++]);
+				map.put("company", rs[i++]);
 				return map;
 			}
 		});
@@ -108,8 +120,8 @@ public class SelectCarAction extends
 		columns.add(new TextColumn4MapKey("m.name", "motorcade_name",
 				getText("car.motorcade"),80).setSortable(true)
 				.setUseTitleFromLabel(true));
-		columns.add(new TextColumn4MapKey("c.old_unit_name", "old_unit_name",
-				getText("selectCar.old_unit_name"), 60).setSortable(true)
+		columns.add(new TextColumn4MapKey("c.company", "company",
+				getText("selectCar.company"), 60).setSortable(true)
 				.setUseTitleFromLabel(true));
 		columns.add(new HiddenColumn4MapKey("motorcadeId", "motorcade_id"));
 		columns.add(new HiddenColumn4MapKey("motorcadeName", "motorcade_name"));

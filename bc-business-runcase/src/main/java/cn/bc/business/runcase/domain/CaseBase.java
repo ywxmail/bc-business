@@ -61,6 +61,7 @@ public class CaseBase extends RichFileEntityImpl {
 	private String closerName;// 结案人姓名
 	private String description;// 备注、详细内容
 
+	private String company;// 所属公司:宝城、广发
 	private Long motorcadeId;// 车队ID
 	private String motorcadeName;// 车队名称
 	private Long carId;// 车辆ID
@@ -71,6 +72,14 @@ public class CaseBase extends RichFileEntityImpl {
 
 	private String syncUid;// 旧数据同步的UID
 	private Long syncId;// 数据同步ID
+
+	public String getCompany() {
+		return company;
+	}
+
+	public void setCompany(String company) {
+		this.company = company;
+	}
 
 	@Column(name = "CASE_NO")
 	public String getCaseNo() {
