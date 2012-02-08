@@ -138,7 +138,10 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("c.cert_fwzg", "cert_fwzg",
 				getText("carMan.cert4FWZG"), 80));
 		columns.add(new TextColumn4MapKey("c.phone", "phone1",
-				getText("carMan.phone"), 100).setSortable(false)
+				getText("carMan.phone1"), 100).setSortable(false)
+				.setUseTitleFromLabel(true));
+		columns.add(new TextColumn4MapKey("c.phone1", "phone2",
+				getText("carMan.phone2"), 100).setSortable(false)
 				.setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("c.origin", "origin",
 				getText("carMan.origin"), 100).setSortable(true)
