@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.json.JSONArray;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -31,6 +30,7 @@ import cn.bc.db.jdbc.SqlObject;
 import cn.bc.identity.domain.Actor;
 import cn.bc.identity.service.ActorService;
 import cn.bc.identity.web.SystemContext;
+import cn.bc.option.domain.OptionItem;
 import cn.bc.web.formater.AbstractFormater;
 import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.formater.EntityStatusFormater;
@@ -360,25 +360,14 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected void initConditionsFrom() throws Exception {
-		// 可选车队列表
-		motorcades = new JSONArray();
-		JSONObject json;
-		for (Map<String, String> map : this.motorcadeService.find4Option(null)) {
-			json = new JSONObject();
-			json.put("label", map.get("value"));
-			json.put("value", map.get("key"));
-			motorcades.put(json);
-		}
-
 		// 可选分公司列表
-		units = new JSONArray();
-		for (Map<String, String> map : this.actorService.find4option(
-				new Integer[] { Actor.TYPE_UNIT }, (Integer[]) null)) {
-			json = new JSONObject();
-			json.put("label", map.get("name"));
-			json.put("value", map.get("id"));
-			units.put(json);
-		}
+		units = OptionItem.toLabelValues(this.actorService.find4option(
+				new Integer[] { Actor.TYPE_UNIT }, (Integer[]) null), "name",
+				"id");
+
+		// 可选车队列表
+		motorcades = OptionItem.toLabelValues(this.motorcadeService
+				.find4Option(null));
 	}
 
 	// ==高级搜索代码结束==

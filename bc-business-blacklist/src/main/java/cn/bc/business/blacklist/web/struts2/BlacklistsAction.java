@@ -9,11 +9,15 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.json.JSONArray;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
 import cn.bc.business.blacklist.domain.Blacklist;
+import cn.bc.business.motorcade.service.MotorcadeService;
 import cn.bc.business.web.struts2.ViewAction;
 import cn.bc.core.query.condition.Condition;
 import cn.bc.core.query.condition.ConditionUtils;
@@ -24,7 +28,10 @@ import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.core.util.StringUtils;
 import cn.bc.db.jdbc.RowMapper;
 import cn.bc.db.jdbc.SqlObject;
+import cn.bc.identity.domain.Actor;
+import cn.bc.identity.service.ActorService;
 import cn.bc.identity.web.SystemContext;
+import cn.bc.option.domain.OptionItem;
 import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.formater.EntityStatusFormater;
 import cn.bc.web.formater.LinkFormater4Id;
@@ -316,4 +323,40 @@ public class BlacklistsAction extends ViewAction<Map<String, Object>> {
 		return statuses;
 	}
 
+	// ==高级搜索代码开始==
+	@Override
+	protected boolean useAdvanceSearch() {
+		return true;
+	}
+
+	private MotorcadeService motorcadeService;
+	private ActorService actorService;
+
+	@Autowired
+	public void setActorService(
+			@Qualifier("actorService") ActorService actorService) {
+		this.actorService = actorService;
+	}
+
+	@Autowired
+	public void setMotorcadeService(MotorcadeService motorcadeService) {
+		this.motorcadeService = motorcadeService;
+	}
+
+	public JSONArray motorcades;// 车队的下拉列表信息
+	public JSONArray units;// 分公司的下拉列表信息
+
+	@Override
+	protected void initConditionsFrom() throws Exception {
+		// 可选分公司列表
+		units = OptionItem.toLabelValues(this.actorService.find4option(
+				new Integer[] { Actor.TYPE_UNIT }, (Integer[]) null), "name",
+				"id");
+
+		// 可选车队列表
+		motorcades = OptionItem.toLabelValues(this.motorcadeService
+				.find4Option(null));
+	}
+
+	// ==高级搜索代码结束==
 }
