@@ -299,7 +299,7 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 	/** 根据车牌号查找carId*/
 	public void findCarId(String carPlateNo) {
 		if(carPlateNo.length() > 0){ //判断车牌号是否为空
-			Long tempCarId = this.carService.findcarInfoByCarPlateNo(carPlateNo);
+			Long tempCarId = this.carService.findcarIdByCarPlateNo(carPlateNo);
 			this.carId = tempCarId;
 		}
 	}

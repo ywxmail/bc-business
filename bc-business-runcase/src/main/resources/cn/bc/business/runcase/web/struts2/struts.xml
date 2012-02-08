@@ -16,6 +16,8 @@
 		<action name="caseTraffic/createFromJiaoWei" class="caseTrafficAction" method="create">
 			<result name="form" >/bc-business/caseTraffic/form.jsp</result>
 		</action>
+		<!-- 批量生成 -->
+		<action name="caseTraffic/doPatchSave" class="caseTrafficAction" method="doPatchSave"/>
 	</package>
 	
 	<!-- 营运违章 -->
