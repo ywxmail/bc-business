@@ -50,6 +50,8 @@ public class CarByDriverHistory extends FileEntityImpl {
 	public static final int MOVETYPE_ZCD = 6;
 	/** 营运类型：顶班 ：处理顶班司机的迁移记录 */
 	public static final int MOVETYPE_DINGBAN = 7;
+	/** 营运类型：交回后转车 ：交证日期与转新车日期之间有大于一日间隔 */
+	public static final int MOVETYPE_JHZC = 8;
 
 	private CarMan driver;// 营运的司机
 	private Car fromCar;// 原车辆
