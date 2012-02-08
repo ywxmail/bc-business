@@ -30,4 +30,8 @@ public class InsuranceTypeServiceImpl extends DefaultCrudService<InsuranceType>
 		return this.insuranceTypeDao.findEnabled4Option();
 	}
 
+	public List<InsuranceType> findTemplateWithPlant(Long pid) {
+		return this.insuranceTypeDao.findTemplateWithPlant(pid);
+	}
+
 }

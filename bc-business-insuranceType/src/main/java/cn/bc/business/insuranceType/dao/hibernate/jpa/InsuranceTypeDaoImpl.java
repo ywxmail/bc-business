@@ -7,6 +7,7 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import cn.bc.BCConstants;
 import cn.bc.business.insuranceType.dao.InsuranceTypeDao;
 import cn.bc.business.insuranceType.domain.InsuranceType;
 import cn.bc.db.jdbc.RowMapper;
@@ -35,6 +36,12 @@ public class InsuranceTypeDaoImpl extends HibernateCrudJpaDao<InsuranceType>
 					}
 				});
 		
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<InsuranceType> findTemplateWithPlant(Long pid) {
+		String hql="from InsuranceType where pid=? and status=? and type=?";
+		return this.getJpaTemplate().find(hql,new Object[] { pid,new Integer(BCConstants.STATUS_ENABLED),new Integer(InsuranceType.TYPE_PLANT)});
 	}
 
 }

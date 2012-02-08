@@ -22,7 +22,6 @@ import cn.bc.db.jdbc.RowMapper;
 import cn.bc.db.jdbc.SqlObject;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.web.formater.EntityStatusFormater;
-import cn.bc.web.formater.NubmerFormater;
 import cn.bc.web.ui.html.grid.Column;
 import cn.bc.web.ui.html.grid.IdColumn4MapKey;
 import cn.bc.web.ui.html.grid.TextColumn4MapKey;
@@ -138,7 +137,7 @@ public class InsuranceTypesAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected PageOption getHtmlPageOption() {
-		return super.getHtmlPageOption().setWidth(500).setMinWidth(300)
+		return super.getHtmlPageOption().setWidth(620).setMinWidth(300)
 				.setHeight(400).setMinHeight(300);
 	}
 
