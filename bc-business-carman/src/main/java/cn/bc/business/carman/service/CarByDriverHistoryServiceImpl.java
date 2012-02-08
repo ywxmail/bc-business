@@ -142,6 +142,7 @@ public class CarByDriverHistoryServiceImpl extends
 	 */
 	public void saveShiftwork(CarByDriverHistory entity, Long[] carIds) {
 		// 保存迁移记录
+
 		this.carByDriverHistoryDao.save(entity);
 
 		// 保存营运班次信息

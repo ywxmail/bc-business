@@ -76,7 +76,7 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 		sql.append("select d.id,m.phone,m.name,nc.plate_type newPlateType,nc.plate_no newPlateNo,d.to_classes");
 		sql.append(",nm.name newMotoreade,d.to_unit,oc.plate_type oldPlateType,oc.plate_no oldPlateNo,d.from_classes");
 		sql.append(",om.name oldMotoreade,d.from_unit,d.move_type,d.move_date,d.driver_id,d.from_car_id,d.to_car_id");
-		sql.append(",d.from_motorcade_id,d.to_motorcade_id,d.shiftwork,d.end_date from BS_CAR_DRIVER_HISTORY d");
+		sql.append(",d.from_motorcade_id,d.to_motorcade_id,d.shiftwork,d.end_date,m.cert_fwzg from BS_CAR_DRIVER_HISTORY d");
 		sql.append(" left join BS_CARMAN m on m.id=d.driver_id");
 		sql.append(" left join BS_CAR  oc on oc.id=d.from_car_id");
 		sql.append(" left join BS_CAR  nc on nc.id=d.to_car_id");
@@ -128,6 +128,7 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 				map.put("to_motorcade_id", rs[i++]);
 				map.put("shiftwork", rs[i++]);
 				map.put("end_date", rs[i++]);
+				map.put("cert_fwzg", rs[i++]);
 				return map;
 			}
 		});
@@ -138,66 +139,9 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 	protected List<Column> getGridColumns() {
 		List<Column> columns = new ArrayList<Column>();
 		columns.add(new IdColumn4MapKey("d.id", "id"));
-		columns.add(new TextColumn4MapKey("d.move_type", "move_type",
-				getText("carByDriverHistory.moveType"), 140)
-				.setValueFormater(new KeyValueFormater(getMoveType())));
-		// columns.add(new TextColumn4MapKey("d.move_date", "move_date",
-		// getText("carByDriverHistory.vMoveDate"), 120).setSortable(true)
-		// .setValueFormater(new CalendarFormater("yyyy-MM-dd")));
-		columns.add(new TextColumn4MapKey("d.move_date", "move_date",
-				getText("carByDriverHistory.vMoveDate"), 180)
-				.setValueFormater(new DateRangeFormater("yyyy-MM-dd") {
-					@Override
-					public Date getToDate(Object context, Object value) {
-						@SuppressWarnings("rawtypes")
-						Map contract = (Map) context;
-						return (Date) contract.get("end_date");
-					}
-				}.setUseEmptySymbol(true)));
-		// columns.add(new TextColumn4MapKey("d.move_type", "move_type",
-		// getText("carByDriverHistory.moveType"), 140)
-		// .setValueFormater(new KeyValueFormater(getMoveType())));
-		columns.add(new TextColumn4MapKey("d.to_unit", "to_unit",
-				getText("carByDriverHistory.toUnit"), 100).setSortable(true));
-		columns.add(new TextColumn4MapKey("d.to_motorcade_id", "newMotoreade",
-				getText("carByDriverHistory.newMotorcade"), 80)
-				.setSortable(true)
-				.setUseTitleFromLabel(true)
-				.setValueFormater(
-						new LinkFormater4Id(this.getContextPath()
-								+ "/bc-business/motorcade/edit?id={0}",
-								"newMotoreade") {
-							@SuppressWarnings("unchecked")
-							@Override
-							public String getIdValue(Object context,
-									Object value) {
-								return StringUtils
-										.toString(((Map<String, Object>) context)
-												.get("to_motorcade_id"));
-							}
-						}));
-		// if (carManId != null || (carManId == null && carId == null)) {
-		columns.add(new TextColumn4MapKey("nc.newPlateType", "newPlate",
-				getText("carByDriverHistory.vNewCar"), 100)
-				.setValueFormater(new LinkFormater4Id(this.getContextPath()
-						+ "/bc-business/car/edit?id={0}", "newPlate") {
-					@SuppressWarnings("unchecked")
-					@Override
-					public String getIdValue(Object context, Object value) {
-						return StringUtils
-								.toString(((Map<String, Object>) context)
-										.get("to_car_id"));
-					}
-
-					@Override
-					public String getTaskbarTitle(Object context, Object value) {
-						@SuppressWarnings("unchecked")
-						Map<String, Object> map = (Map<String, Object>) context;
-						return getText("car") + " - " + map.get("newPlate");
-
-					}
-				}));
-		// }
+		columns.add(new TextColumn4MapKey("m.cert_fwzg", "cert_fwzg",
+				getText("carByDriverHistory.cert_fwzg"), 70).setSortable(true)
+				.setUseTitleFromLabel(true));
 		if (carId != null || (carManId == null && carId == null)) {
 			columns.add(new TextColumn4MapKey("d.name", "driver",
 					getText("carByDriverHistory.driver"), 80)
@@ -224,53 +168,41 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("m.phone", "phone",
 				getText("carByDriverHistory.phone"), 120).setSortable(true)
 				.setUseTitleFromLabel(true));
-		columns.add(new TextColumn4MapKey("d.to_classes", "to_classes",
-				getText("carByDriverHistory.newDriverState"), 50)
-				.setValueFormater(new KeyValueFormater(getType())));
-		columns.add(new TextColumn4MapKey("d.from_unit", "from_unit",
-				getText("carByDriverHistory.fromUnit"), 100).setSortable(true));
-		columns.add(new TextColumn4MapKey("d.from_motorcade_id",
-				"oldMotoreade", getText("carByDriverHistory.oldMotorcade"), 120)
-				.setSortable(true)
-				.setUseTitleFromLabel(true)
-				.setValueFormater(
-						new LinkFormater4Id(this.getContextPath()
-								+ "/bc-business/motorcade/edit?id={0}",
-								"oldMotoreade") {
-							@SuppressWarnings("unchecked")
-							@Override
-							public String getIdValue(Object context,
-									Object value) {
-								return StringUtils
-										.toString(((Map<String, Object>) context)
-												.get("from_motorcade_id"));
-							}
-						}));
-		columns.add(new TextColumn4MapKey("d.oldPlateType", "oldPlate",
-				getText("carByDriverHistory.oldCar"), 100)
-				.setValueFormater(new LinkFormater4Id(this.getContextPath()
-						+ "/bc-business/car/edit?id={0}", "oldPlate") {
-					@SuppressWarnings("unchecked")
+		columns.add(new TextColumn4MapKey("d.move_type", "move_type",
+				getText("carByDriverHistory.moveType"), 140)
+				.setValueFormater(new KeyValueFormater(getMoveType())));
+		columns.add(new TextColumn4MapKey("d.move_date", "move_date",
+				getText("carByDriverHistory.vMoveDate"), 180)
+				.setValueFormater(new DateRangeFormater("yyyy-MM-dd") {
 					@Override
-					public String getIdValue(Object context, Object value) {
-						return StringUtils
-								.toString(((Map<String, Object>) context)
-										.get("from_car_id"));
+					public Date getToDate(Object context, Object value) {
+						@SuppressWarnings("rawtypes")
+						Map contract = (Map) context;
+						return (Date) contract.get("end_date");
 					}
+				}.setUseEmptySymbol(true)));
+		// 迁往
+		columns.add(new TextColumn4MapKey("nc.plate_no", "newPlate",
+				getText("carByDriverHistory.moveTo"), 220)
+				.setUseTitleFromLabel(true).setValueFormater(
+						new LinkFormater4Move(this.getContextPath()
+								+ "/bc-business/car/edit?id={0}", "car",
+								"to_unit", "newMotoreade", "newPlate",
+								"to_car_id", "to_classes", getType(), true)
 
-					@Override
-					public String getTaskbarTitle(Object context, Object value) {
-						@SuppressWarnings("unchecked")
-						Map<String, Object> map = (Map<String, Object>) context;
-						return getText("car") + " - " + map.get("oldPlate");
+				));
+		// 迁自
+		columns.add(new TextColumn4MapKey("oc.plate_no", "oldPlate",
+				getText("carByDriverHistory.moveFrom"), 220)
+				.setUseTitleFromLabel(true).setValueFormater(
+						new LinkFormater4Move(this.getContextPath()
+								+ "/bc-business/car/edit?id={0}", "car",
+								"from_unit", "oldMotoreade", "oldPlate",
+								"from_car_id", "from_classes", getType(), true)
 
-					}
-				}));
-		columns.add(new TextColumn4MapKey("d.from_classes", "from_classes",
-				getText("carByDriverHistory.oldDriverState"), 50)
-				.setValueFormater(new KeyValueFormater(getType())));
+				));
 		columns.add(new TextColumn4MapKey("d.shiftwork", "shiftwork",
-				getText("carByDriverHistory.shiftwork"), 200)
+				getText("carByDriverHistory.shiftwork"), 400)
 				.setValueFormater(new LinkFormater4CarInfo(this
 						.getContextPath())));
 		return columns;
@@ -370,6 +302,8 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 				getText("carByDriver.classes.fuban"));
 		type.put(String.valueOf(CarByDriver.TYPE_DINGBAN),
 				getText("carByDriver.classes.dingban"));
+		type.put(String.valueOf(CarByDriver.TYPE_ZHUGUA),
+				getText("carByDriver.classes.zhugua"));
 		return type;
 	}
 
