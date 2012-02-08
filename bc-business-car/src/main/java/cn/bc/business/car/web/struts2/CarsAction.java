@@ -139,11 +139,11 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 				new EntityStatusFormater(getBSStatuses1())));
 		// 公司
 		columns.add(new TextColumn4MapKey("c.company", "company",
-				getText("car.company"), 40).setSortable(true)
+				getText("label.carCompany"), 40).setSortable(true)
 				.setUseTitleFromLabel(true));
 		// 分公司
-		columns.add(new TextColumn4MapKey("unit_name", "unit_name",
-				getText("car.unitname"), 70).setSortable(true)
+		columns.add(new TextColumn4MapKey("bia.name", "unit_name",
+				getText("label.carUnit"), 70).setSortable(true)
 				.setUseTitleFromLabel(true));
 		// 车队
 		columns.add(new TextColumn4MapKey("m.name", "motorcade_name",
