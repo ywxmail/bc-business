@@ -72,7 +72,6 @@ public class CarByDriverHistoryServiceImpl extends
 		entity = super.save(entity);
 
 		if (entity.getDriver() != null) {
-			// 转车队的迁移记录
 			if (entity.getMoveType() == CarByDriverHistory.MOVETYPE_DINGBAN) {
 
 			} else {

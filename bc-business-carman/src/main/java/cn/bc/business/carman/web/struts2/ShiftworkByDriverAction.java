@@ -94,7 +94,7 @@ public class ShiftworkByDriverAction extends
 		Car toCar = new Car();
 		toCar = this.carService.load(this.getE().getToCar().getId());
 		this.getE().setToMotorcadeId(toCar.getMotorcade().getId());
-		this.getE().setToUnit(toCar.getOldUnitName());
+		this.getE().setToUnit(toCar.getCompany());
 
 		// 将顶班车辆组装成字符串赋值给shiftwork字段：plate1,id1;plate2,id2;...
 		String shiftwork = this.getE().getShiftwork();
