@@ -58,4 +58,11 @@ public interface CarDao extends CrudDao<Car> {
 	 * @return Map<String, Object>
 	 */
 	Map<String, Object> findcarInfoByCarPlateNo2(String carPlateNo);
+
+	/**
+	 * 判断车辆自编号唯一
+	 * @param code
+	 * @return
+	 */
+	List<Map<String, Object>> checkCodeIsExist(String code);
 }

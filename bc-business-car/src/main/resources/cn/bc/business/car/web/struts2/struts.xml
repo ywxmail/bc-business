@@ -40,5 +40,6 @@
 		</action>
 		<action name="autoSetOriginNo" class="carAction" method="autoSetOriginNo">
 		</action>
+		<action name="checkCodeIsExist" class="carAction" method="checkCodeIsExist"/>
 	</package>
 </struts>

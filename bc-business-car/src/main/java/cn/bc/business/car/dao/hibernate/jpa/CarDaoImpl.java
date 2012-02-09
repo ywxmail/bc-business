@@ -371,4 +371,11 @@ public class CarDaoImpl extends HibernateCrudJpaDao<Car> implements CarDao {
 
 		return queryMap;
 	}
+
+	public List<Map<String, Object>> checkCodeIsExist(String code) {
+		List<Map<String, Object>> list = null;
+		String sql = "select c.id from BS_CAR c where c.code='"+code+"'";
+		list = this.jdbcTemplate.queryForList(sql);
+		return list;
+	}
 }

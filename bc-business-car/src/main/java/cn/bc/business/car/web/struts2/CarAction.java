@@ -278,4 +278,20 @@ public class CarAction extends FileEntityAction<Long, Car> {
 	
 	// ======== 通过自编号生成原车号结束 ========
 	
+	
+	// ========判断经济合同自编号唯一代码开始========
+	public String checkCodeIsExist() {
+		json = new Json();
+		List<Map<String, Object>> list = this.carService.checkCodeIsExist(this.code); 
+		if(list != null && list.size() > 0){
+			json.put("id", list.get(0).get("id"));
+			json.put("isExist", "true"); //存在重复自编号
+			json.put("msg", getText("car.code.exist"));
+		}else{
+			json.put("isExist", "false");
+		}
+		return "json";
+	}
+	// ========判断经济合同自编号唯一代码结束========
+	
 }

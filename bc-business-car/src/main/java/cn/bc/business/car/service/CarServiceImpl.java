@@ -72,7 +72,6 @@ public class CarServiceImpl extends DefaultCrudService<Car> implements
 	 * @return
 	 */
 	public List<Car> selectAllCarByCarManId(Long id) {
-		// TODO Auto-generated method stub
 		return  (this.carDao.findAllcarBycarManId(id));
 	}
 
@@ -95,5 +94,9 @@ public class CarServiceImpl extends DefaultCrudService<Car> implements
 
 	public Map<String, Object> findcarInfoByCarPlateNo2(String carPlateNo) {
 		return this.carDao.findcarInfoByCarPlateNo2(carPlateNo);
+	}
+
+	public List<Map<String, Object>> checkCodeIsExist(String code) {
+		return this.carDao.checkCodeIsExist(code);
 	}
 }
