@@ -9,10 +9,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.json.JSONArray;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
+import cn.bc.business.OptionConstants;
 import cn.bc.business.carman.domain.CarByDriver;
 import cn.bc.business.carman.domain.CarByDriverHistory;
 import cn.bc.business.web.struts2.LinkFormater4CarInfo;
@@ -26,6 +29,8 @@ import cn.bc.core.util.StringUtils;
 import cn.bc.db.jdbc.RowMapper;
 import cn.bc.db.jdbc.SqlObject;
 import cn.bc.identity.web.SystemContext;
+import cn.bc.option.domain.OptionItem;
+import cn.bc.option.service.OptionService;
 import cn.bc.web.formater.DateRangeFormater;
 import cn.bc.web.formater.KeyValueFormater;
 import cn.bc.web.formater.LinkFormater4Id;
@@ -52,6 +57,12 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 	public Long carManId;
 	public Long carId;
 	public Long toCarId;
+	private OptionService optionService;
+
+	@Autowired
+	public void setOptionService(OptionService optionService) {
+		this.optionService = optionService;
+	}
 
 	@Override
 	public boolean isReadonly() {
@@ -77,11 +88,11 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 		sql.append(",nm.name newMotoreade,d.to_unit,oc.plate_type oldPlateType,oc.plate_no oldPlateNo,d.from_classes");
 		sql.append(",om.name oldMotoreade,d.from_unit,d.move_type,d.move_date,d.driver_id,d.from_car_id,d.to_car_id");
 		sql.append(",d.from_motorcade_id,d.to_motorcade_id,d.shiftwork,d.end_date,m.cert_fwzg from BS_CAR_DRIVER_HISTORY d");
-		sql.append(" left join BS_CARMAN m on m.id=d.driver_id");
-		sql.append(" left join BS_CAR  oc on oc.id=d.from_car_id");
-		sql.append(" left join BS_CAR  nc on nc.id=d.to_car_id");
-		sql.append(" left join BS_Motorcade  om on om.id=d.from_motorcade_id");
-		sql.append(" left join BS_Motorcade  nm on nm.id=d.to_motorcade_id");
+		sql.append(" left join bs_carman m on m.id=d.driver_id");
+		sql.append(" left join bs_car  oc on oc.id=d.from_car_id");
+		sql.append(" left join bs_car  nc on nc.id=d.to_car_id");
+		sql.append(" left join bs_motorcade  om on om.id=d.from_motorcade_id");
+		sql.append(" left join bs_motorcade  nm on nm.id=d.to_motorcade_id");
 		sqlObject.setSql(sql.toString());
 
 		// 注入参数
@@ -358,16 +369,15 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 				// 如果车辆Id不这空，调用标准的工具条
 				tb.addButton(
 						new ToolbarButton().setIcon("ui-icon-document")
-								.setText("转车队").setAction("create"))
-						.addButton(
-								new ToolbarButton().setIcon("ui-icon-pencil")
-										.setText("编辑").setAction("edit"))
-						// 不能删除历史记录
-						// .addButton(
-						// new ToolbarButton().setIcon("ui-icon-trash")
-						// .setText("删除").setAction("delete"))
-						.addButton(
-								Toolbar.getDefaultSearchToolbarButton(getText("title.click2search")));
+								.setText("转车队").setAction("create")).addButton(
+						new ToolbarButton().setIcon("ui-icon-pencil")
+								.setText("编辑").setAction("edit"));
+				// 不能删除历史记录
+				// .addButton(
+				// new ToolbarButton().setIcon("ui-icon-trash")
+				// .setText("删除").setAction("delete"))
+				// 搜索按钮
+				tb.addButton(this.getDefaultSearchToolbarButton());
 			} else {
 				tb.addButton(
 						new ToolbarButton().setIcon("ui-icon-document")
@@ -380,8 +390,8 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 						// .addButton(
 						// new ToolbarButton().setIcon("ui-icon-trash")
 						// .setText("删除").setAction("delete"))
-						.addButton(
-								Toolbar.getDefaultSearchToolbarButton(getText("title.click2search")))
+						// 搜索按钮
+						.addButton(this.getDefaultSearchToolbarButton())
 						.addButton(
 								new ToolbarButton()
 										.setIcon("ui-icon-document")
@@ -394,6 +404,26 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 		return tb;
 	}
 
+	// ==高级搜索代码开始==
+	@Override
+	protected boolean useAdvanceSearch() {
+		return true;
+	}
+
+	public JSONArray moveType;// 迁移类型
+
+	@Override
+	protected void initConditionsFrom() throws Exception {
+		// 批量加载可选项列表
+		Map<String, List<Map<String, String>>> optionItems = this.optionService
+				.findOptionItemByGroupKeys(new String[] { OptionConstants.CARBYDRIVERHISTORY_MOVETYPE });
+
+		// 可选迁移类型列表
+		moveType = OptionItem.toLabelValues(optionItems
+				.get(OptionConstants.CARBYDRIVERHISTORY_MOVETYPE));
+	}
+
+	// ==高级搜索代码结束==
 	protected String getHtmlPageJs() {
 		return this.getContextPath()
 				+ "/bc-business/carByDriverHistory/list.js,"
