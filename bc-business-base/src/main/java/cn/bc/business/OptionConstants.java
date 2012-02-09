@@ -80,9 +80,6 @@ public class OptionConstants extends cn.bc.option.OptionConstants {
 	/** 购买单位 */
 	public final static String LB_BUYUNIT = "lb.buyUnit";
 
-	/** 迁移类型 */
-	public final static String CARBYDRIVERHISTORY_MOVETYPE = "carByDriverHistory.moveType";
-
 	/** 车队的可选缴费日 */
 	public final static String MOTORCADE_PAYMENT_DATE = "motorcade.paymentDate";
 }

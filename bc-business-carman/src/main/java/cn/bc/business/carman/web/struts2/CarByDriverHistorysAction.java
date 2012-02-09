@@ -6,16 +6,16 @@ package cn.bc.business.carman.web.struts2;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import org.json.JSONArray;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.json.JSONObject;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
-import cn.bc.business.OptionConstants;
 import cn.bc.business.carman.domain.CarByDriver;
 import cn.bc.business.carman.domain.CarByDriverHistory;
 import cn.bc.business.web.struts2.LinkFormater4CarInfo;
@@ -29,8 +29,6 @@ import cn.bc.core.util.StringUtils;
 import cn.bc.db.jdbc.RowMapper;
 import cn.bc.db.jdbc.SqlObject;
 import cn.bc.identity.web.SystemContext;
-import cn.bc.option.domain.OptionItem;
-import cn.bc.option.service.OptionService;
 import cn.bc.web.formater.DateRangeFormater;
 import cn.bc.web.formater.KeyValueFormater;
 import cn.bc.web.formater.LinkFormater4Id;
@@ -57,12 +55,6 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 	public Long carManId;
 	public Long carId;
 	public Long toCarId;
-	private OptionService optionService;
-
-	@Autowired
-	public void setOptionService(OptionService optionService) {
-		this.optionService = optionService;
-	}
 
 	@Override
 	public boolean isReadonly() {
@@ -410,17 +402,25 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 		return true;
 	}
 
-	public JSONArray moveType;// 迁移类型
+	public JSONArray moveTypes;// 迁移类型
 
 	@Override
 	protected void initConditionsFrom() throws Exception {
-		// 批量加载可选项列表
-		Map<String, List<Map<String, String>>> optionItems = this.optionService
-				.findOptionItemByGroupKeys(new String[] { OptionConstants.CARBYDRIVERHISTORY_MOVETYPE });
-
 		// 可选迁移类型列表
-		moveType = OptionItem.toLabelValues(optionItems
-				.get(OptionConstants.CARBYDRIVERHISTORY_MOVETYPE));
+		moveTypes = new JSONArray();
+		Map<String, String> mt = getMoveType();
+		if (mt != null) {
+			JSONObject json;
+			Iterator<String> iterator = mt.keySet().iterator();
+			String key;
+			while(iterator.hasNext()){
+				key = iterator.next();
+				json = new JSONObject();
+				json.put("label", mt.get(key));
+				json.put("value", key);
+				moveTypes.put(json);
+			}
+		}
 	}
 
 	// ==高级搜索代码结束==
