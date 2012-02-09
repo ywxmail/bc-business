@@ -202,5 +202,12 @@ public interface Contract4ChargerService extends CrudService<Contract4Charger> {
 	 */
 	void doLogout(Long fromContractId);
 
+	/**
+	 * 判断经济合同自编号唯一
+	 * @param code
+	 * @return
+	 */
+	List<Map<String, Object>> checkCodeIsExist(String code);
+
 
 }

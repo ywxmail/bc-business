@@ -3,7 +3,9 @@
  */
 package cn.bc.business.contract.web.struts2;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -134,7 +136,8 @@ public class Contract4ChargerAction extends FileEntityAction<Long, Contract4Char
 		entity.setVerMajor(Contract.MAJOR_DEFALUT);
 		entity.setVerMinor(Contract.MINOR_DEFALUT);
 		entity.setUid(this.getIdGeneratorService().next(Contract4Charger.KEY_UID));
-		entity.setCode(this.getIdGeneratorService().nextSN4Month(Contract4Charger.KEY_CODE));
+		SimpleDateFormat format4month = new SimpleDateFormat("yyyyMM");
+		entity.setCode("CLHT"+format4month.format(new Date()));
 		entity.setType(Contract.TYPE_CHARGER);
 		entity.setStatus(Contract.STATUS_NORMAL);
 		entity.setSignType(getText("contract4Charger.optype.create"));
@@ -262,16 +265,6 @@ public class Contract4ChargerAction extends FileEntityAction<Long, Contract4Char
 //		}
 //	}
 	
-	/** 判断指定的车辆是否已经存在经济合同 */
-	public String isExistContract() {
-		json = new Json();
-		json.put("isExistContract",
-				this.contract4ChargerService.isExistContract(carId));
-		return "json";
-	}
-	
-	
-	
 //	private void dealCharger4Save() {
 //		Set<CarMan> chargers = null;
 //		if(this.assignChargerIds != null && this.assignChargerIds.length() > 0){
@@ -291,6 +284,39 @@ public class Contract4ChargerAction extends FileEntityAction<Long, Contract4Char
 //			this.getE().setChargers(chargers);
 //		}
 //	}
+	
+	/** 判断指定的车辆是否已经存在经济合同 */
+	public String isExistContract() {
+		json = new Json();
+		json.put("isExistContract",
+				this.contract4ChargerService.isExistContract(carId));
+		return "json";
+	}
+	
+	// ========判断经济合同自编号唯一代码开始========
+	private String code;
+	
+	public String getCode() {
+		return code;
+	}
+
+	public void setCode(String code) {
+		this.code = code;
+	}
+
+	public String checkCodeIsExist() {
+		json = new Json();
+		List<Map<String, Object>> list = this.contract4ChargerService.checkCodeIsExist(this.code); 
+		if(list != null && list.size() > 0){
+			json.put("id", list.get(0).get("id"));
+			json.put("isExist", "true"); //存在重复自编号
+			json.put("msg", getText("contract4Labour.code.exist"));
+		}else{
+			json.put("isExist", "false");
+		}
+		return "json";
+	}
+	// ========判断经济合同自编号唯一代码结束========
 
 	private AttachWidget buildAttachsUI(boolean isNew, boolean forceReadonly) {
 		// 构建附件控件
