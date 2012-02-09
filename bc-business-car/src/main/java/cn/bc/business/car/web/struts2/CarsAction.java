@@ -208,7 +208,7 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 		}
 		// 购置税证号
 		columns.add(new TextColumn4MapKey("c.cert_no1", "cert_no1",
-				getText("car.certNo1"), 80).setUseTitleFromLabel(true));
+				getText("car.certNo1"), 100).setUseTitleFromLabel(true));
 		// 强检证号
 		columns.add(new TextColumn4MapKey("c.cert_no3", "cert_no3",
 				getText("car.certNo3"), 70).setUseTitleFromLabel(true));
@@ -218,13 +218,13 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 				.setValueFormater(new NubmerFormater()));
 		// 车架号
 		columns.add(new TextColumn4MapKey("c.vin", "vin", getText("car.vin"),
-				140).setUseTitleFromLabel(true));
+				150).setUseTitleFromLabel(true));
 		// 发动机号
 		columns.add(new TextColumn4MapKey("c.engine_no", "engine_no",
 				getText("car.engineNo"), 70).setUseTitleFromLabel(true));
 		// 车型 -厂牌类型、厂牌型号
 		columns.add(new TextColumn4MapKey("c.factory_type", "factory_type",
-				getText("car.factory"), 80).setUseTitleFromLabel(true)
+				getText("car.factory"), 150).setUseTitleFromLabel(true)
 				.setValueFormater(new AbstractFormater<String>() {
 					@Override
 					public String format(Object context, Object value) {
@@ -246,7 +246,7 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 				}));
 		// 计价器制造厂
 		columns.add(new TextColumn4MapKey("c.taximeter_factory",
-				"taximeter_factory", getText("car.taximeterFactory"), 100)
+				"taximeter_factory", getText("car.taximeterFactory"), 80)
 				.setUseTitleFromLabel(true));
 		// 计价器出厂编号
 		columns.add(new TextColumn4MapKey("c.taximeter_no", "taximeter_no",
