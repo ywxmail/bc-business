@@ -99,4 +99,27 @@ public class CarManDaoImpl extends HibernateCrudJpaDao<CarMan> implements
 		return this.getJpaTemplate().find(hql,
 				new Object[] { carId, new Integer(0) });
 	}
+
+	public Long checkCert4FWZGIsExists(Long excludeId, String cert4fwzg) {
+		boolean gte6 = cert4fwzg.length() > 5;
+		if(gte6){
+			// 截取前6位
+			cert4fwzg = cert4fwzg.substring(0, 6) + "%";
+		}
+		
+		String hql = "select m.id as id from CarMan m where m.cert4FWZG" + (gte6 ? " like ?" : " = ?");
+		Object[] args;
+		if (excludeId != null) {
+			hql += " and m.id != ?";
+			args = new Object[] { cert4fwzg, excludeId };
+		} else {
+			args = new Object[] { cert4fwzg };
+		}
+		@SuppressWarnings("unchecked")
+		List<Long> list = this.getJpaTemplate().find(hql, args);
+		if (list != null && !list.isEmpty())
+			return list.get(0);
+		else
+			return null;
+	}
 }
