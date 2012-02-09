@@ -133,7 +133,8 @@ public class Contract4ChargerServiceImpl extends DefaultCrudService<Contract4Cha
 		}
 		newContract.setId(null);
 
-		// 生成新的合同编号
+		/*	
+		 * //生成合同编号	
 		String oldContractCode = oldContract.getCode();
 		if(oldContractCode.lastIndexOf("-") > 0){ //判断旧合同编号是否存在字符"-"
 			//将字符"-"后的数字+1
@@ -142,9 +143,9 @@ public class Contract4ChargerServiceImpl extends DefaultCrudService<Contract4Cha
 		}else{
 			oldContractCode = oldContractCode+"-1";
 		}
-		newContract.setCode(oldContractCode);
+		*/
 		//newContract.setCode(this.idGeneratorService
-		//.nextSN4Month(Contract4Labour.KEY_CODE));
+		//.nextSN4Month("CLHT"+Contract4Charger.KEY_CODE));
 
 		// 设置新的合同期限
 		newContract.setStartDate(newStartDate);
@@ -233,7 +234,9 @@ public class Contract4ChargerServiceImpl extends DefaultCrudService<Contract4Cha
 			throw new CoreException("复制合同信息错误！", e);
 		}
 		newContract.setId(null);
-
+		
+		/*
+		 * 
 		// 生成新的合同编号
 		String oldContractCode = oldContract.getCode();
 		if(oldContractCode.lastIndexOf("-") > 0){ //判断旧合同编号是否存在字符"-"
@@ -244,6 +247,7 @@ public class Contract4ChargerServiceImpl extends DefaultCrudService<Contract4Cha
 			oldContractCode = oldContractCode+"-1";
 		}
 		newContract.setCode(oldContractCode);
+		*/
 		//newContract.setCode(this.idGeneratorService
 		//.nextSN4Month(Contract4Labour.KEY_CODE));
 
@@ -344,7 +348,9 @@ public class Contract4ChargerServiceImpl extends DefaultCrudService<Contract4Cha
 		}
 		newContract.setId(null);
 
-		// 生成新的合同编号
+		
+		/*	// 生成新的合同编号
+		 * 
 		String oldContractCode = oldContract.getCode();
 		if(oldContractCode.lastIndexOf("-") > 0){ //判断旧合同编号是否存在字符"-"
 			//将字符"-"后的数字+1
@@ -354,6 +360,7 @@ public class Contract4ChargerServiceImpl extends DefaultCrudService<Contract4Cha
 			oldContractCode = oldContractCode+"-1";
 		}
 		newContract.setCode(oldContractCode);
+		*/
 		//newContract.setCode(this.idGeneratorService
 		//.nextSN4Month(Contract4Labour.KEY_CODE));
 
@@ -613,6 +620,15 @@ public class Contract4ChargerServiceImpl extends DefaultCrudService<Contract4Cha
 		List<String> list = new ArrayList<String>();
 		list = this.contract4ChargerDao.findChargerNameByContractId(contractId);
 		return list;
+	}
+
+	/**
+	 * 判断经济合同自编号唯一
+	 * @param code
+	 * @return
+	 */
+	public List<Map<String, Object>> checkCodeIsExist(String code) {
+		return this.contract4ChargerDao.checkCodeIsExist(code);
 	}
 
 }

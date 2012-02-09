@@ -53,13 +53,13 @@
 		</action>
 		<action name="delete" class="contract4ChargerAction" method="delete" />
 		<action name="save" class="contract4ChargerAction" method="save"/>
-		<action name="isExistContract" class="contract4ChargerAction" method="isExistContract">
-		</action>
+		<action name="isExistContract" class="contract4ChargerAction" method="isExistContract" />
+		<action name="checkCodeIsExist" class="contract4ChargerAction" method="checkCodeIsExist" />
 	</package>
 	
 	<!-- 经济合同的版本管理 -->
 	<package name="contract4ChargerOperate" extends="bc-default" namespace="/bc-business/contract4ChargerOperate">
-		<!-- 续签 -->
+		<!-- 续约 -->
 		<action name="doRenew" class="contract4ChargerOperateAction" method="doRenew"/>
 		<!-- 过户-->
 		<action name="doChangeCharger" class="contract4ChargerOperateAction" method="doChangeCharger"/>

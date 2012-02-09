@@ -48,8 +48,8 @@ public class Car extends RichFileEntityImpl {
 	private String plateType;// 车牌归属，如“粤A”
 	private String plateNo;// 车牌号码，如“C4X74”
 	private String vin;// 车辆识别代号
-	private String factoryType;// 厂牌类型，如“桑塔纳”
-	private String factoryModel;// 厂牌型号，如“SVW7182QQD”
+	private String factoryType;// 车辆品牌，如“桑塔纳”
+	private String factoryModel;// 车辆型号，如“SVW7182QQD”
 
 	private Calendar registerDate;// 登记日期
 	private Calendar operateDate;// 投产日期
@@ -58,11 +58,11 @@ public class Car extends RichFileEntityImpl {
 
 	private String registerNo;// 机动车登记编号
 	private String level;// 车辆定级
-	private String color;// 颜色
+	private String color;// 车身颜色
 
 	private String engineNo;// 发动机号码
-	private String engineType;// 发动机类型
-	private String fuelType;// 燃料类型，如“汽油”
+	private String engineType;// 发动机型号
+	private String fuelType;// 燃料种类，如“汽油”
 	private int displacement;// 排量，单位ml
 	private float power;// 功率，单位kw
 	private String turnType;// 转向方式，如“方向盘”
@@ -72,13 +72,13 @@ public class Car extends RichFileEntityImpl {
 	private String tireStandard;// 轮胎规格
 	private int axisDistance;// 轴距
 	private int axisCount;// 轴数
-	private int pieceCount;// 后轴钢板弹簧片数
+	private int pieceCount;// 钢板弹簧片数
 	private int dimLen;// 外廓尺寸：长，单位mm
 	private int dimWidth;// 外廓尺寸：宽，单位mm
 	private int dimHeight;// 外廓尺寸：高，单位mm
 	private int totalWeight;// 总质量，单位kg
-	private int accessWeight;// 核定承载量，单位kg
-	private int accessCount;// 载客人数
+	private int accessWeight;// 核定载质量，单位kg
+	private int accessCount;// 核定载客
 
 	private float originalValue;// 固定资产原值
 	private String invoiceNo1;// 购车发票号

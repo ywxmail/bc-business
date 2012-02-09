@@ -152,5 +152,12 @@ public interface Contract4ChargerDao extends CrudDao<Contract4Charger> {
 	 */
 	List<String> findChargerNameByContractId(Long contractId);
 
+	/**
+	 * 判断经济合同自编号唯一
+	 * @param code
+	 * @return
+	 */
+	List<Map<String, Object>> checkCodeIsExist(String code);
+
 
 }
