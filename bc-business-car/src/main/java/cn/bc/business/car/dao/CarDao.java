@@ -40,13 +40,15 @@ public interface CarDao extends CrudDao<Car> {
 
 	/**
 	 * 根据车牌号查找车辆id
-	 * @parma carPlateNo 
+	 * 
+	 * @parma carPlateNo
 	 * @return Long
 	 */
 	Long findcarIdByCarPlateNo(String carPlateNo);
 
 	/**
 	 * 通过自编号生成原车号
+	 * 
 	 * @param code
 	 * @return
 	 */
@@ -54,11 +56,11 @@ public interface CarDao extends CrudDao<Car> {
 
 	/**
 	 * 通过车牌号查找此车辆所属的分公司与车队
-	 * @parma carPlateNo 
+	 * 
+	 * @parma carPlateNo
 	 * @return Map<String, Object>
 	 */
 	Map<String, Object> findcarInfoByCarPlateNo2(String carPlateNo);
-
 
 	/**
 	 * 判断车辆自编号唯一
@@ -70,4 +72,17 @@ public interface CarDao extends CrudDao<Car> {
 	 * @return 如果编号被占用，返回占用此编号的车辆的id，否则返回null
 	 */
 	Long checkCodeIsExists(Long excludeId, String code);
+
+	/**
+	 * 判断车牌是否已经被占用
+	 * 
+	 * @param excludeId
+	 *            要排除检测的id
+	 * @param plateType
+	 *            车牌类型，如粤A
+	 * @param plateNo
+	 *            车牌号码，如JM123
+	 * @return 如果车牌被占用，返回占用此车牌的车辆id，否则返回null
+	 */
+	Long checkPlateIsExists(Long excludeId, String plateType, String plateNo);
 }

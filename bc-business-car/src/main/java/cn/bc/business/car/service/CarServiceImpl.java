@@ -100,4 +100,9 @@ public class CarServiceImpl extends DefaultCrudService<Car> implements
 	public Long checkCodeIsExists(Long excludeId, String code) {
 		return this.carDao.checkCodeIsExists(excludeId, code);
 	}
+
+	public Long checkPlateIsExists(Long excludeId, String plateType,
+			String plateNo) {
+		return this.carDao.checkPlateIsExists(excludeId, plateType, plateNo);
+	}
 }

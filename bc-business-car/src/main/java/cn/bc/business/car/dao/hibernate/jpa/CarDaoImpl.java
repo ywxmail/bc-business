@@ -393,4 +393,23 @@ public class CarDaoImpl extends HibernateCrudJpaDao<Car> implements CarDao {
 		else
 			return null;
 	}
+
+	public Long checkPlateIsExists(Long excludeId, String plateType,
+			String plateNo) {
+		// 只查在案的车辆，因为新车可能沿用旧车的自编号
+		String sql = "select c.id as id from BS_CAR c where c.plate_type=? and c.plate_no=?";
+		Object[] args;
+		if (excludeId != null) {
+			sql += " and c.id!=?";
+			args = new Object[] { plateType, plateNo, excludeId };
+		} else {
+			args = new Object[] { plateType, plateNo };
+		}
+		List<Map<String, Object>> list = this.jdbcTemplate.queryForList(sql,
+				args);
+		if (list != null && !list.isEmpty())
+			return new Long(list.get(0).get("id").toString());
+		else
+			return null;
+	}
 }

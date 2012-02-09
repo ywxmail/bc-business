@@ -277,7 +277,7 @@ public class CarAction extends FileEntityAction<Long, Car> {
 
 	// ======== 通过自编号生成原车号结束 ========
 
-	// ========判断车辆自编号唯一代码开始========
+	// ========判断车辆自编号唯一性代码开始========
 	private Long excludeId;
 
 	public Long getExcludeId() {
@@ -288,19 +288,37 @@ public class CarAction extends FileEntityAction<Long, Car> {
 		this.excludeId = excludeId;
 	}
 
-	public String checkCodeIsExist() {
+	public String checkCodeIsExists() {
 		json = new Json();
-		Long existId = this.carService.checkCodeIsExists(this.excludeId,
+		Long existsId = this.carService.checkCodeIsExists(this.excludeId,
 				this.code);
-		if (existId != null) {
-			json.put("id", existId);
-			json.put("isExist", "true"); // 存在重复自编号
-			json.put("msg", getText("car.code.exist"));
+		if (existsId != null) {
+			json.put("id", existsId);
+			json.put("isExists", "true"); // 存在重复自编号
+			json.put("msg", getText("car.error.codeIsExists"));
 		} else {
-			json.put("isExist", "false");
+			json.put("isExists", "false");
 		}
 		return "json";
 	}
-	// ========判断经济合同自编号唯一代码结束========
+	// ========判断车辆自编号唯一性代码结束========
 
+	// ========判断车牌号唯一性代码开始========
+	public String plateType;
+	public String plateNo;
+
+	public String checkPlateIsExists() {
+		json = new Json();
+		Long existsId = this.carService.checkPlateIsExists(this.excludeId,
+				this.plateType, this.plateNo);
+		if (existsId != null) {
+			json.put("id", existsId);
+			json.put("isExists", "true"); // 存在重复自编号
+			json.put("msg", getText("car.error.plateIsExists"));
+		} else {
+			json.put("isExists", "false");
+		}
+		return "json";
+	}
+	// ========判断车牌号唯一性代码结束========
 }
