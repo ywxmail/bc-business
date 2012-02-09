@@ -23,10 +23,10 @@ public class CarModel extends RichFileEntityImpl {
 	
 	public static final int STATUS_NORMAL  = 0;
 	
-	private String factoryType;// 厂牌类型，如“桑塔纳”
-	private String factoryModel;// 厂牌型号，如“SVW7182QQD”
-	private String engineType;// 发动机类型
-	private String fuelType;// 燃料类型，如“汽油”
+	private String factoryType;// 车辆品牌，如“桑塔纳”
+	private String factoryModel;// 车辆型号，如“SVW7182QQD”
+	private String engineType;// 发动机型号
+	private String fuelType;// 燃料种类，如“汽油”
 	private int displacement;// 排量，单位ml
 	private float power;// 功率，单位kw
 	private String turnType;// 转向方式，如“方向盘”
@@ -36,13 +36,13 @@ public class CarModel extends RichFileEntityImpl {
 	private String tireStandard;// 轮胎规格
 	private int axisDistance;// 轴距
 	private int axisCount;// 轴数
-	private int pieceCount;// 后轴钢板弹簧片数
+	private int pieceCount;// 钢板弹簧片数
 	private int dimLen;// 外廓尺寸：长，单位mm
 	private int dimWidth;// 外廓尺寸：宽，单位mm
 	private int dimHeight;// 外廓尺寸：高，单位mm
 	private int totalWeight;// 总质量，单位kg
-	private int accessWeight;// 核定承载量，单位kg
-	private int accessCount;// 载客人数
+	private int accessWeight;// 核定载质量，单位kg
+	private int accessCount;// 核定载客
 	private String order;//排序号
 
 	@Column(name = "FACTORY_TYPE")
