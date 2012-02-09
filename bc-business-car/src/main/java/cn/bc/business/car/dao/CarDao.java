@@ -59,10 +59,15 @@ public interface CarDao extends CrudDao<Car> {
 	 */
 	Map<String, Object> findcarInfoByCarPlateNo2(String carPlateNo);
 
+
 	/**
 	 * 判断车辆自编号唯一
+	 * 
+	 * @param excludeId
+	 *            要排除检测的id
 	 * @param code
-	 * @return
+	 *            要检测的自编号
+	 * @return 如果编号被占用，返回占用此编号的车辆的id，否则返回null
 	 */
-	List<Map<String, Object>> checkCodeIsExist(String code);
+	Long checkCodeIsExists(Long excludeId, String code);
 }
