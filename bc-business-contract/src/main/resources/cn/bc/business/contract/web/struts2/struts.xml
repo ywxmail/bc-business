@@ -75,5 +75,9 @@
 		<action name="select" class="selectDateAndChargerAction" >
 			<result name="success">/bc-business/contract4Charger/selectDateAndCharger.jsp</result>
 		</action>
+		<!-- 续约选择 -->
+		<action name="select2" class="selectDateRangeAndCodeAction" >
+			<result name="success">/bc-business/contract4Charger/selectDateRange.jsp</result>
+		</action>
 	</package>
 </struts>

@@ -70,7 +70,7 @@ public class BsSyncServiceImpl implements BsSyncService {
 	public void setSyncBaseService(SyncBaseService syncBaseService) {
 		this.syncBaseService = syncBaseService;
 	}
-	
+
 	@Autowired
 	public void setCarService(CarService carService) {
 		this.carService = carService;
@@ -78,19 +78,36 @@ public class BsSyncServiceImpl implements BsSyncService {
 
 	public int doSync4JiaoWeiJTWF(ActorHistory syncer, Calendar fromDate,
 			Calendar toDate, StringBuffer strMsg) {
-		Date startTime = new Date();
 		// 交委接口的宝城企业ID
 		String jiaoWei_qyid_baocheng = this.optionService.getItemValue("sync",
 				"jiaowei.ws.qyid.baocheng");
+		String jiaoWei_qyid_guangfa = this.optionService.getItemValue("sync",
+				"jiaowei.ws.qyid.guangfa");
 
+		int count = 0;
+		StringBuffer msg = new StringBuffer();
+		count += this.doSync4JiaoWeiJTWF(jiaoWei_qyid_baocheng, syncer,
+				fromDate, toDate, msg);
+		strMsg.append(strMsg);
+
+		msg = new StringBuffer();
+		count += this.doSync4JiaoWeiJTWF(jiaoWei_qyid_guangfa, syncer,
+				fromDate, toDate, msg);
+		strMsg.append(strMsg);
+		return count;
+	}
+
+	private int doSync4JiaoWeiJTWF(String qyid, ActorHistory syncer,
+			Calendar fromDate, Calendar toDate, StringBuffer strMsg) {
+		Date startTime = new Date();
 		// 交委接口的url
 		String jiaoWei_ws_uri = this.optionService.getItemValue("sync",
 				"jiaowei.ws.soapUrl");
 		String jiaoWei_ws_method = "SearchPublicTransport";
 
 		// 从交委接口获取数据
-		DataSet dataSet = wsMiddle.findBreachOfTraffic(jiaoWei_qyid_baocheng,
-				fromDate, toDate, strMsg);
+		DataSet dataSet = wsMiddle.findBreachOfTraffic(qyid, fromDate, toDate,
+				strMsg);
 
 		// 发生异常就直接退出
 		if (strMsg.length() > 0)
@@ -120,7 +137,8 @@ public class BsSyncServiceImpl implements BsSyncService {
 				this.syncBaseService.save(toSaveDomains);
 		}
 		if (logger.isInfoEnabled())
-			logger.info("从交委交通违法接口获取数据总耗时：" + DateUtils.getWasteTime(startTime) + ",newCount=" + toSaveDomains.size());
+			logger.info("从交委交通违法接口获取数据总耗时：" + DateUtils.getWasteTime(startTime)
+					+ ",newCount=" + toSaveDomains.size());
 
 		return toSaveDomains.size();
 	}
@@ -145,7 +163,7 @@ public class BsSyncServiceImpl implements BsSyncService {
 		domain.setSyncFrom(syncFrom);
 
 		domain.setSyncCode(row.getCellStringValue("违章顺序号"));
-		String plate = row.getCellStringValue("车牌号码");//格式为粤A.XXXX
+		String plate = row.getCellStringValue("车牌号码");// 格式为粤A.XXXX
 		int index = plate.indexOf(".");
 		if (index != -1) {
 			domain.setCarPlateType(plate.substring(0, index));
@@ -154,13 +172,14 @@ public class BsSyncServiceImpl implements BsSyncService {
 			domain.setCarPlateType(null);
 			domain.setCarPlateNo(plate);
 		}
-		//通过车牌号查找此车辆所属的分公司与车队
-		carInfoMap = this.carService.findcarInfoByCarPlateNo2(domain.getCarPlateNo());
-		if(carInfoMap != null && carInfoMap.get("unit_name") != null){
-			domain.setUnitName(carInfoMap.get("unit_name")+""); //设置分公司
+		// 通过车牌号查找此车辆所属的分公司与车队
+		carInfoMap = this.carService.findcarInfoByCarPlateNo2(domain
+				.getCarPlateNo());
+		if (carInfoMap != null && carInfoMap.get("unit_name") != null) {
+			domain.setUnitName(carInfoMap.get("unit_name") + ""); // 设置分公司
 		}
-		if(carInfoMap != null && carInfoMap.get("motorcade_name") != null){
-			domain.setMotorcadeName(carInfoMap.get("motorcade_name")+""); //设置所属车队
+		if (carInfoMap != null && carInfoMap.get("motorcade_name") != null) {
+			domain.setMotorcadeName(carInfoMap.get("motorcade_name") + ""); // 设置所属车队
 		}
 		domain.setDriverName(row.getCellStringValue("当事司机姓名"));
 		domain.setDriverCert(row.getCellStringValue("服务资格证"));
@@ -180,7 +199,7 @@ public class BsSyncServiceImpl implements BsSyncService {
 		}
 
 		JinDunJTWF jtwf = null;
-		
+
 		int successCount = 0;
 
 		// 循环每台车执行抓取
@@ -226,165 +245,132 @@ public class BsSyncServiceImpl implements BsSyncService {
 				} catch (Exception e) {
 					// 抓取异常就停止
 					logger.warn(e.getMessage());
-					errorCount ++;
+					errorCount++;
 				}
-				
+
 				this.jinDunCache.put("carSpideHistory", carSpideHistory);
 
 				if (jtwf == null)
 					continue;
-				
+
 				String syncType = JinDunJTWF.class.getSimpleName();
-				
+
 				if (!this.syncBaseService.hadSync(syncType, jtwf.getSyncCode())) {
 					// 保存新增的记录
-					if (jtwf != null){
+					if (jtwf != null) {
 						this.syncBaseService.save(jtwf);
 						successCount++;
 					}
 				}
 
 				if (logger.isInfoEnabled())
-					logger.info("从金盾网抓取交通违法信息总耗时：" + DateUtils.getWasteTime(startTime) + ",newCount=" + successCount);
+					logger.info("从金盾网抓取交通违法信息总耗时："
+							+ DateUtils.getWasteTime(startTime) + ",newCount="
+							+ successCount);
 
-				if(errorCount > 0){
-					strMsg.append(errorCount);//记录发生异常的数目
+				if (errorCount > 0) {
+					strMsg.append(errorCount);// 记录发生异常的数目
 				}
-				
+
 			}
 		}
 
 		return successCount;
 	}
-	
-/*	
- * 批量抓取
- * public int doSync4JinDunJTWF(ActorHistory syncer,
-			List<Map<String, Object>> cars, StringBuffer strMsg) {
-		Date startTime = new Date();
-		if (logger.isDebugEnabled()) {
-			logger.debug("cars=" + cars);
-		}
-		
-		boolean hasError = false;
-		List<JinDunJTWF> all = new ArrayList<JinDunJTWF>();
-		
-		// 循环每台车执行抓取
-		this.spider4JinDunJTWF.setSyncer(syncer);
-		this.spider4JinDunJTWF.setCarType("02");
-		int i = 0;
-		List<String> carSpideHistory = this.jinDunCache.get("carSpideHistory");
-		String carId;
-		int errorCount = 0;
-		for (Map<String, Object> car : cars) {
-			carId = car.get("id").toString();
-			i++;
-			// if(i > 10) break;
-			if (carSpideHistory != null && carSpideHistory.contains(carId)) {
-				logger.info("(" + i + "/" + cars.size() + ")" + "车辆'"
-						+ car.get("plateType").toString()
-						+ car.get("plateNo").toString() + "'存在抓取缓存，忽略频繁的抓取！");
-				continue;
-			} else {
-				this.spider4JinDunJTWF.setCarPlateType(car.get("plateType")
-						.toString());
-				this.spider4JinDunJTWF.setCarPlateNo(car.get("plateNo")
-						.toString());
-				if (car.get("engineNo") != null) {
-					logger.warn("(" + i + "/" + cars.size() + ")" + "开始抓取'"
-							+ car.get("plateType").toString() + "."
-							+ car.get("plateNo").toString() + "'的交通违法信息...");
-					this.spider4JinDunJTWF.setEngineNo(car.get("engineNo")
-							.toString());
-				} else {
-					logger.warn("(" + i + "/" + cars.size() + ")" + "车辆'"
-							+ car.get("plateType").toString()
-							+ car.get("plateNo").toString() + "'没有设置发动机号，忽略抓取！");
-					continue;
-				}
-				
-				try {
-					all.addAll(this.spider4JinDunJTWF.excute());
-					
-					// 添加到缓存记录
-					if (carSpideHistory == null)
-						carSpideHistory = new ArrayList<String>();
-					carSpideHistory.remove(carId);
-					carSpideHistory.add(carId);
-				} catch (Exception e) {
-					// 抓取异常就停止
-					logger.warn(e.getMessage());
-					hasError = true;
-					errorCount ++;
-				}
-			}
-		}
-		this.jinDunCache.put("carSpideHistory", carSpideHistory);
-		
-		if (all.isEmpty())
-			return 0;
-		
-		// 获取新的记录
-		List<SyncBase> news = new ArrayList<SyncBase>();
-		List<SyncBase> olds = new ArrayList<SyncBase>();
-		String syncType = JinDunJTWF.class.getSimpleName();
-		for (JinDunJTWF jtwf : all) {
-			if (!this.syncBaseService.hadSync(syncType, jtwf.getSyncCode())) {
-				news.add(jtwf);
-			} else {
-				olds.add(jtwf);
-			}
-		}
-		
-		// 如果抓取没有异常，就将所有现有的其他未处理记录设置为已处理
-		if (!hasError) {
-//			List<String> newSyncCodes = new ArrayList<String>();
-//			for (SyncBase syncBase : news) {
-//				newSyncCodes.add(syncBase.getSyncCode());
-//			}
-//			this.syncBaseService.updateNewStatus2Done4ExcludeCode(syncType,
-//					newSyncCodes);
-		}
-		
-		// 将已经存在的旧记录的状态更新为未处理
-		if (!olds.isEmpty()) {
-//			List<String> oldSyncCodes = new ArrayList<String>();
-//			for (SyncBase syncBase : olds) {
-//				oldSyncCodes.add(syncBase.getSyncCode());
-//			}
-//			int u2 = this.syncBaseService.updateStatus2New(syncType, oldSyncCodes);
-//			if(u2 > 0){
-//				logger.warn("将" + u2 + "条信息重新更新为未处理状态！");
-//			}
-		}
-		
-		// 保存新增的记录
-		if (!news.isEmpty())
-			this.syncBaseService.save(news);
-		if (logger.isInfoEnabled())
-			logger.info("从金盾网抓取交通违法信息总耗时：" + DateUtils.getWasteTime(startTime) + ",newCount=" + news.size());
-		
-		if(errorCount > 0){
-			strMsg.append(errorCount);//记录发生异常的数目
-		}
-		return news.size();
-	}
-**/	
 
+	/*
+	 * 批量抓取 public int doSync4JinDunJTWF(ActorHistory syncer, List<Map<String,
+	 * Object>> cars, StringBuffer strMsg) { Date startTime = new Date(); if
+	 * (logger.isDebugEnabled()) { logger.debug("cars=" + cars); }
+	 * 
+	 * boolean hasError = false; List<JinDunJTWF> all = new
+	 * ArrayList<JinDunJTWF>();
+	 * 
+	 * // 循环每台车执行抓取 this.spider4JinDunJTWF.setSyncer(syncer);
+	 * this.spider4JinDunJTWF.setCarType("02"); int i = 0; List<String>
+	 * carSpideHistory = this.jinDunCache.get("carSpideHistory"); String carId;
+	 * int errorCount = 0; for (Map<String, Object> car : cars) { carId =
+	 * car.get("id").toString(); i++; // if(i > 10) break; if (carSpideHistory
+	 * != null && carSpideHistory.contains(carId)) { logger.info("(" + i + "/" +
+	 * cars.size() + ")" + "车辆'" + car.get("plateType").toString() +
+	 * car.get("plateNo").toString() + "'存在抓取缓存，忽略频繁的抓取！"); continue; } else {
+	 * this.spider4JinDunJTWF.setCarPlateType(car.get("plateType") .toString());
+	 * this.spider4JinDunJTWF.setCarPlateNo(car.get("plateNo") .toString()); if
+	 * (car.get("engineNo") != null) { logger.warn("(" + i + "/" + cars.size() +
+	 * ")" + "开始抓取'" + car.get("plateType").toString() + "." +
+	 * car.get("plateNo").toString() + "'的交通违法信息...");
+	 * this.spider4JinDunJTWF.setEngineNo(car.get("engineNo") .toString()); }
+	 * else { logger.warn("(" + i + "/" + cars.size() + ")" + "车辆'" +
+	 * car.get("plateType").toString() + car.get("plateNo").toString() +
+	 * "'没有设置发动机号，忽略抓取！"); continue; }
+	 * 
+	 * try { all.addAll(this.spider4JinDunJTWF.excute());
+	 * 
+	 * // 添加到缓存记录 if (carSpideHistory == null) carSpideHistory = new
+	 * ArrayList<String>(); carSpideHistory.remove(carId);
+	 * carSpideHistory.add(carId); } catch (Exception e) { // 抓取异常就停止
+	 * logger.warn(e.getMessage()); hasError = true; errorCount ++; } } }
+	 * this.jinDunCache.put("carSpideHistory", carSpideHistory);
+	 * 
+	 * if (all.isEmpty()) return 0;
+	 * 
+	 * // 获取新的记录 List<SyncBase> news = new ArrayList<SyncBase>(); List<SyncBase>
+	 * olds = new ArrayList<SyncBase>(); String syncType =
+	 * JinDunJTWF.class.getSimpleName(); for (JinDunJTWF jtwf : all) { if
+	 * (!this.syncBaseService.hadSync(syncType, jtwf.getSyncCode())) {
+	 * news.add(jtwf); } else { olds.add(jtwf); } }
+	 * 
+	 * // 如果抓取没有异常，就将所有现有的其他未处理记录设置为已处理 if (!hasError) { // List<String>
+	 * newSyncCodes = new ArrayList<String>(); // for (SyncBase syncBase : news)
+	 * { // newSyncCodes.add(syncBase.getSyncCode()); // } //
+	 * this.syncBaseService.updateNewStatus2Done4ExcludeCode(syncType, //
+	 * newSyncCodes); }
+	 * 
+	 * // 将已经存在的旧记录的状态更新为未处理 if (!olds.isEmpty()) { // List<String> oldSyncCodes
+	 * = new ArrayList<String>(); // for (SyncBase syncBase : olds) { //
+	 * oldSyncCodes.add(syncBase.getSyncCode()); // } // int u2 =
+	 * this.syncBaseService.updateStatus2New(syncType, oldSyncCodes); // if(u2 >
+	 * 0){ // logger.warn("将" + u2 + "条信息重新更新为未处理状态！"); // } }
+	 * 
+	 * // 保存新增的记录 if (!news.isEmpty()) this.syncBaseService.save(news); if
+	 * (logger.isInfoEnabled()) logger.info("从金盾网抓取交通违法信息总耗时：" +
+	 * DateUtils.getWasteTime(startTime) + ",newCount=" + news.size());
+	 * 
+	 * if(errorCount > 0){ strMsg.append(errorCount);//记录发生异常的数目 } return
+	 * news.size(); }
+	 */
+	
 	public int doSync4JiaoWeiYYWZ(ActorHistory syncer, Calendar fromDate,
 			Calendar toDate, StringBuffer strMsg) {
-		Date startTime = new Date();
 		// 交委接口的宝城企业ID
 		String jiaoWei_qyid_baocheng = this.optionService.getItemValue("sync",
 				"jiaowei.ws.qyid.baocheng");
+		String jiaoWei_qyid_guangfa = this.optionService.getItemValue("sync",
+				"jiaowei.ws.qyid.guangfa");
 
+		int count = 0;
+		StringBuffer msg = new StringBuffer();
+		count += this.doSync4JiaoWeiYYWZ(jiaoWei_qyid_baocheng, syncer,
+				fromDate, toDate, msg);
+		strMsg.append(strMsg);
+
+		msg = new StringBuffer();
+		count += this.doSync4JiaoWeiYYWZ(jiaoWei_qyid_guangfa, syncer,
+				fromDate, toDate, msg);
+		strMsg.append(strMsg);
+		return count;
+	}
+
+	public int doSync4JiaoWeiYYWZ(String qyid,ActorHistory syncer, Calendar fromDate,
+			Calendar toDate, StringBuffer strMsg) {
+		Date startTime = new Date();
 		// 交委接口的url
 		String jiaoWei_ws_uri = this.optionService.getItemValue("sync",
 				"jiaowei.ws.soapUrl");
 		String jiaoWei_ws_method = "GetMasterWZ";
 
 		// 从交委接口获取数据
-		DataSet dataSet = wsMiddle.findBreachOfBusiness(jiaoWei_qyid_baocheng,
+		DataSet dataSet = wsMiddle.findBreachOfBusiness(qyid,
 				fromDate, toDate, strMsg);
 
 		// 发生异常就直接退出
@@ -415,11 +401,12 @@ public class BsSyncServiceImpl implements BsSyncService {
 				this.syncBaseService.save(toSaveDomains);
 		}
 		if (logger.isInfoEnabled())
-			logger.info("从交委营运违法接口获取数据总耗时：" + DateUtils.getWasteTime(startTime) + ",newCount=" + toSaveDomains.size());
+			logger.info("从交委营运违法接口获取数据总耗时：" + DateUtils.getWasteTime(startTime)
+					+ ",newCount=" + toSaveDomains.size());
 
 		return toSaveDomains.size();
 	}
-	
+
 	/**
 	 * 数据集行数据到交委营运违法信息的转换
 	 * 
@@ -438,7 +425,7 @@ public class BsSyncServiceImpl implements BsSyncService {
 		domain.setSyncDate(createDate);
 		domain.setSyncType(syncType);
 		domain.setSyncFrom(syncFrom);
-		
+
 		domain.setcId(row.getCellStringValue("c_id"));
 		domain.setSyncCode(row.getCellStringValue("案号"));
 		domain.setWzStatus(row.getCellStringValue("状态"));
@@ -450,21 +437,21 @@ public class BsSyncServiceImpl implements BsSyncService {
 		domain.setIdcardType(row.getCellStringValue("身份证明类型"));
 		domain.setIdcardCode(row.getCellStringValue("身份证明编号"));
 		domain.setCarPlate(row.getCellStringValue("违章主体"));
-		
-		String plate = domain.getCarPlate();//格式为粤A.XXXX
+
+		String plate = domain.getCarPlate();// 格式为粤A.XXXX
 		int index = plate.indexOf(".");
 		if (index != -1) {
 			plate = plate.substring(index + 1);
-		} 
-		//通过车牌号查找此车辆所属的分公司与车队
+		}
+		// 通过车牌号查找此车辆所属的分公司与车队
 		carInfoMap = this.carService.findcarInfoByCarPlateNo2(plate);
-		if(carInfoMap != null && carInfoMap.get("unit_name") != null){
-			domain.setUnitName(carInfoMap.get("unit_name")+""); //设置分公司
+		if (carInfoMap != null && carInfoMap.get("unit_name") != null) {
+			domain.setUnitName(carInfoMap.get("unit_name") + ""); // 设置分公司
 		}
-		if(carInfoMap != null && carInfoMap.get("motorcade_name") != null){
-			domain.setMotorcadeName(carInfoMap.get("motorcade_name")+""); //设置所属车队
+		if (carInfoMap != null && carInfoMap.get("motorcade_name") != null) {
+			domain.setMotorcadeName(carInfoMap.get("motorcade_name") + ""); // 设置所属车队
 		}
-		
+
 		domain.setCompany(row.getCellStringValue("违章企业"));
 		domain.setAddress(row.getCellStringValue("违章地段"));
 		domain.setOwner(row.getCellStringValue("业户名称"));
@@ -478,7 +465,8 @@ public class BsSyncServiceImpl implements BsSyncService {
 		domain.setReceipt(row.getCellStringValue("罚没收据编号"));
 		domain.setNotice(row.getCellStringValue("放行通知书编号"));
 		domain.setBusinessCertNo(row.getCellStringValue("营运证号"));
-		if(null !=  row.getCellStringValue("座位数") && row.getCellStringValue("座位数").length() > 0){
+		if (null != row.getCellStringValue("座位数")
+				&& row.getCellStringValue("座位数").length() > 0) {
 			domain.setSeating(Float.parseFloat(row.getCellStringValue("座位数")));
 		}
 		domain.setOweRecord(row.getCellStringValue("欠笔录"));
@@ -491,11 +479,33 @@ public class BsSyncServiceImpl implements BsSyncService {
 		domain.setSubject(row.getCellStringValue("违章项目"));
 		domain.setDetain(row.getCellStringValue("扣留物品"));
 		domain.setPullUnit(row.getCellStringValue("拖车单位"));
-		if(null != row.getCellStringValue("罚款") && row.getCellStringValue("罚款").length() > 0){
+		if (null != row.getCellStringValue("罚款")
+				&& row.getCellStringValue("罚款").length() > 0) {
 			domain.setPenalty(Float.parseFloat(row.getCellStringValue("罚款")));
 		}
-		
+
 		return domain;
+	}
+
+	public int doSync4JiaoWeiADVICE(ActorHistory syncer, Calendar fromDate,
+			Calendar toDate, StringBuffer strMsg) {
+		// 交委接口的宝城企业ID
+		String jiaoWei_qyid_baocheng = this.optionService.getItemValue("sync",
+				"jiaowei.ws.qyid.baocheng");
+		String jiaoWei_qyid_guangfa = this.optionService.getItemValue("sync",
+				"jiaowei.ws.qyid.guangfa");
+
+		int count = 0;
+		StringBuffer msg = new StringBuffer();
+		count += this.doSync4JiaoWeiADVICE(jiaoWei_qyid_baocheng, syncer,
+				fromDate, toDate, msg);
+		strMsg.append(strMsg);
+
+		msg = new StringBuffer();
+		count += this.doSync4JiaoWeiADVICE(jiaoWei_qyid_guangfa, syncer,
+				fromDate, toDate, msg);
+		strMsg.append(strMsg);
+		return count;
 	}
 
 	/**
@@ -507,12 +517,9 @@ public class BsSyncServiceImpl implements BsSyncService {
 	 * @param syncFrom
 	 * @param syncType
 	 */
-	public int doSync4JiaoWeiADVICE(ActorHistory syncer,
-			Calendar fromDate, Calendar toDate, StringBuffer strMsg) {
+	public int doSync4JiaoWeiADVICE(String qyid,ActorHistory syncer, Calendar fromDate,
+			Calendar toDate, StringBuffer strMsg) {
 		Date startTime = new Date();
-		// 交委接口的宝城企业ID
-		String jiaoWei_qyid_baocheng = this.optionService.getItemValue("sync",
-				"jiaowei.ws.qyid.baocheng");
 
 		// 交委接口的url
 		String jiaoWei_ws_uri = this.optionService.getItemValue("sync",
@@ -520,7 +527,7 @@ public class BsSyncServiceImpl implements BsSyncService {
 		String jiaoWei_ws_method = "GetAccuseByQYID";
 
 		// 从交委接口获取数据
-		DataSet dataSet = wsMiddle.findAccuseAndAdvice(jiaoWei_qyid_baocheng,
+		DataSet dataSet = wsMiddle.findAccuseAndAdvice(qyid,
 				fromDate, toDate, strMsg);
 
 		// 发生异常就直接退出
@@ -551,53 +558,62 @@ public class BsSyncServiceImpl implements BsSyncService {
 				this.syncBaseService.save(toSaveDomains);
 		}
 		if (logger.isInfoEnabled())
-			logger.info("从交委投诉与建议接口获取数据总耗时：" + DateUtils.getWasteTime(startTime) + ",newCount=" + toSaveDomains.size());
+			logger.info("从交委投诉与建议接口获取数据总耗时："
+					+ DateUtils.getWasteTime(startTime) + ",newCount="
+					+ toSaveDomains.size());
 
 		return toSaveDomains.size();
 	}
 
 	private JiaoWeiADVICE dataSetRow2JiaoWeiADVICE(Row row,
-			ActorHistory author, Calendar createDate, String syncFrom, String syncType) {
+			ActorHistory author, Calendar createDate, String syncFrom,
+			String syncType) {
 		JiaoWeiADVICE domain = new JiaoWeiADVICE();
 		domain.setAuthor(author);
 		domain.setStatus(JiaoWeiADVICE.STATUS_NEW);
 		domain.setSyncDate(createDate);
 		domain.setSyncType(syncType);
 		domain.setSyncFrom(syncFrom);
-		
+
 		domain.setcId(row.getCellStringValue("c_id"));
 		domain.setSyncCode(row.getCellStringValue("tis_handle_no"));
 		domain.setReceiveCode(row.getCellStringValue("handle_no"));
 		domain.setAdvisorName(row.getCellStringValue("accuser_name"));
 		domain.setPathFrom(row.getCellStringValue("accuser_route"));
 		domain.setPathTo(row.getCellStringValue("accuser_route_to"));
-		if(row.getCellStringValue("accuser_time") != null && row.getCellStringValue("accuser_time").length()>0){
-			domain.setRidingTimeStart(formatCalendar(row.getCellStringValue("accuser_time")));
+		if (row.getCellStringValue("accuser_time") != null
+				&& row.getCellStringValue("accuser_time").length() > 0) {
+			domain.setRidingTimeStart(formatCalendar(row
+					.getCellStringValue("accuser_time")));
 		}
-		if(row.getCellStringValue("end_time") != null && row.getCellStringValue("end_time").length()>0){
-			domain.setRidingTimeEnd(formatCalendar(row.getCellStringValue("end_time")));
+		if (row.getCellStringValue("end_time") != null
+				&& row.getCellStringValue("end_time").length() > 0) {
+			domain.setRidingTimeEnd(formatCalendar(row
+					.getCellStringValue("end_time")));
 		}
 		domain.setAdvisorSex(row.getCellStringValue("accuser_sex"));
-		if(row.getCellStringValue("accuser_age") != null && row.getCellStringValue("accuser_age").length() > 0){
-			domain.setAdvisorAge(Float.parseFloat(row.getCellStringValue("accuser_age")));
+		if (row.getCellStringValue("accuser_age") != null
+				&& row.getCellStringValue("accuser_age").length() > 0) {
+			domain.setAdvisorAge(Float.parseFloat(row
+					.getCellStringValue("accuser_age")));
 		}
 		domain.setAdvisorPhone(row.getCellStringValue("accuser_tel"));
 		domain.setAdvisorCert(row.getCellStringValue("accuser_id"));
 		domain.setOldUnitName(row.getCellStringValue("taxi_dept"));
 		domain.setCarPlate(row.getCellStringValue("taxi_no"));
-		
-		String plate = domain.getCarPlate();//格式为粤A.XXXX
+
+		String plate = domain.getCarPlate();// 格式为粤A.XXXX
 		int index = plate.indexOf(".");
 		if (index != -1) {
 			plate = plate.substring(index + 1);
-		} 
-		//通过车牌号查找此车辆所属的分公司与车队
-		carInfoMap = this.carService.findcarInfoByCarPlateNo2(plate);
-		if(carInfoMap != null && carInfoMap.get("unit_name") != null){
-			domain.setUnitName(carInfoMap.get("unit_name")+""); //设置分公司
 		}
-		if(carInfoMap != null && carInfoMap.get("motorcade_name") != null){
-			domain.setMotorcadeName(carInfoMap.get("motorcade_name")+""); //设置所属车队
+		// 通过车牌号查找此车辆所属的分公司与车队
+		carInfoMap = this.carService.findcarInfoByCarPlateNo2(plate);
+		if (carInfoMap != null && carInfoMap.get("unit_name") != null) {
+			domain.setUnitName(carInfoMap.get("unit_name") + ""); // 设置分公司
+		}
+		if (carInfoMap != null && carInfoMap.get("motorcade_name") != null) {
+			domain.setMotorcadeName(carInfoMap.get("motorcade_name") + ""); // 设置所属车队
 		}
 
 		domain.setDriverCert(row.getCellStringValue("driver_id"));
@@ -616,12 +632,13 @@ public class BsSyncServiceImpl implements BsSyncService {
 		domain.setBuslines(row.getCellStringValue("buslineno"));
 		domain.setBusColor(row.getCellStringValue("bus_color"));
 		domain.setReply(row.getCellStringValue("是否回复"));
-		
+
 		return domain;
 	}
-	
-	public Calendar formatCalendar(String Date){
-		Calendar calendar = Calendar.getInstance();;
+
+	public Calendar formatCalendar(String Date) {
+		Calendar calendar = Calendar.getInstance();
+		;
 		String dateStr = Date.replaceAll("/", "-");
 		DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		Date date;

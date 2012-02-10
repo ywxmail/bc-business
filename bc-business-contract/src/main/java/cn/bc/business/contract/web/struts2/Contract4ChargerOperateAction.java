@@ -36,7 +36,7 @@ public class Contract4ChargerOperateAction extends ActionSupport {
 
 	private Long id;
 	public Json json;
-
+	
 	public Long getId() {
 		return id;
 	}
@@ -48,7 +48,8 @@ public class Contract4ChargerOperateAction extends ActionSupport {
 
 	private Calendar newStartDate;
 	private Calendar newEndDate;
-
+	private String code;
+	
 	public Calendar getNewStartDate() {
 		return newStartDate;
 	}
@@ -65,6 +66,13 @@ public class Contract4ChargerOperateAction extends ActionSupport {
 		this.newEndDate = newEndDate;
 	}
 
+	public Long getCarId() {
+		return carId;
+	}
+
+	public void setCarId(Long carId) {
+		this.carId = carId;
+	}
 	// ========劳动合同续签代码开始========
 	
 	/**
@@ -73,7 +81,7 @@ public class Contract4ChargerOperateAction extends ActionSupport {
 	public String doRenew() throws Exception {
 		Long fromContractId = this.getId();
 		Contract newContract = this.contract4ChargerService.doRenew(
-				fromContractId, newStartDate, newEndDate);
+				fromContractId, newStartDate, newEndDate,code);
 		json = new Json();
 		json.put("id", newContract.getId());
 		json.put("oldId", fromContractId);
@@ -89,14 +97,6 @@ public class Contract4ChargerOperateAction extends ActionSupport {
 	private Boolean takebackOrigin;
 	private String assignChargerIds;
 	private String assignChargerNames;
-	
-	public Long getCarId() {
-		return carId;
-	}
-
-	public void setCarId(Long carId) {
-		this.carId = carId;
-	}
 	
 	public String getAssignChargerIds() {
 		return assignChargerIds;
@@ -122,6 +122,14 @@ public class Contract4ChargerOperateAction extends ActionSupport {
 		this.takebackOrigin = takebackOrigin;
 	}
 
+	public String getCode() {
+		return code;
+	}
+
+	public void setCode(String code) {
+		this.code = code;
+	}
+
 	/**
 	 * 经济合同过户
 	 */
@@ -131,7 +139,7 @@ public class Contract4ChargerOperateAction extends ActionSupport {
 		String assignChargerNamesStr = setChargerName(assignChargerIds,assignChargerNames);
 		
 		Contract newContract = this.contract4ChargerService.doChaneCharger(carId,takebackOrigin,
-				assignChargerIds,assignChargerNamesStr,fromContractId, newStartDate, newEndDate);
+				assignChargerIds,assignChargerNamesStr,fromContractId, newStartDate, newEndDate,code);
 		json = new Json();
 		json.put("id", newContract.getId());
 		json.put("oldId", fromContractId);
@@ -153,7 +161,7 @@ public class Contract4ChargerOperateAction extends ActionSupport {
 		String assignChargerNamesStr = setChargerName(assignChargerIds,assignChargerNames);
 		
 		Contract newContract = this.contract4ChargerService.doChaneCharger2(carId,takebackOrigin,
-				assignChargerIds,assignChargerNamesStr,fromContractId, newStartDate, newEndDate);
+				assignChargerIds,assignChargerNamesStr,fromContractId, newStartDate, newEndDate,code);
 		json = new Json();
 		json.put("id", newContract.getId());
 		json.put("oldId", fromContractId);

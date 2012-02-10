@@ -150,10 +150,11 @@ public interface Contract4ChargerService extends CrudService<Contract4Charger> {
 	 * @parma contractId 原合同id
 	 * @parma newStartDate 续签的开始日期
 	 * @parma newEndDate 续签的结束日期
+	 * @parma code 合同编号
 	 * @return 续签后的合同信息
 	 */
 	Contract4Charger doRenew(Long fromContractId, Calendar newStartDate,
-			Calendar newEndDate);
+			Calendar newEndDate,String code);
 
 	/**
 	 * 根据合同ID查找关联责任人姓名
@@ -171,11 +172,12 @@ public interface Contract4ChargerService extends CrudService<Contract4Charger> {
 	 * @parma contractId 原合同id
 	 * @parma newStartDate 续签的开始日期
 	 * @parma newEndDate 续签的结束日期
+	 * @parma code 合同编号
 	 * @return 过户后的合同信息
 	 */
 	Contract4Charger doChaneCharger(Long carId,Boolean takebackOrigin,String assignChargerIds,
 			String assignChargerNames, Long fromContractId,
-			Calendar newStartDate, Calendar newEndDate);
+			Calendar newStartDate, Calendar newEndDate,String code);
 
 	 /**
 	 * 重发包处理：新纪录、主版本号加1
@@ -186,11 +188,12 @@ public interface Contract4ChargerService extends CrudService<Contract4Charger> {
 	 * @parma contractId 原合同id
 	 * @parma newStartDate 续签的开始日期
 	 * @parma newEndDate 续签的结束日期
+	 * 	 * @parma code 合同编号
 	 * @return 过户后的合同信息
 	 */
 	Contract4Charger doChaneCharger2(Long carId, Boolean takebackOrigin,
 			String assignChargerIds, String assignChargerNamesStr,
-			Long fromContractId, Calendar newStartDate, Calendar newEndDate);
+			Long fromContractId, Calendar newStartDate, Calendar newEndDate,String code);
 
 	/**
 	 * 注销处理：记录不变、次版本号不变

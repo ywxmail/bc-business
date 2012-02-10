@@ -241,7 +241,8 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 			this.getE().setResult(jiaoWeiADVICE.getResult());
 			this.getE().setSubject(jiaoWeiADVICE.getSubject());
 			this.getE().setSubject2(jiaoWeiADVICE.getSubject2());
-			if(jiaoWeiADVICE.getMachinePrice() != null && !jiaoWeiADVICE.getMachinePrice().equals("无")){
+			if(jiaoWeiADVICE.getMachinePrice() != null && !jiaoWeiADVICE.getMachinePrice().equals("无")
+			 && !jiaoWeiADVICE.getMachinePrice().equals("没打表")){
 				this.getE().setMachinePrice(Float.parseFloat(jiaoWeiADVICE.getMachinePrice()));
 			}
 			this.getE().setTicket(jiaoWeiADVICE.getTicket());
