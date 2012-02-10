@@ -3,6 +3,7 @@
  */
 package cn.bc.business.car.web.struts2;
 
+import java.util.Calendar;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +24,7 @@ import cn.bc.business.web.struts2.FileEntityAction;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.option.domain.OptionItem;
 import cn.bc.option.service.OptionService;
+import cn.bc.web.ui.html.page.ButtonOption;
 import cn.bc.web.ui.html.page.PageOption;
 import cn.bc.web.ui.json.Json;
 
@@ -93,6 +95,17 @@ public class CarAction extends FileEntityAction<Long, Car> {
 	}
 
 	@Override
+	protected void buildFormPageButtons(PageOption pageOption, boolean editable) {
+		// 特殊处理的部分
+		if (!this.isReadonly()) {// 有权限
+			if (editable) {// 编辑状态显示保存按钮
+				pageOption.addButton(new ButtonOption(getText("label.save"),
+						null, "bc.carForm.save"));
+			} 
+		}
+	}
+	
+	@Override
 	protected PageOption buildFormPageOption(boolean editable) {
 		return super.buildFormPageOption(editable).setWidth(790)
 				.setMinWidth(250).setHeight(500).setMinHeight(200);
@@ -135,6 +148,29 @@ public class CarAction extends FileEntityAction<Long, Car> {
 		} else {
 			entity.setStatus(Car.CAR_STAUTS_NORMAL);
 		}
+	}
+	
+	@Override
+	public String save() throws Exception{
+		Car e = this.getE();
+		//保存之前检测车牌号是否唯一
+		Long existsId = this.carService.checkPlateIsExists(e.getId(),
+				e.getPlateType(), e.getPlateNo());
+		if (existsId != null) {
+			json = new Json();
+			json.put("msg", getText("car.error.plateIsExists2"));
+			return "json";
+		} 
+		
+		this.beforeSave(e);
+		//设置最后更新人的信息
+		SystemContext context = this.getSystyemContext();
+		e.setModifier(context.getUserHistory());
+		e.setModifiedDate(Calendar.getInstance());
+		this.getCrudService().save(e);
+		
+		this.afterSave(e);
+		return "saveSuccess";
 	}
 
 	@Override

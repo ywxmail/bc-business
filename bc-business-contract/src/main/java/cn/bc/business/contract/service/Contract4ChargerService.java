@@ -204,10 +204,11 @@ public interface Contract4ChargerService extends CrudService<Contract4Charger> {
 
 	/**
 	 * 判断经济合同自编号唯一
+	 * @param excludeId
 	 * @param code
 	 * @return
 	 */
-	List<Map<String, Object>> checkCodeIsExist(String code);
+	Long checkCodeIsExist(Long excludeId,String code);
 
 
 }

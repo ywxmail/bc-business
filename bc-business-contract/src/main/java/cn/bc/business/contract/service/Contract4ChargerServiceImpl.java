@@ -624,11 +624,12 @@ public class Contract4ChargerServiceImpl extends DefaultCrudService<Contract4Cha
 
 	/**
 	 * 判断经济合同自编号唯一
+	 * @param excludeId
 	 * @param code
 	 * @return
 	 */
-	public List<Map<String, Object>> checkCodeIsExist(String code) {
-		return this.contract4ChargerDao.checkCodeIsExist(code);
+	public Long checkCodeIsExist(Long excludeId,String code) {
+		return this.contract4ChargerDao.checkCodeIsExist(excludeId,code);
 	}
 
 }
