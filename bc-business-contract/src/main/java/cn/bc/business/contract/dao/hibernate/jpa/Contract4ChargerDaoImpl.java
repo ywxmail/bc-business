@@ -612,16 +612,28 @@ public class Contract4ChargerDaoImpl extends HibernateCrudJpaDao<Contract4Charge
 
 	/**
 	 * 判断经济合同自编号唯一
+	 * @param excludeId
 	 * @param code
 	 * @return
 	 */
-	public List<Map<String, Object>> checkCodeIsExist(String code) {
-		List<Map<String, Object>> list = null;
-		String sql = "select c.id from BS_CONTRACT c"
-				+ " inner join BS_CONTRACT_CHARGER cc ON c.id = cc.id where c.code='"+code+"'";
-		list = this.jdbcTemplate.queryForList(sql);
-		return list;
+	public Long checkCodeIsExist(Long excludeId,String code){
+		String sql = "select c.id as id from BS_CONTRACT c"+ 
+				" inner join BS_CONTRACT_CHARGER cc ON c.id = cc.id"+
+				" where c.status_=? and c.code=? ";
+		Object[] args;
+		if (excludeId != null) {
+			sql += " and c.id!=?";
+			args = new Object[] { new Integer(Contract.STATUS_NORMAL), code,
+					excludeId };
+		} else {
+			args = new Object[] { new Integer(Contract.STATUS_NORMAL), code };
+		}
+		List<Map<String, Object>> list = this.jdbcTemplate.queryForList(sql,
+				args);
+		if (list != null && !list.isEmpty())
+			return new Long(list.get(0).get("id").toString());
+		else
+			return null;
 	}
-
 
 }

@@ -148,11 +148,22 @@ public class Contract4ChargerAction extends FileEntityAction<Long, Contract4Char
 	
 	@Override
 	public String save() throws Exception{
-		SystemContext context = this.getSystyemContext();
 		Contract4Charger e = this.getE();
+		
+		//保存之前检测自编号是否唯一
+		Long excludeId = this.contract4ChargerService.checkCodeIsExist(
+				e.getId(),e.getCode()); 
+		if(excludeId != null){
+			json = new Json();
+			json.put("msg", getText("contract4Labour.code.exist2"));
+			return "json";
+		}
+		
+		
 		this.beforeSave(e);
 		
 		//设置最后更新人的信息
+		SystemContext context = this.getSystyemContext();
 		e.setModifier(context.getUserHistory());
 		e.setModifiedDate(Calendar.getInstance());
 		//设置责任人姓名
@@ -294,7 +305,16 @@ public class Contract4ChargerAction extends FileEntityAction<Long, Contract4Char
 	}
 	
 	// ========判断经济合同自编号唯一代码开始========
+	private Long excludeId;
 	private String code;
+	
+	public Long getExcludeId() {
+		return excludeId;
+	}
+
+	public void setExcludeId(Long excludeId) {
+		this.excludeId = excludeId;
+	}
 	
 	public String getCode() {
 		return code;
@@ -306,9 +326,10 @@ public class Contract4ChargerAction extends FileEntityAction<Long, Contract4Char
 
 	public String checkCodeIsExist() {
 		json = new Json();
-		List<Map<String, Object>> list = this.contract4ChargerService.checkCodeIsExist(this.code); 
-		if(list != null && list.size() > 0){
-			json.put("id", list.get(0).get("id"));
+		Long excludeId = this.contract4ChargerService.checkCodeIsExist(
+				this.excludeId,this.code); 
+		if(excludeId != null){
+			json.put("id", excludeId);
 			json.put("isExist", "true"); //存在重复自编号
 			json.put("msg", getText("contract4Labour.code.exist"));
 		}else{

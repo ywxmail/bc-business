@@ -113,7 +113,7 @@ public class Contract4ChargerServiceImpl extends DefaultCrudService<Contract4Cha
 	 * 续约
 	 */
 	public Contract4Charger doRenew(Long contractId, Calendar newStartDate,
-			Calendar newEndDate) {
+			Calendar newEndDate,String code) {
 		// 获取原来的合同信息
 		Contract4Charger oldContract = this.contract4ChargerDao.load(contractId);
 		if (oldContract == null)
@@ -146,6 +146,7 @@ public class Contract4ChargerServiceImpl extends DefaultCrudService<Contract4Cha
 		*/
 		//newContract.setCode(this.idGeneratorService
 		//.nextSN4Month("CLHT"+Contract4Charger.KEY_CODE));
+		newContract.setCode(code);
 
 		// 设置新的合同期限
 		newContract.setStartDate(newStartDate);
@@ -215,7 +216,7 @@ public class Contract4ChargerServiceImpl extends DefaultCrudService<Contract4Cha
 	 */
 	public Contract4Charger doChaneCharger(Long carId,Boolean takebackOrigin, String assignChargerIds,
 			String assignChargerNames, Long contractId,
-			Calendar newStartDate, Calendar newEndDate) {
+			Calendar newStartDate, Calendar newEndDate,String code) {
 		// 获取原来的合同信息
 		Contract4Charger oldContract = this.contract4ChargerDao.load(contractId);
 		if (oldContract == null)
@@ -250,6 +251,7 @@ public class Contract4ChargerServiceImpl extends DefaultCrudService<Contract4Cha
 		*/
 		//newContract.setCode(this.idGeneratorService
 		//.nextSN4Month(Contract4Labour.KEY_CODE));
+		newContract.setCode(code);
 
 		// 设置新的合同期限
 		newContract.setStartDate(newStartDate);
@@ -328,7 +330,7 @@ public class Contract4ChargerServiceImpl extends DefaultCrudService<Contract4Cha
 	 */
 	public Contract4Charger doChaneCharger2(Long carId, Boolean takebackOrigin,
 			String assignChargerIds, String assignChargerNames,
-			Long contractId, Calendar newStartDate, Calendar newEndDate) {
+			Long contractId, Calendar newStartDate, Calendar newEndDate,String code) {
 		// 获取原来的合同信息
 		Contract4Charger oldContract = this.contract4ChargerDao.load(contractId);
 		if (oldContract == null)
@@ -363,6 +365,7 @@ public class Contract4ChargerServiceImpl extends DefaultCrudService<Contract4Cha
 		*/
 		//newContract.setCode(this.idGeneratorService
 		//.nextSN4Month(Contract4Labour.KEY_CODE));
+		newContract.setCode(code);
 
 		// 设置新的合同期限
 		newContract.setStartDate(newStartDate);
@@ -624,11 +627,12 @@ public class Contract4ChargerServiceImpl extends DefaultCrudService<Contract4Cha
 
 	/**
 	 * 判断经济合同自编号唯一
+	 * @param excludeId
 	 * @param code
 	 * @return
 	 */
-	public List<Map<String, Object>> checkCodeIsExist(String code) {
-		return this.contract4ChargerDao.checkCodeIsExist(code);
+	public Long checkCodeIsExist(Long excludeId,String code) {
+		return this.contract4ChargerDao.checkCodeIsExist(excludeId,code);
 	}
 
 }
