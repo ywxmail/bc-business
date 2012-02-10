@@ -22,6 +22,7 @@ import cn.bc.core.query.condition.impl.EqualsCondition;
 import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.db.jdbc.RowMapper;
 import cn.bc.db.jdbc.SqlObject;
+import cn.bc.web.formater.EntityStatusFormater;
 import cn.bc.web.struts2.AbstractSelectPageAction;
 import cn.bc.web.ui.html.grid.Column;
 import cn.bc.web.ui.html.grid.IdColumn4MapKey;
@@ -46,7 +47,7 @@ public class SelectInsuranceTypeAction extends
 	@Override
 	protected OrderCondition getGridDefaultOrderCondition() {
 		// 默认排序方向：创建日期
-		return new OrderCondition("i.file_date", Direction.Desc);
+		return new OrderCondition("i.order_", Direction.Asc);
 	}
 	
 	@Override
@@ -55,8 +56,9 @@ public class SelectInsuranceTypeAction extends
 
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer sql = new StringBuffer();
-		sql.append("select i.id,i.name,i.desc_,i.status_,i.type_,i.file_date");
+		sql.append("select i.id,i.name,i.desc_,i.status_,i.type_,i.order_,i.coverage,n.name as pname");
 		sql.append(" from bs_insurance_type i");
+		sql.append(" left join bs_insurance_type n on i.pid=n.id");
 		sqlObject.setSql(sql.toString());
 
 		// 注入参数
@@ -70,6 +72,11 @@ public class SelectInsuranceTypeAction extends
 				map.put("id", rs[i++]);
 				map.put("name", rs[i++]);
 				map.put("desc_", rs[i++]);
+				map.put("status_", rs[i++]);
+				map.put("type_", rs[i++]);
+				map.put("order_", rs[i++]);
+				map.put("coverage", rs[i++]);
+				map.put("pname", rs[i++]);
 				return map;
 			}
 		});
@@ -80,14 +87,36 @@ public class SelectInsuranceTypeAction extends
 	protected List<Column> getGridColumns() {
 		List<Column> columns = new ArrayList<Column>();
 		columns.add(new IdColumn4MapKey("i.id", "id"));
+		columns.add(new TextColumn4MapKey("i.type_", "type_",
+				getText("insuranceType.type"), 40).setSortable(true)
+				.setValueFormater(new EntityStatusFormater(this.getTypes())));
+		// 所属模板名称
+		columns.add(new TextColumn4MapKey("n.name", "pname",
+				getText("insuranceType.pname"), 120).setSortable(true)
+				.setUseTitleFromLabel(true));
+		columns.add(new TextColumn4MapKey("i.order_", "order_",
+				getText("insuranceType.orderNo"), 60).setSortable(true));
 		columns.add(new TextColumn4MapKey("i.name", "name",
-				getText("insuranceType.name"), 120).setSortable(true)
+				getText("insuranceType.name"), 120)
+				.setUseTitleFromLabel(true));
+		columns.add(new TextColumn4MapKey("i.coverage", "coverage",
+				getText("insuranceType.coverage"), 80)
 				.setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("i.desc_", "desc_",
-				getText("insuranceType.description"),100).setSortable(true));
+				getText("insuranceType.description")));
 		return columns;
 	}
 
+	// 类型键值转换
+	private Map<String, String> getTypes() {
+		Map<String, String> mtypes = new HashMap<String, String>();
+		mtypes.put(String.valueOf(InsuranceType.TYPE_PLANT),
+				getText("insuranceType.type.plant"));
+		mtypes.put(String.valueOf(InsuranceType.TYPE_TEMPLATE),
+				getText("insuranceType.type.template"));
+		return mtypes;
+	}
+	
 	@Override
 	protected String[] getGridSearchFields() {
 		return new String[] { "i.name" };
@@ -100,7 +129,7 @@ public class SelectInsuranceTypeAction extends
 
 	@Override
 	protected PageOption getHtmlPageOption() {
-		return super.getHtmlPageOption().setWidth(300).setHeight(350);
+		return super.getHtmlPageOption().setWidth(600).setHeight(350);
 	}
 
 	@Override
@@ -121,8 +150,7 @@ public class SelectInsuranceTypeAction extends
 
 	@Override
 	protected Condition getGridSpecalCondition() {
-		return new AndCondition(new EqualsCondition("i.status_", BCConstants.STATUS_ENABLED),
-				new EqualsCondition("i.type_",InsuranceType.TYPE_TEMPLATE));
+		return new AndCondition(new EqualsCondition("i.status_", BCConstants.STATUS_ENABLED));
 	}
 
 	@Override

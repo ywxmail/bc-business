@@ -31,7 +31,7 @@ public class SelectTemplateWithPlantAction extends FileEntityAction<Long, Insura
 	 */
 	private static final long serialVersionUID = 1L;
 	private InsuranceTypeService insuranceTypeService;
-	public Long pid;
+	public String pid;
 
 	@Autowired
 	public void setCarService(InsuranceTypeService insuranceTypeService) {
@@ -40,18 +40,25 @@ public class SelectTemplateWithPlantAction extends FileEntityAction<Long, Insura
 	}
 	public String json;
 	public String selectInsuranceTypes() throws Exception {
-		List<InsuranceType> iList=this.insuranceTypeService.findTemplateWithPlant(pid);
-		JsonArray jsons = new JsonArray();
-		Json o;
-		for(InsuranceType it:iList){
-			o=new Json();
-			o.put("id", it.getId());
-			o.put("name", it.getName());
-			o.put("coverage", it.getCoverage());
-			o.put("description", it.getDescription() != null ? it.getDescription() : "");
-			jsons.add(o);
+		if(pid!=null){
+			String[] sarr=pid.split(",");
+			JsonArray jsons = new JsonArray();
+			for(String sid:sarr){
+				if(sid!=""){
+					List<InsuranceType> iList=this.insuranceTypeService.findTemplateWithPlant(Long.valueOf(sid));
+					Json o;
+						for(InsuranceType it:iList){
+							o=new Json();
+							o.put("id", it.getId());
+							o.put("name", it.getName());
+							o.put("coverage", it.getCoverage());
+							o.put("description", it.getDescription() != null ? it.getDescription() : "");
+							jsons.add(o);
+						}
+				}
+			}
+			json=jsons.toString();
 		}
-		json=jsons.toString();
 		return "json";
 	}
 }
