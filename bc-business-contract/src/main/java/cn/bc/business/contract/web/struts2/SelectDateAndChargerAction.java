@@ -4,7 +4,9 @@
 package cn.bc.business.contract.web.struts2;
 
 import java.util.Calendar;
+import java.util.Date;
 
+import org.apache.tools.ant.util.DateUtils;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
@@ -25,8 +27,9 @@ public class SelectDateAndChargerAction extends ActionSupport {
 	public String title = getText("title.selectDateRange");// 对话框标题
 	private Calendar startDate;// 开始日期 yyyy-MM-dd
 	private Calendar endDate;// 结束日期 yyyy-MM-dd
-	private Long carId;//车辆ID
-	private int addDay = 0;//要在开始日期上附加的天数
+	private Long carId;// 车辆ID
+	private int addDay = 0;// 要在开始日期上附加的天数
+	public String code;// 合同编号
 
 	public int getAddDay() {
 		return addDay;
@@ -62,8 +65,11 @@ public class SelectDateAndChargerAction extends ActionSupport {
 
 	@Override
 	public String execute() throws Exception {
-		if(addDay > 0 && startDate != null)
+		if (addDay > 0 && startDate != null)
 			startDate.add(Calendar.DAY_OF_MONTH, addDay);
+
+		// 自动生成经济合同编号的前缀
+		this.code = "CLHT" + DateUtils.format(new Date(), "yyyyMM");
 		return SUCCESS;
 	}
 }
