@@ -3,7 +3,6 @@
  */
 package cn.bc.business.car.web.struts2;
 
-import java.util.Calendar;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -101,10 +100,10 @@ public class CarAction extends FileEntityAction<Long, Car> {
 			if (editable) {// 编辑状态显示保存按钮
 				pageOption.addButton(new ButtonOption(getText("label.save"),
 						null, "bc.carForm.save"));
-			} 
+			}
 		}
 	}
-	
+
 	@Override
 	protected PageOption buildFormPageOption(boolean editable) {
 		return super.buildFormPageOption(editable).setWidth(790)
@@ -149,28 +148,28 @@ public class CarAction extends FileEntityAction<Long, Car> {
 			entity.setStatus(Car.CAR_STAUTS_NORMAL);
 		}
 	}
-	
+
 	@Override
-	public String save() throws Exception{
+	public String save() throws Exception {
+		json = new Json();
 		Car e = this.getE();
-		//保存之前检测车牌号是否唯一
-		Long existsId = this.carService.checkPlateIsExists(e.getId(),
-				e.getPlateType(), e.getPlateNo());
+		Long existsId = null;
+		// 保存之前检测车牌号是否唯一:仅在新建时检测
+		if (e.getId() == null) {
+			existsId = this.carService.checkPlateIsExists(e.getId(),
+					e.getPlateType(), e.getPlateNo());
+		}
 		if (existsId != null) {
-			json = new Json();
+			json.put("success", false);
 			json.put("msg", getText("car.error.plateIsExists2"));
 			return "json";
-		} 
-		
-		this.beforeSave(e);
-		//设置最后更新人的信息
-		SystemContext context = this.getSystyemContext();
-		e.setModifier(context.getUserHistory());
-		e.setModifiedDate(Calendar.getInstance());
-		this.getCrudService().save(e);
-		
-		this.afterSave(e);
-		return "saveSuccess";
+		} else {
+			super.save();
+			json.put("id", e.getId());
+			json.put("success", true);
+			json.put("msg", getText("form.save.success"));
+			return "json";
+		}
 	}
 
 	@Override
@@ -337,6 +336,7 @@ public class CarAction extends FileEntityAction<Long, Car> {
 		}
 		return "json";
 	}
+
 	// ========判断车辆自编号唯一性代码结束========
 
 	// ========判断车牌号唯一性代码开始========
