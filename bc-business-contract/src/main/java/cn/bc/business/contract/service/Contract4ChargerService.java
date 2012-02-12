@@ -12,7 +12,6 @@ import cn.bc.core.Page;
 import cn.bc.core.query.condition.Condition;
 import cn.bc.core.service.CrudService;
 
-
 /**
  * 责任人合同Service
  * 
@@ -24,60 +23,65 @@ import cn.bc.core.service.CrudService;
  */
 /**
  * @author wis
- *
+ * 
  */
 public interface Contract4ChargerService extends CrudService<Contract4Charger> {
 
 	/**
 	 * 删除单个CarNContract
-	 * @parma contractId 
+	 * 
+	 * @parma contractId
 	 * @return
 	 */
 	void deleteCarNContract(Long contractId);
 
 	/**
 	 * 删除批量CarNContract
-	 * @parma contractIds 
+	 * 
+	 * @parma contractIds
 	 * @return
 	 */
 	void deleteCarNContract(Long[] contractIds);
 
 	/**
-	 * 保存车辆与合同的关联信息
-	 * jdbc查询BS_CAR_CONTRACT表是否存在相应carId和contractId的记录
-	 * @parma carId 
-	 * @parma contractId 
+	 * 保存车辆与合同的关联信息 jdbc查询BS_CAR_CONTRACT表是否存在相应carId和contractId的记录
+	 * 
+	 * @parma carId
+	 * @parma contractId
 	 * @return
 	 */
 	void carNContract4Save(Long carId, Long contractId);
-	
+
 	/**
 	 * 查找车辆合同列表
-	 * @parma condition 
-	 * @parma carId 
+	 * 
+	 * @parma condition
+	 * @parma carId
 	 * @return
 	 */
 	List<Map<String, Object>> list4car(Condition condition, Long carId);
 
 	/**
 	 * 查找车辆合同分页
-	 * @parma condition 
-	 * @parma carId 
+	 * 
+	 * @parma condition
+	 * @parma carId
 	 * @return
 	 */
-	Page<Map<String,Object>> page4car(Condition condition, int pageNo,
+	Page<Map<String, Object>> page4car(Condition condition, int pageNo,
 			int pageSize);
 
 	/**
 	 * 根据contractId查找car信息
-	 * @parma contractId 
+	 * 
+	 * @parma contractId
 	 * @return
 	 */
 	Map<String, Object> findCarInfoByContractId(Long contractId);
 
-	
 	/**
 	 * 根据合同ID查找关联责任人
+	 * 
 	 * @param contractId
 	 * @return
 	 */
@@ -85,13 +89,15 @@ public interface Contract4ChargerService extends CrudService<Contract4Charger> {
 
 	/**
 	 * 根据责任人ID和合同ID.保存到人员与合同中间表,不存在插入新纪录,存在删除.重新插入
+	 * 
 	 * @param assignChargerIds
 	 * @param contractId
 	 */
 	void carMansNContract4Save(String assignChargerIds, Long contractId);
-	
+
 	/**
 	 * 根据合同ID查找车辆ID
+	 * 
 	 * @param contractId
 	 * @return
 	 */
@@ -99,6 +105,7 @@ public interface Contract4ChargerService extends CrudService<Contract4Charger> {
 
 	/**
 	 * 更新车辆表的负责人信息
+	 * 
 	 * @param assignChargerNames
 	 * @param carId
 	 */
@@ -106,6 +113,7 @@ public interface Contract4ChargerService extends CrudService<Contract4Charger> {
 
 	/**
 	 * 更新司机表的负责人信息
+	 * 
 	 * @param assignChargerNames
 	 * @param carId
 	 */
@@ -113,6 +121,7 @@ public interface Contract4ChargerService extends CrudService<Contract4Charger> {
 
 	/**
 	 * 根据车辆ID查找车辆信息
+	 * 
 	 * @param carId
 	 * @return
 	 */
@@ -120,6 +129,7 @@ public interface Contract4ChargerService extends CrudService<Contract4Charger> {
 
 	/**
 	 * 根据司机ID查找车辆信息
+	 * 
 	 * @param carManId
 	 * @return
 	 */
@@ -128,13 +138,18 @@ public interface Contract4ChargerService extends CrudService<Contract4Charger> {
 	/**
 	 * 保存劳动合同并处理车辆和司机的关联关系
 	 * 
-	 * @param contract4Charger 要保存的合同信息
-	 * @param carId 要关联的车辆id
-	 * @param assignChargerNames 责任人ID列表
-	 * @param assignChargerNames 责任人姓名列表
-	 * @return 
+	 * @param contract4Charger
+	 *            要保存的合同信息
+	 * @param carId
+	 *            要关联的车辆id
+	 * @param assignChargerNames
+	 *            责任人ID列表
+	 * @param assignChargerNames
+	 *            责任人姓名列表
+	 * @return
 	 */
-	Contract4Charger save(Contract4Charger e, Long carId, String assignChargerIds, String assignChargerNames);
+	Contract4Charger save(Contract4Charger e, Long carId,
+			String assignChargerIds, String assignChargerNames);
 
 	/**
 	 * 判断指定的车辆是否已经存在经济合同
@@ -154,10 +169,11 @@ public interface Contract4ChargerService extends CrudService<Contract4Charger> {
 	 * @return 续签后的合同信息
 	 */
 	Contract4Charger doRenew(Long fromContractId, Calendar newStartDate,
-			Calendar newEndDate,String code);
+			Calendar newEndDate, String code);
 
 	/**
 	 * 根据合同ID查找关联责任人姓名
+	 * 
 	 * @param contractId
 	 * @return
 	 */
@@ -165,6 +181,7 @@ public interface Contract4ChargerService extends CrudService<Contract4Charger> {
 
 	/**
 	 * 过户处理：新纪录、主版本号加1
+	 * 
 	 * @parma carId 原车辆id
 	 * @parma takebackOrigin 是否收回原件
 	 * @parma assignChargerIds 多个新责任人id
@@ -175,43 +192,44 @@ public interface Contract4ChargerService extends CrudService<Contract4Charger> {
 	 * @parma code 合同编号
 	 * @return 过户后的合同信息
 	 */
-	Contract4Charger doChaneCharger(Long carId,Boolean takebackOrigin,String assignChargerIds,
-			String assignChargerNames, Long fromContractId,
-			Calendar newStartDate, Calendar newEndDate,String code);
+	Contract4Charger doChaneCharger(Long carId, Boolean takebackOrigin,
+			String assignChargerIds, String assignChargerNames,
+			Long fromContractId, Calendar newStartDate, Calendar newEndDate,
+			String code);
 
-	 /**
+	/**
 	 * 重发包处理：新纪录、主版本号加1
+	 * 
 	 * @parma carId 原车辆id
 	 * @parma takebackOrigin 是否收回原件
 	 * @parma assignChargerIds 多个新责任人id
 	 * @parma assignChargerNames 多个新责任人名
 	 * @parma contractId 原合同id
 	 * @parma newStartDate 续签的开始日期
-	 * @parma newEndDate 续签的结束日期
-	 * 	 * @parma code 合同编号
+	 * @parma newEndDate 续签的结束日期 * @parma code 合同编号
 	 * @return 过户后的合同信息
 	 */
 	Contract4Charger doChaneCharger2(Long carId, Boolean takebackOrigin,
 			String assignChargerIds, String assignChargerNamesStr,
-			Long fromContractId, Calendar newStartDate, Calendar newEndDate,String code);
+			Long fromContractId, Calendar newStartDate, Calendar newEndDate,
+			String code);
 
 	/**
 	 * 注销处理：记录不变、次版本号不变
 	 * 
-	 * @param logoutId
-	 *            指定的注销人
 	 * @param contractId
-	 *            原合同id
+	 * @param logoutDate
+	 *            指定的注销日期 原合同id
 	 */
-	void doLogout(Long fromContractId);
+	void doLogout(Long contractId, Calendar logoutDate);
 
 	/**
 	 * 判断经济合同自编号唯一
+	 * 
 	 * @param excludeId
 	 * @param code
 	 * @return
 	 */
-	Long checkCodeIsExist(Long excludeId,String code);
-
+	Long checkCodeIsExist(Long excludeId, String code);
 
 }
