@@ -14,10 +14,14 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
 import cn.bc.BCConstants;
+import cn.bc.business.carman.domain.CarByDriver;
+import cn.bc.business.carman.domain.CarByDriverHistory;
 import cn.bc.business.carman.domain.CarMan;
+import cn.bc.business.web.struts2.LinkFormater4CarInfo;
 import cn.bc.business.web.struts2.LinkFormater4ChargerInfo;
 import cn.bc.business.web.struts2.ViewAction;
 import cn.bc.core.query.condition.Condition;
+import cn.bc.core.query.condition.ConditionUtils;
 import cn.bc.core.query.condition.Direction;
 import cn.bc.core.query.condition.impl.EqualsCondition;
 import cn.bc.core.query.condition.impl.InCondition;
@@ -61,8 +65,8 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 	@Override
 	protected OrderCondition getGridDefaultOrderCondition() {
 		// 默认排序方向：状态|创建日期
-		return new OrderCondition("c.status_", Direction.Asc).add(
-				"c.file_date", Direction.Desc);
+		return new OrderCondition("m.status_", Direction.Asc).add(
+				"m.file_date", Direction.Desc);
 	}
 
 	@Override
@@ -71,9 +75,17 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer sql = new StringBuffer();
-		sql.append("select c.id,c.status_,c.type_,c.name,c.cert_fwzg,c.cert_fwzg_id,c.cert_identity");
-		sql.append(",c.cert_cyzg,c.work_date,c.origin,c.former_unit,c.charger,c.cert_driving_first_date");
-		sql.append(",c.cert_driving,c.cert_driving_start_date,c.cert_driving_end_date,c.file_date,c.phone,c.phone1,c.sex,c.birthdate from BS_CARMAN c");
+		sql.append("select m.id,c.status_,m.type_,m.name drvierName,m.cert_fwzg,m.cert_fwzg_id,m.cert_identity");
+		sql.append(",m.cert_cyzg,m.work_date,m.origin,m.former_unit,m.charger,m.cert_driving_first_date");
+		sql.append(",m.cert_driving,m.cert_driving_start_date,m.cert_driving_end_date,m.file_date,m.phone,m.phone1,m.sex,m.birthdate");
+		sql.append(",c.plate_type,c.plate_no,bia.name unit_name,mo.name as motorcade,h.move_type,cd.desc_,cd.status_,cd.classes");
+		sql.append(" from BS_CARMAN m");
+		sql.append(" left join bs_car_driver cd on cd.driver_id=m.id");
+		sql.append(" left join bs_car_driver_history h on h.driver_id=m.id");
+		sql.append(" left join bs_car c on cd.car_id=c.id");
+		sql.append(" left join bs_motorcade mo on c.motorcade_id=mo.id");
+		sql.append(" left join bc_identity_actor bia on bia.id=mo.unit_id");
+		// sql.append(" where cd.status_=0 and h.main=0 and(cd.classes=1 or cd.classes=2 or cd.classes=4)");
 		sqlObject.setSql(sql.toString());
 
 		// 注入参数
@@ -87,7 +99,7 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 				map.put("id", rs[i++]);
 				map.put("status_", rs[i++]);
 				map.put("type_", rs[i++]);
-				map.put("name", rs[i++]);
+				map.put("drvierName", rs[i++]);
 				map.put("cert_fwzg", rs[i++]);
 				map.put("cert_fwzg_id", rs[i++]);
 				map.put("cert_identity", rs[i++]);
@@ -105,6 +117,13 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 				map.put("phone2", rs[i++]);
 				map.put("sex", rs[i++]);
 				map.put("birth_date", rs[i++]);
+				// ==========================
+				map.put("plate_type", rs[i++]);
+				map.put("plate_no", rs[i++]);
+				map.put("unit_name", rs[i++]);
+				map.put("motorcade", rs[i++]);
+				map.put("move_type", rs[i++]);
+				map.put("desc_", rs[i++]);
 				return map;
 			}
 		});
@@ -114,56 +133,69 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 	@Override
 	protected List<Column> getGridColumns() {
 		List<Column> columns = new ArrayList<Column>();
-		columns.add(new IdColumn4MapKey("c.id", "id"));
-		columns.add(new TextColumn4MapKey("c.status_", "status_",
+		columns.add(new IdColumn4MapKey("m.id", "id"));
+		columns.add(new TextColumn4MapKey("m.status_", "status_",
 				getText("carMan.status"), 40).setSortable(true)
 				.setValueFormater(new EntityStatusFormater(getBSStatuses1())));
-		columns.add(new TextColumn4MapKey("c.file_date", "file_date",
+		columns.add(new TextColumn4MapKey("m.file_date", "file_date",
 				getText("carMan.fileDate"), 85).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
-		columns.add(new TextColumn4MapKey("c.work_date", "work_date",
+		columns.add(new TextColumn4MapKey("m.work_date", "work_date",
 				getText("carMan.workDate"), 85).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
-		columns.add(new TextColumn4MapKey("c.type_", "type_",
+		columns.add(new TextColumn4MapKey("m.type_", "type_",
 				getText("carMan.type"), 80).setSortable(true).setValueFormater(
 				new KeyValueFormater(getType())));
-		columns.add(new TextColumn4MapKey("c.name", "name",
+		columns.add(new TextColumn4MapKey("m.name", "drvierName",
 				getText("carMan.name"), 60).setSortable(true));
-		columns.add(new TextColumn4MapKey("c.sex", "sex",
+		columns.add(new TextColumn4MapKey("m.sex", "sex",
 				getText("carMan.sex"), 40).setSortable(true).setValueFormater(
 				new SexFormater()));
-		columns.add(new TextColumn4MapKey("c.birthdate", "birth_date",
+		// =================
+		columns.add(new TextColumn4MapKey("h.move_type", "move_type",
+				getText("carMan.move_type"), 120)
+				.setValueFormater(new KeyValueFormater(getMoveType())));
+		columns.add(new TextColumn4MapKey("bia.name", "unit_name",
+				getText("carMan.unit_name"), 80).setSortable(true));
+		columns.add(new TextColumn4MapKey("mo.name", "motorcade",
+				getText("carMan.motorcade"), 80).setSortable(true));
+		columns.add(new TextColumn4MapKey("cd.desc_", "desc_",
+				getText("carMan.operationCar"), 560)
+				.setValueFormater(new LinkFormater4CarInfo(this
+						.getContextPath())));
+		// =================
+		columns.add(new TextColumn4MapKey("m.birthdate", "birth_date",
 				getText("carMan.birthdate"), 85).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
-		columns.add(new TextColumn4MapKey("c.cert_fwzg", "cert_fwzg",
+		columns.add(new TextColumn4MapKey("m.cert_fwzg", "cert_fwzg",
 				getText("carMan.cert4FWZG"), 80));
-		columns.add(new TextColumn4MapKey("c.phone", "phone1",
+		columns.add(new TextColumn4MapKey("m.phone", "phone1",
 				getText("carMan.phone1"), 100).setSortable(false)
 				.setUseTitleFromLabel(true));
-		columns.add(new TextColumn4MapKey("c.phone1", "phone2",
+		columns.add(new TextColumn4MapKey("m.phone1", "phone2",
 				getText("carMan.phone2"), 100).setSortable(false)
 				.setUseTitleFromLabel(true));
-		columns.add(new TextColumn4MapKey("c.origin", "origin",
+		columns.add(new TextColumn4MapKey("m.origin", "origin",
 				getText("carMan.origin"), 100).setSortable(true)
 				.setUseTitleFromLabel(true));
-		columns.add(new TextColumn4MapKey("c.former_unit", "former_unit",
+		columns.add(new TextColumn4MapKey("m.former_unit", "former_unit",
 				getText("carMan.formerUnit"), 80).setSortable(true)
 				.setUseTitleFromLabel(true));
-		columns.add(new TextColumn4MapKey("c.cert_driving_first_date",
+		columns.add(new TextColumn4MapKey("m.cert_driving_first_date",
 				"cert_driving_first_date",
 				getText("carMan.cert4DrivingFirstDateView"), 120).setSortable(
 				true).setValueFormater(new CalendarFormater("yyyy-MM-dd")));
-		columns.add(new TextColumn4MapKey("c.charger", "charger",
+		columns.add(new TextColumn4MapKey("m.charger", "charger",
 				getText("carMan.charger"), 100)
 				.setValueFormater(new LinkFormater4ChargerInfo(this
 						.getContextPath())));
-		columns.add(new TextColumn4MapKey("c.cert_identity", "cert_identity",
+		columns.add(new TextColumn4MapKey("m.cert_identity", "cert_identity",
 				getText("carMan.cert4Indentity"), 160).setSortable(true));
-		columns.add(new TextColumn4MapKey("c.cert_cyzg", "cert_cyzg",
+		columns.add(new TextColumn4MapKey("m.cert_cyzg", "cert_cyzg",
 				getText("carMan.cert4CYZG"), 120));
-		columns.add(new TextColumn4MapKey("c.cert_driving", "cert_driving",
+		columns.add(new TextColumn4MapKey("m.cert_driving", "cert_driving",
 				getText("carMan.cert4Driving"), 160));
-		columns.add(new TextColumn4MapKey("c.cert_driving_start_date",
+		columns.add(new TextColumn4MapKey("m.cert_driving_start_date",
 				"cert_driving_start_date",
 				getText("carMan.cert4DrivingDeadline"), 180)
 				.setValueFormater(new DateRangeFormater("yyyy-MM-dd") {
@@ -180,8 +212,8 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected String[] getGridSearchFields() {
-		return new String[] { "c.name", "c.origin", "c.cert_identity",
-				"c.cert_cyzg", "c.cert_fwzg", "c.phone" };
+		return new String[] { "m.name", "m.origin", "m.cert_identity",
+				"m.cert_cyzg", "m.cert_fwzg", "m.phone" };
 	}
 
 	@Override
@@ -197,7 +229,7 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected String getGridRowLabelExpression() {
-		return "['name']";
+		return "['drvierName']";
 	}
 
 	@Override
@@ -207,16 +239,44 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 		if (status != null && status.length() > 0) {
 			String[] ss = status.split(",");
 			if (ss.length == 1) {
-				statusCondition = new EqualsCondition("c.status_", new Integer(
+				statusCondition = new EqualsCondition("m.status_", new Integer(
 						ss[0]));
 			} else {
-				statusCondition = new InCondition("c.status_",
+				statusCondition = new InCondition("m.status_",
 						StringUtils.stringArray2IntegerArray(ss));
 			}
 		} else {
 			return null;
 		}
-		return statusCondition;
+		// 营运班次为在案的条件
+		Condition classesStatusCondition = null;
+		classesStatusCondition = new EqualsCondition("cd.status_",
+				BCConstants.STATUS_ENABLED);
+		// 迁移记录为当前的条件
+		Condition mainCondition = null;
+		mainCondition = new EqualsCondition("h.main",
+				CarByDriverHistory.MAIN_NOW);
+		// 驾驶状态为正班的条件
+		Condition zhengbanCondition = null;
+		zhengbanCondition = new EqualsCondition("cd.classes",
+				CarByDriver.TYPE_ZHENGBAN);
+		// 驾驶状态为副班的条件
+		Condition fubanCondition = null;
+		fubanCondition = new EqualsCondition("cd.classes",
+				CarByDriver.TYPE_FUBAN);
+		// 驾驶状态为主挂的条件
+		Condition zhuguaCondition = null;
+		zhuguaCondition = new EqualsCondition("cd.classes",
+				CarByDriver.TYPE_ZHUGUA);
+
+		// 合并条件
+		return ConditionUtils.mix2AndCondition(
+				statusCondition,
+				classesStatusCondition,
+				mainCondition,
+				ConditionUtils.mix2OrCondition(zhengbanCondition,
+						fubanCondition, zhuguaCondition).setAddBracket(true));
+
 	}
 
 	@Override
@@ -244,6 +304,35 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 				getText("carMan.type.charger"));
 		type.put(String.valueOf(CarMan.TYPE_DRIVER_AND_CHARGER),
 				getText("carMan.type.driverAndCharger"));
+		return type;
+	}
+
+	/**
+	 * 获取迁移类型值转换列表
+	 * 
+	 * @return
+	 */
+	protected Map<String, String> getMoveType() {
+		Map<String, String> type = new HashMap<String, String>();
+		type = new HashMap<String, String>();
+		type.put(String.valueOf(CarByDriverHistory.MOVETYPE_CLDCL),
+				getText("carByDriverHistory.moveType.cheliangdaocheliang"));
+		type.put(String.valueOf(CarByDriverHistory.MOVETYPE_GSDGSYZX),
+				getText("carByDriverHistory.moveType.gongsidaogongsiyizhuxiao"));
+		type.put(String.valueOf(CarByDriverHistory.MOVETYPE_ZXWYQX),
+				getText("carByDriverHistory.moveType.zhuxiaoweiyouquxiang"));
+		type.put(String.valueOf(CarByDriverHistory.MOVETYPE_YWGSQH),
+				getText("carByDriverHistory.moveType.youwaigongsiqianhui"));
+		type.put(String.valueOf(CarByDriverHistory.MOVETYPE_JHWZX),
+				getText("carByDriverHistory.moveType.jiaohuiweizhuxiao"));
+		type.put(String.valueOf(CarByDriverHistory.MOVETYPE_XRZ),
+				getText("carByDriverHistory.moveType.xinruzhi"));
+		type.put(String.valueOf(CarByDriverHistory.MOVETYPE_ZCD),
+				getText("carByDriverHistory.moveType.cheduidaochedui"));
+		type.put(String.valueOf(CarByDriverHistory.MOVETYPE_DINGBAN),
+				getText("carByDriverHistory.moveType.dingban"));
+		type.put(String.valueOf(CarByDriverHistory.MOVETYPE_JHZC),
+				getText("carByDriverHistory.moveType.jiaohuizhuanche"));
 		return type;
 	}
 

@@ -57,6 +57,10 @@ public class CarMan extends RichFileEntityImpl {
 	private String description;// 备注
 	private String level;// 等级
 
+	private Long mainCarId;// 主车辆Id
+	private String carInFo;// 营运车辆
+	private int moveType;// 迁移类型:1-公司到公司(已注销);2-注销未有去向;3-由外公司迁回;4-交回未注销;5-新入职;6-转车队;7-顶班;8-交回后转车
+
 	// 历史遗留
 	private String model;// 准驾车型
 	private String cert4Indentity;// 身份证号
@@ -366,6 +370,32 @@ public class CarMan extends RichFileEntityImpl {
 
 	public void setLevel(String level) {
 		this.level = level;
+	}
+
+	@Column(name = "MAIN_CAR_ID")
+	public Long getMainCarId() {
+		return mainCarId;
+	}
+
+	public void setMainCarId(Long mainCarId) {
+		this.mainCarId = mainCarId;
+	}
+
+	public String getCarInFo() {
+		return carInFo;
+	}
+
+	public void setCarInFo(String carInFo) {
+		this.carInFo = carInFo;
+	}
+
+	@Column(name = "MOVE_TYPE")
+	public int getMoveType() {
+		return moveType;
+	}
+
+	public void setMoveType(int moveType) {
+		this.moveType = moveType;
 	}
 
 }
