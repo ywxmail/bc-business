@@ -124,6 +124,9 @@ public class SelectCarAction extends
 		columns.add(new TextColumn4MapKey("m.name", "motorcade_name",
 				getText("car.motorcade"),80).setSortable(true)
 				.setUseTitleFromLabel(true));
+		columns.add(new TextColumn4MapKey("c.company", "company",
+				getText("selectCar.company"), 60).setSortable(true)
+				.setUseTitleFromLabel(true));
 		columns.add(new HiddenColumn4MapKey("motorcadeId", "motorcade_id"));
 		columns.add(new HiddenColumn4MapKey("motorcadeName", "motorcade_name"));
 		return columns;
