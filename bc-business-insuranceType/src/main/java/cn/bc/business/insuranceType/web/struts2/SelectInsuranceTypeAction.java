@@ -129,7 +129,7 @@ public class SelectInsuranceTypeAction extends
 
 	@Override
 	protected PageOption getHtmlPageOption() {
-		return super.getHtmlPageOption().setWidth(600).setHeight(300);
+		return super.getHtmlPageOption().setWidth(520).setHeight(480);
 	}
 
 	@Override
