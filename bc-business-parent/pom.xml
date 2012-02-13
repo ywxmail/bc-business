@@ -3,19 +3,19 @@
 	<parent>
 		<groupId>cn.bc</groupId>
 		<artifactId>bc-parent</artifactId>
-		<version>0.8-SNAPSHOT</version>
+		<version>0.8</version>
 		<relativePath>../../bc-framework/bc-parent/pom.xml</relativePath>
 	</parent>
 	<groupId>cn.bc.business</groupId>
 	<artifactId>bc-business-parent</artifactId>
 	<packaging>pom</packaging>
-	<version>0.7-SNAPSHOT</version>
+	<version>0.8</version>
 	<name>bc-business-parent</name>
 	<description>营运管理子系统各模块的parent</description>
 	
 	<properties>
 		<!-- 平台的版本号 -->
-		<framework.version>0.8-SNAPSHOT</framework.version>
+		<framework.version>0.8</framework.version>
 	</properties>
 	
 	<dependencies>
