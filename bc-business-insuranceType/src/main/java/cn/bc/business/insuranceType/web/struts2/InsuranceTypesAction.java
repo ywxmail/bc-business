@@ -65,7 +65,7 @@ public class InsuranceTypesAction extends ViewAction<Map<String, Object>> {
 		sql.append("select i.id as id,i.status_ as status,i.type_ as type,i.name as name");
 		sql.append(" ,i.coverage as coverage,n.name as pname,i.desc_ as desc,i.order_ as orderNo");
 		sql.append(" from bs_insurance_type i");
-		sql.append(" left join bs_insurance_type n on i.pid=n.id");
+		sql.append(" left join bs_insurance_type n on i.pid=n.id and n.type_ not in(0)");
 		sqlObject.setSql(sql.toString());
 
 		// 注入参数
