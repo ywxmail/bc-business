@@ -314,7 +314,7 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected String getGridRowLabelExpression() {
-		return "['ext_str1']+'的经济合同'";
+		return "['ext_str1']+'的经济合同 \t-\t v'+['ver_major']+'.'+['ver_minor']";
 	}
 
 	@Override
