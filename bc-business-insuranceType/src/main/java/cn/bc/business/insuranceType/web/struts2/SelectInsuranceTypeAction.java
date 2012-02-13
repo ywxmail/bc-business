@@ -103,7 +103,7 @@ public class SelectInsuranceTypeAction extends
 				getText("insuranceType.coverage"), 80)
 				.setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("i.desc_", "desc_",
-				getText("insuranceType.description")));
+				getText("insuranceType.description")).setUseTitleFromLabel(true));
 		return columns;
 	}
 
@@ -129,7 +129,7 @@ public class SelectInsuranceTypeAction extends
 
 	@Override
 	protected PageOption getHtmlPageOption() {
-		return super.getHtmlPageOption().setWidth(600).setHeight(350);
+		return super.getHtmlPageOption().setWidth(600).setHeight(300);
 	}
 
 	@Override
