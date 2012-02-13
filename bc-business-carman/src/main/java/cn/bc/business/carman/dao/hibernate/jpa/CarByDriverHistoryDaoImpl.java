@@ -62,4 +62,17 @@ public class CarByDriverHistoryDaoImpl extends
 		this.executeUpdate(hql, new Object[] { unit, motorcadeId, carId });
 	}
 
+	public void updateDriverOperationCar(Long driverId, Long mainCarId,
+			int moveType) {
+		String hql = "update CarMan c set c.carInFo=getCarInfoByDriverId(c.id),c.mainCarId=?,c.moveType=? where c.id=?";
+		this.executeUpdate(hql, new Object[] { mainCarId, moveType, driverId });
+
+	}
+
+	public void updateCarByDriverStatus(Long driverId, Long pid) {
+		String hql = "update CarByDriver c set c.status=1 where c.driver.id=? and c.pid !=?";
+		this.executeUpdate(hql, new Object[] { driverId, pid });
+
+	}
+
 }
