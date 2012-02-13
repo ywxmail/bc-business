@@ -9,6 +9,23 @@
 		<action name="select/search" class="selectCarManAction" method="search"/>
 	</package> -->
 	
+	<package name="carMan" extends="bc-default" namespace="/bc-business/carMan">
+		<action name="create" class="carManAction" method="create">
+			<result name="form">/bc-business/carMan/form.jsp</result>
+		</action>		
+		<action name="open" class="carManAction" method="open">
+			<result name="formr">/bc-business/carMan/form.jsp</result>
+		</action>
+		<action name="edit" class="carManAction" method="edit">
+			<result name="form">/bc-business/carMan/form.jsp</result>
+		</action>
+		<action name="save" class="carManAction" method="save"/>
+		<action name="delete" class="carManAction" method="delete" />
+		<action name="conditions" class="carManAction" method="conditions">
+			<result name="success">/bc-business/carMan/conditions.jsp</result>
+		</action>
+		<action name="checkCert4FWZGIsExists" class="carManAction" method="checkCert4FWZGIsExists"/>
+	</package>
 	
 	<package name="driver4Cert" extends="bc-default" namespace="/bc-business/driver4cert">
 		<action name="create" class="driver4CertAction" method="create">

@@ -66,9 +66,10 @@ public class CarManServiceImpl extends DefaultCrudService<CarMan> implements
 	 */
 
 	public List<CarMan> selectAllCarManByCarId(Long id) {
-		// TODO Auto-generated method stub
-		return (this.carManDao.findAllcarManBycarId(id));
-
+		return this.carManDao.findAllcarManBycarId(id);
 	}
 
+	public Long checkCert4FWZGIsExists(Long excludeId, String cert4FWZG) {
+		return this.carManDao.checkCert4FWZGIsExists(excludeId, cert4FWZG);
+	}
 }

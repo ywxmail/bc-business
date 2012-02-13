@@ -71,7 +71,7 @@ public class SelectCarAction extends
 
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer sql = new StringBuffer();
-		sql.append("select c.id,c.status_,c.plate_type,c.plate_no,c.register_date");
+		sql.append("select c.id,c.status_,c.code,c.plate_type,c.plate_no,c.register_date");
 		sql.append(",c.motorcade_id,m.name,c.company");
 		sql.append(" from bs_car c");
 		sql.append(" inner join bs_motorcade m on m.id=c.motorcade_id");
@@ -87,6 +87,7 @@ public class SelectCarAction extends
 				int i = 0;
 				map.put("id", rs[i++]);
 				map.put("status_", rs[i++]);
+				map.put("code", rs[i++]);
 				map.put("plate_type", rs[i++]);
 				map.put("plate_no", rs[i++]);
 				map.put("register_date", rs[i++]);
@@ -103,6 +104,9 @@ public class SelectCarAction extends
 	protected List<Column> getGridColumns() {
 		List<Column> columns = new ArrayList<Column>();
 		columns.add(new IdColumn4MapKey("c.id", "id"));
+		columns.add(new TextColumn4MapKey("c.code", "code",
+				getText("car.code"), 50).setSortable(true)
+				.setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("c.plate_no", "plate_no",
 				getText("car.plate"), 80).setUseTitleFromLabel(true)
 				.setValueFormater(new AbstractFormater<String>() {

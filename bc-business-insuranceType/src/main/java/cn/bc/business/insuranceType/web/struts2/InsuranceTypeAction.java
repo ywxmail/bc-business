@@ -100,11 +100,14 @@ public class InsuranceTypeAction extends FileEntityAction<Long, InsuranceType> {
 
 	@Override
 	protected void beforeSave(InsuranceType entity) {
-		if(entity.getId().equals(entity.getPid())){
+		//但模板修改类型险种时，下拉列还有当前模板可选择，保存时需要清空此模板
+		if(entity.getId()==entity.getPid()){
 			entity.setPid(null);
 		}
+		//模板保存时清空
 		if(entity.getType()==InsuranceType.TYPE_TEMPLATE){
 			entity.setCoverage(null);
+			entity.setPid(null);
 		}
 		super.beforeSave(entity);
 	}

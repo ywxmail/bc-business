@@ -37,7 +37,7 @@ import cn.bc.orm.hibernate.jpa.HibernateCrudJpaDao;
 public class CarDaoImpl extends HibernateCrudJpaDao<Car> implements CarDao {
 	private static Log logger = LogFactory.getLog(CarDaoImpl.class);
 	private JdbcTemplate jdbcTemplate;
-	
+
 	@Autowired
 	public void setDataSource(DataSource dataSource) {
 		this.jdbcTemplate = new JdbcTemplate(dataSource);
@@ -315,18 +315,21 @@ public class CarDaoImpl extends HibernateCrudJpaDao<Car> implements CarDao {
 	@SuppressWarnings("unchecked")
 	public List<Car> findAllcarBycarManId(Long carManId) {
 		String hql = "select c.car from CarByDriver c where c.driver.id=? and c.status=?";
-		//0为启用中
-		return this.getJpaTemplate().find(hql, new Object[] { carManId,new Integer( 0 )});
+		// 0为启用中
+		return this.getJpaTemplate().find(hql,
+				new Object[] { carManId, new Integer(0) });
 	}
 
 	/**
 	 * 根据车牌号查找车辆id
-	 * @parma carPlateNo 
+	 * 
+	 * @parma carPlateNo
 	 * @return Long
 	 */
 	public Long findcarIdByCarPlateNo(String carPlateNo) {
 		Long carId = null;
-		String sql = "select c.Id from BS_CAR c where c.PLATE_NO='"+carPlateNo+"'";
+		String sql = "select c.Id from BS_CAR c where c.PLATE_NO='"
+				+ carPlateNo + "'";
 		try {
 			carId = this.jdbcTemplate.queryForLong(sql);
 		} catch (EmptyResultDataAccessException e) {
@@ -339,15 +342,15 @@ public class CarDaoImpl extends HibernateCrudJpaDao<Car> implements CarDao {
 		Car car = null;
 		String hql = "select c from Car c where c.code = ?";
 		hql += " order by c.registerDate Desc";
-		List<?> list = this.getJpaTemplate().find(hql,code);
-		if(list.size() == 1){
+		List<?> list = this.getJpaTemplate().find(hql, code);
+		if (list.size() == 1) {
 			car = (Car) list.get(0);
 			return car;
-		}else if(list.size() < 1){
+		} else if (list.size() < 1) {
 			return null;
-		}else{
+		} else {
 			car = (Car) list.get(0);
-			if(logger.isDebugEnabled()){
+			if (logger.isDebugEnabled()) {
 				logger.debug("有两辆或两辆以上的车辆，已选择其第一辆");
 			}
 			return car;
@@ -372,10 +375,41 @@ public class CarDaoImpl extends HibernateCrudJpaDao<Car> implements CarDao {
 		return queryMap;
 	}
 
-	public List<Map<String, Object>> checkCodeIsExist(String code) {
-		List<Map<String, Object>> list = null;
-		String sql = "select c.id from BS_CAR c where c.code='"+code+"'";
-		list = this.jdbcTemplate.queryForList(sql);
-		return list;
+	public Long checkCodeIsExists(Long excludeId, String code) {
+		// 只查在案的车辆，因为新车可能沿用旧车的自编号
+		String sql = "select c.id as id from BS_CAR c where c.status_=? and c.code=?";
+		Object[] args;
+		if (excludeId != null) {
+			sql += " and c.id!=?";
+			args = new Object[] { new Integer(Car.CAR_STAUTS_NORMAL), code,
+					excludeId };
+		} else {
+			args = new Object[] { new Integer(Car.CAR_STAUTS_NORMAL), code };
+		}
+		List<Map<String, Object>> list = this.jdbcTemplate.queryForList(sql,
+				args);
+		if (list != null && !list.isEmpty())
+			return new Long(list.get(0).get("id").toString());
+		else
+			return null;
+	}
+
+	public Long checkPlateIsExists(Long excludeId, String plateType,
+			String plateNo) {
+		// 只查在案的车辆，因为新车可能沿用旧车的自编号
+		String sql = "select c.id as id from BS_CAR c where c.plate_type=? and c.plate_no=?";
+		Object[] args;
+		if (excludeId != null) {
+			sql += " and c.id!=?";
+			args = new Object[] { plateType, plateNo, excludeId };
+		} else {
+			args = new Object[] { plateType, plateNo };
+		}
+		List<Map<String, Object>> list = this.jdbcTemplate.queryForList(sql,
+				args);
+		if (list != null && !list.isEmpty())
+			return new Long(list.get(0).get("id").toString());
+		else
+			return null;
 	}
 }

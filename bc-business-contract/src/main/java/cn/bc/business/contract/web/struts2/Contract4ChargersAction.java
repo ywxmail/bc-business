@@ -134,9 +134,9 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer sql = new StringBuffer();
-		sql.append("select cc.id,cc.sign_type,cc.bs_type,cc.contract_version_no,c.status_,c.ext_str1,c.ext_str2");
+		sql.append("select cc.id,cc.sign_type,cc.bs_type,cc.contract_version_no,c.word_no,c.status_,c.ext_str1,c.ext_str2");
 		sql.append(",c.transactor_name,c.sign_date,c.start_date,c.end_date,c.code,c.logout_id,iah.actor_name,c.logout_date");
-		sql.append(",car.id carId");
+		sql.append(",cc.payment_date,car.id carId");
 		// sql.append(",man.id manId");
 		sql.append(",c.ver_major,c.ver_minor,c.op_type,c.file_date");
 		sql.append(" from BS_CONTRACT_CHARGER cc");
@@ -160,6 +160,7 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 				map.put("sign_type", rs[i++]);
 				map.put("bs_type", rs[i++]);
 				map.put("contract_version_no", rs[i++]);
+				map.put("word_no", rs[i++]);
 				map.put("status_", rs[i++]);
 				map.put("ext_str1", rs[i++]);
 				map.put("ext_str2", rs[i++]);
@@ -171,6 +172,7 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 				map.put("logout_id", rs[i++]);
 				map.put("actor_name", rs[i++]);
 				map.put("logout_date", rs[i++]);
+				map.put("payment_date", rs[i++]);
 				map.put("carId", rs[i++]);
 				// map.put("manId", rs[i++]);
 				map.put("ver_major", rs[i++]);
@@ -218,6 +220,19 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("cc.bs_type", "bs_type",
 				getText("contract4Charger.businessType"), 100)
 				.setUseTitleFromLabel(true));
+		columns.add(new TextColumn4MapKey("cc.payment_date", "payment_date",
+				getText("contract4Charger.paymentDate"), 50)
+				.setValueFormater(new AbstractFormater<String>() {
+					@Override
+					public String format(Object context, Object value) {
+						if (value == null || value.toString().equals("0"))
+							return "月末";
+						else
+							return value.toString();
+					}
+				}));
+		columns.add(new TextColumn4MapKey("c.word_no", "word_no",
+				getText("contract4Charger.wordNo"), 70));
 		columns.add(new TextColumn4MapKey("c.ext_str1", "ext_str1",
 				getText("contract.car"), 85).setUseTitleFromLabel(true)
 				.setValueFormater(
@@ -299,7 +314,7 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected String getGridRowLabelExpression() {
-		return "['ext_str1']+'的经济合同'";
+		return "['ext_str1']+'的经济合同 \t-\t v'+['ver_major']+'.'+['ver_minor']";
 	}
 
 	@Override
@@ -309,7 +324,7 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 		Condition mainsCondition = null;
 		Condition patchCondtion = null;
 		Condition typeCondtion = new EqualsCondition("c.type_", type);
-		
+
 		if (this.contractId == null) {
 			// 查看最新合同列表
 			statusCondition = ConditionUtils.toConditionByComma4IntegerValue(
@@ -320,10 +335,10 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 			// }
 		} else {
 			// 查看历史版本
-			if(this.contractId != 0){
+			if (this.contractId != 0) {
 				// 显示实例本身
 				patchCondtion = new EqualsCondition("c.patch_no", patchNo);
-			}else{
+			} else {
 				// 不显示实例本身
 				patchCondtion = new EqualsCondition("c.patch_no", patchNo);
 				mainsCondition = new EqualsCondition("c.main",

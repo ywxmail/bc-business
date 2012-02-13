@@ -21,6 +21,7 @@ import cn.bc.identity.domain.ActorDetail;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.option.service.OptionService;
 import cn.bc.web.ui.html.page.PageOption;
+import cn.bc.web.ui.json.Json;
 
 /**
  * 司机责任人Action
@@ -34,6 +35,7 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 	// private static Log logger = LogFactory.getLog(BulletinAction.class);
 	private static final long serialVersionUID = 1L;
 	private OptionService optionService;
+	private CarManService carManService;
 
 	public Map<String, String> statusesValue;
 	public List<Map<String, String>> carManHouseTypeList;// 司机责任人户口性质列表
@@ -47,6 +49,7 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 
 	@Autowired
 	public void setCarManService(CarManService carManService) {
+		this.carManService = carManService;
 		this.setCrudService(carManService);
 	}
 
@@ -101,4 +104,33 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 		return super.buildFormPageOption(editable).setWidth(790)
 				.setMinWidth(250).setHeight(570).setMinHeight(200);
 	}
+
+	// ========服务资格证唯一性检测代码开始========
+	public String cert4FWZG;
+	private Long excludeId;
+
+	public Long getExcludeId() {
+		return excludeId;
+	}
+
+	public void setExcludeId(Long excludeId) {
+		this.excludeId = excludeId;
+	}
+
+	public String checkCert4FWZGIsExists() {
+		Json json = new Json();
+		Long existsId = this.carManService.checkCert4FWZGIsExists(
+				this.excludeId, this.cert4FWZG);
+		if (existsId != null) {
+			json.put("id", existsId);
+			json.put("isExists", "true"); // 存在重复自编号
+			json.put("msg", getText("carMan.error.cert4FWZGIsExists"));
+		} else {
+			json.put("isExists", "false");
+		}
+		
+		this.json = json.toString();
+		return "json";
+	}
+	// ========服务资格证唯一性检测代码结束========
 }

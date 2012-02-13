@@ -21,15 +21,14 @@ import com.opensymphony.xwork2.ActionSupport;
  */
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 @Controller
-public class SelectDateAndChargerAction extends ActionSupport {
+public class SelectDateRangeAndCodeAction extends ActionSupport {
 	private static final long serialVersionUID = 1L;
 
-	public String title = getText("title.selectDateRange");// 对话框标题
+	public String title = getText("contract.title.selectDateRange");// 对话框标题
 	private Calendar startDate;// 开始日期 yyyy-MM-dd
 	private Calendar endDate;// 结束日期 yyyy-MM-dd
-	private Long carId;// 车辆ID
+	private String code;// 合同编号
 	private int addDay = 0;// 要在开始日期上附加的天数
-	public String code;// 合同编号
 
 	public int getAddDay() {
 		return addDay;
@@ -55,12 +54,12 @@ public class SelectDateAndChargerAction extends ActionSupport {
 		this.endDate = endDate;
 	}
 
-	public Long getCarId() {
-		return carId;
+	public String getCode() {
+		return code;
 	}
 
-	public void setCarId(Long carId) {
-		this.carId = carId;
+	public void setCode(String code) {
+		this.code = code;
 	}
 
 	@Override

@@ -90,7 +90,7 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 		sql.append(",p.commerial_company,p.commerial_start_date,p.commerial_end_date");
 		sql.append(",p.ownrisk,p.greenslip,p.liability_no,c.id as carId,p.op_type");
 		sql.append(",p.greenslip_no,p.greenslip_company,p.greenslip_start_date,p.greenslip_end_date,p.stop_date,p.main");
-		sql.append(",m.id as motorcade_id,p.liability_amount,p.commerial_amount,p.greenslip_amount");
+		sql.append(",m.id as motorcade_id,p.liability_amount,p.commerial_amount,p.greenslip_amount,c.bs_type as bstype");
 		sql.append(" from bs_car_policy p");
 		sql.append(" inner join bs_car c on c.id=p.car_id");
 		sql.append(" inner join bs_motorcade m on m.id=c.motorcade_id");
@@ -137,6 +137,7 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 				map.put("liability_amount", rs[i++]);// 责任险合计
 				map.put("commerial_amount", rs[i++]);// 商业险合计
 				map.put("greenslip_amount", rs[i++]);// 强制险合计
+				map.put("bstype", rs[i++]);
 				return map;
 			}
 		});
@@ -210,7 +211,10 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("c.register_date", "registeDate",
 				getText("policy.carRegisteDate"), 100).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
-
+		//车辆营运性质
+		columns.add(new TextColumn4MapKey("c.bs_type", "bstype",
+				getText("car.bstype"), 100).setSortable(true));
+		//投保人
 		columns.add(new TextColumn4MapKey("p.assured", "assured",
 				getText("policy.assured"), 190));
 		// 创建日期
@@ -220,11 +224,6 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("p.liability_no", "liability_no",
 				getText("policy.liabilityNo"), 190).setSortable(true)
 				.setUseTitleFromLabel(true));
-		/*
-		 * columns.add(new TextColumn4MapKey("p.stop_date", "stop_date",
-		 * getText("policy.stopDate"), 100).setSortable(true)
-		 * .setValueFormater(new CalendarFormater("yyyy-MM-dd")));
-		 */
 		if (!this.isReadonly()) {
 			// 责任险合计
 			columns.add(new TextColumn4MapKey("p.liability_amount",
@@ -286,7 +285,7 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 		}
 		// 操作类型
 		columns.add(new TextColumn4MapKey("p.op_type", "op_type",
-				getText("policy.labour.optype"), 60).setSortable(true)
+				getText("policy.labour.optype")).setSortable(true)
 				.setValueFormater(new EntityStatusFormater(getEntityOpTypes())));
 		return columns;
 	}

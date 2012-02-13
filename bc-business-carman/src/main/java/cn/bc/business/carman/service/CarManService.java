@@ -36,4 +36,15 @@ public interface CarManService extends CrudService<CarMan> {
 
 	/** 根据司机ID查找返回状态为启用中相关辆信息 */
 	List<CarMan> selectAllCarManByCarId(Long id);
+
+	/**
+	 * 判断服务资格证是否已经被占用
+	 * 
+	 * @param excludeId
+	 *            要排除检测的id
+	 * @param cert4FWZG
+	 *            服务资格证
+	 * @return 如果服务资格证被占用，返回占用此服务资格证的CarManId，否则返回null
+	 */
+	Long checkCert4FWZGIsExists(Long excludeId, String cert4FWZG);
 }

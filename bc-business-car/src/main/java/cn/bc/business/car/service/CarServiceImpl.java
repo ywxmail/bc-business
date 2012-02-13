@@ -64,7 +64,7 @@ public class CarServiceImpl extends DefaultCrudService<Car> implements
 			int pageSize) {
 		return this.carDao.page(condition, pageNo, pageSize);
 	}
-	
+
 	/**
 	 * 根据司机ID查找返回状态为启用中相关辆信息
 	 * 
@@ -72,17 +72,18 @@ public class CarServiceImpl extends DefaultCrudService<Car> implements
 	 * @return
 	 */
 	public List<Car> selectAllCarByCarManId(Long id) {
-		return  (this.carDao.findAllcarBycarManId(id));
+		return (this.carDao.findAllcarBycarManId(id));
 	}
 
 	/**
 	 * 根据车牌号查找车辆id
-	 * @parma carPlateNo 
+	 * 
+	 * @parma carPlateNo
 	 * @return Long
 	 */
 	public Long findcarIdByCarPlateNo(String carPlateNo) {
 		Long carId = 0L;
-		if(carPlateNo.length() > 0){
+		if (carPlateNo.length() > 0) {
 			carId = this.carDao.findcarIdByCarPlateNo(carPlateNo);
 		}
 		return carId;
@@ -96,7 +97,12 @@ public class CarServiceImpl extends DefaultCrudService<Car> implements
 		return this.carDao.findcarInfoByCarPlateNo2(carPlateNo);
 	}
 
-	public List<Map<String, Object>> checkCodeIsExist(String code) {
-		return this.carDao.checkCodeIsExist(code);
+	public Long checkCodeIsExists(Long excludeId, String code) {
+		return this.carDao.checkCodeIsExists(excludeId, code);
+	}
+
+	public Long checkPlateIsExists(Long excludeId, String plateType,
+			String plateNo) {
+		return this.carDao.checkPlateIsExists(excludeId, plateType, plateNo);
 	}
 }

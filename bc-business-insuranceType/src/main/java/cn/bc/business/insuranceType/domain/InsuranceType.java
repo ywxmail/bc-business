@@ -27,6 +27,7 @@ public class InsuranceType extends FileEntityImpl {
 	private int status;// 状态
 	private int type;//类型 0-险种，1-模板
 	private Long pid;//所属模板id
+	private String orderNo;//排序号
 
 	public String getName() {
 		return Name;
@@ -77,6 +78,15 @@ public class InsuranceType extends FileEntityImpl {
 
 	public void setPid(Long pid) {
 		this.pid = pid;
+	}
+	
+	@Column(name = "ORDER_")
+	public String getOrderNo() {
+		return orderNo;
+	}
+
+	public void setOrderNo(String orderNo) {
+		this.orderNo = orderNo;
 	}
 
 	
