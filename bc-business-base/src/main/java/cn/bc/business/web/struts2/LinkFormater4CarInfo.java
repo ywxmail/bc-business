@@ -60,8 +60,8 @@ public class LinkFormater4CarInfo extends LinkFormater {
 			if (i > 0)
 				tpl.append(",");
 
-			vs = vv.split(",");// [0]-车牌号,[1]-车辆id
-
+			vs = vv.split(",");
+			// [0]-车牌号,[1]-车辆id
 			if (vs.length == 2) {
 				labels.add(vs[0]);
 				// 链接地址、模块类型、样式控制
@@ -77,6 +77,22 @@ public class LinkFormater4CarInfo extends LinkFormater {
 
 				// 链接显示的文字：车牌号
 				tpl.append(">" + vs[0] + "</a>");
+			} else if (vs.length == 3) {// [0]-车牌号,[1]-班次,[2]-车辆id
+				labels.add(vs[0]);
+				// 链接地址、模块类型、样式控制
+				tpl.append("<a class=\"bc-link\" data-mtype=\""
+						+ this.moduleKey + "\" href=\"" + this.contextPath
+						+ this.urlPattern + vs[2] + "\"");
+
+				// 任务栏显示的标题：车牌号
+				tpl.append(" data-title=\"" + vs[0] + "\"");
+
+				// 对话框的id
+				tpl.append(" data-mid=\"" + this.moduleKey + vs[2] + "\"");
+
+				// 链接显示的文字：车牌号(班次)
+				tpl.append(">" + vs[0] + "(" + vs[1] + ")" + "</a>");
+
 			} else {
 				tpl.append(vv);
 				labels.add(vv);
@@ -115,6 +131,9 @@ public class LinkFormater4CarInfo extends LinkFormater {
 
 			vs = vv.split(",");// [0]-车牌号,[1]-车辆id
 			if (vs.length == 2) {
+				labels += vs[0];
+				// [0]-车牌号,[1]-班次,[1]-车辆id
+			} else if (vs.length == 3) {
 				labels += vs[0];
 			} else {
 				labels += vv;
