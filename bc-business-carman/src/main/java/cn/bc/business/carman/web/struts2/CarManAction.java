@@ -102,7 +102,7 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 	@Override
 	protected PageOption buildFormPageOption(boolean editable) {
 		return super.buildFormPageOption(editable).setWidth(790)
-				.setMinWidth(250).setHeight(570).setMinHeight(200);
+				.setMinWidth(250).setMinHeight(200);
 	}
 
 	// ========服务资格证唯一性检测代码开始========
@@ -128,7 +128,7 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 		} else {
 			json.put("isExists", "false");
 		}
-		
+
 		this.json = json.toString();
 		return "json";
 	}
