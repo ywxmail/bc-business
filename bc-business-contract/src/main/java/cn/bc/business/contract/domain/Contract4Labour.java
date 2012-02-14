@@ -45,10 +45,10 @@ public class Contract4Labour extends Contract {
 	private String bsType; // 营运性质
 	private String buyUnit; // 购买单位;
 	private String insuranceType; // 社保险种
-	private boolean iQAMA;// 暂住证:0-有,1-无
+	private boolean iqama;// 暂住证:0-有,1-无
 	private boolean accountBook;// 户口薄:0-有,1-无
 	private boolean identityCards;// 身份证:0-有,1-无
-	private boolean fPC;// 计生证:0-有,1-无
+	private boolean fpc;// 计生证:0-有,1-无
 	private boolean unemployed;// 就业手册:0-有,1-无
 	private boolean healthForm;// 体检表:0-有,1-无
 	private boolean photo;// 照片:0-有,1-无
@@ -191,14 +191,14 @@ public class Contract4Labour extends Contract {
 	}
 
 	@Column(name = "IS_IQAMA")
-	public boolean isiQAMA() {
-		return iQAMA;
+	public boolean isIqama() {
+		return iqama;
 	}
 
-	public void setiQAMA(boolean iQAMA) {
-		this.iQAMA = iQAMA;
+	public void setIqama(boolean iqama) {
+		this.iqama = iqama;
 	}
-
+	
 	@Column(name = "IS_ACCOUNT_BOOK")
 	public boolean isAccountBook() {
 		return accountBook;
@@ -217,21 +217,20 @@ public class Contract4Labour extends Contract {
 		this.identityCards = identityCards;
 	}
 
-	@Column(name = "IS_FPC")
-	public boolean isfPC() {
-		return fPC;
+	@Column(name = "IS_FPC")	
+	public boolean isFpc() {
+		return fpc;
 	}
 	
-	public void setfPC(boolean fPC) {
-		this.fPC = fPC;
+	public void setFpc(boolean fpc) {
+		this.fpc = fpc;
 	}
-
 
 	@Column(name = "IS_UNEMPLOYED")
 	public boolean isUnemployed() {
 		return unemployed;
 	}
-	
+
 	public void setUnemployed(boolean unemployed) {
 		this.unemployed = unemployed;
 	}
