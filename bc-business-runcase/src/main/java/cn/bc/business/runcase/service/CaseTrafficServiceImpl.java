@@ -52,6 +52,7 @@ public class CaseTrafficServiceImpl extends DefaultCrudService<Case4InfractTraff
 		this.jinDunJTWFDao = jinDunJTWFDao;
 	}
 
+	@Autowired
 	public void setJiaoWeiJTWFDao(JiaoWeiJTWFDao jiaoWeiJTWFDao) {
 		this.jiaoWeiJTWFDao = jiaoWeiJTWFDao;
 	}
@@ -95,7 +96,7 @@ public class CaseTrafficServiceImpl extends DefaultCrudService<Case4InfractTraff
 		List<Case4InfractTraffic> citList = new ArrayList<Case4InfractTraffic>(); 
 		Case4InfractTraffic cit = null;
 		
-		//遍历syncId
+		//遍历syncIds
 		Long[] syncIdArray = StringUtils.stringArray2LongArray(syncIds.split(","));
 		Long carId = null;
 		for(Long syncId : syncIdArray){

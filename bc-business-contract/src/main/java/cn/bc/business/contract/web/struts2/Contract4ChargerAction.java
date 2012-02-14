@@ -125,8 +125,11 @@ public class Contract4ChargerAction extends FileEntityAction<Long, Contract4Char
 		if(driverId != null){
 			//根据driverId查找车辆的车牌号码
 			carInfoMap = this.contract4ChargerService.findCarByCarManId(driverId);
-			entity.setExt_str1(isNullObject(carInfoMap.get("plate_type")+"."+carInfoMap.get("plate_no")));
-			carId = Long.valueOf(isNullObject(carInfoMap.get("id")));
+			if(carInfoMap != null && !carInfoMap.isEmpty()){
+				entity.setExt_str1(isNullObject(carInfoMap.get("plate_type")+"."+carInfoMap.get("plate_no")));
+				entity.setWordNo(isNullObject(carInfoMap.get("code")));
+				carId = Long.valueOf(isNullObject(carInfoMap.get("id")));
+			}
 		}
 		
 		

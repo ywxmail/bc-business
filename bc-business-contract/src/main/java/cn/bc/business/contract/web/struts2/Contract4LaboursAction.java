@@ -54,7 +54,10 @@ public class Contract4LaboursAction extends ViewAction<Map<String, Object>> {
 
 	public Long contractId;
 	public String patchNo;
+	public Long carId;
+	public Long driverId;
 
+	
 	@Override
 	public boolean isReadonly() {
 		// 劳动合同管理员或系统管理员
@@ -361,6 +364,8 @@ public class Contract4LaboursAction extends ViewAction<Map<String, Object>> {
 		Condition mainsCondition = null;
 		Condition patchCondtion = null;
 		Condition typeCondtion = new EqualsCondition("c.type_", type);
+		Condition carCondition = null;
+		Condition driverCondition = null;
 
 		if (contractId == null) {
 			// 查看最新合同列表
@@ -376,8 +381,18 @@ public class Contract4LaboursAction extends ViewAction<Map<String, Object>> {
 			mainsCondition = new EqualsCondition("c.main",
 					Contract.MAIN_HISTORY);
 		}
+		
+		if (carId != null) {
+			carCondition = new EqualsCondition("carc.car_id",
+					carId);
+		}
+		
+		if (driverId != null) {
+			driverCondition = new EqualsCondition("manc.man_id",
+					driverId);
+		}
 		return ConditionUtils.mix2AndCondition(typeCondtion, statusCondition,
-				mainsCondition, patchCondtion);
+				mainsCondition, patchCondtion,carCondition,driverCondition);
 	}
 
 	@Override
@@ -395,6 +410,14 @@ public class Contract4LaboursAction extends ViewAction<Map<String, Object>> {
 
 		if (patchNo != null) {
 			json.put("patchNo", patchNo);
+		}
+		
+		if (carId != null) {
+			json.put("carId", carId);
+		}
+
+		if (driverId != null) {
+			json.put("driverId", driverId);
 		}
 
 		json.put("type", type);
