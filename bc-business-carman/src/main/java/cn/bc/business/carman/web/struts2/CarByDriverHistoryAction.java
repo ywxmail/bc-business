@@ -124,16 +124,16 @@ public class CarByDriverHistoryAction extends
 				this.getE().setFromMotorcadeId(fromCar.getMotorcade().getId());
 				this.getE().setFromUnit(fromCar.getCompany());
 				this.getE().setToCar(fromCar);
-				this.getE().setToUnit(fromCar.getCompany());
-				this.getE().setToMotorcadeId(fromCar.getMotorcade().getId());
+//				this.getE().setToUnit(fromCar.getCompany());
+//				this.getE().setToMotorcadeId(fromCar.getMotorcade().getId());
 			} else {
 				Car fromCar = this.carService.load(fromCarId);
 				this.getE().setFromCar(fromCar);
 				this.getE().setFromMotorcadeId(fromCar.getMotorcade().getId());
 				this.getE().setFromUnit(fromCar.getCompany());
 				this.getE().setToCar(fromCar);
-				this.getE().setToUnit(fromCar.getCompany());
-				this.getE().setToMotorcadeId(fromCar.getMotorcade().getId());
+//				this.getE().setToUnit(fromCar.getCompany());
+//				this.getE().setToMotorcadeId(fromCar.getMotorcade().getId());
 			}
 			// 设置迁移类型
 			this.getE().setMoveType(CarByDriverHistory.MOVETYPE_ZCD);

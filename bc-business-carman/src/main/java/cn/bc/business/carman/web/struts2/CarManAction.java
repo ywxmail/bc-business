@@ -14,6 +14,8 @@ import org.springframework.stereotype.Controller;
 import cn.bc.BCConstants;
 import cn.bc.business.OptionConstants;
 import cn.bc.business.car.domain.Car;
+import cn.bc.business.carman.domain.CarByDriver;
+import cn.bc.business.carman.domain.CarByDriverHistory;
 import cn.bc.business.carman.domain.CarMan;
 import cn.bc.business.carman.service.CarManService;
 import cn.bc.business.web.struts2.FileEntityAction;
@@ -72,6 +74,10 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 				this.getIdGeneratorService().nextSN4Month(Car.KEY_CODE));
 
 		this.getE().setSex(ActorDetail.SEX_MAN);
+		// 新建司机时，迁移类型为空值
+		this.getE().setMoveType(CarByDriverHistory.MOVETYPE_NULL);
+		// 驾驶状态为空
+		this.getE().setClasses(CarByDriver.TYPE_WEIDINGYI);
 	}
 
 	@Override
@@ -128,7 +134,7 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 		} else {
 			json.put("isExists", "false");
 		}
-		
+
 		this.json = json.toString();
 		return "json";
 	}

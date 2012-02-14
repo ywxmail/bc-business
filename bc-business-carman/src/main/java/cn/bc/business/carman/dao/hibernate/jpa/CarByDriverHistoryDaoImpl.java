@@ -63,9 +63,15 @@ public class CarByDriverHistoryDaoImpl extends
 	}
 
 	public void updateDriverOperationCar(Long driverId, Long mainCarId,
-			int moveType) {
-		String hql = "update CarMan c set c.carInFo=getCarInfoByDriverId(c.id),c.mainCarId=?,c.moveType=? where c.id=?";
-		this.executeUpdate(hql, new Object[] { mainCarId, moveType, driverId });
+			int moveType, int classes) {
+		if (mainCarId == null) {
+			String hql = "update CarMan c set c.carInFo=getCarInfoByDriverId(c.id),c.mainCarId=null,c.classes=0,c.moveType=? where c.id=?";
+			this.executeUpdate(hql, new Object[] { moveType, driverId });
+		} else {
+			String hql = "update CarMan c set c.carInFo=getCarInfoByDriverId(c.id),c.mainCarId=?,c.moveType=?,c.classes=? where c.id=?";
+			this.executeUpdate(hql, new Object[] { mainCarId, moveType,
+					classes, driverId });
+		}
 
 	}
 

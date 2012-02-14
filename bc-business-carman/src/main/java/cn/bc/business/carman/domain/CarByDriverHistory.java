@@ -34,24 +34,26 @@ public class CarByDriverHistory extends FileEntityImpl {
 	/** 营运类型：顶班 */
 	public static final int TYPE_DINGBAN = 3;
 
-	/** 营运类型：车辆到车辆 */
+	/** 迁移类型：车辆到车辆 */
 	public static final int MOVETYPE_CLDCL = 0;
-	/** 营运类型：公司到公司(已注销) */
+	/** 迁移类型：公司到公司(已注销) */
 	public static final int MOVETYPE_GSDGSYZX = 1;
-	/** 营运类型：注销未有去向 :资格证已交给交委 */
+	/** 迁移类型：注销未有去向 :资格证已交给交委 */
 	public static final int MOVETYPE_ZXWYQX = 2;
-	/** 营运类型：由外公司迁回 */
+	/** 迁移类型：由外公司迁回 */
 	public static final int MOVETYPE_YWGSQH = 3;
-	/** 营运类型：交回未注销 :资格证已交回公司,但未交给交委 */
+	/** 迁移类型：交回未注销 :资格证已交回公司,但未交给交委 */
 	public static final int MOVETYPE_JHWZX = 4;
-	/** 营运类型：新入职 */
+	/** 迁移类型：新入职 */
 	public static final int MOVETYPE_XRZ = 5;
-	/** 营运类型：转车队 */
+	/** 迁移类型：转车队 */
 	public static final int MOVETYPE_ZCD = 6;
-	/** 营运类型：顶班 ：处理顶班司机的迁移记录 */
+	/** 迁移类型：顶班 ：处理顶班司机的迁移记录 */
 	public static final int MOVETYPE_DINGBAN = 7;
-	/** 营运类型：交回后转车 ：交证日期与转新车日期之间有大于一日间隔 */
+	/** 迁移类型：交回后转车 ：交证日期与转新车日期之间有大于一日间隔 */
 	public static final int MOVETYPE_JHZC = 8;
+	/** 迁移类型：空值：新建司机时，司机视图的迁移类型(int)不能为空所以要设空值*/
+	public static final int MOVETYPE_NULL = -1;
 
 	/** 主体当前版本 */
 	public static final int MAIN_NOW = 0;

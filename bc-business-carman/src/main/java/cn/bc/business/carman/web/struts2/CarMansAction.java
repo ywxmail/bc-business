@@ -6,9 +6,13 @@ package cn.bc.business.carman.web.struts2;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
@@ -75,17 +79,15 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer sql = new StringBuffer();
-		sql.append("select m.id,c.status_,m.type_,m.name drvierName,m.cert_fwzg,m.cert_fwzg_id,m.cert_identity");
+		sql.append("select m.id,m.status_,m.type_,m.name drvierName,m.cert_fwzg,m.cert_fwzg_id,m.cert_identity");
 		sql.append(",m.cert_cyzg,m.work_date,m.origin,m.former_unit,m.charger,m.cert_driving_first_date");
 		sql.append(",m.cert_driving,m.cert_driving_start_date,m.cert_driving_end_date,m.file_date,m.phone,m.phone1,m.sex,m.birthdate");
-		sql.append(",c.plate_type,c.plate_no,bia.name unit_name,mo.name as motorcade,h.move_type,cd.desc_,cd.status_,cd.classes");
+		sql.append(",m.carinfo,m.move_type,mo.name motorcade,bia.name unit_name,m.classes,m.main_car_id");
 		sql.append(" from BS_CARMAN m");
-		sql.append(" left join bs_car_driver cd on cd.driver_id=m.id");
-		sql.append(" left join bs_car_driver_history h on h.driver_id=m.id");
-		sql.append(" left join bs_car c on cd.car_id=c.id");
+		sql.append(" left join bs_car c on m.main_car_id=c.id");
 		sql.append(" left join bs_motorcade mo on c.motorcade_id=mo.id");
 		sql.append(" left join bc_identity_actor bia on bia.id=mo.unit_id");
-		// sql.append(" where cd.status_=0 and h.main=0 and(cd.classes=1 or cd.classes=2 or cd.classes=4)");
+		// sql.append(" left join bs_car_driver d on d.car_id=m.main_car_id and d.driver_id=m.id");
 		sqlObject.setSql(sql.toString());
 
 		// 注入参数
@@ -118,12 +120,12 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 				map.put("sex", rs[i++]);
 				map.put("birth_date", rs[i++]);
 				// ==========================
-				map.put("plate_type", rs[i++]);
-				map.put("plate_no", rs[i++]);
-				map.put("unit_name", rs[i++]);
-				map.put("motorcade", rs[i++]);
+				map.put("carinfo", rs[i++]);
 				map.put("move_type", rs[i++]);
-				map.put("desc_", rs[i++]);
+				map.put("motorcade", rs[i++]);
+				map.put("unit_name", rs[i++]);
+				map.put("classes", rs[i++]);
+
 				return map;
 			}
 		});
@@ -152,14 +154,17 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 				getText("carMan.sex"), 40).setSortable(true).setValueFormater(
 				new SexFormater()));
 		// =================
-		columns.add(new TextColumn4MapKey("h.move_type", "move_type",
-				getText("carMan.move_type"), 120)
+		columns.add(new TextColumn4MapKey("m.classes", "classes",
+				getText("carByDriver.classes"), 80)
+				.setValueFormater(new KeyValueFormater(getDriverClasses())));
+		columns.add(new TextColumn4MapKey("m.move_type", "move_type",
+				getText("carMan.move_type"), 140)
 				.setValueFormater(new KeyValueFormater(getMoveType())));
 		columns.add(new TextColumn4MapKey("bia.name", "unit_name",
 				getText("carMan.unit_name"), 80).setSortable(true));
 		columns.add(new TextColumn4MapKey("mo.name", "motorcade",
 				getText("carMan.motorcade"), 80).setSortable(true));
-		columns.add(new TextColumn4MapKey("cd.desc_", "desc_",
+		columns.add(new TextColumn4MapKey("m.carinfo", "carinfo",
 				getText("carMan.operationCar"), 560)
 				.setValueFormater(new LinkFormater4CarInfo(this
 						.getContextPath())));
@@ -248,34 +253,8 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 		} else {
 			return null;
 		}
-		// 营运班次为在案的条件
-		Condition classesStatusCondition = null;
-		classesStatusCondition = new EqualsCondition("cd.status_",
-				BCConstants.STATUS_ENABLED);
-		// 迁移记录为当前的条件
-		Condition mainCondition = null;
-		mainCondition = new EqualsCondition("h.main",
-				CarByDriverHistory.MAIN_NOW);
-		// 驾驶状态为正班的条件
-		Condition zhengbanCondition = null;
-		zhengbanCondition = new EqualsCondition("cd.classes",
-				CarByDriver.TYPE_ZHENGBAN);
-		// 驾驶状态为副班的条件
-		Condition fubanCondition = null;
-		fubanCondition = new EqualsCondition("cd.classes",
-				CarByDriver.TYPE_FUBAN);
-		// 驾驶状态为主挂的条件
-		Condition zhuguaCondition = null;
-		zhuguaCondition = new EqualsCondition("cd.classes",
-				CarByDriver.TYPE_ZHUGUA);
-
 		// 合并条件
-		return ConditionUtils.mix2AndCondition(
-				statusCondition,
-				classesStatusCondition,
-				mainCondition,
-				ConditionUtils.mix2OrCondition(zhengbanCondition,
-						fubanCondition, zhuguaCondition).setAddBracket(true));
+		return ConditionUtils.mix2AndCondition(statusCondition);
 
 	}
 
@@ -333,6 +312,24 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 				getText("carByDriverHistory.moveType.dingban"));
 		type.put(String.valueOf(CarByDriverHistory.MOVETYPE_JHZC),
 				getText("carByDriverHistory.moveType.jiaohuizhuanche"));
+		type.put(String.valueOf(CarByDriverHistory.MOVETYPE_NULL),
+				getText("carByDriverHistory.moveType.null"));
+		return type;
+	}
+
+	private Map<String, String> getDriverClasses() {
+		Map<String, String> type;
+		type = new LinkedHashMap<String, String>();
+		type.put(String.valueOf(CarByDriver.TYPE_ZHENGBAN),
+				getText("carByDriver.classes.zhengban"));
+		type.put(String.valueOf(CarByDriver.TYPE_FUBAN),
+				getText("carByDriver.classes.fuban"));
+		type.put(String.valueOf(CarByDriver.TYPE_DINGBAN),
+				getText("carByDriver.classes.dingban"));
+		type.put(String.valueOf(CarByDriver.TYPE_ZHUGUA),
+				getText("carByDriver.classes.zhugua"));
+		type.put(String.valueOf(CarByDriver.TYPE_WEIDINGYI),
+				getText("carByDriver.classes.weidingyi"));
 		return type;
 	}
 
@@ -366,4 +363,26 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 	protected boolean useAdvanceSearch() {
 		return true;
 	}
+
+	public JSONArray moveTypes;// 迁移类型
+
+	@Override
+	protected void initConditionsFrom() throws Exception {
+		// 可选迁移类型列表
+		moveTypes = new JSONArray();
+		Map<String, String> mt = getMoveType();
+		if (mt != null) {
+			JSONObject json;
+			Iterator<String> iterator = mt.keySet().iterator();
+			String key;
+			while (iterator.hasNext()) {
+				key = iterator.next();
+				json = new JSONObject();
+				json.put("label", mt.get(key));
+				json.put("value", key);
+				moveTypes.put(json);
+			}
+		}
+	}
+
 }

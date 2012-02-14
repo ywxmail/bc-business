@@ -72,24 +72,36 @@ public class CarByDriverHistoryServiceImpl extends
 		entity = super.save(entity);
 
 		if (entity.getDriver() != null) {
-			// 加载该司机的营运班次记录
-			CarByDriver carByDriver = this.carByDriverService
-					.selectCarByDriver4CarManId(entity.getDriver().getId());
+			// // 加载该司机的营运班次记录
+			// CarByDriver carByDriver = this.carByDriverService
+			// .selectCarByDriver4CarManId(entity.getDriver().getId());
 
 			// 迁移类型为[新入职,车辆到车辆,由外公司迁回]时行的操作
 			if (entity.getMoveType() == CarByDriverHistory.MOVETYPE_XRZ
 					|| entity.getMoveType() == CarByDriverHistory.MOVETYPE_CLDCL
 					|| entity.getMoveType() == CarByDriverHistory.MOVETYPE_YWGSQH
 					|| entity.getMoveType() == CarByDriverHistory.MOVETYPE_JHZC) {
-				//if (carByDriver != null) {
-					// 如果存在就更新该司机的营运车辆记录状态为注销
-					this.carByDriverHistoryDao.upDateCar4Driver(entity
-							.getDriver().getId());
-					// 更新该司机表营运车辆信息，主车辆Id,迁移类型
-					this.carByDriverHistoryDao.updateDriverOperationCar(entity
-							.getDriver().getId(), entity.getToCar().getId(),
-							entity.getMoveType());
-				//}
+				// if (carByDriver != null) {
+
+				// 找到注销前该司机营运记录
+				List<CarByDriver> oldCarByDrivers = carByDriverService
+						.findCarByDriverInfo4DriverId(entity.getDriver()
+								.getId());
+				// 如果存在就更新该司机的营运车辆记录状态为注销
+				this.carByDriverHistoryDao.upDateCar4Driver(entity.getDriver()
+						.getId());
+				// 如果是顶班转到新入职,车辆到车辆,由外公司迁回时，更新顶班车辆的营运司机信息
+				if (oldCarByDrivers != null) {
+					for (CarByDriver oldAr : oldCarByDrivers) {
+						this.carByDriverHistoryDao.updateDriver4Car(oldAr
+								.getCar().getId());
+					}
+				}
+				// // 更新该司机表营运车辆信息，主车辆Id,迁移类型
+				// this.carByDriverHistoryDao.updateDriverOperationCar(entity
+				// .getDriver().getId(), entity.getToCar().getId(), entity
+				// .getMoveType());
+				// }
 				// 如果不存在就增加一条营运班次记录
 				// 生成新的营运班次记录
 				CarByDriver newcarByDriver = new CarByDriver();
@@ -107,7 +119,7 @@ public class CarByDriverHistoryServiceImpl extends
 				// 更新该司机表营运车辆信息，主车辆Id,迁移类型
 				this.carByDriverHistoryDao.updateDriverOperationCar(entity
 						.getDriver().getId(), entity.getToCar().getId(), entity
-						.getMoveType());
+						.getMoveType(), entity.getToClasses());
 				// 更新旧车辆的营运司机信息
 				if (entity.getFromCar() != null) {
 					this.carByDriverHistoryDao.updateDriver4Car(entity
@@ -117,17 +129,35 @@ public class CarByDriverHistoryServiceImpl extends
 			} else if (entity.getMoveType() == CarByDriverHistory.MOVETYPE_GSDGSYZX
 					|| entity.getMoveType() == CarByDriverHistory.MOVETYPE_JHWZX
 					|| entity.getMoveType() == CarByDriverHistory.MOVETYPE_ZXWYQX) {
-				if (carByDriver != null) {
-					// 执行交回未注销，注销未有去向，公司到公司操作后，查找是否存在在案的营运班次，如果存在，则将其状态更新为注销
-					this.carByDriverHistoryDao.upDateCar4Driver(entity
-							.getDriver().getId());
-					// 更新原车辆的营运司机信息
-					this.carByDriverHistoryDao.updateDriver4Car(entity
-							.getFromCar().getId());
-					// 更新该司机表营运车辆信息，主车辆Id,迁移类型
+				// 找到注销前该司机营运记录
+				List<CarByDriver> oldCarByDrivers = carByDriverService
+						.findCarByDriverInfo4DriverId(entity.getDriver()
+								.getId());
+
+				// 执行交回未注销，注销未有去向，公司到公司操作后，查找是否存在在案的营运班次，如果存在，则将其状态更新为注销
+				this.carByDriverHistoryDao.upDateCar4Driver(entity.getDriver()
+						.getId());
+				// 更新该司机注销前车辆的营运司机信息
+				if (oldCarByDrivers != null) {
+					for (CarByDriver oldAr : oldCarByDrivers) {
+						this.carByDriverHistoryDao.updateDriver4Car(oldAr
+								.getCar().getId());
+					}
+				}
+
+				// 更新原车辆的营运司机信息
+				this.carByDriverHistoryDao.updateDriver4Car(entity.getFromCar()
+						.getId());
+				// 更新该司机表营运车辆信息，主车辆Id,迁移类型,营运班次
+				if (entity.getToCar() != null) {
 					this.carByDriverHistoryDao.updateDriverOperationCar(entity
 							.getDriver().getId(), entity.getToCar().getId(),
-							entity.getMoveType());
+							entity.getMoveType(), entity.getToClasses());
+				} else {
+					// 主车辆Id为空时，营运班次为空
+					this.carByDriverHistoryDao.updateDriverOperationCar(entity
+							.getDriver().getId(), null, entity.getMoveType(),
+							CarByDriver.TYPE_WEIDINGYI);
 				}
 			}
 
@@ -269,13 +299,25 @@ public class CarByDriverHistoryServiceImpl extends
 		if (!carByDrivers.isEmpty()) {
 			// 保存营运班次
 			this.carByDriverDao.save(carByDrivers);
+
+			// 找到注销前该司机营运记录
+			List<CarByDriver> oldCarByDrivers = carByDriverService
+					.findCarByDriverInfo4DriverId(entity.getDriver().getId());
+
 			// 更新司机营运班次记录：将不属于该司机迁移记录产生的其他营运记录的状态更新为注销
 			this.carByDriverHistoryDao.updateCarByDriverStatus(entity
 					.getDriver().getId(), entity.getId());
+			// 更新该司机注销前车辆的营运司机
+			if (oldCarByDrivers != null) {
+				for (CarByDriver oldAr : oldCarByDrivers) {
+					this.carByDriverHistoryDao.updateDriver4Car(oldAr.getCar()
+							.getId());
+				}
+			}
 			// 更新该司机表营运车辆信息，主车辆Id,迁移类型
 			this.carByDriverHistoryDao.updateDriverOperationCar(entity
 					.getDriver().getId(), entity.getToCar().getId(), entity
-					.getMoveType());
+					.getMoveType(), entity.getToClasses());
 		}
 	}
 }
