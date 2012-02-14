@@ -454,7 +454,9 @@ public class Contract4ChargerDaoImpl extends HibernateCrudJpaDao<Contract4Charge
 		
 		//jdbc查询BS_CAR记录
 		try {
-			queryMap = this.jdbcTemplate.queryForMap(sql);
+			List<Map<String,Object>> list = this.jdbcTemplate.queryForList(sql);
+			queryMap = list.get(0);
+			
 		} catch (EmptyResultDataAccessException e) {
 			e.getStackTrace();
 			//logger.error(e.getMessage(), e);
