@@ -6,8 +6,6 @@ package cn.bc.business.web.struts2;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.util.StringUtils;
-
 import cn.bc.business.BSConstants;
 import cn.bc.web.formater.LinkFormater;
 
@@ -91,7 +89,7 @@ public class LinkFormater4CarInfo extends LinkFormater {
 				tpl.append(" data-mid=\"" + this.moduleKey + vs[2] + "\"");
 
 				// 链接显示的文字：车牌号(班次)
-				tpl.append(">" + vs[0] + "(" + vs[1] + ")" + "</a>");
+				tpl.append(">" + vs[0] + "</a>" + "(" + vs[1] + ")");
 
 			} else {
 				tpl.append(vv);
@@ -102,9 +100,8 @@ public class LinkFormater4CarInfo extends LinkFormater {
 		}
 
 		if (this.showTip) {
-			return "<div title=\""
-					+ StringUtils.collectionToCommaDelimitedString(labels)
-					+ "\">" + tpl.toString() + "</div>";
+			return "<div title=\"" + getLinkText(context, value) + "\">"
+					+ tpl.toString() + "</div>";
 		} else {
 			return tpl.toString();
 		}
@@ -134,7 +131,7 @@ public class LinkFormater4CarInfo extends LinkFormater {
 				labels += vs[0];
 				// [0]-车牌号,[1]-班次,[1]-车辆id
 			} else if (vs.length == 3) {
-				labels += vs[0];
+				labels += vs[0] + "(" + vs[1] + ")";
 			} else {
 				labels += vv;
 			}
