@@ -10,8 +10,7 @@ import cn.bc.core.util.StringUtils;
 import cn.bc.web.formater.LinkFormater4Id;
 
 /**
- * 迁移记录的车辆样式化处理器
- *  针对通过id打开超链接的格式化
+ * 迁移记录的车辆样式化处理器 针对通过id打开超链接的格式化
  * <p>
  * 生成类似&lt;a ...&gt;XXXX&lt;/a&gt;的格式
  * </p>
@@ -84,10 +83,11 @@ public class LinkFormater4Move extends LinkFormater4Id {
 		Map<String, Object> map = (Map<String, Object>) context;
 		// 如果车牌号码不空时就导出 如：广发/四分二队/粤A.J4B41(正班)
 		if (map.get(plate) != null) {
-			return map.get(unit)
-					+ "/"
-					+ map.get(motorcade)
-					+ "/"
+			return (map.get(unit) != null && !("").equals(map.get(unit)) ? map
+					.get(unit) + "/" : "")
+					+ (map.get(motorcade) != null
+							&& !("").equals(map.get(motorcade)) ? map
+							.get(motorcade) + "/" : "")
 					+ map.get(plate)
 					+ (!("0".toString()).equals(map.get(classes).toString()) ? "("
 							+ type.get(map.get(classes).toString()) + ")"
@@ -109,9 +109,15 @@ public class LinkFormater4Move extends LinkFormater4Id {
 				Object[] params = getParams(context, _value);
 				String href = MessageFormat.format(this.urlPattern, params);
 				String t;
-				String tpl = map.get(unit) + "/" + map.get(motorcade) + "/"
-						+ "<a href=\"" + href
-						+ "\" class=\"bc-link\" data-mtype=\"" + this.moduleKey
+				String tpl = ((map.get(unit) != null && !("").equals(map
+						.get(unit))) ? map.get(unit) + "/" : "")
+						+ ((map.get(motorcade) != null && !("").equals(map
+								.get(motorcade))) ? map.get(motorcade) + "/"
+								: "")
+						+ "<a href=\""
+						+ href
+						+ "\" class=\"bc-link\" data-mtype=\""
+						+ this.moduleKey
 						+ "\"";
 
 				// 任务栏显示的标题
