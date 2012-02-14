@@ -60,6 +60,9 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 
 	public Long contractId;
 	public String patchNo;
+	public Long carId;
+	public Long driverId;
+	
 
 	@Override
 	public boolean isReadonly() {
@@ -144,8 +147,10 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 		sql.append(" inner join BS_CAR_CONTRACT carc on c.id = carc.contract_id");
 		sql.append(" inner join BS_Car car on carc.car_id = car.id");
 		sql.append(" left join bc_identity_actor_history iah on c.logout_id = iah.id");
-		// sql.append(" left join BS_CARMAN_CONTRACT manc on c.id = manc.contract_id");
-		// sql.append(" left join BS_CARMAN man on manc.man_id = man.id");
+		if(driverId != null){
+			sql.append(" left join BS_CARMAN_CONTRACT manc on c.id = manc.contract_id");
+			sql.append(" left join BS_CARMAN man on manc.man_id = man.id");
+		}
 		sqlObject.setSql(sql.toString());
 
 		// 注入参数
@@ -266,7 +271,7 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
 		columns.add(new TextColumn4MapKey("cc.contract_version_no",
 				"contract_version_no",
-				getText("contract4Charger.contractVersionNo"))
+				getText("contract4Charger.contractVersionNo"),180)
 				.setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("c.transactor_name",
 				"transactor_name", getText("contract.transactor"), 50)
@@ -281,7 +286,7 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 				.setUseTitleFromLabel(true));
 		// }
 		columns.add(new TextColumn4MapKey("c.code", "code",
-				getText("contract.code"), 60).setUseTitleFromLabel(true));
+				getText("contract.code"), 130).setUseTitleFromLabel(true));
 		// columns.add(new TextColumn4MapKey("c.op_type", "op_type",
 		// getText("contract4Labour.op"),
 		// 35).setSortable(true).setUseTitleFromLabel(true)
@@ -324,6 +329,8 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 		Condition mainsCondition = null;
 		Condition patchCondtion = null;
 		Condition typeCondtion = new EqualsCondition("c.type_", type);
+		Condition carCondition = null;
+		Condition driverCondition = null;
 
 		if (this.contractId == null) {
 			// 查看最新合同列表
@@ -346,8 +353,18 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 
 			}
 		}
+		
+		if (carId != null) {
+			carCondition = new EqualsCondition("carc.car_id",
+					carId);
+		}
+		
+		if (driverId != null) {
+			driverCondition = new EqualsCondition("manc.man_id",
+					driverId);
+		}
 		return ConditionUtils.mix2AndCondition(typeCondtion, statusCondition,
-				patchCondtion, mainsCondition);
+				patchCondtion, mainsCondition,carCondition,driverCondition);
 	}
 
 	@Override
@@ -365,6 +382,14 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 
 		if (patchNo != null) {
 			json.put("patchNo", patchNo);
+		}
+		
+		if (carId != null) {
+			json.put("carId", carId);
+		}
+
+		if (driverId != null) {
+			json.put("driverId", driverId);
 		}
 	}
 
