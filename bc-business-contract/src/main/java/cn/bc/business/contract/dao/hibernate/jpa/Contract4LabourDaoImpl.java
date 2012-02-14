@@ -501,7 +501,7 @@ public class Contract4LabourDaoImpl extends
 		List<Map<String, Object>> list = null;
 		String sql = "SELECT car.id,car.plate_type,car.plate_no,car.bs_type,car.factory_type,car.factory_model,car.register_date,car.scrap_date,car.level_,car.vin,car.engine_no"
 				+ ",car.total_weight,car.dim_len,car.dim_width,car.dim_height,car.access_weight,car.access_count,cd.car_id FROM BS_CAR_DRIVER cd left join BS_CAR car on cd.car_id = car.id"
-				+ " where cd.driver_id=" + carManId;
+				+ " where cd.driver_id=" + carManId + " and cd.status_=0 order by cd.file_date DESC";
 
 		list = this.jdbcTemplate.queryForList(sql);
 
@@ -546,7 +546,10 @@ public class Contract4LabourDaoImpl extends
 
 		// jdbc查询BS_CAR记录
 		try {
-			queryMap = this.jdbcTemplate.queryForMap(sql);
+			List<Map<String,Object>> list = this.jdbcTemplate.queryForList(sql);
+			if(list.size()>0){
+				queryMap = list.get(0);
+			}
 		} catch (EmptyResultDataAccessException e) {
 			e.getStackTrace();
 			// logger.error(e.getMessage(), e);

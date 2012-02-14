@@ -450,12 +450,14 @@ public class Contract4ChargerDaoImpl extends HibernateCrudJpaDao<Contract4Charge
 		Map<String,Object> queryMap = null;
 		String sql = "SELECT car.id,car.plate_type,car.plate_no,car.factory_type,car.factory_model,car.register_date,car.scrap_date,car.level_,car.vin,car.engine_no" +
 				",car.total_weight,car.dim_len,car.dim_width,car.dim_height,car.access_weight,car.access_count,car.code FROM BS_CAR_DRIVER cd left join BS_CAR car on cd.car_id = car.id" +
-				" where cd.driver_id="+carManId;
+				" where cd.driver_id="+carManId+" and cd.status_ = 0";
 		
 		//jdbc查询BS_CAR记录
 		try {
 			List<Map<String,Object>> list = this.jdbcTemplate.queryForList(sql);
-			queryMap = list.get(0);
+			if(list.size()>0){
+				queryMap = list.get(0);
+			}
 			
 		} catch (EmptyResultDataAccessException e) {
 			e.getStackTrace();
