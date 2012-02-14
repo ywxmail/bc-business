@@ -42,6 +42,15 @@ public interface CarByDriverDao extends CrudDao<CarByDriver> {
 	 * @return
 	 */
 	List<CarByDriver> find4Shiftwork(Long pid);
-	
+
 	void save(Collection<CarByDriver> entities);
+
+	/**
+	 * 通过司机Id查找在案的营运记录
+	 * 
+	 * @param driverId
+	 *            司机Id
+	 * @return
+	 */
+	List<CarByDriver> findCarByDrivers4DriverId(Long driverId);
 }

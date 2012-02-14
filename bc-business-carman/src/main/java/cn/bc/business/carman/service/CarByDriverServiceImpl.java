@@ -3,6 +3,8 @@
  */
 package cn.bc.business.carman.service;
 
+import java.util.List;
+
 import cn.bc.business.car.domain.Car;
 import cn.bc.business.carman.dao.CarByDriverDao;
 import cn.bc.business.carman.domain.CarByDriver;
@@ -33,5 +35,9 @@ public class CarByDriverServiceImpl extends DefaultCrudService<CarByDriver>
 
 	public CarByDriver selectCarByDriver4CarManId(Long id) {
 		return (this.carByDriverDao.findCarByDriverBycarManId(id));
+	}
+
+	public List<CarByDriver> findCarByDriverInfo4DriverId(Long driverId) {
+		return (this.carByDriverDao.findCarByDrivers4DriverId(driverId));
 	}
 }

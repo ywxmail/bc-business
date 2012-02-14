@@ -60,8 +60,11 @@ public interface CarByDriverHistoryDao extends CrudDao<CarByDriverHistory> {
 	 *            主车辆Id
 	 * @param moveType
 	 *            迁移类型
+	 * @param classes
+	 *            驾驶状态
 	 */
-	void updateDriverOperationCar(Long driverId, Long mainCarId, int moveType);
+	void updateDriverOperationCar(Long driverId, Long mainCarId, int moveType,
+			int classes);
 
 	/**
 	 * 更新司机营运班次记录：将不属于该司机迁移记录产生的其他营运记录的状态更新为注销

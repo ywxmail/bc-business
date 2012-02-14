@@ -3,6 +3,8 @@
  */
 package cn.bc.business.carman.service;
 
+import java.util.List;
+
 import cn.bc.business.car.domain.Car;
 import cn.bc.business.carman.domain.CarByDriver;
 import cn.bc.core.service.CrudService;
@@ -25,4 +27,13 @@ public interface CarByDriverService extends CrudService<CarByDriver> {
 	 * @return
 	 */
 	CarByDriver selectCarByDriver4CarManId(Long id);
+
+	/**
+	 * 通过司机Id查找在案的营运记录
+	 * 
+	 * @param driverId
+	 *            司机Id
+	 * @return
+	 */
+	List<CarByDriver> findCarByDriverInfo4DriverId(Long driverId);
 }
