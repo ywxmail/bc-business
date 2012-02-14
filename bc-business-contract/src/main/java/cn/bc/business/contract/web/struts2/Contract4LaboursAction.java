@@ -283,12 +283,12 @@ public class Contract4LaboursAction extends ViewAction<Map<String, Object>> {
 				getText("contract4Labour.leaveDate"), 90)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
 		columns.add(new TextColumn4MapKey("c.op_type", "op_type",
-				getText("contract4Labour.op"), 60).setSortable(true)
+				getText("contract4Labour.op"), 40).setSortable(true)
 				.setValueFormater(new EntityStatusFormater(getEntityOpTypes())));
 		columns.add(new TextColumn4MapKey("iah.name", "name",
 				getText("contract.author"), 55).setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("c.code", "code",
-				getText("contract.code")).setUseTitleFromLabel(true));
+				getText("contract.code"),130).setUseTitleFromLabel(true));
 		return columns;
 	}
 

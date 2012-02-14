@@ -271,7 +271,7 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
 		columns.add(new TextColumn4MapKey("cc.contract_version_no",
 				"contract_version_no",
-				getText("contract4Charger.contractVersionNo"))
+				getText("contract4Charger.contractVersionNo"),180)
 				.setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("c.transactor_name",
 				"transactor_name", getText("contract.transactor"), 50)
@@ -286,7 +286,7 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 				.setUseTitleFromLabel(true));
 		// }
 		columns.add(new TextColumn4MapKey("c.code", "code",
-				getText("contract.code"), 60).setUseTitleFromLabel(true));
+				getText("contract.code"), 130).setUseTitleFromLabel(true));
 		// columns.add(new TextColumn4MapKey("c.op_type", "op_type",
 		// getText("contract4Labour.op"),
 		// 35).setSortable(true).setUseTitleFromLabel(true)
