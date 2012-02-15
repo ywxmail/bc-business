@@ -33,7 +33,7 @@ public class Car extends RichFileEntityImpl {
 	private static final long serialVersionUID = 1L;
 	public static final String KEY_UID = "car.uid";
 	public static final String KEY_CODE = "car.code";
-	
+
 	public static final int CAR_STAUTS_NORMAL = 0;
 	public static final int CAR_STAUTS_LOGOUT = 1;
 
@@ -67,8 +67,8 @@ public class Car extends RichFileEntityImpl {
 	private float power;// 功率，单位kw
 	private String turnType;// 转向方式，如“方向盘”
 	private int tireCount;// 轮胎数
-	private String tireFrontDistance;//前轮距
-	private String tireBehindDistance;//后轮距
+	private String tireFrontDistance;// 前轮距
+	private String tireBehindDistance;// 后轮距
 	private String tireStandard;// 轮胎规格
 	private int axisDistance;// 轴距
 	private int axisCount;// 轴数
@@ -88,6 +88,7 @@ public class Car extends RichFileEntityImpl {
 	private String certNo1;// 购置税证号
 	private String certNo2;// 经营权使用证号
 	private String certNo3;// 强检证号
+	private String certNo4;// 道路运输证号
 	private String taximeterFactory;// 计价器制造厂
 	private String taximeterType;// 计价器型号
 	private String taximeterNo;// 计价器出厂编号
@@ -103,10 +104,9 @@ public class Car extends RichFileEntityImpl {
 	private boolean verify;// 主管部门核准:0-未,1-已
 	private Calendar verifyDate;// 核准日期
 	private String logoutRemark;// 注销备注
-	
+
 	private Set<Cert> certs;// 拥有的证件
 	private Set<Contract> contracts;// 合同
-	
 
 	@ManyToOne(fetch = FetchType.EAGER, optional = false)
 	@JoinColumn(name = "MOTORCADE_ID", referencedColumnName = "ID")
@@ -363,12 +363,12 @@ public class Car extends RichFileEntityImpl {
 	public void setTireCount(int tireCount) {
 		this.tireCount = tireCount;
 	}
-	
+
 	@Column(name = "TIRE_STANDARD")
 	public String getTireStandard() {
 		return tireStandard;
 	}
-	
+
 	public void setTireStandard(String tireStandard) {
 		this.tireStandard = tireStandard;
 	}
@@ -377,16 +377,16 @@ public class Car extends RichFileEntityImpl {
 	public String getTireFrontDistance() {
 		return tireFrontDistance;
 	}
-	
+
 	public void setTireFrontDistance(String tireFrontDistance) {
 		this.tireFrontDistance = tireFrontDistance;
 	}
-	
+
 	@Column(name = "TIRE_BEHIND_DISTANCE")
 	public String getTireBehindDistance() {
 		return tireBehindDistance;
 	}
-	
+
 	public void setTireBehindDistance(String tireBehindDistance) {
 		this.tireBehindDistance = tireBehindDistance;
 	}
@@ -408,7 +408,7 @@ public class Car extends RichFileEntityImpl {
 	public void setAxisCount(int axisCount) {
 		this.axisCount = axisCount;
 	}
-	
+
 	@Column(name = "PIECE_COUNT")
 	public int getPieceCount() {
 		return pieceCount;
@@ -535,6 +535,15 @@ public class Car extends RichFileEntityImpl {
 		this.certNo3 = certNo3;
 	}
 
+	@Column(name = "CERT_NO4")
+	public String getCertNo4() {
+		return certNo4;
+	}
+
+	public void setCertNo4(String certNo4) {
+		this.certNo4 = certNo4;
+	}
+
 	@Column(name = "TAXIMETER_FACTORY")
 	public String getTaximeterFactory() {
 		return taximeterFactory;
@@ -651,6 +660,5 @@ public class Car extends RichFileEntityImpl {
 	public void setLogoutRemark(String logoutRemark) {
 		this.logoutRemark = logoutRemark;
 	}
-	
-	
+
 }
