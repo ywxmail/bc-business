@@ -7,6 +7,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
@@ -62,7 +64,11 @@ public class CarAction extends FileEntityAction<Long, Car> {
 	public List<Map<String, String>> logoutReasonList; // 注销原因列表
 	public List<Map<String, String>> carModelList; // 车型配置列表
 	public Map<String, String> statusesValue;
+	public JSONArray vinPrefixes;// 车辆车架号前缀
 	public Json json;
+
+	public String vinPrefix;// 车架号前缀
+	public String vinSuffix;// 车架号后缀
 
 	@Autowired
 	public void setCarService(CarService carService) {
@@ -106,7 +112,7 @@ public class CarAction extends FileEntityAction<Long, Car> {
 
 	@Override
 	protected PageOption buildFormPageOption(boolean editable) {
-		return super.buildFormPageOption(editable).setWidth(760)
+		return super.buildFormPageOption(editable).setWidth(765)
 				.setMinWidth(250).setMinHeight(200);
 	}
 
@@ -164,6 +170,10 @@ public class CarAction extends FileEntityAction<Long, Car> {
 			json.put("msg", getText("car.error.plateIsExists2"));
 			return "json";
 		} else {
+			// 合并车架号的前缀和后缀
+			this.getE().setVin(this.vinPrefix + this.vinSuffix);
+			
+			// 执行基类的保存
 			super.save();
 			json.put("id", e.getId());
 			json.put("success", true);
@@ -173,7 +183,7 @@ public class CarAction extends FileEntityAction<Long, Car> {
 	}
 
 	@Override
-	protected void initForm(boolean editable) {
+	protected void initForm(boolean editable) throws Exception {
 		super.initForm(editable);
 
 		// 状态列表
@@ -199,7 +209,8 @@ public class CarAction extends FileEntityAction<Long, Car> {
 						OptionConstants.CAR_COLOR,
 						OptionConstants.CAR_TAXIMETERFACTORY,
 						OptionConstants.CAR_COMPANY,
-						OptionConstants.CAR_LOGOUT_REASON });
+						OptionConstants.CAR_LOGOUT_REASON,
+						OptionConstants.CAR_VIN_PREFIX });
 
 		// 加载可选营运性质列表
 		this.businessTypeList = optionItems
@@ -221,6 +232,10 @@ public class CarAction extends FileEntityAction<Long, Car> {
 		this.taximeterFactoryTypeList = optionItems
 				.get(OptionConstants.CAR_TAXIMETERFACTORY);
 
+		// 车辆车架号前缀
+		this.vinPrefixes = OptionItem.toLabelValues(optionItems
+				.get(OptionConstants.CAR_VIN_PREFIX));
+
 		// 所属单位列表
 		this.companyList = optionItems.get(OptionConstants.CAR_COMPANY);
 		OptionItem.insertIfNotExist(companyList, null, getE().getCompany());
@@ -228,6 +243,18 @@ public class CarAction extends FileEntityAction<Long, Car> {
 		// 注销原因列表
 		this.logoutReasonList = optionItems
 				.get(OptionConstants.CAR_LOGOUT_REASON);
+
+		// 分拆出车架号的前缀和后缀
+		if (editable) {
+			String vin = this.getE().getVin();
+			if (vin == null || vin.length() < 12) {
+				this.vinPrefix = vin;
+				this.vinSuffix = "";
+			} else {
+				this.vinPrefix = vin.substring(0, 11);
+				this.vinSuffix = vin.substring(11);
+			}
+		}
 	}
 
 	/**
