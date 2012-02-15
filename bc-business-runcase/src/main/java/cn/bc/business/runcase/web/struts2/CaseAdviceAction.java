@@ -423,7 +423,7 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 	}
 	
 	@Override
-	protected void initForm(boolean editable) {
+	protected void initForm(boolean editable) throws Exception {
 		super.initForm(editable);
 		
 		statusesValue		=	this.getCaseStatuses();

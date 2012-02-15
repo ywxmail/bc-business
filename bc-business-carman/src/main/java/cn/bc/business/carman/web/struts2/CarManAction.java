@@ -81,7 +81,7 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 	}
 
 	@Override
-	protected void initForm(boolean editable) {
+	protected void initForm(boolean editable) throws Exception {
 		super.initForm(editable);
 
 		// 状态列表

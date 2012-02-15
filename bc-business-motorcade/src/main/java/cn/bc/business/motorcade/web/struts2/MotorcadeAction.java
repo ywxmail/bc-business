@@ -92,7 +92,7 @@ public class MotorcadeAction extends FileEntityAction<Long, Motorcade> {
 	}
 
 	@Override
-	protected void initForm(boolean editable) {
+	protected void initForm(boolean editable) throws Exception {
 		super.initForm(editable);
 		// 加载缴费日列表
 		this.paymentDates = this.optionService

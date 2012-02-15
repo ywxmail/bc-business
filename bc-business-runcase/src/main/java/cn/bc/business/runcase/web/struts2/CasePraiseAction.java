@@ -270,7 +270,7 @@ public class CasePraiseAction extends FileEntityAction<Long, Case4Praise> {
 	}
 	
 	@Override
-	protected void initForm(boolean editable) {
+	protected void initForm(boolean editable) throws Exception {
 		super.initForm(editable);
 
 		statusesValue		=	this.getCaseStatuses();
