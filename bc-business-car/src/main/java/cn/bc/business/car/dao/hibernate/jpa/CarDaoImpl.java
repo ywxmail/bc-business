@@ -6,6 +6,7 @@ package cn.bc.business.car.dao.hibernate.jpa;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -25,6 +26,8 @@ import org.springframework.util.StringUtils;
 import cn.bc.BCConstants;
 import cn.bc.business.car.dao.CarDao;
 import cn.bc.business.car.domain.Car;
+import cn.bc.business.cert.domain.Cert;
+import cn.bc.business.contract.domain.Contract;
 import cn.bc.core.Page;
 import cn.bc.core.query.condition.Condition;
 import cn.bc.orm.hibernate.jpa.HibernateCrudJpaDao;
@@ -411,5 +414,32 @@ public class CarDaoImpl extends HibernateCrudJpaDao<Car> implements CarDao {
 			return new Long(list.get(0).get("id").toString());
 		else
 			return null;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public Car save(Car entity) {
+		if (!entity.isNew()) {
+			// 重新加载证件信息，避免保存时将其删除
+			if (entity.getCerts() == null)
+				entity.setCerts(new HashSet<Cert>());
+			entity.getCerts()
+					.addAll(this
+							.getJpaTemplate()
+							.find("select cert from Car car join car.certs cert where car.id=?",
+									entity.getId()));
+
+			// 重新加载合同信息，避免保存时将其删除
+			if (entity.getContracts() == null)
+				entity.setContracts(new HashSet<Contract>());
+			entity.getContracts()
+					.addAll(this
+							.getJpaTemplate()
+							.find("select contract from Car car join car.contracts contract where car.id=?",
+									entity.getId()));
+		}
+
+		// 调用基类的保存
+		return super.save(entity);
 	}
 }
