@@ -217,6 +217,8 @@ public class BlacklistAction extends FileEntityAction<Long, Blacklist> {
 				pageOption.addButton(new ButtonOption(
 						getText("blacklist.unlocker"), null,
 						"bc.business.blacklistForm.unlcoker"));
+				// 添加默认的保存按钮
+				pageOption.addButton(this.getDefaultSaveButtonOption());
 			}
 
 		}
