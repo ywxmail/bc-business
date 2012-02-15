@@ -119,6 +119,7 @@ public class Contract4ChargerAction extends FileEntityAction<Long, Contract4Char
 				//根据carId查找车辆的车牌号码
 				carInfoMap = this.contract4ChargerService.findCarByCarId(carId);
 				entity.setExt_str1(isNullObject(carInfoMap.get("plate_type")+"."+carInfoMap.get("plate_no")));
+				entity.setWordNo((String)carInfoMap.get("code"));//车辆自编号
 //			}
 		}
 		
