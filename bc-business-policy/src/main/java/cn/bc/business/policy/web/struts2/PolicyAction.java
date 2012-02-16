@@ -211,7 +211,7 @@ public class PolicyAction extends FileEntityAction<Long, Policy> {
 	}
 
 	@Override
-	protected void initForm(boolean editable) {
+	protected void initForm(boolean editable) throws Exception {
 		super.initForm(editable);
 		Date startTime = new Date();
 		statusesValue = this.getBSStatuses1();

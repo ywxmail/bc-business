@@ -297,7 +297,7 @@ public class Contract4LabourAction extends
 	}
 
 	@Override
-	protected void initForm(boolean editable) {
+	protected void initForm(boolean editable) throws Exception {
 		super.initForm(editable);
 
 		// 状态列表

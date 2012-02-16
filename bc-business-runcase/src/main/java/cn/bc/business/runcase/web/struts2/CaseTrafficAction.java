@@ -343,7 +343,7 @@ public class CaseTrafficAction extends FileEntityAction<Long, Case4InfractTraffi
 	}
 	
 	@Override
-	protected void initForm(boolean editable) {
+	protected void initForm(boolean editable) throws Exception {
 		super.initForm(editable);
 		
 		statusesValue		=	this.getCaseStatuses();

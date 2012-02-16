@@ -152,7 +152,7 @@ public class CasePraiseAction extends FileEntityAction<Long, Case4Praise> {
 	public boolean isReadonly() {
 		// 交通违章管理员或系统管理员
 		SystemContext context = (SystemContext) this.getContext();
-		return !context.hasAnyRole(getText("key.role.bs.infractPraise"),
+		return !context.hasAnyRole(getText("key.role.bs.praise"),
 				getText("key.role.bc.admin"));
 	}
 	
@@ -173,8 +173,10 @@ public class CasePraiseAction extends FileEntityAction<Long, Case4Praise> {
 				buttonOption.put("id", "bcSaveDlgButton");
 				pageOption.addButton(buttonOption);
 			}
-			// 添加默认的保存按钮
-			pageOption.addButton(this.getDefaultSaveButtonOption());
+			if(Case4Praise.STATUS_CLOSED != getE().getStatus()){
+				// 添加默认的保存按钮
+				pageOption.addButton(this.getDefaultSaveButtonOption());
+			}
 		}
 	}
 
@@ -270,7 +272,7 @@ public class CasePraiseAction extends FileEntityAction<Long, Case4Praise> {
 	}
 	
 	@Override
-	protected void initForm(boolean editable) {
+	protected void initForm(boolean editable) throws Exception {
 		super.initForm(editable);
 
 		statusesValue		=	this.getCaseStatuses();

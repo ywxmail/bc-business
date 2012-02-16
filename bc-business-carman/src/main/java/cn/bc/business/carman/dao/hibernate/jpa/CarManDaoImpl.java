@@ -11,6 +11,7 @@ import cn.bc.business.carman.dao.CarManDao;
 import cn.bc.business.carman.domain.CarMan;
 import cn.bc.business.cert.dao.CertDao;
 import cn.bc.business.cert.domain.Cert;
+import cn.bc.business.contract.domain.Contract;
 import cn.bc.orm.hibernate.jpa.HibernateCrudJpaDao;
 
 /**
@@ -102,12 +103,13 @@ public class CarManDaoImpl extends HibernateCrudJpaDao<CarMan> implements
 
 	public Long checkCert4FWZGIsExists(Long excludeId, String cert4fwzg) {
 		boolean gte6 = cert4fwzg.length() > 5;
-		if(gte6){
+		if (gte6) {
 			// 截取前6位
 			cert4fwzg = cert4fwzg.substring(0, 6) + "%";
 		}
-		
-		String hql = "select m.id as id from CarMan m where m.cert4FWZG" + (gte6 ? " like ?" : " = ?");
+
+		String hql = "select m.id as id from CarMan m where m.cert4FWZG"
+				+ (gte6 ? " like ?" : " = ?");
 		Object[] args;
 		if (excludeId != null) {
 			hql += " and m.id != ?";
@@ -121,5 +123,32 @@ public class CarManDaoImpl extends HibernateCrudJpaDao<CarMan> implements
 			return list.get(0);
 		else
 			return null;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public CarMan save(CarMan entity) {
+		if (!entity.isNew()) {
+			// 重新加载证件信息，避免保存时将其删除
+			if (entity.getCerts() == null)
+				entity.setCerts(new HashSet<Cert>());
+			entity.getCerts()
+					.addAll(this
+							.getJpaTemplate()
+							.find("select cert from CarMan man join man.certs cert where man.id=?",
+									entity.getId()));
+
+			// 重新加载合同信息，避免保存时将其删除
+			if (entity.getContracts() == null)
+				entity.setContracts(new HashSet<Contract>());
+			entity.getContracts()
+					.addAll(this
+							.getJpaTemplate()
+							.find("select contract from CarMan man join man.contracts contract where man.id=?",
+									entity.getId()));
+		}
+
+		// 调用基类的保存
+		return super.save(entity);
 	}
 }

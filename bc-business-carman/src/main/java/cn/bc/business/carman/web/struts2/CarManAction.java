@@ -78,10 +78,13 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 		this.getE().setMoveType(CarByDriverHistory.MOVETYPE_NULL);
 		// 驾驶状态为空
 		this.getE().setClasses(CarByDriver.TYPE_WEIDINGYI);
+		
+		// 广州驾证默认为“是”
+		this.getE().setGz(true);
 	}
 
 	@Override
-	protected void initForm(boolean editable) {
+	protected void initForm(boolean editable) throws Exception {
 		super.initForm(editable);
 
 		// 状态列表

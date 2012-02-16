@@ -24,7 +24,7 @@ import cn.bc.identity.domain.RichFileEntityImpl;
 public class CaseBase extends RichFileEntityImpl {
 	private static final long serialVersionUID = 1L;
 	public static final String ATTACH_TYPE = CaseBase.class.getSimpleName();
-	
+
 	/** 事件状态：在案 */
 	public static final int STATUS_ACTIVE = 0;
 	/** 事件状态：已结案 */
@@ -32,7 +32,7 @@ public class CaseBase extends RichFileEntityImpl {
 
 	/** 事件类型：表扬 */
 	public static final int TYPE_PRAISE = 1;
-	/** 事件类型：投诉 */
+	/** 事件类型：客管投诉 */
 	public static final int TYPE_COMPLAIN = 2;
 	/** 事件类型：营运违章 */
 	public static final int TYPE_INFRACT_BUSINESS = 3;
@@ -40,6 +40,8 @@ public class CaseBase extends RichFileEntityImpl {
 	public static final int TYPE_INFRACT_TRAFFIC = 4;
 	/** 事件类型：事故 */
 	public static final int TYPE_ACCIDENT = 5;
+	/** 事件类型：公司投诉 */
+	public static final int TYPE_COMPANY_COMPLAIN = 6;
 
 	/** 事件来源：自建 */
 	public static final int SOURCE_SYS = 0;
@@ -51,7 +53,7 @@ public class CaseBase extends RichFileEntityImpl {
 	private String subject;// 标题：事件的简要描述
 	private int type;// 事件类型：参考常数TYPE_XXXX的定义
 	private int source = SOURCE_SYS;// 来源：参考常数SOURCE_xxxx的定义
-	private String from; //信息来源(用户填写)
+	private String from; // 信息来源(用户填写)
 	private String caseNo;// 案号
 	private String code;// 自编号
 	private String address;// 事发地点
@@ -122,7 +124,7 @@ public class CaseBase extends RichFileEntityImpl {
 	public void setSource(int source) {
 		this.source = source;
 	}
-	
+
 	@Column(name = "FROM_")
 	public String getFrom() {
 		return from;
@@ -153,7 +155,7 @@ public class CaseBase extends RichFileEntityImpl {
 	public Calendar getCloseDate() {
 		return closeDate;
 	}
-	
+
 	public void setCloseDate(Calendar closeDate) {
 		this.closeDate = closeDate;
 	}

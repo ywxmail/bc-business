@@ -281,7 +281,7 @@ public class CarByDriverHistoryAction extends
 	}
 
 	@Override
-	protected void initForm(boolean editable) {
+	protected void initForm(boolean editable) throws Exception {
 		super.initForm(editable);
 		// 批量加载可选项列表
 		Map<String, List<Map<String, String>>> optionItems = this.optionService

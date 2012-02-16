@@ -93,7 +93,7 @@ public class InsuranceTypeAction extends FileEntityAction<Long, InsuranceType> {
 	}
 
 	@Override
-	protected void initForm(boolean editable) {
+	protected void initForm(boolean editable) throws Exception {
 		super.initForm(editable);
 		templateList=this.insuranceTypeService.findEnabled4Option();
 	}

@@ -344,7 +344,7 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 	}
 	
 	@Override
-	protected void initForm(boolean editable) {
+	protected void initForm(boolean editable) throws Exception {
 		super.initForm(editable);
 		Date startTime = new Date();
 		// 表单可选项的加载
