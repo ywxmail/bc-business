@@ -105,4 +105,9 @@ public class CarServiceImpl extends DefaultCrudService<Car> implements
 			String plateNo) {
 		return this.carDao.checkPlateIsExists(excludeId, plateType, plateNo);
 	}
+
+	@Override
+	public Car save(Car entity) {
+		return this.carDao.save(entity);
+	}
 }

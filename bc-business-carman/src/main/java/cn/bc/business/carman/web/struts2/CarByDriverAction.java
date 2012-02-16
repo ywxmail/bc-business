@@ -106,7 +106,7 @@ public class CarByDriverAction extends FileEntityAction<Long, CarByDriver> {
 	}
 
 	@Override
-	protected void initForm(boolean editable) {
+	protected void initForm(boolean editable) throws Exception {
 		super.initForm(editable);
 
 		// 状态列表

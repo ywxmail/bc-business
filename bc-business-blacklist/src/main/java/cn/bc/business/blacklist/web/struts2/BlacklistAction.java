@@ -248,7 +248,7 @@ public class BlacklistAction extends FileEntityAction<Long, Blacklist> {
 	}
 
 	@Override
-	protected void initForm(boolean editable) {
+	protected void initForm(boolean editable) throws Exception {
 		super.initForm(editable);
 		Date startTime = new Date();
 		// 状态列表

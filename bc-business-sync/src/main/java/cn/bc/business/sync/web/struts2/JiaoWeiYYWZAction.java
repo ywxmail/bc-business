@@ -52,7 +52,7 @@ public class JiaoWeiYYWZAction extends EntityAction<Long, JiaoWeiYYWZ> {
 	}
 
 	@Override
-	protected void initForm(boolean editable) {
+	protected void initForm(boolean editable) throws Exception {
 		super.initForm(editable);
 		// 状态列表
 		statusesValue = this.getSyncStatuses();

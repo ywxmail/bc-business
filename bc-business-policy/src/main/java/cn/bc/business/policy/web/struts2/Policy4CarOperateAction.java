@@ -96,7 +96,7 @@ public class Policy4CarOperateAction extends FileEntityAction<Long, Policy> {
 
 	}
 
-	protected void initForm(boolean editable) {
+	protected void initForm(boolean editable) throws Exception {
 		super.initForm(editable);
 		Date startTime = new Date();
 		statusesValue = this.getBSStatuses1();

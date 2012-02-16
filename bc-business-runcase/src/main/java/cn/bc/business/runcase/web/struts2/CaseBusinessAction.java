@@ -360,7 +360,7 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 	}
 	
 	@Override
-	protected void initForm(boolean editable) {
+	protected void initForm(boolean editable) throws Exception {
 		super.initForm(editable);
 		
 		statusesValue		=	this.getCaseStatuses();

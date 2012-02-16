@@ -179,7 +179,7 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 	public boolean isReadonly() {
 		// 交通违章管理员或系统管理员
 		SystemContext context = (SystemContext) this.getContext();
-		return !context.hasAnyRole(getText("key.role.bs.infractAdvice"),
+		return !context.hasAnyRole(getText("key.role.bs.advice"),
 				getText("key.role.bc.admin"));
 	}
 
@@ -200,8 +200,10 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 				buttonOption.put("id", "bcSaveDlgButton");
 				pageOption.addButton(buttonOption);
 			}
-			// 添加默认的保存按钮
-			pageOption.addButton(this.getDefaultSaveButtonOption());
+			if(Case4Advice.STATUS_CLOSED != getE().getStatus()){
+				// 添加默认的保存按钮
+				pageOption.addButton(this.getDefaultSaveButtonOption());
+			}
 		}
 	}
 
@@ -423,7 +425,7 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 	}
 	
 	@Override
-	protected void initForm(boolean editable) {
+	protected void initForm(boolean editable) throws Exception {
 		super.initForm(editable);
 		
 		statusesValue		=	this.getCaseStatuses();
