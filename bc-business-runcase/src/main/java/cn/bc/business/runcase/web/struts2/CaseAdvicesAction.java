@@ -46,6 +46,7 @@ import cn.bc.web.ui.json.Json;
 public class CaseAdvicesAction extends ViewAction<Map<String, Object>> {
 	private static final long serialVersionUID = 1L;
 	public String status = String.valueOf(BCConstants.STATUS_ENABLED); // 车辆的状态，多个用逗号连接
+	public String type;
 	public Long carManId;
 	public Long carId;
 
@@ -70,9 +71,9 @@ public class CaseAdvicesAction extends ViewAction<Map<String, Object>> {
 
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer sql = new StringBuffer();
-		sql.append("select a.id, b.status_,a.advice_type,b.subject,b.motorcade_name,b.car_plate,b.driver_name");
+		sql.append("select a.id,b.status_,b.type_,a.advice_type,b.subject,b.motorcade_name,b.car_plate,b.driver_name");
 		sql.append(",b.closer_name,b.close_date,a.advisor_name,b.happen_date,a.detail");
-		sql.append(",b.from_,b.source,b.driver_cert,a.receive_code,b.case_no,a.receive_date ");
+		sql.append(",b.from_,b.source,b.driver_cert,a.receive_code,a.receive_date ");
 		sql.append(" from BS_CASE_ADVICE a");
 		sql.append(" inner join BS_CASE_BASE b on b.id=a.id");
 		sqlObject.setSql(sql.toString());
@@ -87,6 +88,7 @@ public class CaseAdvicesAction extends ViewAction<Map<String, Object>> {
 				int i = 0;
 				map.put("id", rs[i++]);
 				map.put("status_", rs[i++]);
+				map.put("type_", rs[i++]);
 				map.put("advice_type", rs[i++]);
 				map.put("subject", rs[i++]);
 				map.put("motorcade_name", rs[i++]);
@@ -101,7 +103,6 @@ public class CaseAdvicesAction extends ViewAction<Map<String, Object>> {
 				map.put("source", rs[i++]);
 				map.put("driver_cert", rs[i++]);
 				map.put("receive_code", rs[i++]);
-				map.put("case_no", rs[i++]);
 				map.put("receive_date", rs[i++]);
 
 				return map;
@@ -115,7 +116,7 @@ public class CaseAdvicesAction extends ViewAction<Map<String, Object>> {
 		List<Column> columns = new ArrayList<Column>();
 		columns.add(new IdColumn4MapKey("a.id", "id"));
 		columns.add(new TextColumn4MapKey("c.status_", "status_",
-				getText("runcase.status"), 50).setSortable(true)
+				getText("runcase.status"), 40).setSortable(true)
 				.setValueFormater(new EntityStatusFormater(getBSStatuses2())));
 		columns.add(new TextColumn4MapKey("a.advice_type", "advice_type",
 				getText("runcase.adviceType"), 40).setSortable(true)
@@ -124,7 +125,7 @@ public class CaseAdvicesAction extends ViewAction<Map<String, Object>> {
 				getText("runcase.receiveDate3"), 130).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd HH:mm")));
 		columns.add(new TextColumn4MapKey("b.subject", "subject",
-				getText("runcase.subject2")+getText("runcase.big"), 120).setSortable(true));
+				getText("runcase.subject2"), 120).setSortable(true));
 		columns.add(new TextColumn4MapKey("a.detail", "detail",
 				getText("runcase.detail"), 150).setSortable(true)
 				.setUseTitleFromLabel(true));
@@ -149,9 +150,6 @@ public class CaseAdvicesAction extends ViewAction<Map<String, Object>> {
 				.setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("b.receive_code", "receive_code",
 				getText("runcase.receiveCode"), 100).setSortable(true)
-				.setUseTitleFromLabel(true));
-		columns.add(new TextColumn4MapKey("b.case_no", "case_no",
-				getText("runcase.caseNo2"), 100).setSortable(true)
 				.setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("b.source", "source",
 				getText("runcase.ifsource"), 60).setSortable(true).setUseTitleFromLabel(true)
@@ -186,6 +184,15 @@ public class CaseAdvicesAction extends ViewAction<Map<String, Object>> {
 	}
 
 	@Override
+	protected String getHtmlPageTitle() {
+		if(Integer.valueOf(type) == CaseBase.TYPE_COMPLAIN){
+			return this.getText("caseAdvice1.title");
+		}else{
+			return this.getText("caseAdvice2.title");
+		}
+	}
+	
+	@Override
 	protected PageOption getHtmlPageOption() {
 		return super.getHtmlPageOption().setWidth(900).setMinWidth(400)
 				.setHeight(400).setMinHeight(300);
@@ -213,8 +220,14 @@ public class CaseAdvicesAction extends ViewAction<Map<String, Object>> {
 		if (carId != null) {
 			carIdCondition = new EqualsCondition("b.car_id", carId);
 		}
+		
+		//投诉分类type(2:客管投诉,6:公司投诉)
+		Condition typeCondition = ConditionUtils.toConditionByComma4IntegerValue(this.type,
+				"b.type_");
+		
 		// 合并条件
-		return ConditionUtils.mix2AndCondition(statusCondition,carManIdCondition,carIdCondition);
+		return ConditionUtils.mix2AndCondition(statusCondition,carManIdCondition,
+				carIdCondition,typeCondition);
 	}
 
 	@Override
@@ -232,16 +245,19 @@ public class CaseAdvicesAction extends ViewAction<Map<String, Object>> {
 		if (carId != null) {
 			json.put("carId", carId);
 		}
+		// type条件
+		if (type != null) {
+			json.put("type", type);
+		}
 		return json.isEmpty() ? null : json;
 	}
 
 	@Override
 	protected Toolbar getHtmlPageToolbar() {
-		return super.getHtmlPageToolbar()
-				.addButton(
-						Toolbar.getDefaultToolbarRadioGroup(
-								this.getBSStatuses2(), "status", 0,
-								getText("title.click2changeSearchStatus")));
+		return super.getHtmlPageToolbar().addButton(
+				Toolbar.getDefaultToolbarRadioGroup(
+						this.getBSStatuses2(), "status", 0,
+						getText("title.click2changeSearchStatus")));
 	}
 
 	/**
