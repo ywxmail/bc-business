@@ -147,8 +147,8 @@ public class JiaoWeiADVICEsAction extends SyncViewAction {
 
 	@Override
 	protected String[] getGridSearchFields() {
-		return new String[] { "b.sync_code", "t.car_plate", "t.driver_name",
-				"t.driver_cert", "t.content", "t.advisorName" };
+		return new String[] { "b.sync_code", "t.car_plate", "t.driver_cert", 
+				"t.content", "t.advisor_name" };
 	}
 
 	@Override
