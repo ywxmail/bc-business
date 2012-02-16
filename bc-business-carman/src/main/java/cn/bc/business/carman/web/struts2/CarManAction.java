@@ -22,6 +22,7 @@ import cn.bc.business.web.struts2.FileEntityAction;
 import cn.bc.identity.domain.ActorDetail;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.option.service.OptionService;
+import cn.bc.web.ui.html.page.ButtonOption;
 import cn.bc.web.ui.html.page.PageOption;
 import cn.bc.web.ui.json.Json;
 
@@ -78,7 +79,7 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 		this.getE().setMoveType(CarByDriverHistory.MOVETYPE_NULL);
 		// 驾驶状态为空
 		this.getE().setClasses(CarByDriver.TYPE_WEIDINGYI);
-		
+
 		// 广州驾证默认为“是”
 		this.getE().setGz(true);
 	}
@@ -112,6 +113,14 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 	protected PageOption buildFormPageOption(boolean editable) {
 		return super.buildFormPageOption(editable).setWidth(760)
 				.setMinWidth(250).setMinHeight(200);
+	}
+
+	protected void buildFormPageButtons(PageOption pageOption, boolean editable) {
+		boolean readonly = this.isReadonly();
+		if (editable && !readonly) {
+			pageOption.addButton(new ButtonOption(getText("label.save"), null,
+					"bc.carManForm.save"));
+		}
 	}
 
 	// ========服务资格证唯一性检测代码开始========
