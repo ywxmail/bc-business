@@ -77,6 +77,8 @@ public class OptionConstants extends cn.bc.option.OptionConstants {
 	public final static String AD_SOURCE = "ad.source";
 	/** 表扬类型 */
 	public final static String PR_TYPE = "pr.type";
+	/** 投诉-责任 */
+	public final static String AD_DUTY = "ad.duty";
 
 	/** 社保险种 */
 	public final static String LB_INSURANCETYPE = "lb.insuranceType";

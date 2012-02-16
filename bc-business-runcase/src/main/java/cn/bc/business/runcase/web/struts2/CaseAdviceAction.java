@@ -54,6 +54,7 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 	public  Long 							carId;
 	public  Long 							carManId;
 	private	Long							syncId;			//同步ID
+	private String							type;			//投诉类型
 	
 	public  boolean 						isMoreCar;
 	public  boolean 						isMoreCarMan;
@@ -119,9 +120,17 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 	public String getSourceStr() {
 		return sourceStr;
 	}
-
+	
 	public void setSourceStr(String sourceStr) {
 		this.sourceStr = sourceStr;
+	}
+	
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
 	}
 
 	@Autowired
@@ -212,6 +221,11 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 	protected void afterCreate(Case4Advice entity) {
 		super.afterCreate(entity);
 		
+		if(Integer.valueOf(type) == CaseBase.TYPE_COMPLAIN){//客管投诉
+			this.getE().setType(CaseBase.TYPE_COMPLAIN);
+		}else{//公司投诉
+			this.getE().setType(CaseBase.TYPE_COMPANY_COMPLAIN);
+		}
 		if(syncId != null){	//判断同步id是否为空
 			JiaoWeiADVICE jiaoWeiADVICE = this.jiaoWeiADVICEService.load(syncId);
 			String carPlateNo = "";
@@ -298,7 +312,8 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 		}
 		
 		// 初始化信息
-		this.getE().setType  (CaseBase.TYPE_COMPLAIN);
+		this.getE().setAdviceType(CaseBase.TYPE_COMPLAIN);
+		this.getE().setCarColor("绿灰");
 		this.getE().setStatus(CaseBase.STATUS_ACTIVE);
 		this.getE().setUid(this.getIdGeneratorService().next(this.getE().ATTACH_TYPE));
 		// 自动生成自编号
@@ -434,6 +449,7 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 		initSelects();
 	}
 	
+	
 	// 表单可选项的加载
 	public void initSelects(){
 		// 加载可选车队列表
@@ -445,12 +461,12 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 
 		// 加载可选责任列表
 		this.allList		=	this.optionService.findOptionItemByGroupKeys(new String[] {
-									OptionConstants.IT_DUTY,OptionConstants.AD_SOURCE,
+									OptionConstants.AD_DUTY,OptionConstants.AD_SOURCE,
 									OptionConstants.IT_DEGREE,OptionConstants.BS_CERT,
 									
 								});
 		// 可选责任列表
-		this.dutyList			=	allList.get(OptionConstants.IT_DUTY);	
+		this.dutyList			=	allList.get(OptionConstants.AD_DUTY);	
 		// 可选程度列表
 		this.degreeList			=	allList.get(OptionConstants.IT_DEGREE);
 		// 可选没收证件列表
