@@ -3,6 +3,7 @@
  */
 package cn.bc.business.runcase.web.struts2;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -21,6 +22,9 @@ import cn.bc.business.car.service.CarService;
 import cn.bc.business.carman.domain.CarMan;
 import cn.bc.business.carman.service.CarManService;
 import cn.bc.business.motorcade.service.MotorcadeService;
+import cn.bc.business.policy.domain.BuyPlant;
+import cn.bc.business.policy.domain.Policy;
+import cn.bc.business.policy.service.PolicyService;
 import cn.bc.business.runcase.domain.Case4Accident;
 import cn.bc.business.runcase.domain.CaseBase;
 import cn.bc.business.runcase.service.CaseAccidentService;
@@ -76,6 +80,8 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 	private CarManService carManService;
 	private CarService carService;
 
+	
+	
 	public Long getCarId() {
 		return carId;
 	}
@@ -93,7 +99,7 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 	}
 
 	@Autowired
-	public void CarService(CarService carService) {
+	public void setCarService(CarService carService) {
 		this.carService = carService;
 	}
 
@@ -241,6 +247,8 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 		// 初始化信息
 		this.getE().setType(CaseBase.TYPE_INFRACT_BUSINESS);
 		this.getE().setStatus(CaseBase.STATUS_ACTIVE);
+		this.getE().setHappenDate(Calendar.getInstance());
+		this.getE().setReceiveDate(Calendar.getInstance());
 		statusesValue = this.getBSStatuses2();
 
 		// 构建附件控件
@@ -334,29 +342,7 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 				getText("runcase.select.source.sync.gen"));
 		return statuses;
 	}
-
-	public String json;
-
-	public String selectCarMansInfo() {
-		List<CarMan> drivers = this.carManService.selectAllCarManByCarId(carId);
-		JsonArray jsons = new JsonArray();
-		Json o;
-		for (CarMan driver : drivers) {
-			o = new Json();
-			o.put("name", driver.getName());
-			o.put("id", driver.getId());
-			o.put("cert4FWZG", driver.getCert4FWZG());
-			o.put("region", driver.getRegion());
-			o.put("drivingStatus", driver.getDrivingStatus());
-			o.put("origin", driver.getOrigin());
-			jsons.add(o);
-		}
-
-		json = jsons.toString();
-		return "json";
-
-	}
-
+	
 	@Override
 	protected void initForm(boolean editable) {
 		super.initForm(editable);
@@ -393,5 +379,101 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 			logger.info("findOptionItem耗时：" + DateUtils.getWasteTime(startTime));
 
 	}
+
+	public String json;
+	
+	//		=======自动加载司机相关信息开始  =========
+	public String selectCarMansInfo() {
+		List<CarMan> drivers = this.carManService.selectAllCarManByCarId(carId);
+		JsonArray jsons = new JsonArray();
+		Json o;
+		for (CarMan driver : drivers) {
+			o = new Json();
+			o.put("name", driver.getName());
+			o.put("id", driver.getId());
+			o.put("cert4FWZG", driver.getCert4FWZG());
+			o.put("region", driver.getRegion());
+			o.put("drivingStatus", driver.getDrivingStatus());
+			o.put("origin", driver.getOrigin());
+			jsons.add(o);
+		}
+
+		json = jsons.toString();
+		return "json";
+
+	}
+	//		====== 自动加载司机相关信息结束 ========
+
+	//		=======	自动加载相关保单开始  =========
+	private Calendar happenTime;
+	private PolicyService policyService;
+	
+	public PolicyService getPolicyService() {
+		return policyService;
+	}
+	
+	@Autowired
+	public void setPolicyService(PolicyService policyService) {
+		this.policyService = policyService;
+	}
+
+	public Calendar getHappenTime() {
+		return happenTime;
+	}
+
+	public void setHappenTime(Calendar happenTime) {
+		this.happenTime = happenTime;
+	}
+
+	public String loadPolicyInfo(){
+		if(carId!=null&&happenTime!=null){
+			List<Policy> pList=this.policyService.getPolicise(carId, happenTime);
+			JsonArray jsons = new JsonArray();
+			JsonArray jsonsbp = new JsonArray();
+			Json op;
+			Json obp;
+			SimpleDateFormat date_format=new SimpleDateFormat("yyyy-MM-dd");
+			for (Policy policy : pList) {
+				op = new Json();
+				//商业险号
+				op.put("commerialNo", policy.getCommerialNo());
+				op.put("commerialCompany", policy.getCommerialCompany());
+				op.put("commerialStartDate", 
+						date_format.format(policy.getCommerialStartDate().getTime()));
+				op.put("commerialEndDate", 
+						date_format.format(policy.getCommerialEndDate().getTime()));
+				//责任险号
+				op.put("liabilityNo", policy.getLiabilityNo());
+				//强制险号
+				op.put("greenslipNo", 
+						policy.getGreenslipNo()==null?"":policy.getGreenslipNo());
+				op.put("greenslipCompany", 
+						policy.getGreenslipCompany()==null?"":policy.getGreenslipCompany());
+				op.put("greenslipStartDate", 
+						policy.getGreenslipStartDate()==null?"":
+							date_format.format(policy.getGreenslipStartDate().getTime()));
+				op.put("greenslipEndDate", 
+						policy.getGreenslipEndDate()==null?"":
+							date_format.format(policy.getGreenslipEndDate().getTime()));
+				for(BuyPlant bp:policy.getBuyPlants()){
+					obp=new Json();
+					obp.put("name", bp.getName());
+					obp.put("coverage", bp.getCoverage()==null?"":
+										bp.getCoverage());
+					obp.put("description", bp.getDescription()==null?"":
+											bp.getDescription());
+					jsonsbp.add(obp);
+				}
+				op.put("buyPlant",jsonsbp);
+				jsons.add(op);
+				//jsons.add(op);
+			}
+			
+			json = jsons.toString();
+		}
+		return "json";
+	}
+	
+	//		======= 自动加载相关保单单结束  =========
 
 }
