@@ -34,8 +34,8 @@
 	
 	<!-- 事故理赔 -->
 	<package name="caseAccident" extends="bc-default" namespace="/bc-business">
-		<action name="caseAccident/selectCarMansInfo" class="caseAccidentAction" method="selectCarMansInfo">
-		</action>
+		<action name="caseAccident/selectCarMansInfo" class="caseAccidentAction" method="selectCarMansInfo"/>
+		<action name="caseAccident/loadPolicyInfo" class="caseAccidentAction" method="loadPolicyInfo"/>
 	</package>
 	
 	<!-- 投诉建议 -->

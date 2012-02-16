@@ -4,6 +4,7 @@
 package cn.bc.business.policy.service;
 
 import java.util.Calendar;
+import java.util.List;
 
 import cn.bc.business.policy.domain.Policy;
 import cn.bc.core.service.CrudService;
@@ -41,4 +42,13 @@ public interface PolicyService extends CrudService<Policy> {
 	 * @param policyId  原车保id
 	 */
 	void doLogout(Long policyId);
+	
+	/**
+	 * 获取相关保单
+	 * 
+	 * @param carId		车辆ID
+	 * @param happenTime 事故发生时间
+	 * @return
+	 */
+	List<Policy> getPolicise(Long carId,Calendar happenTime);
 }

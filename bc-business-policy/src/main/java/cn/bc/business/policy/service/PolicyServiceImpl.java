@@ -5,6 +5,7 @@ package cn.bc.business.policy.service;
 
 import java.util.Calendar;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.springframework.beans.BeanUtils;
@@ -158,6 +159,11 @@ public class PolicyServiceImpl extends DefaultCrudService<Policy> implements
 			this.policyDao.save(oldPolicy);
 		}
 		return super.save(entity);
+	}
+
+
+	public List<Policy> getPolicise(Long carId, Calendar happenTime) {	
+		return this.policyDao.getPolicise(carId, happenTime);
 	}
 
 }
