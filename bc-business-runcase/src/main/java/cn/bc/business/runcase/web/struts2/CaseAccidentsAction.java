@@ -23,6 +23,7 @@ import cn.bc.core.query.condition.ConditionUtils;
 import cn.bc.core.query.condition.Direction;
 import cn.bc.core.query.condition.impl.EqualsCondition;
 import cn.bc.core.query.condition.impl.InCondition;
+import cn.bc.core.query.condition.impl.LikeCondition;
 import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.core.util.StringUtils;
 import cn.bc.db.jdbc.RowMapper;
@@ -70,6 +71,17 @@ public class CaseAccidentsAction extends ViewAction<Map<String, Object>> {
 		// 默认排序方向：状态|创建日期
 		return new OrderCondition("b.status_", Direction.Asc).add(
 				"b.file_date", Direction.Desc);
+	}
+
+	@Override
+	protected LikeCondition getGridSearchCondition4OneField(String field,
+			String value) {
+		if (field.indexOf("b.car_plate") != -1) {
+			return new LikeCondition(field, value != null ? value.toUpperCase()
+					: value);
+		} else {
+			return super.getGridSearchCondition4OneField(field, value);
+		}
 	}
 
 	@Override
