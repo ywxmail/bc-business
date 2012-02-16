@@ -53,8 +53,6 @@ import cn.bc.web.ui.json.JsonArray;
 public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 	// private static Log logger = LogFactory.getLog(CarAction.class);
 	private static final long serialVersionUID = 1L;
-	private final static SimpleDateFormat format4date = new SimpleDateFormat(
-			"yyyyMMddHHmmss_SSS");
 
 	private Long carId;
 	public String isClosed;
@@ -200,7 +198,6 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 		}
 	}
 
-	@SuppressWarnings("static-access")
 	@Override
 	protected void afterCreate(Case4Accident entity) {
 		super.afterCreate(entity);
@@ -248,7 +245,8 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 		this.getE().setUid(
 				this.getIdGeneratorService().next(this.getE().ATTACH_TYPE));
 		//事故编号自动生成为流水号
-		this.getE().setCode(this.format4date.format(new Date()));
+		this.getE().setCode(this.getIdGeneratorService()
+				.nextSN4Day(Case4Accident.KEY_CODE, "00"));
 		
 		
 		// 初始化信息
