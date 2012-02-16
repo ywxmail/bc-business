@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.json.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
@@ -46,6 +47,7 @@ public class CarByDriverHistoryAction extends
 	public Map<String, String> moveTypeValueList;// 迁移类型列表
 	public List<Map<String, String>> motorcadeList; // 可选车队列表
 	public List<Map<String, String>> companyList; // 所属单位列表
+	public JSONArray companyNames; // 公司名称列表
 	public CarManService carManService;
 	public CarService carService;
 	public CarByDriverService carByDriverService;
@@ -124,16 +126,16 @@ public class CarByDriverHistoryAction extends
 				this.getE().setFromMotorcadeId(fromCar.getMotorcade().getId());
 				this.getE().setFromUnit(fromCar.getCompany());
 				this.getE().setToCar(fromCar);
-//				this.getE().setToUnit(fromCar.getCompany());
-//				this.getE().setToMotorcadeId(fromCar.getMotorcade().getId());
+				// this.getE().setToUnit(fromCar.getCompany());
+				// this.getE().setToMotorcadeId(fromCar.getMotorcade().getId());
 			} else {
 				Car fromCar = this.carService.load(fromCarId);
 				this.getE().setFromCar(fromCar);
 				this.getE().setFromMotorcadeId(fromCar.getMotorcade().getId());
 				this.getE().setFromUnit(fromCar.getCompany());
 				this.getE().setToCar(fromCar);
-//				this.getE().setToUnit(fromCar.getCompany());
-//				this.getE().setToMotorcadeId(fromCar.getMotorcade().getId());
+				// this.getE().setToUnit(fromCar.getCompany());
+				// this.getE().setToMotorcadeId(fromCar.getMotorcade().getId());
 			}
 			// 设置迁移类型
 			this.getE().setMoveType(CarByDriverHistory.MOVETYPE_ZCD);
@@ -281,13 +283,16 @@ public class CarByDriverHistoryAction extends
 	}
 
 	@Override
-	protected void initForm(boolean editable) {
+	protected void initForm(boolean editable) throws Exception {
 		super.initForm(editable);
 		// 批量加载可选项列表
 		Map<String, List<Map<String, String>>> optionItems = this.optionService
 				.findOptionItemByGroupKeys(new String[] {
-
-				OptionConstants.CAR_COMPANY });
+						OptionConstants.CAR_COMPANY,
+						OptionConstants.COMPANY_NAME });
+		// 公司名称列表
+		this.companyNames = OptionItem.toLabelValues(optionItems
+				.get(OptionConstants.COMPANY_NAME));
 
 		// 状态列表
 		statusesValueList = this.getBSStatuses1();
