@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import org.json.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
@@ -53,6 +54,7 @@ import cn.bc.web.ui.json.JsonArray;
 public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 	// private static Log logger = LogFactory.getLog(CarAction.class);
 	private static final long serialVersionUID = 1L;
+
 	private Long carId;
 	public String isClosed;
 	public boolean isMoreCar;// 标识是否一个司机对应有多辆车
@@ -70,7 +72,7 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 	public List<Map<String, String>> motorcadeList; // 可选车队列表
 	public List<Map<String, String>> dutyList; // 可选责任列表
 	public List<Map<String, String>> sortList; // 可选性质列表
-	public List<Map<String, String>> departmentList; // 可选执法机关列表
+	public JSONArray departmentList; // 可选执法机关列表
 	public List<Map<String, String>> companyList; // 可选保险公司列表
 
 	public Map<String, String> statusesValue;
@@ -243,7 +245,11 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 		}
 		this.getE().setUid(
 				this.getIdGeneratorService().next(this.getE().ATTACH_TYPE));
-
+		//事故编号自动生成为流水号
+		this.getE().setCode(this.getIdGeneratorService()
+				.nextSN4Day(Case4Accident.KEY_CODE, "00"));
+		
+		
 		// 初始化信息
 		this.getE().setType(CaseBase.TYPE_INFRACT_BUSINESS);
 		this.getE().setStatus(CaseBase.STATUS_ACTIVE);
@@ -371,7 +377,8 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 		// 加载可选营运性质列表
 		this.sortList = optionItems.get(OptionConstants.CA_SORT);
 		// 加载可选执法机关列表
-		this.departmentList = optionItems.get(OptionConstants.CA_DEPARTMENT);
+		this.departmentList = OptionItem.toLabelValues(optionItems.get(OptionConstants.CA_DEPARTMENT));
+
 		// 加载可选保险公司列表
 		this.companyList = optionItems.get(OptionConstants.CA_COMPANY);
 
@@ -395,6 +402,7 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 			o.put("region", driver.getRegion());
 			o.put("drivingStatus", driver.getDrivingStatus());
 			o.put("origin", driver.getOrigin());
+			o.put("type",driver.getType());
 			jsons.add(o);
 		}
 

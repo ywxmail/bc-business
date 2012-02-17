@@ -190,7 +190,7 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 						.getContextPath())));
 		// 责任人
 		columns.add(new TextColumn4MapKey("c.charger", "charger",
-				getText("car.charger"), 100)
+				getText("car.charger"), 130)
 				.setValueFormater(new LinkFormater4ChargerInfo(this
 						.getContextPath())));
 		// 营运性质

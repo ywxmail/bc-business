@@ -119,7 +119,8 @@ public class Contract4ChargerAction extends FileEntityAction<Long, Contract4Char
 				//根据carId查找车辆的车牌号码
 				carInfoMap = this.contract4ChargerService.findCarByCarId(carId);
 				entity.setExt_str1(isNullObject(carInfoMap.get("plate_type")+"."+carInfoMap.get("plate_no")));
-				entity.setWordNo((String)carInfoMap.get("code"));//车辆自编号
+				entity.setWordNo(isNullObject(carInfoMap.get("code")));//车辆自编号
+				entity.setBusinessType(isNullObject(carInfoMap.get("bs_type")));//车辆自编号
 //			}
 		}
 		
@@ -129,6 +130,7 @@ public class Contract4ChargerAction extends FileEntityAction<Long, Contract4Char
 			if(carInfoMap != null && !carInfoMap.isEmpty()){
 				entity.setExt_str1(isNullObject(carInfoMap.get("plate_type")+"."+carInfoMap.get("plate_no")));
 				entity.setWordNo(isNullObject(carInfoMap.get("code")));
+				entity.setBusinessType(isNullObject(carInfoMap.get("bs_type")));
 				carId = Long.valueOf(isNullObject(carInfoMap.get("id")));
 			}
 		}
@@ -145,6 +147,7 @@ public class Contract4ChargerAction extends FileEntityAction<Long, Contract4Char
 		entity.setType(Contract.TYPE_CHARGER);
 		entity.setStatus(Contract.STATUS_NORMAL);
 		entity.setSignType(getText("contract4Charger.optype.create"));
+		entity.setIncludeCost(true);
 		
 		// 构建附件控件
 		attachsUI = buildAttachsUI(true, false);
@@ -152,31 +155,40 @@ public class Contract4ChargerAction extends FileEntityAction<Long, Contract4Char
 	
 	@Override
 	public String save() throws Exception{
+		json = new Json();
 		Contract4Charger e = this.getE();
-		
-		//保存之前检测自编号是否唯一
-		Long excludeId = this.contract4ChargerService.checkCodeIsExist(
-				e.getId(),e.getCode()); 
+		Long excludeId = null;
+		// 保存之前检测自编号是否唯一:仅在新建时检测
+		if (e.getId() == null) {
+			excludeId = this.contract4ChargerService.checkCodeIsExist(
+					e.getId(),e.getCode()); 
+		}
 		if(excludeId != null){
-			json = new Json();
+			json.put("success", false);
 			json.put("msg", getText("contract4Labour.code.exist2"));
 			return "json";
-		}
-		
-		
-		this.beforeSave(e);
-		
-		//设置最后更新人的信息
-		SystemContext context = this.getSystyemContext();
-		e.setModifier(context.getUserHistory());
-		e.setModifiedDate(Calendar.getInstance());
-		//设置责任人姓名
-		e.setExt_str2(setChargerName(assignChargerIds,assignChargerNames));
-		
-		this.contract4ChargerService.save(e,this.getCarId(),
-				assignChargerIds,assignChargerNames);
+		}else{
+			// 执行基类的保存
+			this.beforeSave(e);
+			
+			//设置最后更新人的信息
+			SystemContext context = this.getSystyemContext();
+			e.setModifier(context.getUserHistory());
+			e.setModifiedDate(Calendar.getInstance());
+			//设置责任人姓名
+			e.setExt_str2(setChargerName(assignChargerIds,assignChargerNames));
+			
+			this.contract4ChargerService.save(e,this.getCarId(),
+					assignChargerIds,assignChargerNames);
 
-		this.afterSave(e);
+			this.afterSave(e);
+			
+			json.put("id", e.getId());
+			json.put("success", true);
+			json.put("msg", getText("form.save.success"));
+			return "json";
+		}
+
 //		//保存证件与车辆的关联表信息
 //		this.contract4ChargerService.carNContract4Save(carId,getE().getId());
 //		
@@ -186,8 +198,6 @@ public class Contract4ChargerAction extends FileEntityAction<Long, Contract4Char
 //		this.contract4ChargerService.updateCar4dirverName(assignChargerNames,carId);
 //		//更新司机的chager列显示责任人姓名
 //		this.contract4ChargerService.updateCarMan4dirverName(assignChargerNames,carId);
-		
-		return "saveSuccess";
 		
 	}
 	
