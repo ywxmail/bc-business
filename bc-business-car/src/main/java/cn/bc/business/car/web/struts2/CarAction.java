@@ -64,6 +64,7 @@ public class CarAction extends FileEntityAction<Long, Car> {
 	public List<Map<String, String>> carModelList; // 车型配置列表
 	public Map<String, String> statusesValue;
 	public JSONArray vinPrefixes;// 车辆车架号前缀
+	public JSONArray taximeterTypes; // 计价器型号
 	public Json json;
 
 	public String vinPrefix;// 车架号前缀
@@ -127,6 +128,7 @@ public class CarAction extends FileEntityAction<Long, Car> {
 		this.getE().setLevel("一级");// 车辆定级
 		this.getE().setColor("绿灰");// 车辆颜色
 		this.getE().setFuelType("汽油"); // 燃料类型
+		this.getE().setBusinessType("承包合同");//营运性质
 		// // 设置默认的原归属单位信息
 		// this.getE().setOldUnitName(getText("app.oldUnitName"));
 
@@ -209,7 +211,9 @@ public class CarAction extends FileEntityAction<Long, Car> {
 						OptionConstants.CAR_TAXIMETERFACTORY,
 						OptionConstants.CAR_COMPANY,
 						OptionConstants.CAR_LOGOUT_REASON,
-						OptionConstants.CAR_VIN_PREFIX });
+						OptionConstants.CAR_VIN_PREFIX, 
+						OptionConstants.CAR_TAXIMETER_TYPE
+						});
 
 		// 加载可选营运性质列表
 		this.businessTypeList = optionItems
@@ -234,6 +238,10 @@ public class CarAction extends FileEntityAction<Long, Car> {
 		// 车辆车架号前缀
 		this.vinPrefixes = OptionItem.toLabelValues(optionItems
 				.get(OptionConstants.CAR_VIN_PREFIX));
+		
+		// 计价器型号
+		this.taximeterTypes = OptionItem.toLabelValues(optionItems
+				.get(OptionConstants.CAR_TAXIMETER_TYPE));
 
 		// 所属单位列表
 		this.companyList = optionItems.get(OptionConstants.CAR_COMPANY);
