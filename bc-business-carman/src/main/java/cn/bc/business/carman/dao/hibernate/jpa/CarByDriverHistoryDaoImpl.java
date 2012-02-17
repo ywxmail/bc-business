@@ -3,6 +3,8 @@
  */
 package cn.bc.business.carman.dao.hibernate.jpa;
 
+import java.util.Calendar;
+
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceException;
@@ -62,22 +64,32 @@ public class CarByDriverHistoryDaoImpl extends
 		this.executeUpdate(hql, new Object[] { unit, motorcadeId, carId });
 	}
 
-	public void updateDriverOperationCar(Long driverId, Long mainCarId,
-			int moveType, int classes) {
-		if (mainCarId == null) {
-			String hql = "update CarMan c set c.carInFo=getCarInfoByDriverId(c.id),c.mainCarId=null,c.classes=0,c.moveType=? where c.id=?";
-			this.executeUpdate(hql, new Object[] { moveType, driverId });
-		} else {
-			String hql = "update CarMan c set c.carInFo=getCarInfoByDriverId(c.id),c.mainCarId=?,c.moveType=?,c.classes=? where c.id=?";
-			this.executeUpdate(hql, new Object[] { mainCarId, moveType,
-					classes, driverId });
-		}
-
-	}
-
 	public void updateCarByDriverStatus(Long driverId, Long pid) {
 		String hql = "update CarByDriver c set c.status=1 where c.driver.id=? and c.pid !=?";
 		this.executeUpdate(hql, new Object[] { driverId, pid });
+
+	}
+
+	public void updateDriverOperationCar(Long driverId, Long mainCarId,
+			int moveType, Calendar moveDate, Calendar endDate, int status,
+			int classes) {
+		// 如果迁移类型为顶班时的处理
+		if (moveType == CarByDriverHistory.MOVETYPE_DINGBAN) {
+			String hql = "update CarMan c set c.carInFo=getCarInfoByDriverId(c.id),c.mainCarId=?,c.moveType=?,c.moveDate=?,c.shiftworkEndDate=?,c.status=?,c.classes=? where c.id=?";
+			this.executeUpdate(hql, new Object[] { mainCarId, moveType,
+					moveDate, endDate, status, classes, driverId });
+		} else {
+			// 其他类型的处理
+			if (mainCarId == null) {
+				String hql = "update CarMan c set c.carInFo=getCarInfoByDriverId(c.id),c.mainCarId=null,c.shiftworkEndDate=null,c.classes=0,c.moveType=?,c.moveDate=?,c.status=? where c.id=?";
+				this.executeUpdate(hql, new Object[] { moveType, moveDate,
+						status, driverId });
+			} else {
+				String hql = "update CarMan c set c.carInFo=getCarInfoByDriverId(c.id),c.shiftworkEndDate=null,c.mainCarId=?,c.moveType=?,c.moveDate=?,c.status=?,c.classes=? where c.id=?";
+				this.executeUpdate(hql, new Object[] { mainCarId, moveType,
+						moveDate, status, classes, driverId });
+			}
+		}
 
 	}
 

@@ -116,10 +116,11 @@ public class CarByDriverHistoryServiceImpl extends
 				// 更新新车辆的营运司机信息
 				this.carByDriverHistoryDao.updateDriver4Car(entity.getToCar()
 						.getId());
-				// 更新该司机表营运车辆信息，主车辆Id,迁移类型
+				// 更新该司机表营运车辆信息，主车辆Id,迁移类型,迁移日期，顶班会同期结束日期，司状态(正常)，驾驶状态
 				this.carByDriverHistoryDao.updateDriverOperationCar(entity
 						.getDriver().getId(), entity.getToCar().getId(), entity
-						.getMoveType(), entity.getToClasses());
+						.getMoveType(), entity.getMoveDate(), null,
+						BCConstants.STATUS_ENABLED, entity.getToClasses());
 				// 更新旧车辆的营运司机信息
 				if (entity.getFromCar() != null) {
 					this.carByDriverHistoryDao.updateDriver4Car(entity
@@ -148,16 +149,19 @@ public class CarByDriverHistoryServiceImpl extends
 				// 更新原车辆的营运司机信息
 				this.carByDriverHistoryDao.updateDriver4Car(entity.getFromCar()
 						.getId());
-				// 更新该司机表营运车辆信息，主车辆Id,迁移类型,营运班次
 				if (entity.getToCar() != null) {
+					// 更新该司机表营运车辆信息，主车辆Id,迁移类型,迁移日期，顶班会同期结束日期，司状态(注销)，驾驶状态
 					this.carByDriverHistoryDao.updateDriverOperationCar(entity
 							.getDriver().getId(), entity.getToCar().getId(),
-							entity.getMoveType(), entity.getToClasses());
+							entity.getMoveType(), entity.getMoveDate(), null,
+							BCConstants.STATUS_DISABLED, entity.getToClasses());
 				} else {
 					// 主车辆Id为空时，营运班次为空
 					this.carByDriverHistoryDao.updateDriverOperationCar(entity
 							.getDriver().getId(), null, entity.getMoveType(),
-							CarByDriver.TYPE_WEIDINGYI);
+							entity.getMoveDate(), null,
+							BCConstants.STATUS_DISABLED, entity.getToClasses());
+
 				}
 			}
 
@@ -314,10 +318,11 @@ public class CarByDriverHistoryServiceImpl extends
 							.getId());
 				}
 			}
-			// 更新该司机表营运车辆信息，主车辆Id,迁移类型
+			// 更新该司机表营运车辆信息，主车辆Id,迁移类型,迁移日期，顶班会同期结束日期，司状态(正常)，驾驶状态
 			this.carByDriverHistoryDao.updateDriverOperationCar(entity
 					.getDriver().getId(), entity.getToCar().getId(), entity
-					.getMoveType(), entity.getToClasses());
+					.getMoveType(), entity.getMoveDate(), entity.getEndDate(),
+					BCConstants.STATUS_ENABLED, entity.getToClasses());
 		}
 	}
 }

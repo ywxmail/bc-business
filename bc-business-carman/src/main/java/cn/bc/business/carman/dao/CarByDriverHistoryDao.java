@@ -3,6 +3,8 @@
  */
 package cn.bc.business.carman.dao;
 
+import java.util.Calendar;
+
 import cn.bc.business.carman.domain.CarByDriverHistory;
 import cn.bc.core.dao.CrudDao;
 
@@ -60,11 +62,16 @@ public interface CarByDriverHistoryDao extends CrudDao<CarByDriverHistory> {
 	 *            主车辆Id
 	 * @param moveType
 	 *            迁移类型
+	 * @param endDate
+	 *            顶班合同期结束日期
+	 * @param moveDate
+	 *            迁移日期(顶班合同期开始日期)
 	 * @param classes
 	 *            驾驶状态
+	 * @param status司机状态
 	 */
 	void updateDriverOperationCar(Long driverId, Long mainCarId, int moveType,
-			int classes);
+			Calendar moveDate, Calendar endDate, int status, int classes);
 
 	/**
 	 * 更新司机营运班次记录：将不属于该司机迁移记录产生的其他营运记录的状态更新为注销
