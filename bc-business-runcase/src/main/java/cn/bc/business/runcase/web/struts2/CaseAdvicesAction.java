@@ -152,7 +152,7 @@ public class CaseAdvicesAction extends ViewAction<Map<String, Object>> {
 				getText("runcase.receiveCode"), 100).setSortable(true)
 				.setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("b.source", "source",
-				getText("runcase.ifsource"), 60).setSortable(true).setUseTitleFromLabel(true)
+				getText("runcase.source"), 60).setSortable(true).setUseTitleFromLabel(true)
 				.setValueFormater(new AbstractFormater<String>() {
 					@Override
 					public String format(Object context, Object value) {

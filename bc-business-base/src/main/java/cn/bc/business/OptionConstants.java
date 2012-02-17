@@ -46,6 +46,8 @@ public class OptionConstants extends cn.bc.option.OptionConstants {
 
 	/** 计价器制造厂 */
 	public final static String CAR_TAXIMETERFACTORY = "car.taximeterFactory";
+	/** 计价器型号 */
+	public final static String CAR_TAXIMETER_TYPE = "car.taximeter.type";
 
 	/** 签约类型 */
 	public final static String CONTRACT_SIGNTYPE = "contract.signType";
