@@ -194,7 +194,7 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 
 	@Override
 	protected PageOption buildFormPageOption(boolean editable) {
-		return super.buildFormPageOption(editable).setWidth(825).setMinWidth(250).setHeight(480)
+		return super.buildFormPageOption(editable).setWidth(705).setMinWidth(250).setHeight(500)
 				.setMinHeight(200);
 	}
 
@@ -282,6 +282,7 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 								+ car.get(0).getPlateNo());
 				this.getE().setMotorcadeId(car.get(0).getMotorcade().getId());
 				this.getE().setMotorcadeName(car.get(0).getMotorcade().getName());
+				this.getE().setCompany(car.get(0).getCompany());
 			} else if (car.size() > 1) {
 				isMoreCar = true;
 			} else {
@@ -298,6 +299,7 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 			this.getE().setCarId(carId);
 			this.getE().setMotorcadeId(car.getMotorcade().getId());
 			this.getE().setMotorcadeName(car.getMotorcade().getName());
+			this.getE().setCompany(car.getCompany());
 			List<CarMan> carMan = this.carManService
 					.selectAllCarManByCarId(carId);
 			if (carMan.size() == 1) {
@@ -362,7 +364,7 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 		e.setModifiedDate(Calendar.getInstance());
 		
 		//设置结案信息
-		if(e.getStatus() == 1){
+		if(e.getStatus() == CaseBase.STATUS_CLOSED){
 			e.setStatus(CaseBase.STATUS_CLOSED);
 			e.setCloserId(context.getUser().getId());
 			e.setCloserName(context.getUser().getName());
