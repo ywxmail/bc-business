@@ -34,8 +34,6 @@ public class CaseBase4AdviceAndPraise extends CaseBase {
 	public static final int SEX_WOMAN = 2;
 	
 	private Calendar receiveDate;// 接诉时间
-	private Long receiverId;// 经办人ID(对应ActorHistory的ID)
-	private String receiverName;// 经办人姓名
 	private String subject2;// 投诉建议项目小类(大类使用基类的subject)
 	private String detail;// 投诉内容
 	private String carColor;// 车色
@@ -72,23 +70,6 @@ public class CaseBase4AdviceAndPraise extends CaseBase {
 		this.receiveDate = receiveDate;
 	}
 
-	@Column(name = "RECEIVER_ID")
-	public Long getReceiverId() {
-		return receiverId;
-	}
-
-	public void setReceiverId(Long receiverId) {
-		this.receiverId = receiverId;
-	}
-
-	@Column(name = "RECEIVER_NAME")
-	public String getReceiverName() {
-		return receiverName;
-	}
-
-	public void setReceiverName(String receiverName) {
-		this.receiverName = receiverName;
-	}
 
 	public String getSubject2() {
 		return subject2;
