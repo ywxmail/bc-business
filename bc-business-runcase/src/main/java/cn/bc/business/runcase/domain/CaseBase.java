@@ -381,6 +381,7 @@ public class CaseBase extends RichFileEntityImpl {
 		this.dedit = dedit;
 	}
 
+	@Column(name = "DRIVER_RATING")
 	public String getDriverRating() {
 		return driverRating;
 	}

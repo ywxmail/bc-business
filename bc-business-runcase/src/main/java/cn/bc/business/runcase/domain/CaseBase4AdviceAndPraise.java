@@ -37,10 +37,8 @@ public class CaseBase4AdviceAndPraise extends CaseBase {
 	private String subject2;// 投诉建议项目小类(大类使用基类的subject)
 	private String detail;// 投诉内容
 	private String carColor;// 车色
-	//private int driverSex;// 司机性别:参考 ActorDetail 类 SEX_XXX 常数的定义
 	private String driverFeature;// 司机特征
 	private String advisorName;// 提诉人姓名
-	//private int advisorSex;// 提诉人性别
 	private Integer advisorAge;// 提诉人年龄
 	private String advisorPhone;// 提诉人电话
 	private String advisorCert;// 提诉人证件号
@@ -96,14 +94,6 @@ public class CaseBase4AdviceAndPraise extends CaseBase {
 		this.carColor = carColor;
 	}
 
-//	@Column(name = "DRIVER_SEX")
-//	public int getDriverSex() {
-//		return driverSex;
-//	}
-//
-//	public void setDriverSex(int driverSex) {
-//		this.driverSex = driverSex;
-//	}
 	
 	/**
 	 * @return 司机性别(0-未设置,1-男,2-女)
@@ -169,14 +159,6 @@ public class CaseBase4AdviceAndPraise extends CaseBase {
 		this.advisorName = advisorName;
 	}
 
-//	@Column(name = "ADVISOR_SEX")
-//	public int getAdvisorSex() {
-//		return advisorSex;
-//	}
-//
-//	public void setAdvisorSex(int advisorSex) {
-//		this.advisorSex = advisorSex;
-//	}
 	
 	/**
 	 * @return 	提诉人性别(0-未设置,1-男,2-女)
