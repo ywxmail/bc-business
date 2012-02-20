@@ -22,6 +22,8 @@ import cn.bc.business.web.struts2.FileEntityAction;
 import cn.bc.identity.domain.ActorDetail;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.option.service.OptionService;
+import cn.bc.placeorigin.domain.PlaceOrigin;
+import cn.bc.placeorigin.service.PlaceOriginService;
 import cn.bc.web.ui.html.page.ButtonOption;
 import cn.bc.web.ui.html.page.PageOption;
 import cn.bc.web.ui.json.Json;
@@ -151,4 +153,75 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 		return "json";
 	}
 	// ========服务资格证唯一性检测代码结束========
+	
+	// ========根据身份证号码匹配出司机的籍贯、生日和区域开始========
+	private String identityId;
+	
+	public String getIdentityId() {
+		return identityId;
+	}
+
+	public void setIdentityId(String identityId) {
+		this.identityId = identityId;
+	}
+
+	private PlaceOriginService placeOriginServie;
+	
+	@Autowired
+	public void setPlaceOriginServie(PlaceOriginService placeOriginServie) {
+		this.placeOriginServie = placeOriginServie;
+	}
+
+	public String autoLoadCarManIdentityInfo(){
+		Json json=new Json();
+		//根据编码找出籍贯
+		List<PlaceOrigin> pList=null;
+		String core= this.identityId.substring(0, 6);
+		//先按身份证前6位查找
+		pList=this.placeOriginServie.findPlaceOrigin(core);
+		if(pList==null||pList.size()==0){
+			//若前6位找不到然后按前4位
+			core=this.identityId.substring(0,4);
+			pList=this.placeOriginServie.findPlaceOrigin(core+"00");
+			if(pList==null||pList.size()==0){
+				core=this.identityId.substring(0,2);
+				pList=this.placeOriginServie.findPlaceOrigin(core+"0000");
+			}
+		}
+		
+		if(pList!=null&&pList.size()>0){
+			//取集合中第一的对象
+		    PlaceOrigin po=pList.get(0);
+		    String fullname=po.getFullname();
+		    json.put("origin", fullname);
+		    //根据全名判断区域
+		    String[] isFlag=fullname.split("广东省广州市");
+		    if(isFlag.length>=2){
+		    	//本市
+		    	json.put("area", "1");
+		    }else{
+		    	isFlag=fullname.split("广东省");
+		    	if(isFlag.length>=2){
+		    		//本省
+			    	json.put("area", "2");
+			    }else{
+			    	//外省
+			    	json.put("area", "3");
+			    }
+		    }
+		    
+		}
+		//生成出生日期
+		String birthday="";
+		birthday+=this.identityId.substring(6, 10);
+		birthday+="-";
+		birthday+=this.identityId.substring(10, 12);
+		birthday+="-";
+		birthday+=this.identityId.substring(12, 14);
+		json.put("birthday", birthday);
+		this.json=json.toString();
+		return "json";
+	}
+	// ========根据身份证号码匹配出司机的籍贯、生日和区域结束========
+	
 }
