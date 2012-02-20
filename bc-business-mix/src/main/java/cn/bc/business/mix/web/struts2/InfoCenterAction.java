@@ -60,8 +60,8 @@ public class InfoCenterAction extends ActionSupport {
 	public String execute() throws Exception {
 		// 初始化页面配置信息
 		this.pageOption = new PageOption().setMaximizable(true)
-				.setMinimizable(true).setMinWidth(500).setWidth(900)
-				.setMinHeight(350).setHeight(400);
+				.setMinimizable(true).setMinWidth(760).setWidth(880)
+				.setMinHeight(380).setHeight(500);
 
 		// 可选分公司列表
 		units = OptionItem.toLabelValues(this.actorService.find4option(
