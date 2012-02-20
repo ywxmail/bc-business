@@ -16,5 +16,12 @@
 			<artifactId>bc-business-base</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		
+		<!-- 车队 -->
+		<dependency>
+			<groupId>cn.bc.business</groupId>
+			<artifactId>bc-business-motorcade</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 	</dependencies>
 </project>
