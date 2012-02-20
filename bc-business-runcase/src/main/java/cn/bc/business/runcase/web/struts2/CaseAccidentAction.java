@@ -182,9 +182,10 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 			//新建时
 			if(getE().isNew()){
 				pageOption
-				.addButton(new ButtonOption(getText("label.save"), "save"));
+				.addButton(new ButtonOption(getText("label.save")
+						,null, "bc.caseAccidentForm.save").setId("caseAccidentSave"));
 			}
-			// 特殊处理结案按钮
+			//特殊处理结案按钮
 			//状态为在案时
 			if (Case4Accident.STATUS_ACTIVE == getE().getStatus()  &&!getE().isNew()
 					) {
@@ -194,7 +195,8 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 				buttonOption.put("id", "bcSaveDlgButton");
 				pageOption.addButton(buttonOption);
 				pageOption
-				.addButton(new ButtonOption(getText("label.save"), "save"));
+				.addButton(new ButtonOption(getText("label.save")
+						,null, "bc.caseAccidentForm.save").setId("caseAccidentSave"));
 			}
 		}
 	}
@@ -249,7 +251,6 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 		this.getE().setCode(this.getIdGeneratorService()
 				.nextSN4Day(Case4Accident.KEY_CODE, "00"));
 		
-		
 		// 初始化信息
 		this.getE().setType(CaseBase.TYPE_INFRACT_BUSINESS);
 		this.getE().setStatus(CaseBase.STATUS_ACTIVE);
@@ -271,19 +272,6 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 		// 设置结案信息
 		if (isClosed.length() > 0 && isClosed.equals("1")) {
 			this.setCloserInfo(context, e);
-		}
-
-		// 判断状态设置保存时是否结案
-		// 已经送保，已经赔付，已经选择受款司机，没有二次送保
-		if (e.isDeliver() && e.isClaim() && e.isPay() && (!e.isDeliverSecond())) {
-			this.setCloserInfo(context, e);
-			result="json";
-		}
-		// 已经送保，已经赔付，已经选择受款司机，选择二次送保
-		if (e.isDeliver() && e.isClaim() && e.isPay() && e.isDeliverSecond()
-				&& e.isDeliverTwo() && e.isClaimTwo() && e.isPayTwo()) {
-			this.setCloserInfo(context, e);
-			result="json";
 		}
 
 		// 设置最后更新人的信息
@@ -474,7 +462,6 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 				}
 				op.put("buyPlant",jsonsbp);
 				jsons.add(op);
-				//jsons.add(op);
 			}
 			
 			json = jsons.toString();
