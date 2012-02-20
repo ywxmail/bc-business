@@ -47,6 +47,7 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 	public List<Map<String, String>> carManLevelList;// 司机责任人等级列表
 	public List<Map<String, String>> carManModelList;// 司机责任人准驾车型列表
 
+
 	@Autowired
 	public void setOptionService(OptionService optionService) {
 		this.optionService = optionService;
@@ -72,6 +73,7 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 
 		// 额外参数的设置
 		this.getE().setStatus(BCConstants.STATUS_ENABLED);
+		this.getE().setType(CarMan.TYPE_DRIVER_AND_CHARGER);
 		this.getE().setUid(this.getIdGeneratorService().next(CarMan.KEY_UID));
 		this.getE().setOrderNo(
 				this.getIdGeneratorService().nextSN4Month(Car.KEY_CODE));

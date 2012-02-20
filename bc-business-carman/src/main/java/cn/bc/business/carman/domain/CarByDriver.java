@@ -33,9 +33,9 @@ public class CarByDriver extends FileEntityImpl {
 	/** 营运类型：副班 */
 	public static final int TYPE_FUBAN = 2;
 	/** 营运类型：顶班 */
-	public static final int TYPE_DINGBAN = 3;
+	public static final int TYPE_DINGBAN = 4;
 	/** 营运类型：主挂 */
-	public static final int TYPE_ZHUGUA = 4;
+	public static final int TYPE_ZHUGUA = 3;
 	
 	private int status = BCConstants.STATUS_ENABLED;// 状态
 

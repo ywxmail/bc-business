@@ -113,6 +113,7 @@ public class CarByDriverHistoryAction extends
 					|| moveType == CarByDriverHistory.MOVETYPE_JHWZX
 					|| moveType == CarByDriverHistory.MOVETYPE_JHZC) {
 				setCarInfoByCarManId();
+				this.initForm(true);
 
 			}
 			this.getE().setDriver(this.carManService.load(carManId));
@@ -285,6 +286,16 @@ public class CarByDriverHistoryAction extends
 	@Override
 	protected void initForm(boolean editable) throws Exception {
 		super.initForm(editable);
+
+		// 加载可选车队列表
+		this.motorcadeList = this.motorcadeService.findEnabled4Option();
+		if (this.getE().getToMotorcadeId() != null) {
+			getOldMotorcade(this.getE().getToMotorcadeId());
+		}
+		if (this.getE().getFromMotorcadeId() != null) {
+			getOldMotorcade(this.getE().getFromMotorcadeId());
+		}
+
 		// 批量加载可选项列表
 		Map<String, List<Map<String, String>>> optionItems = this.optionService
 				.findOptionItemByGroupKeys(new String[] {
@@ -303,8 +314,6 @@ public class CarByDriverHistoryAction extends
 		this.companyList = optionItems.get(OptionConstants.CAR_COMPANY);
 		OptionItem.insertIfNotExist(companyList, null, getE().getToUnit());
 
-		// 车队列表
-		this.motorcadeList = this.motorcadeService.findEnabled4Option();
 		// 可选车队下拉框显示
 		if (!this.getE().isNew()) {
 			// 新建时不作处理
@@ -340,6 +349,15 @@ public class CarByDriverHistoryAction extends
 			}
 		}
 
+	}
+
+	/**
+	 * 获取旧车队名
+	 */
+	private void getOldMotorcade(Long motorcadeId) {
+		Motorcade m = this.motorcadeService.load(motorcadeId);
+		OptionItem.insertIfNotExist(this.motorcadeList, m.getId().toString(),
+				m.getName());
 	}
 
 	@Override

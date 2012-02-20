@@ -82,7 +82,7 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 		sql.append("select m.id,m.status_,m.type_,m.name drvierName,m.cert_fwzg,m.cert_fwzg_id,m.cert_identity");
 		sql.append(",m.cert_cyzg,m.work_date,m.origin,m.former_unit,m.charger,m.cert_driving_first_date");
 		sql.append(",m.cert_driving,m.cert_driving_start_date,m.cert_driving_end_date,m.file_date,m.phone,m.phone1,m.sex,m.birthdate");
-		sql.append(",m.carinfo,m.move_type,mo.name motorcade,bia.name unit_name,m.classes,m.main_car_id");
+		sql.append(",m.carinfo,m.move_type,mo.name motorcade,bia.name unit_name,m.classes,m.move_date,m.shiftwork_end_date,m.main_car_id");
 		sql.append(" from BS_CARMAN m");
 		sql.append(" left join bs_car c on m.main_car_id=c.id");
 		sql.append(" left join bs_motorcade mo on c.motorcade_id=mo.id");
@@ -125,6 +125,8 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 				map.put("motorcade", rs[i++]);
 				map.put("unit_name", rs[i++]);
 				map.put("classes", rs[i++]);
+				map.put("move_date", rs[i++]);
+				map.put("shiftwork_end_date", rs[i++]);
 
 				return map;
 			}
@@ -155,11 +157,21 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 				new SexFormater()));
 		// =================
 		columns.add(new TextColumn4MapKey("m.classes", "classes",
-				getText("carByDriver.classes"), 80)
+				getText("carMan.classes"), 80)
 				.setValueFormater(new KeyValueFormater(getDriverClasses())));
 		columns.add(new TextColumn4MapKey("m.move_type", "move_type",
 				getText("carMan.move_type"), 140)
 				.setValueFormater(new KeyValueFormater(getMoveType())));
+		columns.add(new TextColumn4MapKey("m.move_date", "move_date",
+				getText("carMan.moveDate"), 180)
+				.setValueFormater(new DateRangeFormater("yyyy-MM-dd") {
+					@Override
+					public Date getToDate(Object context, Object value) {
+						@SuppressWarnings("rawtypes")
+						Map contract = (Map) context;
+						return (Date) contract.get("shiftwork_end_date");
+					}
+				}.setUseEmptySymbol(true)));
 		columns.add(new TextColumn4MapKey("bia.name", "unit_name",
 				getText("carMan.unit_name"), 80).setSortable(true));
 		columns.add(new TextColumn4MapKey("mo.name", "motorcade",
@@ -327,7 +339,7 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 		type.put(String.valueOf(CarByDriver.TYPE_DINGBAN),
 				getText("carByDriver.classes.dingban"));
 		type.put(String.valueOf(CarByDriver.TYPE_ZHUGUA),
-				getText("carByDriver.classes.zhugua"));
+				getText("carByDriver.classes.dingban"));
 		type.put(String.valueOf(CarByDriver.TYPE_WEIDINGYI),
 				getText("carByDriver.classes.weidingyi"));
 		return type;

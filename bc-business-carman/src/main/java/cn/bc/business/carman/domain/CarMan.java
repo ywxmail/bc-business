@@ -60,8 +60,9 @@ public class CarMan extends RichFileEntityImpl {
 	private Long mainCarId;// 主车辆Id
 	private String carInFo;// 营运车辆
 	private int moveType;// 迁移类型:1-公司到公司(已注销);2-注销未有去向;3-由外公司迁回;4-交回未注销;5-新入职;6-转车队;7-顶班;8-交回后转车
-	private int classes;//营运班次：'营运班次:如0-""、1-正班、2-副班、3-顶班、4-主挂'
-
+	private Calendar moveDate;// 迁移日期
+	private Calendar shiftworkEndDate;// 顶班合同期结束日期
+	private int classes;// 营运班次：'营运班次:如0-""、1-正班、2-副班、3-顶班、4-主挂'
 
 	// 历史遗留
 	private String model;// 准驾车型
@@ -406,6 +407,24 @@ public class CarMan extends RichFileEntityImpl {
 
 	public void setClasses(int classes) {
 		this.classes = classes;
+	}
+
+	@Column(name = "MOVE_DATE")
+	public Calendar getMoveDate() {
+		return moveDate;
+	}
+
+	public void setMoveDate(Calendar moveDate) {
+		this.moveDate = moveDate;
+	}
+
+	@Column(name = "SHIFTWORK_END_DATE")
+	public Calendar getShiftworkEndDate() {
+		return shiftworkEndDate;
+	}
+
+	public void setShiftworkEndDate(Calendar shiftworkEndDate) {
+		this.shiftworkEndDate = shiftworkEndDate;
 	}
 
 }
