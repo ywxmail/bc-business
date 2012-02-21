@@ -111,9 +111,8 @@ public class PolicyAction extends FileEntityAction<Long, Policy> {
 		this.getE().setVerMinor(Policy.MINOR_DEFALUT);
 		this.getE().setOpType(Policy.OPTYPE_CREATE);
 		this.getE().setUid(this.getIdGeneratorService().next(Policy.KEY_UID));
-		this.getE().setPatchNo(this.getE().getUid());	
+		this.getE().setPatchNo(this.getE().getUid());
 	}
-
 
 	@Override
 	protected void beforeSave(Policy entity) {
@@ -121,6 +120,8 @@ public class PolicyAction extends FileEntityAction<Long, Policy> {
 		// 插入险种值
 		try {
 			Set<BuyPlant> buyPlants = null;
+			// 保存险种字符串如 :车辆(ZB) 第三者(ZB)
+			String buyPlantStr = "";
 			if (this.buyPlants != null && this.buyPlants.length() > 0) {
 				buyPlants = new LinkedHashSet<BuyPlant>();
 				BuyPlant resource;
@@ -134,7 +135,18 @@ public class PolicyAction extends FileEntityAction<Long, Policy> {
 					resource.setOrderNo(i);
 					resource.setPolicy(this.getE());
 					resource.setName(json.getString("name"));
+					buyPlantStr += json.getString("name");
+					buyPlantStr += "[";
 					resource.setCoverage(json.getString("coverage"));
+					buyPlantStr += json.getString("coverage");
+					//只要备注不为空，也显示备注
+					if (json.getString("description") != null
+							&& json.getString("description").length() > 0) {
+						buyPlantStr += ",";
+						buyPlantStr += json.getString("description");
+					}
+					buyPlantStr += "]";
+					buyPlantStr += "  ";
 					resource.setDescription(json.getString("description"));
 					buyPlants.add(resource);
 				}
@@ -142,8 +154,10 @@ public class PolicyAction extends FileEntityAction<Long, Policy> {
 			if (this.getE().getBuyPlants() != null) {
 				this.getE().getBuyPlants().clear();
 				this.getE().getBuyPlants().addAll(buyPlants);
+				this.getE().setBuyPlantStr(buyPlantStr);
 			} else {
 				this.getE().setBuyPlants(buyPlants);
+				this.getE().setBuyPlantStr(buyPlantStr);
 			}
 		} catch (JSONException e) {
 			logger.error(e.getMessage(), e);
@@ -155,10 +169,6 @@ public class PolicyAction extends FileEntityAction<Long, Policy> {
 		}
 	}
 
-	
-	
-	
-	
 	@Override
 	protected void buildFormPageButtons(PageOption pageOption, boolean editable) {
 		boolean readonly = this.isReadonly();
@@ -171,20 +181,24 @@ public class PolicyAction extends FileEntityAction<Long, Policy> {
 			// }
 		} else {// open
 			if (!readonly) {
-			if(this.getE().getStatus()==Policy.STATUS_ENABLED){
-				//维护
-				pageOption.addButton(new ButtonOption(
-						getText("policy.optype.edit"), null,
-						"bc.policyForm.doMaintenance").setId("policyeEdit"));
-				//注销
-				pageOption.addButton(new ButtonOption(
-						getText("policy.status.disabled"),null,
-						"bc.policyForm.doLogout"));
-				//停保 
-				/*pageOption.addButton(new ButtonOption(
-						getText("policy.optype.surrenders"), null,
-						"bc.policyForm.doSurrender").setId("policySurrenders"));*/
-			  }
+				if (this.getE().getStatus() == Policy.STATUS_ENABLED) {
+					// 维护
+					pageOption
+							.addButton(new ButtonOption(
+									getText("policy.optype.edit"), null,
+									"bc.policyForm.doMaintenance")
+									.setId("policyeEdit"));
+					// 注销
+					pageOption.addButton(new ButtonOption(
+							getText("policy.status.disabled"), null,
+							"bc.policyForm.doLogout"));
+					// 停保
+					/*
+					 * pageOption.addButton(new ButtonOption(
+					 * getText("policy.optype.surrenders"), null,
+					 * "bc.policyForm.doSurrender").setId("policySurrenders"));
+					 */
+				}
 			}
 		}
 	}
@@ -202,10 +216,10 @@ public class PolicyAction extends FileEntityAction<Long, Policy> {
 
 	@Override
 	protected void afterOpen(Policy entity) {
-		if(isReadonly()){
-			this.getE().setLiabilityAmount((float)-1);
-			this.getE().setCommerialAmount((float)-1);
-			this.getE().setGreenslipAmount((float)-1);
+		if (isReadonly()) {
+			this.getE().setLiabilityAmount((float) -1);
+			this.getE().setCommerialAmount((float) -1);
+			this.getE().setGreenslipAmount((float) -1);
 		}
 		super.afterOpen(entity);
 	}

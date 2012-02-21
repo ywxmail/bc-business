@@ -49,7 +49,12 @@ public class CaseBase extends RichFileEntityImpl {
 	public static final int SOURCE_SYNC = 1;
 	/** 事件来源：生成 */
 	public static final int SOURCE_GENERATION = 2;
-
+	
+	/** 处理状态：未处理 */
+	public static final int HANDLE_STATUS_NEW = 0;
+	/** 处理状态：已处理 */
+	public static final int HANDLE_STATUS_DONE = 1;
+	
 	private String subject;// 标题：事件的简要描述
 	private int type;// 事件类型：参考常数TYPE_XXXX的定义
 	private int source = SOURCE_SYS;// 来源：参考常数SOURCE_xxxx的定义
@@ -74,6 +79,27 @@ public class CaseBase extends RichFileEntityImpl {
 
 	private String syncUid;// 旧数据同步的UID
 	private Long syncId;// 数据同步ID
+	
+	private Long receiverId;// 经办人ID(对应ActorHistory的ID)
+	private String receiverName;// 经办人姓名
+	
+	private Long branchChargerId; // 分公司负责人id(对应ActorHistory的ID)
+	private String branchChargerName;// 分公司负责人姓名
+	private Long companyApprovalId; // 公司审批人id(对应ActorHistory的ID)
+	private String companyApprovalName;// 公司审批人姓名
+	
+	private String content;// 内容
+	private String stopProduction;// 停产
+	private String study;// 学习
+	private float dedit;// 违约金
+	private String driverRating;// 驾驶员评级
+	
+	private Long handlerId; // 处理人id(对应ActorHistory的ID)
+	private String handlerName; // 处理人姓名
+	private Integer handleStatus; //处理状态:0-未处理;1-已处理
+	private String handleOpinion; // 处理意见
+	private Calendar handleDate; // 处理时间
+	
 
 	public String getCompany() {
 		return company;
@@ -267,4 +293,146 @@ public class CaseBase extends RichFileEntityImpl {
 	public void setSyncUid(String syncUid) {
 		this.syncUid = syncUid;
 	}
+	
+	@Column(name = "RECEIVER_ID")
+	public Long getReceiverId() {
+		return receiverId;
+	}
+
+	public void setReceiverId(Long receiverId) {
+		this.receiverId = receiverId;
+	}
+
+	@Column(name = "RECEIVER_NAME")
+	public String getReceiverName() {
+		return receiverName;
+	}
+
+	public void setReceiverName(String receiverName) {
+		this.receiverName = receiverName;
+	}
+
+	@Column(name = "BRANCH_CHARGER_ID")
+	public Long getBranchChargerId() {
+		return branchChargerId;
+	}
+
+	public void setBranchChargerId(Long branchChargerId) {
+		this.branchChargerId = branchChargerId;
+	}
+
+	@Column(name = "BRANCH_CHARGER_NAME")
+	public String getBranchChargerName() {
+		return branchChargerName;
+	}
+
+	public void setBranchChargerName(String branchChargerName) {
+		this.branchChargerName = branchChargerName;
+	}
+
+	@Column(name = "COMPANY_APPROVAL_ID")
+	public Long getCompanyApprovalId() {
+		return companyApprovalId;
+	}
+
+	public void setCompanyApprovalId(Long companyApprovalId) {
+		this.companyApprovalId = companyApprovalId;
+	}
+
+	@Column(name = "COMPANY_APPROVAL_NAME")
+	public String getCompanyApprovalName() {
+		return companyApprovalName;
+	}
+
+	public void setCompanyApprovalName(String companyApprovalName) {
+		this.companyApprovalName = companyApprovalName;
+	}
+
+	public String getContent() {
+		return content;
+	}
+
+	public void setContent(String content) {
+		this.content = content;
+	}
+
+	@Column(name = "STOP_PRODUCTION")
+	public String getStopProduction() {
+		return stopProduction;
+	}
+
+	public void setStopProduction(String stopProduction) {
+		this.stopProduction = stopProduction;
+	}
+
+	public String getStudy() {
+		return study;
+	}
+
+	public void setStudy(String study) {
+		this.study = study;
+	}
+
+	public float getDedit() {
+		return dedit;
+	}
+
+	public void setDedit(float dedit) {
+		this.dedit = dedit;
+	}
+
+	@Column(name = "DRIVER_RATING")
+	public String getDriverRating() {
+		return driverRating;
+	}
+
+	public void setDriverRating(String driverRating) {
+		this.driverRating = driverRating;
+	}
+
+	@Column(name = "HANDLER_ID")
+	public Long getHandlerId() {
+		return handlerId;
+	}
+
+	public void setHandlerId(Long handlerId) {
+		this.handlerId = handlerId;
+	}
+
+	@Column(name = "HANDLER_NAME")
+	public String getHandlerName() {
+		return handlerName;
+	}
+
+	public void setHandlerName(String handlerName) {
+		this.handlerName = handlerName;
+	}
+
+	@Column(name = "HANDLE_STATUS")
+	public Integer getHandleStatus() {
+		return handleStatus;
+	}
+
+	public void setHandleStatus(Integer handleStatus) {
+		this.handleStatus = handleStatus;
+	}
+
+	@Column(name = "HANDLE_OPINION")
+	public String getHandleOpinion() {
+		return handleOpinion;
+	}
+
+	public void setHandleOpinion(String handleOpinion) {
+		this.handleOpinion = handleOpinion;
+	}
+
+	@Column(name = "HANDLE_DATE")
+	public Calendar getHandleDate() {
+		return handleDate;
+	}
+
+	public void setHandleDate(Calendar handleDate) {
+		this.handleDate = handleDate;
+	}
+
 }

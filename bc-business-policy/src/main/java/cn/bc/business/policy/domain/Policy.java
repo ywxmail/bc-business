@@ -95,6 +95,8 @@ public class Policy extends RichFileEntityImpl {
 
 	private ActorHistory logout;//注销人
 	private Calendar logoutDate; // 注销日期
+	
+	private String buyPlantStr;//险种字符串
 
 	@ManyToOne(fetch = FetchType.EAGER, optional = true)
 	@JoinColumn(name = "CAR_ID", referencedColumnName = "ID")
@@ -356,5 +358,15 @@ public class Policy extends RichFileEntityImpl {
 		this.logout = logout;
 	}
 
+	@Column(name = "BUY_PLANT")
+	public String getBuyPlantStr() {
+		return buyPlantStr;
+	}
+
+	public void setBuyPlantStr(String buyPlantStr) {
+		this.buyPlantStr = buyPlantStr;
+	}
+
+	
 	
 }

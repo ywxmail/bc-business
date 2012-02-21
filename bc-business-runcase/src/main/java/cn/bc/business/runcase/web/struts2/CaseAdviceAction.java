@@ -194,7 +194,7 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 
 	@Override
 	protected PageOption buildFormPageOption(boolean editable) {
-		return super.buildFormPageOption(editable).setWidth(825).setMinWidth(250).setHeight(480)
+		return super.buildFormPageOption(editable).setWidth(705).setMinWidth(250).setHeight(500)
 				.setMinHeight(200);
 	}
 
@@ -282,6 +282,7 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 								+ car.get(0).getPlateNo());
 				this.getE().setMotorcadeId(car.get(0).getMotorcade().getId());
 				this.getE().setMotorcadeName(car.get(0).getMotorcade().getName());
+				this.getE().setCompany(car.get(0).getCompany());
 			} else if (car.size() > 1) {
 				isMoreCar = true;
 			} else {
@@ -290,6 +291,7 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 			this.getE().setDriverId(carManId);
 			this.getE().setDriverName(driver.getName());
 			this.getE().setDriverCert(driver.getCert4FWZG());
+			this.getE().setDriverSex(driver.getSex());
 		}
 		if (carId != null) {
 			Car car = this.carService.load(carId);
@@ -298,12 +300,14 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 			this.getE().setCarId(carId);
 			this.getE().setMotorcadeId(car.getMotorcade().getId());
 			this.getE().setMotorcadeName(car.getMotorcade().getName());
+			this.getE().setCompany(car.getCompany());
 			List<CarMan> carMan = this.carManService
 					.selectAllCarManByCarId(carId);
 			if (carMan.size() == 1) {
 				this.getE().setDriverName(carMan.get(0).getName());
 				this.getE().setDriverId(carMan.get(0).getId());
 				this.getE().setDriverCert(carMan.get(0).getCert4FWZG());
+				this.getE().setDriverSex(carMan.get(0).getSex());
 			} else if (carMan.size() > 1) {
 				isMoreCarMan = true;
 			} else {
@@ -335,6 +339,53 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 		}
 	}
 	
+	// 显示车辆,司机相关信息临时变量  //
+	private String chargers;
+	private Calendar birthdate;
+	private String origin;
+	private Calendar workDate;
+	private String businessType;
+	
+	public String getChargers() {
+		return chargers;
+	}
+
+	public void setChargers(String chargers) {
+		this.chargers = chargers;
+	}
+
+	public Calendar getBirthdate() {
+		return birthdate;
+	}
+
+	public void setBirthdate(Calendar birthdate) {
+		this.birthdate = birthdate;
+	}
+
+	public String getOrigin() {
+		return origin;
+	}
+
+	public void setOrigin(String origin) {
+		this.origin = origin;
+	}
+
+	public Calendar getWorkDate() {
+		return workDate;
+	}
+
+	public void setWorkDate(Calendar workDate) {
+		this.workDate = workDate;
+	}
+
+	public String getBusinessType() {
+		return businessType;
+	}
+
+	public void setBusinessType(String businessType) {
+		this.businessType = businessType;
+	}
+
 	@Override
 	public String edit() throws Exception {
 		if(syncId != null){//根据syncId查找已存在CaseBase的记录
@@ -348,6 +399,56 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 		// 初始化表单的其他配置
 		this.initForm(true);
 		sourceStr = getSourceStatuses().get(this.getE().getSource()+"");
+		
+		this.carId = this.getE().getCarId();
+		// 设置显示车辆,司机相关信息
+		if (carId != null && carManId == null) {
+			Car car = this.carService.load(carId);
+			this.getE().setCarPlate(car.getPlateType() + "." + car.getPlateNo());
+			this.getE().setCarId(carId);
+			this.getE().setMotorcadeId(car.getMotorcade().getId());
+			this.getE().setMotorcadeName(car.getMotorcade().getName());
+			this.getE().setCompany(car.getCompany());
+			
+			this.chargers = formatChargers(car.getCharger());
+			this.businessType = car.getBusinessType();
+			
+			List<CarMan> carMan = this.carManService.selectAllCarManByCarId(carId);
+			this.getE().setDriverName(carMan.get(0).getName());
+			this.getE().setDriverId(carMan.get(0).getId());
+			this.getE().setDriverCert(carMan.get(0).getCert4FWZG());
+			this.getE().setDriverSex(carMan.get(0).getSex());
+			
+			this.birthdate = carMan.get(0).getBirthdate();
+			this.origin = carMan.get(0).getOrigin();
+			this.workDate = carMan.get(0).getWorkDate();
+		}
+		this.carManId = this.getE().getDriverId();
+		if (carManId != null && carId == null) {
+			CarMan driver = this.carManService.load(carManId);
+			this.getE().setDriverId(carManId);
+			this.getE().setDriverName(driver.getName());
+			this.getE().setDriverCert(driver.getCert4FWZG());
+			this.getE().setDriverSex(driver.getSex());
+			
+			this.birthdate = driver.getBirthdate();
+			this.origin = driver.getOrigin();
+			this.workDate = driver.getWorkDate();
+			
+			List<Car> car = this.carService.selectAllCarByCarManId(carManId);
+			this.getE().setCarId(car.get(0).getId());
+			this.getE().setCarPlate(
+					car.get(0).getPlateType() + "."
+							+ car.get(0).getPlateNo());
+			this.getE().setMotorcadeId(car.get(0).getMotorcade().getId());
+			this.getE().setMotorcadeName(car.get(0).getMotorcade().getName());
+			this.getE().setCompany(car.get(0).getCompany());
+			
+			this.chargers = formatChargers(car.get(0).getCharger());
+			this.businessType = car.get(0).getBusinessType();
+		}
+		
+		
 		return "form";
 	}
 	
@@ -362,7 +463,7 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 		e.setModifiedDate(Calendar.getInstance());
 		
 		//设置结案信息
-		if(e.getStatus() == 1){
+		if(e.getStatus() == CaseBase.STATUS_CLOSED){
 			e.setStatus(CaseBase.STATUS_CLOSED);
 			e.setCloserId(context.getUser().getId());
 			e.setCloserName(context.getUser().getName());
@@ -504,6 +605,24 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 		statuses.put(String.valueOf(CaseBase.SOURCE_GENERATION),
 				getText("runcase.select.source.sync.gen"));
 		return statuses;
+	}
+	
+	/**
+	 * 组装责任人姓名
+	 * @param chargers
+	 * @return
+	 */
+	public String formatChargers(String chargersStr){
+		String chargers = "";
+		if(chargersStr.trim().length() > 0){
+			String [] chargerAry = chargersStr.split(";");
+			for(int i=0;i<chargerAry.length;i++){
+				chargers += chargerAry[i].split(",")[0];
+				if((i+1) < chargerAry.length)
+					chargers += ",";
+			}
+		}
+		return chargers;
 	}
 	
 }

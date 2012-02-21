@@ -34,15 +34,11 @@ public class CaseBase4AdviceAndPraise extends CaseBase {
 	public static final int SEX_WOMAN = 2;
 	
 	private Calendar receiveDate;// 接诉时间
-	private Long receiverId;// 经办人ID(对应ActorHistory的ID)
-	private String receiverName;// 经办人姓名
 	private String subject2;// 投诉建议项目小类(大类使用基类的subject)
 	private String detail;// 投诉内容
 	private String carColor;// 车色
-	//private int driverSex;// 司机性别:参考 ActorDetail 类 SEX_XXX 常数的定义
 	private String driverFeature;// 司机特征
 	private String advisorName;// 提诉人姓名
-	//private int advisorSex;// 提诉人性别
 	private Integer advisorAge;// 提诉人年龄
 	private String advisorPhone;// 提诉人电话
 	private String advisorCert;// 提诉人证件号
@@ -72,23 +68,6 @@ public class CaseBase4AdviceAndPraise extends CaseBase {
 		this.receiveDate = receiveDate;
 	}
 
-	@Column(name = "RECEIVER_ID")
-	public Long getReceiverId() {
-		return receiverId;
-	}
-
-	public void setReceiverId(Long receiverId) {
-		this.receiverId = receiverId;
-	}
-
-	@Column(name = "RECEIVER_NAME")
-	public String getReceiverName() {
-		return receiverName;
-	}
-
-	public void setReceiverName(String receiverName) {
-		this.receiverName = receiverName;
-	}
 
 	public String getSubject2() {
 		return subject2;
@@ -115,14 +94,6 @@ public class CaseBase4AdviceAndPraise extends CaseBase {
 		this.carColor = carColor;
 	}
 
-//	@Column(name = "DRIVER_SEX")
-//	public int getDriverSex() {
-//		return driverSex;
-//	}
-//
-//	public void setDriverSex(int driverSex) {
-//		this.driverSex = driverSex;
-//	}
 	
 	/**
 	 * @return 司机性别(0-未设置,1-男,2-女)
@@ -188,14 +159,6 @@ public class CaseBase4AdviceAndPraise extends CaseBase {
 		this.advisorName = advisorName;
 	}
 
-//	@Column(name = "ADVISOR_SEX")
-//	public int getAdvisorSex() {
-//		return advisorSex;
-//	}
-//
-//	public void setAdvisorSex(int advisorSex) {
-//		this.advisorSex = advisorSex;
-//	}
 	
 	/**
 	 * @return 	提诉人性别(0-未设置,1-男,2-女)

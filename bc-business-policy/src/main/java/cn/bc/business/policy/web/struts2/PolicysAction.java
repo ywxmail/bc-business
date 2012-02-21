@@ -91,6 +91,7 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 		sql.append(",p.ownrisk,p.greenslip,p.liability_no,c.id as carId,p.op_type");
 		sql.append(",p.greenslip_no,p.greenslip_company,p.greenslip_start_date,p.greenslip_end_date,p.stop_date,p.main");
 		sql.append(",m.id as motorcade_id,p.liability_amount,p.commerial_amount,p.greenslip_amount,c.bs_type as bstype");
+		sql.append(",p.buy_plant");
 		sql.append(" from bs_car_policy p");
 		sql.append(" inner join bs_car c on c.id=p.car_id");
 		sql.append(" inner join bs_motorcade m on m.id=c.motorcade_id");
@@ -138,6 +139,7 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 				map.put("commerial_amount", rs[i++]);// 商业险合计
 				map.put("greenslip_amount", rs[i++]);// 强制险合计
 				map.put("bstype", rs[i++]);
+				map.put("buy_plant",rs[i++]);//承保险种
 				return map;
 			}
 		});
@@ -285,8 +287,11 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 		}
 		// 操作类型
 		columns.add(new TextColumn4MapKey("p.op_type", "op_type",
-				getText("policy.labour.optype")).setSortable(true)
+				getText("policy.labour.optype"),65).setSortable(true)
 				.setValueFormater(new EntityStatusFormater(getEntityOpTypes())));
+		//承保险种
+		columns.add(new TextColumn4MapKey("p.buy_plant", "buy_plant",
+				getText("policy.insuranceType")).setUseTitleFromLabel(true));
 		return columns;
 	}
 
@@ -295,7 +300,7 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 		return new String[] { "c.company", "bia.name", "m.name",
 				"c.plate_type", "c.plate_no", "p.commerial_no",
 				"p.greenslip_no", "p.liability_no", "p.commerial_company",
-				"c.code" };
+				"c.code","p.buy_plant" };
 	}
 
 	@Override
