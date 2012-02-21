@@ -41,7 +41,7 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 
 		final StringBuffer sql = new StringBuffer();
 		final List<Object> args = new ArrayList<Object>();
-		sql.append("select c.id,c.code,c.plate_type,c.plate_no from bs_car c");
+		sql.append("select c.id,c.code,c.plate_type,c.plate_no,c.status_ from bs_car c");
 		sql.append(" inner join bs_motorcade m on m.id=c.motorcade_id");
 		sql.append(" inner join bc_identity_actor unit on unit.id=m.unit_id");
 		if (unitId != null) {
@@ -62,6 +62,28 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 					+ StringUtils.collectionToCommaDelimitedString(args)
 					+ ";sql=" + sql);
 		}
+		return findCars(sql, args.toArray());
+	}
+
+	public JSONArray findCars(String searchType, String searchText) {
+		if (searchType == null || searchText == null
+				|| searchType.length() == 0 || searchText.length() == 0)
+			return new JSONArray();
+
+		final String value = "%" + searchText.toUpperCase() + "%";
+		final StringBuffer sql = new StringBuffer();
+		sql.append("select c.id,c.code,c.plate_type,c.plate_no,c.status_ from bs_car c");
+		sql.append(" where c.plate_no like ?");
+		sql.append(" order by c.register_date desc");
+
+		if (logger.isDebugEnabled()) {
+			logger.debug("searchType=" + searchType + ",searchText="
+					+ searchText + ";sql=" + sql);
+		}
+		return findCars(sql, new Object[] { value });
+	}
+
+	private JSONArray findCars(final StringBuffer sql, final Object[] args) {
 		return this.jpaTemplate.execute(new JpaCallback<JSONArray>() {
 			@SuppressWarnings("unchecked")
 			public JSONArray doInJpa(EntityManager em)
@@ -88,6 +110,7 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 							json.put("id", rs.get(j)[0]);
 							json.put("code", rs.get(j)[1]);
 							json.put("plate", rs.get(j)[2] + "." + rs.get(j)[3]);
+							json.put("status", rs.get(j)[4]);
 						} catch (JSONException e) {
 							logger.error(e.getMessage(), e);
 						}
@@ -97,11 +120,6 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 				return jsons;
 			}
 		});
-	}
-
-	public JSONArray findCars(String searchType, String searchText) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	public JSONObject findCarDetail(Long carId) throws Exception {

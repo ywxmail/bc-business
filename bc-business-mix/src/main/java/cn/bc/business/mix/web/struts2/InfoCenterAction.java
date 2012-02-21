@@ -95,6 +95,13 @@ public class InfoCenterAction extends ActionSupport {
 		return "json";
 	}
 
+	// 根据车辆所属分公司或车队获取相应的车辆列表信息
+	public String findCarsBySearchText() throws Exception {
+		this.json = this.infoCenterService.findCars(this.searchType,
+				this.searchText).toString();
+		return "json";
+	}
+
 	// 根据车辆id获取详细的综合信息
 	public String findCarDetail() throws Exception {
 		JSONObject json;
