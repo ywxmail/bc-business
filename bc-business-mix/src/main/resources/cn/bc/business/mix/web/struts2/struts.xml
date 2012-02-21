@@ -5,7 +5,11 @@
 <struts>
 	<package name="infoCenter" extends="bc-default" namespace="/bc-business/infoCenter">
 		<action name="main" class="infoCenterAction" method="execute">
-			<result name="success" >/bc-business/infoCenter/main.jsp</result>
+			<result name="success">/bc-business/infoCenter/main.jsp
+			</result>
 		</action>
+		<action name="findCarsByUnitAndMotorcade" class="infoCenterAction"
+			method="findCarsByUnitAndMotorcade" />
+		<action name="findCarDetail" class="infoCenterAction" method="findCarDetail" />
 	</package>
 </struts>

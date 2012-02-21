@@ -3,6 +3,8 @@
  */
 package cn.bc.business.mix.web.struts2;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -30,6 +32,8 @@ import com.opensymphony.xwork2.ActionSupport;
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 @Controller
 public class InfoCenterAction extends ActionSupport {
+	protected static final Log logger = LogFactory
+			.getLog(InfoCenterAction.class);
 	private static final long serialVersionUID = 1L;
 	private InfoCenterService infoCenterService;
 	private MotorcadeService motorcadeService;
@@ -37,8 +41,13 @@ public class InfoCenterAction extends ActionSupport {
 	public JSONArray units;// 分公司的下拉列表信息
 	public JSONArray motorcades;// 车队的下拉列表信息
 	public JSONArray searchTypes;// 查找类型的下拉列表信息
-
 	public PageOption pageOption;
+	public Long unitId;// 分公司id
+	public Long motorcadeId;// 车队id
+	public String json;// ajax返回的json信息
+	public String searchType;// 模糊查询的字段类型
+	public String searchText;// 模糊查询的值
+	public Long carId;// 车辆的id
 
 	@Autowired
 	public void setActorService(
@@ -77,6 +86,29 @@ public class InfoCenterAction extends ActionSupport {
 
 		// 返回综合查询页面
 		return super.execute();
+	}
+
+	// 根据车辆所属分公司或车队获取相应的车辆列表信息
+	public String findCarsByUnitAndMotorcade() throws Exception {
+		this.json = this.infoCenterService.findCars(unitId, motorcadeId)
+				.toString();
+		return "json";
+	}
+
+	// 根据车辆id获取详细的综合信息
+	public String findCarDetail() throws Exception {
+		JSONObject json;
+		try {
+			json = this.infoCenterService.findCarDetail(carId);
+			json.put("success", true);
+			this.json = json.toString();
+		} catch (Exception e) {
+			json = new JSONObject();
+			json.put("success", false);
+			json.put("msg", e.getMessage());
+			logger.warn(e.getMessage(), e);
+		}
+		return "json";
 	}
 
 	/**
