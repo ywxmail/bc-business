@@ -40,6 +40,12 @@
 			<artifactId>bc-business-carmodel</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<!-- 车型配置模块 -->
+		<dependency>
+			<groupId>cn.bc.business</groupId>
+			<artifactId>bc-business-carlpg</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 		
 		
 		<!-- 选项模块 -->
