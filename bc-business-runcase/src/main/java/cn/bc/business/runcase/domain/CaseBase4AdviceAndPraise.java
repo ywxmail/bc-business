@@ -58,7 +58,7 @@ public class CaseBase4AdviceAndPraise extends CaseBase {
 	private Integer passengerWomanCount;// 乘车人数(女)
 	private Integer passengerChildCount;// 乘车人数(童)
 	private Integer passengerCount;// 乘车人数
-
+	
 	@Column(name = "RECEIVE_DATE")
 	public Calendar getReceiveDate() {
 		return receiveDate;
@@ -325,4 +325,5 @@ public class CaseBase4AdviceAndPraise extends CaseBase {
 	public void setPassengerCount(Integer passengerCount) {
 		this.passengerCount = passengerCount;
 	}
+	
 }

@@ -22,10 +22,7 @@ public class Case4InfractTraffic extends CaseBase {
 	public static final String ATTACH_TYPE = Case4InfractTraffic.class
 			.getSimpleName();
 
-	private Long chargerId;// 责任人1ID(对应CarMan的ID)
-	private String chargerName;// 责任人1姓名
-	private Long chargerId2;// 责任人2ID(对应CarMan的ID)
-	private String chargerName2;// 责任人2姓名
+	private String charger;// 责任人
 
 	private String duty;// 责任
 	private String sort;// 性质
@@ -37,40 +34,12 @@ public class Case4InfractTraffic extends CaseBase {
 	private boolean sign;// 是否签领
 	private Calendar signDate;// 签领时间
 
-	@Column(name = "CHARGER1_ID")
-	public Long getChargerId() {
-		return chargerId;
+	public String getCharger() {
+		return charger;
 	}
 
-	public void setChargerId(Long chargerId) {
-		this.chargerId = chargerId;
-	}
-
-	@Column(name = "CHARGER1_NAME")
-	public String getChargerName() {
-		return chargerName;
-	}
-
-	public void setChargerName(String chargerName) {
-		this.chargerName = chargerName;
-	}
-
-	@Column(name = "CHARGER2_ID")
-	public Long getChargerId2() {
-		return chargerId2;
-	}
-
-	public void setChargerId2(Long chargerId2) {
-		this.chargerId2 = chargerId2;
-	}
-
-	@Column(name = "CHARGER2_NAME")
-	public String getChargerName2() {
-		return chargerName2;
-	}
-
-	public void setChargerName2(String chargerName2) {
-		this.chargerName2 = chargerName2;
+	public void setCharger(String charger) {
+		this.charger = charger;
 	}
 
 	public String getDuty() {

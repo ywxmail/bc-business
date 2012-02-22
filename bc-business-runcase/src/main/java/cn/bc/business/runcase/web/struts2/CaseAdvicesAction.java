@@ -8,13 +8,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.json.JSONArray;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
 import cn.bc.BCConstants;
+import cn.bc.business.OptionConstants;
+import cn.bc.business.motorcade.service.MotorcadeService;
 import cn.bc.business.runcase.domain.Case4Advice;
 import cn.bc.business.runcase.domain.CaseBase;
+import cn.bc.business.web.struts2.LinkFormater4ChargerInfo;
 import cn.bc.business.web.struts2.ViewAction;
 import cn.bc.core.query.condition.Condition;
 import cn.bc.core.query.condition.ConditionUtils;
@@ -23,11 +29,14 @@ import cn.bc.core.query.condition.impl.EqualsCondition;
 import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.db.jdbc.RowMapper;
 import cn.bc.db.jdbc.SqlObject;
+import cn.bc.identity.domain.Actor;
+import cn.bc.identity.service.ActorService;
 import cn.bc.identity.web.SystemContext;
+import cn.bc.option.domain.OptionItem;
+import cn.bc.option.service.OptionService;
 import cn.bc.web.formater.AbstractFormater;
 import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.formater.EntityStatusFormater;
-import cn.bc.web.formater.KeyValueFormater;
 import cn.bc.web.ui.html.grid.Column;
 import cn.bc.web.ui.html.grid.IdColumn4MapKey;
 import cn.bc.web.ui.html.grid.TextColumn4MapKey;
@@ -72,10 +81,17 @@ public class CaseAdvicesAction extends ViewAction<Map<String, Object>> {
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer sql = new StringBuffer();
 		sql.append("select a.id,b.status_,b.type_,a.advice_type,b.subject,b.motorcade_name,b.car_plate,b.driver_name");
-		sql.append(",b.closer_name,b.close_date,a.advisor_name,b.happen_date,a.detail");
+		sql.append(",b.closer_name,b.close_date,a.advisor_name,b.happen_date,a.path_from,a.path_to,a.detail,a.charger");
 		sql.append(",b.from_,b.source,b.driver_cert,a.receive_code,a.receive_date ");
+		sql.append(",b.company,c.bs_type");
+		sql.append(",man.origin");
 		sql.append(" from BS_CASE_ADVICE a");
 		sql.append(" inner join BS_CASE_BASE b on b.id=a.id");
+		sql.append(" left join BS_CAR c on b.car_id = c.id");
+		sql.append(" left join BS_CARMAN man on b.driver_id=man.id");
+		sql.append(" left join bs_motorcade m on m.id=c.motorcade_id");
+		sql.append(" left join bc_identity_actor bia on bia.id=m.unit_id");
+
 		sqlObject.setSql(sql.toString());
 
 		// 注入参数
@@ -98,12 +114,18 @@ public class CaseAdvicesAction extends ViewAction<Map<String, Object>> {
 				map.put("close_date", rs[i++]);
 				map.put("advisor_name", rs[i++]);
 				map.put("happen_date", rs[i++]);
+				map.put("path_from", rs[i++]);
+				map.put("path_to", rs[i++]);
 				map.put("detail", rs[i++]);
+				map.put("charger", rs[i++]);
 				map.put("from_", rs[i++]);
 				map.put("source", rs[i++]);
 				map.put("driver_cert", rs[i++]);
 				map.put("receive_code", rs[i++]);
 				map.put("receive_date", rs[i++]);
+				map.put("company", rs[i++]);
+				map.put("bs_type", rs[i++]);
+				map.put("origin", rs[i++]);
 
 				return map;
 			}
@@ -115,67 +137,94 @@ public class CaseAdvicesAction extends ViewAction<Map<String, Object>> {
 	protected List<Column> getGridColumns() {
 		List<Column> columns = new ArrayList<Column>();
 		columns.add(new IdColumn4MapKey("a.id", "id"));
+		columns.add(new TextColumn4MapKey("a.receive_code", "receive_code",
+				getText("runcase.receiveCode"), 100).setSortable(true)
+				.setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("c.status_", "status_",
 				getText("runcase.status"), 40).setSortable(true)
 				.setValueFormater(new EntityStatusFormater(getBSStatuses2())));
-		columns.add(new TextColumn4MapKey("a.advice_type", "advice_type",
-				getText("runcase.adviceType"), 40).setSortable(true)
-				.setValueFormater(new KeyValueFormater(getType())));
-		columns.add(new TextColumn4MapKey("a.receive_date", "receive_date",
-				getText("runcase.receiveDate3"), 130).setSortable(true)
-				.setValueFormater(new CalendarFormater("yyyy-MM-dd HH:mm")));
-		columns.add(new TextColumn4MapKey("b.subject", "subject",
-				getText("runcase.subject2"), 120).setSortable(true));
-		columns.add(new TextColumn4MapKey("a.detail", "detail",
-				getText("runcase.detail"), 150).setSortable(true)
-				.setUseTitleFromLabel(true));
+//		columns.add(new TextColumn4MapKey("a.advice_type", "advice_type",
+//				getText("runcase.adviceType"), 40).setSortable(true)
+//				.setValueFormater(new KeyValueFormater(getType())));
+//		columns.add(new TextColumn4MapKey("a.receive_date", "receive_date",
+//				getText("runcase.receiveDate3"), 130).setSortable(true)
+//				.setValueFormater(new CalendarFormater("yyyy-MM-dd HH:mm")));
+		columns.add(new TextColumn4MapKey("b.company", "company",
+				getText("runcase.company"), 60).setSortable(true));
 		columns.add(new TextColumn4MapKey("b.motorcade_name", "motorcade_name",
-				getText("runcase.motorcadeName"), 80).setSortable(true));
+				getText("runcase.motorcadeName"), 70).setSortable(true));
 		columns.add(new TextColumn4MapKey("b.car_plate", "car_plate",
-				getText("runcase.carPlate"), 100));
+				getText("runcase.carPlate"), 80));
 		columns.add(new TextColumn4MapKey("b.driver_name", "driver_name",
 				getText("runcase.driverName"), 70).setSortable(true));
-		columns.add(new TextColumn4MapKey("b.closer_name", "closer_name",
-				getText("runcase.closerName"), 70));
-		columns.add(new TextColumn4MapKey("b.close_date", "close_date",
-				getText("runcase.closeDate"), 100).setSortable(true)
-				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
-		columns.add(new TextColumn4MapKey("a.advisor_name", "advisor_name",
-				getText("runcase.advisorName"), 70).setSortable(true));
-		columns.add(new TextColumn4MapKey("b.happen_date", "happen_date",
-				getText("runcase.happenDate"), 120).setSortable(true)
-				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
 		columns.add(new TextColumn4MapKey("b.driver_cert", "driver_cert",
-				getText("runcase.FWZGCert"), 100).setSortable(true)
+				getText("runcase.FWZGCert"), 70).setSortable(true)
 				.setUseTitleFromLabel(true));
-		columns.add(new TextColumn4MapKey("b.receive_code", "receive_code",
-				getText("runcase.receiveCode"), 100).setSortable(true)
-				.setUseTitleFromLabel(true));
-		columns.add(new TextColumn4MapKey("b.source", "source",
-				getText("runcase.source"), 60).setSortable(true).setUseTitleFromLabel(true)
+		columns.add(new TextColumn4MapKey("b.subject", "subject",
+				getText("runcase.subject2"), 180).setSortable(true));
+		columns.add(new TextColumn4MapKey("b.happen_date", "happen_date",
+				getText("runcase.happenDate"), 125).setSortable(true)
+				.setValueFormater(new CalendarFormater("yyyy-MM-dd HH:mm")));
+		columns.add(new TextColumn4MapKey("a.path_from", "path_from",
+				getText("runcase.address"), 200).setUseTitleFromLabel(true)
 				.setValueFormater(new AbstractFormater<String>() {
+					@SuppressWarnings("unchecked")
 					@Override
 					public String format(Object context, Object value) {
-						// 从上下文取出元素Map
-						@SuppressWarnings("unchecked")
-						Map<String, Object> obj = (Map<String, Object>) context;
-						if(null != obj.get("from_") && obj.get("from_").toString().length() > 0){
-							return getSourceStatuses().get(obj.get("source")+"") + " - " + obj.get("from_");
-						}else if(null != obj.get("source") && obj.get("source").toString().length() > 0){
-							return getSourceStatuses().get(obj.get("source")+"");
-						}else{
+						Map<String, Object> advice = (Map<String, Object>) context;
+						if(advice.get("path_from").toString().length()< 0
+						   || advice.get("path_to").toString().length()< 0){
 							return "";
 						}
+						return "从"+ advice.get("path_from") + "到"
+								+ advice.get("path_to");
 					}
-				}));
+				})
+		);
+		columns.add(new TextColumn4MapKey("a.charger", "charger",
+				getText("runcase.chargers"), 170).setUseTitleFromLabel(true)
+				.setValueFormater(new LinkFormater4ChargerInfo(this
+						.getContextPath()))
+		);
+		columns.add(new TextColumn4MapKey("c.bs_type", "bs_type",
+				getText("runcase.businessType"), 80));
+		columns.add(new TextColumn4MapKey("man.origin", "origin",
+				getText("runcase.origin"), 150));
+//		columns.add(new TextColumn4MapKey("a.detail", "detail",
+//				getText("runcase.detail"), 150).setSortable(true)
+//				.setUseTitleFromLabel(true));
+//		columns.add(new TextColumn4MapKey("b.closer_name", "closer_name",
+//				getText("runcase.closerName"), 70));
+//		columns.add(new TextColumn4MapKey("b.close_date", "close_date",
+//				getText("runcase.closeDate"), 100).setSortable(true)
+//				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+//		columns.add(new TextColumn4MapKey("a.advisor_name", "advisor_name",
+//				getText("runcase.advisorName"), 70).setSortable(true));
+//		columns.add(new TextColumn4MapKey("b.source", "source",
+//				getText("runcase.source"), 60).setSortable(true).setUseTitleFromLabel(true)
+//				.setValueFormater(new AbstractFormater<String>() {
+//					@Override
+//					public String format(Object context, Object value) {
+//						// 从上下文取出元素Map
+//						@SuppressWarnings("unchecked")
+//						Map<String, Object> obj = (Map<String, Object>) context;
+//						if(null != obj.get("from_") && obj.get("from_").toString().length() > 0){
+//							return getSourceStatuses().get(obj.get("source")+"") + " - " + obj.get("from_");
+//						}else if(null != obj.get("source") && obj.get("source").toString().length() > 0){
+//							return getSourceStatuses().get(obj.get("source")+"");
+//						}else{
+//							return "";
+//						}
+//					}
+//				}));
 
 		return columns;
 	}
 
 	@Override
 	protected String[] getGridSearchFields() {
-		return new String[] { "b.case_no", "b.car_plate",
-				"b.closer_name", "b.driver_name", "b.driver_cert"};
+		return new String[] { "b.subject", "b.car_plate",
+				"a.receive_code", "b.driver_name", "b.driver_cert"};
 	}
 
 	@Override
@@ -200,9 +249,8 @@ public class CaseAdvicesAction extends ViewAction<Map<String, Object>> {
 	
 	@Override
 	protected String getGridRowLabelExpression() {
-		return "['car_plate']";
+		return "['car_plate']+'\t 的投诉信息'";
 	}
-
 
 	@Override
 	protected Condition getGridSpecalCondition() {
@@ -259,6 +307,13 @@ public class CaseAdvicesAction extends ViewAction<Map<String, Object>> {
 						this.getBSStatuses2(), "status", 0,
 						getText("title.click2changeSearchStatus")));
 	}
+	
+	@Override
+	protected String getGridDblRowMethod() {
+		// 强制为只读表单
+		return "bc.page.open";
+	}
+
 
 	/**
 	 * 获取类型(表扬,投诉)分类值转换列表
@@ -291,4 +346,60 @@ public class CaseAdvicesAction extends ViewAction<Map<String, Object>> {
 				getText("runcase.select.source.sync.auto"));
 		return statuses;
 	}
+	
+	// ==高级搜索代码开始==
+	@Override
+	protected boolean useAdvanceSearch() {
+		return true;
+	}
+
+
+	private MotorcadeService motorcadeService;
+	private ActorService actorService;
+	private OptionService optionService;
+
+	@Autowired
+	public void setActorService(
+			@Qualifier("actorService") ActorService actorService) {
+		this.actorService = actorService;
+	}
+
+	@Autowired
+	public void setMotorcadeService(MotorcadeService motorcadeService) {
+		this.motorcadeService = motorcadeService;
+	}
+	
+	@Autowired
+	public void setOptionService(OptionService optionService) {
+		this.optionService = optionService;
+	}
+
+	public JSONArray motorcades;// 车队的下拉列表信息
+	public JSONArray units;// 分公司的下拉列表信息
+	public JSONArray businessTypes;// 营运性质列表
+
+	@Override
+	protected void initConditionsFrom() throws Exception {
+		// 可选分公司列表
+		units = OptionItem.toLabelValues(this.actorService.find4option(
+				new Integer[] { Actor.TYPE_UNIT }, (Integer[]) null), "name",
+				"id");
+
+		// 可选车队列表
+		motorcades = OptionItem.toLabelValues(this.motorcadeService
+				.find4Option(null));
+		
+		// 批量加载可选项列表
+				Map<String, List<Map<String, String>>> optionItems = this.optionService
+						.findOptionItemByGroupKeys(new String[] {
+							OptionConstants.CAR_BUSINESS_NATURE
+						});
+		
+		// 营运性质列表
+		this.businessTypes = OptionItem.toLabelValues(
+				optionItems.get(OptionConstants.CAR_BUSINESS_NATURE), "value");
+	}
+
+	// ==高级搜索代码结束==
+
 }
