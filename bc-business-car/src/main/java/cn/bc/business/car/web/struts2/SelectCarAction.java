@@ -14,6 +14,7 @@ import org.springframework.stereotype.Controller;
 
 import cn.bc.BCConstants;
 import cn.bc.business.BSConstants;
+import cn.bc.business.web.struts2.LinkFormater4ChargerInfo;
 import cn.bc.core.query.condition.Condition;
 import cn.bc.core.query.condition.Direction;
 import cn.bc.core.query.condition.impl.EqualsCondition;
@@ -72,7 +73,7 @@ public class SelectCarAction extends
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer sql = new StringBuffer();
 		sql.append("select c.id,c.status_,c.code,c.plate_type,c.plate_no,c.register_date");
-		sql.append(",c.motorcade_id,m.name,c.company,c.bs_type");
+		sql.append(",c.motorcade_id,m.name,c.company,c.bs_type,c.charger");
 		sql.append(" from bs_car c");
 		sql.append(" inner join bs_motorcade m on m.id=c.motorcade_id");
 		sqlObject.setSql(sql.toString());
@@ -95,6 +96,7 @@ public class SelectCarAction extends
 				map.put("motorcade_name", rs[i++]);
 				map.put("company", rs[i++]);
 				map.put("bs_type", rs[i++]);
+				map.put("charger", rs[i++]);
 				return map;
 			}
 		});
@@ -128,6 +130,10 @@ public class SelectCarAction extends
 		columns.add(new TextColumn4MapKey("c.bs_type", "bs_type",
 				getText("car.businessType"), 60).setSortable(true)
 				.setUseTitleFromLabel(true));
+		columns.add(new TextColumn4MapKey("c.charger", "charger",
+				getText("car.charger"), 120).setUseTitleFromLabel(true)
+				.setValueFormater(new LinkFormater4ChargerInfo(this
+						.getContextPath())));
 		columns.add(new TextColumn4MapKey("c.company", "company",
 				getText("selectCar.company"), 60).setSortable(true)
 				.setUseTitleFromLabel(true));

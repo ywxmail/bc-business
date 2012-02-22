@@ -87,6 +87,7 @@ public class FindInfoByCarAction extends ActionSupport {
 			car.put("registerDate", getDateToString(first.get("carRegisterDate")));
 			car.put("bsType", first.get("carBsType"));
 			car.put("company", first.get("carCompany"));
+			car.put("charger", first.get("charger"));
 
 			
 			//营运司机信息
@@ -102,6 +103,7 @@ public class FindInfoByCarAction extends ActionSupport {
 				driver.put("houseType", info.get("driverHouseType"));
 				driver.put("birthDate", getDateToString(info.get("driverBirthDate")));
 				driver.put("age", getBirthDateToString(info.get("driverBirthDate")));
+				driver.put("workDate", getDateToString(info.get("driverWorkDate")));
 				
 				drivers.add(driver);
 			}
@@ -140,9 +142,9 @@ public class FindInfoByCarAction extends ActionSupport {
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer sql = new StringBuffer();
 		sql.append("select c.id carId,c.status_ carStatus,c.plate_type carPlateType,c.plate_no carPlateNo,c.register_date carRegisterDate,c.bs_type carBsType");
-		sql.append(",c.company carCompany,c.motorcade_id motorcadeId,m.name motorcadeName");
+		sql.append(",c.company carCompany,c.charger carCharger,c.motorcade_id motorcadeId,m.name motorcadeName");
 		sql.append(",cd.classes driverClasses,cd.driver_id driverId,d.name driverName,d.sex driverSex,d.cert_fwzg driverCert4FWZG");
-		sql.append(",d.cert_identity driverCert4IDENTITY,d.origin driverOrigin,d.house_type driverHouseType,d.birthdate driverBirthDate");
+		sql.append(",d.cert_identity driverCert4IDENTITY,d.origin driverOrigin,d.house_type driverHouseType,d.birthdate driverBirthDate,d.workDate driverWorkDate");
 		sql.append(" from bs_car c");
 		sql.append(" inner join bs_motorcade m on m.id=c.motorcade_id");
 		sql.append(" inner join bs_car_driver cd on cd.car_id=c.id");
@@ -164,6 +166,7 @@ public class FindInfoByCarAction extends ActionSupport {
 				map.put("carRegisterDate", rs[i++]);
 				map.put("carBsType", rs[i++]);
 				map.put("carCompany", rs[i++]);
+				map.put("carCharger", rs[i++]);
 				map.put("motorcadeId", rs[i++]);
 				map.put("motorcadeName", rs[i++]);
 				map.put("driverClasses", rs[i++]);
@@ -175,6 +178,7 @@ public class FindInfoByCarAction extends ActionSupport {
 				map.put("driverOrigin", rs[i++]);
 				map.put("driverHouseType", rs[i++]);
 				map.put("driverBirthDate", rs[i++]);
+				map.put("driverWorkDate", rs[i++]);
 				return map;
 			}
 		});
