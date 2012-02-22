@@ -187,7 +187,8 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 	private JSONArray getMans(final Long carId) {
 		final StringBuffer sql = new StringBuffer();
 		sql.append("select m.id,m.uid_,m.status_,m.type_,m.name,m.sex,m.origin,m.house_type,m.address,m.address1");
-		sql.append(",m.phone,m.phone1,m.cert_identity,m.cert_fwzg,m.classes,m.move_type,m.desc_");
+		sql.append(",m.phone,m.phone1,m.cert_identity,m.cert_fwzg,m.classes");
+		sql.append(",m.move_type,m.move_date,m.shiftwork_end_date,m.carinfo,m.desc_");
 		sql.append(" from bs_carman m");
 		sql.append(" where m.id in (");
 
@@ -241,7 +242,11 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 							json.put("cert4fwzg", obj[i++]);
 							json.put("classes", getManClasses(obj[i++]));
 							json.put("moveType", getManMoveType(obj[i++]));
-							json.put("moveDate", "TODO");
+							json.put(
+									"moveDate",
+									getManMoveDate((Date) obj[i++],
+											(Date) obj[i++]));
+							json.put("carInfo", obj[i++]);
 							json.put("desc", obj[i++]);
 
 							jsons.put(json);
@@ -251,6 +256,24 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 					}
 				}
 				return jsons;
+			}
+
+			private String getManMoveDate(Date move_date,
+					Date shiftwork_end_date) {
+				if (move_date != null) {
+					if (shiftwork_end_date != null) {
+						return DateUtils.formatDate(move_date) + "～"
+								+ DateUtils.formatDate(shiftwork_end_date);
+					} else {
+						return DateUtils.formatDate(move_date);
+					}
+				} else {
+					if (shiftwork_end_date != null) {
+						return "～" + DateUtils.formatDate(shiftwork_end_date);
+					} else {
+						return "";
+					}
+				}
 			}
 
 			private String getManType(Object type) {
@@ -464,7 +487,7 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 		sql.append(",c.factory_type,c.factory_model,c.engine_no,c.vin,c.color");
 		sql.append(",c.bs_type,c.register_date,c.operate_date,c.cert_no4");
 		sql.append(",c.taximeter_factory,c.taximeter_type,c.desc1,c.desc2,c.desc3");
-		// sql.append(",c.lpg,c.tv");
+		sql.append(",c.lpg_name,c.lpg_model,c.car_tv_screen");
 		sql.append(" from bs_car c");
 		sql.append(" inner join bs_motorcade m on m.id=c.motorcade_id");
 		sql.append(" inner join bc_identity_actor unit on unit.id=m.unit_id");
@@ -517,14 +540,30 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 								getDesc((String) car[i++], (String) car[i++],
 										(String) car[i++]));
 
-						// TODO
-						json.put("lpg", "TODO");
-						json.put("tv", "TODO");
+						json.put("lpg",
+								getLPG((String) car[i++], (String) car[i++]));
+						json.put("tv", null2Empty(car[i++]));
 					} catch (JSONException e) {
 						logger.error(e.getMessage(), e);
 					}
 				}
 				return json;
+			}
+
+			private String getLPG(String name, String model) {
+				if (name != null && name.length() > 0) {
+					if (model != null && model.length() > 0) {
+						return name + " " + model;
+					} else {
+						return name;
+					}
+				} else {
+					if (model != null && model.length() > 0) {
+						return model;
+					} else {
+						return "";
+					}
+				}
 			}
 
 			private String getDesc(String desc1, String desc2, String desc3) {
