@@ -107,6 +107,24 @@ public class Car extends RichFileEntityImpl {
 
 	private Set<Cert> certs;// 拥有的证件
 	private Set<Contract> contracts;// 合同
+	
+	//LPG属性配置
+	private String lpgName;//专用装置供应商
+	private String lpgModel;//专用装置品牌型号
+	private String lpgGpModel;//钢瓶品牌型号
+	private String lpgGpId;//钢瓶编号
+	private Calendar lpgGpDate;//钢瓶出厂日期
+	private String lpgJcfModel;//集成阀品牌型号
+	private String lpgQhqModel;//汽化器品牌型号
+	private String lpgPsqModel;//混合/喷射器品牌型号
+	private String lpgRefitFactory;//改装厂
+	private Calendar lpgRefitDate;//改装出厂日期
+	private String lpgInsuranceId;//LPG保单号
+	private Calendar lpgInsuranceStartDate;//LPG保单开始日期
+	private Calendar lpgInsuranceEndDate;//LPG保单结束日期
+	
+	private String carTvScreen;//车载电视屏
+	
 
 	@ManyToOne(fetch = FetchType.EAGER, optional = false)
 	@JoinColumn(name = "MOTORCADE_ID", referencedColumnName = "ID")
@@ -660,5 +678,134 @@ public class Car extends RichFileEntityImpl {
 	public void setLogoutRemark(String logoutRemark) {
 		this.logoutRemark = logoutRemark;
 	}
+
+	@Column(name = "LPG_NAME")
+	public String getLpgName() {
+		return lpgName;
+	}
+
+	public void setLpgName(String lpgName) {
+		this.lpgName = lpgName;
+	}
+
+	@Column(name = "LPG_MODEL")
+	public String getLpgModel() {
+		return lpgModel;
+	}
+
+	public void setLpgModel(String lpgModel) {
+		this.lpgModel = lpgModel;
+	}
+
+	@Column(name = "LPG_GP_MODEL")
+	public String getLpgGpModel() {
+		return lpgGpModel;
+	}
+
+	public void setLpgGpModel(String lpgGpModel) {
+		this.lpgGpModel = lpgGpModel;
+	}
+
+	@Column(name = "LPG_GP_ID")
+	public String getLpgGpId() {
+		return lpgGpId;
+	}
+
+	public void setLpgGpId(String lpgGpId) {
+		this.lpgGpId = lpgGpId;
+	}
+
+	@Column(name = "LPG_GP_DATE")
+	public Calendar getLpgGpDate() {
+		return lpgGpDate;
+	}
+
+	public void setLpgGpDate(Calendar lpgGpDate) {
+		this.lpgGpDate = lpgGpDate;
+	}
+
+	@Column(name = "LPG_JCF_MODEL")
+	public String getLpgJcfModel() {
+		return lpgJcfModel;
+	}
+
+	public void setLpgJcfModel(String lpgJcfModel) {
+		this.lpgJcfModel = lpgJcfModel;
+	}
+
+	@Column(name = " LPG_QHQ_MODEL")
+	public String getLpgQhqModel() {
+		return lpgQhqModel;
+	}
+
+	public void setLpgQhqModel(String lpgQhqModel) {
+		this.lpgQhqModel = lpgQhqModel;
+	}
+
+	@Column(name = "LPG_PSQ_MODEL")
+	public String getLpgPsqModel() {
+		return lpgPsqModel;
+	}
+
+	public void setLpgPsqModel(String lpgPsqModel) {
+		this.lpgPsqModel = lpgPsqModel;
+	}
+
+	@Column(name = "LPG_REFIT_FACTORY")
+	public String getLpgRefitFactory() {
+		return lpgRefitFactory;
+	}
+
+	public void setLpgRefitFactory(String lpgRefitFactory) {
+		this.lpgRefitFactory = lpgRefitFactory;
+	}
+
+	@Column(name = "LPG_REFIT_DATE")
+	public Calendar getLpgRefitDate() {
+		return lpgRefitDate;
+	}
+
+	public void setLpgRefitDate(Calendar lpgRefitDate) {
+		this.lpgRefitDate = lpgRefitDate;
+	}
+	
+	@Column(name = "LPG_INSURANCE_ID")
+	public String getLpgInsuranceId() {
+		return lpgInsuranceId;
+	}
+
+	public void setLpgInsuranceId(String lpgInsuranceId) {
+		this.lpgInsuranceId = lpgInsuranceId;
+	}
+
+	@Column(name = "LPG_INSURANCE_STARTDATE")
+	public Calendar getLpgInsuranceStartDate() {
+		return lpgInsuranceStartDate;
+	}
+
+	public void setLpgInsuranceStartDate(Calendar lpgInsuranceStartDate) {
+		this.lpgInsuranceStartDate = lpgInsuranceStartDate;
+	}
+
+	@Column(name = "LPG_INSURANCE_ENDDATE")
+	public Calendar getLpgInsuranceEndDate() {
+		return lpgInsuranceEndDate;
+	}
+
+	public void setLpgInsuranceEndDate(Calendar lpgInsuranceEndDate) {
+		this.lpgInsuranceEndDate = lpgInsuranceEndDate;
+	}
+
+	@Column(name = "CAR_TV_SCREEN")
+	public String getCarTvScreen() {
+		return carTvScreen;
+	}
+
+	public void setCarTvScreen(String carTvScreen) {
+		this.carTvScreen = carTvScreen;
+	}
+	
+	
+	
 
 }

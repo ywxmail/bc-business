@@ -38,6 +38,8 @@
 		</action>
 		<action name="carModelInfo" class="carAction" method="carModelInfo">
 		</action>
+		<action name="carLPGInfo" class="carAction" method="carLPGInfo">
+		</action>
 		<action name="autoSetOriginNo" class="carAction" method="autoSetOriginNo">
 		</action>
 		<action name="checkPlateIsExists" class="carAction" method="checkPlateIsExists"/>
