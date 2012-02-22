@@ -23,5 +23,10 @@
 			<artifactId>bc-business-motorcade</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>cn.bc.business</groupId>
+			<artifactId>bc-business-carman</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 	</dependencies>
 </project>

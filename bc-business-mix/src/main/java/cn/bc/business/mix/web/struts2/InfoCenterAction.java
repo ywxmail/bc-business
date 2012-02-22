@@ -108,13 +108,13 @@ public class InfoCenterAction extends ActionSupport {
 		try {
 			json = this.infoCenterService.findCarDetail(carId);
 			json.put("success", true);
-			this.json = json.toString();
 		} catch (Exception e) {
 			json = new JSONObject();
 			json.put("success", false);
 			json.put("msg", e.getMessage());
 			logger.warn(e.getMessage(), e);
 		}
+		this.json = json.toString();
 		return "json";
 	}
 
