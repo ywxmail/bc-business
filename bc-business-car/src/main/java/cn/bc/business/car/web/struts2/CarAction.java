@@ -92,6 +92,14 @@ public class CarAction extends FileEntityAction<Long, Car> {
 	}
 
 	@Override
+	public String getPageTitle() {
+		if (this.getE() != null && !this.getE().isNew())
+			return this.getE().getPlate();
+		else
+			return super.getPageTitle();
+	}
+
+	@Override
 	public boolean isReadonly() {
 		// 车辆管理员或系统管理员
 		SystemContext context = (SystemContext) this.getContext();
@@ -128,7 +136,7 @@ public class CarAction extends FileEntityAction<Long, Car> {
 		this.getE().setLevel("一级");// 车辆定级
 		this.getE().setColor("绿灰");// 车辆颜色
 		this.getE().setFuelType("汽油"); // 燃料类型
-		this.getE().setBusinessType("承包合同");//营运性质
+		this.getE().setBusinessType("承包合同");// 营运性质
 		// // 设置默认的原归属单位信息
 		// this.getE().setOldUnitName(getText("app.oldUnitName"));
 
@@ -173,7 +181,7 @@ public class CarAction extends FileEntityAction<Long, Car> {
 		} else {
 			// 合并车架号的前缀和后缀
 			this.getE().setVin(this.vinPrefix + this.vinSuffix);
-			
+
 			// 执行基类的保存
 			super.save();
 			json.put("id", e.getId());
@@ -211,9 +219,8 @@ public class CarAction extends FileEntityAction<Long, Car> {
 						OptionConstants.CAR_TAXIMETERFACTORY,
 						OptionConstants.CAR_COMPANY,
 						OptionConstants.CAR_LOGOUT_REASON,
-						OptionConstants.CAR_VIN_PREFIX, 
-						OptionConstants.CAR_TAXIMETER_TYPE
-						});
+						OptionConstants.CAR_VIN_PREFIX,
+						OptionConstants.CAR_TAXIMETER_TYPE });
 
 		// 加载可选营运性质列表
 		this.businessTypeList = optionItems
@@ -238,7 +245,7 @@ public class CarAction extends FileEntityAction<Long, Car> {
 		// 车辆车架号前缀
 		this.vinPrefixes = OptionItem.toLabelValues(optionItems
 				.get(OptionConstants.CAR_VIN_PREFIX));
-		
+
 		// 计价器型号
 		this.taximeterTypes = OptionItem.toLabelValues(optionItems
 				.get(OptionConstants.CAR_TAXIMETER_TYPE));
