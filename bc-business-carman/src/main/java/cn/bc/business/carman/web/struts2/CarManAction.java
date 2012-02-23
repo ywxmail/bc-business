@@ -178,16 +178,16 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 		Json json=new Json();
 		//根据编码找出籍贯
 		List<PlaceOrigin> pList=null;
-		String core= this.identityId.substring(0, 6);
+		String code= this.identityId.substring(0, 6);
 		//先按身份证前6位查找
-		pList=this.placeOriginServie.findPlaceOrigin(core);
+		pList=this.placeOriginServie.findPlaceOrigin(code);
 		if(pList==null||pList.size()==0){
 			//若前6位找不到然后按前4位
-			core=this.identityId.substring(0,4);
-			pList=this.placeOriginServie.findPlaceOrigin(core+"00");
+			code=this.identityId.substring(0,4);
+			pList=this.placeOriginServie.findPlaceOrigin(code+"00");
 			if(pList==null||pList.size()==0){
-				core=this.identityId.substring(0,2);
-				pList=this.placeOriginServie.findPlaceOrigin(core+"0000");
+				code=this.identityId.substring(0,2);
+				pList=this.placeOriginServie.findPlaceOrigin(code+"0000");
 			}
 		}
 		
