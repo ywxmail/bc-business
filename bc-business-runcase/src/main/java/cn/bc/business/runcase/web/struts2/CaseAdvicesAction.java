@@ -143,9 +143,15 @@ public class CaseAdvicesAction extends ViewAction<Map<String, Object>> {
 	protected List<Column> getGridColumns() {
 		List<Column> columns = new ArrayList<Column>();
 		columns.add(new IdColumn4MapKey("a.id", "id"));
-		columns.add(new TextColumn4MapKey("a.receive_code", "receive_code",
-				getText("runcase.receiveCode"), 100).setSortable(true)
-				.setUseTitleFromLabel(true));
+		if(type.length() > 0 && Integer.valueOf(type) == Case4Advice.TYPE_COMPLAIN){ //客管投诉
+			columns.add(new TextColumn4MapKey("a.receive_code", "receive_code",
+					getText("runcase.receiveCode"), 100).setSortable(true)
+					.setUseTitleFromLabel(true));
+		}else{
+			columns.add(new TextColumn4MapKey("a.receive_code", "receive_code",
+					getText("runcase.company.receiveCode"), 100).setSortable(true)
+					.setUseTitleFromLabel(true));
+		}
 		columns.add(new TextColumn4MapKey("c.status_", "status_",
 				getText("runcase.status"), 40).setSortable(true)
 				.setValueFormater(new EntityStatusFormater(getBSStatuses2())));

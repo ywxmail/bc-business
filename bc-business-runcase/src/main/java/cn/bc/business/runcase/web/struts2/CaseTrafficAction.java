@@ -196,8 +196,10 @@ public class CaseTrafficAction extends FileEntityAction<Long, Case4InfractTraffi
 				buttonOption.put("id", "bcSaveDlgButton");
 				pageOption.addButton(buttonOption);
 			}
-			// 添加默认的保存按钮
-			pageOption.addButton(this.getDefaultSaveButtonOption());
+			if(CaseBase.STATUS_ACTIVE == getE().getStatus()){
+				// 添加默认的保存按钮
+				pageOption.addButton(this.getDefaultSaveButtonOption());
+			}
 		}
 	}
 	

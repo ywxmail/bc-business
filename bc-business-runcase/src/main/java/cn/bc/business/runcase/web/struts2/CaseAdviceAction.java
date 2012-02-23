@@ -260,10 +260,10 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 					pageOption.addButton(new ButtonOption(
 							"生成通知单", null,
 							"bc.caseAdviceForm.doGenNotice"));
-					//生成表格
-					pageOption.addButton(new ButtonOption(
-							"生成表格", null,
-							"bc.caseAdviceForm.doGenForm"));
+//					//生成表格
+//					pageOption.addButton(new ButtonOption(
+//							"生成表格", null,
+//							"bc.caseAdviceForm.doGenForm"));
 				}
 				if(!getE().isNew()){
 					//维护按钮

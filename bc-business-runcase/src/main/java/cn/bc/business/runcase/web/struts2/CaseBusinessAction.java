@@ -79,6 +79,7 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 	
 	public 	Map<String,String> 					statusesValue;
 	public	Map<String,String>					sourcesValue;
+	public	Map<String,String>					categoryValue;
 	private Map<String, List<Map<String, String>>> 			allList;
 
 	public Long getCarId() {
@@ -185,13 +186,15 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 		boolean readonly = this.isReadonly();
 		if (editable && !readonly) {
 			//特殊处理结案按钮
-			if(Case4InfractBusiness.STATUS_ACTIVE == getE().getStatus() && !getE().isNew()){
+			if(CaseBase.STATUS_ACTIVE == getE().getStatus() && !getE().isNew()){
 				ButtonOption buttonOption = new ButtonOption(getText("label.closefile"),null,"bc.caseBusinessForm.closefile");
 				buttonOption.put("id", "bcSaveDlgButton");
 				pageOption.addButton(buttonOption);
 			}
-			// 添加默认的保存按钮
-			pageOption.addButton(this.getDefaultSaveButtonOption());
+			if(CaseBase.STATUS_ACTIVE == getE().getStatus()){
+				// 添加默认的保存按钮
+				pageOption.addButton(this.getDefaultSaveButtonOption());
+			}
 		}
 	}
 
@@ -468,4 +471,20 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 		return statuses;
 	}
 	
+	/**
+	 * 获取Entity的违章类别转换列表
+	 * 
+	 * @return
+	 */
+	protected Map<String, String> getCategory() {
+		Map<String, String> statuses = new HashMap<String, String>();
+		statuses.put(String.valueOf(Case4InfractBusiness.CATEGORY_BUSINESS),
+				getText("runcase.category.business"));
+		statuses.put(String.valueOf(Case4InfractBusiness.CATEGORY_STATION),
+				getText("runcase.category.station"));
+		statuses.put(String.valueOf(Case4InfractBusiness.CATEGORY_SERVICE),
+				getText("runcase.category.service"));
+		return statuses;
+	}
+
 }
