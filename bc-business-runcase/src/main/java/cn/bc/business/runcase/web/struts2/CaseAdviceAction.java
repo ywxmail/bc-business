@@ -505,6 +505,10 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 			this.workDate = carMan.get(0).getWorkDate();
 		}
 		
+		if(this.getE().getType() == CaseBase.TYPE_COMPANY_COMPLAIN){//公司投诉
+			handlestatusesValue = this.getHandleStatues();
+		}
+		
 	}
 	
 	@Override

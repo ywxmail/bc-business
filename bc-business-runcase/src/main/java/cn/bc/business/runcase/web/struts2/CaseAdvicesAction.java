@@ -27,6 +27,7 @@ import cn.bc.core.query.condition.ConditionUtils;
 import cn.bc.core.query.condition.Direction;
 import cn.bc.core.query.condition.impl.EqualsCondition;
 import cn.bc.core.query.condition.impl.OrderCondition;
+import cn.bc.core.util.StringUtils;
 import cn.bc.db.jdbc.RowMapper;
 import cn.bc.db.jdbc.SqlObject;
 import cn.bc.identity.domain.Actor;
@@ -37,6 +38,7 @@ import cn.bc.option.service.OptionService;
 import cn.bc.web.formater.AbstractFormater;
 import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.formater.EntityStatusFormater;
+import cn.bc.web.formater.LinkFormater4Id;
 import cn.bc.web.ui.html.grid.Column;
 import cn.bc.web.ui.html.grid.IdColumn4MapKey;
 import cn.bc.web.ui.html.grid.TextColumn4MapKey;
@@ -85,6 +87,7 @@ public class CaseAdvicesAction extends ViewAction<Map<String, Object>> {
 		sql.append(",b.from_,b.source,b.driver_cert,a.receive_code,a.receive_date ");
 		sql.append(",b.company,c.bs_type");
 		sql.append(",man.origin");
+		sql.append(",b.motorcade_id,b.car_id,b.driver_id");
 		sql.append(" from BS_CASE_ADVICE a");
 		sql.append(" inner join BS_CASE_BASE b on b.id=a.id");
 		sql.append(" left join BS_CAR c on b.car_id = c.id");
@@ -126,6 +129,9 @@ public class CaseAdvicesAction extends ViewAction<Map<String, Object>> {
 				map.put("company", rs[i++]);
 				map.put("bs_type", rs[i++]);
 				map.put("origin", rs[i++]);
+				map.put("motorcade_id", rs[i++]);
+				map.put("carId", rs[i++]);
+				map.put("driverId", rs[i++]);
 
 				return map;
 			}
@@ -152,11 +158,54 @@ public class CaseAdvicesAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("b.company", "company",
 				getText("runcase.company"), 60).setSortable(true));
 		columns.add(new TextColumn4MapKey("b.motorcade_name", "motorcade_name",
-				getText("runcase.motorcadeName"), 70).setSortable(true));
-		columns.add(new TextColumn4MapKey("b.car_plate", "car_plate",
-				getText("runcase.carPlate"), 80));
+				getText("runcase.motorcadeName"), 70)
+				.setSortable(true)
+				.setUseTitleFromLabel(true)
+				.setValueFormater(
+						new LinkFormater4Id(this.getContextPath()
+								+ "/bc-business/motorcade/edit?id={0}",
+								"motorcade") {
+							@SuppressWarnings("unchecked")
+							@Override
+							public String getIdValue(Object context,
+									Object value) {
+								return StringUtils
+										.toString(((Map<String, Object>) context)
+												.get("motorcade_id"));
+							}
+						}));
+		if (carId == null) {
+			columns.add(new TextColumn4MapKey("b.car_plate", "car_plate",
+					getText("runcase.carPlate"), 80)
+					.setValueFormater(new LinkFormater4Id(this.getContextPath()
+							+ "/bc-business/car/edit?id={0}", "car") {
+						@SuppressWarnings("unchecked")
+						@Override
+						public String getIdValue(Object context, Object value) {
+							return StringUtils
+									.toString(((Map<String, Object>) context)
+											.get("carId"));
+						}
+					}));
+		}
+		if (carManId == null) {
 		columns.add(new TextColumn4MapKey("b.driver_name", "driver_name",
-				getText("runcase.driverName"), 70).setSortable(true));
+				getText("runcase.driverName"), 70).setSortable(true)
+				.setValueFormater(
+					new LinkFormater4Id(this.getContextPath()
+							+ "/bc-business/carMan/edit?id={0}",
+							"drivers") {
+						@SuppressWarnings("unchecked")
+						@Override
+						public String getIdValue(Object context,
+								Object value) {
+							return StringUtils
+									.toString(((Map<String, Object>) context)
+											.get("driverId"));
+						}
+					}));
+		
+		}
 		columns.add(new TextColumn4MapKey("b.driver_cert", "driver_cert",
 				getText("runcase.FWZGCert"), 70).setSortable(true)
 				.setUseTitleFromLabel(true));
