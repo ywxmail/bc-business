@@ -606,4 +606,18 @@ public class Contract4LabourDaoImpl extends
 		args.add(driverId);
 		this.executeUpdate(hql.toString(), args);
 	}
+
+	/**
+	 * 更新司机的备注列
+	 * @param driverId 
+	 * @param description
+	 */
+	public void updateCarMan4Description(Long driverId,String description) {
+		ArrayList<Object> args = new ArrayList<Object>();
+		StringBuffer hql = new StringBuffer();
+		hql.append("UPDATE CarMan c SET c.description=? WHERE c.id =?");
+		args.add(description);
+		args.add(driverId);
+		this.executeUpdate(hql.toString(), args);
+	}
 }
