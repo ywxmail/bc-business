@@ -235,7 +235,7 @@ public class CaseAccidentsAction extends ViewAction<Map<String, Object>> {
 				getText("runcase.origin"), 60).setUseTitleFromLabel(true));
 		// 责任
 		columns.add(new TextColumn4MapKey("c.duty", "duty",
-				getText("runcase.duty"), 40).setSortable(true));
+				getText("runcase.duty"), 65).setSortable(true).setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("b.address", "address",
 				getText("runcase.address"), 100).setSortable(true)
 				.setUseTitleFromLabel(true));
@@ -243,7 +243,8 @@ public class CaseAccidentsAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("b.desc_", "desc_",
 				getText("runcase.jingguo"), 150).setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("c.sort", "sort",
-				getText("runcase.sort"), 40).setSortable(true));
+				getText("runcase.accident.sort"), 65).setSortable(true)
+				.setUseTitleFromLabel(true));
 		// 自车损失=车损情况
 		columns.add(new TextColumn4MapKey("c.car_hurt", "car_hurt",
 				getText("runcase.carHurt"), 80).setUseTitleFromLabel(true));
