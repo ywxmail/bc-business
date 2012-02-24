@@ -3,6 +3,8 @@
  */
 package cn.bc.business.runcase.web.struts2;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -79,6 +81,7 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 	
 	public 	Map<String,String> 					statusesValue;
 	public	Map<String,String>					sourcesValue;
+	public	Map<String,String>					categoryValue;
 	private Map<String, List<Map<String, String>>> 			allList;
 
 	public Long getCarId() {
@@ -180,18 +183,73 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 				.setMinHeight(200);
 	}
 	
+	// 显示车辆,司机相关信息临时变量  //
+	private String chargers;
+	private Calendar birthdate;
+	private String origin;
+	private Calendar workDate;
+	private String businessType;
+	
+	public String getChargers() {
+		return chargers;
+	}
+
+	public void setChargers(String chargers) {
+		this.chargers = chargers;
+	}
+
+	public Calendar getBirthdate() {
+		return birthdate;
+	}
+
+	public void setBirthdate(Calendar birthdate) {
+		this.birthdate = birthdate;
+	}
+
+	public String getOrigin() {
+		return origin;
+	}
+
+	public void setOrigin(String origin) {
+		this.origin = origin;
+	}
+
+	public Calendar getWorkDate() {
+		return workDate;
+	}
+
+	public void setWorkDate(Calendar workDate) {
+		this.workDate = workDate;
+	}
+
+	public String getBusinessType() {
+		return businessType;
+	}
+
+	public void setBusinessType(String businessType) {
+		this.businessType = businessType;
+	}
+	
 	@Override
 	protected void buildFormPageButtons(PageOption pageOption, boolean editable) {
 		boolean readonly = this.isReadonly();
 		if (editable && !readonly) {
+			if(!getE().isNew()){
+				//生成通知单
+				pageOption.addButton(new ButtonOption(
+						"生成通知单", null,
+						"bc.caseBusinessForm.doGenNotice"));
+			}
 			//特殊处理结案按钮
-			if(Case4InfractBusiness.STATUS_ACTIVE == getE().getStatus() && !getE().isNew()){
+			if(CaseBase.STATUS_ACTIVE == getE().getStatus() && !getE().isNew()){
 				ButtonOption buttonOption = new ButtonOption(getText("label.closefile"),null,"bc.caseBusinessForm.closefile");
 				buttonOption.put("id", "bcSaveDlgButton");
 				pageOption.addButton(buttonOption);
 			}
-			// 添加默认的保存按钮
-			pageOption.addButton(this.getDefaultSaveButtonOption());
+			if(CaseBase.STATUS_ACTIVE == getE().getStatus()){
+				// 添加默认的保存按钮
+				pageOption.addButton(this.getDefaultSaveButtonOption());
+			}
 		}
 	}
 
@@ -249,6 +307,12 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 								+ car.get(0).getPlateNo());
 				this.getE().setMotorcadeId(car.get(0).getMotorcade().getId());
 				this.getE().setMotorcadeName(car.get(0).getMotorcade().getName());
+				this.getE().setCompany(car.get(0).getCompany());
+				this.getE().setCharger(car.get(0).getCharger());
+				
+				this.chargers = formatChargers(car.get(0).getCharger());
+				this.businessType = car.get(0).getBusinessType();
+			
 			} else if (car.size() > 1) {
 				isMoreCar = true;
 			} else {
@@ -257,6 +321,10 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 			this.getE().setDriverId(carManId);
 			this.getE().setDriverName(driver.getName());
 			this.getE().setDriverCert(driver.getCert4FWZG());
+			
+			this.birthdate = driver.getBirthdate();
+			this.origin = driver.getOrigin();
+			this.workDate = driver.getWorkDate();
 		}
 		if (carId != null) {
 			Car car = this.carService.load(carId);
@@ -265,12 +333,21 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 			this.getE().setCarId(carId);
 			this.getE().setMotorcadeId(car.getMotorcade().getId());
 			this.getE().setMotorcadeName(car.getMotorcade().getName());
+			this.getE().setCompany(car.getCompany());
+			this.getE().setCharger(car.getCharger());
+			
+			this.chargers = formatChargers(car.getCharger());
+			this.businessType = car.getBusinessType();
 			List<CarMan> carMan = this.carManService
 					.selectAllCarManByCarId(carId);
 			if (carMan.size() == 1) {
 				this.getE().setDriverName(carMan.get(0).getName());
 				this.getE().setDriverId(carMan.get(0).getId());
 				this.getE().setDriverCert(carMan.get(0).getCert4FWZG());
+				
+				this.birthdate = carMan.get(0).getBirthdate();
+				this.origin = carMan.get(0).getOrigin();
+				this.workDate = carMan.get(0).getWorkDate();
 			} else if (carMan.size() > 1) {
 				isMoreCarMan = true;
 			} else {
@@ -283,11 +360,13 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 		// 自动生成自编号
 		this.getE().setCode(
 				this.getIdGeneratorService().nextSN4Month(Case4InfractBusiness.KEY_CODE));
+		
 		SystemContext context = this.getSystyemContext();
 		this.getE().setType  (CaseBase.TYPE_INFRACT_BUSINESS);
 		this.getE().setStatus(CaseBase.STATUS_ACTIVE);
-		this.getE().setReceiverId(context.getUser().getId());
-		this.getE().setReceiverName(context.getUser().getName());
+		this.getE().setReceiverId(context.getUserHistory().getId());
+		this.getE().setReceiverName(context.getUserHistory().getName());
+		this.getE().setCategory(Case4InfractBusiness.CATEGORY_BUSINESS);
 		// 来源
 		if(syncId == null){ //不是同步过来的信息设为自建
 			this.getE().setSource(CaseBase.SOURCE_SYS);
@@ -320,6 +399,23 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 		sourcesValue		=	this.getSourceStatuses();
 		sourceStr = getSourceStatuses().get(this.getE().getSource()+"");
 		initForm(true);
+		
+		this.carId = this.getE().getCarId();
+		// 设置显示车辆,司机相关信息
+		if (carId != null) {
+			Car car = this.carService.load(carId);
+			
+			this.chargers = formatChargers(this.getE().getCharger());
+			this.businessType = car.getBusinessType();
+			
+			List<CarMan> carMan = this.carManService.selectAllCarManByCarId(carId);
+			if(carMan.get(0).getBirthdate() != null){
+				this.birthdate = carMan.get(0).getBirthdate();
+			}
+			this.origin = carMan.get(0).getOrigin();
+			this.workDate = carMan.get(0).getWorkDate();
+		}
+		
 		return "form";
 	}
 	
@@ -466,6 +562,55 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 		statuses.put(String.valueOf(CaseBase.SOURCE_GENERATION),
 				getText("runcase.select.source.sync.gen"));
 		return statuses;
+	}
+	
+	/**
+	 * 获取Entity的违章类别转换列表
+	 * 
+	 * @return
+	 */
+	protected Map<String, String> getCategory() {
+		Map<String, String> statuses = new HashMap<String, String>();
+		statuses.put(String.valueOf(Case4InfractBusiness.CATEGORY_BUSINESS),
+				getText("runcase.category.business"));
+		statuses.put(String.valueOf(Case4InfractBusiness.CATEGORY_STATION),
+				getText("runcase.category.station"));
+		statuses.put(String.valueOf(Case4InfractBusiness.CATEGORY_SERVICE),
+				getText("runcase.category.service"));
+		return statuses;
+	}
+	
+    /**
+     * 格式化日期
+     * @return
+     */
+    public String calendarToString(Calendar object){
+    	if(null != object && object.toString().length() > 0){
+    		Calendar calendar = object;
+	    	DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+	    	String dateStr = df.format(calendar.getTime());
+	        return dateStr;
+    	}else{
+    		return "";
+    	}
+    }
+	
+	/**
+	 * 组装责任人姓名
+	 * @param chargers
+	 * @return
+	 */
+	public String formatChargers(String chargersStr){
+		String chargers = "";
+		if(null != chargersStr && chargersStr.trim().length() > 0){
+			String [] chargerAry = chargersStr.split(";");
+			for(int i=0;i<chargerAry.length;i++){
+				chargers += chargerAry[i].split(",")[0];
+				if((i+1) < chargerAry.length)
+					chargers += ",";
+			}
+		}
+		return chargers;
 	}
 	
 }

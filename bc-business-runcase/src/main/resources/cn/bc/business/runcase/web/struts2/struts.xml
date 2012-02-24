@@ -52,7 +52,35 @@
 		<action name="caseAdvice/createFromJiaoWei" class="caseAdviceAction" method="create">
 			<result name="form" >/bc-business/caseAdvice/form.jsp</result>
 		</action>
+		
+		<action name="caseAdvice/create" class="caseAdviceAction" method="create">
+			<result name="form">/bc-business/caseAdvice/form.jsp</result>
+		</action>
+		<action name="caseAdvice/open" class="caseAdviceAction" method="open">
+			<result name="formr">/bc-business/caseAdvice/form.jsp</result>
+		</action>
+		<action name="caseAdvice/edit" class="caseAdviceAction" method="edit">
+			<result name="form">/bc-business/caseAdvice/form.jsp</result>
+		</action>
+		<action name="caseAdvice/delete" class="caseAdviceAction" method="delete" />
+		<action name="caseAdvice/save" class="caseAdviceAction" method="save"/>
+		
 	</package>
+	
+	<!-- 投诉建议操作 -->
+	<package name="caseAdviceOperate" extends="bc-default" namespace="/bc-business/caseAdviceOperate">
+		<!-- 核准 -->
+		<action name="doManage" class="caseAdviceOperateAction" method="doManage"/>
+	</package>
+	
+	<!-- 投诉建议选择 -->
+	<package name="selectDateAndHandler" extends="bc-default" namespace="/bc-business/selectDateAndHandler">
+		<!-- 核准选择 -->
+		<action name="select" class="selectDateAndHandlerAction" >
+			<result name="success">/bc-business/caseAdvice/selectDateAndHandler.jsp</result>
+		</action>
+	</package>
+	
 	
 	<!-- 表扬 -->
 	<package name="casePraise" extends="bc-default" namespace="/bc-business">

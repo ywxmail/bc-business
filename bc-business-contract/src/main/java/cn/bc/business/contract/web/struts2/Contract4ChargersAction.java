@@ -230,7 +230,9 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 				.setValueFormater(new AbstractFormater<String>() {
 					@Override
 					public String format(Object context, Object value) {
-						if (value == null || value.toString().equals("0"))
+						if (value == null)
+							return "";
+						else if (value.toString().equals("0"))
 							return "月末";
 						else
 							return value.toString();

@@ -438,13 +438,9 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 		// 搜索按钮
 		tb.addButton(this.getDefaultSearchToolbarButton());
 
-		if (this.carId != null) {
-			return tb;
-		} else {
-			return tb.addButton(Toolbar.getDefaultToolbarRadioGroup(
-					getPolicyStatuses(), "status", 0,
-					getText("title.click2changeSearchClasses")));
-		}
+		return tb.addButton(Toolbar.getDefaultToolbarRadioGroup(
+				getPolicyStatuses(), "status", 0,
+				getText("title.click2changeSearchClasses")));
 	}
 
 	@Override

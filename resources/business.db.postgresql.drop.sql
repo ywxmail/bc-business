@@ -16,6 +16,13 @@ drop table if exists BS_ARRANGE_MEMBER;
 drop table if exists BS_ARRANGE;
 drop table if exists BS_MEMBER;
 
+-- 证照遗失管理
+drop table if exists BS_CERT_LOST_ITEM;
+drop table if exists BS_CERT_LOST;
+
+-- LPG配置模块
+drop table if exists BS_CAR_LPGMODEL;
+
 -- 同步记录
 drop table if exists BS_SYNC_JIAOWEI_JTWF;
 drop table if exists BS_SYNC_JINDUN_JTWF;
@@ -57,24 +64,11 @@ drop table if exists BS_CAR_DRIVER_HISTORY;
 -- 司机营运车辆
 drop table if exists BS_CAR_DRIVER;
 
--- 车辆与证件的关联
-drop table if exists BS_CAR_CERT;
-
--- 车辆
-drop table if exists BS_CAR_MODEL;
-drop table if exists BS_CAR;
-
--- 车队历史车辆数
-drop table if exists BS_HISTORY_CAR_QUANTITY;
-drop table if exists BS_MOTORCADE_CARQUANTITY;
-
--- 车队负责人
-drop table if exists BS_CHARGER;
--- 车队信息
-drop table if exists BS_MOTORCADE;
-
 -- 司机责任人与证件的关联
 drop table if exists BS_CARMAN_CERT;
+
+-- 车辆与证件的关联
+drop table if exists BS_CAR_CERT;
 
 -- 证件
 drop table if exists BS_CERT_IDENTITY;
@@ -88,3 +82,16 @@ drop table if exists BS_CERT;
 
 -- 司机责任人
 drop table if exists BS_CARMAN;
+
+-- 车辆
+drop table if exists BS_CAR_MODEL;
+drop table if exists BS_CAR;
+
+-- 车队历史车辆数
+drop table if exists BS_HISTORY_CAR_QUANTITY;
+drop table if exists BS_MOTORCADE_CARQUANTITY;
+
+-- 车队负责人
+drop table if exists BS_CHARGER;
+-- 车队信息
+drop table if exists BS_MOTORCADE;

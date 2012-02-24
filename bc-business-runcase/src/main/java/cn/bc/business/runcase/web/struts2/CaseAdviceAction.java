@@ -3,6 +3,8 @@
  */
 package cn.bc.business.runcase.web.struts2;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -30,6 +32,7 @@ import cn.bc.business.sync.service.JiaoWeiADVICEService;
 import cn.bc.business.web.struts2.FileEntityAction;
 import cn.bc.core.query.condition.Direction;
 import cn.bc.core.query.condition.impl.OrderCondition;
+import cn.bc.identity.domain.ActorDetail;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.option.domain.OptionItem;
 import cn.bc.option.service.OptionService;
@@ -80,6 +83,7 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 	
 	
 	public 	Map<String,String> 				statusesValue;
+	public 	Map<String,String> 				handlestatusesValue;
 	public	Map<String,String>				sourcesValue;
 	private Map<String, List<Map<String, String>>> 			allList;
 
@@ -202,143 +206,91 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 	@Override
 	protected void buildFormPageButtons(PageOption pageOption, boolean editable) {
 		boolean readonly = this.isReadonly();
-		if (editable && !readonly) {
-			//特殊处理结案按钮
-			if(Case4Advice.STATUS_ACTIVE == getE().getStatus() && !getE().isNew()){
-				ButtonOption buttonOption = new ButtonOption(getText("label.closefile"),null,"bc.caseAdviceForm.closefile");
-				buttonOption.put("id", "bcSaveDlgButton");
-				pageOption.addButton(buttonOption);
-			}
-			if(Case4Advice.STATUS_CLOSED != getE().getStatus()){
+//		if (editable && !readonly) {
+//			if(!getE().isNew()){
+//				//生成通知单
+//				pageOption.addButton(new ButtonOption(
+//						"生成通知单", null,
+//						"bc.caseAdviceForm.doGenNotice"));
+//				//生成表格
+//				pageOption.addButton(new ButtonOption(
+//						"生成表格", null,
+//						"bc.caseAdviceForm.doGenForm"));
+//			}
+//			if(Case4Advice.STATUS_ACTIVE != getE().getStatus() && !getE().isNew()){
+//				//维护按钮
+////				pageOption.addButton(new ButtonOption(
+////						getText("维护"), null,
+////						"bc.caseAdviceForm.doMaintenance"));
+//				
+//				ButtonOption buttonOption = new ButtonOption("维护",null,"bc.caseAdviceForm.doMaintenance");
+//				buttonOption.put("id", "maintenance");
+//				pageOption.addButton(buttonOption);
+//			}
+//			//特殊处理结案按钮
+//			if(Case4Advice.STATUS_ACTIVE == getE().getStatus() && !getE().isNew()){
+//				ButtonOption buttonOption = new ButtonOption(getText("label.closefile"),null,"bc.caseAdviceForm.closefile");
+//				buttonOption.put("id", "bcSaveDlgButton");
+//				pageOption.addButton(buttonOption);
+//			}
+//			if(CaseBase.TYPE_COMPANY_COMPLAIN == getE().getType()
+//				&& Case4Advice.STATUS_ACTIVE == getE().getStatus()
+//				&& Case4Advice.HANDLE_STATUS_NEW == getE().getHandleStatus()
+//				&& !getE().isNew()){
+//				//核准按钮
+//				pageOption.addButton(new ButtonOption(
+//						"核准", null,
+//						"bc.caseAdviceForm.doManage"));
+//			}
+//		}
+		
+		if (!readonly) {
+			if(editable){
 				// 添加默认的保存按钮
 				pageOption.addButton(this.getDefaultSaveButtonOption());
+				//特殊处理结案按钮
+				if(Case4Advice.STATUS_ACTIVE == getE().getStatus() && !getE().isNew()){
+					ButtonOption buttonOption = new ButtonOption(getText("label.closefile"),null,"bc.caseAdviceForm.closefile");
+					buttonOption.put("id", "bcSaveDlgButton");
+					pageOption.addButton(buttonOption);
+				}
+			}else{
+				if(!getE().isNew()){
+					//生成通知单
+					pageOption.addButton(new ButtonOption(
+							"生成通知单", null,
+							"bc.caseAdviceForm.doGenNotice"));
+//					//生成表格
+//					pageOption.addButton(new ButtonOption(
+//							"生成表格", null,
+//							"bc.caseAdviceForm.doGenForm"));
+				}
+				if(!getE().isNew()){
+					//维护按钮
+					pageOption.addButton(new ButtonOption(
+							getText("维护"), null,
+							"bc.caseAdviceForm.doMaintenance"));
+				}
+				if(CaseBase.TYPE_COMPANY_COMPLAIN == getE().getType()
+						&& Case4Advice.STATUS_ACTIVE == getE().getStatus()
+						&& Case4Advice.HANDLE_STATUS_NEW == getE().getHandleStatus()
+						&& !getE().isNew()){
+						//核准按钮
+						pageOption.addButton(new ButtonOption(
+								"核准", null,
+								"bc.caseAdviceForm.doManage"));
+				}
+				//特殊处理结案按钮
+				if(Case4Advice.STATUS_ACTIVE == getE().getStatus() && !getE().isNew()){
+					ButtonOption buttonOption = new ButtonOption(getText("label.closefile"),null,"bc.caseAdviceForm.closefile");
+					buttonOption.put("id", "bcSaveDlgButton");
+					pageOption.addButton(buttonOption);
+				}
+
 			}
 		}
 	}
 
-	@SuppressWarnings("static-access")
-	@Override
-	protected void afterCreate(Case4Advice entity) {
-		super.afterCreate(entity);
-		
-		if(Integer.valueOf(type) == CaseBase.TYPE_COMPLAIN){//客管投诉
-			this.getE().setType(CaseBase.TYPE_COMPLAIN);
-		}else{//公司投诉
-			this.getE().setType(CaseBase.TYPE_COMPANY_COMPLAIN);
-		}
-		if(syncId != null){	//判断同步id是否为空
-			JiaoWeiADVICE jiaoWeiADVICE = this.jiaoWeiADVICEService.load(syncId);
-			String carPlateNo = "";
-			carPlateNo = jiaoWeiADVICE.getCarPlate().replaceAll("粤A.", carPlateNo);
-			if(carPlateNo.length() > 0){
-				//根据车牌号码查找carId
-				findCarId(carPlateNo);
-			}
-			//设置从交委同步的信息
-			this.getE().setCaseNo(jiaoWeiADVICE.getSyncCode());
-			this.getE().setReceiveDate(jiaoWeiADVICE.getReceiveDate());
-			this.getE().setReceiveCode(jiaoWeiADVICE.getReceiveCode());
-			this.getE().setAdvisorName(jiaoWeiADVICE.getAdvisorName());
-			this.getE().setPathFrom(jiaoWeiADVICE.getPathFrom());
-			this.getE().setPathTo(jiaoWeiADVICE.getPathTo());
-			this.getE().setRidingStartTime(jiaoWeiADVICE.getRidingTimeStart());
-			this.getE().setRidingEndTime(jiaoWeiADVICE.getRidingTimeEnd());
-			if(jiaoWeiADVICE.getAdvisorSex().equals("男")){
-				this.getE().setAdvisorSex(CaseBase4AdviceAndPraise.SEX_MAN);
-			}else if(jiaoWeiADVICE.getAdvisorSex().equals("女")){
-				this.getE().setAdvisorSex(CaseBase4AdviceAndPraise.SEX_WOMAN);
-			}
-			if(jiaoWeiADVICE.getAdvisorAge() != null){
-				this.getE().setAdvisorAge(jiaoWeiADVICE.getAdvisorAge().intValue());
-			}
-			this.getE().setAdvisorCert(jiaoWeiADVICE.getAdvisorCert());
-			this.getE().setDriverFeature(jiaoWeiADVICE.getDriverChar());
-			this.getE().setDetail(jiaoWeiADVICE.getContent());
-			this.getE().setResult(jiaoWeiADVICE.getResult());
-			this.getE().setSubject(jiaoWeiADVICE.getSubject());
-			this.getE().setSubject2(jiaoWeiADVICE.getSubject2());
-			if(jiaoWeiADVICE.getMachinePrice() != null && !jiaoWeiADVICE.getMachinePrice().equals("无")
-			 && !jiaoWeiADVICE.getMachinePrice().equals("没打表")){
-				this.getE().setMachinePrice(Float.parseFloat(jiaoWeiADVICE.getMachinePrice()));
-			}
-			this.getE().setTicket(jiaoWeiADVICE.getTicket());
-			if(jiaoWeiADVICE.getCharge() != null && !jiaoWeiADVICE.getCharge().equals("无")){
-				this.getE().setCharge(Float.parseFloat(jiaoWeiADVICE.getCharge()));
-			}
-			this.getE().setCarColor(jiaoWeiADVICE.getBusColor());
-			//设置来源
-			this.getE().setSource(CaseBase.SOURCE_GENERATION);
-			//设置syncId
-			this.getE().setSyncId(syncId);
-		}
-		
-		if (carManId != null) {
-			CarMan driver = this.carManService.load(carManId);
-			List<Car> car = this.carService.selectAllCarByCarManId(carManId);
-			if (car.size() == 1) {
-				this.getE().setCarId(car.get(0).getId());
-				this.getE().setCarPlate(
-						car.get(0).getPlateType() + "."
-								+ car.get(0).getPlateNo());
-				this.getE().setMotorcadeId(car.get(0).getMotorcade().getId());
-				this.getE().setMotorcadeName(car.get(0).getMotorcade().getName());
-				this.getE().setCompany(car.get(0).getCompany());
-			} else if (car.size() > 1) {
-				isMoreCar = true;
-			} else {
-				isNullCar = true;
-			}
-			this.getE().setDriverId(carManId);
-			this.getE().setDriverName(driver.getName());
-			this.getE().setDriverCert(driver.getCert4FWZG());
-			this.getE().setDriverSex(driver.getSex());
-		}
-		if (carId != null) {
-			Car car = this.carService.load(carId);
-			this.getE()
-					.setCarPlate(car.getPlateType() + "." + car.getPlateNo());
-			this.getE().setCarId(carId);
-			this.getE().setMotorcadeId(car.getMotorcade().getId());
-			this.getE().setMotorcadeName(car.getMotorcade().getName());
-			this.getE().setCompany(car.getCompany());
-			List<CarMan> carMan = this.carManService
-					.selectAllCarManByCarId(carId);
-			if (carMan.size() == 1) {
-				this.getE().setDriverName(carMan.get(0).getName());
-				this.getE().setDriverId(carMan.get(0).getId());
-				this.getE().setDriverCert(carMan.get(0).getCert4FWZG());
-				this.getE().setDriverSex(carMan.get(0).getSex());
-			} else if (carMan.size() > 1) {
-				isMoreCarMan = true;
-			} else {
-				isNullCarMan = true;
-			}
-		}
-		
-		// 初始化信息
-		this.getE().setAdviceType(CaseBase.TYPE_COMPLAIN);
-		this.getE().setCarColor("绿灰");
-		this.getE().setStatus(CaseBase.STATUS_ACTIVE);
-		this.getE().setUid(this.getIdGeneratorService().next(this.getE().ATTACH_TYPE));
-		// 自动生成自编号
-		this.getE().setCode(
-				this.getIdGeneratorService().nextSN4Month(Case4Advice.KEY_CODE));
-		
-		// 来源
-		if(syncId == null){ //不是同步过来的信息设为自建
-			this.getE().setSource(CaseBase.SOURCE_SYS);
-		}
-		sourceStr = getSourceStatuses().get(this.getE().getSource()+"");
-	}
-	
-	/** 根据车牌号查找carId*/
-	public void findCarId(String carPlateNo) {
-		if(carPlateNo.length() > 0){ //判断车牌号是否为空
-			Long tempCarId = this.carService.findcarIdByCarPlateNo(carPlateNo);
-			this.carId = tempCarId;
-		}
-	}
-	
 	// 显示车辆,司机相关信息临时变量  //
 	private String chargers;
 	private Calendar birthdate;
@@ -385,7 +337,180 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 	public void setBusinessType(String businessType) {
 		this.businessType = businessType;
 	}
-
+	
+	@SuppressWarnings("static-access")
+	@Override
+	protected void afterCreate(Case4Advice entity) {
+		super.afterCreate(entity);
+		
+		if(syncId != null || Integer.valueOf(type) == CaseBase.TYPE_COMPLAIN){//客管投诉
+			this.getE().setType(CaseBase.TYPE_COMPLAIN);
+		}else{//公司投诉
+			this.getE().setType(CaseBase.TYPE_COMPANY_COMPLAIN);
+			this.getE().setHandleStatus(Case4Advice.HANDLE_STATUS_NEW);
+			handlestatusesValue = this.getHandleStatues();
+		}
+		if(syncId != null){	//判断同步id是否为空
+			JiaoWeiADVICE jiaoWeiADVICE = this.jiaoWeiADVICEService.load(syncId);
+			String carPlateNo = "";
+			carPlateNo = jiaoWeiADVICE.getCarPlate().replaceAll("粤A.", carPlateNo);
+			if(carPlateNo.length() > 0){
+				//根据车牌号码查找carId
+				findCarId(carPlateNo);
+			}
+			//设置从交委同步的信息
+			this.getE().setCaseNo(jiaoWeiADVICE.getSyncCode());
+			this.getE().setReceiveDate(jiaoWeiADVICE.getReceiveDate());
+			this.getE().setReceiveCode(jiaoWeiADVICE.getSyncCode());
+			this.getE().setAdvisorName(jiaoWeiADVICE.getAdvisorName());
+			this.getE().setPathFrom(jiaoWeiADVICE.getPathFrom());
+			this.getE().setPathTo(jiaoWeiADVICE.getPathTo());
+			this.getE().setRidingStartTime(jiaoWeiADVICE.getRidingTimeStart());
+			this.getE().setRidingEndTime(jiaoWeiADVICE.getRidingTimeEnd());
+			this.getE().setHappenDate(this.getE().getRidingStartTime());
+			this.getE().setAdvisorPhone(jiaoWeiADVICE.getAdvisorPhone());
+			if(jiaoWeiADVICE.getAdvisorSex().equals("男")){
+				this.getE().setAdvisorSex(CaseBase4AdviceAndPraise.SEX_MAN);
+			}else if(jiaoWeiADVICE.getAdvisorSex().equals("女")){
+				this.getE().setAdvisorSex(CaseBase4AdviceAndPraise.SEX_WOMAN);
+			}
+			if(jiaoWeiADVICE.getAdvisorAge() != null){
+				this.getE().setAdvisorAge(jiaoWeiADVICE.getAdvisorAge().intValue());
+			}
+			this.getE().setAdvisorCert(jiaoWeiADVICE.getAdvisorCert());
+			this.getE().setDriverFeature(jiaoWeiADVICE.getDriverChar());
+			this.getE().setDetail(jiaoWeiADVICE.getContent());
+			this.getE().setResult(jiaoWeiADVICE.getResult());
+			this.getE().setSubject(jiaoWeiADVICE.getSubject());
+			this.getE().setSubject2(jiaoWeiADVICE.getSubject2());
+			if(jiaoWeiADVICE.getMachinePrice() != null && !jiaoWeiADVICE.getMachinePrice().equals("无")
+			 && !jiaoWeiADVICE.getMachinePrice().equals("没打表")){
+				this.getE().setMachinePrice(Float.parseFloat(jiaoWeiADVICE.getMachinePrice()));
+			}
+			this.getE().setTicket(jiaoWeiADVICE.getTicket());
+			if(jiaoWeiADVICE.getCharge() != null && !jiaoWeiADVICE.getCharge().equals("无")){
+				this.getE().setCharge(Float.parseFloat(jiaoWeiADVICE.getCharge()));
+			}
+			this.getE().setCarColor(jiaoWeiADVICE.getBusColor());
+			//设置来源
+			this.getE().setSource(CaseBase.SOURCE_GENERATION);
+			//设置syncId
+			this.getE().setSyncId(syncId);
+			
+		}
+		
+		if (carManId != null) {
+			CarMan driver = this.carManService.load(carManId);
+			List<Car> car = this.carService.selectAllCarByCarManId(carManId);
+			if (car.size() == 1) {
+				this.getE().setCarId(car.get(0).getId());
+				this.getE().setCarPlate(
+						car.get(0).getPlateType() + "."
+								+ car.get(0).getPlateNo());
+				this.getE().setMotorcadeId(car.get(0).getMotorcade().getId());
+				this.getE().setMotorcadeName(car.get(0).getMotorcade().getName());
+				this.getE().setCompany(car.get(0).getCompany());
+				this.getE().setCharger(car.get(0).getCharger());
+				
+				this.chargers = formatChargers(car.get(0).getCharger());
+				this.businessType = car.get(0).getBusinessType();
+				
+			} else if (car.size() > 1) {
+				isMoreCar = true;
+			} else {
+				isNullCar = true;
+			}
+			this.getE().setDriverId(carManId);
+			this.getE().setDriverName(driver.getName());
+			this.getE().setDriverCert(driver.getCert4FWZG());
+			this.getE().setDriverSex(driver.getSex());
+			
+			this.birthdate = driver.getBirthdate();
+			this.origin = driver.getOrigin();
+			this.workDate = driver.getWorkDate();
+		}
+		if (carId != null) {
+			Car car = this.carService.load(carId);
+			this.getE()
+					.setCarPlate(car.getPlateType() + "." + car.getPlateNo());
+			this.getE().setCarId(carId);
+			this.getE().setMotorcadeId(car.getMotorcade().getId());
+			this.getE().setMotorcadeName(car.getMotorcade().getName());
+			this.getE().setCompany(car.getCompany());
+			this.getE().setCharger(car.getCharger());
+			
+			this.chargers = formatChargers(car.getCharger());
+			this.businessType = car.getBusinessType();
+			List<CarMan> carMan = this.carManService
+					.selectAllCarManByCarId(carId);
+			
+			if (carMan.size() == 1) {
+				this.getE().setDriverName(carMan.get(0).getName());
+				this.getE().setDriverId(carMan.get(0).getId());
+				this.getE().setDriverCert(carMan.get(0).getCert4FWZG());
+				this.getE().setDriverSex(carMan.get(0).getSex());
+				
+				this.birthdate = carMan.get(0).getBirthdate();
+				this.origin = carMan.get(0).getOrigin();
+				this.workDate = carMan.get(0).getWorkDate();
+			} else if (carMan.size() > 1) {
+				isMoreCarMan = true;
+			} else {
+				isNullCarMan = true;
+			}
+		}
+		
+		// 初始化信息
+		this.getE().setAdviceType(CaseBase.TYPE_COMPLAIN);
+		this.getE().setDriverSex(ActorDetail.SEX_MAN);
+		this.getE().setCarColor("绿灰");
+		this.getE().setStatus(CaseBase.STATUS_ACTIVE);
+		this.getE().setUid(this.getIdGeneratorService().next(this.getE().ATTACH_TYPE));
+		// 自动生成自编号
+		this.getE().setCode(
+				this.getIdGeneratorService().nextSN4Month(Case4Advice.KEY_CODE));
+		
+		// 来源
+		if(syncId == null){ //不是同步过来的信息设为自建
+			this.getE().setSource(CaseBase.SOURCE_SYS);
+		}
+		sourceStr = getSourceStatuses().get(this.getE().getSource()+"");
+	}
+	
+	/** 根据车牌号查找carId*/
+	public void findCarId(String carPlateNo) {
+		if(carPlateNo.length() > 0){ //判断车牌号是否为空
+			Long tempCarId = this.carService.findcarIdByCarPlateNo(carPlateNo);
+			this.carId = tempCarId;
+		}
+	}
+	
+	@Override
+	protected void afterOpen(Case4Advice entity) {
+		super.afterOpen(entity);
+		
+		this.carId = this.getE().getCarId();
+		// 设置显示车辆,司机相关信息
+		if (carId != null) {
+			Car car = this.carService.load(carId);
+			
+			this.chargers = formatChargers(this.getE().getCharger());
+			this.businessType = car.getBusinessType();
+			
+			List<CarMan> carMan = this.carManService.selectAllCarManByCarId(carId);
+			if(carMan.get(0).getBirthdate() != null){
+				this.birthdate = carMan.get(0).getBirthdate();
+			}
+			this.origin = carMan.get(0).getOrigin();
+			this.workDate = carMan.get(0).getWorkDate();
+		}
+		
+		if(this.getE().getType() == CaseBase.TYPE_COMPANY_COMPLAIN){//公司投诉
+			handlestatusesValue = this.getHandleStatues();
+		}
+		
+	}
+	
 	@Override
 	public String edit() throws Exception {
 		if(syncId != null){//根据syncId查找已存在CaseBase的记录
@@ -398,57 +523,28 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 		this.formPageOption = 	buildFormPageOption(true);
 		// 初始化表单的其他配置
 		this.initForm(true);
+		if(this.getE().getType() == CaseBase.TYPE_COMPANY_COMPLAIN){//公司投诉
+			handlestatusesValue = this.getHandleStatues();
+		}
+		
 		sourceStr = getSourceStatuses().get(this.getE().getSource()+"");
 		
 		this.carId = this.getE().getCarId();
 		// 设置显示车辆,司机相关信息
-		if (carId != null && carManId == null) {
+		if (carId != null) {
 			Car car = this.carService.load(carId);
-			this.getE().setCarPlate(car.getPlateType() + "." + car.getPlateNo());
-			this.getE().setCarId(carId);
-			this.getE().setMotorcadeId(car.getMotorcade().getId());
-			this.getE().setMotorcadeName(car.getMotorcade().getName());
-			this.getE().setCompany(car.getCompany());
 			
-			this.chargers = formatChargers(car.getCharger());
+			this.chargers = formatChargers(this.getE().getCharger());
 			this.businessType = car.getBusinessType();
 			
 			List<CarMan> carMan = this.carManService.selectAllCarManByCarId(carId);
-			this.getE().setDriverName(carMan.get(0).getName());
-			this.getE().setDriverId(carMan.get(0).getId());
-			this.getE().setDriverCert(carMan.get(0).getCert4FWZG());
-			this.getE().setDriverSex(carMan.get(0).getSex());
-			
-			this.birthdate = carMan.get(0).getBirthdate();
+			if(carMan.get(0).getBirthdate() != null){
+				this.birthdate = carMan.get(0).getBirthdate();
+			}
 			this.origin = carMan.get(0).getOrigin();
 			this.workDate = carMan.get(0).getWorkDate();
 		}
-		this.carManId = this.getE().getDriverId();
-		if (carManId != null && carId == null) {
-			CarMan driver = this.carManService.load(carManId);
-			this.getE().setDriverId(carManId);
-			this.getE().setDriverName(driver.getName());
-			this.getE().setDriverCert(driver.getCert4FWZG());
-			this.getE().setDriverSex(driver.getSex());
-			
-			this.birthdate = driver.getBirthdate();
-			this.origin = driver.getOrigin();
-			this.workDate = driver.getWorkDate();
-			
-			List<Car> car = this.carService.selectAllCarByCarManId(carManId);
-			this.getE().setCarId(car.get(0).getId());
-			this.getE().setCarPlate(
-					car.get(0).getPlateType() + "."
-							+ car.get(0).getPlateNo());
-			this.getE().setMotorcadeId(car.get(0).getMotorcade().getId());
-			this.getE().setMotorcadeName(car.get(0).getMotorcade().getName());
-			this.getE().setCompany(car.get(0).getCompany());
-			
-			this.chargers = formatChargers(car.get(0).getCharger());
-			this.businessType = car.get(0).getBusinessType();
-		}
-		
-		
+
 		return "form";
 	}
 	
@@ -528,6 +624,9 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 			o.put("name", driver.getName());
 			o.put("id", driver.getId());
 			o.put("cert4FWZG", driver.getCert4FWZG());
+			o.put("origin", driver.getOrigin());
+			o.put("birthDate", calendarToString(driver.getBirthdate()));
+			o.put("workDate", calendarToString(driver.getWorkDate()));
 			//o.put("region", driver.getRegion());
 			//o.put("drivingStatus", driver.getDrivingStatus());
 			jsons.add(o);
@@ -592,6 +691,20 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 	}
 	
 	/**
+	 * 获取Entity的处理状态值转换列表
+	 * 
+	 * @return
+	 */
+	protected Map<String, String> getHandleStatues() {
+		Map<String, String> statuses = new HashMap<String, String>();
+		statuses.put(String.valueOf(Case4Advice.HANDLE_STATUS_NEW),
+				getText("runcase.handle.status.new"));
+		statuses.put(String.valueOf(Case4Advice.HANDLE_STATUS_DONE),
+				getText("runcase.handle.status.done"));
+		return statuses;
+	}
+	
+	/**
 	 * 获取Entity的来源值转换列表
 	 * 
 	 * @return
@@ -607,6 +720,21 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 		return statuses;
 	}
 	
+    /**
+     * 格式化日期
+     * @return
+     */
+    public String calendarToString(Calendar object){
+    	if(null != object && object.toString().length() > 0){
+    		Calendar calendar = object;
+	    	DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+	    	String dateStr = df.format(calendar.getTime());
+	        return dateStr;
+    	}else{
+    		return "";
+    	}
+    }
+	
 	/**
 	 * 组装责任人姓名
 	 * @param chargers
@@ -614,7 +742,7 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 	 */
 	public String formatChargers(String chargersStr){
 		String chargers = "";
-		if(chargersStr.trim().length() > 0){
+		if(null != chargersStr && chargersStr.trim().length() > 0){
 			String [] chargerAry = chargersStr.split(";");
 			for(int i=0;i<chargerAry.length;i++){
 				chargers += chargerAry[i].split(",")[0];

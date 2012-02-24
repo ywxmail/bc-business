@@ -3,6 +3,8 @@
  */
 package cn.bc.business.car.web.struts2;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +18,8 @@ import org.springframework.stereotype.Controller;
 import cn.bc.business.OptionConstants;
 import cn.bc.business.car.domain.Car;
 import cn.bc.business.car.service.CarService;
+import cn.bc.business.carlpg.domain.CarLPG;
+import cn.bc.business.carlpg.service.CarLPGService;
 import cn.bc.business.carmodel.domain.CarModel;
 import cn.bc.business.carmodel.service.CarModelService;
 import cn.bc.business.motorcade.domain.Motorcade;
@@ -50,6 +54,7 @@ public class CarAction extends FileEntityAction<Long, Car> {
 	private MotorcadeService motorcadeService;
 	private CarService carService;
 	private CarModelService carModelService;
+	private CarLPGService carLPGService;
 	private OptionService optionService;
 
 	public List<Map<String, String>> motorcadeList; // 可选车队列表
@@ -62,9 +67,12 @@ public class CarAction extends FileEntityAction<Long, Car> {
 	public List<Map<String, String>> companyList; // 所属公司列表（宝城、广发）
 	public List<Map<String, String>> logoutReasonList; // 注销原因列表
 	public List<Map<String, String>> carModelList; // 车型配置列表
+	public List<Map<String, String>> carLPGList; // LPG配置列表
+	
 	public Map<String, String> statusesValue;
 	public JSONArray vinPrefixes;// 车辆车架号前缀
 	public JSONArray taximeterTypes; // 计价器型号
+	public JSONArray carTvScreenList;
 	public Json json;
 
 	public String vinPrefix;// 车架号前缀
@@ -87,8 +95,21 @@ public class CarAction extends FileEntityAction<Long, Car> {
 	}
 
 	@Autowired
+	public void setCarLPGService(CarLPGService carLPGService) {
+		this.carLPGService = carLPGService;
+	}
+
+	@Autowired
 	public void setOptionService(OptionService optionService) {
 		this.optionService = optionService;
+	}
+
+	@Override
+	public String getPageTitle() {
+		if (this.getE() != null && !this.getE().isNew())
+			return this.getE().getPlate();
+		else
+			return super.getPageTitle();
 	}
 
 	@Override
@@ -128,7 +149,7 @@ public class CarAction extends FileEntityAction<Long, Car> {
 		this.getE().setLevel("一级");// 车辆定级
 		this.getE().setColor("绿灰");// 车辆颜色
 		this.getE().setFuelType("汽油"); // 燃料类型
-		this.getE().setBusinessType("承包合同");//营运性质
+		this.getE().setBusinessType("承包合同");// 营运性质
 		// // 设置默认的原归属单位信息
 		// this.getE().setOldUnitName(getText("app.oldUnitName"));
 
@@ -173,7 +194,7 @@ public class CarAction extends FileEntityAction<Long, Car> {
 		} else {
 			// 合并车架号的前缀和后缀
 			this.getE().setVin(this.vinPrefix + this.vinSuffix);
-			
+
 			// 执行基类的保存
 			super.save();
 			json.put("id", e.getId());
@@ -200,6 +221,9 @@ public class CarAction extends FileEntityAction<Long, Car> {
 
 		// 加载可选车型配置列表
 		this.carModelList = this.carModelService.findEnabled4Option();
+		
+		// 加载可选LPG配置列表
+		this.carLPGList = this.carLPGService.findEnabled4Option();
 
 		// 批量加载可选项列表
 		Map<String, List<Map<String, String>>> optionItems = this.optionService
@@ -211,9 +235,8 @@ public class CarAction extends FileEntityAction<Long, Car> {
 						OptionConstants.CAR_TAXIMETERFACTORY,
 						OptionConstants.CAR_COMPANY,
 						OptionConstants.CAR_LOGOUT_REASON,
-						OptionConstants.CAR_VIN_PREFIX, 
-						OptionConstants.CAR_TAXIMETER_TYPE
-						});
+						OptionConstants.CAR_VIN_PREFIX,
+						OptionConstants.CAR_TAXIMETER_TYPE });
 
 		// 加载可选营运性质列表
 		this.businessTypeList = optionItems
@@ -238,7 +261,7 @@ public class CarAction extends FileEntityAction<Long, Car> {
 		// 车辆车架号前缀
 		this.vinPrefixes = OptionItem.toLabelValues(optionItems
 				.get(OptionConstants.CAR_VIN_PREFIX));
-		
+
 		// 计价器型号
 		this.taximeterTypes = OptionItem.toLabelValues(optionItems
 				.get(OptionConstants.CAR_TAXIMETER_TYPE));
@@ -262,6 +285,23 @@ public class CarAction extends FileEntityAction<Long, Car> {
 				this.vinSuffix = vin.substring(11);
 			}
 		}
+		
+		//加载车载电视
+		this.carTvScreenList=OptionItem.toLabelValues(this.getCarTvScreen());
+	}
+	
+	//车载电视屏参数
+	protected List<Map<String,String>> getCarTvScreen(){
+		List<Map<String,String>> tvList=new ArrayList<Map<String,String>>();
+		Map<String,String> tvMap=new HashMap<String, String>();
+		tvMap.put("key", "0");
+		tvMap.put("value", "触动传媒Q屏");
+		tvList.add(tvMap);
+		tvMap=new HashMap<String, String>();
+		tvMap.put("key", "1");
+		tvMap.put("value", "城市电视");
+		tvList.add(tvMap);
+		return tvList;
 	}
 
 	/**
@@ -317,8 +357,32 @@ public class CarAction extends FileEntityAction<Long, Car> {
 		json.put("accessCount", obj.getAccessCount()); // 载客人数
 		return "json";
 	}
+	
 
 	// ======== 通过factoryModel查找车型配置的相关信息结束 ========
+	
+	// ======== 通过lpgName查找车型配置的相关信息开始 ========
+	private String lpgName;
+	
+	public String getLpgName() {
+		return lpgName;
+	}
+
+	public void setLpgName(String lpgName) {
+		this.lpgName = lpgName;
+	}
+
+	public String carLPGInfo(){
+		json = new Json();
+		CarLPG obj=this.carLPGService.findcarLPGByLPGModel(lpgName);
+		json.put("lpgModel", obj.getModel());
+		json.put("lpgGpModel", obj.getGpmodel());
+		json.put("lpgJcfModel", obj.getJcfmodel());
+		json.put("lpgQhqModel", obj.getQhqmodel());
+		json.put("lpgPsqModel", obj.getPsqmodel());
+		return "json";
+	}
+	// ======== 通过lpgName查找车型配置的相关信息开始 ========
 
 	// ======== 通过自编号生成原车号开始 ========
 

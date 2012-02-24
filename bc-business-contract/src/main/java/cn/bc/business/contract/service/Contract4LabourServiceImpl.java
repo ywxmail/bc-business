@@ -3,6 +3,8 @@
  */
 package cn.bc.business.contract.service;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -89,6 +91,16 @@ public class Contract4LabourServiceImpl extends
 		}
 		//更新司机的户口性质
 		this.contract4LabourDao.updateCarMan4HouseType(driverId,contract4Labour.getHouseType());
+		
+		//更新司机的备注列
+    	String description = "劳动合同期限: 从 "+calendarToString(contract4Labour.getStartDate())+" 到 "+
+    			calendarToString(contract4Labour.getEndDate())+"\n"
+    			+"社保参保日期: "+calendarToString(contract4Labour.getJoinDate())+"\n"
+    			+"个人社保编号: "+contract4Labour.getInsurCode()+"\n"
+    			+"社保参保险种: "+contract4Labour.getInsuranceType();
+    	
+		this.contract4LabourDao.updateCarMan4Description(driverId,description);
+		
 		return contract4Labour;
 	}
 
@@ -423,5 +435,20 @@ public class Contract4LabourServiceImpl extends
 	public boolean isExistContractByCarId(Long carId) {
 		return this.contract4LabourDao.isExistContractByCarId(carId);
 	}
+	
+    /**
+     * 格式化日期
+     * @return
+     */
+    public String calendarToString(Calendar object){
+    	if(null != object && object.toString().length() > 0){
+    		Calendar calendar = object;
+	    	DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+	    	String dateStr = df.format(calendar.getTime());
+	        return dateStr;
+    	}else{
+    		return "";
+    	}
+    }
 	
 }

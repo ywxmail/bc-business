@@ -22,14 +22,18 @@ public class Case4InfractBusiness extends CaseBase {
 	public static final String ATTACH_TYPE = Case4InfractBusiness.class
 			.getSimpleName();
 
+	/** 营运违章 */
+	public static final int CATEGORY_BUSINESS = 0;
+	/** 站场违章 */
+	public static final int CATEGORY_STATION = 1;
+	/** 服务违章 */
+	public static final int CATEGORY_SERVICE = 2;
+	
 	private Calendar receiveDate;// 接案日期
 	private Long receiverId;// 接案人ID(对应ActorHistory的ID)
 	private String receiverName;// 接案人姓名
 
-	private Long chargerId;// 责任人1ID(对应CarMan的ID)
-	private String chargerName;// 责任人1姓名
-	private Long chargerId2;// 责任人2ID(对应CarMan的ID)
-	private String chargerName2;// 责任人2姓名
+	private String charger;// 责任人
 
 	private String duty;// 责任
 	private String sort;// 性质
@@ -55,6 +59,22 @@ public class Case4InfractBusiness extends CaseBase {
 	private boolean close;// 是否结案
 	private boolean overdue;// 是否过期
 	private boolean stop;// 是否停场
+	
+	private Long transactorId;// 经办人ID(对应ActorHistory的ID)
+	private String transactorName;// 经办人姓名
+	
+	private Long branchChargerId; // 分公司负责人id(对应ActorHistory的ID)
+	private String branchChargerName;// 分公司负责人姓名
+	private Long companyApprovalId; // 公司审批人id(对应ActorHistory的ID)
+	private String companyApprovalName;// 公司审批人姓名
+	
+	private String content;// 内容
+	private String stopProduction;// 停产
+	private String study;// 学习
+	private float dedit;// 违约金
+	private String driverRating;// 驾驶员评级
+	
+	private int category;//类别:0-营运违章,1-站场违章,2-服务违章.
 
 	@Column(name = "RECEIVE_DATE")
 	public Calendar getReceiveDate() {
@@ -83,40 +103,12 @@ public class Case4InfractBusiness extends CaseBase {
 		this.receiverName = receiverName;
 	}
 
-	@Column(name = "CHARGER1_ID")
-	public Long getChargerId() {
-		return chargerId;
+	public String getCharger() {
+		return charger;
 	}
 
-	public void setChargerId(Long chargerId) {
-		this.chargerId = chargerId;
-	}
-
-	@Column(name = "CHARGER1_NAME")
-	public String getChargerName() {
-		return chargerName;
-	}
-
-	public void setChargerName(String chargerName) {
-		this.chargerName = chargerName;
-	}
-
-	@Column(name = "CHARGER2_ID")
-	public Long getChargerId2() {
-		return chargerId2;
-	}
-
-	public void setChargerId2(Long chargerId2) {
-		this.chargerId2 = chargerId2;
-	}
-
-	@Column(name = "CHARGER2_NAME")
-	public String getChargerName2() {
-		return chargerName2;
-	}
-
-	public void setChargerName2(String chargerName2) {
-		this.chargerName2 = chargerName2;
+	public void setCharger(String charger) {
+		this.charger = charger;
 	}
 
 	public String getDuty() {
@@ -306,4 +298,109 @@ public class Case4InfractBusiness extends CaseBase {
 	public void setStop(boolean stop) {
 		this.stop = stop;
 	}
+	
+	@Column(name = "TRANSACTOR_ID")
+	public Long getTransactorId() {
+		return transactorId;
+	}
+
+	public void setTransactorId(Long transactorId) {
+		this.transactorId = transactorId;
+	}
+
+	@Column(name = "TRANSACTOR_NAME")
+	public String getTransactorName() {
+		return transactorName;
+	}
+
+	public void setTransactorName(String transactorName) {
+		this.transactorName = transactorName;
+	}
+
+	@Column(name = "BRANCH_CHARGER_ID")
+	public Long getBranchChargerId() {
+		return branchChargerId;
+	}
+
+	public void setBranchChargerId(Long branchChargerId) {
+		this.branchChargerId = branchChargerId;
+	}
+
+	@Column(name = "BRANCH_CHARGER_NAME")
+	public String getBranchChargerName() {
+		return branchChargerName;
+	}
+
+	public void setBranchChargerName(String branchChargerName) {
+		this.branchChargerName = branchChargerName;
+	}
+
+	@Column(name = "COMPANY_APPROVAL_ID")
+	public Long getCompanyApprovalId() {
+		return companyApprovalId;
+	}
+
+	public void setCompanyApprovalId(Long companyApprovalId) {
+		this.companyApprovalId = companyApprovalId;
+	}
+
+	@Column(name = "COMPANY_APPROVAL_NAME")
+	public String getCompanyApprovalName() {
+		return companyApprovalName;
+	}
+
+	public void setCompanyApprovalName(String companyApprovalName) {
+		this.companyApprovalName = companyApprovalName;
+	}
+
+	public String getContent() {
+		return content;
+	}
+
+	public void setContent(String content) {
+		this.content = content;
+	}
+
+	@Column(name = "STOP_PRODUCTION")
+	public String getStopProduction() {
+		return stopProduction;
+	}
+
+	public void setStopProduction(String stopProduction) {
+		this.stopProduction = stopProduction;
+	}
+
+	public String getStudy() {
+		return study;
+	}
+
+	public void setStudy(String study) {
+		this.study = study;
+	}
+
+	public float getDedit() {
+		return dedit;
+	}
+
+	public void setDedit(float dedit) {
+		this.dedit = dedit;
+	}
+
+	@Column(name = "DRIVER_RATING")
+	public String getDriverRating() {
+		return driverRating;
+	}
+
+	public void setDriverRating(String driverRating) {
+		this.driverRating = driverRating;
+	}
+
+	public int getCategory() {
+		return category;
+	}
+
+	public void setCategory(int category) {
+		this.category = category;
+	}
+	
 }
