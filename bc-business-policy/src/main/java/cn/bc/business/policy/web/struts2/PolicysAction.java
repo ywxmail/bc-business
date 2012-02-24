@@ -285,13 +285,14 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 					.setSortable(true).setUseTitleFromLabel(true)
 					.setValueFormater(new NubmerFormater("###,###.00")));
 		}
-		// 操作类型
-		columns.add(new TextColumn4MapKey("p.op_type", "op_type",
-				getText("policy.labour.optype"),65).setSortable(true)
-				.setValueFormater(new EntityStatusFormater(getEntityOpTypes())));
 		//承保险种
 		columns.add(new TextColumn4MapKey("p.buy_plant", "buy_plant",
-				getText("policy.insuranceType")).setUseTitleFromLabel(true));
+						getText("policy.insuranceType"),800).setUseTitleFromLabel(true));
+		// 操作类型
+		columns.add(new TextColumn4MapKey("p.op_type", "op_type",
+				getText("policy.labour.optype")).setSortable(true)
+				.setValueFormater(new EntityStatusFormater(getEntityOpTypes())));
+		
 		return columns;
 	}
 
