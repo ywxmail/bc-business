@@ -135,14 +135,15 @@ public class PolicyAction extends FileEntityAction<Long, Policy> {
 					resource.setOrderNo(i);
 					resource.setPolicy(this.getE());
 					resource.setName(json.getString("name"));
-					buyPlantStr += json.getString("name");
 					buyPlantStr += "[";
+					buyPlantStr += json.getString("name");
+					buyPlantStr += ":";
 					resource.setCoverage(json.getString("coverage"));
 					buyPlantStr += json.getString("coverage");
 					//只要备注不为空，也显示备注
 					if (json.getString("description") != null
 							&& json.getString("description").length() > 0) {
-						buyPlantStr += ",";
+						buyPlantStr += ":";
 						buyPlantStr += json.getString("description");
 					}
 					buyPlantStr += "]";
