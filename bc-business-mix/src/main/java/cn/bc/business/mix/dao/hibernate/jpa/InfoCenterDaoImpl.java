@@ -48,7 +48,7 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 
 		final StringBuffer sql = new StringBuffer();
 		final List<Object> args = new ArrayList<Object>();
-		sql.append("select c.id,c.code,c.plate_type,c.plate_no,c.status_ from bs_car c");
+		sql.append("select c.id,c.code,c.plate_type,c.plate_no,c.status_,c.return_date from bs_car c");
 		sql.append(" inner join bs_motorcade m on m.id=c.motorcade_id");
 		sql.append(" inner join bc_identity_actor unit on unit.id=m.unit_id");
 		if (unitId != null) {
@@ -79,7 +79,7 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 
 		final String value = "%" + searchText.toUpperCase() + "%";
 		final StringBuffer sql = new StringBuffer();
-		sql.append("select c.id,c.code,c.plate_type,c.plate_no,c.status_ from bs_car c");
+		sql.append("select c.id,c.code,c.plate_type,c.plate_no,c.status_,c.return_date from bs_car c");
 		sql.append(" where c.plate_no like ?");
 		sql.append(" order by c.register_date desc");
 
@@ -118,6 +118,7 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 							json.put("code", rs.get(j)[1]);
 							json.put("plate", rs.get(j)[2] + "." + rs.get(j)[3]);
 							json.put("status", rs.get(j)[4]);
+							json.put("returnDate", DateUtils.formatDate((Date)rs.get(j)[5]));
 						} catch (JSONException e) {
 							logger.error(e.getMessage(), e);
 						}
@@ -150,6 +151,8 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 		JSONObject policy = this.getPolicy(carId);
 		if (policy != null) {
 			car.put("zb", policy.get("zb"));
+		}else{
+			car.put("zb", false);
 		}
 
 		// ==提醒信息==
@@ -230,24 +233,24 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 							json.put("type", getManType(obj[i++]));
 							json.put("name", obj[i++]);
 							json.put("sex", getManSex(obj[i++]));
-							json.put("origin", obj[i++]);
-							json.put("houseType", obj[i++]);
-							json.put("address1", obj[i++]);
-							json.put("address2", obj[i++]);
+							json.put("origin", null2Empty(obj[i++]));
+							json.put("houseType", null2Empty(obj[i++]));
+							json.put("address1", null2Empty(obj[i++]));
+							json.put("address2", null2Empty(obj[i++]));
 							json.put(
 									"phones",
 									getManPhones((String) obj[i++],
 											(String) obj[i++]));
-							json.put("identity", obj[i++]);
-							json.put("cert4fwzg", obj[i++]);
+							json.put("identity", null2Empty(obj[i++]));
+							json.put("cert4fwzg", null2Empty(obj[i++]));
 							json.put("classes", getManClasses(obj[i++]));
 							json.put("moveType", getManMoveType(obj[i++]));
 							json.put(
 									"moveDate",
 									getManMoveDate((Date) obj[i++],
 											(Date) obj[i++]));
-							json.put("carInfo", obj[i++]);
-							json.put("desc", obj[i++]);
+							json.put("carInfo", null2Empty(obj[i++]));
+							json.put("desc", null2Empty(obj[i++]));
 
 							jsons.put(json);
 						} catch (JSONException e) {
@@ -405,11 +408,11 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 							json.put("module", "黑名单");
 							int i = 0;
 							json.put("id", obj[i++]);
-							json.put("subject", obj[i++]);
+							json.put("subject", null2Empty(obj[i++]));
 							json.put("date",
 									DateUtils.formatDate((Date) obj[i++]));
-							json.put("limit", obj[i++]);
-							json.put("link", obj[i++]);
+							json.put("limit", null2Empty(obj[i++]));
+							json.put("link", null2Empty(obj[i++]));
 
 							jsons.put(json);
 						} catch (JSONException e) {
@@ -452,11 +455,11 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 					obj = (Object[]) queryObject.getSingleResult();
 				} catch (NoResultException e) {
 					if (logger.isDebugEnabled())
-						logger.debug("car = null,id=" + carId);
-					obj = null;
+						logger.debug("policy = null,id=" + carId);
+					return null;
 				}
-				JSONObject json = new JSONObject();
 				if (obj != null) {
+					JSONObject json = new JSONObject();
 					try {
 						int i = 2;
 						json.put("zb", obj[i++]);
@@ -468,8 +471,10 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 					} catch (JSONException e) {
 						logger.error(e.getMessage(), e);
 					}
+					return json;
+				}else{
+					return null;
 				}
-				return json;
 			}
 		});
 	}
@@ -519,21 +524,21 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 
 						int i = 4;
 						json.put("code", car[i++]);
-						json.put("company", car[i++]);
-						json.put("unitName", car[i++]);
-						json.put("motorcadeName", car[i++]);
-						json.put("factoryType", car[i++]);
-						json.put("factoryModel", car[i++]);
-						json.put("engineNo", car[i++]);
-						json.put("vin", car[i++]);
-						json.put("color", car[i++]);
+						json.put("company", null2Empty(car[i++]));
+						json.put("unitName", null2Empty(car[i++]));
+						json.put("motorcadeName", null2Empty(car[i++]));
+						json.put("factoryType", null2Empty(car[i++]));
+						json.put("factoryModel", null2Empty(car[i++]));
+						json.put("engineNo", null2Empty(car[i++]));
+						json.put("vin", null2Empty(car[i++]));
+						json.put("color", null2Empty(car[i++]));
 
-						json.put("businessType", car[i++]);
+						json.put("businessType", null2Empty(car[i++]));
 						json.put("registeDate",
 								DateUtils.formatDate((Date) car[i++]));
 						json.put("operateDate",
 								DateUtils.formatDate((Date) car[i++]));
-						json.put("certNo4", car[i++]);
+						json.put("certNo4", null2Empty(car[i++]));
 						json.put("taximeter", car[i++] + " " + car[i++]);
 						json.put(
 								"desc",
