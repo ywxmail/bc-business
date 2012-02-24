@@ -131,3 +131,91 @@ BEGIN
 	return carInfo;
 END;
 $$ LANGUAGE plpgsql;
+
+
+--##查找司机营运车辆的自定义函数和存储过程##
+CREATE OR REPLACE FUNCTION getCarInfoByDriverId(did IN integer) RETURNS varchar AS $$
+DECLARE
+	--定义变量
+	caridInfo varchar(4000);
+BEGIN
+	select string_agg(concat(name,',',(case when classes=1 then '正班' when classes=2 then '副班' when classes=3 then '主挂' when classes=4 then '顶班' else '无' end),',',id),';')
+		into caridInfo
+		from (select c.id as id,concat(c.plate_type,'.',c.plate_no) as name,cm.classes as classes 
+			from BS_CAR_DRIVER cm
+			inner join bs_car c on c.id=cm.car_id
+			where cm.status_=0 and cm.driver_id=did
+			order by cm.classes asc,c.file_date asc) as t;
+	return caridInfo;
+END;
+$$ LANGUAGE plpgsql;
+
+
+--##将现有的迁移记录的最新的迁移记录标识为当前的迁移记录##
+CREATE OR REPLACE FUNCTION updateCarByDriverHistory4Min(did IN integer) RETURNS integer AS $$
+DECLARE
+	--定义变量
+	main integer;
+BEGIN
+	
+	update BS_CAR_DRIVER_HISTORY set main=0 where id in (
+		select  id from BS_CAR_DRIVER_HISTORY where driver_id=did order by move_date desc limit 1 );
+
+	return main;
+END;
+$$ LANGUAGE plpgsql;
+
+
+--##获取司机最新的迁移类型##
+CREATE OR REPLACE FUNCTION getDriverMoveTypeByDriverId(did IN integer) RETURNS integer AS $$
+DECLARE
+	--定义变量
+	moveType integer;
+BEGIN
+	select  h.move_type
+		into moveType
+		from BS_CAR_DRIVER_HISTORY h where h.driver_id=did order by h.move_date desc limit 1;
+	return moveType;
+END;
+$$ LANGUAGE plpgsql;
+
+--##获取司机最新的迁移日期##
+CREATE OR REPLACE FUNCTION getDriverMoveDateByDriverId(did IN integer) RETURNS timestamp AS $$
+DECLARE
+	--定义变量
+	moveDate timestamp;
+BEGIN
+	select  h.move_date
+		into moveDate
+		from BS_CAR_DRIVER_HISTORY h where h.driver_id=did order by h.move_date desc limit 1;
+	return moveDate;
+END;
+$$ LANGUAGE plpgsql;
+
+--##获取司机最新的驾驶状态--
+CREATE OR REPLACE FUNCTION getDriverClassesByDriverId(did IN integer) RETURNS integer AS $$
+DECLARE
+	--定义变量
+	classes integer;
+BEGIN
+	select  c.classes
+		into classes
+		from BS_CAR_DRIVER c where driver_id=did order by c.file_date desc limit 1;
+	return classes;
+END;
+$$ LANGUAGE plpgsql;
+
+
+--##获取司机最新的营运的主车辆ID--
+CREATE OR REPLACE FUNCTION getDriverMainCarIdByDriverId(did IN integer) RETURNS integer AS $$
+DECLARE
+	--定义变量
+	mainCarId integer;
+BEGIN
+	select  c.car_id
+		into mainCarId
+		from BS_CAR_DRIVER c where c.status_=0 and (c.classes=1 or c.classes=2 or c.classes=4) and driver_id=did;
+	return mainCarId;
+END;
+$$ LANGUAGE plpgsql;
+

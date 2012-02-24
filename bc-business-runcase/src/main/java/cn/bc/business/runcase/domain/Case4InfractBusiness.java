@@ -26,6 +26,8 @@ public class Case4InfractBusiness extends CaseBase {
 	public static final int CATEGORY_BUSINESS = 0;
 	/** 站场违章 */
 	public static final int CATEGORY_STATION = 1;
+	/** 服务违章 */
+	public static final int CATEGORY_SERVICE = 2;
 	
 	private Calendar receiveDate;// 接案日期
 	private Long receiverId;// 接案人ID(对应ActorHistory的ID)
@@ -72,7 +74,7 @@ public class Case4InfractBusiness extends CaseBase {
 	private float dedit;// 违约金
 	private String driverRating;// 驾驶员评级
 	
-	private int category;//类别:0-营运违章,1-站场违章
+	private int category;//类别:0-营运违章,1-站场违章,2-服务违章.
 
 	@Column(name = "RECEIVE_DATE")
 	public Calendar getReceiveDate() {
