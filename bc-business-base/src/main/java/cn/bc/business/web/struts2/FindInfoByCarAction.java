@@ -144,7 +144,7 @@ public class FindInfoByCarAction extends ActionSupport {
 		sql.append("select c.id carId,c.status_ carStatus,c.plate_type carPlateType,c.plate_no carPlateNo,c.register_date carRegisterDate,c.bs_type carBsType");
 		sql.append(",c.company carCompany,c.charger carCharger,c.motorcade_id motorcadeId,m.name motorcadeName");
 		sql.append(",cd.classes driverClasses,cd.driver_id driverId,d.name driverName,d.sex driverSex,d.cert_fwzg driverCert4FWZG");
-		sql.append(",d.cert_identity driverCert4IDENTITY,d.origin driverOrigin,d.house_type driverHouseType,d.birthdate driverBirthDate,d.workDate driverWorkDate");
+		sql.append(",d.cert_identity driverCert4IDENTITY,d.origin driverOrigin,d.house_type driverHouseType,d.birthdate driverBirthDate,d.work_date driverWorkDate");
 		sql.append(" from bs_car c");
 		sql.append(" inner join bs_motorcade m on m.id=c.motorcade_id");
 		sql.append(" inner join bs_car_driver cd on cd.car_id=c.id");

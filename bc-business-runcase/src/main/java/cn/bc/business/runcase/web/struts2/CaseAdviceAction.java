@@ -260,10 +260,10 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 					pageOption.addButton(new ButtonOption(
 							"生成通知单", null,
 							"bc.caseAdviceForm.doGenNotice"));
-					//生成表格
-					pageOption.addButton(new ButtonOption(
-							"生成表格", null,
-							"bc.caseAdviceForm.doGenForm"));
+//					//生成表格
+//					pageOption.addButton(new ButtonOption(
+//							"生成表格", null,
+//							"bc.caseAdviceForm.doGenForm"));
 				}
 				if(!getE().isNew()){
 					//维护按钮
@@ -505,6 +505,10 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 			this.workDate = carMan.get(0).getWorkDate();
 		}
 		
+		if(this.getE().getType() == CaseBase.TYPE_COMPANY_COMPLAIN){//公司投诉
+			handlestatusesValue = this.getHandleStatues();
+		}
+		
 	}
 	
 	@Override
@@ -539,23 +543,8 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 			}
 			this.origin = carMan.get(0).getOrigin();
 			this.workDate = carMan.get(0).getWorkDate();
-			return "form";
 		}
-		if (carManId != null) {
-			CarMan driver = this.carManService.load(carManId);
-			
-			if(driver.getBirthdate() != null){
-				this.birthdate = driver.getBirthdate();
-			}
-			this.origin = driver.getOrigin();
-			this.workDate = driver.getWorkDate();
-			
-			List<Car> car = this.carService.selectAllCarByCarManId(carManId);
-			
-			this.chargers = formatChargers(this.getE().getCharger());
-			this.businessType = car.get(0).getBusinessType();
-			return "form";
-		}
+
 		return "form";
 	}
 	
