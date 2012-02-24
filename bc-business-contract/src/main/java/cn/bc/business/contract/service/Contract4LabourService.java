@@ -154,11 +154,4 @@ public interface Contract4LabourService extends CrudService<Contract4Labour> {
 	 */
 	boolean isExistContractByDriverId(Long driverId);
 
-	/**
-	 * 判断指定的车辆是否已经存在劳动合同
-	 * 
-	 * @param driverId
-	 * @return
-	 */
-	boolean isExistContractByCarId(Long carId);
 }

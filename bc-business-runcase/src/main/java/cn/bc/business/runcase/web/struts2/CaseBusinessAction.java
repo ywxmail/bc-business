@@ -179,7 +179,7 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 	
 	@Override
 	protected PageOption buildFormPageOption(boolean editable) {
-		return super.buildFormPageOption(editable).setWidth(833).setMinWidth(250).setHeight(450)
+		return super.buildFormPageOption(editable).setWidth(745).setMinWidth(250).setHeight(450)
 				.setMinHeight(200);
 	}
 	
@@ -189,6 +189,9 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 	private String origin;
 	private Calendar workDate;
 	private String businessType;
+	private Calendar registerDate;
+	private Calendar scrapDate;
+	
 	
 	public String getChargers() {
 		return chargers;
@@ -230,6 +233,22 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 		this.businessType = businessType;
 	}
 	
+	public Calendar getRegisterDate() {
+		return registerDate;
+	}
+
+	public void setRegisterDate(Calendar registerDate) {
+		this.registerDate = registerDate;
+	}
+
+	public Calendar getScrapDate() {
+		return scrapDate;
+	}
+
+	public void setScrapDate(Calendar scrapDate) {
+		this.scrapDate = scrapDate;
+	}
+
 	@Override
 	protected void buildFormPageButtons(PageOption pageOption, boolean editable) {
 		boolean readonly = this.isReadonly();
@@ -242,7 +261,7 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 			}
 			//特殊处理结案按钮
 			if(CaseBase.STATUS_ACTIVE == getE().getStatus() && !getE().isNew()){
-				ButtonOption buttonOption = new ButtonOption(getText("label.closefile"),null,"bc.caseBusinessForm.closefile");
+				ButtonOption buttonOption = new ButtonOption(getText("label.closefile"),null,"bc.caseBusinessForm.doCloseFile");
 				buttonOption.put("id", "bcSaveDlgButton");
 				pageOption.addButton(buttonOption);
 			}
@@ -312,7 +331,9 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 				
 				this.chargers = formatChargers(car.get(0).getCharger());
 				this.businessType = car.get(0).getBusinessType();
-			
+				this.registerDate = car.get(0).getRegisterDate();
+				this.scrapDate = car.get(0).getScrapDate();
+				
 			} else if (car.size() > 1) {
 				isMoreCar = true;
 			} else {
@@ -338,6 +359,9 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 			
 			this.chargers = formatChargers(car.getCharger());
 			this.businessType = car.getBusinessType();
+			this.registerDate = car.getRegisterDate();
+			this.scrapDate = car.getScrapDate();
+			
 			List<CarMan> carMan = this.carManService
 					.selectAllCarManByCarId(carId);
 			if (carMan.size() == 1) {
@@ -367,6 +391,8 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 		this.getE().setReceiverId(context.getUserHistory().getId());
 		this.getE().setReceiverName(context.getUserHistory().getName());
 		this.getE().setCategory(Case4InfractBusiness.CATEGORY_BUSINESS);
+		
+		categoryValue = this.getCategory();
 		// 来源
 		if(syncId == null){ //不是同步过来的信息设为自建
 			this.getE().setSource(CaseBase.SOURCE_SYS);
@@ -397,6 +423,7 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 		// 表单可选项的加载
 		statusesValue		=	this.getCaseStatuses();
 		sourcesValue		=	this.getSourceStatuses();
+		categoryValue 		= this.getCategory();
 		sourceStr = getSourceStatuses().get(this.getE().getSource()+"");
 		initForm(true);
 		
@@ -407,6 +434,8 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 			
 			this.chargers = formatChargers(this.getE().getCharger());
 			this.businessType = car.getBusinessType();
+			this.registerDate = car.getRegisterDate();
+			this.scrapDate = car.getScrapDate();
 			
 			List<CarMan> carMan = this.carManService.selectAllCarManByCarId(carId);
 			if(carMan.get(0).getBirthdate() != null){
@@ -498,6 +527,9 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 			o.put("name", driver.getName());
 			o.put("id", driver.getId());
 			o.put("cert4FWZG", driver.getCert4FWZG());
+			o.put("origin", driver.getOrigin());
+			o.put("birthDate", calendarToString(driver.getBirthdate()));
+			o.put("workDate", calendarToString(driver.getWorkDate()));
 			//o.put("region", driver.getRegion());
 			//o.put("drivingStatus", driver.getDrivingStatus());
 			jsons.add(o);

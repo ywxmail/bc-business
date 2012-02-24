@@ -198,7 +198,7 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 
 	@Override
 	protected PageOption buildFormPageOption(boolean editable) {
-		return super.buildFormPageOption(editable).setWidth(705).setMinWidth(250).setHeight(500)
+		return super.buildFormPageOption(editable).setWidth(745).setMinWidth(250).setHeight(500)
 				.setMinHeight(200);
 	}
 
@@ -297,6 +297,8 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 	private String origin;
 	private Calendar workDate;
 	private String businessType;
+	private Calendar registerDate;
+	private Calendar scrapDate;
 	
 	public String getChargers() {
 		return chargers;
@@ -336,6 +338,22 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 
 	public void setBusinessType(String businessType) {
 		this.businessType = businessType;
+	}
+	
+	public Calendar getRegisterDate() {
+		return registerDate;
+	}
+
+	public void setRegisterDate(Calendar registerDate) {
+		this.registerDate = registerDate;
+	}
+
+	public Calendar getScrapDate() {
+		return scrapDate;
+	}
+
+	public void setScrapDate(Calendar scrapDate) {
+		this.scrapDate = scrapDate;
 	}
 	
 	@SuppressWarnings("static-access")
@@ -414,6 +432,8 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 				
 				this.chargers = formatChargers(car.get(0).getCharger());
 				this.businessType = car.get(0).getBusinessType();
+				this.registerDate = car.get(0).getRegisterDate();
+				this.scrapDate = car.get(0).getScrapDate();
 				
 			} else if (car.size() > 1) {
 				isMoreCar = true;
@@ -441,6 +461,9 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 			
 			this.chargers = formatChargers(car.getCharger());
 			this.businessType = car.getBusinessType();
+			this.registerDate = car.getRegisterDate();
+			this.scrapDate = car.getScrapDate();
+			
 			List<CarMan> carMan = this.carManService
 					.selectAllCarManByCarId(carId);
 			
@@ -496,6 +519,8 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 			
 			this.chargers = formatChargers(this.getE().getCharger());
 			this.businessType = car.getBusinessType();
+			this.registerDate = car.getRegisterDate();
+			this.scrapDate = car.getScrapDate();
 			
 			List<CarMan> carMan = this.carManService.selectAllCarManByCarId(carId);
 			if(carMan.get(0).getBirthdate() != null){
@@ -536,6 +561,8 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 			
 			this.chargers = formatChargers(this.getE().getCharger());
 			this.businessType = car.getBusinessType();
+			this.registerDate = car.getRegisterDate();
+			this.scrapDate = car.getScrapDate();
 			
 			List<CarMan> carMan = this.carManService.selectAllCarManByCarId(carId);
 			if(carMan.get(0).getBirthdate() != null){

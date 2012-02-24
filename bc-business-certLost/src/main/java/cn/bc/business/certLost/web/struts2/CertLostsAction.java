@@ -5,6 +5,7 @@ package cn.bc.business.certLost.web.struts2;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
+import cn.bc.business.web.struts2.BooleanFormater4certLost;
 import cn.bc.business.web.struts2.ViewAction;
 import cn.bc.core.query.condition.Condition;
 import cn.bc.core.query.condition.ConditionUtils;
@@ -22,7 +24,6 @@ import cn.bc.core.util.StringUtils;
 import cn.bc.db.jdbc.RowMapper;
 import cn.bc.db.jdbc.SqlObject;
 import cn.bc.identity.web.SystemContext;
-import cn.bc.web.formater.BooleanFormater;
 import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.formater.LinkFormater4Id;
 import cn.bc.web.ui.html.grid.Column;
@@ -42,9 +43,7 @@ import cn.bc.web.ui.json.Json;
 @Controller
 public class CertLostsAction extends ViewAction<Map<String, Object>> {
 	private static final long serialVersionUID = 1L;
-	// public String status = String.valueOf(BCConstants.STATUS_ENABLED); //
-	// 车辆的状态，多个用逗号连接
-	public String classes;// 默认全部
+	public String isReplace = "false"; // 打开视图时默认为未补办
 	public Long carManId;
 	public Long carId;
 
@@ -56,10 +55,10 @@ public class CertLostsAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	public boolean isReadonly() {
-		// 车辆管理/司机管理或系统管理员
+		// 证照遗失管理或系统管理员
 		SystemContext context = (SystemContext) this.getContext();
-		return !context.hasAnyRole(getText("key.role.bs.car"),
-				getText("key.role.bs.driver"), getText("key.role.bc.admin"));
+		return !context.hasAnyRole(getText("key.role.bs.certLost"),
+				getText("key.role.bc.admin"));
 	}
 
 	@Override
@@ -68,10 +67,14 @@ public class CertLostsAction extends ViewAction<Map<String, Object>> {
 
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer sql = new StringBuffer();
-		sql.append("select i.id,i.cert_name,c.code,c.plate_type,c.plate_no,l.lost_date,i.is_replace,i.replace_date");
-		sql.append(",l.handler_name,l.driver,l.driver_id,l.car_id from bs_cert_lost_item i");
+		sql.append("select l.id,i.cert_name,c.code,c.plate_type,c.plate_no,l.lost_date,i.is_replace,i.replace_date");
+		sql.append(",l.transactor_name,l.driver,l.driver_id,l.car_id,c.company,unit.name unit_name");
+		sql.append(",m.name motorcade_name,i.lost_address,d.cert_fwzg from bs_cert_lost_item i ");
 		sql.append(" left join bs_cert_lost l on l.id=i.pid");
 		sql.append(" left join bs_car c on c.id=l.car_id");
+		sql.append(" left join bs_carman d on d.id=l.driver_id");
+		sql.append(" left join bs_motorcade m on m.id=l.motorcade_id");
+		sql.append(" left join bc_identity_actor unit on unit.id=m.unit_id");
 		sqlObject.setSql(sql.toString());
 
 		// 注入参数
@@ -87,15 +90,25 @@ public class CertLostsAction extends ViewAction<Map<String, Object>> {
 				map.put("code", rs[i++]);
 				map.put("plate_type", rs[i++]);
 				map.put("plate_no", rs[i++]);
-				map.put("plate", map.get("plate_type").toString() + "."
-						+ map.get("plate_no").toString());
+				if (map.get("plate_type") == null
+						&& map.get("plate_no") == null) {
+					map.put("plate", null);
+				} else {
+					map.put("plate", map.get("plate_type").toString() + "."
+							+ map.get("plate_no").toString());
+				}
 				map.put("lost_date", rs[i++]);
 				map.put("is_replace", rs[i++]);
 				map.put("replace_date", rs[i++]);
-				map.put("handler_name", rs[i++]);
+				map.put("transactor_name", rs[i++]);
 				map.put("driver", rs[i++]);
 				map.put("driverId", rs[i++]);
 				map.put("carId", rs[i++]);
+				map.put("company", rs[i++]);
+				map.put("unit_name", rs[i++]);
+				map.put("motorcade_name", rs[i++]);
+				map.put("lost_address", rs[i++]);
+				map.put("cert_fwzg", rs[i++]);
 				return map;
 			}
 		});
@@ -105,11 +118,12 @@ public class CertLostsAction extends ViewAction<Map<String, Object>> {
 	@Override
 	protected List<Column> getGridColumns() {
 		List<Column> columns = new ArrayList<Column>();
-		columns.add(new IdColumn4MapKey("i.id", "id"));
+		columns.add(new IdColumn4MapKey("l.id", "id"));
 		columns.add(new TextColumn4MapKey("i.cert_name", "cert_name",
 				getText("certLost.certName")).setSortable(true));
 		columns.add(new TextColumn4MapKey("i.code", "code",
-				getText("certLost.carCode")).setSortable(true));
+				getText("certLost.carCode"), 80).setSortable(true)
+				.setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("c.plate_no", "plate",
 				getText("certLost.plate"), 100)
 				.setValueFormater(new LinkFormater4Id(this.getContextPath()
@@ -130,13 +144,41 @@ public class CertLostsAction extends ViewAction<Map<String, Object>> {
 
 					}
 				}));
+		// 公司
+		columns.add(new TextColumn4MapKey("c.company", "company",
+				getText("car.company"), 40).setSortable(true)
+				.setUseTitleFromLabel(true));
+		// 分公司
+		columns.add(new TextColumn4MapKey("unit.name", "unit_name",
+				getText("car.unitname"), 65).setSortable(true)
+				.setUseTitleFromLabel(true));
+		// 车队
+		columns.add(new TextColumn4MapKey("m.name", "motorcade_name",
+				getText("car.motorcade"), 65)
+				.setSortable(true)
+				.setUseTitleFromLabel(true)
+				.setValueFormater(
+						new LinkFormater4Id(this.getContextPath()
+								+ "/bc-business/motorcade/edit?id={0}",
+								"motorcade") {
+							@SuppressWarnings("unchecked")
+							@Override
+							public String getIdValue(Object context,
+									Object value) {
+								return StringUtils
+										.toString(((Map<String, Object>) context)
+												.get("motorcade_id"));
+							}
+						}));
 		columns.add(new TextColumn4MapKey("l.lost_date", "lost_date",
 				getText("certLost.lostDate"), 100).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+		columns.add(new TextColumn4MapKey("l.lost_address", "lost_address",
+				getText("certLost.lostAddress")).setSortable(true));
 		columns.add(new TextColumn4MapKey("i.is_replace", "is_replace",
 				getText("certLost.isReplace"), 75).setSortable(true)
 				.setUseTitleFromLabel(true)
-				.setValueFormater(new BooleanFormater()));
+				.setValueFormater(new BooleanFormater4certLost()));
 		columns.add(new TextColumn4MapKey("i.replace_date", "replace_date",
 				getText("certLost.replaceDate"), 100).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
@@ -160,8 +202,11 @@ public class CertLostsAction extends ViewAction<Map<String, Object>> {
 								+ map.get("driver");
 					}
 				}));
-		columns.add(new TextColumn4MapKey("l.handler_name", "handler_name",
-				getText("certLost.handlerName")).setSortable(true));
+		columns.add(new TextColumn4MapKey("d.cert_fwzg", "cert_fwzg",
+				getText("certLost.certFWZG"), 80).setSortable(true));
+		columns.add(new TextColumn4MapKey("l.transactor_name",
+				"transactor_name", getText("certLost.handlerName"))
+				.setSortable(true));
 
 		return columns;
 	}
@@ -169,7 +214,8 @@ public class CertLostsAction extends ViewAction<Map<String, Object>> {
 	@Override
 	protected String[] getGridSearchFields() {
 		return new String[] { "c.plate_type", "c.plate_no", "i.cert_name",
-				"c.code", "l.driver", "l.handler_name" };
+				"c.code", "l.driver", "l.transactor_name", "c.company",
+				"unit.name", "m.name", "d.cert_fwzg" };
 	}
 
 	@Override
@@ -190,39 +236,34 @@ public class CertLostsAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected Condition getGridSpecalCondition() {
-		// // 状态条件
-		// Condition statusCondition = ConditionUtils
-		// .toConditionByComma4IntegerValue(status, "d.status_");
+		// 是否补办条件
+		Condition isReplaceCondition = null;
+		if (("true").equals(isReplace)) {
+			isReplaceCondition = new EqualsCondition("i.is_replace", true);
+		} else if (("false").equals(isReplace)) {
+			isReplaceCondition = new EqualsCondition("i.is_replace", false);
+		}
 
 		// carManId条件
 		Condition carManIdCondition = null;
 		if (carManId != null) {
-			carManIdCondition = new EqualsCondition("d.driver_id", carManId);
+			carManIdCondition = new EqualsCondition("l.driver_id", carManId);
 		}
 
 		// carId条件
 		Condition carIdCondition = null;
 		if (carId != null) {
-			carIdCondition = new EqualsCondition("d.car_id", carId);
+			carIdCondition = new EqualsCondition("l.car_id", carId);
 		}
 
-		// classes条件
-		Condition classesCondition = ConditionUtils
-				.toConditionByComma4IntegerValue(classes, "d.classes");
-
 		// 合并条件
-		return ConditionUtils.mix2AndCondition(carManIdCondition,
-				carIdCondition, classesCondition);
+		return ConditionUtils.mix2AndCondition(isReplaceCondition,
+				carManIdCondition, carIdCondition);
 	}
 
 	@Override
 	protected Json getGridExtrasData() {
 		Json json = new Json();
-		// // 状态条件
-		// if (this.status != null || this.status.length() != 0) {
-		// json.put("status", status);
-		// }
-		// carManId条件
 		if (carManId != null) {
 			json.put("carManId", carManId);
 		}
@@ -232,18 +273,6 @@ public class CertLostsAction extends ViewAction<Map<String, Object>> {
 		}
 		return json.isEmpty() ? null : json;
 	}
-
-	// @Override
-	// protected Toolbar getHtmlPageToolbar() {
-	// if (this.carId != null || this.carManId != null) {
-	// return super.getHtmlPageToolbar();
-	// } else {
-	// return super.getHtmlPageToolbar().addButton(
-	// Toolbar.getDefaultToolbarRadioGroup(getDriverClasses(),
-	// "classes", 4,
-	// getText("title.click2changeSearchClasses")));
-	// }
-	// }
 
 	protected Toolbar getHtmlPageToolbar(boolean useDisabledReplaceDelete) {
 		Toolbar tb = new Toolbar();
@@ -256,11 +285,6 @@ public class CertLostsAction extends ViewAction<Map<String, Object>> {
 			// 新建按钮
 			tb.addButton(Toolbar
 					.getDefaultCreateToolbarButton(getText("label.create")));
-
-			// 批量处理顶班按钮
-			// tb.addButton(new ToolbarButton().setIcon("ui-icon-document")
-			// .setText("批量处理顶班")
-			// .setClick("bc.business.chuLiDingBan.create"));
 
 			// 编辑按钮
 			tb.addButton(Toolbar
@@ -275,6 +299,9 @@ public class CertLostsAction extends ViewAction<Map<String, Object>> {
 				tb.addButton(Toolbar
 						.getDefaultDeleteToolbarButton(getText("label.delete")));
 			}
+			// 补办结果单选按钮组
+			tb.addButton(Toolbar.getDefaultToolbarRadioGroup(this.getReplace(),
+					"isReplace", 0, getText("title.click2changeSearchReplace")));
 		}
 
 		// 搜索按钮
@@ -284,5 +311,17 @@ public class CertLostsAction extends ViewAction<Map<String, Object>> {
 		return tb;
 	}
 
-	
+	/**
+	 * 补办结果转换列表：未补办|补办|全部
+	 * 
+	 * @return
+	 */
+	protected Map<String, String> getReplace() {
+		Map<String, String> statuses = new LinkedHashMap<String, String>();
+		statuses.put("false", getText("certLost.isReplace.no"));
+		statuses.put("true", getText("certLost.isReplace.yes"));
+		statuses.put("", getText("certLost.isReplace.all"));
+		return statuses;
+	}
+
 }

@@ -59,6 +59,9 @@ public class CaseBase4AdviceAndPraise extends CaseBase {
 	private Integer passengerChildCount;// 乘车人数(童)
 	private Integer passengerCount;// 乘车人数
 	
+	private Long transactorId;// 经办人ID(对应ActorHistory的ID)
+	private String transactorName;// 经办人姓名
+	
 	@Column(name = "RECEIVE_DATE")
 	public Calendar getReceiveDate() {
 		return receiveDate;
@@ -326,4 +329,21 @@ public class CaseBase4AdviceAndPraise extends CaseBase {
 		this.passengerCount = passengerCount;
 	}
 	
+	@Column(name = "TRANSACTOR_ID")
+	public Long getTransactorId() {
+		return transactorId;
+	}
+
+	public void setTransactorId(Long transactorId) {
+		this.transactorId = transactorId;
+	}
+
+	@Column(name = "TRANSACTOR_NAME")
+	public String getTransactorName() {
+		return transactorName;
+	}
+
+	public void setTransactorName(String transactorName) {
+		this.transactorName = transactorName;
+	}
 }

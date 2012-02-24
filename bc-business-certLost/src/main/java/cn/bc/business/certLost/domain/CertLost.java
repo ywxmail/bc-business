@@ -17,7 +17,7 @@ import javax.persistence.Table;
 
 import cn.bc.business.car.domain.Car;
 import cn.bc.business.carman.domain.CarMan;
-import cn.bc.identity.domain.Actor;
+import cn.bc.identity.domain.ActorHistory;
 import cn.bc.identity.domain.FileEntityImpl;
 
 /**
@@ -36,8 +36,8 @@ public class CertLost extends FileEntityImpl {
 	private String driverNane;// 司机姓名
 	private String subject;// 标题
 	private Calendar lostDate;// 遗失日期
-	private Actor hadler;// 经办人
-	private String hadlerName;// 经办人姓名
+	private ActorHistory transactor;// 经办人
+	private String transactorName;// 经办人姓名
 	private String description;// 备注
 	private Set<CertLostItem> certLostItem;// 遗失证照
 
@@ -96,23 +96,23 @@ public class CertLost extends FileEntityImpl {
 		this.lostDate = lostDate;
 	}
 
+	@Column(name = "TRANSACTOR_NAME")
+	public String getTransactorName() {
+		return transactorName;
+	}
+
 	@ManyToOne(fetch = FetchType.EAGER, optional = true)
-	@JoinColumn(name = "HANDLER_ID", referencedColumnName = "ID")
-	public Actor getHadler() {
-		return hadler;
+	@JoinColumn(name = "TRANSACTOR_ID", referencedColumnName = "ID")
+	public ActorHistory getTransactor() {
+		return transactor;
 	}
 
-	public void setHadler(Actor hadler) {
-		this.hadler = hadler;
+	public void setTransactor(ActorHistory transactor) {
+		this.transactor = transactor;
 	}
 
-	@Column(name = "HANDLER_NAME")
-	public String getHadlerName() {
-		return hadlerName;
-	}
-
-	public void setHadlerName(String hadlerName) {
-		this.hadlerName = hadlerName;
+	public void setTransactorName(String transactorName) {
+		this.transactorName = transactorName;
 	}
 
 	@Column(name = "DESC_")
