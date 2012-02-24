@@ -22,12 +22,13 @@ public class CertLostItem extends EntityImpl {
 	private static final long serialVersionUID = 1L;
 	private CertLost certLost;// 证照遗失管理
 	private String certName;// 证照名称
-	private boolean isReplace;// 是否补办
-	private Calendar replaceDate;// 遗失日期
+	private boolean replace;// 是否补办
+	private Calendar replaceDate;// 补办日期
+	private String lostAddress;// 遗失地点
 	private String reason;// 补办原因
 	private String certNo;// 证件号码
-	private String NewCertNo;// 新证件号码
-	private boolean isRemains;// 是否有残骸
+	private String newCertNo;// 新证件号码
+	private boolean remains;// 是否有残骸
 	private String description;// 备注
 
 	@ManyToOne(fetch = FetchType.EAGER, optional = false)
@@ -49,15 +50,6 @@ public class CertLostItem extends EntityImpl {
 		this.certName = certName;
 	}
 
-	@Column(name = "IS_REPLACE")
-	public boolean isReplace() {
-		return isReplace;
-	}
-
-	public void setReplace(boolean isReplace) {
-		this.isReplace = isReplace;
-	}
-
 	@Column(name = "REPLACE_DATE")
 	public Calendar getReplaceDate() {
 		return replaceDate;
@@ -65,6 +57,15 @@ public class CertLostItem extends EntityImpl {
 
 	public void setReplaceDate(Calendar replaceDate) {
 		this.replaceDate = replaceDate;
+	}
+
+	@Column(name = "LOST_ADDRESS")
+	public String getLostAddress() {
+		return lostAddress;
+	}
+
+	public void setLostAddress(String lostAddress) {
+		this.lostAddress = lostAddress;
 	}
 
 	public String getReason() {
@@ -86,20 +87,29 @@ public class CertLostItem extends EntityImpl {
 
 	@Column(name = "NEW_CERT_NO")
 	public String getNewCertNo() {
-		return NewCertNo;
+		return newCertNo;
 	}
 
-	public void setNewCertNo(String newCertNo) {
-		NewCertNo = newCertNo;
+	@Column(name = "IS_REPLACE")
+	public boolean isReplace() {
+		return replace;
+	}
+
+	public void setReplace(boolean replace) {
+		this.replace = replace;
 	}
 
 	@Column(name = "IS_REMAINS")
 	public boolean isRemains() {
-		return isRemains;
+		return remains;
 	}
 
-	public void setRemains(boolean isRemains) {
-		this.isRemains = isRemains;
+	public void setRemains(boolean remains) {
+		this.remains = remains;
+	}
+
+	public void setNewCertNo(String newCertNo) {
+		this.newCertNo = newCertNo;
 	}
 
 	@Column(name = "DESC_")

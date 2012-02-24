@@ -92,4 +92,7 @@ public class OptionConstants extends cn.bc.option.OptionConstants {
 
 	/** 迁移记录的公司名称 */
 	public final static String COMPANY_NAME = "company.name";
+
+	/** 证件名称 */
+	public final static String CERT_NAME = "cert.name";
 }
