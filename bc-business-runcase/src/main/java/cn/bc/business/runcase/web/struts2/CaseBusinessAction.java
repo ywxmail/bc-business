@@ -8,7 +8,6 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -458,12 +457,12 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 			e.setReceiverName(context.getUser().getName());
 		}
 		
-		//设置结案信息
-		if(e.getStatus() == 1){
-			e.setCloserId(context.getUser().getId());
-			e.setCloserName(context.getUser().getName());
-			e.setCloseDate(Calendar.getInstance(Locale.CHINA));
-		}
+//		//设置结案信息
+//		if(e.getStatus() == 1){
+//			e.setCloserId(context.getUserHistory().getId());
+//			e.setCloserName(context.getUserHistory().getName());
+//			e.setCloseDate(Calendar.getInstance(Locale.CHINA));
+//		}
 		//设置最后更新人的信息
 		e.setModifier(context.getUserHistory());
 		e.setModifiedDate(Calendar.getInstance());

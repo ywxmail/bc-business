@@ -261,8 +261,8 @@ public class CasePraiseAction extends FileEntityAction<Long, Case4Praise> {
 		//设置结案信息
 		if(e.getStatus() == 1){
 			e.setStatus(CaseBase.STATUS_CLOSED);
-			e.setCloserId(context.getUser().getId());
-			e.setCloserName(context.getUser().getName());
+			e.setCloserId(context.getUserHistory().getId());
+			e.setCloserName(context.getUserHistory().getName());
 			e.setCloseDate(Calendar.getInstance(Locale.CHINA));
 		}
 		

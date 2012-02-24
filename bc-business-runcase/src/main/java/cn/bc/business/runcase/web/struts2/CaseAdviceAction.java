@@ -588,8 +588,8 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 		//设置结案信息
 		if(e.getStatus() == CaseBase.STATUS_CLOSED){
 			e.setStatus(CaseBase.STATUS_CLOSED);
-			e.setCloserId(context.getUser().getId());
-			e.setCloserName(context.getUser().getName());
+			e.setCloserId(context.getUserHistory().getId());
+			e.setCloserName(context.getUserHistory().getName());
 			e.setCloseDate(Calendar.getInstance(Locale.CHINA));
 		}
 		
