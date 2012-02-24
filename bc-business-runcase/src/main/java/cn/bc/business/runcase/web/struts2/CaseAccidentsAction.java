@@ -170,7 +170,7 @@ public class CaseAccidentsAction extends ViewAction<Map<String, Object>> {
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd hh:mm")));
 		// 公司
 		columns.add(new TextColumn4MapKey("b.company", "company",
-				getText("runcase.company"), 40).setSortable(true)
+				getText("runcase.company2"), 40).setSortable(true)
 				.setUseTitleFromLabel(true));
 		// 分公司
 		columns.add(new TextColumn4MapKey("a.name", "unitname",
