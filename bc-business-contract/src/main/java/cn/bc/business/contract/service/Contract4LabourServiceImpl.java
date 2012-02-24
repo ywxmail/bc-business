@@ -432,10 +432,6 @@ public class Contract4LabourServiceImpl extends
 		return this.contract4LabourDao.isExistContractByDriverId(driverId);
 	}
 
-	public boolean isExistContractByCarId(Long carId) {
-		return this.contract4LabourDao.isExistContractByCarId(carId);
-	}
-	
     /**
      * 格式化日期
      * @return

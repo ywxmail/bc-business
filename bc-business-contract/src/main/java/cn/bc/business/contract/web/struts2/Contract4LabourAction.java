@@ -122,8 +122,6 @@ public class Contract4LabourAction extends
 		Calendar date2 = Calendar.getInstance();
 
 		if (carId != null && driverId == null) {// 车辆页签中的新建
-			//查找此司机是否存在劳动合同,若存在前台提示
-			isExistContract = this.contract4LabourService.isExistContractByCarId(carId); 
 			
 			if(isExistContract == false){
 				// 根据carId查找车辆以及司机id

@@ -584,14 +584,6 @@ public class Contract4LabourDaoImpl extends
 		return list != null && list.size() > 0;
 	}
 
-	public boolean isExistContractByCarId(Long carId) {
-		String sql = "select c.* from BS_CONTRACT c"
-				+ " inner join BS_CAR_CONTRACT cc ON c.id = cc.contract_id where c.type_="+Contract.TYPE_LABOUR+" and cc.car_id="
-				+ carId;
-
-		List<Map<String, Object>> list = this.jdbcTemplate.queryForList(sql);
-		return list != null && list.size() > 0;
-	}
 
 	/**
 	 * 更新指定司机的户口性质
