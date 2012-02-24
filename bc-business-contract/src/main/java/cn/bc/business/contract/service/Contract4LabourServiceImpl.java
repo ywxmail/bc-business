@@ -89,17 +89,20 @@ public class Contract4LabourServiceImpl extends
 			this.contractDao.saveContractCarManRelation(driverRelation);
 			
 		}
-		//更新司机的户口性质
-		this.contract4LabourDao.updateCarMan4HouseType(driverId,contract4Labour.getHouseType());
-		
 		//更新司机的备注列
-    	String description = "劳动合同期限: 从 "+calendarToString(contract4Labour.getStartDate())+" 到 "+
-    			calendarToString(contract4Labour.getEndDate())+"\n"
-    			+"社保参保日期: "+calendarToString(contract4Labour.getJoinDate())+"\n"
-    			+"个人社保编号: "+contract4Labour.getInsurCode()+"\n"
-    			+"社保参保险种: "+contract4Labour.getInsuranceType();
+		String description = "劳动合同期限: 从 "+calendarToString(contract4Labour.getStartDate())+" 到 "+
+				calendarToString(contract4Labour.getEndDate())+"\n"
+				+"社保参保日期: "+calendarToString(contract4Labour.getJoinDate())+"\n"
+				+"个人社保编号: "+contract4Labour.getInsurCode()+"\n"
+				+"社保参保险种: "+contract4Labour.getInsuranceType();
+		
+		//更新司机的户口性质,区域,籍贯,出生日期,备注
+		this.contract4LabourDao.updateCarMan4CarManInfo(driverId,contract4Labour.getHouseType(),
+				contract4Labour.getRegion(),contract4Labour.getOrigin(),contract4Labour.getBirthDate(),
+				description);
+		
     	
-		this.contract4LabourDao.updateCarMan4Description(driverId,description);
+		//this.contract4LabourDao.updateCarMan4Description(driverId,description);
 		
 		return contract4Labour;
 	}

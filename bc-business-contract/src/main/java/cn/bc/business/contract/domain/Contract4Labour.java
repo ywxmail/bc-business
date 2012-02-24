@@ -58,6 +58,7 @@ public class Contract4Labour extends Contract {
 	private String	remark;
 	private Calendar stopDate;//停保日期
 	private Calendar leaveDate;//离职日期
+	private Integer region;// 区域
 	
 	
 
@@ -302,6 +303,15 @@ public class Contract4Labour extends Contract {
 
 	public void setLeaveDate(Calendar leaveDate) {
 		this.leaveDate = leaveDate;
+	}
+
+	@Column(name = "REGION_")
+	public Integer getRegion() {
+		return region;
+	}
+
+	public void setRegion(Integer region) {
+		this.region = region;
 	}
 
 	/**

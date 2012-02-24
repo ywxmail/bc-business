@@ -5,6 +5,7 @@ package cn.bc.business.contract.dao.hibernate.jpa;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -600,16 +601,43 @@ public class Contract4LabourDaoImpl extends
 	}
 
 	/**
-	 * 更新司机的备注列
-	 * @param driverId 
+	 * 更新指定司机的户口性质,区域,籍贯,出生日期,备注
+	 * @param driverId
+	 * @param houseType
+	 * @param region
+	 * @param origin
+	 * @param birthDate
 	 * @param description
 	 */
-	public void updateCarMan4Description(Long driverId,String description) {
+	public void updateCarMan4CarManInfo(Long driverId, String houseType,
+			Integer region, String origin, Calendar birthDate,
+			String description) {
 		ArrayList<Object> args = new ArrayList<Object>();
 		StringBuffer hql = new StringBuffer();
-		hql.append("UPDATE CarMan c SET c.description=? WHERE c.id =?");
+		hql.append("UPDATE CarMan c SET c.houseType=?,c.region=?");
+		hql.append(",c.origin=?,c.birthdate=?,c.description=?");
+		hql.append(" WHERE c.id =?");
+		args.add(houseType);
+		args.add(region);
+		args.add(origin);
+		args.add(birthDate);
 		args.add(description);
 		args.add(driverId);
 		this.executeUpdate(hql.toString(), args);
+		
 	}
+
+//	/**
+//	 * 更新司机的备注列
+//	 * @param driverId 
+//	 * @param description
+//	 */
+//	public void updateCarMan4Description(Long driverId,String description) {
+//		ArrayList<Object> args = new ArrayList<Object>();
+//		StringBuffer hql = new StringBuffer();
+//		hql.append("UPDATE CarMan c SET c.description=? WHERE c.id =?");
+//		args.add(description);
+//		args.add(driverId);
+//		this.executeUpdate(hql.toString(), args);
+//	}
 }
