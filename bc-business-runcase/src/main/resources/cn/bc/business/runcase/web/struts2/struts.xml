@@ -20,6 +20,12 @@
 		<action name="caseTraffic/doPatchSave" class="caseTrafficAction" method="doPatchSave"/>
 	</package>
 	
+	<!-- 营运违章操作 -->
+	<package name="caseBusinessOperate" extends="bc-default" namespace="/bc-business/casebusinessOperate">
+		<!-- 核准 -->
+		<action name="doCloseFile" class="caseBusinessOperateAction" method="doCloseFile"/>
+	</package>
+	
 	<!-- 营运违章 -->
 	<package name="caseBusiness" extends="bc-default" namespace="/bc-business">
 		<action name="caseBusiness/closefile" class="caseBusinessAction" method="closefile">

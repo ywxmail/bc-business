@@ -74,7 +74,7 @@ public class Case4InfractBusiness extends CaseBase {
 	private float dedit;// 违约金
 	private String driverRating;// 驾驶员评级
 	
-	private int category;//类别:0-营运违章,1-站场违章,2-服务违章.
+	private Integer category;//类别:0-营运违章,1-站场违章,2-服务违章.
 
 	@Column(name = "RECEIVE_DATE")
 	public Calendar getReceiveDate() {
@@ -395,12 +395,14 @@ public class Case4InfractBusiness extends CaseBase {
 		this.driverRating = driverRating;
 	}
 
-	public int getCategory() {
+	public Integer getCategory() {
 		return category;
 	}
 
-	public void setCategory(int category) {
+	public void setCategory(Integer category) {
 		this.category = category;
 	}
+
+
 	
 }

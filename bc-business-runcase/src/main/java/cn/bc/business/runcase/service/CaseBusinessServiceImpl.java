@@ -3,11 +3,17 @@
  */
 package cn.bc.business.runcase.service;
 
+import java.util.Calendar;
+
 import org.springframework.beans.factory.annotation.Autowired;
 
 import cn.bc.business.runcase.dao.CaseBusinessDao;
 import cn.bc.business.runcase.domain.Case4InfractBusiness;
+import cn.bc.business.runcase.domain.CaseBase;
+import cn.bc.core.exception.CoreException;
 import cn.bc.core.service.DefaultCrudService;
+import cn.bc.identity.web.SystemContext;
+import cn.bc.identity.web.SystemContextHolder;
 import cn.bc.sync.dao.SyncBaseDao;
 import cn.bc.sync.domain.SyncBase;
 
@@ -51,5 +57,33 @@ public class CaseBusinessServiceImpl extends DefaultCrudService<Case4InfractBusi
 			this.syncBaseDao.save(sb);
 		}
 		return e;
+	}
+
+	/**
+	 * 结案操作
+	 * @param fromBusinessId
+	 * @param closeDate
+	 * @return
+	 */
+	public Case4InfractBusiness doCloseFile(Long fromBusinessId,
+			Calendar closeDate) {
+		Case4InfractBusiness business = this.caseBusinessDao.load(fromBusinessId);
+		if(business == null)
+			throw new CoreException("要处理的营运违章已不存在！businessId=" + fromBusinessId);
+		
+		//更新营运违章相关信息
+		business.setStatus(CaseBase.STATUS_CLOSED);
+		
+		// 设置创建人信息和最后修改人信息
+		SystemContext context = SystemContextHolder.get();
+		business.setModifier(context.getUserHistory());
+		business.setModifiedDate(Calendar.getInstance());
+		
+		//设置结案人,结案日期
+		business.setCloserId(context.getUserHistory().getId());
+		business.setCloserName(context.getUserHistory().getName());
+		business.setCloseDate(closeDate);
+		
+		return this.caseBusinessDao.save(business);
 	}
 }
