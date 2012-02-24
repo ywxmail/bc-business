@@ -67,12 +67,13 @@ public class CarAction extends FileEntityAction<Long, Car> {
 	public List<Map<String, String>> companyList; // 所属公司列表（宝城、广发）
 	public List<Map<String, String>> logoutReasonList; // 注销原因列表
 	public List<Map<String, String>> carModelList; // 车型配置列表
-	public List<Map<String, String>> carLPGList; // LPG配置列表
+	//public List<Map<String, String>> carLPGList; // LPG配置列表
 	
 	public Map<String, String> statusesValue;
 	public JSONArray vinPrefixes;// 车辆车架号前缀
 	public JSONArray taximeterTypes; // 计价器型号
 	public JSONArray carTvScreenList;
+	public JSONArray carLPGList;
 	public Json json;
 
 	public String vinPrefix;// 车架号前缀
@@ -223,7 +224,7 @@ public class CarAction extends FileEntityAction<Long, Car> {
 		this.carModelList = this.carModelService.findEnabled4Option();
 		
 		// 加载可选LPG配置列表
-		this.carLPGList = this.carLPGService.findEnabled4Option();
+		this.carLPGList =OptionItem.toLabelValues(this.carLPGService.findEnabled4Option());
 
 		// 批量加载可选项列表
 		Map<String, List<Map<String, String>>> optionItems = this.optionService
