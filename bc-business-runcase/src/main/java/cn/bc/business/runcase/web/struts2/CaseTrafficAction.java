@@ -73,6 +73,7 @@ public class CaseTrafficAction extends FileEntityAction<Long, Case4InfractTraffi
 	private JiaoWeiJTWFService 				jiaoWeiJTWFService;				//交委Service
 	private JinDunJTWFService 				jinDunJTWFService;				//金盾Service
 	private String							sourceStr;
+	private String 							chargers;
 
 	public 	List<Map<String, String>> 		motorcadeList;					// 可选车队列表
 	public  List<Map<String, String>>		dutyList;						// 可选责任列表
@@ -114,6 +115,14 @@ public class CaseTrafficAction extends FileEntityAction<Long, Case4InfractTraffi
 
 	public void setSourceStr(String sourceStr) {
 		this.sourceStr = sourceStr;
+	}
+	
+	public String getChargers() {
+		return chargers;
+	}
+
+	public void setChargers(String chargers) {
+		this.chargers = chargers;
 	}
 
 	@Autowired
@@ -246,6 +255,11 @@ public class CaseTrafficAction extends FileEntityAction<Long, Case4InfractTraffi
 								+ car.get(0).getPlateNo());
 				this.getE().setMotorcadeId(car.get(0).getMotorcade().getId());
 				this.getE().setMotorcadeName(car.get(0).getMotorcade().getName());
+				this.getE().setCharger(car.get(0).getCharger());
+				
+				//组装责任人
+				this.chargers = formatChargers(car.get(0).getCharger());
+				
 			} else if (car.size() > 1) {
 				isMoreCar = true;
 			} else {
@@ -262,6 +276,11 @@ public class CaseTrafficAction extends FileEntityAction<Long, Case4InfractTraffi
 			this.getE().setCarId(carId);
 			this.getE().setMotorcadeId(car.getMotorcade().getId());
 			this.getE().setMotorcadeName(car.getMotorcade().getName());
+			this.getE().setCharger(car.getCharger());
+			
+			//组装责任人
+			this.chargers = formatChargers(car.getCharger());
+			
 			List<CarMan> carMan = this.carManService.selectAllCarManByCarId(carId);
 			if (carMan.size() == 1) {
 				this.getE().setDriverName(carMan.get(0).getName());
@@ -310,6 +329,9 @@ public class CaseTrafficAction extends FileEntityAction<Long, Case4InfractTraffi
 		this.formPageOption = 	buildFormPageOption(true);
 		// 初始化表单的其他配置
 		this.initForm(true);
+		//组装责任人
+		this.chargers = formatChargers(this.getE().getCharger());
+		
 		return "form";
 	}
 	
@@ -479,5 +501,24 @@ public class CaseTrafficAction extends FileEntityAction<Long, Case4InfractTraffi
 				getText("runcase.select.source.sync.gen"));
 		return statuses;
 	}
+	
+	/**
+	 * 组装责任人姓名
+	 * @param chargers
+	 * @return
+	 */
+	public String formatChargers(String chargersStr){
+		String chargers = "";
+		if(null != chargersStr && chargersStr.trim().length() > 0){
+			String [] chargerAry = chargersStr.split(";");
+			for(int i=0;i<chargerAry.length;i++){
+				chargers += chargerAry[i].split(",")[0];
+				if((i+1) < chargerAry.length)
+					chargers += ",";
+			}
+		}
+		return chargers;
+	}
+	
 	
 }

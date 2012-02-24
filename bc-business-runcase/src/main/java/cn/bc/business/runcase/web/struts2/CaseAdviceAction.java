@@ -543,23 +543,8 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 			}
 			this.origin = carMan.get(0).getOrigin();
 			this.workDate = carMan.get(0).getWorkDate();
-			return "form";
 		}
-		if (carManId != null) {
-			CarMan driver = this.carManService.load(carManId);
-			
-			if(driver.getBirthdate() != null){
-				this.birthdate = driver.getBirthdate();
-			}
-			this.origin = driver.getOrigin();
-			this.workDate = driver.getWorkDate();
-			
-			List<Car> car = this.carService.selectAllCarByCarManId(carManId);
-			
-			this.chargers = formatChargers(this.getE().getCharger());
-			this.businessType = car.get(0).getBusinessType();
-			return "form";
-		}
+
 		return "form";
 	}
 	
