@@ -392,7 +392,6 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 		this.getE().setReceiverName(context.getUserHistory().getName());
 		this.getE().setCategory(Case4InfractBusiness.CATEGORY_BUSINESS);
 		
-		categoryValue = this.getCategory();
 		// 来源
 		if(syncId == null){ //不是同步过来的信息设为自建
 			this.getE().setSource(CaseBase.SOURCE_SYS);
@@ -490,6 +489,7 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 		
 		statusesValue		=	this.getCaseStatuses();
 		sourcesValue		=	this.getSourceStatuses();
+		categoryValue		 = 	this.getCategory();
 		// 表单可选项的加载
 		initSelects();
 	}
