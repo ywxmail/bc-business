@@ -23,6 +23,7 @@ import cn.bc.business.carman.domain.CarByDriver;
 import cn.bc.business.carman.domain.CarByDriverHistory;
 import cn.bc.business.carman.domain.CarMan;
 import cn.bc.business.mix.dao.InfoCenterDao;
+import cn.bc.business.policy.domain.Policy;
 import cn.bc.core.util.DateUtils;
 import cn.bc.identity.domain.ActorDetail;
 
@@ -118,7 +119,8 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 							json.put("code", rs.get(j)[1]);
 							json.put("plate", rs.get(j)[2] + "." + rs.get(j)[3]);
 							json.put("status", rs.get(j)[4]);
-							json.put("returnDate", DateUtils.formatDate((Date)rs.get(j)[5]));
+							json.put("returnDate",
+									DateUtils.formatDate((Date) rs.get(j)[5]));
 						} catch (JSONException e) {
 							logger.error(e.getMessage(), e);
 						}
@@ -131,6 +133,8 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 	}
 
 	public JSONObject findCarDetail(Long carId) throws Exception {
+		Date now = new Date();
+		DateUtils.setToZeroTime(now);
 		JSONObject json = new JSONObject();
 		json.put("id", carId);
 
@@ -150,16 +154,24 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 		// ==基本信息：保单==
 		JSONObject policy = this.getPolicy(carId);
 		if (policy != null) {
+			// 设置车辆是否自保的信息
 			car.put("zb", policy.get("zb"));
-		}else{
+		} else {
 			car.put("zb", false);
 		}
 
+		// ==联系人信息==
+		JSONArray mans = this.getMans(carId);
+		json.put("mans", mans);
+
 		// ==提醒信息==
+		// {module:"..",id:1,link:"..",limit:"..",date:"yyyy-MM-dd",subject:".."}
 		JSONArray messages = new JSONArray();
 		json.put("messages", messages);
+		JSONObject msg;
 
-		// ==提醒信息：黑名单==
+		// ==提醒信息/黑名单==
+		// {module:"黑名单",id:1,link:"张三,李四",limit:"不可退押金",date:"yyyy-MM-dd",subject:".."}
 		JSONArray blacklist = this.getBlacklist(carId);
 		if (blacklist != null && blacklist.length() > 0) {
 			for (int i = 0; i < blacklist.length(); i++) {
@@ -167,12 +179,78 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 			}
 		}
 
-		// ==联系人信息==
-		JSONArray mans = this.getMans(carId);
-		json.put("mans", mans);
+		// ==提醒信息/车辆保单==
+		// {module:"车辆保单",id:1,link:"张三,李四",limit:"不可退押金",date:"yyyy-MM-dd",subject:".."}
+		msg = buildPolicyMessage(now, policy);
+		if (msg != null)
+			messages.put(msg);
 
 		// 返回
 		return json;
+	}
+
+	private JSONObject buildPolicyMessage(Date now, JSONObject policy)
+			throws JSONException {
+		JSONObject msg = new JSONObject();
+		if (policy != null) {
+			msg.put("module", "车辆保单");
+			msg.put("id", policy.get("id"));
+			int status = policy.getInt("status");
+
+			// 获取保单的过期期限 判断保单是否已过期或将于30日后到期：
+			Date endDate = (Date) policy.get("commerialEndDate");
+			boolean greenslipSameDate = "true".equalsIgnoreCase(policy.get(
+					"greenslipSameDate").toString())
+					|| "1".equalsIgnoreCase(policy.get("greenslipSameDate")
+							.toString());
+			if (!greenslipSameDate) {// 强制险与商业险不同期
+				Date greenslipEndDate = (Date) policy.get("greenslipEndDate");
+				if (greenslipEndDate != null
+						&& greenslipEndDate.before(endDate))
+					endDate = greenslipEndDate;
+			}
+
+			// 即将过期的日期
+			msg.put("date", DateUtils.formatDate(endDate));
+
+			// 限制项目
+			msg.put("limit", "");
+
+			// 最后修改人或作者:TODO
+			msg.put("link", "");
+
+			// 计算过期天数
+			if (status == Policy.STATUS_DISABLED) {
+				msg.put("subject", "保单已注销");
+			} else if (status == Policy.STATUS_SURRENDER) {
+				msg.put("subject", "保单已停保");
+			} else {
+				if (endDate == null) {
+					msg.put("subject", "保单没有设置过期期限");
+				} else {
+					DateUtils.setToZeroTime(endDate);
+					// 24*64*60=86400,忽略毫秒的比较
+					long dc = (endDate.getTime()/1000 - now.getTime()/1000) / 86400;
+					if (dc < 0) {
+						msg.put("subject", "保单已过期");
+					} else if (dc == 0) {
+						msg.put("subject", "保单今日到期");
+					} else if (dc <= 30) {
+						msg.put("subject", "保单" + dc + "日后到期");
+					} else {
+						msg = null;// 不提醒
+					}
+				}
+			}
+		} else {
+			msg.put("module", "车辆保单");
+			msg.put("id", "");
+			msg.put("subject", "无有效保单信息");
+			msg.put("date", "");
+			msg.put("limit", "");
+			msg.put("link", "");
+		}
+		return msg;
 	}
 
 	/**
@@ -461,7 +539,9 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 				if (obj != null) {
 					JSONObject json = new JSONObject();
 					try {
-						int i = 2;
+						int i = 0;
+						json.put("id", obj[i++]);
+						json.put("status", obj[i++]);
 						json.put("zb", obj[i++]);
 						json.put("commerialStartDate", obj[i++]);
 						json.put("commerialEndDate", obj[i++]);
@@ -472,7 +552,7 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 						logger.error(e.getMessage(), e);
 					}
 					return json;
-				}else{
+				} else {
 					return null;
 				}
 			}
