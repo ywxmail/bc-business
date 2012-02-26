@@ -22,6 +22,7 @@ import org.springframework.util.StringUtils;
 import cn.bc.business.carman.domain.CarByDriver;
 import cn.bc.business.carman.domain.CarByDriverHistory;
 import cn.bc.business.carman.domain.CarMan;
+import cn.bc.business.contract.domain.Contract4Charger;
 import cn.bc.business.mix.dao.InfoCenterDao;
 import cn.bc.business.policy.domain.Policy;
 import cn.bc.core.util.DateUtils;
@@ -180,13 +181,71 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 		}
 
 		// ==提醒信息/车辆保单==
-		// {module:"车辆保单",id:1,link:"张三,李四",limit:"不可退押金",date:"yyyy-MM-dd",subject:".."}
+		// {module:"车辆保单",id:1,link:"",limit:"",date:"yyyy-MM-dd",subject:".."}
 		msg = buildPolicyMessage(now, policy);
+		if (msg != null)
+			messages.put(msg);
+
+		// ==提醒信息/经济合同==
+		// {module:"经济合同",id:1,link:"张三,李四",limit:"",date:"yyyy-MM-dd",subject:".."}
+		msg = buildContract4ChargerMessage(now, contract4Charger);
 		if (msg != null)
 			messages.put(msg);
 
 		// 返回
 		return json;
+	}
+
+	private JSONObject buildContract4ChargerMessage(Date now,
+			JSONObject contract4Charger) throws JSONException {
+		JSONObject msg = new JSONObject();
+		if (contract4Charger != null) {
+			msg.put("module", "经济合同");
+			msg.put("id", contract4Charger.get("id"));
+			int status = contract4Charger.getInt("status");
+
+			// 获取保单的过期期限 判断保单是否已过期或将于30日后到期：
+			Date endDate = (Date) contract4Charger.get("endDate");
+
+			// 即将过期的日期
+			msg.put("date", DateUtils.formatDate(endDate));
+
+			// 限制项目
+			msg.put("limit", "");
+
+			// 责任人:TODO
+			msg.put("link", "");
+
+			// 计算过期天数
+			if (status != Contract4Charger.STATUS_NORMAL) {
+				msg.put("subject", "经济合同已注销");
+			} else {
+				if (endDate == null) {
+					msg.put("subject", "经济合同没有设置过期期限");
+				} else {
+					DateUtils.setToZeroTime(endDate);
+					// 24*64*60=86400,忽略毫秒的比较
+					long dc = (endDate.getTime() / 1000 - now.getTime() / 1000) / 86400;
+					if (dc < 0) {
+						msg.put("subject", "经济合同已过期");
+					} else if (dc == 0) {
+						msg.put("subject", "经济合同今日到期");
+					} else if (dc <= 30) {
+						msg.put("subject", "经济合同" + dc + "日后到期");
+					} else {
+						msg = null;// 不提醒
+					}
+				}
+			}
+		} else {
+			msg.put("module", "经济合同");
+			msg.put("id", "");
+			msg.put("subject", "无有效经济合同信息");
+			msg.put("date", "");
+			msg.put("limit", "");
+			msg.put("link", "");
+		}
+		return msg;
 	}
 
 	private JSONObject buildPolicyMessage(Date now, JSONObject policy)
@@ -230,7 +289,7 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 				} else {
 					DateUtils.setToZeroTime(endDate);
 					// 24*64*60=86400,忽略毫秒的比较
-					long dc = (endDate.getTime()/1000 - now.getTime()/1000) / 86400;
+					long dc = (endDate.getTime() / 1000 - now.getTime() / 1000) / 86400;
 					if (dc < 0) {
 						msg.put("subject", "保单已过期");
 					} else if (dc == 0) {
@@ -671,7 +730,7 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 	 */
 	private JSONObject getContract4Charger(final Long carId) {
 		final StringBuffer sql = new StringBuffer();
-		sql.append("select cc.id,c.status_,cc.sign_type,cc.bs_type");
+		sql.append("select cc.id,c.status_,cc.bs_type");
 		sql.append(",c.start_date,c.end_date");
 		sql.append(",cc.payment_date,cc.include_cost,c.main");
 		sql.append(" from BS_CONTRACT_CHARGER cc");
@@ -695,18 +754,26 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 					obj = (Object[]) queryObject.getSingleResult();
 				} catch (NoResultException e) {
 					if (logger.isDebugEnabled())
-						logger.debug("car = null,id=" + carId);
+						logger.debug("contract4Charger=null,id=" + carId);
 					obj = null;
 				}
 				JSONObject json = new JSONObject();
 				if (obj != null) {
 					try {
-						int i = 3;
+						int i = 0;
 						String t;
+						json.put("id", obj[i++]);
+						json.put("status", obj[i++]);
 						json.put("businessType", null2Empty(obj[i++]));
-						json.put("dateRange",
-								DateUtils.formatDate((Date) obj[i++]) + "～"
-										+ DateUtils.formatDate((Date) obj[i++]));
+						json.put("startDate", obj[i++]);
+						json.put("endDate", obj[i++]);
+						json.put(
+								"dateRange",
+								DateUtils.formatDate((Date) json
+										.get("startDate"))
+										+ "～"
+										+ DateUtils.formatDate((Date) json
+												.get("endDate")));
 						t = (String) obj[i++];
 						json.put("paymentDate", ("0".equals(t) ? "月末"
 								: (t == null ? "" : t)));
