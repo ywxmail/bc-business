@@ -299,11 +299,11 @@ public class CertLostsAction extends ViewAction<Map<String, Object>> {
 				tb.addButton(Toolbar
 						.getDefaultDeleteToolbarButton(getText("label.delete")));
 			}
-			// 补办结果单选按钮组
-			tb.addButton(Toolbar.getDefaultToolbarRadioGroup(this.getReplace(),
-					"isReplace", 0, getText("title.click2changeSearchReplace")));
-		}
 
+		}
+		// 补办结果单选按钮组
+		tb.addButton(Toolbar.getDefaultToolbarRadioGroup(this.getReplace(),
+				"isReplace", 0, getText("title.click2changeSearchReplace")));
 		// 搜索按钮
 		tb.addButton(Toolbar
 				.getDefaultSearchToolbarButton(getText("title.click2search")));
