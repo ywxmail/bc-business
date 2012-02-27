@@ -65,7 +65,7 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 			sql.append(" where m.id=?");
 			args.add(motorcadeId);
 		}
-		sql.append(" order by c.register_date desc");
+		sql.append(" order by c.status_,c.register_date desc");
 
 		if (logger.isDebugEnabled()) {
 			logger.debug("args="
@@ -164,6 +164,8 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 			car.put("contract4ChargerDate", contract4Charger.get("dateRange"));
 			car.put("paymentDate", contract4Charger.get("paymentDate"));
 			car.put("includeCost", contract4Charger.get("includeCost"));
+		} else {
+
 		}
 
 		// ==基本信息：保单==
@@ -623,11 +625,10 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 						json.put("greenslipEndDate", obj[i++]);
 					} catch (JSONException e) {
 						logger.error(e.getMessage(), e);
+						return json;
 					}
-					return json;
-				} else {
-					return null;
 				}
+				return null;
 			}
 		});
 	}
@@ -692,7 +693,10 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 						json.put("operateDate",
 								DateUtils.formatDate((Date) car[i++]));
 						json.put("certNo4", null2Empty(car[i++]));
-						json.put("taximeter", car[i++] + " " + car[i++]);
+						json.put(
+								"taximeter",
+								getTaximeter((String) car[i++],
+										(String) car[i++]));
 						json.put(
 								"desc",
 								getDesc((String) car[i++], (String) car[i++],
@@ -706,6 +710,23 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 					}
 				}
 				return json;
+			}
+
+			private String getTaximeter(String factoryType,
+					String factoryModel) {
+				if (factoryType != null && factoryType.length() > 0) {
+					if (factoryModel != null && factoryModel.length() > 0) {
+						return factoryType + " " + factoryModel;
+					} else {
+						return factoryType;
+					}
+				} else {
+					if (factoryModel != null && factoryModel.length() > 0) {
+						return factoryModel;
+					} else {
+						return "";
+					}
+				}
 			}
 
 			private String getLPG(String name, String model) {
@@ -771,9 +792,9 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 						logger.debug("contract4Charger=null,id=" + carId);
 					obj = null;
 				}
-				JSONObject json = new JSONObject();
 				if (obj != null) {
 					try {
+						JSONObject json = new JSONObject();
 						int i = 0;
 						String t;
 						json.put("id", obj[i++]);
@@ -792,11 +813,12 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 						json.put("paymentDate", ("0".equals(t) ? "月末"
 								: (t == null ? "" : t)));
 						json.put("includeCost", obj[i++]);
+						return json;
 					} catch (JSONException e) {
 						logger.error(e.getMessage(), e);
 					}
 				}
-				return json;
+				return null;
 			}
 
 		});
