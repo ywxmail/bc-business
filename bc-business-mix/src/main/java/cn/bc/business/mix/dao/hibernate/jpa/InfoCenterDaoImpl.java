@@ -24,6 +24,7 @@ import cn.bc.business.carman.domain.CarByDriverHistory;
 import cn.bc.business.carman.domain.CarMan;
 import cn.bc.business.contract.domain.Contract4Charger;
 import cn.bc.business.mix.dao.InfoCenterDao;
+import cn.bc.business.mix.domain.InfoCenter;
 import cn.bc.business.policy.domain.Policy;
 import cn.bc.core.util.DateUtils;
 import cn.bc.identity.domain.ActorDetail;
@@ -82,8 +83,21 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 		final String value = "%" + searchText.toUpperCase() + "%";
 		final StringBuffer sql = new StringBuffer();
 		sql.append("select c.id,c.code,c.plate_type,c.plate_no,c.status_,c.return_date from bs_car c");
-		sql.append(" where c.plate_no like ?");
-		sql.append(" order by c.register_date desc");
+		if (searchType.equals(InfoCenter.TYPE_CAR_PLATE)) {// 车牌
+			sql.append(" where c.plate_no like ?");
+		} else if (searchType.equals(InfoCenter.TYPE_CAR_CODE)) {// 自编号
+			sql.append(" where c.code like ?");
+		} else if (searchType.equals(InfoCenter.TYPE_CAR_ENGINENO)) {// 发动机号
+			sql.append(" where c.engine_no like ?");
+		} else if (searchType.equals(InfoCenter.TYPE_CAR_VIN)) {// 车架号
+			sql.append(" where c.vin like ?");
+		} else if (searchType.equals(InfoCenter.TYPE_CAR_INVOICENO)) {// 购置税发票号
+			sql.append(" where c.invoice_no2 like ?");
+		} else {// 默认按车牌
+			sql.append(" where c.plate_no like ?");
+		}
+
+		sql.append(" order by c.status_,c.register_date desc");
 
 		if (logger.isDebugEnabled()) {
 			logger.debug("searchType=" + searchType + ",searchText="

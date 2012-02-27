@@ -14,6 +14,7 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
+import cn.bc.business.mix.domain.InfoCenter;
 import cn.bc.business.mix.service.InfoCenterService;
 import cn.bc.business.motorcade.service.MotorcadeService;
 import cn.bc.identity.domain.Actor;
@@ -126,13 +127,13 @@ public class InfoCenterAction extends ActionSupport {
 	 */
 	private JSONArray getSearchTypes() throws JSONException {
 		JSONArray jsons = new JSONArray();
-		jsons.put(getOneSearchTypeJson("车牌", "plate"));
-		jsons.put(getOneSearchTypeJson("自编号", "code"));// 车辆的自编号
-		jsons.put(getOneSearchTypeJson("车主", "man"));
-		jsons.put(getOneSearchTypeJson("服务资格证号", "cert4fwzg"));
-		jsons.put(getOneSearchTypeJson("车架号", "vin"));
-		jsons.put(getOneSearchTypeJson("发动机号", "engineNo"));
-		jsons.put(getOneSearchTypeJson("发票号", "invoiceNo"));// 购置税发票号
+		jsons.put(getOneSearchTypeJson("车牌", InfoCenter.TYPE_CAR_PLATE));
+		jsons.put(getOneSearchTypeJson("自编号", InfoCenter.TYPE_CAR_CODE));
+		jsons.put(getOneSearchTypeJson("发动机号", InfoCenter.TYPE_CAR_ENGINENO));
+		jsons.put(getOneSearchTypeJson("车架号", InfoCenter.TYPE_CAR_VIN));
+		//jsons.put(getOneSearchTypeJson("购置税发票号", InfoCenter.TYPE_CAR_INVOICENO));
+		// jsons.put(getOneSearchTypeJson("服务资格证号", "cert4fwzg"));
+		// jsons.put(getOneSearchTypeJson("车主", "man"));
 		return jsons;
 	}
 
