@@ -164,8 +164,6 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 			car.put("contract4ChargerDate", contract4Charger.get("dateRange"));
 			car.put("paymentDate", contract4Charger.get("paymentDate"));
 			car.put("includeCost", contract4Charger.get("includeCost"));
-		} else {
-
 		}
 
 		// ==基本信息：保单==
@@ -623,9 +621,9 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 						json.put("greenslipSameDate", obj[i++]);
 						json.put("greenslipStartDate", obj[i++]);
 						json.put("greenslipEndDate", obj[i++]);
+						return json;
 					} catch (JSONException e) {
 						logger.error(e.getMessage(), e);
-						return json;
 					}
 				}
 				return null;
@@ -668,9 +666,9 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 						logger.debug("car = null,id=" + carId);
 					car = null;
 				}
-				JSONObject json = new JSONObject();
 				if (car != null) {
 					try {
+						JSONObject json = new JSONObject();
 						// int i = 0;
 						// json.put("id", car[i++]);
 						// json.put("status", car[i++]);
@@ -705,11 +703,12 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 						json.put("lpg",
 								getLPG((String) car[i++], (String) car[i++]));
 						json.put("tv", null2Empty(car[i++]));
+						return json;
 					} catch (JSONException e) {
 						logger.error(e.getMessage(), e);
 					}
 				}
-				return json;
+				return null;
 			}
 
 			private String getTaximeter(String factoryType,
@@ -750,7 +749,7 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 						+ (desc2 != null && desc2.length() > 0 ? "\r\n----备注2----\r\n"
 								+ desc2
 								: "")
-						+ (desc3 != null && desc2.length() > 0 ? "\r\n----备注3----\r\n"
+						+ (desc3 != null && desc3.length() > 0 ? "\r\n----备注3----\r\n"
 								+ desc3
 								: "");
 			}
