@@ -111,7 +111,7 @@ public class CertLostAction extends FileEntityAction<Long, CertLost> {
 	@Override
 	protected PageOption buildFormPageOption(boolean editable) {
 		return super.buildFormPageOption(editable).setWidth(850)
-				.setMinWidth(250).setHeight(350);
+				.setMinWidth(250);
 	}
 
 	@SuppressWarnings("static-access")
