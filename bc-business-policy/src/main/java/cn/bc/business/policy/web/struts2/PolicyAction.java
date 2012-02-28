@@ -101,6 +101,11 @@ public class PolicyAction extends FileEntityAction<Long, Policy> {
 		if (carId != null) {
 			Car car = this.carService.load(carId);
 			this.getE().setCar(car);
+			if(car.getCompany().equals("宝城")){
+				this.getE().setAssured("广州市宝城汽车出租有限公司");
+			}else if(car.getCompany().equals("广发")){
+				this.getE().setAssured("广州市广发出租汽车有限公司");
+			}
 		}
 		// 新建时填写表单的默认信息
 		// 默认购买强制险

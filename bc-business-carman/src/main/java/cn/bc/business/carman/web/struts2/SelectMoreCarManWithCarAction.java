@@ -47,8 +47,14 @@ public class SelectMoreCarManWithCarAction extends
 		if(carMans.size() > 0){
 			for(CarMan man : carMans){
 				infoMap.put(man.getName(), 
-				isNullObject(man.getId())+isNullObject(man.getCert4FWZG())+isNullObject(man.getRegion())
-				+isNullObject(man.getOrigin())+isNullObject(calendarToString(man.getBirthdate()))+isNullObject(calendarToString(man.getWorkDate()))
+				isNullObject(man.getId())
+				+isNullObject(man.getCert4FWZG())
+				+isNullObject(man.getRegion())
+				+isNullObject(man.getOrigin())
+				+isNullObject(calendarToString(man.getBirthdate()))
+				+isNullObject(calendarToString(man.getWorkDate()))
+				+isNullObject(man.getDrivingStatus())
+				+isNullObject(man.getType())
 				+man.getStatus()
 				);
 			}

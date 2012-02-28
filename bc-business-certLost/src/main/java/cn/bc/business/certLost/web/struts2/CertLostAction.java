@@ -111,13 +111,19 @@ public class CertLostAction extends FileEntityAction<Long, CertLost> {
 	@Override
 	protected PageOption buildFormPageOption(boolean editable) {
 		return super.buildFormPageOption(editable).setWidth(850)
-				.setMinWidth(250).setHeight(350);
+				.setMinWidth(250);
 	}
 
 	@SuppressWarnings("static-access")
 	@Override
 	protected void beforeSave(CertLost entity) {
 		super.beforeSave(entity);
+		// 如果司机为空时,将其设为空
+		CertLost c = this.getE();
+		if (c.getDriver() != null && c.getDriver().getId() == null) {
+			c.setDriver(null);
+		}
+
 		// 插入证件
 		try {
 			Set<CertLostItem> certs = null;
@@ -141,8 +147,12 @@ public class CertLostAction extends FileEntityAction<Long, CertLost> {
 					resource.setNewCertNo(json.getString("newCertNo"));
 					resource.setRemains(new Boolean(json.getString("remains")));
 					resource.setReplace(new Boolean(json.getString("replace")));
-					resource.setReplaceDate(new DateUtils().getCalendar(json
-							.getString("replaceDate")));
+					if (("").equals(json.getString("replaceDate"))) {
+						resource.setReplaceDate(null);
+					} else {
+						resource.setReplaceDate(new DateUtils()
+								.getCalendar(json.getString("replaceDate")));
+					}
 					certs.add(resource);
 
 				}
