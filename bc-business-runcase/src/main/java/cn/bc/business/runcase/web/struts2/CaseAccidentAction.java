@@ -209,8 +209,10 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 			CarMan driver = this.carManService.load(carManId);
 			List<Car> car = this.carService.selectAllCarByCarManId(carManId);
 			if (car.size() == 1) {
+				this.getE().setCarId(car.get(0).getId());
 				this.getE().setCarPlate(
-						car.get(0).getPlateType() + "."
+								car.get(0).getPlateType()
+								+ "."
 								+ car.get(0).getPlateNo());
 				this.getE().setMotorcadeId(car.get(0).getMotorcade().getId());
 			} else if (car.size() > 1) {
@@ -223,6 +225,8 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 			this.getE().setDriverCert(driver.getCert4FWZG());
 			this.getE().setDriverArea(driver.getRegion());
 			this.getE().setDriverClasses(driver.getDrivingStatus());
+			this.getE().setOrigin(driver.getOrigin());
+			this.getE().setDriverType(driver.getType());
 		}
 		if (carId != null) {
 			// 如果车辆Id不为空(在司机页签中新建事故理赔表单)
@@ -239,6 +243,8 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 				this.getE().setDriverCert(carMan.get(0).getCert4FWZG());
 				this.getE().setDriverArea(carMan.get(0).getRegion());
 				this.getE().setDriverClasses(carMan.get(0).getDrivingStatus());
+				this.getE().setOrigin(carMan.get(0).getOrigin());
+				this.getE().setDriverType(carMan.get(0).getType());
 			} else if (carMan.size() > 1) {
 				isMoreCarMan = true;
 			} else {
