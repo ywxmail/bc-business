@@ -25,6 +25,7 @@ import cn.bc.db.jdbc.RowMapper;
 import cn.bc.db.jdbc.SqlObject;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.web.formater.CalendarFormater;
+import cn.bc.web.formater.KeyValueFormater;
 import cn.bc.web.formater.LinkFormater4Id;
 import cn.bc.web.ui.html.grid.Column;
 import cn.bc.web.ui.html.grid.IdColumn4MapKey;
@@ -69,7 +70,8 @@ public class CertLostsAction extends ViewAction<Map<String, Object>> {
 		StringBuffer sql = new StringBuffer();
 		sql.append("select l.id,i.cert_name,c.code,c.plate_type,c.plate_no,l.lost_date,i.is_replace,i.replace_date");
 		sql.append(",l.transactor_name,l.driver,l.driver_id,l.car_id,c.company,unit.name unit_name");
-		sql.append(",m.name motorcade_name,i.lost_address,d.cert_fwzg from bs_cert_lost_item i ");
+		sql.append(",m.name motorcade_name,i.lost_address,d.cert_fwzg,l.motorcade_id ");
+		sql.append(",i.is_remains,i.cert_no,i.new_cert_no from bs_cert_lost_item i ");
 		sql.append(" left join bs_cert_lost l on l.id=i.pid");
 		sql.append(" left join bs_car c on c.id=l.car_id");
 		sql.append(" left join bs_carman d on d.id=l.driver_id");
@@ -109,6 +111,10 @@ public class CertLostsAction extends ViewAction<Map<String, Object>> {
 				map.put("motorcade_name", rs[i++]);
 				map.put("lost_address", rs[i++]);
 				map.put("cert_fwzg", rs[i++]);
+				map.put("motorcade_id", rs[i++]);
+				map.put("is_remains", rs[i++]);
+				map.put("cert_no", rs[i++]);
+				map.put("new_cert_no", rs[i++]);
 				return map;
 			}
 		});
@@ -121,29 +127,6 @@ public class CertLostsAction extends ViewAction<Map<String, Object>> {
 		columns.add(new IdColumn4MapKey("l.id", "id"));
 		columns.add(new TextColumn4MapKey("i.cert_name", "cert_name",
 				getText("certLost.certName")).setSortable(true));
-		columns.add(new TextColumn4MapKey("i.code", "code",
-				getText("certLost.carCode"), 80).setSortable(true)
-				.setUseTitleFromLabel(true));
-		columns.add(new TextColumn4MapKey("c.plate_no", "plate",
-				getText("certLost.plate"), 100)
-				.setValueFormater(new LinkFormater4Id(this.getContextPath()
-						+ "/bc-business/car/edit?id={0}", "car") {
-					@SuppressWarnings("unchecked")
-					@Override
-					public String getIdValue(Object context, Object value) {
-						return StringUtils
-								.toString(((Map<String, Object>) context)
-										.get("carId"));
-					}
-
-					@Override
-					public String getTaskbarTitle(Object context, Object value) {
-						@SuppressWarnings("unchecked")
-						Map<String, Object> map = (Map<String, Object>) context;
-						return getText("car") + " - " + map.get("plate");
-
-					}
-				}));
 		// 公司
 		columns.add(new TextColumn4MapKey("c.company", "company",
 				getText("car.company"), 40).setSortable(true)
@@ -170,18 +153,29 @@ public class CertLostsAction extends ViewAction<Map<String, Object>> {
 												.get("motorcade_id"));
 							}
 						}));
-		columns.add(new TextColumn4MapKey("l.lost_date", "lost_date",
-				getText("certLost.lostDate"), 100).setSortable(true)
-				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
-		columns.add(new TextColumn4MapKey("l.lost_address", "lost_address",
-				getText("certLost.lostAddress")).setSortable(true));
-		columns.add(new TextColumn4MapKey("i.is_replace", "is_replace",
-				getText("certLost.isReplace"), 75).setSortable(true)
-				.setUseTitleFromLabel(true)
-				.setValueFormater(new BooleanFormater4certLost()));
-		columns.add(new TextColumn4MapKey("i.replace_date", "replace_date",
-				getText("certLost.replaceDate"), 100).setSortable(true)
-				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+		columns.add(new TextColumn4MapKey("i.code", "code",
+				getText("certLost.carCode"), 80).setSortable(true)
+				.setUseTitleFromLabel(true));
+		columns.add(new TextColumn4MapKey("c.plate_no", "plate",
+				getText("certLost.plate"), 100)
+				.setValueFormater(new LinkFormater4Id(this.getContextPath()
+						+ "/bc-business/car/edit?id={0}", "car") {
+					@SuppressWarnings("unchecked")
+					@Override
+					public String getIdValue(Object context, Object value) {
+						return StringUtils
+								.toString(((Map<String, Object>) context)
+										.get("carId"));
+					}
+
+					@Override
+					public String getTaskbarTitle(Object context, Object value) {
+						@SuppressWarnings("unchecked")
+						Map<String, Object> map = (Map<String, Object>) context;
+						return getText("car") + " - " + map.get("plate");
+
+					}
+				}));
 		columns.add(new TextColumn4MapKey("l.driver", "driver",
 				getText("certLost.driver"), 100)
 				.setValueFormater(new LinkFormater4Id(this.getContextPath()
@@ -204,6 +198,25 @@ public class CertLostsAction extends ViewAction<Map<String, Object>> {
 				}));
 		columns.add(new TextColumn4MapKey("d.cert_fwzg", "cert_fwzg",
 				getText("certLost.certFWZG"), 80).setSortable(true));
+		columns.add(new TextColumn4MapKey("l.lost_date", "lost_date",
+				getText("certLost.lostDate"), 100).setSortable(true)
+				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+		columns.add(new TextColumn4MapKey("l.lost_address", "lost_address",
+				getText("certLost.lostAddress")).setSortable(true));
+		columns.add(new TextColumn4MapKey("i.is_replace", "is_replace",
+				getText("certLost.isReplace"), 75).setSortable(true)
+				.setUseTitleFromLabel(true)
+				.setValueFormater(new BooleanFormater4certLost()));
+		columns.add(new TextColumn4MapKey("i.replace_date", "replace_date",
+				getText("certLost.replaceDate"), 100).setSortable(true)
+				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+		columns.add(new TextColumn4MapKey("l.cert_no", "cert_no",
+				getText("certLost.certNo"), 80).setSortable(true));
+		columns.add(new TextColumn4MapKey("l.new_cert_no", "new_cert_no",
+				getText("certLost.newCertNo"), 80).setSortable(true));
+		columns.add(new TextColumn4MapKey("l.is_remains", "is_remains",
+				getText("certLost.isRemains"), 40).setSortable(true)
+				.setValueFormater(new KeyValueFormater(getRemains())));
 		columns.add(new TextColumn4MapKey("l.transactor_name",
 				"transactor_name", getText("certLost.handlerName"))
 				.setSortable(true));
@@ -303,7 +316,8 @@ public class CertLostsAction extends ViewAction<Map<String, Object>> {
 		}
 		// 补办结果单选按钮组
 		tb.addButton(Toolbar.getDefaultToolbarRadioGroup(this.getReplace(),
-				"isReplace", 0, getText("title.click2changeSearchReplace")));
+				"isReplace", 0,
+				getText("certLost.title.click2changeSearchReplace")));
 		// 搜索按钮
 		tb.addButton(Toolbar
 				.getDefaultSearchToolbarButton(getText("title.click2search")));
@@ -317,11 +331,23 @@ public class CertLostsAction extends ViewAction<Map<String, Object>> {
 	 * @return
 	 */
 	protected Map<String, String> getReplace() {
-		Map<String, String> statuses = new LinkedHashMap<String, String>();
-		statuses.put("false", getText("certLost.isReplace.no"));
-		statuses.put("true", getText("certLost.isReplace.yes"));
-		statuses.put("", getText("certLost.isReplace.all"));
-		return statuses;
+		Map<String, String> replace = new LinkedHashMap<String, String>();
+		replace.put("false", getText("certLost.isReplace.no"));
+		replace.put("true", getText("certLost.isReplace.yes"));
+		replace.put("", getText("certLost.isReplace.all"));
+		return replace;
+	}
+
+	/**
+	 * 是否有残骸转换列表
+	 * 
+	 * @return
+	 */
+	protected Map<String, String> getRemains() {
+		Map<String, String> remains = new LinkedHashMap<String, String>();
+		remains.put("false", getText("certLost.isRemains.no"));
+		remains.put("true", getText("certLost.isRemains.yes"));
+		return remains;
 	}
 
 }
