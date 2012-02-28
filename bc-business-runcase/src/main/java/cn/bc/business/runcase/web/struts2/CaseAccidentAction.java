@@ -215,6 +215,8 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 								+ "."
 								+ car.get(0).getPlateNo());
 				this.getE().setMotorcadeId(car.get(0).getMotorcade().getId());
+				//公司
+				this.getE().setCompany(car.get(0).getCompany());
 			} else if (car.size() > 1) {
 				isMoreCar = true;
 			} else {
@@ -235,6 +237,8 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 					.setCarPlate(car.getPlateType() + "." + car.getPlateNo());
 			this.getE().setCarId(carId);
 			this.getE().setMotorcadeId(car.getMotorcade().getId());
+			//公司
+			this.getE().setCompany(car.getCompany());
 			List<CarMan> carMan = this.carManService
 					.selectAllCarManByCarId(carId);
 			if (carMan.size() == 1) {
