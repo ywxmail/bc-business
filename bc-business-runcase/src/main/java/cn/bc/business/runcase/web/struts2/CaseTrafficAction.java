@@ -191,7 +191,7 @@ public class CaseTrafficAction extends FileEntityAction<Long, Case4InfractTraffi
 
 	@Override
 	protected PageOption buildFormPageOption(boolean editable) {
-		return super.buildFormPageOption(editable).setWidth(820).setMinWidth(250).setHeight(473)
+		return super.buildFormPageOption(editable).setWidth(690).setMinWidth(250).setHeight(460)
 				.setMinHeight(200);
 	}
 	
@@ -333,6 +333,12 @@ public class CaseTrafficAction extends FileEntityAction<Long, Case4InfractTraffi
 		this.chargers = formatChargers(this.getE().getCharger());
 		
 		return "form";
+	}
+	
+	@Override
+	protected void afterOpen(Case4InfractTraffic entity) {
+		super.afterOpen(entity);
+		sourceStr = getSourceStatuses().get(this.getE().getSource()+"");
 	}
 	
 	@Override

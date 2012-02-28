@@ -95,10 +95,10 @@ public class CarManDaoImpl extends HibernateCrudJpaDao<CarMan> implements
 	 */
 	@SuppressWarnings("unchecked")
 	public List<CarMan> findAllcarManBycarId(Long carId) {
-		String hql = "select c.driver from CarByDriver c where c.car.id=? and c.status=?";
+		String hql = "select c.driver from CarByDriver c where c.car.id=?";
 		// 0为启用中
 		return this.getJpaTemplate().find(hql,
-				new Object[] { carId, new Integer(0) });
+				new Object[] { carId });
 	}
 
 	public Long checkCert4FWZGIsExists(Long excludeId, String cert4fwzg) {

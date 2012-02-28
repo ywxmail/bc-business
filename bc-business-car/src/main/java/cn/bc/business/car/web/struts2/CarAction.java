@@ -222,6 +222,7 @@ public class CarAction extends FileEntityAction<Long, Car> {
 
 		// 加载可选车型配置列表
 		this.carModelList = this.carModelService.findEnabled4Option();
+		OptionItem.insertIfNotExist(carModelList, null, getE().getFactoryModel());
 		
 		// 加载可选LPG配置列表
 		this.carLPGList =OptionItem.toLabelValues(this.carLPGService.findEnabled4Option());

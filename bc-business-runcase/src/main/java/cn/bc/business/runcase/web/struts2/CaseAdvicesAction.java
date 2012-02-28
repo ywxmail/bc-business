@@ -228,8 +228,8 @@ public class CaseAdvicesAction extends ViewAction<Map<String, Object>> {
 					@Override
 					public String format(Object context, Object value) {
 						Map<String, Object> advice = (Map<String, Object>) context;
-						if(advice.get("path_from").toString().length()< 0
-						   || advice.get("path_to").toString().length()< 0){
+						if(advice.get("path_from").toString().length() == 0
+						   || advice.get("path_to").toString().length() == 0){
 							return "";
 						}
 						return "从"+ advice.get("path_from") + "到"

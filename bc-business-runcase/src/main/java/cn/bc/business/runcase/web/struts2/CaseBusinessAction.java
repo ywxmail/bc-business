@@ -447,18 +447,25 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 	}
 	
 	@Override
+	protected void afterOpen(Case4InfractBusiness entity) {
+		super.afterOpen(entity);
+		sourceStr = getSourceStatuses().get(this.getE().getSource()+"");
+	}
+	
+	@Override
 	public String save() throws Exception{
 		
 		SystemContext context = this.getSystyemContext();
 		Case4InfractBusiness e = this.getE();
 		
-		if(e != null && (e.getReceiverId() == null || e.getReceiverId() < 0)){
-			e.setReceiverId(context.getUser().getId());
-			e.setReceiverName(context.getUser().getName());
-		}
+//		if(e != null && (e.getReceiverId() == null || e.getReceiverId() < 0)){
+//			e.setReceiverId(context.getUserHistory().getId());
+//			e.setReceiverName(context.getUserHistory().getName());
+//		}
 		
 //		//设置结案信息
 //		if(e.getStatus() == 1){
+//			e.setStatus(CaseBase.STATUS_CLOSED);
 //			e.setCloserId(context.getUserHistory().getId());
 //			e.setCloserName(context.getUserHistory().getName());
 //			e.setCloseDate(Calendar.getInstance(Locale.CHINA));

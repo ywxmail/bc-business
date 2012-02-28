@@ -523,16 +523,19 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 			this.scrapDate = car.getScrapDate();
 			
 			List<CarMan> carMan = this.carManService.selectAllCarManByCarId(carId);
-			if(carMan.get(0).getBirthdate() != null){
-				this.birthdate = carMan.get(0).getBirthdate();
+			if(carMan.size() > 0 ){
+				if(carMan.get(0).getBirthdate() != null){
+					this.birthdate = carMan.get(0).getBirthdate();
+				}
+				this.origin = carMan.get(0).getOrigin();
+				this.workDate = carMan.get(0).getWorkDate();
 			}
-			this.origin = carMan.get(0).getOrigin();
-			this.workDate = carMan.get(0).getWorkDate();
 		}
 		
 		if(this.getE().getType() == CaseBase.TYPE_COMPANY_COMPLAIN){//公司投诉
 			handlestatusesValue = this.getHandleStatues();
 		}
+		sourceStr = getSourceStatuses().get(this.getE().getSource()+"");
 		
 	}
 	
@@ -565,11 +568,13 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 			this.scrapDate = car.getScrapDate();
 			
 			List<CarMan> carMan = this.carManService.selectAllCarManByCarId(carId);
-			if(carMan.get(0).getBirthdate() != null){
-				this.birthdate = carMan.get(0).getBirthdate();
+			if(carMan.size() > 0 ){
+				if(carMan.get(0).getBirthdate() != null){
+					this.birthdate = carMan.get(0).getBirthdate();
+				}
+				this.origin = carMan.get(0).getOrigin();
+				this.workDate = carMan.get(0).getWorkDate();
 			}
-			this.origin = carMan.get(0).getOrigin();
-			this.workDate = carMan.get(0).getWorkDate();
 		}
 
 		return "form";
