@@ -72,6 +72,8 @@ public class InfoCenterAction extends ActionSupport {
 		this.pageOption = new PageOption().setMaximizable(true)
 				.setMinimizable(true).setMinWidth(760).setWidth(880)
 				.setMinHeight(380).setHeight(500);
+		this.pageOption.setHelp("bs/infoCenter");//添加帮助按钮
+		//this.pageOption.setPrint("bs/infoCenter");//添加打印按钮
 
 		// 可选分公司列表
 		units = OptionItem.toLabelValues(this.actorService.find4option(
