@@ -75,7 +75,7 @@ public class CertLostsAction extends ViewAction<Map<String, Object>> {
 		sql.append(" left join bs_cert_lost l on l.id=i.pid");
 		sql.append(" left join bs_car c on c.id=l.car_id");
 		sql.append(" left join bs_carman d on d.id=l.driver_id");
-		sql.append(" left join bs_motorcade m on m.id=l.motorcade_id");
+		sql.append(" left join bs_motorcade m on m.id=c.motorcade_id");
 		sql.append(" left join bc_identity_actor unit on unit.id=m.unit_id");
 		sqlObject.setSql(sql.toString());
 
