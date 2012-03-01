@@ -8,6 +8,7 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
+import cn.bc.BCConstants;
 import cn.bc.business.carlpg.domain.CarLPG;
 import cn.bc.business.carlpg.service.CarLPGService;
 import cn.bc.business.web.struts2.FileEntityAction;
@@ -44,6 +45,13 @@ public class CarLPGAction extends FileEntityAction<Long, CarLPG> {
 	}
 	
 	
+	
+	@Override
+	protected void afterCreate(CarLPG entity) {
+		entity.setStatus(BCConstants.STATUS_ENABLED);
+		super.afterCreate(entity);
+	}
+
 	@Override
 	protected PageOption buildFormPageOption(boolean editable) {
 		return	super.buildFormPageOption(editable).setWidth(535).setHeight(400)
