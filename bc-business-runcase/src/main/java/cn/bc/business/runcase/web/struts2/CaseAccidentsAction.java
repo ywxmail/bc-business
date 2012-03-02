@@ -247,7 +247,7 @@ public class CaseAccidentsAction extends ViewAction<Map<String, Object>> {
 				.setUseTitleFromLabel(true));
 		// 自车损失=车损情况
 		columns.add(new TextColumn4MapKey("c.car_hurt", "car_hurt",
-				getText("runcase.carHurt"), 80).setUseTitleFromLabel(true));
+				getText("runcase.carHurt"), 100).setUseTitleFromLabel(true));
 		// 总损=实际损失
 		columns.add(new TextColumn4MapKey("c.actual_loss", "actual_loss",
 				getText("runcase.actualLoss"), 80).setUseTitleFromLabel(true)
