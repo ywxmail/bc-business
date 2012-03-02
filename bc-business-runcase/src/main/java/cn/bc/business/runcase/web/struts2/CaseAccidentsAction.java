@@ -98,9 +98,10 @@ public class CaseAccidentsAction extends ViewAction<Map<String, Object>> {
 		sql.append(",b.desc_ ,c.car_hurt,c.actual_loss");
 		sql.append(",c.receiver_name,c.insurance_company");
 		sql.append(",c.is_deliver,c.is_claim,c.is_pay,a.name as unitname,b.company");
-		sql.append(",b.motorcade_id,b.car_id,b.driver_id");
+		sql.append(",b.motorcade_id,b.car_id,b.driver_id,cr.code as carcode");
 		sql.append(" from bs_case_accident c");
 		sql.append(" inner join bs_case_base b on b.id=c.id");
+		sql.append(" left join bs_car cr on cr.id=b.car_id");
 		sql.append(" left join bs_motorcade m on m.id=b.motorcade_id");
 		sql.append(" left join bc_identity_actor a on a.id=m.unit_id");
 		sqlObject.setSql(sql.toString());
@@ -151,6 +152,7 @@ public class CaseAccidentsAction extends ViewAction<Map<String, Object>> {
 				map.put("motorcade_id", rs[i++]);// 车队ID
 				map.put("carId", rs[i++]);
 				map.put("driverId", rs[i++]);
+				map.put("carcode", rs[i++]);//车辆自编号
 				return map;
 			}
 		});
@@ -194,6 +196,7 @@ public class CaseAccidentsAction extends ViewAction<Map<String, Object>> {
 												.get("motorcade_id"));
 							}
 						}));
+		
 		// 车牌
 		if (carId == null) {
 			columns.add(new TextColumn4MapKey("b.car_plate", "car_plate",
@@ -209,7 +212,11 @@ public class CaseAccidentsAction extends ViewAction<Map<String, Object>> {
 						}
 					}));
 		}
-
+		//车辆自编号
+		columns.add(new TextColumn4MapKey("cr.code", "carcode",
+						getText("runcase.accident.carCode"), 80).setSortable(true)
+						.setUseTitleFromLabel(true));
+		
 		if (carManId == null) {
 			columns.add(new TextColumn4MapKey("b.driver_name", "driver_name",
 					getText("runcase.driverName"), 60).setSortable(true)
@@ -315,7 +322,7 @@ public class CaseAccidentsAction extends ViewAction<Map<String, Object>> {
 	@Override
 	protected String[] getGridSearchFields() {
 		return new String[] { "b.code", "b.motorcade_name", "b.car_plate",
-				"c.sort", "b.driver_name", "b.driver_cert", "a.name" };
+				"c.sort", "b.driver_name", "b.driver_cert", "a.name","cr.code" };
 	}
 
 	@Override
