@@ -190,10 +190,14 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 
 	@Override
 	public boolean isReadonly() {
-		// 交通违章管理员或系统管理员
 		SystemContext context = (SystemContext) this.getContext();
-		return !context.hasAnyRole(getText("key.role.bs.advice"),
-				getText("key.role.bc.admin"));
+		if(CaseBase.TYPE_COMPLAIN == getE().getType()){ //客管投诉管理员和超级管理员
+			return !context.hasAnyRole(getText("key.role.bs.advice.keguan"),
+					getText("key.role.bc.admin"));
+		}else{ //公司投诉管理员和超级管理员
+			return !context.hasAnyRole(getText("key.role.bs.advice.gongsi"),
+					getText("key.role.bc.admin"));
+		}
 	}
 
 	@Override
