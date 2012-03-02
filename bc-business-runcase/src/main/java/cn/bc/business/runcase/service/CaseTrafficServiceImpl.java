@@ -112,6 +112,7 @@ public class CaseTrafficServiceImpl extends DefaultCrudService<Case4InfractTraff
 				cit.setJeom(jinDunJTWF.getJeom());
 				cit.setFrom("金盾网/"+jinDunJTWF.getSource());
 			}else{	//交委同步
+				
 				JiaoWeiJTWF jiaoWeiJTWF = this.jiaoWeiJTWFDao.load(syncId);
 				//通过交委接口交通违法并装交通违章对象
 				carId = findCarId(jiaoWeiJTWF.getCarPlateNo()); //根据车牌查找carId;
@@ -120,6 +121,18 @@ public class CaseTrafficServiceImpl extends DefaultCrudService<Case4InfractTraff
 				cit.setJeom(jiaoWeiJTWF.getJeom());
 				cit.setHappenDate(jiaoWeiJTWF.getHappenDate());
 				cit.setFrom("交委/");
+
+			/**
+			 *  TODO
+				//根据违章顺序号查找金盾网交通违章记录
+				if(jiaoWeiJTWF.getSyncCode().length() > 0){
+					JinDunJTWF jinDunJTWF = this.jinDunJTWFDao.findJinDunJTWFBySyscCode(jiaoWeiJTWF.getSyncCode());
+					if(null != jinDunJTWF && jinDunJTWF.getAddress() != null
+							&& jinDunJTWF.getAddress().trim().length() > 0){//判断此记录是否存在并且违章地点不为空
+						cit.setAddress(jinDunJTWF.getAddress()); //设置违章地点
+					}
+				}
+			**/
 			}
 			
 			//设置交通违法对象车辆相关信息

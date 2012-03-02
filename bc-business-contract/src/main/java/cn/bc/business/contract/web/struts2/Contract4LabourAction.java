@@ -123,64 +123,62 @@ public class Contract4LabourAction extends
 
 		if (carId != null && driverId == null) {// 车辆页签中的新建
 			
-			if(isExistContract == false){
-				// 根据carId查找车辆以及司机id
-				carInfoMap = this.contract4LabourService.findCarByCarId(carId);
-				infoList = this.contract4LabourService
-						.selectRelateCarManByCarId(carId);
-	
-				if (infoList.size() == 1) {
-					// 填写司机信息forceReadOnly
-					driverId = Long.valueOf(isNullObject(infoList.get(0).get(
-							"driver_id")));
-					entity.setExt_str2(
-							isNullObject(infoList.get(0).get("name")));
-					entity.setSex(
-							Integer.valueOf(infoList.get(0).get("sex") + ""));
-					entity.setCertNo(
-							isNullObject(infoList.get(0).get("cert_fwzg")));
-					entity.setCertIdentity(
-							isNullObject(infoList.get(0).get("cert_identity")));
-					entity.setOrigin(
-							isNullObject(infoList.get(0).get("origin")));
-					entity.setHouseType(
-							isNullObject(infoList.get(0).get("house_type")));
-	
-					if (entity.getAge() == null
-							&& getDateToString(infoList.get(0).get("birthdate"))
-									.length() > 0) {
-						try {
-							date = sdf.parse(infoList.get(0).get("birthdate") + "");
-						} catch (ParseException e) {
-							e.printStackTrace();
-						}
-						date2.setTime(date);
-						entity.setBirthDate(date2);
-					}
-	
-					entity.setAge(
-							Integer.valueOf(getBirthDateToString(infoList.get(0)
-									.get("birthdate"))));
-				} else if (infoList.size() > 1) {
-					isMoreCarMan = true;
-				} else {
-					isNullCarMan = true;
-				}
-				// 填写车辆信息
-				entity.setExt_str1(
-						isNullObject(carInfoMap.get("plate_type")) + "."
-								+ isNullObject(carInfoMap.get("plate_no")));
-				if (getDateToString(carInfoMap.get("register_date")).length() > 0) {
+			// 根据carId查找车辆以及司机id
+			carInfoMap = this.contract4LabourService.findCarByCarId(carId);
+			infoList = this.contract4LabourService
+					.selectRelateCarManByCarId(carId);
+
+			if (infoList.size() == 1) {
+				// 填写司机信息forceReadOnly
+				driverId = Long.valueOf(isNullObject(infoList.get(0).get(
+						"driver_id")));
+				entity.setExt_str2(
+						isNullObject(infoList.get(0).get("name")));
+				entity.setSex(
+						Integer.valueOf(infoList.get(0).get("sex") + ""));
+				entity.setCertNo(
+						isNullObject(infoList.get(0).get("cert_fwzg")));
+				entity.setCertIdentity(
+						isNullObject(infoList.get(0).get("cert_identity")));
+				entity.setOrigin(
+						isNullObject(infoList.get(0).get("origin")));
+				entity.setHouseType(
+						isNullObject(infoList.get(0).get("house_type")));
+
+				if (entity.getAge() == null
+						&& getDateToString(infoList.get(0).get("birthdate"))
+								.length() > 0) {
 					try {
-						date = sdf.parse(carInfoMap.get("register_date") + "");
+						date = sdf.parse(infoList.get(0).get("birthdate") + "");
 					} catch (ParseException e) {
 						e.printStackTrace();
 					}
 					date2.setTime(date);
-					entity.setRegisterDate(date2);
+					entity.setBirthDate(date2);
 				}
-				entity.setBsType(isNullObject(carInfoMap.get("bs_type")));
+
+				entity.setAge(
+						Integer.valueOf(getBirthDateToString(infoList.get(0)
+								.get("birthdate"))));
+			} else if (infoList.size() > 1) {
+				isMoreCarMan = true;
+			} else {
+				isNullCarMan = true;
 			}
+			// 填写车辆信息
+			entity.setExt_str1(
+					isNullObject(carInfoMap.get("plate_type")) + "."
+							+ isNullObject(carInfoMap.get("plate_no")));
+			if (getDateToString(carInfoMap.get("register_date")).length() > 0) {
+				try {
+					date = sdf.parse(carInfoMap.get("register_date") + "");
+				} catch (ParseException e) {
+					e.printStackTrace();
+				}
+				date2.setTime(date);
+				entity.setRegisterDate(date2);
+			}
+			entity.setBsType(isNullObject(carInfoMap.get("bs_type")));
 		}
 
 		if (driverId != null && carId == null) {// 司机页签中的新建
@@ -266,6 +264,9 @@ public class Contract4LabourAction extends
 		entity.setInsuranceType(getText("contract.wujin"));
 		entity.setBuyUnit(getText("contract.baocheng"));
 		entity.setStatus(Contract.STATUS_NORMAL);
+		entity.setIdentityCards(true);
+		entity.setHealthForm(true);
+		entity.setPhoto(true);
 		
 		// 构建附件控件
 		attachsUI = buildAttachsUI(true, false);
@@ -327,20 +328,73 @@ public class Contract4LabourAction extends
 
 	@Override
 	public String save() throws Exception {
-		SystemContext context = this.getSystyemContext();
+		json = new Json();
 		Contract4Labour e = this.getE();
-		this.beforeSave(e);
+		Long carManId = null;
+		// 保存之前检测社保号是否唯一:仅在新建时检测
+		if (e.getId() == null) {
+			carManId = this.contract4LabourService.checkInsurCodeIsExist(
+					e.getId(), e.getInsurCode());
+		}
+		if(carManId != null){
+			json.put("success", false);
+			json.put("msg", getText("contract4Labour.insurCode.exist2"));
+			return "json";
+		}else{
+			this.beforeSave(e);
 
-		// 设置最后更新人的信息
-		e.setModifier(context.getUserHistory());
-		e.setModifiedDate(Calendar.getInstance());
-
-		this.contract4LabourService
-				.save(e, this.getCarId(), this.getDriverId());
-
-		this.afterSave(e);
-		return "saveSuccess";
+			// 设置最后更新人的信息
+			SystemContext context = this.getSystyemContext();
+			e.setModifier(context.getUserHistory());
+			e.setModifiedDate(Calendar.getInstance());
+	
+			this.contract4LabourService
+					.save(e, this.getCarId(), this.getDriverId());
+	
+			this.afterSave(e);
+			
+			json.put("id", e.getId());
+			json.put("success", true);
+			json.put("msg", getText("form.save.success"));
+			return "json";
+		}
 	}
+	
+	// ========判断经济合同自编号唯一代码开始========
+	private Long excludeId;
+	private String insurCode;
+	
+	public Long getExcludeId() {
+		return excludeId;
+	}
+
+	public void setExcludeId(Long excludeId) {
+		this.excludeId = excludeId;
+	}
+	
+	public String getInsurCode() {
+		return insurCode;
+	}
+
+	public void setInsurCode(String insurCode) {
+		this.insurCode = insurCode;
+	}
+
+	public String checkInsurCodeIsExist() {
+		json = new Json();
+		Long carManId = this.contract4LabourService.checkInsurCodeIsExist(
+				this.excludeId,this.insurCode); 
+		if(carManId != null){
+			json.put("carManId", carManId);
+			json.put("isExist", "true"); //存在重复自编号
+			json.put("msg", getText("contract4Labour.insurCode.exist"));
+		}else{
+			json.put("isExist", "false");
+		}
+		return "json";
+	}
+	// ========判断经济合同自编号唯一代码结束========
+
 
 	private AttachWidget buildAttachsUI(boolean isNew, boolean forceReadonly) {
 		// 构建附件控件
@@ -368,7 +422,8 @@ public class Contract4LabourAction extends
 		// 特殊处理的部分
 		if (!this.isReadonly()) {// 有权限
 			if (editable) {// 编辑状态显示保存按钮
-				pageOption.addButton(this.getDefaultSaveButtonOption());
+				pageOption.addButton(new ButtonOption(getText("label.save"),
+						null, "bc.contract4LabourForm.save"));
 			} else {// 只读状态显示操作按钮
 //				ToolbarMenuButton toolbarMenuButton = new ToolbarMenuButton(
 //						getText("contract4Labour.op"));

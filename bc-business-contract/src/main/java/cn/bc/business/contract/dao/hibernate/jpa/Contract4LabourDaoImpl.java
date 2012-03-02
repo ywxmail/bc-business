@@ -626,6 +626,34 @@ public class Contract4LabourDaoImpl extends
 		this.executeUpdate(hql.toString(), args);
 		
 	}
+	
+	/**
+	 * 判断经济合同自编号唯一
+	 * 
+	 * @param excludeId
+	 * @param code
+	 * @return
+	 */
+	public Long checkInsurCodeIsExist(Long excludeId, String insurCode) {
+		String sql = "select c.id as id,manc.man_id as carManId from BS_CONTRACT c"+ 
+				" inner join BS_CONTRACT_LABOUR cl ON c.id = cl.id"+
+				" left join BS_CARMAN_CONTRACT manc ON c.id = manc.contract_id"+
+				" where c.status_=? and cl.insurcode=? ";
+		Object[] args;
+		if (excludeId != null) {
+			sql += " and c.id!=?";
+			args = new Object[] { new Integer(Contract.STATUS_NORMAL), insurCode,
+					excludeId };
+		} else {
+			args = new Object[] { new Integer(Contract.STATUS_NORMAL), insurCode };
+		}
+		List<Map<String, Object>> list = this.jdbcTemplate.queryForList(sql,
+				args);
+		if (list != null && !list.isEmpty())
+			return new Long(list.get(0).get("carManId").toString());
+		else
+			return null;
+	}
 
 //	/**
 //	 * 更新司机的备注列

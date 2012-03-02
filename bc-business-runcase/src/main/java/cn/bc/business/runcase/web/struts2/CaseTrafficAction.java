@@ -236,6 +236,19 @@ public class CaseTrafficAction extends FileEntityAction<Long, Case4InfractTraffi
 				this.getE().setJeom(jiaoWeiJTWF.getJeom());
 				this.getE().setHappenDate(jiaoWeiJTWF.getHappenDate());
 				this.getE().setFrom(getText("runcase.jiaowei"));
+				
+				/**
+				 *  TODO	
+					//根据违章顺序号查找金盾网交通违章记录
+					if(jiaoWeiJTWF.getSyncCode().length() > 0){
+						JinDunJTWF jinDunJTWF = this.jinDunJTWFService.findJinDunJTWFBySyscCode(jiaoWeiJTWF.getSyncCode());
+						if(null != jinDunJTWF && jinDunJTWF.getAddress() != null
+								&& jinDunJTWF.getAddress().trim().length() > 0){//判断此记录是否存在并且违章地点不为空
+							this.getE().setAddress(jinDunJTWF.getAddress());//设置违章时间
+						}
+					}
+				**/
+
 			}
 			//设置来源
 			this.getE().setSource(CaseBase.SOURCE_GENERATION);
@@ -331,7 +344,6 @@ public class CaseTrafficAction extends FileEntityAction<Long, Case4InfractTraffi
 		this.initForm(true);
 		//组装责任人
 		this.chargers = formatChargers(this.getE().getCharger());
-		
 		return "form";
 	}
 	

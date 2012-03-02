@@ -24,4 +24,14 @@ public class JinDunJTWFServiceImpl extends DefaultCrudService<JinDunJTWF> implem
 		this.jinDunJTWFDao = jinDunJTWFDao;
 		this.setCrudDao(jinDunJTWFDao);
 	}
+
+//	TODO
+//	/**
+//	 * 根据违章顺序号查找金盾网交通违章记录
+//	 * @param syncCode
+//	 * @return
+//	 */
+//	public JinDunJTWF findJinDunJTWFBySyscCode(String syncCode) {
+//		return this.jinDunJTWFDao.findJinDunJTWFBySyscCode(syncCode);
+//	}
 }
