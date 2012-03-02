@@ -64,10 +64,14 @@ public class CaseAdvicesAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	public boolean isReadonly() {
-		// 司机管理员或系统管理员
 		SystemContext context = (SystemContext) this.getContext();
-		return !context.hasAnyRole(getText("key.role.bs.advice"),
-				getText("key.role.bc.admin"));
+		if(CaseBase.TYPE_COMPLAIN == Integer.valueOf(this.type)){ //客管投诉管理员和超级管理员
+			return !context.hasAnyRole(getText("key.role.bs.advice.keguan"),
+					getText("key.role.bc.admin"));
+		}else{ //公司投诉管理员和超级管理员
+			return !context.hasAnyRole(getText("key.role.bs.advice.gongsi"),
+					getText("key.role.bc.admin"));
+		}
 	}
 
 	@Override
