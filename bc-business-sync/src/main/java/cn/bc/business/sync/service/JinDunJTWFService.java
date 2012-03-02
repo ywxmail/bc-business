@@ -14,4 +14,14 @@ import cn.bc.core.service.CrudService;
  */
 public interface JinDunJTWFService extends CrudService<JinDunJTWF> {
 
+//	
+// TODO
+//		/**
+//		 * 根据违章顺序号查找金盾网交通违章记录
+//		 * @param syncCode
+//		 * @return
+//		 */
+//		JinDunJTWF findJinDunJTWFBySyscCode(String syncCode);
+//
+
 }

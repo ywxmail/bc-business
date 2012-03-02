@@ -169,6 +169,14 @@ public interface Contract4LabourDao extends CrudDao<Contract4Labour> {
 //	 * @param driverId 
 //	 * @param description
 //	 */
-//	void updateCarMan4Description(Long driverId, String description);
+//	void updateCarMan4Description(Long driverId, String description);
+	/**
+	 * 判断经济合同自编号唯一
+	 * 
+	 * @param excludeId
+	 * @param code
+	 * @return
+	 */
+	Long checkInsurCodeIsExist(Long excludeId, String insurCode);
 
 }

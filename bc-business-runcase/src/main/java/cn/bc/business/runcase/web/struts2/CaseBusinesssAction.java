@@ -194,7 +194,8 @@ public class CaseBusinesssAction extends ViewAction<Map<String, Object>> {
 				getText("runcase.FWZGCert"), 70).setSortable(true)
 				.setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("b.subject", "subject",
-				getText("runcase.subject"), 180).setSortable(true));
+				getText("runcase.subject"), 180).setUseTitleFromLabel(true)
+				.setSortable(true));
 		columns.add(new TextColumn4MapKey("b.happen_date", "happen_date",
 				getText("runcase.happenDate2"), 125).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd HH:mm")));
