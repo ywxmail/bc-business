@@ -36,7 +36,7 @@ BEGIN
 			inner join bs_contract_charger c1 on c1.id=c.id
 			inner join bs_carman_contract cm on cm.contract_id=c.id
 			inner join bs_carman m on m.id=cm.man_id
-			where cc.car_id=cid
+			where cc.car_id=cid and c.status_=0
 			order by m.work_date asc) as t;
 	return chargerInfo;
 END;
