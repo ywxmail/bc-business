@@ -92,6 +92,8 @@ public class Case4Accident extends CaseBase {
 	private Long payDriverId;//送保的受款司机ID
 	private Long payDriverIdTwo;//第二次送保里的受款司机ID
 	
+	private String thirdLossInfo;//第三者损失情况
+	
 	@Column(name = "RECEIVE_DATE")
 	public Calendar getReceiveDate() {
 		return receiveDate;
@@ -621,6 +623,16 @@ public class Case4Accident extends CaseBase {
 	public void setPayDriverIdTwo(Long payDriverIdTwo) {
 		this.payDriverIdTwo = payDriverIdTwo;
 	}
+
+	@Column(name="THIRD_LOSS_INFO")
+	public String getThirdLossInfo() {
+		return thirdLossInfo;
+	}
+
+	public void setThirdLossInfo(String thirdLossInfo) {
+		this.thirdLossInfo = thirdLossInfo;
+	}
+	
 	
 	
 }
