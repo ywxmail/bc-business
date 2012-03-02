@@ -154,4 +154,13 @@ public interface Contract4LabourService extends CrudService<Contract4Labour> {
 	 */
 	boolean isExistContractByDriverId(Long driverId);
 
+	/**
+	 * 判断劳动社保编号唯一
+	 * 
+	 * @param excludeId
+	 * @param code
+	 * @return
+	 */
+	Long checkInsurCodeIsExist(Long excludeId, String insurCode);
+
 }

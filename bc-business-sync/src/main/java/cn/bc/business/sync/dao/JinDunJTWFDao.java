@@ -13,5 +13,12 @@ import cn.bc.core.dao.CrudDao;
  * @author wis
  */
 public interface JinDunJTWFDao extends CrudDao<JinDunJTWF> {
+//  TODO
+//	/**
+//	 * 根据违章顺序号查找金盾网交通违章记录
+//	 * @param syncCode
+//	 * @return
+//	 */
+//	JinDunJTWF findJinDunJTWFBySyscCode(String syncCode);
 
 }

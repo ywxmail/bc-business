@@ -449,5 +449,16 @@ public class Contract4LabourServiceImpl extends
     		return "";
     	}
     }
+
+	/**
+	 * 判断经济合同自编号唯一
+	 * 
+	 * @param excludeId
+	 * @param code
+	 * @return
+	 */
+	public Long checkInsurCodeIsExist(Long excludeId, String insurCode) {
+		return this.contract4LabourDao.checkInsurCodeIsExist(excludeId,insurCode);
+	}
 	
 }

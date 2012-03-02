@@ -28,6 +28,7 @@
 		</action>
 		<action name="isExistContract" class="contract4LabourAction" method="isExistContract">
 		</action>
+		<action name="checkInsurCodeIsExist" class="contract4LabourAction" method="checkInsurCodeIsExist" />
 	</package>
 	
 	<!-- 劳动合同的版本管理 -->

@@ -124,6 +124,7 @@ public class Car extends RichFileEntityImpl {
 	private Calendar lpgInsuranceEndDate;//LPG保单结束日期
 	
 	private String carTvScreen;//车载电视屏
+	private String rentNo;//
 	
 
 	@ManyToOne(fetch = FetchType.EAGER, optional = false)
@@ -804,8 +805,14 @@ public class Car extends RichFileEntityImpl {
 	public void setCarTvScreen(String carTvScreen) {
 		this.carTvScreen = carTvScreen;
 	}
-	
-	
-	
+
+	@Column(name = "rent_no")
+	public String getRentNo() {
+		return rentNo;
+	}
+
+	public void setRentNo(String rentNo) {
+		this.rentNo = rentNo;
+	}
 
 }
