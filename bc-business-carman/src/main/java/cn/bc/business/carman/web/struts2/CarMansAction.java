@@ -44,6 +44,8 @@ import cn.bc.web.ui.html.grid.IdColumn4MapKey;
 import cn.bc.web.ui.html.grid.TextColumn4MapKey;
 import cn.bc.web.ui.html.page.PageOption;
 import cn.bc.web.ui.html.toolbar.Toolbar;
+import cn.bc.web.ui.html.toolbar.ToolbarButton;
+import cn.bc.web.ui.html.toolbar.ToolbarMenuButton;
 import cn.bc.web.ui.json.Json;
 
 /**
@@ -368,6 +370,12 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 		// 状态单选按钮组
 		tb.addButton(Toolbar.getDefaultToolbarRadioGroup(this.getBSStatuses1(),
 				"status", 0, getText("title.click2changeSearchStatus")));
+
+		// 出租协会网查询
+		if (!this.isReadonly())
+			tb.addButton(new ToolbarButton().setIcon("ui-icon-check")
+					.setText("出租协会网查询 ")
+					.setClick("bs.carManView.gztaxixhDriverInfo"));
 		return tb;
 	}
 
@@ -397,4 +405,8 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 		}
 	}
 
+	@Override
+	protected String getHtmlPageJs() {
+		return this.getContextPath() + "/bc-business/carMan/view.js";
+	}
 }

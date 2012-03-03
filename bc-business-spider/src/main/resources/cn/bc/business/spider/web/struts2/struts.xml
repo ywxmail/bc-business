@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<package name="gztaxixh" extends="bc-default" namespace="/bc-business/gztaxixh">
+		<action name="driverInfo" class="gzTaxiXhAction" method="driverInfo">
+			<result name="success">/bc-business/spider/gztaxixh/driverInfo.jsp</result>
+		</action>
+		<action name="findDriverInfo" class="gzTaxiXhAction" method="findDriverInfo" />
+	</package>
+</struts>
