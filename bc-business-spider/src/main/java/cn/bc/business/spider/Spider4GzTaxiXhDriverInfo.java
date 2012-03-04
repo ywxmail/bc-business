@@ -5,6 +5,7 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -23,6 +24,7 @@ import org.apache.http.util.EntityUtils;
 import org.apache.tools.ant.util.DateUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.util.FileCopyUtils;
 
@@ -46,17 +48,19 @@ public class Spider4GzTaxiXhDriverInfo implements Spider<GzTaxiXhDriverInfo> {
 	private String rootPath;// 司机图片保存到的父目录
 	private String userName;// 登录协会的帐号
 	private String userPassword;// 登录协会的密码
+	private int index;// 简易列表信息含有多行时默认详细查询对应哪行的，第一条的数据对应值0
 
 	public Spider4GzTaxiXhDriverInfo() {
 	}
 
 	public Spider4GzTaxiXhDriverInfo(String type, String value,
-			String userName, String userPassword, String rootPath) {
+			String userName, String userPassword, String rootPath, int index) {
 		this.type = type;
 		this.value = value;
 		this.userName = userName;
 		this.userPassword = userPassword;
 		this.rootPath = rootPath;
+		this.index = index;
 	}
 
 	public GzTaxiXhDriverInfo excute() throws Exception {
@@ -115,7 +119,8 @@ public class Spider4GzTaxiXhDriverInfo implements Spider<GzTaxiXhDriverInfo> {
 		doc = Jsoup.parse(html);
 		boolean loginSuccess = "已登陆".equals(doc.select("#_ctl0_L1").text());
 		if (!loginSuccess) {
-			info.setMsg("使用帐号“" + this.userName + "”登录广州市出租汽车协会网失败！");
+			info.setMsg("使用帐号“" + this.userName
+					+ "”登录广州市出租汽车协会网失败！如果帐号密码有变动，请联系管理员到选项管理中作相应修改。");
 			logger.info(info.getMsg());
 			return info;
 		} else {
@@ -176,7 +181,24 @@ public class Spider4GzTaxiXhDriverInfo implements Spider<GzTaxiXhDriverInfo> {
 			info.setMsg("没有找到相关信息！");
 			return info;
 		}
-		table.select("input").remove();// 删除”查看详情“图片
+
+		Elements inputs = table.select("input");
+		if (inputs.size() > 1) {// ”查看详情“图片替换
+			Iterator<Element> itor = inputs.iterator();
+			int j = 0;
+			Element td;
+			while (itor.hasNext()) {
+				td = itor.next().parent();
+				if (j == index) {
+					td.parent().addClass("active");
+				}
+				td.html("<span class='ui-icon ui-icon-search' data-index='"
+						+ (j++) + "'></span>");
+			}
+		} else {// 删除”查看详情“图片
+			inputs.remove();
+		}
+
 		info.setSimple(table.removeAttr("width").outerHtml());
 		if (logger.isDebugEnabled()) {
 			logger.debug("simple=" + info.getSimple());
@@ -197,9 +219,11 @@ public class Spider4GzTaxiXhDriverInfo implements Spider<GzTaxiXhDriverInfo> {
 		formParams.add(new BasicNameValuePair(
 				"_ctl0:ContentPlaceHolder1:txtFilter", this.value));
 		formParams.add(new BasicNameValuePair(
-				"_ctl0:ContentPlaceHolder1:dgCardList:_ctl2:ibtnView.x", "8"));
+				"_ctl0:ContentPlaceHolder1:dgCardList:_ctl" + (index + 2)
+						+ ":ibtnView.x", "8"));
 		formParams.add(new BasicNameValuePair(
-				"_ctl0:ContentPlaceHolder1:dgCardList:_ctl2:ibtnView.y", "8"));
+				"_ctl0:ContentPlaceHolder1:dgCardList:_ctl" + (index + 2)
+						+ ":ibtnView.y", "8"));
 		entity = new UrlEncodedFormEntity(formParams, "GBK");
 		request4post = new HttpPost(infoUrl);
 		request4post.setEntity(entity);

@@ -371,8 +371,10 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 		tb.addButton(Toolbar.getDefaultToolbarRadioGroup(this.getBSStatuses1(),
 				"status", 0, getText("title.click2changeSearchStatus")));
 
-		// 出租协会网查询
-		if (!this.isReadonly())
+		// 出租协会网查询:司机管理员、系统管理员或出租协会网查询角色
+		if (!this.isReadonly()
+				|| ((SystemContext) this.getContext())
+						.hasAnyRole("BS_SEARCH_GZTAXIXH"))
 			tb.addButton(new ToolbarButton().setIcon("ui-icon-check")
 					.setText("出租协会网查询 ")
 					.setClick("bs.carManView.gztaxixhDriverInfo"));
