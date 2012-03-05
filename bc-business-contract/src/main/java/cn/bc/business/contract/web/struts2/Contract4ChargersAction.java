@@ -12,12 +12,14 @@ import java.util.Map;
 
 import org.json.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
 import cn.bc.business.OptionConstants;
 import cn.bc.business.contract.domain.Contract;
+import cn.bc.business.motorcade.service.MotorcadeService;
 import cn.bc.business.web.struts2.LinkFormater4ChargerInfo;
 import cn.bc.business.web.struts2.ViewAction;
 import cn.bc.core.query.condition.Condition;
@@ -29,6 +31,8 @@ import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.core.util.StringUtils;
 import cn.bc.db.jdbc.RowMapper;
 import cn.bc.db.jdbc.SqlObject;
+import cn.bc.identity.domain.Actor;
+import cn.bc.identity.service.ActorService;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.option.domain.OptionItem;
 import cn.bc.option.service.OptionService;
@@ -495,12 +499,26 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 	// ==高级搜索代码开始==
 
 	private OptionService optionService;
+	private MotorcadeService motorcadeService;
+	private ActorService actorService;
 
 	@Autowired
 	public void setOptionService(OptionService optionService) {
 		this.optionService = optionService;
 	}
 
+	@Autowired
+	public void setActorService(
+			@Qualifier("actorService") ActorService actorService) {
+		this.actorService = actorService;
+	}
+	
+	@Autowired
+	public void setMotorcadeService(MotorcadeService motorcadeService) {
+		this.motorcadeService = motorcadeService;
+	}
+	public JSONArray units;// 分公司的下拉列表信息
+	public JSONArray motorcades;// 车队的下拉列表信息
 	public JSONArray contractVersionNos;// 合同版本号列表
 	public JSONArray businessTypes;// 营运性质列表
 	public JSONArray signTypes;// 签约类型列表
@@ -512,6 +530,15 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected void initConditionsFrom() throws Exception {
+		// 可选分公司列表
+		units = OptionItem.toLabelValues(this.actorService.find4option(
+				new Integer[] { Actor.TYPE_UNIT }, (Integer[]) null), "name",
+				"id");
+
+		// 可选车队列表
+		motorcades = OptionItem.toLabelValues(this.motorcadeService
+				.find4Option(null));
+
 		// 批量加载可选项列表
 		Map<String, List<Map<String, String>>> optionItems = this.optionService
 				.findOptionItemByGroupKeys(new String[] {

@@ -21,7 +21,7 @@ public class Spider4GzTaxiXhDriverInfoTest {
 
 		String value = "257506";
 		Spider<GzTaxiXhDriverInfo> spider = new Spider4GzTaxiXhDriverInfo(type,
-				value, userName, userPassword, rootPath,0);
+				value, userName, userPassword, rootPath, (int) 0);
 		GzTaxiXhDriverInfo info = spider.excute();
 		Assert.assertNotNull(info);
 
