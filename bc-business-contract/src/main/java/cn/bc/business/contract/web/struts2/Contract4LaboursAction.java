@@ -146,6 +146,7 @@ public class Contract4LaboursAction extends ViewAction<Map<String, Object>> {
 		sql.append(",car.company company");
 		sql.append(",bia.id batch_company_id,bia.name batch_company");
 		sql.append(",m.id motorcade_id,m.name motorcade_name");
+		sql.append(",car.code car_code");
 		sql.append(" from BS_CONTRACT_LABOUR cl");
 		sql.append(" inner join BS_CONTRACT c on cl.id = c.id");
 		sql.append(" left join BS_CAR_CONTRACT carc on c.id = carc.contract_id");
@@ -197,6 +198,7 @@ public class Contract4LaboursAction extends ViewAction<Map<String, Object>> {
 				map.put("batch_company", rs[i++]);
 				map.put("motorcade_id", rs[i++]);
 				map.put("motorcade_name", rs[i++]);
+				map.put("car_code", rs[i++]);
 				return map;
 			}
 		});
@@ -267,6 +269,8 @@ public class Contract4LaboursAction extends ViewAction<Map<String, Object>> {
 												.get("carId"));
 							}
 						}));
+		columns.add(new TextColumn4MapKey("car.code", "car_code",
+				getText("contract4Charger.wordNo"), 70));
 		columns.add(new TextColumn4MapKey("c.ext_str2", "ext_str2",
 				getText("contract4Labour.driver"), 55).setUseTitleFromLabel(
 				true).setValueFormater(
@@ -340,7 +344,7 @@ public class Contract4LaboursAction extends ViewAction<Map<String, Object>> {
 	@Override
 	protected String[] getGridSearchFields() {
 		return new String[] { "c.code", "c.ext_str1", "c.ext_str2",
-				"cl.insurance_type", "cl.cert_no", "cl.insurCode" };
+				"cl.insurance_type", "cl.cert_no", "cl.insurCode", "car.code" };
 	}
 
 	@Override

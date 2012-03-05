@@ -142,15 +142,21 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 		sql.append(",cc.payment_date,car.id carId");
 		// sql.append(",man.id manId");
 		sql.append(",c.ver_major,c.ver_minor,c.op_type,c.file_date");
+		sql.append(",car.company company");
+		sql.append(",bia.id batch_company_id,bia.name batch_company");
+		sql.append(",m.id motorcade_id,m.name motorcade_name");
 		sql.append(" from BS_CONTRACT_CHARGER cc");
 		sql.append(" inner join BS_CONTRACT c on cc.id = c.id");
 		sql.append(" inner join BS_CAR_CONTRACT carc on c.id = carc.contract_id");
 		sql.append(" inner join BS_Car car on carc.car_id = car.id");
-		sql.append(" left join bc_identity_actor_history iah on c.logout_id = iah.id");
 		if(driverId != null){
 			sql.append(" left join BS_CARMAN_CONTRACT manc on c.id = manc.contract_id");
 			sql.append(" left join BS_CARMAN man on manc.man_id = man.id");
 		}
+		sql.append(" left join BC_IDENTITY_ACTOR_HISTORY iah on c.author_id = iah.id");
+		sql.append(" left join bs_motorcade m on m.id=car.motorcade_id");
+		sql.append(" left join bc_identity_actor bia on bia.id=m.unit_id");
+		
 		sqlObject.setSql(sql.toString());
 
 		// 注入参数
@@ -184,6 +190,11 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 				map.put("ver_minor", rs[i++]);
 				map.put("op_type", rs[i++]);
 				map.put("fileDate", rs[i++]);
+				map.put("company", rs[i++]);
+				map.put("batch_company_id", rs[i++]);
+				map.put("batch_company", rs[i++]);
+				map.put("motorcade_id", rs[i++]);
+				map.put("motorcade_name", rs[i++]);
 				return map;
 			}
 		});
@@ -238,8 +249,27 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 							return value.toString();
 					}
 				}));
-		columns.add(new TextColumn4MapKey("c.word_no", "word_no",
-				getText("contract4Charger.wordNo"), 70));
+		columns.add(new TextColumn4MapKey("car.company", "company",
+				getText("contract.company"), 50).setSortable(true));
+		columns.add(new TextColumn4MapKey("bia.name", "batch_company",
+				getText("contract.batch.company"), 70).setSortable(true));
+		columns.add(new TextColumn4MapKey("m.name", "motorcade_name",
+				getText("contract.motorcadeName"), 70)
+				.setSortable(true)
+				.setUseTitleFromLabel(true)
+				.setValueFormater(
+						new LinkFormater4Id(this.getContextPath()
+								+ "/bc-business/motorcade/edit?id={0}",
+								"motorcade") {
+							@SuppressWarnings("unchecked")
+							@Override
+							public String getIdValue(Object context,
+									Object value) {
+								return StringUtils
+										.toString(((Map<String, Object>) context)
+												.get("motorcade_id"));
+							}
+						}));
 		columns.add(new TextColumn4MapKey("c.ext_str1", "ext_str1",
 				getText("contract.car"), 85).setUseTitleFromLabel(true)
 				.setValueFormater(
@@ -254,6 +284,8 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 												.get("carId"));
 							}
 						}));
+		columns.add(new TextColumn4MapKey("c.word_no", "word_no",
+				getText("contract4Charger.wordNo"), 70));
 		columns.add(new TextColumn4MapKey("c.ext_str2", "ext_str2",
 				getText("contract4Charger.charger"), 140).setUseTitleFromLabel(
 				true).setValueFormater(
@@ -305,7 +337,7 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 	@Override
 	protected String[] getGridSearchFields() {
 		return new String[] { "c.code", "c.ext_str1", "c.ext_str2",
-				"c.word_no", "cc.bs_type" };
+				"c.word_no", "cc.bs_type","c.word_no" };
 	}
 
 	@Override
