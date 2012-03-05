@@ -72,8 +72,8 @@ public class InfoCenterAction extends ActionSupport {
 		this.pageOption = new PageOption().setMaximizable(true)
 				.setMinimizable(true).setMinWidth(760).setWidth(880)
 				.setMinHeight(380).setHeight(500);
-		this.pageOption.setHelp("cheliangchaxun");//添加帮助按钮
-		//this.pageOption.setPrint("bs/infoCenter");//添加打印按钮
+		this.pageOption.setHelp("cheliangchaxun");// 添加帮助按钮
+		// this.pageOption.setPrint("bs/infoCenter");//添加打印按钮
 
 		// 可选分公司列表
 		units = OptionItem.toLabelValues(this.actorService.find4option(
@@ -133,9 +133,9 @@ public class InfoCenterAction extends ActionSupport {
 		jsons.put(getOneSearchTypeJson("自编号", InfoCenter.TYPE_CAR_CODE));
 		jsons.put(getOneSearchTypeJson("发动机号", InfoCenter.TYPE_CAR_ENGINENO));
 		jsons.put(getOneSearchTypeJson("车架号", InfoCenter.TYPE_CAR_VIN));
-		//jsons.put(getOneSearchTypeJson("购置税发票号", InfoCenter.TYPE_CAR_INVOICENO));
-		// jsons.put(getOneSearchTypeJson("服务资格证号", "cert4fwzg"));
-		// jsons.put(getOneSearchTypeJson("车主", "man"));
+//		jsons.put(getOneSearchTypeJson("购置税发票号", InfoCenter.TYPE_CAR_INVOICENO));
+		jsons.put(getOneSearchTypeJson("服务资格证", InfoCenter.TYPE_MAN_CERT_FWZG));
+		jsons.put(getOneSearchTypeJson("姓名", InfoCenter.TYPE_MAN_NAME));
 		return jsons;
 	}
 
