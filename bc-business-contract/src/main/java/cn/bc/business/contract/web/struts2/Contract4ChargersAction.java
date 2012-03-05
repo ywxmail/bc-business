@@ -4,7 +4,6 @@
 package cn.bc.business.contract.web.struts2;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -38,7 +37,6 @@ import cn.bc.option.domain.OptionItem;
 import cn.bc.option.service.OptionService;
 import cn.bc.web.formater.AbstractFormater;
 import cn.bc.web.formater.CalendarFormater;
-import cn.bc.web.formater.DateRangeFormater;
 import cn.bc.web.formater.EntityStatusFormater;
 import cn.bc.web.formater.LinkFormater4Id;
 import cn.bc.web.ui.html.grid.Column;
@@ -66,7 +64,6 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 	public String patchNo;
 	public Long carId;
 	public Long driverId;
-	
 
 	@Override
 	public boolean isReadonly() {
@@ -153,14 +150,14 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 		sql.append(" inner join BS_CONTRACT c on cc.id = c.id");
 		sql.append(" inner join BS_CAR_CONTRACT carc on c.id = carc.contract_id");
 		sql.append(" inner join BS_Car car on carc.car_id = car.id");
-		if(driverId != null){
+		if (driverId != null) {
 			sql.append(" left join BS_CARMAN_CONTRACT manc on c.id = manc.contract_id");
 			sql.append(" left join BS_CARMAN man on manc.man_id = man.id");
 		}
 		sql.append(" left join BC_IDENTITY_ACTOR_HISTORY iah on c.author_id = iah.id");
 		sql.append(" left join bs_motorcade m on m.id=car.motorcade_id");
 		sql.append(" left join bc_identity_actor bia on bia.id=m.unit_id");
-		
+
 		sqlObject.setSql(sql.toString());
 
 		// 注入参数
@@ -295,21 +292,17 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 				true).setValueFormater(
 				new LinkFormater4ChargerInfo(this.getContextPath())));
 		columns.add(new TextColumn4MapKey("c.start_date", "start_date",
-				getText("contract.deadline"), 180).setValueFormater(
-				new DateRangeFormater("yyyy-MM-dd") {
-					@Override
-					public Date getToDate(Object context, Object value) {
-						@SuppressWarnings("rawtypes")
-						Map contract = (Map) context;
-						return (Date) contract.get("end_date");
-					}
-				}).setUseTitleFromLabel(true));
+				getText("contract4Charger.startDate"), 90)
+				.setValueFormater(new CalendarFormater()));
+		columns.add(new TextColumn4MapKey("c.end_date", "end_date",
+				getText("contract4Charger.endDate"), 90)
+				.setValueFormater(new CalendarFormater()));
 		columns.add(new TextColumn4MapKey("c.sign_date", "sign_date",
 				getText("contract.signDate"), 90).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
 		columns.add(new TextColumn4MapKey("cc.contract_version_no",
 				"contract_version_no",
-				getText("contract4Charger.contractVersionNo"),180)
+				getText("contract4Charger.contractVersionNo"), 180)
 				.setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("c.transactor_name",
 				"transactor_name", getText("contract.transactor"), 50)
@@ -341,7 +334,8 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 	@Override
 	protected String[] getGridSearchFields() {
 		return new String[] { "c.code", "c.ext_str1", "c.ext_str2",
-				"c.word_no", "cc.bs_type","c.word_no" };
+				"c.word_no", "cc.bs_type", "c.word_no", "car.company",
+				"bia.name", "m.name" };
 	}
 
 	@Override
@@ -391,18 +385,16 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 
 			}
 		}
-		
+
 		if (carId != null) {
-			carCondition = new EqualsCondition("carc.car_id",
-					carId);
+			carCondition = new EqualsCondition("carc.car_id", carId);
 		}
-		
+
 		if (driverId != null) {
-			driverCondition = new EqualsCondition("manc.man_id",
-					driverId);
+			driverCondition = new EqualsCondition("manc.man_id", driverId);
 		}
 		return ConditionUtils.mix2AndCondition(typeCondtion, statusCondition,
-				patchCondtion, mainsCondition,carCondition,driverCondition);
+				patchCondtion, mainsCondition, carCondition, driverCondition);
 	}
 
 	@Override
@@ -421,7 +413,7 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 		if (patchNo != null) {
 			json.put("patchNo", patchNo);
 		}
-		
+
 		if (carId != null) {
 			json.put("carId", carId);
 		}
@@ -512,11 +504,12 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 			@Qualifier("actorService") ActorService actorService) {
 		this.actorService = actorService;
 	}
-	
+
 	@Autowired
 	public void setMotorcadeService(MotorcadeService motorcadeService) {
 		this.motorcadeService = motorcadeService;
 	}
+
 	public JSONArray units;// 分公司的下拉列表信息
 	public JSONArray motorcades;// 车队的下拉列表信息
 	public JSONArray contractVersionNos;// 合同版本号列表
