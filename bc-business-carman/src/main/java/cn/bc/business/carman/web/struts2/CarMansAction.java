@@ -29,6 +29,7 @@ import cn.bc.core.query.condition.ConditionUtils;
 import cn.bc.core.query.condition.Direction;
 import cn.bc.core.query.condition.impl.EqualsCondition;
 import cn.bc.core.query.condition.impl.InCondition;
+import cn.bc.core.query.condition.impl.LikeCondition;
 import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.core.util.StringUtils;
 import cn.bc.db.jdbc.RowMapper;
@@ -45,7 +46,6 @@ import cn.bc.web.ui.html.grid.TextColumn4MapKey;
 import cn.bc.web.ui.html.page.PageOption;
 import cn.bc.web.ui.html.toolbar.Toolbar;
 import cn.bc.web.ui.html.toolbar.ToolbarButton;
-import cn.bc.web.ui.html.toolbar.ToolbarMenuButton;
 import cn.bc.web.ui.json.Json;
 
 /**
@@ -85,6 +85,7 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 		sql.append(",m.cert_cyzg,m.work_date,m.origin,m.former_unit,m.charger,m.cert_driving_first_date");
 		sql.append(",m.cert_driving,m.cert_driving_start_date,m.cert_driving_end_date,m.file_date,m.phone,m.phone1,m.sex,m.birthdate");
 		sql.append(",m.carinfo,m.move_type,mo.name motorcade,bia.name unit_name,m.classes,m.move_date,m.shiftwork_end_date,m.main_car_id");
+		sql.append(",c.company company,c.code");
 		sql.append(" from BS_CARMAN m");
 		sql.append(" left join bs_car c on m.main_car_id=c.id");
 		sql.append(" left join bs_motorcade mo on c.motorcade_id=mo.id");
@@ -129,6 +130,9 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 				map.put("classes", rs[i++]);
 				map.put("move_date", rs[i++]);
 				map.put("shiftwork_end_date", rs[i++]);
+				map.put("mainCarId", rs[i++]);
+				map.put("company", rs[i++]);
+				map.put("carCode", rs[i++]);
 
 				return map;
 			}
@@ -174,14 +178,18 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 						return (Date) contract.get("shiftwork_end_date");
 					}
 				}.setUseEmptySymbol(true)));
+		columns.add(new TextColumn4MapKey("c.company", "company",
+				getText("carMan.company"), 40).setSortable(true));
 		columns.add(new TextColumn4MapKey("bia.name", "unit_name",
-				getText("carMan.unit_name"), 80).setSortable(true));
+				getText("carMan.unit_name"), 70).setSortable(true));
 		columns.add(new TextColumn4MapKey("mo.name", "motorcade",
-				getText("carMan.motorcade"), 80).setSortable(true));
+				getText("carMan.motorcade"), 70).setSortable(true));
 		columns.add(new TextColumn4MapKey("m.carinfo", "carinfo",
 				getText("carMan.operationCar"), 560)
 				.setValueFormater(new LinkFormater4CarInfo(this
 						.getContextPath())));
+		columns.add(new TextColumn4MapKey("c.code", "carCode",
+				getText("carMan.carCode"), 70).setSortable(true));
 		// =================
 		columns.add(new TextColumn4MapKey("m.birthdate", "birth_date",
 				getText("carMan.birthdate"), 85).setSortable(true)
@@ -232,7 +240,19 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 	@Override
 	protected String[] getGridSearchFields() {
 		return new String[] { "m.name", "m.origin", "m.cert_identity",
-				"m.cert_cyzg", "m.cert_fwzg", "m.phone" };
+				"m.cert_cyzg", "m.cert_fwzg", "m.phone", "c.company",
+				"bia.name", "mo.name", "m.carinfo", "c.code" };
+	}
+
+	@Override
+	protected LikeCondition getGridSearchCondition4OneField(String field,
+			String value) {
+		if ("m.carinfo".equals(field)) {
+			return new LikeCondition(field, value != null ? value.toUpperCase()
+					: value);
+		} else {
+			return super.getGridSearchCondition4OneField(field, value);
+		}
 	}
 
 	@Override
