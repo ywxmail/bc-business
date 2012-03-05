@@ -234,25 +234,6 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 						}
 					}
 				}));
-		columns.add(new TextColumn4MapKey("cc.sign_type", "sign_type",
-				getText("contract4Charger.signType"), 58).setSortable(true)
-				.setUseTitleFromLabel(true));
-		columns.add(new TextColumn4MapKey("cc.bs_type", "bs_type",
-				getText("contract4Charger.businessType"), 100)
-				.setUseTitleFromLabel(true));
-		columns.add(new TextColumn4MapKey("cc.payment_date", "payment_date",
-				getText("contract4Charger.paymentDate"), 50)
-				.setValueFormater(new AbstractFormater<String>() {
-					@Override
-					public String format(Object context, Object value) {
-						if (value == null)
-							return "";
-						else if (value.toString().equals("0"))
-							return "月末";
-						else
-							return value.toString();
-					}
-				}));
 		columns.add(new TextColumn4MapKey("car.company", "company",
 				getText("contract.company"), 50).setSortable(true));
 		columns.add(new TextColumn4MapKey("bia.name", "batch_company",
@@ -290,6 +271,25 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 						}));
 		columns.add(new TextColumn4MapKey("c.word_no", "word_no",
 				getText("contract4Charger.wordNo"), 70));
+		columns.add(new TextColumn4MapKey("cc.sign_type", "sign_type",
+				getText("contract4Charger.signType"), 58).setSortable(true)
+				.setUseTitleFromLabel(true));
+		columns.add(new TextColumn4MapKey("cc.bs_type", "bs_type",
+				getText("contract4Charger.businessType"), 100)
+				.setUseTitleFromLabel(true));
+		columns.add(new TextColumn4MapKey("cc.payment_date", "payment_date",
+				getText("contract4Charger.paymentDate"), 50)
+				.setValueFormater(new AbstractFormater<String>() {
+					@Override
+					public String format(Object context, Object value) {
+						if (value == null)
+							return "";
+						else if (value.toString().equals("0"))
+							return "月末";
+						else
+							return value.toString();
+					}
+				}));
 		columns.add(new TextColumn4MapKey("c.ext_str2", "ext_str2",
 				getText("contract4Charger.charger"), 140).setUseTitleFromLabel(
 				true).setValueFormater(
