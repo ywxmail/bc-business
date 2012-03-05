@@ -32,6 +32,7 @@
 		<module>bc-business-certLost</module>
 		<module>bc-business-carlpg</module>
 		<module>bc-business-mix</module>
+		<module>bc-business-invoice</module>
 	</modules>
 	<scm>
 		<connection>scm:git:git@192.168.0.222:bc-business.git</connection>
