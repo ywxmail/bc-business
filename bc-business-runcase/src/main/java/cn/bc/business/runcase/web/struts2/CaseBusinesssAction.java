@@ -82,8 +82,9 @@ public class CaseBusinesssAction extends ViewAction<Map<String, Object>> {
 		StringBuffer sql = new StringBuffer();
 		sql.append("select cit.id,cit.charger,cit.category,b.status_,b.subject,b.motorcade_name,b.car_plate,b.driver_name,b.closer_name,b.happen_date");
 		sql.append(",b.close_date,b.address,b.from_,b.source,b.driver_cert,b.case_no,b.motorcade_id,b.driver_id,b.car_id");
-		sql.append(",b.company,c.bs_type");
+		sql.append(",b.company,c.bs_type,c.code");
 		sql.append(",man.origin");
+		sql.append(",bia.id batch_company_id,bia.name batch_company");
 		sql.append(" from bs_case_infract_business cit");
 		sql.append(" inner join BS_CASE_BASE b on cit.id=b.id");
 		sql.append(" left join BS_CAR c on b.car_id = c.id");
@@ -122,7 +123,11 @@ public class CaseBusinesssAction extends ViewAction<Map<String, Object>> {
 				map.put("carId", rs[i++]);
 				map.put("company", rs[i++]);
 				map.put("bs_type", rs[i++]);
+				map.put("code", rs[i++]);
 				map.put("origin", rs[i++]);
+				map.put("batch_company_id", rs[i++]);
+				map.put("batch_company", rs[i++]);
+				
 				
 				return map;
 			}
@@ -141,6 +146,8 @@ public class CaseBusinesssAction extends ViewAction<Map<String, Object>> {
 				.setValueFormater(new EntityStatusFormater(getBSStatuses2())));
 		columns.add(new TextColumn4MapKey("b.company", "company",
 				getText("runcase.company"), 60).setSortable(true));
+		columns.add(new TextColumn4MapKey("bia.name", "batch_company",
+				getText("runcase.batch.company"), 70).setSortable(true));
 		columns.add(new TextColumn4MapKey("b.motorcade_name", "motorcade_name",
 				getText("runcase.motorcadeName"), 70)
 				.setSortable(true)
@@ -193,6 +200,9 @@ public class CaseBusinesssAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("b.driver_cert", "driver_cert",
 				getText("runcase.FWZGCert"), 70).setSortable(true)
 				.setUseTitleFromLabel(true));
+		columns.add(new TextColumn4MapKey("c.code", "code",
+				getText("runcase.accident.carCode"), 70).setSortable(true)
+				.setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("b.subject", "subject",
 				getText("runcase.subject"), 180).setUseTitleFromLabel(true)
 				.setSortable(true));
@@ -221,7 +231,7 @@ public class CaseBusinesssAction extends ViewAction<Map<String, Object>> {
 	@Override
 	protected String[] getGridSearchFields() {
 		return new String[] { "b.case_no", "b.car_plate","b.driver_name","b.driver_cert",
-						"b.closer_name", "b.subject" };
+						"b.closer_name", "b.subject","c.code" };
 	}
 
 	@Override

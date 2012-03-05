@@ -82,22 +82,35 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 
 		final String value = "%" + searchText.toUpperCase() + "%";
 		final StringBuffer sql = new StringBuffer();
-		sql.append("select c.id,c.code,c.plate_type,c.plate_no,c.status_,c.return_date from bs_car c");
-		if (searchType.equals(InfoCenter.TYPE_CAR_PLATE)) {// 车牌
-			sql.append(" where c.plate_no like ?");
-		} else if (searchType.equals(InfoCenter.TYPE_CAR_CODE)) {// 自编号
-			sql.append(" where c.code like ?");
-		} else if (searchType.equals(InfoCenter.TYPE_CAR_ENGINENO)) {// 发动机号
-			sql.append(" where c.engine_no like ?");
-		} else if (searchType.equals(InfoCenter.TYPE_CAR_VIN)) {// 车架号
-			sql.append(" where c.vin like ?");
-		} else if (searchType.equals(InfoCenter.TYPE_CAR_INVOICENO)) {// 购置税发票号
-			sql.append(" where c.invoice_no2 like ?");
+		sql.append("select distinct car.id,car.code,car.plate_type,car.plate_no,car.status_,car.return_date,car.register_date");
+		sql.append(" from bs_car car");
+		if (searchType.equals(InfoCenter.TYPE_CAR_PLATE)) {// 车牌-车牌
+			sql.append(" where car.plate_no like ?");
+		} else if (searchType.equals(InfoCenter.TYPE_CAR_CODE)) {// 车牌-自编号
+			sql.append(" where car.code like ?");
+		} else if (searchType.equals(InfoCenter.TYPE_CAR_ENGINENO)) {// 车牌-发动机号
+			sql.append(" where car.engine_no like ?");
+		} else if (searchType.equals(InfoCenter.TYPE_CAR_VIN)) {// 车牌-车架号
+			sql.append(" where car.vin like ?");
+		} else if (searchType.equals(InfoCenter.TYPE_CAR_INVOICENO)) {// 车牌-购置税发票号
+			sql.append(" where car.invoice_no2 like ?");
+		} else if (searchType.indexOf("man") == 0) {// 司机或责任人
+			sql.append(" inner join bs_car_contract carc on carc.car_id = car.id");
+			sql.append(" inner join bs_contract c on c.id = carc.contract_id");// 合同
+			sql.append(" inner join bs_carman_contract mc on mc.contract_id = c.id");
+			sql.append(" inner join bs_carman m on m.id = mc.man_id");
+			sql.append(" left join bs_contract_labour cl on cl.id = c.id");// 劳动合同
+			sql.append(" left join bs_contract_charger cc on cc.id = c.id");// 经济合同
+			if (searchType.equals(InfoCenter.TYPE_MAN_CERT_FWZG)) {// 服务资格证
+				sql.append(" where m.cert_fwzg like ?");
+			} else if (searchType.equals(InfoCenter.TYPE_MAN_NAME)) {// 姓名
+				sql.append(" where m.name like ?");
+			}
 		} else {// 默认按车牌
-			sql.append(" where c.plate_no like ?");
+			sql.append(" where car.plate_no like ?");
 		}
 
-		sql.append(" order by c.status_,c.register_date desc");
+		sql.append(" order by car.status_,car.register_date desc");
 
 		if (logger.isDebugEnabled()) {
 			logger.debug("searchType=" + searchType + ",searchText="
@@ -711,8 +724,7 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 				return null;
 			}
 
-			private String getTaximeter(String factoryType,
-					String factoryModel) {
+			private String getTaximeter(String factoryType, String factoryModel) {
 				if (factoryType != null && factoryType.length() > 0) {
 					if (factoryModel != null && factoryModel.length() > 0) {
 						return factoryType + " " + factoryModel;
