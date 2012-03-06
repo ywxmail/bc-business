@@ -14,10 +14,16 @@
 
 	<!-- 需要在主配置文件配置entityManagerFactory和transactionManager的实现 -->
 
-	<!-- invoice -->
-	<bean id="invoiceDao" class="cn.bc.business.invoice.dao.hibernate.jpa.InvoiceDaoImpl"
+	<!-- 票务采购 -->
+	<bean id="invoice4BuyDao" class="cn.bc.business.invoice.dao.hibernate.jpa.Invoice4BuyDaoImpl"
 		p:entityManagerFactory-ref="entityManagerFactory" />
-	<bean id="invoiceService" class="cn.bc.business.invoice.service.InvoiceServiceImpl"
-		p:invoiceDao-ref="invoiceDao"	 />
+	<bean id="invoice4BuyService" class="cn.bc.business.invoice.service.Invoice4BuyServiceImpl"
+		p:invoice4BuyDao-ref="invoice4BuyDao"/>
+		
+	<!-- 票务销售 -->
+	<bean id="invoice4SaleDao" class="cn.bc.business.invoice.dao.hibernate.jpa.Invoice4SaleDaoImpl"
+		p:entityManagerFactory-ref="entityManagerFactory" />
+	<bean id="invoice4SaleService" class="cn.bc.business.invoice.service.Invoice4SaleServiceImpl"
+		p:invoice4SaleDao-ref="invoice4SaleDao"/>
 		
 </beans>

@@ -29,14 +29,14 @@ import cn.bc.web.ui.html.page.PageOption;
 import cn.bc.web.ui.json.Json;
 
 /**
- * 票务视图Action
+ * 票务采购视图Action
  * 
  * @author wis
  * 
  */
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 @Controller
-public class InvoicesAction extends ViewAction<Map<String, Object>> {
+public class Invoice4BuysAction extends ViewAction<Map<String, Object>> {
 	private static final long serialVersionUID = 1L;
 	public String status = String.valueOf(BCConstants.STATUS_ENABLED); // 票务的状态，多个用逗号连接
 
@@ -60,8 +60,8 @@ public class InvoicesAction extends ViewAction<Map<String, Object>> {
 
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer sql = new StringBuffer();
-		sql.append("select i.id,i.status_,i.code");
-		sql.append(" from bs_invoice i");
+		sql.append("select i.id,i.status_");
+		sql.append(" from bs_invoice_base i");
 		sqlObject.setSql(sql.toString());
 
 		// 注入参数
