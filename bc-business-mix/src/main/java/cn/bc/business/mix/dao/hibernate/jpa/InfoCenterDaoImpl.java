@@ -368,7 +368,7 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 		sql.append(" inner join BS_CONTRACT c on cc.id = c.id");
 		sql.append(" inner join BS_CAR_CONTRACT carc on c.id = carc.contract_id");
 		sql.append(" inner join bs_carman_contract mc on c.id = mc.contract_id");
-		sql.append(" where carc.car_id = ? and c.main = 0)");
+		sql.append(" where carc.car_id = ? and c.status_ = 0 and c.main = 0)");
 
 		// 在案的排在前面
 		sql.append(") order by m.status_,m.type_ desc,m.file_date");
@@ -407,8 +407,12 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 											(String) obj[i++]));
 							json.put("identity", null2Empty(obj[i++]));
 							json.put("cert4fwzg", null2Empty(obj[i++]));
-							json.put("classes", getManClasses(obj[i++]));
-							json.put("moveType", getManMoveType(obj[i++]));
+							json.put("classes", obj[i++]);
+							json.put("classesDesc",
+									getManClasses(json.get("classes")));
+							json.put("moveType", obj[i++]);
+							json.put("moveTypeDesc",
+									getManMoveType(json.get("moveType")));
 							json.put(
 									"moveDate",
 									getManMoveDate((Date) obj[i++],
@@ -474,7 +478,7 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 				else if (s == CarByDriver.TYPE_ZHUGUA)
 					return "主挂";
 				else
-					return "未知";
+					return "";
 			}
 
 			private String getManMoveType(Object moveType) {
@@ -501,7 +505,7 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 				else if (s == CarByDriverHistory.MOVETYPE_JHZC)
 					return "交回后转车";
 				else
-					return "未知";
+					return "";
 			}
 
 			private String getManSex(Object sex) {

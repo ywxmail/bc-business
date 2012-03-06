@@ -68,9 +68,9 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected OrderCondition getGridDefaultOrderCondition() {
-		// 默认排序方向：状态|登记日期|车队
+		// 默认排序方向：状态|登记日期|自编号
 		return new OrderCondition("c.status_", Direction.Asc).add(
-				"c.register_date", Direction.Desc).add("m.name", Direction.Asc);
+				"c.register_date", Direction.Desc).add("c.code", Direction.Desc);
 	}
 
 	@Override

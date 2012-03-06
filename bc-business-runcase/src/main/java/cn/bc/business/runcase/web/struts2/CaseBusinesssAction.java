@@ -58,7 +58,7 @@ public class CaseBusinesssAction extends ViewAction<Map<String, Object>> {
 	public String status = String.valueOf(CaseBase.STATUS_ACTIVE); // 营运违章的状态，多个用逗号连接
 	public Long carManId;
 	public Long carId;
-	
+
 	@Override
 	public boolean isReadonly() {
 		// 营运违章管理员或系统管理员
@@ -71,7 +71,8 @@ public class CaseBusinesssAction extends ViewAction<Map<String, Object>> {
 	protected OrderCondition getGridDefaultOrderCondition() {
 		// 默认排序方向：登记日期|状态
 		return new OrderCondition("b.file_date", Direction.Desc).add(
-				"b.status_", Direction.Asc).add("b.happen_date", Direction.Desc);
+				"b.status_", Direction.Asc)
+				.add("b.happen_date", Direction.Desc);
 	}
 
 	@Override
@@ -91,9 +92,9 @@ public class CaseBusinesssAction extends ViewAction<Map<String, Object>> {
 		sql.append(" left join BS_CARMAN man on b.driver_id=man.id");
 		sql.append(" left join bs_motorcade m on m.id=b.motorcade_id");
 		sql.append(" left join bc_identity_actor bia on bia.id=m.unit_id");
-		
+
 		sqlObject.setSql(sql.toString());
-		
+
 		// 注入参数
 		sqlObject.setArgs(null);
 
@@ -127,8 +128,7 @@ public class CaseBusinesssAction extends ViewAction<Map<String, Object>> {
 				map.put("origin", rs[i++]);
 				map.put("batch_company_id", rs[i++]);
 				map.put("batch_company", rs[i++]);
-				
-				
+
 				return map;
 			}
 		});
@@ -138,14 +138,15 @@ public class CaseBusinesssAction extends ViewAction<Map<String, Object>> {
 	@Override
 	protected List<Column> getGridColumns() {
 		List<Column> columns = new ArrayList<Column>();
-		columns.add(new IdColumn4MapKey("cit.id","id"));
-		columns.add(new TextColumn4MapKey("b.case_no", "case_no",
-				getText("runcase.caseNo2"),110));
+		columns.add(new IdColumn4MapKey("cit.id", "id"));
 		columns.add(new TextColumn4MapKey("b.status_", "status_",
 				getText("runcase.status"), 40).setSortable(true)
 				.setValueFormater(new EntityStatusFormater(getBSStatuses2())));
+		columns.add(new TextColumn4MapKey("b.happen_date", "happen_date",
+				getText("runcase.happenDate2"), 125).setSortable(true)
+				.setValueFormater(new CalendarFormater("yyyy-MM-dd HH:mm")));
 		columns.add(new TextColumn4MapKey("b.company", "company",
-				getText("runcase.company"), 60).setSortable(true));
+				getText("runcase.company2"), 40).setSortable(true));
 		columns.add(new TextColumn4MapKey("bia.name", "batch_company",
 				getText("runcase.batch.company"), 70).setSortable(true));
 		columns.add(new TextColumn4MapKey("b.motorcade_name", "motorcade_name",
@@ -179,59 +180,56 @@ public class CaseBusinesssAction extends ViewAction<Map<String, Object>> {
 						}
 					}));
 		}
+		columns.add(new TextColumn4MapKey("c.code", "code",
+				getText("runcase.accident.carCode"), 70).setSortable(true)
+				.setUseTitleFromLabel(true));
 		if (carManId == null) {
-		columns.add(new TextColumn4MapKey("b.driver_name", "driver_name",
-				getText("runcase.driverName"), 70).setSortable(true)
-				.setValueFormater(
-					new LinkFormater4Id(this.getContextPath()
-							+ "/bc-business/carMan/edit?id={0}",
-							"drivers") {
-						@SuppressWarnings("unchecked")
-						@Override
-						public String getIdValue(Object context,
-								Object value) {
-							return StringUtils
-									.toString(((Map<String, Object>) context)
-											.get("driverId"));
-						}
-					}));
-		
+			columns.add(new TextColumn4MapKey("b.driver_name", "driver_name",
+					getText("runcase.driverName"), 70).setSortable(true)
+					.setValueFormater(
+							new LinkFormater4Id(this.getContextPath()
+									+ "/bc-business/carMan/edit?id={0}",
+									"drivers") {
+								@SuppressWarnings("unchecked")
+								@Override
+								public String getIdValue(Object context,
+										Object value) {
+									return StringUtils
+											.toString(((Map<String, Object>) context)
+													.get("driverId"));
+								}
+							}));
+
 		}
 		columns.add(new TextColumn4MapKey("b.driver_cert", "driver_cert",
 				getText("runcase.FWZGCert"), 70).setSortable(true)
 				.setUseTitleFromLabel(true));
-		columns.add(new TextColumn4MapKey("c.code", "code",
-				getText("runcase.accident.carCode"), 70).setSortable(true)
-				.setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("b.subject", "subject",
 				getText("runcase.subject"), 180).setUseTitleFromLabel(true)
 				.setSortable(true));
-		columns.add(new TextColumn4MapKey("b.happen_date", "happen_date",
-				getText("runcase.happenDate2"), 125).setSortable(true)
-				.setValueFormater(new CalendarFormater("yyyy-MM-dd HH:mm")));
 		columns.add(new TextColumn4MapKey("b.address", "address",
-				getText("runcase.address2"), 200).setUseTitleFromLabel(true)
-		);
+				getText("runcase.address2"), 200).setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("cit.category", "category",
 				getText("runcase.category"), 70).setSortable(true)
 				.setValueFormater(new EntityStatusFormater(getCategory())));
 		columns.add(new TextColumn4MapKey("cit.charger", "charger",
 				getText("runcase.chargers"), 170).setUseTitleFromLabel(true)
-				.setValueFormater(new LinkFormater4ChargerInfo(this
-						.getContextPath()))
-		);
+				.setValueFormater(
+						new LinkFormater4ChargerInfo(this.getContextPath())));
 		columns.add(new TextColumn4MapKey("c.bs_type", "bs_type",
 				getText("runcase.businessType"), 80));
 		columns.add(new TextColumn4MapKey("man.origin", "origin",
 				getText("runcase.origin"), 150));
-		
+		columns.add(new TextColumn4MapKey("b.case_no", "case_no",
+				getText("runcase.caseNo2"), 110));
+
 		return columns;
 	}
 
 	@Override
 	protected String[] getGridSearchFields() {
-		return new String[] { "b.case_no", "b.car_plate","b.driver_name","b.driver_cert",
-						"b.closer_name", "b.subject","c.code" };
+		return new String[] { "b.case_no", "b.car_plate", "b.driver_name",
+				"b.driver_cert", "b.closer_name", "b.subject", "c.code" };
 	}
 
 	@Override
@@ -250,28 +248,28 @@ public class CaseBusinesssAction extends ViewAction<Map<String, Object>> {
 		return "['car_plate']+'\t 的营运违章信息'";
 	}
 
-	
 	@Override
 	protected Condition getGridSpecalCondition() {
-		//状态条件
-		Condition statusCondition = ConditionUtils.toConditionByComma4IntegerValue(this.status,
-				"b.status_");
-		
+		// 状态条件
+		Condition statusCondition = ConditionUtils
+				.toConditionByComma4IntegerValue(this.status, "b.status_");
+
 		// carManId条件
 		Condition carManIdCondition = null;
 		if (carManId != null) {
 			carManIdCondition = new EqualsCondition("b.driver_id", carManId);
 		}
-		
+
 		// carId条件
 		Condition carIdCondition = null;
 		if (carId != null) {
-			carIdCondition =new EqualsCondition("b.car_id", carId);
+			carIdCondition = new EqualsCondition("b.car_id", carId);
 		}
-		
-		return ConditionUtils.mix2AndCondition(statusCondition,carManIdCondition,carIdCondition);
+
+		return ConditionUtils.mix2AndCondition(statusCondition,
+				carManIdCondition, carIdCondition);
 	}
-	
+
 	@Override
 	protected void extendGridExtrasData(Json json) {
 		super.extendGridExtrasData(json);
@@ -280,7 +278,7 @@ public class CaseBusinesssAction extends ViewAction<Map<String, Object>> {
 		if (this.status != null && this.status.trim().length() > 0) {
 			json.put("status", status);
 		}
-		
+
 		if (carManId != null) {
 			json.put("carManId", carManId);
 		}
@@ -290,7 +288,6 @@ public class CaseBusinesssAction extends ViewAction<Map<String, Object>> {
 		}
 	}
 
-	
 	/**
 	 * 获取Entity的状态值转换列表
 	 * 
@@ -304,7 +301,7 @@ public class CaseBusinesssAction extends ViewAction<Map<String, Object>> {
 				getText("runcase.select.status.closed"));
 		return statuses;
 	}
-	
+
 	/**
 	 * 获取Entity的来源转换列表
 	 * 
@@ -320,7 +317,7 @@ public class CaseBusinesssAction extends ViewAction<Map<String, Object>> {
 				getText("runcase.select.source.sync.auto"));
 		return statuses;
 	}
-	
+
 	/**
 	 * 获取Entity的违章类别转换列表
 	 * 
@@ -345,7 +342,7 @@ public class CaseBusinesssAction extends ViewAction<Map<String, Object>> {
 								this.getBSStatuses2(), "status", 0,
 								getText("title.click2changeSearchStatus")));
 	}
-	
+
 	@Override
 	protected LikeCondition getGridSearchCondition4OneField(String field,
 			String value) {
@@ -356,14 +353,12 @@ public class CaseBusinesssAction extends ViewAction<Map<String, Object>> {
 			return super.getGridSearchCondition4OneField(field, value);
 		}
 	}
-	
-	
+
 	// ==高级搜索代码开始==
 	@Override
 	protected boolean useAdvanceSearch() {
 		return true;
 	}
-
 
 	private MotorcadeService motorcadeService;
 	private ActorService actorService;
@@ -379,7 +374,7 @@ public class CaseBusinesssAction extends ViewAction<Map<String, Object>> {
 	public void setMotorcadeService(MotorcadeService motorcadeService) {
 		this.motorcadeService = motorcadeService;
 	}
-	
+
 	@Autowired
 	public void setOptionService(OptionService optionService) {
 		this.optionService = optionService;
@@ -399,13 +394,11 @@ public class CaseBusinesssAction extends ViewAction<Map<String, Object>> {
 		// 可选车队列表
 		motorcades = OptionItem.toLabelValues(this.motorcadeService
 				.find4Option(null));
-		
+
 		// 批量加载可选项列表
-				Map<String, List<Map<String, String>>> optionItems = this.optionService
-						.findOptionItemByGroupKeys(new String[] {
-							OptionConstants.CAR_BUSINESS_NATURE
-						});
-		
+		Map<String, List<Map<String, String>>> optionItems = this.optionService
+				.findOptionItemByGroupKeys(new String[] { OptionConstants.CAR_BUSINESS_NATURE });
+
 		// 营运性质列表
 		this.businessTypes = OptionItem.toLabelValues(
 				optionItems.get(OptionConstants.CAR_BUSINESS_NATURE), "value");
