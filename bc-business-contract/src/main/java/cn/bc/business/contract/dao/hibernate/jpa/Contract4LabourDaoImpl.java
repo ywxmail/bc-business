@@ -610,18 +610,16 @@ public class Contract4LabourDaoImpl extends
 	 * @param description
 	 */
 	public void updateCarMan4CarManInfo(Long driverId, String houseType,
-			Integer region, String origin, Calendar birthDate,
-			String description) {
+			Integer region, String origin, Calendar birthDate) {
 		ArrayList<Object> args = new ArrayList<Object>();
 		StringBuffer hql = new StringBuffer();
 		hql.append("UPDATE CarMan c SET c.houseType=?,c.region=?");
-		hql.append(",c.origin=?,c.birthdate=?,c.description=?");
+		hql.append(",c.origin=?,c.birthdate=?");
 		hql.append(" WHERE c.id =?");
 		args.add(houseType);
 		args.add(region);
 		args.add(origin);
 		args.add(birthDate);
-		args.add(description);
 		args.add(driverId);
 		this.executeUpdate(hql.toString(), args);
 		
