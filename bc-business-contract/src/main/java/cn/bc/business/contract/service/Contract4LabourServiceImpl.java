@@ -96,10 +96,9 @@ public class Contract4LabourServiceImpl extends
 //				+"个人社保编号: "+contract4Labour.getInsurCode()+"\n"
 //				+"社保参保险种: "+contract4Labour.getInsuranceType();
 //		
-//		//更新司机的户口性质,区域,籍贯,出生日期,备注
-//		this.contract4LabourDao.updateCarMan4CarManInfo(driverId,contract4Labour.getHouseType(),
-//				contract4Labour.getRegion(),contract4Labour.getOrigin(),contract4Labour.getBirthDate(),
-//				description);
+		//更新司机的户口性质,区域,籍贯,出生日期,备注
+		this.contract4LabourDao.updateCarMan4CarManInfo(driverId,contract4Labour.getHouseType(),
+				contract4Labour.getRegion(),contract4Labour.getOrigin(),contract4Labour.getBirthDate());
 		
     	
 		//this.contract4LabourDao.updateCarMan4Description(driverId,description);
