@@ -484,7 +484,7 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 		final StringBuffer sql = new StringBuffer();
 		sql.append("select b.id,b.subject,b.lock_date,b.type_,m.name");
 		sql.append(" from bs_blacklist b");
-		sql.append(" inner join bs_carman m on m.id=b.driver_id");
+		sql.append(" left join bs_carman m on m.id=b.driver_id");
 		sql.append(" where b.car_id = ? and b.status_ = 0");
 		sql.append(" order by b.file_date desc");
 
