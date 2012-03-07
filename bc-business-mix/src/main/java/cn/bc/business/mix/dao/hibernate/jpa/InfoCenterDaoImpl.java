@@ -189,7 +189,7 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 		}
 
 		// ==联系人信息==
-		JSONArray mans = this.getMans(carId);
+		JSONArray mans = this.getMansOld(carId);
 		json.put("mans", mans);
 
 		// ==提醒信息==
@@ -352,6 +352,44 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 	 * @return
 	 */
 	private JSONArray getMans(final Long carId) {
+		// 预定义查询司机的相关sql信息
+		StringBuffer manSql = new StringBuffer();
+		manSql.append("select m.id,m.uid_,m.status_,m.type_,m.name,m.sex,m.origin,m.house_type,m.address,m.address1");
+		manSql.append(",m.phone,m.phone1,m.cert_identity,m.cert_fwzg,m.classes");
+		manSql.append(",m.move_type,m.move_date,m.shiftwork_end_date,m.carinfo,m.desc_");
+
+		// 获取迁移记录对应的司机信息
+		JSONArray mansFromCarByDriverHistory = this
+				.getMansFromCarByDriverHistory(carId, manSql);
+
+		// 获取经济合同对应的责任人信息
+		JSONArray mansFromContract4Charger = this.getMansFromContract4Charger(
+				carId, manSql);
+
+		// 获取劳动合同对应的司机信息
+		JSONArray mansFromContract4Labour = this.getMansFromContract4Labour(
+				carId, manSql);
+
+		// 获取营运班次对应的顶班司机信息
+		JSONArray mansFromCarByDriver = this.getMansFromCarByDriver(carId,
+				manSql);
+
+		return null;
+	}
+
+	/**
+	 * 获取司机、责任人信息
+	 * <p>
+	 * [{id:1,uid:"uid1",type:"司机",name:"张三",sex:"男",phones:"电话1,电话2",moveType:
+	 * "迁移类型", moveDate
+	 * :"迁移日期",identity:"身份证号码",address1:"身份证地址",address2:"暂住地址",region
+	 * :"籍贯",cert4fwzg:"资格证号",classes:"营运班次"},...]
+	 * </p>
+	 * 
+	 * @param carId
+	 * @return
+	 */
+	private JSONArray getMansOld(final Long carId) {
 		final StringBuffer sql = new StringBuffer();
 		sql.append("select m.id,m.uid_,m.status_,m.type_,m.name,m.sex,m.origin,m.house_type,m.address,m.address1");
 		sql.append(",m.phone,m.phone1,m.cert_identity,m.cert_fwzg,m.classes");
@@ -429,113 +467,6 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 				return jsons;
 			}
 
-			private String getManMoveDate(Date move_date,
-					Date shiftwork_end_date) {
-				if (move_date != null) {
-					if (shiftwork_end_date != null) {
-						return DateUtils.formatDate(move_date) + "～"
-								+ DateUtils.formatDate(shiftwork_end_date);
-					} else {
-						return DateUtils.formatDate(move_date);
-					}
-				} else {
-					if (shiftwork_end_date != null) {
-						return "～" + DateUtils.formatDate(shiftwork_end_date);
-					} else {
-						return "";
-					}
-				}
-			}
-
-			private String getManType(Object type) {
-				if (type == null)
-					return "";
-
-				int s = Integer.parseInt(type.toString());
-				if (s == CarMan.TYPE_DRIVER)
-					return "司机";
-				else if (s == CarMan.TYPE_CHARGER)
-					return "责任人";
-				else if (s == CarMan.TYPE_DRIVER_AND_CHARGER)
-					return "司机和责任人";
-				else if (s == CarMan.TYPE_FEIBIAN)
-					return "非编";
-				else
-					return "未知";
-			}
-
-			private String getManClasses(Object classes) {
-				if (classes == null)
-					return "";
-
-				int s = Integer.parseInt(classes.toString());
-				if (s == CarByDriver.TYPE_ZHENGBAN)
-					return "正班";
-				else if (s == CarByDriver.TYPE_FUBAN)
-					return "副班";
-				else if (s == CarByDriver.TYPE_DINGBAN)
-					return "顶班";
-				else if (s == CarByDriver.TYPE_ZHUGUA)
-					return "主挂";
-				else
-					return "";
-			}
-
-			private String getManMoveType(Object moveType) {
-				if (moveType == null)
-					return "";
-
-				int s = Integer.parseInt(moveType.toString());
-				if (s == CarByDriverHistory.MOVETYPE_CLDCL)
-					return "车辆到车辆";
-				else if (s == CarByDriverHistory.MOVETYPE_GSDGSYZX)
-					return "公司到公司(已注销)";
-				else if (s == CarByDriverHistory.MOVETYPE_ZXWYQX)
-					return "注销未有去向";
-				else if (s == CarByDriverHistory.MOVETYPE_YWGSQH)
-					return "由外公司迁回";
-				else if (s == CarByDriverHistory.MOVETYPE_JHWZX)
-					return "交回未注销";
-				else if (s == CarByDriverHistory.MOVETYPE_XRZ)
-					return "新入职";
-				else if (s == CarByDriverHistory.MOVETYPE_ZCD)
-					return "转车队";
-				else if (s == CarByDriverHistory.MOVETYPE_DINGBAN)
-					return "顶班";
-				else if (s == CarByDriverHistory.MOVETYPE_JHZC)
-					return "交回后转车";
-				else
-					return "";
-			}
-
-			private String getManSex(Object sex) {
-				if (sex == null)
-					return "无";
-
-				int s = Integer.parseInt(sex.toString());
-				if (s == ActorDetail.SEX_MAN)
-					return "男";
-				else if (s == ActorDetail.SEX_WOMAN)
-					return "女";
-				else
-					return "无";
-			}
-
-			private String getManPhones(String phone1, String phone2) {
-				if (phone1 != null && phone1.length() > 0) {
-					if (phone2 != null && phone2.length() > 0) {
-						return phone1 + "，" + phone2;
-					} else {
-						return phone1;
-					}
-				} else {
-					if (phone2 != null && phone2.length() > 0) {
-						return phone2;
-					} else {
-						return "";
-					}
-				}
-			}
 		});
 	}
 
@@ -783,9 +714,9 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 		sql.append("select cc.id,c.status_,cc.bs_type");
 		sql.append(",c.start_date,c.end_date");
 		sql.append(",cc.payment_date,cc.include_cost,c.main");
-		sql.append(" from BS_CONTRACT_CHARGER cc");
-		sql.append(" inner join BS_CONTRACT c on cc.id = c.id");
-		sql.append(" inner join BS_CAR_CONTRACT carc on c.id = carc.contract_id");
+		sql.append(" from bs_contract_charger cc");
+		sql.append(" inner join bs_contract c on cc.id = c.id");
+		sql.append(" inner join bs_car_contract carc on c.id = carc.contract_id");
 		sql.append(" where carc.car_id = ? and c.main = 0");
 		sql.append(" order by c.file_date desc");
 
@@ -839,9 +770,395 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 		});
 	}
 
+	/**
+	 * 获取车辆迁移记录对应的司机信息,对同一个司机的多条迁移记录只获取最新的那条：
+	 * <p>
+	 * [{司机1信息},{司机2信息},...]
+	 * </p>
+	 * 
+	 * @param carId
+	 * @return
+	 */
+	private JSONArray getMansFromCarByDriverHistory(final Long carId,
+			StringBuffer manSql) {
+		final StringBuffer sql = new StringBuffer(manSql);
+		sql.append(",h.id h_id,h.move_type h_moveType,h.move_date h_moveDate,h.from_car_id h_fromCarId,h.to_car_id h_toCarId");
+		sql.append(" from bs_carman m");
+		sql.append(" inner join bs_car_driver_history h on m.id=h.driver_id");
+		sql.append(" where (h.from_car_id=? or h.to_car_id=?)");
+		// 排除相同司机的旧记录
+		sql.append(" and not exists (select 1 from bs_car_driver_history hi where hi.driver_id=h.driver_id and hi.move_date > h.move_date)");
+		sql.append(" order by h.move_date desc");
+
+		if (logger.isDebugEnabled()) {
+			logger.debug("getMansFromCarByDriverHistory:carId=" + carId
+					+ ";sql=" + sql);
+		}
+		return this.jpaTemplate.execute(new JpaCallback<JSONArray>() {
+			public JSONArray doInJpa(EntityManager em)
+					throws PersistenceException {
+				Query queryObject = em.createNativeQuery(sql.toString());
+				queryObject.setParameter(1, carId);
+				queryObject.setParameter(2, carId);
+				@SuppressWarnings("unchecked")
+				List<Object[]> objs = queryObject.getResultList();
+				JSONArray jsons = new JSONArray();
+				if (objs != null && !objs.isEmpty()) {
+					JSONObject json;
+					for (Object[] obj : objs) {
+						try {
+							json = new JSONObject();
+							int i = 0;
+
+							// 司机的相关信息
+							i = buildManJson(json, obj, i);
+
+							// 迁移记录的相关信息
+							json.put("h_id", obj[i++]);
+							json.put("h_moveType", obj[i++]);
+							json.put("h_moveDate",
+									DateUtils.formatDate((Date) obj[i++]));
+							json.put("h_fromCarId", null2Empty(obj[i++]));
+							json.put("h_toCarId", null2Empty(obj[i++]));
+
+							jsons.put(json);
+						} catch (JSONException e) {
+							logger.error(e.getMessage(), e);
+						}
+					}
+				}
+				return jsons;
+			}
+		});
+	}
+
+	/**
+	 * 获取车辆经济合同对应的责任人信息,对同一个责任人的多条经济合同只获取最新的那条：
+	 * <p>
+	 * [{责任人1信息},{责任人2信息},...]
+	 * </p>
+	 * 
+	 * @param carId
+	 * @return
+	 */
+	private JSONArray getMansFromContract4Charger(final Long carId,
+			StringBuffer manSql) {
+		final StringBuffer sql = new StringBuffer(manSql);
+		sql.append(",c.id c_id,c.status_ c_status");
+		sql.append(" from bs_carman m");
+		sql.append(" inner join bs_carman_contract mc on mc.man_id=m.id");
+		sql.append(" inner join bs_contract c on c.id = mc.contract_id");
+		sql.append(" inner join bs_contract_charger cc on cc.id=c.id");
+		sql.append(" inner join bs_car_contract carc on carc.contract_id=c.id");
+		sql.append(" where carc.car_id = ?");
+		// 排除相同责任人的旧记录
+		sql.append(" and not exists (select 1 from bs_carman_contract mci");
+		sql.append(" 	inner join bs_contract ci on ci.id = mci.contract_id");
+		sql.append("	inner join bs_contract_charger cci on cci.id=ci.id");
+		sql.append("	inner join bs_car_contract carci on carci.contract_id=ci.id");
+		sql.append("	where carci.car_id = carc.car_id and mci.man_id=mc.man_id and ci.start_date > c.start_date)");
+		sql.append(" order by c.start_date desc");
+		if (logger.isDebugEnabled()) {
+			logger.debug("getMansFromContract4Charger:carId=" + carId + ";sql="
+					+ sql);
+		}
+		return this.jpaTemplate.execute(new JpaCallback<JSONArray>() {
+			public JSONArray doInJpa(EntityManager em)
+					throws PersistenceException {
+				Query queryObject = em.createNativeQuery(sql.toString());
+				queryObject.setParameter(1, carId);
+				@SuppressWarnings("unchecked")
+				List<Object[]> objs = queryObject.getResultList();
+				JSONArray jsons = new JSONArray();
+				if (objs != null && !objs.isEmpty()) {
+					JSONObject json;
+					for (Object[] obj : objs) {
+						try {
+							json = new JSONObject();
+							int i = 0;
+
+							// 司机的相关信息
+							i = buildManJson(json, obj, i);
+
+							// 合同的相关信息
+							json.put("c_id", obj[i++]);
+							json.put("c_status", obj[i++]);
+
+							jsons.put(json);
+						} catch (JSONException e) {
+							logger.error(e.getMessage(), e);
+						}
+					}
+				}
+				return jsons;
+			}
+		});
+	}
+
+	/**
+	 * 获取车辆劳动合同对应的司机信息,对同一个司机的多条劳动合同只获取最新的那条:112929/
+	 * <p>
+	 * [{司机1信息},{司机2信息},...]
+	 * </p>
+	 * 
+	 * @param carId
+	 * @return
+	 */
+	private JSONArray getMansFromContract4Labour(final Long carId,
+			StringBuffer manSql) {
+		final StringBuffer sql = new StringBuffer(manSql);
+		sql.append(",c.id c_id,c.status_ c_status");
+		sql.append(" from bs_carman m");
+		sql.append(" inner join bs_carman_contract mc on mc.man_id=m.id");
+		sql.append(" inner join bs_contract c on c.id = mc.contract_id");
+		sql.append(" inner join bs_contract_labour cc on cc.id=c.id");
+		sql.append(" inner join bs_car_contract carc on carc.contract_id=c.id");
+		sql.append(" where carc.car_id = ?");
+		// 排除相同司机的旧记录
+		sql.append(" and not exists (select 1 from bs_carman_contract mci");
+		sql.append(" 	inner join bs_contract ci on ci.id = mci.contract_id");
+		sql.append("	inner join bs_contract_labour cci on cci.id=ci.id");
+		sql.append("	inner join bs_car_contract carci on carci.contract_id=ci.id");
+		sql.append("	where carci.car_id = carc.car_id and mci.man_id=mc.man_id and ci.start_date > c.start_date)");
+		sql.append(" order by c.start_date desc");
+		if (logger.isDebugEnabled()) {
+			logger.debug("getMansFromContract4Labour:carId=" + carId + ";sql="
+					+ sql);
+		}
+		return this.jpaTemplate.execute(new JpaCallback<JSONArray>() {
+			public JSONArray doInJpa(EntityManager em)
+					throws PersistenceException {
+				Query queryObject = em.createNativeQuery(sql.toString());
+				queryObject.setParameter(1, carId);
+				@SuppressWarnings("unchecked")
+				List<Object[]> objs = queryObject.getResultList();
+				JSONArray jsons = new JSONArray();
+				if (objs != null && !objs.isEmpty()) {
+					JSONObject json;
+					for (Object[] obj : objs) {
+						try {
+							json = new JSONObject();
+							int i = 0;
+
+							// 司机的相关信息
+							i = buildManJson(json, obj, i);
+
+							// 合同的相关信息
+							json.put("c_id", obj[i++]);
+							json.put("c_status", obj[i++]);
+
+							jsons.put(json);
+						} catch (JSONException e) {
+							logger.error(e.getMessage(), e);
+						}
+					}
+				}
+				return jsons;
+			}
+		});
+	}
+
+	/**
+	 * 获取车辆营运班次对应的顶班司机信息,对同一个司机的多条营运班次只获取最新的那条
+	 * <p>
+	 * [{司机1信息},{司机2信息},...]
+	 * </p>
+	 * 
+	 * @param carId
+	 * @return
+	 */
+	private JSONArray getMansFromCarByDriver(final Long carId,
+			StringBuffer manSql) {
+		final StringBuffer sql = new StringBuffer(manSql);
+		sql.append(",cd.id cd_id,cd.status_ cd_status,cd.classes cd_classes");
+		sql.append(" from bs_carman m");
+		sql.append(" inner join bs_car_driver cd on cd.driver_id=m.id");
+		sql.append(" where cd.car_id = ? and cd.classes = 4");
+		// 排除相同司机的旧记录
+		sql.append(" and not exists (select 1 from bs_car_driver cdi");
+		sql.append(" 	where cdi.car_id = cd.car_id and cdi.classes = cd.classes and cdi.driver_id=cd.driver_id");
+		sql.append("	and cdi.file_date > cd.file_date)");
+		sql.append(" order by cd.status_,cd.classes,cd.file_date desc");
+		if (logger.isDebugEnabled()) {
+			logger.debug("getMansFromCarByDriver:carId=" + carId + ";sql="
+					+ sql);
+		}
+		return this.jpaTemplate.execute(new JpaCallback<JSONArray>() {
+			public JSONArray doInJpa(EntityManager em)
+					throws PersistenceException {
+				Query queryObject = em.createNativeQuery(sql.toString());
+				queryObject.setParameter(1, carId);
+				@SuppressWarnings("unchecked")
+				List<Object[]> objs = queryObject.getResultList();
+				JSONArray jsons = new JSONArray();
+				if (objs != null && !objs.isEmpty()) {
+					JSONObject json;
+					for (Object[] obj : objs) {
+						try {
+							json = new JSONObject();
+							int i = 0;
+
+							// 司机的相关信息
+							i = buildManJson(json, obj, i);
+
+							// 营运班次的相关信息
+							json.put("cd_id", obj[i++]);
+							json.put("cd_status", obj[i++]);
+							json.put("cd_classes", obj[i++]);
+
+							jsons.put(json);
+						} catch (JSONException e) {
+							logger.error(e.getMessage(), e);
+						}
+					}
+				}
+				return jsons;
+			}
+		});
+	}
+
+	// 构建司机的json信息
+	private int buildManJson(JSONObject json, Object[] obj, int startIndex)
+			throws JSONException {
+		json.put("id", obj[startIndex++]);
+		json.put("uid", obj[startIndex++]);
+		json.put("status", obj[startIndex++]);
+		json.put("type", getManType(obj[startIndex++]));
+		json.put("name", obj[startIndex++]);
+		json.put("sex", getManSex(obj[startIndex++]));
+		json.put("origin", null2Empty(obj[startIndex++]));
+		json.put("houseType", null2Empty(obj[startIndex++]));
+		json.put("address1", null2Empty(obj[startIndex++]));
+		json.put("address2", null2Empty(obj[startIndex++]));
+		json.put(
+				"phones",
+				getManPhones((String) obj[startIndex++],
+						(String) obj[startIndex++]));
+		json.put("identity", null2Empty(obj[startIndex++]));
+		json.put("cert4fwzg", null2Empty(obj[startIndex++]));
+		json.put("classes", obj[startIndex++]);
+		json.put("classesDesc", getManClasses(json.get("classes")));
+		json.put("moveType", obj[startIndex++]);
+		json.put("moveTypeDesc", getManMoveType(json.get("moveType")));
+		json.put(
+				"moveDate",
+				getManMoveDate((Date) obj[startIndex++],
+						(Date) obj[startIndex++]));
+		json.put("carInfo", null2Empty(obj[startIndex++]));
+		json.put("desc", null2Empty(obj[startIndex++]));
+		return startIndex;
+	}
+
 	private String null2Empty(Object obj) {
 		if (obj == null)
 			return "";
 		return obj.toString();
+	}
+
+	private String getManMoveDate(Date move_date, Date shiftwork_end_date) {
+		if (move_date != null) {
+			if (shiftwork_end_date != null) {
+				return DateUtils.formatDate(move_date) + "～"
+						+ DateUtils.formatDate(shiftwork_end_date);
+			} else {
+				return DateUtils.formatDate(move_date);
+			}
+		} else {
+			if (shiftwork_end_date != null) {
+				return "～" + DateUtils.formatDate(shiftwork_end_date);
+			} else {
+				return "";
+			}
+		}
+	}
+
+	private String getManType(Object type) {
+		if (type == null)
+			return "";
+
+		int s = Integer.parseInt(type.toString());
+		if (s == CarMan.TYPE_DRIVER)
+			return "司机";
+		else if (s == CarMan.TYPE_CHARGER)
+			return "责任人";
+		else if (s == CarMan.TYPE_DRIVER_AND_CHARGER)
+			return "司机和责任人";
+		else if (s == CarMan.TYPE_FEIBIAN)
+			return "非编";
+		else
+			return "未知";
+	}
+
+	private String getManClasses(Object classes) {
+		if (classes == null)
+			return "";
+
+		int s = Integer.parseInt(classes.toString());
+		if (s == CarByDriver.TYPE_ZHENGBAN)
+			return "正班";
+		else if (s == CarByDriver.TYPE_FUBAN)
+			return "副班";
+		else if (s == CarByDriver.TYPE_DINGBAN)
+			return "顶班";
+		else if (s == CarByDriver.TYPE_ZHUGUA)
+			return "主挂";
+		else
+			return "";
+	}
+
+	private String getManMoveType(Object moveType) {
+		if (moveType == null)
+			return "";
+
+		int s = Integer.parseInt(moveType.toString());
+		if (s == CarByDriverHistory.MOVETYPE_CLDCL)
+			return "车辆到车辆";
+		else if (s == CarByDriverHistory.MOVETYPE_GSDGSYZX)
+			return "公司到公司(已注销)";
+		else if (s == CarByDriverHistory.MOVETYPE_ZXWYQX)
+			return "注销未有去向";
+		else if (s == CarByDriverHistory.MOVETYPE_YWGSQH)
+			return "由外公司迁回";
+		else if (s == CarByDriverHistory.MOVETYPE_JHWZX)
+			return "交回未注销";
+		else if (s == CarByDriverHistory.MOVETYPE_XRZ)
+			return "新入职";
+		else if (s == CarByDriverHistory.MOVETYPE_ZCD)
+			return "转车队";
+		else if (s == CarByDriverHistory.MOVETYPE_DINGBAN)
+			return "顶班";
+		else if (s == CarByDriverHistory.MOVETYPE_JHZC)
+			return "交回后转车";
+		else
+			return "";
+	}
+
+	private String getManSex(Object sex) {
+		if (sex == null)
+			return "无";
+
+		int s = Integer.parseInt(sex.toString());
+		if (s == ActorDetail.SEX_MAN)
+			return "男";
+		else if (s == ActorDetail.SEX_WOMAN)
+			return "女";
+		else
+			return "无";
+	}
+
+	private String getManPhones(String phone1, String phone2) {
+		if (phone1 != null && phone1.length() > 0) {
+			if (phone2 != null && phone2.length() > 0) {
+				return phone1 + "，" + phone2;
+			} else {
+				return phone1;
+			}
+		} else {
+			if (phone2 != null && phone2.length() > 0) {
+				return phone2;
+			} else {
+				return "";
+			}
+		}
 	}
 }
