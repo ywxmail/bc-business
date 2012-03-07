@@ -95,4 +95,11 @@ public class OptionConstants extends cn.bc.option.OptionConstants {
 
 	/** 证件名称 */
 	public final static String CERT_NAME = "cert.name";
+	
+	/** 发票类型*/
+	public final static String INVOICE_TYPE ="invoice.type";
+	/** 发票单位*/
+	public final static String	INVOICE_UNIT ="invoice.unit";
+	/** 购买发票付款方式*/
+	public final static String INVOICE_PAYTYPE ="invoice.paytype";
 }
