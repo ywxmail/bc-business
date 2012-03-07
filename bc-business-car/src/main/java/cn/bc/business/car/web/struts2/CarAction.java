@@ -128,6 +128,9 @@ public class CarAction extends FileEntityAction<Long, Car> {
 			if (editable) {// 编辑状态显示保存按钮
 				pageOption.addButton(new ButtonOption(getText("label.save"),
 						null, "bc.carForm.save"));
+				pageOption.addButton(new ButtonOption(getText("label.saveAndClose"),
+						null, "bc.carForm.saveAndClose"));
+
 			}
 		}
 	}
