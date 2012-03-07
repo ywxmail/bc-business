@@ -14,19 +14,20 @@ import org.springframework.stereotype.Controller;
 
 import cn.bc.BCConstants;
 import cn.bc.business.web.struts2.ViewAction;
-import cn.bc.core.query.condition.Condition;
-import cn.bc.core.query.condition.ConditionUtils;
 import cn.bc.core.query.condition.Direction;
 import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.db.jdbc.RowMapper;
 import cn.bc.db.jdbc.SqlObject;
 import cn.bc.identity.web.SystemContext;
+import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.formater.EntityStatusFormater;
+import cn.bc.web.formater.KeyValueFormater;
+import cn.bc.web.formater.NubmerFormater;
 import cn.bc.web.ui.html.grid.Column;
 import cn.bc.web.ui.html.grid.IdColumn4MapKey;
 import cn.bc.web.ui.html.grid.TextColumn4MapKey;
 import cn.bc.web.ui.html.page.PageOption;
-import cn.bc.web.ui.json.Json;
+import cn.bc.web.ui.html.toolbar.Toolbar;
 
 /**
  * 票务采购视图Action
@@ -51,7 +52,7 @@ public class Invoice4BuysAction extends ViewAction<Map<String, Object>> {
 	@Override
 	protected OrderCondition getGridDefaultOrderCondition() {
 		// 默认排序方向：状态
-		return new OrderCondition("i.status_", Direction.Asc);
+		return new OrderCondition("b.status_", Direction.Asc).add("b.buy_date", Direction.Desc);
 	}
 
 	@Override
@@ -60,8 +61,10 @@ public class Invoice4BuysAction extends ViewAction<Map<String, Object>> {
 
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer sql = new StringBuffer();
-		sql.append("select i.id,i.status_");
-		sql.append(" from bs_invoice_base i");
+		sql.append("select b.id as id,b.status_ as status_,b.buy_date as buy_date,");
+		sql.append("b.code as code,b.start_no as start_no,b.end_no as end_no");
+		sql.append(",b.company as company,b.type_ as type_,b.count_ as count_,b.buy_price as buy_price");
+		sql.append(" from bs_invoice_buy b");
 		sqlObject.setSql(sql.toString());
 
 		// 注入参数
@@ -74,7 +77,23 @@ public class Invoice4BuysAction extends ViewAction<Map<String, Object>> {
 				int i = 0;
 				map.put("id", rs[i++]);
 				map.put("status_", rs[i++]); // 状态
-				map.put("code", rs[i++]); // 自编号
+				map.put("buy_date", rs[i++]); // 采购日期
+				map.put("code", rs[i++]); // 发票代码
+				map.put("start_no", rs[i++]); // 发票编码开始号
+				map.put("end_no", rs[i++]); // 发票编码结束号
+				map.put("company", rs[i++]); // 公司
+				map.put("type_", rs[i++]); // 发票类型
+				map.put("count_", rs[i++]); // 数量
+				map.put("buy_price", rs[i++]); // 采购单价
+				// 合计
+				if (map.get("count_") != null && map.get("buy_price") != null) {
+					map.put("amount",
+							Float.parseFloat(map.get("count_").toString())
+									* Float.parseFloat(map.get("buy_price")
+											.toString()));
+				} else {
+					map.put("amount", null);
+				}
 				return map;
 			}
 		});
@@ -84,22 +103,67 @@ public class Invoice4BuysAction extends ViewAction<Map<String, Object>> {
 	@Override
 	protected List<Column> getGridColumns() {
 		List<Column> columns = new ArrayList<Column>();
-		columns.add(new IdColumn4MapKey("i.id", "id"));
+		columns.add(new IdColumn4MapKey("b.id", "id"));
 		// 状态
-		columns.add(new TextColumn4MapKey("i.status_", "status_",
-				getText("invoice.status"), 40).setSortable(true).setValueFormater(
-				new EntityStatusFormater(getBSStatuses1())));
+		columns.add(new TextColumn4MapKey("b.status_", "status_",
+				getText("invoice.status"), 40).setSortable(true)
+				.setValueFormater(new EntityStatusFormater(getBSStatuses1())));
+		// 公司
+		columns.add(new TextColumn4MapKey("b.company", "company",
+				getText("invoice.company"), 60).setSortable(true));
+		// 采购日期
+		columns.add(new TextColumn4MapKey("b.buy_date", "buy_date",
+				getText("invoice.buy.buydate"), 100).setSortable(true)
+				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+		// 发票类型
+		columns.add(new TextColumn4MapKey("b.type_", "type_",
+				getText("invoice.type"), 60).setSortable(true)
+				.setValueFormater(new KeyValueFormater(getTypes())));
+		// 发票代码
+		columns.add(new TextColumn4MapKey("b.code", "code",
+				getText("invoice.code"), 100).setSortable(true)
+				.setUseTitleFromLabel(true));
+		// 发票编码开始号
+		columns.add(new TextColumn4MapKey("b.start_no", "start_no",
+				getText("invoice.startNo"), 100).setSortable(true)
+				.setUseTitleFromLabel(true));
+		// 发票编码结束号
+		columns.add(new TextColumn4MapKey("b.end_no", "end_no",
+				getText("invoice.endNo"), 60).setSortable(true)
+				.setUseTitleFromLabel(true));
+		// 数量
+		columns.add(new TextColumn4MapKey("b.count_", "count_",
+				getText("invoice.count"), 60).setSortable(true));
+		// 采购单价
+		columns.add(new TextColumn4MapKey("b.buy_price", "buy_price",
+				getText("invoice.buy.price"), 60).setSortable(true)
+				.setValueFormater(new NubmerFormater("###,###.00")));
+		// 合计
+		columns.add(new TextColumn4MapKey("b.buy_price", "amount",
+				getText("invoice.amount"), 60).setSortable(true)
+				.setValueFormater(new NubmerFormater("###,###.00")));
 		return columns;
+	}
+
+	/**
+	 * 发票类型值转换:手撕票|打印票
+	 * 
+	 */
+	private Map<String, String> getTypes() {
+		Map<String, String> map = new HashMap<String, String>();
+		map.put("1", getText("invoice.type.dayinpiao"));
+		map.put("2", getText("invoice.type.shousipiao"));
+		return map;
 	}
 
 	@Override
 	protected String[] getGridSearchFields() {
-		return null;
+		return new String[]{"b.code"};
 	}
-
+	
 	@Override
 	protected String getFormActionName() {
-		return "invoice";
+		return "";
 	}
 
 	@Override
@@ -110,23 +174,29 @@ public class Invoice4BuysAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected String getGridRowLabelExpression() {
-		return "['code']";
+		return "'采购单 ' + ['id']";
 	}
 
 	@Override
-	protected Condition getGridSpecalCondition() {
-		// 状态条件
-		return ConditionUtils.toConditionByComma4IntegerValue(this.status,
-				"i.status_");
+	protected Toolbar getHtmlPageToolbar() {
+		return super.getHtmlPageToolbar()
+				.addButton(
+						Toolbar.getDefaultToolbarRadioGroup(
+								this.getBSStatuses1(), "status", 0,
+								getText("title.click2changeSearchStatus")));
+	}
+
+	// ==高级搜索代码开始==
+	@Override
+	protected boolean useAdvanceSearch() {
+		return true;
 	}
 
 	@Override
-	protected void extendGridExtrasData(Json json) {
-		super.extendGridExtrasData(json);
-
-		// 状态条件
-		if (this.status != null && this.status.trim().length() > 0) {
-			json.put("status", status);
-		}
+	protected void initConditionsFrom() throws Exception {
+	
 	}
+
+	// ==高级搜索代码结束==
+
 }
