@@ -309,8 +309,7 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 	 * @return
 	 */
 	protected Map<String, String> getType() {
-		Map<String, String> type = new HashMap<String, String>();
-		type = new HashMap<String, String>();
+		Map<String, String> type = new LinkedHashMap<String, String>();
 		type.put(String.valueOf(CarMan.TYPE_DRIVER),
 				getText("carMan.type.driver"));
 		type.put(String.valueOf(CarMan.TYPE_CHARGER),
@@ -326,8 +325,7 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 	 * @return
 	 */
 	protected Map<String, String> getMoveType() {
-		Map<String, String> type = new HashMap<String, String>();
-		type = new HashMap<String, String>();
+		Map<String, String> type = new LinkedHashMap<String, String>();
 		type.put(String.valueOf(CarByDriverHistory.MOVETYPE_CLDCL),
 				getText("carByDriverHistory.moveType.cheliangdaocheliang"));
 		type.put(String.valueOf(CarByDriverHistory.MOVETYPE_GSDGSYZX),
@@ -346,14 +344,12 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 				getText("carByDriverHistory.moveType.dingban"));
 		type.put(String.valueOf(CarByDriverHistory.MOVETYPE_JHZC),
 				getText("carByDriverHistory.moveType.jiaohuizhuanche"));
-		type.put(String.valueOf(CarByDriverHistory.MOVETYPE_NULL),
-				getText("carByDriverHistory.moveType.null"));
+		type.put(String.valueOf(CarByDriverHistory.MOVETYPE_NULL), "(无)");
 		return type;
 	}
 
 	private Map<String, String> getDriverClasses() {
-		Map<String, String> type;
-		type = new LinkedHashMap<String, String>();
+		Map<String, String> type = new LinkedHashMap<String, String>();
 		type.put(String.valueOf(CarByDriver.TYPE_ZHENGBAN),
 				getText("carByDriver.classes.zhengban"));
 		type.put(String.valueOf(CarByDriver.TYPE_FUBAN),

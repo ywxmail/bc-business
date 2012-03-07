@@ -22,9 +22,12 @@ import cn.bc.business.car.service.CarService;
 import cn.bc.business.carman.domain.CarMan;
 import cn.bc.business.carman.service.CarByDriverService;
 import cn.bc.business.carman.service.CarManService;
+import cn.bc.business.motorcade.domain.Motorcade;
+import cn.bc.business.motorcade.service.MotorcadeService;
 import cn.bc.business.web.struts2.FileEntityAction;
 import cn.bc.core.util.DateUtils;
 import cn.bc.identity.web.SystemContext;
+import cn.bc.option.domain.OptionItem;
 import cn.bc.option.service.OptionService;
 import cn.bc.web.ui.html.page.ButtonOption;
 import cn.bc.web.ui.html.page.PageOption;
@@ -42,8 +45,10 @@ public class BlacklistAction extends FileEntityAction<Long, Blacklist> {
 	// private static Log logger = LogFactory.getLog(ContractAction.class);
 	private static final long serialVersionUID = 1L;
 	public BlacklistService blacklistService;
+	private MotorcadeService motorcadeService;
 	public Long carManId;
 	public OptionService optionService;
+	public List<Map<String, String>> motorcadeList; // 可选车队列表
 	public List<Map<String, String>> blackLevelList;// 黑名单等级列表
 	public List<Map<String, String>> blackTypeList;// 黑名单限制项目
 	public CarByDriverService carByDriverService;
@@ -75,6 +80,11 @@ public class BlacklistAction extends FileEntityAction<Long, Blacklist> {
 
 	public void setCarId(Long carId) {
 		this.carId = carId;
+	}
+
+	@Autowired
+	public void setMotorcadeService(MotorcadeService motorcadeService) {
+		this.motorcadeService = motorcadeService;
 	}
 
 	@Autowired
@@ -137,7 +147,7 @@ public class BlacklistAction extends FileEntityAction<Long, Blacklist> {
 			// 如果车辆Id不为空，加载车辆信息
 			Car car = this.carService.load(carId);
 			this.getE().setCar(car);
-
+			this.getE().setCompany(car.getCompany());
 			this.getE().setMotorcade(car.getMotorcade());
 			List<CarMan> carMan = this.carManService
 					.selectAllCarManByCarId(carId);
@@ -170,6 +180,10 @@ public class BlacklistAction extends FileEntityAction<Long, Blacklist> {
 		Blacklist e = this.getE();
 		if (e.getUnlocker() != null && e.getUnlocker().getId() == null) {
 			e.setUnlocker(null);
+		}
+		// 司机可以为空
+		if (e.getDriver() != null && e.getDriver().getId() == null) {
+			e.setDriver(null);
 		}
 
 		// 设置最后更新人的信息
@@ -254,6 +268,13 @@ public class BlacklistAction extends FileEntityAction<Long, Blacklist> {
 		// 状态列表
 		statusesValue = this.getBLStatuses();
 
+		// 加载可选车队列表
+		this.motorcadeList = this.motorcadeService.findEnabled4Option();
+		Motorcade m = this.getE().getMotorcade();
+		if (m != null) {
+			OptionItem.insertIfNotExist(this.motorcadeList, m.getId()
+					.toString(), m.getName());
+		}
 		// 批量加载可选项列表
 		Map<String, List<Map<String, String>>> optionItems = this.optionService
 				.findOptionItemByGroupKeys(new String[] {
