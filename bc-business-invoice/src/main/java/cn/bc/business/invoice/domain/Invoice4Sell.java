@@ -10,10 +10,13 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import cn.bc.business.motorcade.domain.Motorcade;
+import cn.bc.identity.domain.ActorHistory;
 import cn.bc.identity.domain.RichFileEntityImpl;
 
 /**
@@ -41,7 +44,7 @@ public class Invoice4Sell extends RichFileEntityImpl {
 	private Motorcade motorcadeId;//车队ID
 	private String company;//所属公司
 	private Calendar sellDate; //销售日期
-	private Long cashierId;// 收银员id
+	private ActorHistory cashierId;// 收银员id
 	private Integer payType; //收款方式
 	private String bankCode; //银行流水号
 	private String desc;//备注
@@ -102,11 +105,12 @@ public class Invoice4Sell extends RichFileEntityImpl {
 	public void setSellDate(Calendar sellDate) {
 		this.sellDate = sellDate;
 	}
-	@Column(name = "CASHIER_ID")
-	public Long getCashierId() {
+	@ManyToOne(fetch = FetchType.EAGER, optional = true)
+	@JoinColumn(name = "CASHIER_ID", referencedColumnName = "ID")
+	public ActorHistory getCashierId() {
 		return cashierId;
 	}
-	public void setCashierId(Long cashierId) {
+	public void setCashierId(ActorHistory cashierId) {
 		this.cashierId = cashierId;
 	}
 	@Column(name = "PAY_TYPE")
