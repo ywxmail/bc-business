@@ -15,13 +15,19 @@
 			<groupId>cn.bc.business</groupId>
 			<artifactId>bc-business-base</artifactId>
 			<version>${project.version}</version>
-		</dependency>		
+		</dependency>
+		<!-- 车队 -->
+		<dependency>
+			<groupId>cn.bc.business</groupId>
+			<artifactId>bc-business-motorcade</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 		<!-- 选项模块 -->
 		<dependency>
 			<groupId>cn.bc</groupId>
 			<artifactId>bc-option</artifactId>
 			<version>${framework.version}</version>
 		</dependency>
-
+		
 	</dependencies>
 </project>

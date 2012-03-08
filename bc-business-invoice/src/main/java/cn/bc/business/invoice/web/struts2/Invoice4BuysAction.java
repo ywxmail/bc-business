@@ -64,6 +64,7 @@ public class Invoice4BuysAction extends ViewAction<Map<String, Object>> {
 		sql.append("select b.id as id,b.status_ as status_,b.buy_date as buy_date,");
 		sql.append("b.code as code,b.start_no as start_no,b.end_no as end_no");
 		sql.append(",b.company as company,b.type_ as type_,b.count_ as count_,b.buy_price as buy_price");
+		sql.append(",b.desc_ as desc");
 		sql.append(" from bs_invoice_buy b");
 		sqlObject.setSql(sql.toString());
 
@@ -94,6 +95,7 @@ public class Invoice4BuysAction extends ViewAction<Map<String, Object>> {
 				} else {
 					map.put("amount", null);
 				}
+				map.put("desc", rs[i++]); // 备注
 				return map;
 			}
 		});
@@ -142,6 +144,9 @@ public class Invoice4BuysAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("b.buy_price", "amount",
 				getText("invoice.amount"), 60).setSortable(true)
 				.setValueFormater(new NubmerFormater("###,###.00")));
+		// 备注
+		columns.add(new TextColumn4MapKey("b.desc_", "desc",
+				getText("invoice.desc")).setUseTitleFromLabel(true));
 		return columns;
 	}
 
@@ -163,7 +168,7 @@ public class Invoice4BuysAction extends ViewAction<Map<String, Object>> {
 	
 	@Override
 	protected String getFormActionName() {
-		return "";
+		return "invoice4Buy";
 	}
 
 	@Override

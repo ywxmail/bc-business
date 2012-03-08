@@ -8,20 +8,30 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.json.JSONArray;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
 import cn.bc.BCConstants;
+import cn.bc.business.motorcade.service.MotorcadeService;
 import cn.bc.business.web.struts2.ViewAction;
 import cn.bc.core.query.condition.Direction;
+import cn.bc.core.query.condition.impl.LikeCondition;
 import cn.bc.core.query.condition.impl.OrderCondition;
+import cn.bc.core.util.StringUtils;
 import cn.bc.db.jdbc.RowMapper;
 import cn.bc.db.jdbc.SqlObject;
+import cn.bc.identity.domain.Actor;
+import cn.bc.identity.service.ActorService;
 import cn.bc.identity.web.SystemContext;
+import cn.bc.option.domain.OptionItem;
 import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.formater.EntityStatusFormater;
 import cn.bc.web.formater.KeyValueFormater;
+import cn.bc.web.formater.LinkFormater4Id;
 import cn.bc.web.formater.NubmerFormater;
 import cn.bc.web.ui.html.grid.Column;
 import cn.bc.web.ui.html.grid.IdColumn4MapKey;
@@ -40,7 +50,9 @@ import cn.bc.web.ui.html.toolbar.Toolbar;
 public class Invoice4SellsAction extends ViewAction<Map<String, Object>> {
 	private static final long serialVersionUID = 1L;
 	public String status = String.valueOf(BCConstants.STATUS_ENABLED); // 票务的状态，多个用逗号连接
-
+	public Long buyerId;
+	public Long carId;
+	
 	@Override
 	public boolean isReadonly() {
 		// 票务管理员或系统管理员
@@ -52,7 +64,18 @@ public class Invoice4SellsAction extends ViewAction<Map<String, Object>> {
 	@Override
 	protected OrderCondition getGridDefaultOrderCondition() {
 		// 默认排序方向：状态
-		return new OrderCondition("d.status_", Direction.Asc).add("s.sell_date", Direction.Desc);
+		return new OrderCondition("s.status_", Direction.Asc).add("s.sell_date", Direction.Desc);
+	}
+	
+	@Override
+	protected LikeCondition getGridSearchCondition4OneField(String field,
+			String value) {
+		if (field.indexOf("s.car_plate") != -1) {
+			return new LikeCondition(field, value != null ? value.toUpperCase()
+					: value);
+		} else {
+			return super.getGridSearchCondition4OneField(field, value);
+		}
 	}
 
 	@Override
@@ -61,11 +84,11 @@ public class Invoice4SellsAction extends ViewAction<Map<String, Object>> {
 
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer sql = new StringBuffer();
-		sql.append("select s.id as id,s.status_ as status,s.sell_date as selldate");
+		sql.append("select s.id as id,s.status_ as status_,s.sell_date as sell_date");
 		sql.append(",d.start_no as start_no,d.end_no as end_no,s.company as company");
 		sql.append(",m.id as motorcade_id,m.name as motorcade_name,s.car_id as car_id,s.car_plate as car_plate");
 		sql.append(",s.buyer_id as buyer_id,s.buyer_name as buyer_name,b.type_ as type,b.unit_ as unit_");
-		sql.append(",d.count_ as count,d.price as price");
+		sql.append(",d.count_ as count_,d.price as price,s.desc_ as desc,b.code as code");
 		sql.append(" from bs_invoice_sell_detail d");
 		sql.append(" inner join bs_invoice_buy b on b.id=d.buy_id");
 		sql.append(" inner join bs_invoice_sell s on s.id=d.sell_id");
@@ -83,8 +106,8 @@ public class Invoice4SellsAction extends ViewAction<Map<String, Object>> {
 				map.put("id", rs[i++]);
 				map.put("status_", rs[i++]); // 状态
 				map.put("sell_date", rs[i++]); // 销售日期
-				map.put("start_no", rs[i++]); // 销售日期
-				map.put("end_no", rs[i++]); // 销售日期
+				map.put("start_no", rs[i++]); // 开始号
+				map.put("end_no", rs[i++]); // 结束号
 				map.put("company", rs[i++]); // 公司
 				map.put("motorcade_id", rs[i++]); // 车队id
 				map.put("motorcade_name", rs[i++]); // 车队名称
@@ -105,6 +128,8 @@ public class Invoice4SellsAction extends ViewAction<Map<String, Object>> {
 				} else {
 					map.put("amount", null);
 				}
+				map.put("desc", rs[i++]); // 备注
+				map.put("code", rs[i++]); // 发票代码
 				return map;
 			}
 		});
@@ -116,43 +141,102 @@ public class Invoice4SellsAction extends ViewAction<Map<String, Object>> {
 		List<Column> columns = new ArrayList<Column>();
 		columns.add(new IdColumn4MapKey("b.id", "id"));
 		// 状态
-		columns.add(new TextColumn4MapKey("b.status_", "status_",
+		columns.add(new TextColumn4MapKey("s.status_", "status_",
 				getText("invoice.status"), 40).setSortable(true)
 				.setValueFormater(new EntityStatusFormater(getBSStatuses1())));
 		// 公司
-		columns.add(new TextColumn4MapKey("b.company", "company",
+		columns.add(new TextColumn4MapKey("s.company", "company",
 				getText("invoice.company"), 60).setSortable(true));
-		// 采购日期
-		columns.add(new TextColumn4MapKey("b.buy_date", "buy_date",
-				getText("invoice.buy.buydate"), 100).setSortable(true)
+		// 销售日期
+		columns.add(new TextColumn4MapKey("s.sell_date", "sell_date",
+				getText("invoice.sell.selldate"), 100).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+		//车队
+		columns.add(new TextColumn4MapKey("m.name", "motorcade_name",
+				getText("invoice.motorcade"), 70)
+				.setSortable(true)
+				.setUseTitleFromLabel(true)
+				.setValueFormater(
+						new LinkFormater4Id(this.getContextPath()
+								+ "/bc-business/motorcade/edit?id={0}",
+								"motorcade") {
+							@SuppressWarnings("unchecked")
+							@Override
+							public String getIdValue(Object context,
+									Object value) {
+								return StringUtils
+										.toString(((Map<String, Object>) context)
+												.get("motorcade_id"));
+							}
+						}));
+		// 车牌
+		if (carId == null) {
+			columns.add(new TextColumn4MapKey("s.car_plate", "car_plate",
+					getText("invoice.carPlate"), 80)
+					.setValueFormater(new LinkFormater4Id(this.getContextPath()
+							+ "/bc-business/car/edit?id={0}", "car") {
+						@SuppressWarnings("unchecked")
+						@Override
+						public String getIdValue(Object context, Object value) {
+							return StringUtils
+									.toString(((Map<String, Object>) context)
+											.get("car_id"));
+						}
+					}));
+		}
+		//购买人
+		if (buyerId == null) {
+			columns.add(new TextColumn4MapKey("s.buyer_name", "buyer_name",
+					getText("invoice.buyer"), 60).setSortable(true)
+					.setValueFormater(
+							new LinkFormater4Id(this.getContextPath()
+									+ "/bc-business/carMan/edit?id={0}",
+									"drivers") {
+								@SuppressWarnings("unchecked")
+								@Override
+								public String getIdValue(Object context,
+										Object value) {
+									return StringUtils
+											.toString(((Map<String, Object>) context)
+													.get("buyer_id"));
+								}
+							}));
+		}
+		
 		// 发票类型
 		columns.add(new TextColumn4MapKey("b.type_", "type_",
 				getText("invoice.type"), 60).setSortable(true)
 				.setValueFormater(new KeyValueFormater(getTypes())));
+		//发票单位
+		columns.add(new TextColumn4MapKey("b.unit_", "unit_",
+				getText("invoice.unit"), 40).setSortable(true)
+				.setValueFormater(new KeyValueFormater(getUnits())));
 		// 发票代码
-		columns.add(new TextColumn4MapKey("b.code", "code",
+		/*columns.add(new TextColumn4MapKey("b.code", "code",
 				getText("invoice.code"), 100).setSortable(true)
-				.setUseTitleFromLabel(true));
+				.setUseTitleFromLabel(true));*/
 		// 发票编码开始号
-		columns.add(new TextColumn4MapKey("b.start_no", "start_no",
+		columns.add(new TextColumn4MapKey("s.start_no", "start_no",
 				getText("invoice.startNo"), 100).setSortable(true)
 				.setUseTitleFromLabel(true));
 		// 发票编码结束号
-		columns.add(new TextColumn4MapKey("b.end_no", "end_no",
+		columns.add(new TextColumn4MapKey("s.end_no", "end_no",
 				getText("invoice.endNo"), 60).setSortable(true)
 				.setUseTitleFromLabel(true));
 		// 数量
-		columns.add(new TextColumn4MapKey("b.count_", "count_",
+		columns.add(new TextColumn4MapKey("s.count_", "count_",
 				getText("invoice.count"), 60).setSortable(true));
-		// 采购单价
-		columns.add(new TextColumn4MapKey("b.buy_price", "buy_price",
-				getText("invoice.buy.price"), 60).setSortable(true)
+		// 销售单价
+		columns.add(new TextColumn4MapKey("d.price", "price",
+				getText("invoice.sell.price"), 60).setSortable(true)
 				.setValueFormater(new NubmerFormater("###,###.00")));
 		// 合计
-		columns.add(new TextColumn4MapKey("b.buy_price", "amount",
+		columns.add(new TextColumn4MapKey("s.price", "amount",
 				getText("invoice.amount"), 60).setSortable(true)
 				.setValueFormater(new NubmerFormater("###,###.00")));
+		// 备注
+		columns.add(new TextColumn4MapKey("s.desc_", "desc",
+				getText("invoice.desc")).setUseTitleFromLabel(true));
 		return columns;
 	}
 
@@ -166,15 +250,26 @@ public class Invoice4SellsAction extends ViewAction<Map<String, Object>> {
 		map.put("2", getText("invoice.type.shousipiao"));
 		return map;
 	}
+	
+	/**
+	 * 发票单位值转换:卷|本
+	 * 
+	 */
+	private Map<String, String> getUnits() {
+		Map<String, String> map = new HashMap<String, String>();
+		map.put("1", getText("invoice.unit.juan"));
+		map.put("2", getText("invoice.unit.ben"));
+		return map;
+	}
 
 	@Override
 	protected String[] getGridSearchFields() {
-		return new String[]{"b.code"};
+		return new String[]{"m.name","car_plate","s.buyer_name"};
 	}
 	
 	@Override
 	protected String getFormActionName() {
-		return "";
+		return "invoice4Sell";
 	}
 
 	@Override
@@ -185,7 +280,7 @@ public class Invoice4SellsAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected String getGridRowLabelExpression() {
-		return "'采购单 ' + ['id']";
+		return "'购买人' + ['buyer_name']";
 	}
 
 	@Override
@@ -203,9 +298,33 @@ public class Invoice4SellsAction extends ViewAction<Map<String, Object>> {
 		return true;
 	}
 
+	private MotorcadeService motorcadeService;
+	private ActorService actorService;
+
+	@Autowired
+	public void setActorService(
+			@Qualifier("actorService") ActorService actorService) {
+		this.actorService = actorService;
+	}
+
+	@Autowired
+	public void setMotorcadeService(MotorcadeService motorcadeService) {
+		this.motorcadeService = motorcadeService;
+	}
+
+	public JSONArray motorcades;// 车队的下拉列表信息
+	public JSONArray units;// 分公司的下拉列表信息
+	
 	@Override
 	protected void initConditionsFrom() throws Exception {
-	
+		// 可选车队列表
+		motorcades = OptionItem.toLabelValues(this.motorcadeService
+				.find4Option(null));
+
+		// 可选分公司列表
+		units = OptionItem.toLabelValues(this.actorService.find4option(
+				new Integer[] { Actor.TYPE_UNIT }, (Integer[]) null), "name",
+				"id");
 	}
 
 	// ==高级搜索代码结束==
