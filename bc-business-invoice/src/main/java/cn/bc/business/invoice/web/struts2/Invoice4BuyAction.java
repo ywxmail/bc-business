@@ -3,15 +3,22 @@
  */
 package cn.bc.business.invoice.web.struts2;
 
+import java.util.Calendar;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
+import cn.bc.BCConstants;
+import cn.bc.business.OptionConstants;
 import cn.bc.business.invoice.domain.Invoice4Buy;
 import cn.bc.business.invoice.service.Invoice4BuyService;
 import cn.bc.business.web.struts2.FileEntityAction;
 import cn.bc.identity.web.SystemContext;
+import cn.bc.option.domain.OptionItem;
 import cn.bc.option.service.OptionService;
 import cn.bc.web.ui.html.page.PageOption;
 
@@ -29,6 +36,10 @@ public class Invoice4BuyAction extends FileEntityAction<Long, Invoice4Buy> {
 	private static final long serialVersionUID = 1L;
 	private Invoice4BuyService invoice4BuyService;
 	private OptionService optionService;
+	
+	public List<Map<String, String>> companyList; // 所属公司列表（宝城、广发）
+	public List<Map<String, String>> typeList; // 发票类型列表（打印票、手撕票）
+	public List<Map<String, String>> unitList; // 发票单位列表（宝城、广发）
 
 	@Autowired
 	public void setInvoice4BuyService(Invoice4BuyService invoice4BuyService) {
@@ -51,21 +62,36 @@ public class Invoice4BuyAction extends FileEntityAction<Long, Invoice4Buy> {
 
 	@Override
 	protected PageOption buildFormPageOption(boolean editable) {
-		return super.buildFormPageOption(editable).setWidth(765)
+		return super.buildFormPageOption(editable).setWidth(550)
 				.setMinWidth(250).setMinHeight(200);
 	}
 
 	@Override
 	protected void afterCreate(Invoice4Buy entity) {
 		super.afterCreate(entity);
-		// 自动生成uid
-		this.getE().setUid(this.getIdGeneratorService().next(Invoice4Buy.KEY_UID));
+		entity.setBuyDate(Calendar.getInstance());
+		entity.setBuyPrice(7F);
+		entity.setStatus(BCConstants.STATUS_ENABLED);
 	}
 
 	@Override
 	protected void initForm(boolean editable) throws Exception {
 		super.initForm(editable);
+		// 批量加载可选项列表
+		Map<String, List<Map<String, String>>> optionItems = this.optionService
+				.findOptionItemByGroupKeys(new String[] {
+						OptionConstants.CAR_COMPANY,
+						OptionConstants.INVOICE_TYPE,
+						OptionConstants.INVOICE_UNIT
+						});
 
+		// 所属公司列表
+		this.companyList =optionItems.get(OptionConstants.CAR_COMPANY);
+		OptionItem.insertIfNotExist(companyList, null, getE().getCompany());
+		//发票类型
+		this.typeList=optionItems.get(OptionConstants.INVOICE_TYPE);
+		//发票单位
+		this.unitList=optionItems.get(OptionConstants.INVOICE_UNIT);
 	}
 	
 }
