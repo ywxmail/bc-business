@@ -3,7 +3,7 @@
  */
 package cn.bc.business.invoice.dao;
 
-import cn.bc.business.invoice.domain.Invoice4Sale;
+import cn.bc.business.invoice.domain.Invoice4Sell;
 import cn.bc.core.dao.CrudDao;
 
 /**
@@ -11,6 +11,6 @@ import cn.bc.core.dao.CrudDao;
  * 
  * @author wis
  */
-public interface Invoice4SaleDao extends CrudDao<Invoice4Sale> {
+public interface Invoice4SellDao extends CrudDao<Invoice4Sell> {
 
 }
