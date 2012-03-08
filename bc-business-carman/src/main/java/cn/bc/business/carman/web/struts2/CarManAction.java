@@ -124,6 +124,9 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 		if (editable && !readonly) {
 			pageOption.addButton(new ButtonOption(getText("label.save"), null,
 					"bc.carManForm.save"));
+			pageOption.addButton(new ButtonOption(getText("label.saveAndClose"),
+					null, "bc.carManForm.saveAndClose"));
+
 		}
 	}
 
