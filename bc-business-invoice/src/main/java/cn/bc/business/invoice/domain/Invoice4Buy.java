@@ -27,15 +27,20 @@ public class Invoice4Buy extends RichFileEntityImpl {
 	public static final String KEY_UID = "Invoice4Buy.uid";
 	public static final String KEY_CODE = Invoice4Buy.class.getSimpleName();
 
-	/** 发票类型：打印票 */
-	public static final int TYPE_PRINT = 0;
-	/** 发票类型：手撕票 */
-	public static final int TYPE_TORE = 1;
-	
 	/** 票务状态：正常 */
 	public static final int STATUS_NORMAL = 0;
 	/** 票务状态：作废 */
 	public static final int STATUS_INVALID = 1;
+	
+	/** 发票类型：打印票 */
+	public static final int TYPE_PRINT = 1;
+	/** 发票类型：手撕票 */
+	public static final int TYPE_TORE = 2;
+	
+	/** 单位：卷*/
+	public static final int UNIT_JUAN = 0;
+	/** 单位：本 */
+	public static final int UNIT_BEN = 1;
 	
 	private String company;//所属公司
 	private String code;//发票代码
