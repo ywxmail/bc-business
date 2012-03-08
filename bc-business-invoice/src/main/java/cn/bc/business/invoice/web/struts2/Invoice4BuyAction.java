@@ -39,7 +39,7 @@ public class Invoice4BuyAction extends FileEntityAction<Long, Invoice4Buy> {
 	
 	public List<Map<String, String>> companyList; // 所属公司列表（宝城、广发）
 	public List<Map<String, String>> typeList; // 发票类型列表（打印票、手撕票）
-	public List<Map<String, String>> unitList; // 发票单位列表（宝城、广发）
+	public List<Map<String, String>> unitList; // 发票单位列表（卷、本）
 
 	@Autowired
 	public void setInvoice4BuyService(Invoice4BuyService invoice4BuyService) {

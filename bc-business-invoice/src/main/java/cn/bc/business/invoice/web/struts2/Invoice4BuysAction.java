@@ -71,7 +71,7 @@ public class Invoice4BuysAction extends ViewAction<Map<String, Object>> {
 		sql.append("select b.id as id,b.status_ as status_,b.buy_date as buy_date,");
 		sql.append("b.code as code,b.start_no as start_no,b.end_no as end_no");
 		sql.append(",b.company as company,b.type_ as type_,b.count_ as count_,b.buy_price as buy_price");
-		sql.append(",b.desc_ as desc");
+		sql.append(",b.desc_ as desc,b.unit_ as unit_,b.sell_price as sell_price");
 		sql.append(" from bs_invoice_buy b");
 		sqlObject.setSql(sql.toString());
 
@@ -103,6 +103,8 @@ public class Invoice4BuysAction extends ViewAction<Map<String, Object>> {
 					map.put("amount", null);
 				}
 				map.put("desc", rs[i++]); // 备注
+				map.put("unit_", rs[i++]); // 单位
+				map.put("sell_price", rs[i++]); // 销售单价
 				return map;
 			}
 		});
@@ -128,6 +130,10 @@ public class Invoice4BuysAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("b.type_", "type_",
 				getText("invoice.type"), 60).setSortable(true)
 				.setValueFormater(new KeyValueFormater(getTypes())));
+		// 发票单位
+		columns.add(new TextColumn4MapKey("b.unit_", "unit_",
+				getText("invoice.unit"), 40).setSortable(true)
+				.setValueFormater(new KeyValueFormater(getUnits())));
 		// 发票代码
 		columns.add(new TextColumn4MapKey("b.code", "code",
 				getText("invoice.code"), 100).setSortable(true)
@@ -143,9 +149,14 @@ public class Invoice4BuysAction extends ViewAction<Map<String, Object>> {
 		// 数量
 		columns.add(new TextColumn4MapKey("b.count_", "count_",
 				getText("invoice.count"), 60).setSortable(true));
+		
 		// 采购单价
 		columns.add(new TextColumn4MapKey("b.buy_price", "buy_price",
 				getText("invoice4Buy.buyPrice"), 60).setSortable(true)
+				.setValueFormater(new NubmerFormater("###,###.00")));
+		// 销售单价
+		columns.add(new TextColumn4MapKey("b.sell_price", "sell_price",
+				getText("invoice4Buy.sellPrice"), 60).setSortable(true)
 				.setValueFormater(new NubmerFormater("###,###.00")));
 		// 合计
 		columns.add(new TextColumn4MapKey("b.buy_price", "amount",
@@ -184,6 +195,19 @@ public class Invoice4BuysAction extends ViewAction<Map<String, Object>> {
 		return map;
 	}
 
+	/**
+	 * 发票单位值转换:卷|本
+	 * 
+	 */
+	private Map<String, String> getUnits() {
+		Map<String, String> map = new HashMap<String, String>();
+		map.put(String.valueOf(Invoice4Buy.UNIT_JUAN),
+				getText("invoice.unit.juan"));
+		map.put(String.valueOf(Invoice4Buy.UNIT_BEN),
+				getText("invoice.unit.ben"));
+		return map;
+	}
+	
 	@Override
 	protected String[] getGridSearchFields() {
 		return new String[] { "b.code" };
