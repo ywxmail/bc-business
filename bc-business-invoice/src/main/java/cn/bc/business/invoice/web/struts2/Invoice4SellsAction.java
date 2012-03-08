@@ -30,14 +30,14 @@ import cn.bc.web.ui.html.page.PageOption;
 import cn.bc.web.ui.html.toolbar.Toolbar;
 
 /**
- * 票务采购视图Action
+ * 票务销售视图Action
  * 
  * @author wis
  * 
  */
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 @Controller
-public class Invoice4BuysAction extends ViewAction<Map<String, Object>> {
+public class Invoice4SellsAction extends ViewAction<Map<String, Object>> {
 	private static final long serialVersionUID = 1L;
 	public String status = String.valueOf(BCConstants.STATUS_ENABLED); // 票务的状态，多个用逗号连接
 
@@ -52,7 +52,7 @@ public class Invoice4BuysAction extends ViewAction<Map<String, Object>> {
 	@Override
 	protected OrderCondition getGridDefaultOrderCondition() {
 		// 默认排序方向：状态
-		return new OrderCondition("b.status_", Direction.Asc).add("b.buy_date", Direction.Desc);
+		return new OrderCondition("d.status_", Direction.Asc).add("s.sell_date", Direction.Desc);
 	}
 
 	@Override
@@ -61,10 +61,15 @@ public class Invoice4BuysAction extends ViewAction<Map<String, Object>> {
 
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer sql = new StringBuffer();
-		sql.append("select b.id as id,b.status_ as status_,b.buy_date as buy_date,");
-		sql.append("b.code as code,b.start_no as start_no,b.end_no as end_no");
-		sql.append(",b.company as company,b.type_ as type_,b.count_ as count_,b.buy_price as buy_price");
-		sql.append(" from bs_invoice_buy b");
+		sql.append("select s.id as id,s.status_ as status,s.sell_date as selldate");
+		sql.append(",d.start_no as start_no,d.end_no as end_no,s.company as company");
+		sql.append(",m.id as motorcade_id,m.name as motorcade_name,s.car_id as car_id,s.car_plate as car_plate");
+		sql.append(",s.buyer_id as buyer_id,s.buyer_name as buyer_name,b.type_ as type,b.unit_ as unit_");
+		sql.append(",d.count_ as count,d.price as price");
+		sql.append(" from bs_invoice_sell_detail d");
+		sql.append(" inner join bs_invoice_buy b on b.id=d.buy_id");
+		sql.append(" inner join bs_invoice_sell s on s.id=d.sell_id");
+		sql.append(" inner join bs_motorcade m on m.id=s.motorcade_id");
 		sqlObject.setSql(sql.toString());
 
 		// 注入参数
@@ -77,19 +82,25 @@ public class Invoice4BuysAction extends ViewAction<Map<String, Object>> {
 				int i = 0;
 				map.put("id", rs[i++]);
 				map.put("status_", rs[i++]); // 状态
-				map.put("buy_date", rs[i++]); // 采购日期
-				map.put("code", rs[i++]); // 发票代码
-				map.put("start_no", rs[i++]); // 发票编码开始号
-				map.put("end_no", rs[i++]); // 发票编码结束号
+				map.put("sell_date", rs[i++]); // 销售日期
+				map.put("start_no", rs[i++]); // 销售日期
+				map.put("end_no", rs[i++]); // 销售日期
 				map.put("company", rs[i++]); // 公司
+				map.put("motorcade_id", rs[i++]); // 车队id
+				map.put("motorcade_name", rs[i++]); // 车队名称
+				map.put("car_id", rs[i++]); // 车id
+				map.put("car_plate", rs[i++]); // 车票
+				map.put("buyer_id", rs[i++]); // 购买人id
+				map.put("buyer_name", rs[i++]); // 购买人名称
 				map.put("type_", rs[i++]); // 发票类型
-				map.put("count_", rs[i++]); // 数量
-				map.put("buy_price", rs[i++]); // 采购单价
+				map.put("unit_", rs[i++]); // 单位
+				map.put("count_", rs[i++]); // 销售数量
+				map.put("price", rs[i++]); // 销售单价
 				// 合计
-				if (map.get("count_") != null && map.get("buy_price") != null) {
+				if (map.get("count_") != null && map.get("price") != null) {
 					map.put("amount",
 							Float.parseFloat(map.get("count_").toString())
-									* Float.parseFloat(map.get("buy_price")
+									* Float.parseFloat(map.get("price")
 											.toString()));
 				} else {
 					map.put("amount", null);
