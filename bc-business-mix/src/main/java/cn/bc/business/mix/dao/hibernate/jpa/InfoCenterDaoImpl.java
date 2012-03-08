@@ -1,6 +1,7 @@
 package cn.bc.business.mix.dao.hibernate.jpa;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -397,7 +398,8 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 				if (charger != null) {
 					exists.add(charger);
 					// 对司机信息做相应处理
-					man.put("judgeType", "司机和责任人");
+					if (charger.getInt("c_status") == 0)
+						man.put("judgeType", "司机和责任人");
 				}
 				mans.add(man);
 			}
@@ -457,6 +459,9 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 				_man.put("autoInfo", autoInfos.get(id));
 			}
 		}
+		
+		// 重新排序
+		Collections.sort(mans, new ManStatusComparator());
 
 		return new JSONArray(mans);
 	}
@@ -995,7 +1000,7 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 			StringBuffer manSql) {
 		final StringBuffer sql = new StringBuffer(manSql);
 		sql.append(",h.id h_id,h.move_type h_moveType,h.move_date h_moveDate,h.from_car_id h_fromCarId,h.to_car_id h_toCarId");
-		sql.append(",h.to_classes h_toClasses,h.from_classes h_fromClasses");
+		sql.append(",h.from_classes h_fromClasses,h.to_classes h_toClasses");
 		sql.append(" from bs_carman m");
 		sql.append(" inner join bs_car_driver_history h on m.id=h.driver_id");
 		sql.append(" where (h.from_car_id=? or h.to_car_id=?)");
@@ -1042,11 +1047,12 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 							// 特殊处理
 							json.put("judgeType", "司机");// 先假定全部都是司机
 							int moveType = json.getInt("moveType");
-							if (moveType == CarByDriverHistory.MOVETYPE_XRZ
+							if ((moveType == CarByDriverHistory.MOVETYPE_XRZ
 									|| moveType == CarByDriverHistory.MOVETYPE_CLDCL
 									|| moveType == CarByDriverHistory.MOVETYPE_JHZC
-									|| moveType == CarByDriverHistory.MOVETYPE_YWGSQH
-									|| moveType == CarByDriverHistory.MOVETYPE_DINGBAN) {
+									|| moveType == CarByDriverHistory.MOVETYPE_YWGSQH || moveType == CarByDriverHistory.MOVETYPE_DINGBAN)
+									&& carId.toString().equals(
+											json.getString("toCarId"))) {
 								json.put("judgeStatus", 0);// 当前营运司机
 								json.put("judgeClasses",
 										convert2ManClassesDesc(json
