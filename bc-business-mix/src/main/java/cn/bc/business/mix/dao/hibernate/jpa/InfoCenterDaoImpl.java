@@ -2,7 +2,9 @@ package cn.bc.business.mix.dao.hibernate.jpa;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -169,6 +171,7 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 		// ==基本信息：车辆==
 		JSONObject car = this.getCar(carId);
 		json.put("car", car);
+		boolean isLogoutCar = car.getInt("status") != 0;
 
 		// ==基本信息：经济合同==
 		JSONObject contract4Charger = this.getContract4Charger(carId);
@@ -189,7 +192,7 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 		}
 
 		// ==联系人信息==
-		JSONArray mans = this.getMansOld(carId);
+		JSONArray mans = this.getMans(carId);
 		json.put("mans", mans);
 
 		// ==提醒信息==
@@ -207,17 +210,19 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 			}
 		}
 
-		// ==提醒信息/车辆保单==
-		// {module:"车辆保单",id:1,link:"",limit:"",date:"yyyy-MM-dd",subject:".."}
-		msg = buildPolicyMessage(now, policy);
-		if (msg != null)
-			messages.put(msg);
+		if (!isLogoutCar) {
+			// ==提醒信息/车辆保单==
+			// {module:"车辆保单",id:1,link:"",limit:"",date:"yyyy-MM-dd",subject:".."}
+			msg = buildPolicyMessage(now, policy);
+			if (msg != null)
+				messages.put(msg);
 
-		// ==提醒信息/经济合同==
-		// {module:"经济合同",id:1,link:"张三,李四",limit:"",date:"yyyy-MM-dd",subject:".."}
-		msg = buildContract4ChargerMessage(now, contract4Charger);
-		if (msg != null)
-			messages.put(msg);
+			// ==提醒信息/经济合同==
+			// {module:"经济合同",id:1,link:"张三,李四",limit:"",date:"yyyy-MM-dd",subject:".."}
+			msg = buildContract4ChargerMessage(now, contract4Charger);
+			if (msg != null)
+				messages.put(msg);
+		}
 
 		// 返回
 		return json;
@@ -350,8 +355,9 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 	 * 
 	 * @param carId
 	 * @return
+	 * @throws JSONException
 	 */
-	private JSONArray getMans(final Long carId) {
+	private JSONArray getMans(final Long carId) throws JSONException {
 		// 预定义查询司机的相关sql信息
 		StringBuffer manSql = new StringBuffer();
 		manSql.append("select m.id,m.uid_,m.status_,m.type_,m.name,m.sex,m.origin,m.house_type,m.address,m.address1");
@@ -359,21 +365,122 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 		manSql.append(",m.move_type,m.move_date,m.shiftwork_end_date,m.carinfo,m.desc_");
 
 		// 获取迁移记录对应的司机信息
-		JSONArray mansFromCarByDriverHistory = this
+		List<JSONObject> mansFromCarByDriverHistory = this
 				.getMansFromCarByDriverHistory(carId, manSql);
+		boolean noHistory = mansFromCarByDriverHistory.isEmpty();
 
 		// 获取经济合同对应的责任人信息
-		JSONArray mansFromContract4Charger = this.getMansFromContract4Charger(
-				carId, manSql);
-
-		// 获取劳动合同对应的司机信息
-		JSONArray mansFromContract4Labour = this.getMansFromContract4Labour(
-				carId, manSql);
+		List<JSONObject> mansFromContract4Charger = this
+				.getMansFromContract4Charger(carId, manSql);
 
 		// 获取营运班次对应的顶班司机信息
-		JSONArray mansFromCarByDriver = this.getMansFromCarByDriver(carId,
-				manSql);
+		List<JSONObject> mansFromCarByDriver = this.getMansFromCarByDriver(
+				carId, manSql);
 
+		if (logger.isDebugEnabled()) {
+			logger.debug("mansFromCarByDriverHistory="
+					+ mansFromCarByDriverHistory);
+			logger.debug("mansFromContract4Charger=" + mansFromContract4Charger);
+			logger.debug("mansFromCarByDriver=" + mansFromCarByDriver);
+		}
+
+		// 信息合并
+		List<JSONObject> mans = new ArrayList<JSONObject>();
+		List<JSONObject> exists = new ArrayList<JSONObject>();
+		JSONObject man, charger;
+		if (!noHistory) {// 有迁移记录的情况：迁移记录(司机) + 经济合同(责任人)
+			// 判断一下司机是否兼为责任人并做相应处理
+			for (int i = 0; i < mansFromCarByDriverHistory.size(); i++) {
+				man = mansFromCarByDriverHistory.get(i);
+				charger = this.findCharger(mansFromContract4Charger,
+						man.getLong("id"));
+				if (charger != null) {
+					// 对司机信息做相应处理
+					man.put("judgeType", "司机和责任人");
+
+					exists.add(charger);
+				}
+				mans.add(man);
+			}
+
+			// 添加经济合同中单独的责任人
+			mansFromContract4Charger.removeAll(exists);
+			mans.addAll(mansFromContract4Charger);
+		} else {// 无迁移记录的情况：劳动合同(司机) + 经济合同(责任人)
+			// 获取劳动合同对应的司机信息：没有迁移记录才查劳动合同
+			List<JSONObject> mansFromContract4Labour = this
+					.getMansFromContract4Labour(carId, manSql);
+			if (logger.isDebugEnabled()) {
+				logger.debug("mansFromContract4Labour"
+						+ mansFromContract4Labour);
+			}
+
+			// 判断一下司机是否兼为责任人并做相应处理
+			for (int i = 0; i < mansFromContract4Labour.size(); i++) {
+				man = mansFromContract4Labour.get(i);
+				charger = this.findCharger(mansFromContract4Charger,
+						man.getLong("id"));
+				if (charger != null) {
+					// 对司机信息做相应处理
+					man.put("judgeType", "司机和责任人");
+
+					exists.add(charger);
+				}
+				mans.add(man);
+			}
+
+			// 添加经济合同中单独的责任人
+			mansFromContract4Charger.removeAll(exists);
+			mans.addAll(mansFromContract4Charger);
+		}
+
+		// 添加顶班司机
+		if (mansFromCarByDriver != null) {
+			List<JSONObject> toAdds = new ArrayList<JSONObject>();
+			for (JSONObject json : mansFromCarByDriver) {
+				if (!exists(mans, json.getLong("id")))
+					toAdds.add(json);
+			}
+			mans.addAll(toAdds);
+		}
+
+		// 获取司机对应的劳动合同的拼装信息
+		Long[] ids = new Long[mans.size()];
+		for (int i = 0; i < mans.size(); i++) {
+			ids[i] = mans.get(i).getLong("id");
+		}
+		Map<String, JSONObject> autoInfos = this
+				.getContract4Labours(carId, ids);
+		String id;
+		for (JSONObject _man : mans) {
+			id = carId + "." + _man.getString("id");
+			if (autoInfos.containsKey(id)) {
+				_man.put("autoInfo", autoInfos.get(id));
+			}
+		}
+
+		return new JSONArray(mans);
+	}
+
+	private boolean exists(List<JSONObject> mans, long manId)
+			throws JSONException {
+		for (JSONObject man : mans) {
+			if (man.getLong("id") == manId) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private JSONObject findCharger(List<JSONObject> mans, long manId)
+			throws JSONException {
+		JSONObject man;
+		for (int i = 0; i < mans.size(); i++) {
+			man = mans.get(i);
+			if (man.getLong("id") == manId) {
+				return man;
+			}
+		}
 		return null;
 	}
 
@@ -389,7 +496,7 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 	 * @param carId
 	 * @return
 	 */
-	private JSONArray getMansOld(final Long carId) {
+	protected JSONArray getMansOld(final Long carId) {
 		final StringBuffer sql = new StringBuffer();
 		sql.append("select m.id,m.uid_,m.status_,m.type_,m.name,m.sex,m.origin,m.house_type,m.address,m.address1");
 		sql.append(",m.phone,m.phone1,m.cert_identity,m.cert_fwzg,m.classes");
@@ -432,7 +539,7 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 							json.put("id", obj[i++]);
 							json.put("uid", obj[i++]);
 							json.put("status", obj[i++]);
-							json.put("type", getManType(obj[i++]));
+							json.put("type", getManTypeDesc(obj[i++]));
 							json.put("name", obj[i++]);
 							json.put("sex", getManSex(obj[i++]));
 							json.put("origin", null2Empty(obj[i++]));
@@ -484,7 +591,7 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 		final StringBuffer sql = new StringBuffer();
 		sql.append("select b.id,b.subject,b.lock_date,b.type_,m.name");
 		sql.append(" from bs_blacklist b");
-		sql.append(" inner join bs_carman m on m.id=b.driver_id");
+		sql.append(" left join bs_carman m on m.id=b.driver_id");
 		sql.append(" where b.car_id = ? and b.status_ = 0");
 		sql.append(" order by b.file_date desc");
 
@@ -587,7 +694,7 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 	 */
 	private JSONObject getCar(final Long carId) {
 		final StringBuffer sql = new StringBuffer();
-		sql.append("select c.id as id,c.status_,c.plate_type,c.plate_no");
+		sql.append("select c.id as id,c.plate_type,c.plate_no,c.status_");
 		sql.append(",c.code,c.company,unit.name as unit_name,m.name as motorcade_name");
 		sql.append(",c.factory_type,c.factory_model,c.engine_no,c.vin,c.color");
 		sql.append(",c.bs_type,c.register_date,c.operate_date,c.cert_no4");
@@ -619,10 +726,10 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 						JSONObject json = new JSONObject();
 						// int i = 0;
 						// json.put("id", car[i++]);
-						// json.put("status", car[i++]);
 						// json.put("plate", car[i++] + "." + car[i++]);
 
-						int i = 4;
+						int i = 3;
+						json.put("status", car[i++]);
 						json.put("code", car[i++]);
 						json.put("company", null2Empty(car[i++]));
 						json.put("unitName", null2Empty(car[i++]));
@@ -771,6 +878,111 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 	}
 
 	/**
+	 * 获取司机签订指定车辆的劳动合同信息,对同一个司机的多条劳动合同只获取最新的那条：
+	 * <p>
+	 * [{劳动合同1信息},{劳动合同2信息},...]
+	 * </p>
+	 * 
+	 * @param carId
+	 * @param driverIds
+	 * @return
+	 */
+	private Map<String, JSONObject> getContract4Labours(final Long carId,
+			Long[] driverIds) {
+		if (carId == null || driverIds == null || driverIds.length == 0) {
+			logger.warn("参数不足：getContract4Labours:carId" + carId
+					+ ";driverIds="
+					+ StringUtils.arrayToCommaDelimitedString(driverIds));
+			return new HashMap<String, JSONObject>();
+		}
+		final StringBuffer sql = new StringBuffer();
+		final List<Object> args = new ArrayList<Object>();
+		sql.append("select c.id,c.status_,c.start_date,c.end_date,cc.joindate,cc.insurcode,cc.insurance_type");
+		sql.append(",carc.car_id car_id,m.id driver_id,m.name driver_name");
+		sql.append(" from bs_contract_labour cc");
+		sql.append(" inner join bs_contract c on c.id=cc.id");
+		sql.append(" inner join bs_carman_contract mc on mc.contract_id=c.id");
+		sql.append(" inner join bs_car_contract carc on carc.contract_id=c.id");
+		sql.append(" inner join bs_carman m on m.id = mc.man_id");
+		sql.append(" where carc.car_id = ?");
+		args.add(carId);
+		if (driverIds.length == 1) {
+			sql.append(" and m.id = ?");
+			args.add(driverIds[0]);
+		} else {
+			sql.append(" and m.id in (?");
+			args.add(driverIds[0]);
+			for (int i = 1; i < driverIds.length; i++) {
+				sql.append(",?");
+				args.add(driverIds[i]);
+			}
+			sql.append(")");
+		}
+		// 排除相同司机的旧记录
+		sql.append(" and not exists (select 1 from bs_contract_labour cci");
+		sql.append("	inner join bs_contract ci on ci.id=cci.id");
+		sql.append("	inner join bs_carman_contract mci on mci.contract_id=ci.id");
+		sql.append("	inner join bs_car_contract carci on carci.contract_id=ci.id");
+		sql.append("	inner join bs_carman mi on mi.id = mci.man_id");
+		sql.append("	where carci.car_id = carc.car_id and mci.man_id=mc.man_id and ci.start_date > c.start_date)");
+		sql.append(" order by c.file_date desc");
+
+		if (logger.isDebugEnabled()) {
+			logger.debug("getContract4Labours:carId=" + carId + ";driverIds="
+					+ StringUtils.arrayToCommaDelimitedString(driverIds)
+					+ ";sql=" + sql);
+		}
+		return this.jpaTemplate
+				.execute(new JpaCallback<Map<String, JSONObject>>() {
+					public Map<String, JSONObject> doInJpa(EntityManager em)
+							throws PersistenceException {
+						Query queryObject = em.createNativeQuery(sql.toString());
+						int j = 0;
+						for (Object value : args) {
+							queryObject.setParameter(j + 1, value);// jpa的索引号从1开始
+							j++;
+						}
+						@SuppressWarnings("unchecked")
+						List<Object[]> objs = queryObject.getResultList();
+						Map<String, JSONObject> jsons = new HashMap<String, JSONObject>();
+						if (objs != null && !objs.isEmpty()) {
+							JSONObject json;
+							for (Object[] obj : objs) {
+								try {
+									json = new JSONObject();
+									int i = 0;
+
+									// 合同的相关信息
+									json.put("id", obj[i++]);
+									json.put("status", obj[i++]);
+									json.put("startDate", DateUtils
+											.formatDate((Date) obj[i++]));
+									json.put("endDate", DateUtils
+											.formatDate((Date) obj[i++]));
+									json.put("joinDate", DateUtils
+											.formatDate((Date) obj[i++]));
+									json.put("insurcode", null2Empty(obj[i++]));
+									json.put("insuranceType",
+											null2Empty(obj[i++]));
+
+									// 车辆、司机的相关信息
+									json.put("car_id", obj[i++]);
+									json.put("driver_id", obj[i++]);
+									json.put("driver_name", obj[i++]);
+
+									jsons.put(json.getString("car_id") + "."
+											+ json.getString("driver_id"), json);
+								} catch (JSONException e) {
+									logger.error(e.getMessage(), e);
+								}
+							}
+						}
+						return jsons;
+					}
+				});
+	}
+
+	/**
 	 * 获取车辆迁移记录对应的司机信息,对同一个司机的多条迁移记录只获取最新的那条：
 	 * <p>
 	 * [{司机1信息},{司机2信息},...]
@@ -779,7 +991,7 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 	 * @param carId
 	 * @return
 	 */
-	private JSONArray getMansFromCarByDriverHistory(final Long carId,
+	private List<JSONObject> getMansFromCarByDriverHistory(final Long carId,
 			StringBuffer manSql) {
 		final StringBuffer sql = new StringBuffer(manSql);
 		sql.append(",h.id h_id,h.move_type h_moveType,h.move_date h_moveDate,h.from_car_id h_fromCarId,h.to_car_id h_toCarId");
@@ -794,15 +1006,15 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 			logger.debug("getMansFromCarByDriverHistory:carId=" + carId
 					+ ";sql=" + sql);
 		}
-		return this.jpaTemplate.execute(new JpaCallback<JSONArray>() {
-			public JSONArray doInJpa(EntityManager em)
+		return this.jpaTemplate.execute(new JpaCallback<List<JSONObject>>() {
+			public List<JSONObject> doInJpa(EntityManager em)
 					throws PersistenceException {
 				Query queryObject = em.createNativeQuery(sql.toString());
 				queryObject.setParameter(1, carId);
 				queryObject.setParameter(2, carId);
 				@SuppressWarnings("unchecked")
 				List<Object[]> objs = queryObject.getResultList();
-				JSONArray jsons = new JSONArray();
+				List<JSONObject> jsons = new ArrayList<JSONObject>();
 				if (objs != null && !objs.isEmpty()) {
 					JSONObject json;
 					for (Object[] obj : objs) {
@@ -812,6 +1024,7 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 
 							// 司机的相关信息
 							i = buildManJson(json, obj, i);
+							json.put("judgeType", "司机");// 先假定全部都是司机
 
 							// 迁移记录的相关信息
 							json.put("h_id", obj[i++]);
@@ -821,7 +1034,7 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 							json.put("h_fromCarId", null2Empty(obj[i++]));
 							json.put("h_toCarId", null2Empty(obj[i++]));
 
-							jsons.put(json);
+							jsons.add(json);
 						} catch (JSONException e) {
 							logger.error(e.getMessage(), e);
 						}
@@ -841,7 +1054,7 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 	 * @param carId
 	 * @return
 	 */
-	private JSONArray getMansFromContract4Charger(final Long carId,
+	private List<JSONObject> getMansFromContract4Charger(final Long carId,
 			StringBuffer manSql) {
 		final StringBuffer sql = new StringBuffer(manSql);
 		sql.append(",c.id c_id,c.status_ c_status");
@@ -862,14 +1075,14 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 			logger.debug("getMansFromContract4Charger:carId=" + carId + ";sql="
 					+ sql);
 		}
-		return this.jpaTemplate.execute(new JpaCallback<JSONArray>() {
-			public JSONArray doInJpa(EntityManager em)
+		return this.jpaTemplate.execute(new JpaCallback<List<JSONObject>>() {
+			public List<JSONObject> doInJpa(EntityManager em)
 					throws PersistenceException {
 				Query queryObject = em.createNativeQuery(sql.toString());
 				queryObject.setParameter(1, carId);
 				@SuppressWarnings("unchecked")
 				List<Object[]> objs = queryObject.getResultList();
-				JSONArray jsons = new JSONArray();
+				List<JSONObject> jsons = new ArrayList<JSONObject>();
 				if (objs != null && !objs.isEmpty()) {
 					JSONObject json;
 					for (Object[] obj : objs) {
@@ -881,10 +1094,11 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 							i = buildManJson(json, obj, i);
 
 							// 合同的相关信息
+							json.put("judgeType", "责任人");// 先假定全部为责任人
 							json.put("c_id", obj[i++]);
 							json.put("c_status", obj[i++]);
 
-							jsons.put(json);
+							jsons.add(json);
 						} catch (JSONException e) {
 							logger.error(e.getMessage(), e);
 						}
@@ -904,7 +1118,7 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 	 * @param carId
 	 * @return
 	 */
-	private JSONArray getMansFromContract4Labour(final Long carId,
+	private List<JSONObject> getMansFromContract4Labour(final Long carId,
 			StringBuffer manSql) {
 		final StringBuffer sql = new StringBuffer(manSql);
 		sql.append(",c.id c_id,c.status_ c_status");
@@ -925,14 +1139,14 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 			logger.debug("getMansFromContract4Labour:carId=" + carId + ";sql="
 					+ sql);
 		}
-		return this.jpaTemplate.execute(new JpaCallback<JSONArray>() {
-			public JSONArray doInJpa(EntityManager em)
+		return this.jpaTemplate.execute(new JpaCallback<List<JSONObject>>() {
+			public List<JSONObject> doInJpa(EntityManager em)
 					throws PersistenceException {
 				Query queryObject = em.createNativeQuery(sql.toString());
 				queryObject.setParameter(1, carId);
 				@SuppressWarnings("unchecked")
 				List<Object[]> objs = queryObject.getResultList();
-				JSONArray jsons = new JSONArray();
+				List<JSONObject> jsons = new ArrayList<JSONObject>();
 				if (objs != null && !objs.isEmpty()) {
 					JSONObject json;
 					for (Object[] obj : objs) {
@@ -947,7 +1161,7 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 							json.put("c_id", obj[i++]);
 							json.put("c_status", obj[i++]);
 
-							jsons.put(json);
+							jsons.add(json);
 						} catch (JSONException e) {
 							logger.error(e.getMessage(), e);
 						}
@@ -967,7 +1181,7 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 	 * @param carId
 	 * @return
 	 */
-	private JSONArray getMansFromCarByDriver(final Long carId,
+	private List<JSONObject> getMansFromCarByDriver(final Long carId,
 			StringBuffer manSql) {
 		final StringBuffer sql = new StringBuffer(manSql);
 		sql.append(",cd.id cd_id,cd.status_ cd_status,cd.classes cd_classes");
@@ -983,14 +1197,14 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 			logger.debug("getMansFromCarByDriver:carId=" + carId + ";sql="
 					+ sql);
 		}
-		return this.jpaTemplate.execute(new JpaCallback<JSONArray>() {
-			public JSONArray doInJpa(EntityManager em)
+		return this.jpaTemplate.execute(new JpaCallback<List<JSONObject>>() {
+			public List<JSONObject> doInJpa(EntityManager em)
 					throws PersistenceException {
 				Query queryObject = em.createNativeQuery(sql.toString());
 				queryObject.setParameter(1, carId);
 				@SuppressWarnings("unchecked")
 				List<Object[]> objs = queryObject.getResultList();
-				JSONArray jsons = new JSONArray();
+				List<JSONObject> jsons = new ArrayList<JSONObject>();
 				if (objs != null && !objs.isEmpty()) {
 					JSONObject json;
 					for (Object[] obj : objs) {
@@ -1000,13 +1214,14 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 
 							// 司机的相关信息
 							i = buildManJson(json, obj, i);
+							json.put("judgeType", "司机");
 
 							// 营运班次的相关信息
 							json.put("cd_id", obj[i++]);
 							json.put("cd_status", obj[i++]);
 							json.put("cd_classes", obj[i++]);
 
-							jsons.put(json);
+							jsons.add(json);
 						} catch (JSONException e) {
 							logger.error(e.getMessage(), e);
 						}
@@ -1023,7 +1238,8 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 		json.put("id", obj[startIndex++]);
 		json.put("uid", obj[startIndex++]);
 		json.put("status", obj[startIndex++]);
-		json.put("type", getManType(obj[startIndex++]));
+		json.put("type", obj[startIndex++]);
+		json.put("typeDesc", getManTypeDesc(json.get("type")));
 		json.put("name", obj[startIndex++]);
 		json.put("sex", getManSex(obj[startIndex++]));
 		json.put("origin", null2Empty(obj[startIndex++]));
@@ -1072,7 +1288,7 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 		}
 	}
 
-	private String getManType(Object type) {
+	private String getManTypeDesc(Object type) {
 		if (type == null)
 			return "";
 
@@ -1086,7 +1302,7 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 		else if (s == CarMan.TYPE_FEIBIAN)
 			return "非编";
 		else
-			return "未知";
+			return "";
 	}
 
 	private String getManClasses(Object classes) {

@@ -272,6 +272,10 @@ public class CarByDriverHistoryAction extends
 		if (editable) {// edit,create
 			// 添加默认的保存按钮
 			pageOption.addButton(this.getDefaultSaveButtonOption());
+			pageOption.addButton(new ButtonOption(
+					getText("label.saveAndClose"), null,
+					"bc.business.carByDriverHistoryForm.saveAndClose"));
+
 			// }
 		} else {// open
 			if (!readonly) {

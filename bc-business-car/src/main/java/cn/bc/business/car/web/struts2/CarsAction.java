@@ -84,7 +84,7 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 		sql.append(",c.cert_no2,c.cert_no1,c.cert_no3,c.original_value");
 		sql.append(",c.vin ,c.engine_no,c.factory_type,c.factory_model");
 		sql.append(",c.taximeter_no,c.taximeter_factory,c.taximeter_type");
-		sql.append(",m.id as motorcade_id");
+		sql.append(",m.id as motorcade_id,c.return_date");
 		sql.append(" from bs_car c");
 		sql.append(" inner join bs_motorcade m on m.id=c.motorcade_id");
 		sql.append(" inner join bc_identity_actor bia on bia.id=m.unit_id");
@@ -123,6 +123,7 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 				map.put("taximeter_factory", rs[i++]);// 计价器制造厂
 				map.put("taximeter_type", rs[i++]);// 计价器型号
 				map.put("motorcade_id", rs[i++]);// 车队id
+				map.put("return_date", rs[i++]);// 交车日期
 				return map;
 			}
 		});
@@ -255,6 +256,11 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 		// 计价器型号
 		columns.add(new TextColumn4MapKey("c.taximeter_type", "taximeter_type",
 				getText("car.taximeterType"), 80).setUseTitleFromLabel(true));
+		// 交车日期
+		columns.add(new TextColumn4MapKey("c.return_date", "return_date",
+				getText("car.returnDate"), 90).setSortable(true)
+				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+
 		return columns;
 	}
 
