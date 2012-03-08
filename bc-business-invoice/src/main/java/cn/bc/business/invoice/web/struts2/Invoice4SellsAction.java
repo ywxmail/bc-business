@@ -157,7 +157,7 @@ public class Invoice4SellsAction extends ViewAction<Map<String, Object>> {
 				getText("invoice.company"), 60).setSortable(true));
 		// 销售日期
 		columns.add(new TextColumn4MapKey("s.sell_date", "sell_date",
-				getText("invoice.sell.selldate"), 100).setSortable(true)
+				getText("invoice4Sell.selldate"), 100).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
 		// 车队
 		columns.add(new TextColumn4MapKey("m.name", "motorcade_name",
@@ -238,7 +238,7 @@ public class Invoice4SellsAction extends ViewAction<Map<String, Object>> {
 				getText("invoice.count"), 60).setSortable(true));
 		// 销售单价
 		columns.add(new TextColumn4MapKey("d.price", "price",
-				getText("invoice.sell.price"), 60).setSortable(true)
+				getText("invoice4Sell.price"), 60).setSortable(true)
 				.setValueFormater(new NubmerFormater("###,###.00")));
 		// 合计
 		columns.add(new TextColumn4MapKey("s.price", "amount",
@@ -318,10 +318,10 @@ public class Invoice4SellsAction extends ViewAction<Map<String, Object>> {
 		if (status != null && status.length() > 0) {
 			String[] ss = status.split(",");
 			if (ss.length == 1) {
-				statusCondition = new EqualsCondition("b.status_", new Integer(
+				statusCondition = new EqualsCondition("s.status_", new Integer(
 						ss[0]));
 			} else {
-				statusCondition = new InCondition("b.status_",
+				statusCondition = new InCondition("s.status_",
 						StringUtils.stringArray2IntegerArray(ss));
 			}
 		}
@@ -333,7 +333,7 @@ public class Invoice4SellsAction extends ViewAction<Map<String, Object>> {
 		// carId条件
 		Condition carIdCondition = null;
 		if (carId != null) {
-			carIdCondition = new EqualsCondition("b.car_id", carId);
+			carIdCondition = new EqualsCondition("s.car_id", carId);
 		}
 		// 合并条件
 		return ConditionUtils.mix2AndCondition(statusCondition,

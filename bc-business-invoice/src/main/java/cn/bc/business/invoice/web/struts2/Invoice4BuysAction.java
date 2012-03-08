@@ -16,8 +16,12 @@ import org.springframework.stereotype.Controller;
 import cn.bc.BCConstants;
 import cn.bc.business.invoice.domain.Invoice4Buy;
 import cn.bc.business.web.struts2.ViewAction;
+import cn.bc.core.query.condition.Condition;
 import cn.bc.core.query.condition.Direction;
+import cn.bc.core.query.condition.impl.EqualsCondition;
+import cn.bc.core.query.condition.impl.InCondition;
 import cn.bc.core.query.condition.impl.OrderCondition;
+import cn.bc.core.util.StringUtils;
 import cn.bc.db.jdbc.RowMapper;
 import cn.bc.db.jdbc.SqlObject;
 import cn.bc.identity.web.SystemContext;
@@ -118,7 +122,7 @@ public class Invoice4BuysAction extends ViewAction<Map<String, Object>> {
 				getText("invoice.company"), 60).setSortable(true));
 		// 采购日期
 		columns.add(new TextColumn4MapKey("b.buy_date", "buy_date",
-				getText("invoice.buy.buydate"), 100).setSortable(true)
+				getText("invoice4Buy.buydate"), 100).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
 		// 发票类型
 		columns.add(new TextColumn4MapKey("b.type_", "type_",
@@ -134,14 +138,14 @@ public class Invoice4BuysAction extends ViewAction<Map<String, Object>> {
 				.setUseTitleFromLabel(true));
 		// 发票编码结束号
 		columns.add(new TextColumn4MapKey("b.end_no", "end_no",
-				getText("invoice.endNo"), 60).setSortable(true)
+				getText("invoice.endNo"), 100).setSortable(true)
 				.setUseTitleFromLabel(true));
 		// 数量
 		columns.add(new TextColumn4MapKey("b.count_", "count_",
 				getText("invoice.count"), 60).setSortable(true));
 		// 采购单价
 		columns.add(new TextColumn4MapKey("b.buy_price", "buy_price",
-				getText("invoice.buy.price"), 60).setSortable(true)
+				getText("invoice4Buy.buyPrice"), 60).setSortable(true)
 				.setValueFormater(new NubmerFormater("###,###.00")));
 		// 合计
 		columns.add(new TextColumn4MapKey("b.buy_price", "amount",
@@ -222,6 +226,25 @@ public class Invoice4BuysAction extends ViewAction<Map<String, Object>> {
 		return tb.addButton(Toolbar.getDefaultToolbarRadioGroup(
 				this.getStatus(), "status", 0,
 				getText("title.click2changeSearchStatus")));
+	}
+	
+	@Override
+	protected Condition getGridSpecalCondition() {
+		// 状态条件
+		Condition statusCondition = null;
+		if (status != null && status.length() > 0) {
+			String[] ss = status.split(",");
+			if (ss.length == 1) {
+				statusCondition = new EqualsCondition("b.status_", new Integer(
+						ss[0]));
+			} else {
+				statusCondition = new InCondition("b.status_",
+						StringUtils.stringArray2IntegerArray(ss));
+			}
+		}
+		
+		// 合并条件
+		return statusCondition;
 	}
 
 	// ==高级搜索代码开始==
