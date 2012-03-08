@@ -13,7 +13,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import cn.bc.identity.domain.ActorHistory;
-import cn.bc.identity.domain.RichFileEntityImpl;
+import cn.bc.identity.domain.FileEntityImpl;
 
 /**
  * 票务采购单
@@ -22,7 +22,7 @@ import cn.bc.identity.domain.RichFileEntityImpl;
  */
 @Entity
 @Table(name = "BS_INVOICE_BUY")
-public class Invoice4Buy extends RichFileEntityImpl {
+public class Invoice4Buy extends FileEntityImpl {
 	private static final long serialVersionUID = 1L;
 	public static final String KEY_UID = "Invoice4Buy.uid";
 	public static final String KEY_CODE = Invoice4Buy.class.getSimpleName();
@@ -42,6 +42,7 @@ public class Invoice4Buy extends RichFileEntityImpl {
 	/** 单位：本 */
 	public static final int UNIT_BEN = 1;
 	
+	private int status;//状态
 	private String company;//所属公司
 	private String code;//发票代码
 	private int type;// 发票类型：1-打印票,2-手撕票
@@ -55,7 +56,13 @@ public class Invoice4Buy extends RichFileEntityImpl {
 	private Calendar buyDate; //采购日期
 	private String desc;//备注
 	
-	
+	@Column(name = "STATUS_")
+	public int getStatus() {
+		return status;
+	}
+	public void setStatus(int status) {
+		this.status = status;
+	}
 	public String getCompany() {
 		return company;
 	}
@@ -125,7 +132,7 @@ public class Invoice4Buy extends RichFileEntityImpl {
 	public void setBuyerId(ActorHistory buyerId) {
 		this.buyerId = buyerId;
 	}
-	@Column(name = "BUT_DATE")
+	@Column(name = "BUY_DATE")
 	public Calendar getBuyDate() {
 		return buyDate;
 	}

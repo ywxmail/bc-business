@@ -17,7 +17,7 @@ import javax.persistence.Table;
 
 import cn.bc.business.motorcade.domain.Motorcade;
 import cn.bc.identity.domain.ActorHistory;
-import cn.bc.identity.domain.RichFileEntityImpl;
+import cn.bc.identity.domain.FileEntityImpl;
 
 /**
  * 票务销售单
@@ -26,7 +26,7 @@ import cn.bc.identity.domain.RichFileEntityImpl;
  */
 @Entity
 @Table(name = "BS_INVOICE_SELL")
-public class Invoice4Sell extends RichFileEntityImpl {
+public class Invoice4Sell extends FileEntityImpl {
 	private static final long serialVersionUID = 1L;
 	public static final String KEY_UID = "Invoice4Sell.uid";
 	public static final String KEY_CODE = Invoice4Sell.class.getSimpleName();
@@ -53,6 +53,7 @@ public class Invoice4Sell extends RichFileEntityImpl {
 	private Integer payType; //收款方式
 	private String bankCode; //银行流水号
 	private String desc;//备注
+	private int status;//状态
 	
 	@OneToMany(mappedBy = "invoice4Sell", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE, orphanRemoval = true)
 	public Set<Invoice4SellDetail> getInvoice4SellDetail() {
@@ -140,5 +141,11 @@ public class Invoice4Sell extends RichFileEntityImpl {
 		this.desc = desc;
 	}
 
-	
+	@Column(name = "STATUS_")
+	public int getStatus() {
+		return status;
+	}
+	public void setStatus(int status) {
+		this.status = status;
+	}
 }
