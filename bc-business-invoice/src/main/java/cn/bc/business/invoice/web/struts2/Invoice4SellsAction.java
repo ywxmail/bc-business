@@ -5,6 +5,7 @@ package cn.bc.business.invoice.web.struts2;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -17,9 +18,14 @@ import org.springframework.stereotype.Controller;
 
 import cn.bc.BCConstants;
 import cn.bc.business.invoice.domain.Invoice4Buy;
+import cn.bc.business.invoice.domain.Invoice4Sell;
 import cn.bc.business.motorcade.service.MotorcadeService;
 import cn.bc.business.web.struts2.ViewAction;
+import cn.bc.core.query.condition.Condition;
+import cn.bc.core.query.condition.ConditionUtils;
 import cn.bc.core.query.condition.Direction;
+import cn.bc.core.query.condition.impl.EqualsCondition;
+import cn.bc.core.query.condition.impl.InCondition;
 import cn.bc.core.query.condition.impl.LikeCondition;
 import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.core.util.StringUtils;
@@ -145,7 +151,7 @@ public class Invoice4SellsAction extends ViewAction<Map<String, Object>> {
 		// 状态
 		columns.add(new TextColumn4MapKey("s.status_", "status_",
 				getText("invoice.status"), 40).setSortable(true)
-				.setValueFormater(new EntityStatusFormater(getBSStatuses1())));
+				.setValueFormater(new EntityStatusFormater(getStatus())));
 		// 公司
 		columns.add(new TextColumn4MapKey("s.company", "company",
 				getText("invoice.company"), 60).setSortable(true));
@@ -245,6 +251,20 @@ public class Invoice4SellsAction extends ViewAction<Map<String, Object>> {
 	}
 
 	/**
+	 * 发票状态值转换:正常|作废|全部
+	 * 
+	 */
+	private Map<String, String> getStatus() {
+		Map<String, String> map = new LinkedHashMap<String, String>();
+		map.put(String.valueOf(Invoice4Sell.STATUS_NORMAL),
+				getText("invoice.status.normal"));
+		map.put(String.valueOf(Invoice4Sell.STATUS_INVALID),
+				getText("invoice.status.invalid"));
+		map.put("", getText("invoice.status.all"));
+		return map;
+	}
+
+	/**
 	 * 发票类型值转换:手撕票|打印票
 	 * 
 	 */
@@ -263,8 +283,10 @@ public class Invoice4SellsAction extends ViewAction<Map<String, Object>> {
 	 */
 	private Map<String, String> getUnits() {
 		Map<String, String> map = new HashMap<String, String>();
-		map.put("1", getText("invoice.unit.juan"));
-		map.put("2", getText("invoice.unit.ben"));
+		map.put(String.valueOf(Invoice4Buy.UNIT_JUAN),
+				getText("invoice.unit.juan"));
+		map.put(String.valueOf(Invoice4Buy.UNIT_BEN),
+				getText("invoice.unit.ben"));
 		return map;
 	}
 
@@ -288,14 +310,57 @@ public class Invoice4SellsAction extends ViewAction<Map<String, Object>> {
 	protected String getGridRowLabelExpression() {
 		return "'购买人' + ['buyer_name']";
 	}
+	
+	@Override
+	protected Condition getGridSpecalCondition() {
+		// 状态条件
+		Condition statusCondition = null;
+		if (status != null && status.length() > 0) {
+			String[] ss = status.split(",");
+			if (ss.length == 1) {
+				statusCondition = new EqualsCondition("b.status_", new Integer(
+						ss[0]));
+			} else {
+				statusCondition = new InCondition("b.status_",
+						StringUtils.stringArray2IntegerArray(ss));
+			}
+		}
+		// carManId条件
+		Condition carManIdCondition = null;
+		if (buyerId != null) {
+			carManIdCondition = new EqualsCondition("s.buyer_id", buyerId);
+		}
+		// carId条件
+		Condition carIdCondition = null;
+		if (carId != null) {
+			carIdCondition = new EqualsCondition("b.car_id", carId);
+		}
+		// 合并条件
+		return ConditionUtils.mix2AndCondition(statusCondition,
+				carManIdCondition, carIdCondition);
+	}
 
 	@Override
 	protected Toolbar getHtmlPageToolbar() {
-		return super.getHtmlPageToolbar()
-				.addButton(
-						Toolbar.getDefaultToolbarRadioGroup(
-								this.getBSStatuses1(), "status", 0,
-								getText("title.click2changeSearchStatus")));
+		Toolbar tb = new Toolbar();
+		if (this.isReadonly()) {
+			// 查看按钮
+			tb.addButton(this.getDefaultOpenToolbarButton());
+		} else {
+			// 新建按钮
+			tb.addButton(this.getDefaultCreateToolbarButton());
+			// 编辑按钮
+			tb.addButton(this.getDefaultEditToolbarButton());
+			// 作废按钮
+			tb.addButton(Toolbar
+					.getDefaultDisabledToolbarButton(getText("invoice.status.invalid")));
+		}
+		// 搜索按钮
+		tb.addButton(this.getDefaultSearchToolbarButton());
+
+		return tb.addButton(Toolbar.getDefaultToolbarRadioGroup(
+				this.getStatus(), "status", 0,
+				getText("title.click2changeSearchStatus")));
 	}
 
 	// ==高级搜索代码开始==

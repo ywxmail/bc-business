@@ -5,6 +5,7 @@ package cn.bc.business.invoice.web.struts2;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -157,7 +158,7 @@ public class Invoice4BuysAction extends ViewAction<Map<String, Object>> {
 	 * 
 	 */
 	private Map<String, String> getStatus() {
-		Map<String, String> map = new HashMap<String, String>();
+		Map<String, String> map = new LinkedHashMap<String, String>();
 		map.put(String.valueOf(Invoice4Buy.STATUS_NORMAL),
 				getText("invoice.status.normal"));
 		map.put(String.valueOf(Invoice4Buy.STATUS_INVALID),
@@ -202,9 +203,25 @@ public class Invoice4BuysAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected Toolbar getHtmlPageToolbar() {
-		return super.getHtmlPageToolbar().addButton(
-				Toolbar.getDefaultToolbarRadioGroup(this.getStatus(), "status",
-						0, getText("title.click2changeSearchStatus")));
+		Toolbar tb = new Toolbar();
+		if (this.isReadonly()) {
+			// 查看按钮
+			tb.addButton(this.getDefaultOpenToolbarButton());
+		} else {
+			// 新建按钮
+			tb.addButton(this.getDefaultCreateToolbarButton());
+			// 编辑按钮
+			tb.addButton(this.getDefaultEditToolbarButton());
+			// 作废按钮
+			tb.addButton(Toolbar
+					.getDefaultDisabledToolbarButton(getText("invoice.status.invalid")));
+		}
+		// 搜索按钮
+		tb.addButton(this.getDefaultSearchToolbarButton());
+
+		return tb.addButton(Toolbar.getDefaultToolbarRadioGroup(
+				this.getStatus(), "status", 0,
+				getText("title.click2changeSearchStatus")));
 	}
 
 	// ==高级搜索代码开始==
