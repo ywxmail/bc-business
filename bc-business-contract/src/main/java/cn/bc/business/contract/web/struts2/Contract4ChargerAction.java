@@ -167,10 +167,8 @@ public class Contract4ChargerAction extends
 		Contract4Charger e = this.getE();
 		Long excludeId = null;
 		// 保存之前检测自编号是否唯一:仅在新建时检测
-		if (e.getId() == null) {
-			excludeId = this.contract4ChargerService.checkCodeIsExist(
-					e.getId(), e.getCode());
-		}
+		excludeId = this.contract4ChargerService.checkCodeIsExist(
+				e.getId(), e.getCode());
 		if (excludeId != null) {
 			json.put("success", false);
 			json.put("msg", getText("contract4Labour.code.exist2"));
