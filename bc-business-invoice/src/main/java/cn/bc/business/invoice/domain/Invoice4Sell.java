@@ -37,9 +37,9 @@ public class Invoice4Sell extends RichFileEntityImpl {
 	public static final int STATUS_INVALID = 1;
 	
 	/** 收款方式：现金 */
-	public static final int STATUS_CASH = 0;
+	public static final int PAY_TYPE_CASH = 0;
 	/** 收款方式：银行卡 */
-	public static final int STATUS_BANK_CARE = 1;
+	public static final int PAY_TYPE_BANK_CARE = 1;
 
 	private Set<Invoice4SellDetail> invoice4SellDetail;
 	private Long buyerId;//购买人ID;
