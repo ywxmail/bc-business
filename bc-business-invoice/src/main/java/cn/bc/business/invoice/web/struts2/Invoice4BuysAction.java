@@ -13,6 +13,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
 import cn.bc.BCConstants;
+import cn.bc.business.invoice.domain.Invoice4Buy;
 import cn.bc.business.web.struts2.ViewAction;
 import cn.bc.core.query.condition.Direction;
 import cn.bc.core.query.condition.impl.OrderCondition;
@@ -52,7 +53,8 @@ public class Invoice4BuysAction extends ViewAction<Map<String, Object>> {
 	@Override
 	protected OrderCondition getGridDefaultOrderCondition() {
 		// 默认排序方向：状态
-		return new OrderCondition("b.status_", Direction.Asc).add("b.buy_date", Direction.Desc);
+		return new OrderCondition("b.status_", Direction.Asc).add("b.buy_date",
+				Direction.Desc);
 	}
 
 	@Override
@@ -109,7 +111,7 @@ public class Invoice4BuysAction extends ViewAction<Map<String, Object>> {
 		// 状态
 		columns.add(new TextColumn4MapKey("b.status_", "status_",
 				getText("invoice.status"), 40).setSortable(true)
-				.setValueFormater(new EntityStatusFormater(getBSStatuses1())));
+				.setValueFormater(new EntityStatusFormater(this.getStatus())));
 		// 公司
 		columns.add(new TextColumn4MapKey("b.company", "company",
 				getText("invoice.company"), 60).setSortable(true));
@@ -151,21 +153,37 @@ public class Invoice4BuysAction extends ViewAction<Map<String, Object>> {
 	}
 
 	/**
+	 * 发票状态值转换:正常|作废|全部
+	 * 
+	 */
+	private Map<String, String> getStatus() {
+		Map<String, String> map = new HashMap<String, String>();
+		map.put(String.valueOf(Invoice4Buy.STATUS_NORMAL),
+				getText("invoice.status.normal"));
+		map.put(String.valueOf(Invoice4Buy.STATUS_INVALID),
+				getText("invoice.status.invalid"));
+		map.put("", getText("invoice.status.all"));
+		return map;
+	}
+
+	/**
 	 * 发票类型值转换:手撕票|打印票
 	 * 
 	 */
 	private Map<String, String> getTypes() {
 		Map<String, String> map = new HashMap<String, String>();
-		map.put("1", getText("invoice.type.dayinpiao"));
-		map.put("2", getText("invoice.type.shousipiao"));
+		map.put(String.valueOf(Invoice4Buy.TYPE_PRINT),
+				getText("invoice.type.dayinpiao"));
+		map.put(String.valueOf(Invoice4Buy.TYPE_TORE),
+				getText("invoice.type.shousipiao"));
 		return map;
 	}
 
 	@Override
 	protected String[] getGridSearchFields() {
-		return new String[]{"b.code"};
+		return new String[] { "b.code" };
 	}
-	
+
 	@Override
 	protected String getFormActionName() {
 		return "invoice4Buy";
@@ -184,11 +202,9 @@ public class Invoice4BuysAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected Toolbar getHtmlPageToolbar() {
-		return super.getHtmlPageToolbar()
-				.addButton(
-						Toolbar.getDefaultToolbarRadioGroup(
-								this.getBSStatuses1(), "status", 0,
-								getText("title.click2changeSearchStatus")));
+		return super.getHtmlPageToolbar().addButton(
+				Toolbar.getDefaultToolbarRadioGroup(this.getStatus(), "status",
+						0, getText("title.click2changeSearchStatus")));
 	}
 
 	// ==高级搜索代码开始==
@@ -199,9 +215,7 @@ public class Invoice4BuysAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected void initConditionsFrom() throws Exception {
-	
+
 	}
-
 	// ==高级搜索代码结束==
-
 }

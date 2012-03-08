@@ -16,6 +16,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
 import cn.bc.BCConstants;
+import cn.bc.business.invoice.domain.Invoice4Buy;
 import cn.bc.business.motorcade.service.MotorcadeService;
 import cn.bc.business.web.struts2.ViewAction;
 import cn.bc.core.query.condition.Direction;
@@ -52,7 +53,7 @@ public class Invoice4SellsAction extends ViewAction<Map<String, Object>> {
 	public String status = String.valueOf(BCConstants.STATUS_ENABLED); // 票务的状态，多个用逗号连接
 	public Long buyerId;
 	public Long carId;
-	
+
 	@Override
 	public boolean isReadonly() {
 		// 票务管理员或系统管理员
@@ -64,9 +65,10 @@ public class Invoice4SellsAction extends ViewAction<Map<String, Object>> {
 	@Override
 	protected OrderCondition getGridDefaultOrderCondition() {
 		// 默认排序方向：状态
-		return new OrderCondition("s.status_", Direction.Asc).add("s.sell_date", Direction.Desc);
+		return new OrderCondition("s.status_", Direction.Asc).add(
+				"s.sell_date", Direction.Desc);
 	}
-	
+
 	@Override
 	protected LikeCondition getGridSearchCondition4OneField(String field,
 			String value) {
@@ -151,7 +153,7 @@ public class Invoice4SellsAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("s.sell_date", "sell_date",
 				getText("invoice.sell.selldate"), 100).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
-		//车队
+		// 车队
 		columns.add(new TextColumn4MapKey("m.name", "motorcade_name",
 				getText("invoice.motorcade"), 70)
 				.setSortable(true)
@@ -184,7 +186,7 @@ public class Invoice4SellsAction extends ViewAction<Map<String, Object>> {
 						}
 					}));
 		}
-		//购买人
+		// 购买人
 		if (buyerId == null) {
 			columns.add(new TextColumn4MapKey("s.buyer_name", "buyer_name",
 					getText("invoice.buyer"), 60).setSortable(true)
@@ -202,19 +204,21 @@ public class Invoice4SellsAction extends ViewAction<Map<String, Object>> {
 								}
 							}));
 		}
-		
+
 		// 发票类型
 		columns.add(new TextColumn4MapKey("b.type_", "type_",
 				getText("invoice.type"), 60).setSortable(true)
 				.setValueFormater(new KeyValueFormater(getTypes())));
-		//发票单位
+		// 发票单位
 		columns.add(new TextColumn4MapKey("b.unit_", "unit_",
 				getText("invoice.unit"), 40).setSortable(true)
 				.setValueFormater(new KeyValueFormater(getUnits())));
 		// 发票代码
-		/*columns.add(new TextColumn4MapKey("b.code", "code",
-				getText("invoice.code"), 100).setSortable(true)
-				.setUseTitleFromLabel(true));*/
+		/*
+		 * columns.add(new TextColumn4MapKey("b.code", "code",
+		 * getText("invoice.code"), 100).setSortable(true)
+		 * .setUseTitleFromLabel(true));
+		 */
 		// 发票编码开始号
 		columns.add(new TextColumn4MapKey("s.start_no", "start_no",
 				getText("invoice.startNo"), 100).setSortable(true)
@@ -246,11 +250,13 @@ public class Invoice4SellsAction extends ViewAction<Map<String, Object>> {
 	 */
 	private Map<String, String> getTypes() {
 		Map<String, String> map = new HashMap<String, String>();
-		map.put("1", getText("invoice.type.dayinpiao"));
-		map.put("2", getText("invoice.type.shousipiao"));
+		map.put(String.valueOf(Invoice4Buy.TYPE_PRINT),
+				getText("invoice.type.dayinpiao"));
+		map.put(String.valueOf(Invoice4Buy.TYPE_TORE),
+				getText("invoice.type.shousipiao"));
 		return map;
 	}
-	
+
 	/**
 	 * 发票单位值转换:卷|本
 	 * 
@@ -264,9 +270,9 @@ public class Invoice4SellsAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected String[] getGridSearchFields() {
-		return new String[]{"m.name","car_plate","s.buyer_name"};
+		return new String[] { "m.name", "car_plate", "s.buyer_name" };
 	}
-	
+
 	@Override
 	protected String getFormActionName() {
 		return "invoice4Sell";
@@ -314,7 +320,7 @@ public class Invoice4SellsAction extends ViewAction<Map<String, Object>> {
 
 	public JSONArray motorcades;// 车队的下拉列表信息
 	public JSONArray units;// 分公司的下拉列表信息
-	
+
 	@Override
 	protected void initConditionsFrom() throws Exception {
 		// 可选车队列表
@@ -326,7 +332,5 @@ public class Invoice4SellsAction extends ViewAction<Map<String, Object>> {
 				new Integer[] { Actor.TYPE_UNIT }, (Integer[]) null), "name",
 				"id");
 	}
-
 	// ==高级搜索代码结束==
-
 }
