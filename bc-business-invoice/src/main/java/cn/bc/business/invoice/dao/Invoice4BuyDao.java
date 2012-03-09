@@ -24,4 +24,11 @@ public interface Invoice4BuyDao extends CrudDao<Invoice4Buy> {
 	 */
 	List<Map<String, String>> findEnabled4Option();
 
+	/**
+	 * 通过发票代码查找对应的采购单列表
+	 * @param code
+	 * @return
+	 */
+	List<Invoice4Buy> selectInvoice4BuyByCode(String code);
+
 }

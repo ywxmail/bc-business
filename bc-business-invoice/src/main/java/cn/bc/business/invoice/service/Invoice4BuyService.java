@@ -17,11 +17,17 @@ import cn.bc.core.service.CrudService;
 public interface Invoice4BuyService extends CrudService<Invoice4Buy> {
 
 	/**
-	 * 获取当前可用的购买单下拉列表信息
+	 * 获取当前可用的采购单下拉列表信息
 	 * 
 	 * @return 返回结果中的元素Map格式为：：id -- Invoice4Buy的id,
 	 * name -- Invoice4Buy的code(startNo-endNo),如:XXXX(10001~20000)
 	 */
 	List<Map<String, String>> findEnabled4Option();
 
+	/**
+	 * 通过发票代码查找对应的采购单列表
+	 * @param code
+	 * @return
+	 */
+	List<Invoice4Buy> selectInvoice4BuyByCode(String code);
 }

@@ -66,4 +66,15 @@ public class Invoice4BuyDaoImpl extends HibernateCrudJpaDao<Invoice4Buy> impleme
 				});
 	}
 
+	/**
+	 * 通过发票代码查找对应的采购单列表
+	 * @param code
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public List<Invoice4Buy> selectInvoice4BuyByCode(String code) {
+		return this.getJpaTemplate().find(
+				"from Invoice4Buy where code=?", code);
+	}
+
 }
