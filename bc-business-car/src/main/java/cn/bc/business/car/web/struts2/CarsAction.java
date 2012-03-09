@@ -35,7 +35,6 @@ import cn.bc.web.formater.AbstractFormater;
 import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.formater.EntityStatusFormater;
 import cn.bc.web.formater.LinkFormater4Id;
-import cn.bc.web.formater.NubmerFormater;
 import cn.bc.web.ui.html.grid.Column;
 import cn.bc.web.ui.html.grid.IdColumn4MapKey;
 import cn.bc.web.ui.html.grid.TextColumn4MapKey;
