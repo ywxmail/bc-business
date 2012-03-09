@@ -214,9 +214,9 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("c.cert_no3", "cert_no3",
 				getText("car.certNo3"), 70).setUseTitleFromLabel(true));
 		// 固定资产原值
-		columns.add(new TextColumn4MapKey("c.original_value", "original_value",
-				getText("car.originalValue"), 100).setUseTitleFromLabel(true)
-				.setValueFormater(new NubmerFormater()));
+//		columns.add(new TextColumn4MapKey("c.original_value", "original_value",
+//				getText("car.originalValue"), 100).setUseTitleFromLabel(true)
+//				.setValueFormater(new NubmerFormater()));
 		// 车架号
 		columns.add(new TextColumn4MapKey("c.vin", "vin", getText("car.vin"),
 				150).setUseTitleFromLabel(true));
