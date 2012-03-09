@@ -30,8 +30,8 @@ public class SelectMoreCarManWithCarAction extends
 
 	private static final long serialVersionUID = 1L;
 	public List<CarMan> carMans;
-	public HashMap<String,String> infoMap;
-	
+	public HashMap<String, String> infoMap;
+
 	private CarManService carManService;
 	public Long carId;
 
@@ -44,33 +44,34 @@ public class SelectMoreCarManWithCarAction extends
 	public String selectCarMans() throws Exception {
 		carMans = this.carManService.selectAllCarManByCarId(new Long(carId));
 		infoMap = new HashMap<String, String>();
-		if(carMans.size() > 0){
-			for(CarMan man : carMans){
-				infoMap.put(man.getName(), 
-				isNullObject(man.getId())
-				+isNullObject(man.getCert4FWZG())
-				+isNullObject(man.getRegion())
-				+isNullObject(man.getOrigin())
-				+isNullObject(calendarToString(man.getBirthdate()))
-				+isNullObject(calendarToString(man.getWorkDate()))
-				+isNullObject(man.getDrivingStatus())
-				+isNullObject(man.getType())
-				+man.getStatus()
-				);
+		if (carMans.size() > 0) {
+			for (CarMan man : carMans) {
+				infoMap.put(
+						man.getName(),
+						isNullObject(man.getId())
+								+ isNullObject(man.getCert4FWZG())
+								+ isNullObject(man.getRegion())
+								+ isNullObject(man.getOrigin())
+								+ isNullObject(calendarToString(man
+										.getBirthdate()))
+								+ isNullObject(calendarToString(man
+										.getWorkDate()))
+								+ isNullObject(man.getClasses())
+								+ isNullObject(man.getType()) + man.getStatus());
 			}
 		}
 		return SUCCESS;
 	}
-	
+
 	public String isNullObject(Object obj) {
 		if (null != obj && obj.toString().length() > 0) {
-			return obj+",";
+			return obj + ",";
 		} else {
 			return "";
 		}
 	}
-	
-	public String calendarToString(Calendar obj){
+
+	public String calendarToString(Calendar obj) {
 		Calendar calendar = obj;
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 		String dateStr = df.format(calendar.getTime());
