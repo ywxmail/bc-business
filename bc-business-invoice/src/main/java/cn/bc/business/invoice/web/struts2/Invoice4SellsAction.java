@@ -220,11 +220,10 @@ public class Invoice4SellsAction extends ViewAction<Map<String, Object>> {
 				getText("invoice.unit"), 40).setSortable(true)
 				.setValueFormater(new KeyValueFormater(getUnits())));
 		// 发票代码
-		/*
-		 * columns.add(new TextColumn4MapKey("b.code", "code",
-		 * getText("invoice.code"), 100).setSortable(true)
-		 * .setUseTitleFromLabel(true));
-		 */
+		columns.add(new TextColumn4MapKey("b.code", "code",
+				getText("invoice.code"), 100).setSortable(true)
+				.setUseTitleFromLabel(true));
+		 
 		// 发票编码开始号
 		columns.add(new TextColumn4MapKey("s.start_no", "start_no",
 				getText("invoice.startNo"), 100).setSortable(true)
