@@ -14,8 +14,9 @@ import org.springframework.stereotype.Controller;
 
 import cn.bc.BCConstants;
 import cn.bc.business.OptionConstants;
-import cn.bc.business.invoice.domain.Invoice4Buy;
-import cn.bc.business.invoice.service.Invoice4BuyService;
+import cn.bc.business.invoice.domain.Invoice4Sell;
+import cn.bc.business.invoice.service.Invoice4SellService;
+import cn.bc.business.motorcade.service.MotorcadeService;
 import cn.bc.business.web.struts2.FileEntityAction;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.option.domain.OptionItem;
@@ -31,25 +32,35 @@ import cn.bc.web.ui.html.page.PageOption;
 
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 @Controller
-public class Invoice4BuyAction extends FileEntityAction<Long, Invoice4Buy> {
+public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 	// private static Log logger = LogFactory.getLog(CarAction.class);
 	private static final long serialVersionUID = 1L;
-	private Invoice4BuyService invoice4BuyService;
+	private Invoice4SellService invoice4SellService;
 	private OptionService optionService;
+	private MotorcadeService motorcadeService;
+	public Long buyerId;
+	public Long carId;
 	
 	public List<Map<String, String>> companyList; // 所属公司列表（宝城、广发）
+	public List<Map<String, String>> motorcadeList; // 可选车队列表
 	public List<Map<String, String>> typeList; // 发票类型列表（打印票、手撕票）
 	public List<Map<String, String>> unitList; // 发票单位列表（卷、本）
+	public List<Map<String, String>> payTypeList; // 付款方式列表（现金、银行卡）
 
 	@Autowired
-	public void setInvoice4BuyService(Invoice4BuyService invoice4BuyService) {
-		this.setCrudService(invoice4BuyService);
-		this.invoice4BuyService = invoice4BuyService;
+	public void setInvoice4BuyService(Invoice4SellService invoice4SellService) {
+		this.setCrudService(invoice4SellService);
+		this.invoice4SellService = invoice4SellService;
 	}
 
 	@Autowired
 	public void setOptionService(OptionService optionService) {
 		this.optionService = optionService;
+	}
+	
+	@Autowired
+	public void setMotorcadeService(MotorcadeService motorcadeService) {
+		this.motorcadeService = motorcadeService;
 	}
 
 	@Override
@@ -62,27 +73,36 @@ public class Invoice4BuyAction extends FileEntityAction<Long, Invoice4Buy> {
 
 	@Override
 	protected PageOption buildFormPageOption(boolean editable) {
-		return super.buildFormPageOption(editable).setWidth(550)
+		return super.buildFormPageOption(editable).setWidth(800)
 				.setMinWidth(250).setMinHeight(200);
 	}
 
 	@Override
-	protected void afterCreate(Invoice4Buy entity) {
+	protected void afterCreate(Invoice4Sell entity) {
 		super.afterCreate(entity);
-		entity.setBuyDate(Calendar.getInstance());
-		entity.setBuyPrice(7F);
+		entity.setSellDate(Calendar.getInstance());
+		//entity.setBuyPrice(7F);
 		entity.setStatus(BCConstants.STATUS_ENABLED);
 	}
 
 	@Override
 	protected void initForm(boolean editable) throws Exception {
 		super.initForm(editable);
+		
+		// 加载可选车队列表
+		this.motorcadeList = this.motorcadeService.findEnabled4Option();
+		/*if (this.getE().getMotorcadeId() != null)
+			OptionItem.insertIfNotExist(this.motorcadeList, this.getE()
+					.getMotorcadeId().toString(), this.getE()
+					.getMotorcadeName());
+		*/
 		// 批量加载可选项列表
 		Map<String, List<Map<String, String>>> optionItems = this.optionService
 				.findOptionItemByGroupKeys(new String[] {
 						OptionConstants.CAR_COMPANY,
 						OptionConstants.INVOICE_TYPE,
-						OptionConstants.INVOICE_UNIT
+						OptionConstants.INVOICE_UNIT,
+						OptionConstants.INVOICE_PAYTYPE
 						});
 
 		// 所属公司列表
@@ -92,6 +112,8 @@ public class Invoice4BuyAction extends FileEntityAction<Long, Invoice4Buy> {
 		this.typeList=optionItems.get(OptionConstants.INVOICE_TYPE);
 		//发票单位
 		this.unitList=optionItems.get(OptionConstants.INVOICE_UNIT);
+		//收款方式
+		this.payTypeList=optionItems.get(OptionConstants.INVOICE_PAYTYPE);
 	}
 	
 }
