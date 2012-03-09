@@ -52,7 +52,7 @@ public class CarByDriverHistory extends FileEntityImpl {
 	public static final int MOVETYPE_DINGBAN = 7;
 	/** 迁移类型：交回后转车 ：交证日期与转新车日期之间有大于一日间隔 */
 	public static final int MOVETYPE_JHZC = 8;
-	/** 迁移类型：空值：新建司机时，司机视图的迁移类型(int)不能为空所以要设空值*/
+	/** 迁移类型：空值：新建司机时，司机视图的迁移类型(int)不能为空所以要设空值 */
 	public static final int MOVETYPE_NULL = -1;
 
 	/** 主体当前版本 */
@@ -225,4 +225,17 @@ public class CarByDriverHistory extends FileEntityImpl {
 		this.toCar = toCar;
 	}
 
+	/**
+	 * 判定指定的迁移类型是否是当前营运状态
+	 * 
+	 * @param moveType
+	 * @return
+	 */
+	public static boolean isActive(int moveType) {
+		return moveType == CarByDriverHistory.MOVETYPE_XRZ
+				|| moveType == CarByDriverHistory.MOVETYPE_CLDCL
+				|| moveType == CarByDriverHistory.MOVETYPE_JHZC
+				|| moveType == CarByDriverHistory.MOVETYPE_YWGSQH
+				|| moveType == CarByDriverHistory.MOVETYPE_DINGBAN;
+	}
 }

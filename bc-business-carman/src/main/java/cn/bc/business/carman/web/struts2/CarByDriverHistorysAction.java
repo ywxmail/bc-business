@@ -70,6 +70,46 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 		return new OrderCondition("d.file_date", Direction.Desc);
 	}
 
+	@SuppressWarnings("unchecked")
+	@Override
+	protected String getGridRowClass(List<? extends Object> data,
+			Object rowData, int index, int type) {
+		if (this.carId != null || this.toCarId != null) {
+			// 车辆的迁移记录页签：同一司机最后的那条记录如果是在案的就添加高亮显示样式
+			Long _toCarId = (this.carId == null ? this.toCarId : this.carId);
+			Map<String, Object> row = (Map<String, Object>) rowData;
+			Integer thisToCarId = (Integer) row.get("to_car_id");
+			if (thisToCarId != null
+					&& thisToCarId.intValue() == _toCarId.intValue()) {
+				int id = (Integer) row.get("id");
+				int driverId = (Integer) row.get("driver_id");
+				Date moveDate = (Date) row.get("move_date");
+				int moveType = (Integer) row.get("move_type");
+
+				// 查此司机所在列表中最新的那条信息
+				int topId = 0;
+				for (Map<String, Object> r : (List<Map<String, Object>>) data) {
+					if (((Integer) r.get("driver_id")).intValue() == driverId
+							&& moveDate.before((Date) r.get("move_date"))) {
+						topId = (Integer) r.get("id");
+					}
+				}
+
+				if ((topId == 0 || topId == id)
+						&& CarByDriverHistory.isActive(moveType)) {
+					return "ui-state-active";// 高亮样式
+				}
+			}
+		}
+		return null;
+	}
+
+	@Override
+	protected List<Map<String, Object>> rebuildGridData(
+			List<Map<String, Object>> data) {
+		return super.rebuildGridData(data);
+	}
+
 	@Override
 	protected SqlObject<Map<String, Object>> getSqlObject() {
 		SqlObject<Map<String, Object>> sqlObject = new SqlObject<Map<String, Object>>();
@@ -296,7 +336,6 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 	 */
 	protected Map<String, String> getType() {
 		Map<String, String> type = new HashMap<String, String>();
-		type = new HashMap<String, String>();
 		type.put(String.valueOf(CarByDriver.TYPE_WEIDINGYI),
 				getText("carByDriver.classes.weidingyi"));
 		type.put(String.valueOf(CarByDriver.TYPE_ZHENGBAN),
@@ -317,7 +356,6 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 	 */
 	protected Map<String, String> getMoveType() {
 		Map<String, String> type = new HashMap<String, String>();
-		type = new HashMap<String, String>();
 		type.put(String.valueOf(CarByDriverHistory.MOVETYPE_CLDCL),
 				getText("carByDriverHistory.moveType.cheliangdaocheliang"));
 		type.put(String.valueOf(CarByDriverHistory.MOVETYPE_GSDGSYZX),
@@ -413,7 +451,7 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 			JSONObject json;
 			Iterator<String> iterator = mt.keySet().iterator();
 			String key;
-			while(iterator.hasNext()){
+			while (iterator.hasNext()) {
 				key = iterator.next();
 				json = new JSONObject();
 				json.put("label", mt.get(key));

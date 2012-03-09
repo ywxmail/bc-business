@@ -459,7 +459,7 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 				_man.put("autoInfo", autoInfos.get(id));
 			}
 		}
-		
+
 		// 重新排序
 		Collections.sort(mans, new ManStatusComparator());
 
@@ -1047,10 +1047,7 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 							// 特殊处理
 							json.put("judgeType", "司机");// 先假定全部都是司机
 							int moveType = json.getInt("moveType");
-							if ((moveType == CarByDriverHistory.MOVETYPE_XRZ
-									|| moveType == CarByDriverHistory.MOVETYPE_CLDCL
-									|| moveType == CarByDriverHistory.MOVETYPE_JHZC
-									|| moveType == CarByDriverHistory.MOVETYPE_YWGSQH || moveType == CarByDriverHistory.MOVETYPE_DINGBAN)
+							if (CarByDriverHistory.isActive(moveType)
 									&& carId.toString().equals(
 											json.getString("toCarId"))) {
 								json.put("judgeStatus", 0);// 当前营运司机
