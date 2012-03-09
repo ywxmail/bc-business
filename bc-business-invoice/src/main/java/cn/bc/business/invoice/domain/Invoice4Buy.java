@@ -38,7 +38,7 @@ public class Invoice4Buy extends FileEntityImpl {
 	public static final int TYPE_TORE = 2;
 	
 	/** 单位：卷*/
-	public static final int UNIT_JUAN = 0;
+	public static final int UNIT_JUAN = 2;
 	/** 单位：本 */
 	public static final int UNIT_BEN = 1;
 	
