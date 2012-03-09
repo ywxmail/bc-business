@@ -71,8 +71,9 @@ public class Invoice4BuysAction extends ViewAction<Map<String, Object>> {
 		sql.append("select b.id as id,b.status_ as status_,b.buy_date as buy_date,");
 		sql.append("b.code as code,b.start_no as start_no,b.end_no as end_no");
 		sql.append(",b.company as company,b.type_ as type_,b.count_ as count_,b.buy_price as buy_price");
-		sql.append(",b.desc_ as desc,b.unit_ as unit_,b.sell_price as sell_price");
+		sql.append(",b.desc_ as desc,b.unit_ as unit_,b.sell_price as sell_price,a.actor_name as buyerName");
 		sql.append(" from bs_invoice_buy b");
+		sql.append(" left join bc_identity_actor_history a on a.id=b.buyer_id");
 		sqlObject.setSql(sql.toString());
 
 		// 注入参数
@@ -105,6 +106,7 @@ public class Invoice4BuysAction extends ViewAction<Map<String, Object>> {
 				map.put("desc", rs[i++]); // 备注
 				map.put("unit_", rs[i++]); // 单位
 				map.put("sell_price", rs[i++]); // 销售单价
+				map.put("buyerName", rs[i++]); // 购买人
 				return map;
 			}
 		});
@@ -122,6 +124,9 @@ public class Invoice4BuysAction extends ViewAction<Map<String, Object>> {
 		// 公司
 		columns.add(new TextColumn4MapKey("b.company", "company",
 				getText("invoice.company"), 60).setSortable(true));
+		// 购买人
+		columns.add(new TextColumn4MapKey("a.actor_name", "buyerName",
+				getText("invoice4Buy.buyer"), 60).setSortable(true));
 		// 采购日期
 		columns.add(new TextColumn4MapKey("b.buy_date", "buy_date",
 				getText("invoice4Buy.buydate"), 100).setSortable(true)
@@ -210,7 +215,7 @@ public class Invoice4BuysAction extends ViewAction<Map<String, Object>> {
 	
 	@Override
 	protected String[] getGridSearchFields() {
-		return new String[] { "b.code" };
+		return new String[] { "b.code",	"a.actor_name"};
 	}
 
 	@Override
@@ -226,7 +231,7 @@ public class Invoice4BuysAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected String getGridRowLabelExpression() {
-		return "'采购单 ' + ['id']";
+		return "'发票采购单 '";
 	}
 
 	@Override
