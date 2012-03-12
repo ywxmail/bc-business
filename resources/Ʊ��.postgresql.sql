@@ -152,28 +152,3 @@ insert into BC_IDENTITY_ROLE_RESOURCE (RID,SID)
 	select r.id,m.id from BC_IDENTITY_ROLE r,BC_IDENTITY_RESOURCE m where r.code='BC_ADMIN' 
 	and m.type_ > 1 and m.order_ in ('031901','031902')
 	order by m.order_;
-
--- 插入选项分组信息
--- 发票类型
-insert into BC_OPTION_GROUP (ID,ORDER_, KEY_, VALUE_, ICON) values (NEXTVAL('CORE_SEQUENCE'), '5036', 'invoice.type', '发票类型', null);
--- 发票单位
-insert into BC_OPTION_GROUP (ID,ORDER_, KEY_, VALUE_, ICON) values (NEXTVAL('CORE_SEQUENCE'), '5037', 'invoice.unit', '发票单位', null);
--- 购买发票收款方式
-insert into BC_OPTION_GROUP (ID,ORDER_, KEY_, VALUE_, ICON) values (NEXTVAL('CORE_SEQUENCE'), '5038', 'invoice.paytype', '收款方式', null);
-
--- 插入选项条目信息
-insert into BC_OPTION_ITEM (ID,STATUS_, PID, ORDER_, KEY_, VALUE_, ICON) 
-	select NEXTVAL('CORE_SEQUENCE'), 0, g.id, '01', 'dayinpiao', '打印票', null from BC_OPTION_GROUP g where g.KEY_='invoice.type'; 
-insert into BC_OPTION_ITEM (ID,STATUS_, PID, ORDER_, KEY_, VALUE_, ICON) 
-	select NEXTVAL('CORE_SEQUENCE'), 0, g.id, '02', 'shousipiao', '手撕票', null from BC_OPTION_GROUP g where g.KEY_='invoice.type';
-
-insert into BC_OPTION_ITEM (ID,STATUS_, PID, ORDER_, KEY_, VALUE_, ICON) 
-	select NEXTVAL('CORE_SEQUENCE'), 0, g.id, '01', 'juan', '卷', null from BC_OPTION_GROUP g where g.KEY_='invoice.unit';
-insert into BC_OPTION_ITEM (ID,STATUS_, PID, ORDER_, KEY_, VALUE_, ICON) 
-	select NEXTVAL('CORE_SEQUENCE'), 0, g.id, '02', 'ben', '本', null from BC_OPTION_GROUP g where g.KEY_='invoice.unit';
-
-insert into BC_OPTION_ITEM (ID,STATUS_, PID, ORDER_, KEY_, VALUE_, ICON) 
-	select NEXTVAL('CORE_SEQUENCE'), 0, g.id, '01', 'xianjin', '现金', null from BC_OPTION_GROUP g where g.KEY_='invoice.paytype';
-insert into BC_OPTION_ITEM (ID,STATUS_, PID, ORDER_, KEY_, VALUE_, ICON) 
-	select NEXTVAL('CORE_SEQUENCE'), 0, g.id, '02', 'yinhangka', '银行卡', null from BC_OPTION_GROUP g where g.KEY_='invoice.paytype';
-
