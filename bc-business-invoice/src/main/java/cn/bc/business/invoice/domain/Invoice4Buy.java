@@ -33,9 +33,9 @@ public class Invoice4Buy extends FileEntityImpl {
 	public static final int STATUS_INVALID = 1;
 	
 	/** 发票类型：打印票 */
-	public static final int TYPE_PRINT = 1;
+	public static final int TYPE_PRINT = 2;
 	/** 发票类型：手撕票 */
-	public static final int TYPE_TORE = 2;
+	public static final int TYPE_TORE = 1;
 	
 	/** 单位：卷*/
 	public static final int UNIT_JUAN = 2;
