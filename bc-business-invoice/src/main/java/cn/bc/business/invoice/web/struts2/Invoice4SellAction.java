@@ -14,6 +14,10 @@ import org.springframework.stereotype.Controller;
 
 import cn.bc.BCConstants;
 import cn.bc.business.OptionConstants;
+import cn.bc.business.car.domain.Car;
+import cn.bc.business.car.service.CarService;
+import cn.bc.business.carman.domain.CarMan;
+import cn.bc.business.carman.service.CarManService;
 import cn.bc.business.invoice.domain.Invoice4Sell;
 import cn.bc.business.invoice.service.Invoice4SellService;
 import cn.bc.business.motorcade.service.MotorcadeService;
@@ -38,6 +42,9 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 	private Invoice4SellService invoice4SellService;
 	private OptionService optionService;
 	private MotorcadeService motorcadeService;
+	private CarService carService;
+	private CarManService carManService;
+	
 	public Long buyerId;
 	public Long carId;
 	
@@ -46,6 +53,11 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 	public List<Map<String, String>> typeList; // 发票类型列表（打印票、手撕票）
 	public List<Map<String, String>> unitList; // 发票单位列表（卷、本）
 	public List<Map<String, String>> payTypeList; // 付款方式列表（现金、银行卡）
+	
+	public boolean isMoreCar; // 是否存在多辆车
+	public boolean isMoreCarMan; // 是否存在多个司机
+	public boolean isNullCar; // 此司机没有车
+	public boolean isNullCarMan; // 此车没有司机
 
 	@Autowired
 	public void setInvoice4BuyService(Invoice4SellService invoice4SellService) {
@@ -61,6 +73,16 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 	@Autowired
 	public void setMotorcadeService(MotorcadeService motorcadeService) {
 		this.motorcadeService = motorcadeService;
+	}
+
+	@Autowired
+	public void setCarService(CarService carService) {
+		this.carService = carService;
+	}
+
+	@Autowired
+	public void setCarManService(CarManService carManService) {
+		this.carManService = carManService;
 	}
 
 	@Override
@@ -83,6 +105,17 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 		entity.setSellDate(Calendar.getInstance());
 		//entity.setBuyPrice(7F);
 		entity.setStatus(BCConstants.STATUS_ENABLED);
+		entity.setPayType(Invoice4Sell.PAY_TYPE_CASH);
+		
+		if (carId != null && buyerId == null) {// 车辆页签中的新建
+			Car car=this.carService.load(carId);
+			entity.setCarId(this.carId);
+			entity.setCarPlate(car.getPlate());
+		}else if(carId == null && buyerId != null){// 司机页签中的新建
+			CarMan carman=this.carManService.load(buyerId);
+			entity.setBuyerId(this.buyerId);
+			entity.setBuyerName(carman.getName());
+		}
 	}
 
 	@Override
