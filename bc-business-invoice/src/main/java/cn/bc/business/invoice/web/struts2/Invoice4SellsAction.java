@@ -96,11 +96,14 @@ public class Invoice4SellsAction extends ViewAction<Map<String, Object>> {
 		sql.append(",d.start_no as start_no,d.end_no as end_no,s.company as company");
 		sql.append(",m.id as motorcade_id,m.name as motorcade_name,s.car_id as car_id,s.car_plate as car_plate");
 		sql.append(",s.buyer_id as buyer_id,s.buyer_name as buyer_name,b.type_ as type,b.unit_ as unit_");
-		sql.append(",d.count_ as count_,d.price as price,s.desc_ as desc,b.code as code");
+		sql.append(",d.count_ as count_,d.price as price,s.desc_ as desc,b.code as code,a.actor_name as cashier");
+		sql.append(",bia.name as unit_name");
 		sql.append(" from bs_invoice_sell_detail d");
 		sql.append(" inner join bs_invoice_buy b on b.id=d.buy_id");
 		sql.append(" inner join bs_invoice_sell s on s.id=d.sell_id");
+		sql.append(" inner join bc_identity_actor_history a on a.actor_id=s.cashier_id");
 		sql.append(" inner join bs_motorcade m on m.id=s.motorcade_id");
+		sql.append(" inner join bc_identity_actor bia on bia.id=m.unit_id");
 		sqlObject.setSql(sql.toString());
 
 		// 注入参数
@@ -138,6 +141,8 @@ public class Invoice4SellsAction extends ViewAction<Map<String, Object>> {
 				}
 				map.put("desc", rs[i++]); // 备注
 				map.put("code", rs[i++]); // 发票代码
+				map.put("cashier", rs[i++]); // 发票代码
+				map.put("unit_name", rs[i++]); // 分公司
 				return map;
 			}
 		});
@@ -155,10 +160,16 @@ public class Invoice4SellsAction extends ViewAction<Map<String, Object>> {
 		// 公司
 		columns.add(new TextColumn4MapKey("s.company", "company",
 				getText("invoice.company"), 60).setSortable(true));
+		// 分公司
+		columns.add(new TextColumn4MapKey("unit_name", "company",
+				getText("invoice.unitCompany"), 60).setSortable(true));
 		// 销售日期
 		columns.add(new TextColumn4MapKey("s.sell_date", "sell_date",
-				getText("invoice4Sell.selldate"), 100).setSortable(true)
+				getText("invoice4Sell.selldate"), 100).setSortable(true).setUseTitleFromLabel(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+		// 销售员
+		columns.add(new TextColumn4MapKey("a.actor_name", "cashier",
+				getText("invoice4Sell.cashier"), 60).setUseTitleFromLabel(true));
 		// 车队
 		columns.add(new TextColumn4MapKey("m.name", "motorcade_name",
 				getText("invoice.motorcade"), 70)
@@ -180,7 +191,7 @@ public class Invoice4SellsAction extends ViewAction<Map<String, Object>> {
 		// 车牌
 		if (carId == null) {
 			columns.add(new TextColumn4MapKey("s.car_plate", "car_plate",
-					getText("invoice.carPlate"), 80)
+					getText("invoice.carPlate"), 80).setUseTitleFromLabel(true)
 					.setValueFormater(new LinkFormater4Id(this.getContextPath()
 							+ "/bc-business/car/edit?id={0}", "car") {
 						@SuppressWarnings("unchecked")
@@ -291,7 +302,7 @@ public class Invoice4SellsAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected String[] getGridSearchFields() {
-		return new String[] { "m.name", "car_plate", "s.buyer_name" };
+		return new String[] { "m.name", "car_plate", "s.buyer_name","a.actor_name" };
 	}
 
 	@Override
@@ -348,11 +359,11 @@ public class Invoice4SellsAction extends ViewAction<Map<String, Object>> {
 		} else {
 			// 新建按钮
 			tb.addButton(this.getDefaultCreateToolbarButton());
-			// 编辑按钮
-			tb.addButton(this.getDefaultEditToolbarButton());
+			// 查看按钮
+			tb.addButton(this.getDefaultOpenToolbarButton());
 			// 作废按钮
-			tb.addButton(Toolbar
-					.getDefaultDisabledToolbarButton(getText("invoice.status.invalid")));
+			/*tb.addButton(Toolbar
+					.getDefaultDisabledToolbarButton(getText("invoice.status.invalid")));*/
 		}
 		// 搜索按钮
 		tb.addButton(this.getDefaultSearchToolbarButton());
@@ -362,6 +373,11 @@ public class Invoice4SellsAction extends ViewAction<Map<String, Object>> {
 				getText("title.click2changeSearchStatus")));
 	}
 
+	@Override
+	protected String getGridDblRowMethod() {
+		return "bc.page.open";
+	}
+	
 	// ==高级搜索代码开始==
 	@Override
 	protected boolean useAdvanceSearch() {
