@@ -67,18 +67,19 @@ public class Invoice4BuyDaoImpl extends HibernateCrudJpaDao<Invoice4Buy> impleme
 	}
 
 	/**
-	 * 通过发票代码查找对应的采购单列表
+	 * 通过发票代码查找对应可用的采购单列表
 	 * @param code
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
 	public List<Invoice4Buy> selectInvoice4BuyByCode(String code) {
 		return this.getJpaTemplate().find(
-				"from Invoice4Buy where code=? order by startNo", code);
+				"from Invoice4Buy where code=? and status=? order by startNo", 
+				new Object[] {code,BCConstants.STATUS_ENABLED});
 	}
 
 	/**
-	 * 通过发票代码查找对应的采购单列表(不包含自己本身)
+	 * 通过发票代码查找对应可用的采购单列表(不包含自己本身)
 	 * @param code
 	 * @param id
 	 * @return
@@ -86,7 +87,8 @@ public class Invoice4BuyDaoImpl extends HibernateCrudJpaDao<Invoice4Buy> impleme
 	@SuppressWarnings("unchecked")
 	public List<Invoice4Buy> selectInvoice4BuyByCode(String code, Long id) {
 		return this.getJpaTemplate().find(
-				"from Invoice4Buy where code=? and id != ? order by startNo",new Object[] { code,id});
+				"from Invoice4Buy where code=? and id != ? and status=? order by startNo",
+				new Object[] { code,id,BCConstants.STATUS_ENABLED});
 	}
 
 }

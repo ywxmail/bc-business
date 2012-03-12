@@ -25,14 +25,14 @@ public interface Invoice4BuyService extends CrudService<Invoice4Buy> {
 	List<Map<String, String>> findEnabled4Option();
 
 	/**
-	 * 通过发票代码查找对应的采购单列表
+	 * 通过发票代码查找对应可用的采购单列表
 	 * @param code
 	 * @return
 	 */
 	List<Invoice4Buy> selectInvoice4BuyByCode(String code);
 	
 	/**
-	 * 通过发票代码查找对应的采购单列表(不包含自己本身)
+	 * 通过发票代码查找对应可用的采购单列表(不包含自己本身)
 	 * @param code
 	 * @param id
 	 * @return
