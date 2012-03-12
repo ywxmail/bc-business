@@ -77,4 +77,16 @@ public class Invoice4BuyDaoImpl extends HibernateCrudJpaDao<Invoice4Buy> impleme
 				"from Invoice4Buy where code=? order by startNo", code);
 	}
 
+	/**
+	 * 通过发票代码查找对应的采购单列表(不包含自己本身)
+	 * @param code
+	 * @param id
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public List<Invoice4Buy> selectInvoice4BuyByCode(String code, Long id) {
+		return this.getJpaTemplate().find(
+				"from Invoice4Buy where code=? and id != ? order by startNo",new Object[] { code,id});
+	}
+
 }
