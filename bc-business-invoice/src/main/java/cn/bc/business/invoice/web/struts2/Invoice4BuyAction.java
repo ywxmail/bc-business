@@ -17,6 +17,9 @@ import cn.bc.business.OptionConstants;
 import cn.bc.business.invoice.domain.Invoice4Buy;
 import cn.bc.business.invoice.service.Invoice4BuyService;
 import cn.bc.business.web.struts2.FileEntityAction;
+import cn.bc.identity.domain.ActorHistory;
+import cn.bc.identity.service.ActorHistoryService;
+import cn.bc.identity.service.ActorService;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.option.domain.OptionItem;
 import cn.bc.option.service.OptionService;
@@ -36,10 +39,13 @@ public class Invoice4BuyAction extends FileEntityAction<Long, Invoice4Buy> {
 	private static final long serialVersionUID = 1L;
 	private Invoice4BuyService invoice4BuyService;
 	private OptionService optionService;
+	private ActorHistoryService  actorHistoryService;
 	
 	public List<Map<String, String>> companyList; // 所属公司列表（宝城、广发）
 	public List<Map<String, String>> typeList; // 发票类型列表（打印票、手撕票）
 	public List<Map<String, String>> unitList; // 发票单位列表（卷、本）
+	
+	public String buyer;//购买人
 
 	@Autowired
 	public void setInvoice4BuyService(Invoice4BuyService invoice4BuyService) {
@@ -50,6 +56,11 @@ public class Invoice4BuyAction extends FileEntityAction<Long, Invoice4Buy> {
 	@Autowired
 	public void setOptionService(OptionService optionService) {
 		this.optionService = optionService;
+	}
+	
+	@Autowired
+	public void setActorHistoryServicec(ActorHistoryService actorHistoryService){
+		this.actorHistoryService= actorHistoryService;
 	}
 
 	@Override
@@ -72,6 +83,16 @@ public class Invoice4BuyAction extends FileEntityAction<Long, Invoice4Buy> {
 		entity.setBuyDate(Calendar.getInstance());
 		entity.setBuyPrice(7F);
 		entity.setStatus(BCConstants.STATUS_ENABLED);
+	}
+	
+	
+
+	@Override
+	protected void afterEdit(Invoice4Buy entity) {
+		super.afterEdit(entity);
+		if(entity.getBuyerId()!=null){
+			buyer=this.actorHistoryService.load(entity.getBuyerId()).getName();
+		}
 	}
 
 	@Override
