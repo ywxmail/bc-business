@@ -74,7 +74,7 @@ public class Invoice4BuyDaoImpl extends HibernateCrudJpaDao<Invoice4Buy> impleme
 	@SuppressWarnings("unchecked")
 	public List<Invoice4Buy> selectInvoice4BuyByCode(String code) {
 		return this.getJpaTemplate().find(
-				"from Invoice4Buy where code=?", code);
+				"from Invoice4Buy where code=? order by startNo", code);
 	}
 
 }
