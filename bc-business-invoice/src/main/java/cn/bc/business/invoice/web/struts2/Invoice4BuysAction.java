@@ -9,12 +9,15 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.json.JSONArray;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
 import cn.bc.BCConstants;
 import cn.bc.business.invoice.domain.Invoice4Buy;
+import cn.bc.business.invoice.service.Invoice4BuyService;
 import cn.bc.business.web.struts2.ViewAction;
 import cn.bc.core.query.condition.Condition;
 import cn.bc.core.query.condition.Direction;
@@ -25,6 +28,7 @@ import cn.bc.core.util.StringUtils;
 import cn.bc.db.jdbc.RowMapper;
 import cn.bc.db.jdbc.SqlObject;
 import cn.bc.identity.web.SystemContext;
+import cn.bc.option.domain.OptionItem;
 import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.formater.EntityStatusFormater;
 import cn.bc.web.formater.KeyValueFormater;
@@ -126,7 +130,7 @@ public class Invoice4BuysAction extends ViewAction<Map<String, Object>> {
 				getText("invoice.company"), 60).setSortable(true));
 		// 购买人
 		columns.add(new TextColumn4MapKey("a.actor_name", "buyerName",
-				getText("invoice4Buy.buyer"), 60).setSortable(true));
+				getText("invoice4Buy.buyer"), 80).setSortable(true));
 		// 采购日期
 		columns.add(new TextColumn4MapKey("b.buy_date", "buy_date",
 				getText("invoice4Buy.buydate"), 100).setSortable(true)
@@ -165,7 +169,7 @@ public class Invoice4BuysAction extends ViewAction<Map<String, Object>> {
 				.setValueFormater(new NubmerFormater("###,###.00")));
 		// 合计
 		columns.add(new TextColumn4MapKey("b.buy_price", "amount",
-				getText("invoice.amount"), 60).setSortable(true)
+				getText("invoice.amount"), 150).setSortable(true).setUseTitleFromLabel(true)
 				.setValueFormater(new NubmerFormater("###,###.00")));
 		// 备注
 		columns.add(new TextColumn4MapKey("b.desc_", "desc",
@@ -243,11 +247,11 @@ public class Invoice4BuysAction extends ViewAction<Map<String, Object>> {
 		} else {
 			// 新建按钮
 			tb.addButton(this.getDefaultCreateToolbarButton());
-			// 编辑按钮
-			tb.addButton(this.getDefaultEditToolbarButton());
+			// 查看按钮
+			tb.addButton(this.getDefaultOpenToolbarButton());
 			// 作废按钮
-			tb.addButton(Toolbar
-					.getDefaultDisabledToolbarButton(getText("invoice.status.invalid")));
+			/*tb.addButton(Toolbar
+					.getDefaultDisabledToolbarButton(getText("invoice.status.invalid")));*/
 		}
 		// 搜索按钮
 		tb.addButton(this.getDefaultSearchToolbarButton());
@@ -275,16 +279,30 @@ public class Invoice4BuysAction extends ViewAction<Map<String, Object>> {
 		// 合并条件
 		return statusCondition;
 	}
+	
+	@Override
+	protected String getGridDblRowMethod() {
+		return "bc.page.open";
+	}
 
 	// ==高级搜索代码开始==
 	@Override
 	protected boolean useAdvanceSearch() {
 		return true;
 	}
+	
+	private Invoice4BuyService invoice4BuyService;
+	
+	@Autowired
+	public void setInvoice4BuyService(Invoice4BuyService invoice4BuyService) {
+		this.invoice4BuyService = invoice4BuyService;
+	}
+
+	public JSONArray codes;
 
 	@Override
 	protected void initConditionsFrom() throws Exception {
-
+			codes=OptionItem.toLabelValues(this.invoice4BuyService.findEnabled4Option());
 	}
 	// ==高级搜索代码结束==
 }
