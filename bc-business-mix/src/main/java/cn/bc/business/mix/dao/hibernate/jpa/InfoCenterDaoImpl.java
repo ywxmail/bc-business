@@ -1076,8 +1076,7 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 									json.put("insurcode", null2Empty(obj[i++]));
 									json.put("insuranceType",
 											null2Empty(obj[i++]));
-									json.put("remark",
-											null2Empty(obj[i++]));
+									json.put("remark", null2Empty(obj[i++]));
 
 									// 车辆、司机的相关信息
 									json.put("car_id", obj[i++]);
@@ -1398,10 +1397,12 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 		json.put("houseType", null2Empty(obj[startIndex++]));
 		json.put("address1", null2Empty(obj[startIndex++]));
 		json.put("address2", null2Empty(obj[startIndex++]));
+		json.put("phone1", null2Empty(obj[startIndex++]));
+		json.put("phone2", null2Empty(obj[startIndex++]));
 		json.put(
 				"phones",
-				convert2ManPhones((String) obj[startIndex++],
-						(String) obj[startIndex++]));
+				convert2ManPhones(json.getString("phone1"),
+						json.getString("phone2")));
 		json.put("identity", null2Empty(obj[startIndex++]));
 		json.put("cert4fwzg", null2Empty(obj[startIndex++]));
 		json.put("classes", obj[startIndex++]);
@@ -1520,7 +1521,7 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 	private String convert2ManPhones(String phone1, String phone2) {
 		if (phone1 != null && phone1.length() > 0) {
 			if (phone2 != null && phone2.length() > 0) {
-				return phone1 + "，" + phone2;
+				return phone1 + ", " + phone2;
 			} else {
 				return phone1;
 			}
