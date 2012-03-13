@@ -98,6 +98,7 @@ public class ShiftworkByDriverAction extends
 
 		// 将顶班车辆组装成字符串赋值给shiftwork字段：plate1,id1;plate2,id2;...
 		String shiftwork = this.getE().getShiftwork();
+		this.getE().setShiftwork(shiftwork + ";");
 		String[] shiftworks = shiftwork.split(";");
 		Long[] carIds = new Long[shiftworks.length];
 		for (int i = 0; i < shiftworks.length; i++) {
@@ -111,8 +112,7 @@ public class ShiftworkByDriverAction extends
 	@Override
 	protected PageOption buildFormPageOption(boolean editable) {
 		return super.buildFormPageOption(editable).setWidth(430)
-				.setMinWidth(320).setMinHeight(200)
-				.setModal(true);
+				.setMinWidth(320).setMinHeight(200).setModal(true);
 
 	}
 }
