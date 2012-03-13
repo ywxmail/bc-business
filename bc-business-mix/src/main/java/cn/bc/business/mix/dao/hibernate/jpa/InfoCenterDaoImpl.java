@@ -1009,7 +1009,7 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 		}
 		final StringBuffer sql = new StringBuffer();
 		final List<Object> args = new ArrayList<Object>();
-		sql.append("select c.id,c.status_,c.start_date,c.end_date,cc.joindate,cc.insurcode,cc.insurance_type");
+		sql.append("select c.id,c.status_,c.start_date,c.end_date,cc.joindate,cc.insurcode,cc.insurance_type,cc.remark");
 		sql.append(",carc.car_id car_id,m.id driver_id,m.name driver_name");
 		sql.append(" from bs_contract_labour cc");
 		sql.append(" inner join bs_contract c on c.id=cc.id");
@@ -1075,6 +1075,8 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 											.formatDate((Date) obj[i++]));
 									json.put("insurcode", null2Empty(obj[i++]));
 									json.put("insuranceType",
+											null2Empty(obj[i++]));
+									json.put("remark",
 											null2Empty(obj[i++]));
 
 									// 车辆、司机的相关信息
