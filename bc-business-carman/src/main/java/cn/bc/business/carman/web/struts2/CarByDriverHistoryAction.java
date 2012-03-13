@@ -368,23 +368,22 @@ public class CarByDriverHistoryAction extends
 	protected PageOption buildFormPageOption(boolean editable) {
 		// 设置批量处理顶班车辆的表单
 		if (this.getE().getMoveType() == CarByDriverHistory.MOVETYPE_DINGBAN) {
-			return super.buildFormPageOption(editable).setWidth(430)
-					.setMinWidth(320).setMinHeight(200)
-					.setModal(true);
-			// 设置迁移类型为交回未注销的表单高度
-		} else if (this.getE().getMoveType() == CarByDriverHistory.MOVETYPE_JHWZX) {
-			return super.buildFormPageOption(editable).setWidth(745)
-					.setMinWidth(320).setMinHeight(200)
-					.setModal(true);
-			// 设置迁移类型为注销未有去向的表单高度
-		} else if (this.getE().getMoveType() == CarByDriverHistory.MOVETYPE_ZXWYQX) {
-			return super.buildFormPageOption(editable).setWidth(745)
-					.setMinWidth(320).setMinHeight(200)
-					.setModal(true);
+			if (this.getE().isNew()) {
+				return super.buildFormPageOption(editable).setWidth(430)
+						.setMinWidth(320).setMinHeight(200).setModal(true);
+			} else {
+				return super.buildFormPageOption(editable).setWidth(430)
+						.setMinWidth(320).setMinHeight(200).setModal(false);
+			}
+
 		} else {
-			return super.buildFormPageOption(editable).setWidth(745)
-					.setMinWidth(320).setMinHeight(200)
-					.setModal(true);
+			if (this.getE().isNew()) {
+				return super.buildFormPageOption(editable).setWidth(745)
+						.setMinWidth(320).setMinHeight(200).setModal(true);
+			} else {
+				return super.buildFormPageOption(editable).setWidth(745)
+						.setMinWidth(320).setMinHeight(200).setModal(false);
+			}
 		}
 
 	}

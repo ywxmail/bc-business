@@ -24,6 +24,7 @@ import cn.bc.core.query.condition.Condition;
 import cn.bc.core.query.condition.ConditionUtils;
 import cn.bc.core.query.condition.Direction;
 import cn.bc.core.query.condition.impl.EqualsCondition;
+import cn.bc.core.query.condition.impl.LikeCondition;
 import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.core.util.StringUtils;
 import cn.bc.db.jdbc.RowMapper;
@@ -119,7 +120,8 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 		sql.append("select d.id,m.phone,m.name,nc.plate_type newPlateType,nc.plate_no newPlateNo,d.to_classes");
 		sql.append(",nm.name newMotoreade,d.to_unit,oc.plate_type oldPlateType,oc.plate_no oldPlateNo,d.from_classes");
 		sql.append(",om.name oldMotoreade,d.from_unit,d.move_type,d.move_date,d.driver_id,d.from_car_id,d.to_car_id");
-		sql.append(",d.from_motorcade_id,d.to_motorcade_id,d.shiftwork,d.end_date,m.cert_fwzg from BS_CAR_DRIVER_HISTORY d");
+		sql.append(",d.from_motorcade_id,d.to_motorcade_id,d.shiftwork,d.end_date,m.cert_fwzg");
+		sql.append(" from BS_CAR_DRIVER_HISTORY d");
 		sql.append(" left join bs_carman m on m.id=d.driver_id");
 		sql.append(" left join bs_car  oc on oc.id=d.from_car_id");
 		sql.append(" left join bs_car  nc on nc.id=d.to_car_id");
@@ -282,17 +284,6 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 		if (carManId != null) {
 			carManIdCondition = new EqualsCondition("d.driver_id", carManId);
 		}
-		// toCarId条件
-		Condition newCarIdCondition = null;
-		if (toCarId != null) {
-			newCarIdCondition = new EqualsCondition("d.to_car_id", toCarId);
-		}
-		// toCar4FromCar条件
-		Condition toCar4FromCarCondition = null;
-		if (toCarId != null) {
-			toCar4FromCarCondition = new EqualsCondition("d.from_car_id",
-					toCarId);
-		}
 		// newCarId条件
 		Condition oldCarIdCondition = null;
 		if (carId != null) {
@@ -303,11 +294,18 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 		if (carId != null) {
 			carId2ToCarIdCondition = new EqualsCondition("d.to_car_id", carId);
 		}
+		// carId2ShiftworkCarId条件
+		Condition carId2ShiftworkCarIdCondition = null;
+		if (carId != null) {
+			String shiftworkCarId = "%," + carId.toString() + ";%";
+			carId2ShiftworkCarIdCondition = new LikeCondition("d.shiftwork",
+					shiftworkCarId);
+		}
+
 		// 合并条件
 		return ConditionUtils.mix2AndCondition(carManIdCondition,
-				ConditionUtils.mix2OrCondition(newCarIdCondition,
-						carId2ToCarIdCondition, oldCarIdCondition,
-						toCar4FromCarCondition));
+				ConditionUtils.mix2OrCondition(carId2ToCarIdCondition,
+						oldCarIdCondition, carId2ShiftworkCarIdCondition));
 	}
 
 	@Override
@@ -320,11 +318,7 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 		}
 		// carId条件
 		if (carId != null) {
-			json.put("toCarId", carId);
-		}
-		// toCarId条件
-		if (toCarId != null) {
-			json.put("toCarId", toCarId);
+			json.put("carId", carId);
 		}
 		return json.isEmpty() ? null : json;
 	}
@@ -391,8 +385,7 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 			tb.addButton(Toolbar
 					.getDefaultOpenToolbarButton(getText("label.read")));
 			// 搜索按钮
-			tb.addButton(Toolbar
-					.getDefaultSearchToolbarButton(getText("title.click2search")));
+			tb.addButton(this.getDefaultSearchToolbarButton());
 
 		} else {
 			if (carId != null) {

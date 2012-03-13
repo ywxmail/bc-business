@@ -246,7 +246,8 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 							}
 						}));
 		columns.add(new TextColumn4MapKey("c.word_no", "word_no",
-				getText("contract4Charger.wordNo"), 70));
+				getText("contract4Charger.wordNo"), 70)
+				.setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("c.ext_str2", "ext_str2",
 				getText("contract4Charger.charger"), 140).setUseTitleFromLabel(
 				true).setValueFormater(
