@@ -162,15 +162,15 @@ public class Invoice4BuysAction extends ViewAction<Map<String, Object>> {
 		// 采购单价
 		columns.add(new TextColumn4MapKey("b.buy_price", "buy_price",
 				getText("invoice4Buy.buyPrice"), 60).setSortable(true)
-				.setValueFormater(new NubmerFormater("###,###.00")));
+				.setValueFormater(new NubmerFormater("###,##0.00")));
 		// 销售单价
 		columns.add(new TextColumn4MapKey("b.sell_price", "sell_price",
 				getText("invoice4Buy.sellPrice"), 60).setSortable(true)
-				.setValueFormater(new NubmerFormater("###,###.00")));
+				.setValueFormater(new NubmerFormater("###,##0.00")));
 		// 合计
 		columns.add(new TextColumn4MapKey("b.buy_price", "amount",
 				getText("invoice.amount"), 150).setSortable(true).setUseTitleFromLabel(true)
-				.setValueFormater(new NubmerFormater("###,###.00")));
+				.setValueFormater(new NubmerFormater("###,##0.00")));
 		// 备注
 		columns.add(new TextColumn4MapKey("b.desc_", "desc",
 				getText("invoice.desc")).setUseTitleFromLabel(true));
