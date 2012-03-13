@@ -19,6 +19,7 @@ import cn.bc.business.car.service.CarService;
 import cn.bc.business.carman.domain.CarMan;
 import cn.bc.business.carman.service.CarManService;
 import cn.bc.business.invoice.domain.Invoice4Sell;
+import cn.bc.business.invoice.service.Invoice4BuyService;
 import cn.bc.business.invoice.service.Invoice4SellService;
 import cn.bc.business.motorcade.service.MotorcadeService;
 import cn.bc.business.web.struts2.FileEntityAction;
@@ -40,6 +41,7 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 	// private static Log logger = LogFactory.getLog(CarAction.class);
 	private static final long serialVersionUID = 1L;
 	private Invoice4SellService invoice4SellService;
+	private Invoice4BuyService invoice4BuyService;
 	private OptionService optionService;
 	private MotorcadeService motorcadeService;
 	private CarService carService;
@@ -52,7 +54,8 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 	public List<Map<String, String>> motorcadeList; // 可选车队列表
 	public List<Map<String, String>> typeList; // 发票类型列表（打印票、手撕票）
 	public List<Map<String, String>> unitList; // 发票单位列表（卷、本）
-	public List<Map<String, String>> payTypeList; // 付款方式列表（现金、银行卡）
+	//public List<Map<String, String>> payTypeList; // 付款方式列表（现金、银行卡）
+	public List<Map<String,String>>	codeList;
 	
 	public boolean isMoreCar; // 是否存在多辆车
 	public boolean isMoreCarMan; // 是否存在多个司机
@@ -144,9 +147,10 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 		//发票类型
 		this.typeList=optionItems.get(OptionConstants.INVOICE_TYPE);
 		//发票单位
-		this.unitList=optionItems.get(OptionConstants.INVOICE_UNIT);
-		//收款方式
-		this.payTypeList=optionItems.get(OptionConstants.INVOICE_PAYTYPE);
+		this.unitList=optionItems.get(OptionConstants.INVOICE_UNIT);	
+		
+		//发票代码
+		this.codeList=this.invoice4BuyService.findEnabled4Option();
 	}
 	
 }
