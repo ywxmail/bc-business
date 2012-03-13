@@ -171,8 +171,8 @@ public class Invoice4BuyAction extends FileEntityAction<Long, Invoice4Buy> {
 			this.json = json.toString();
 			return "json";
 		} else {
-			Long startNo4Long = Long.parseLong(startNo);
-			Long endNo4Long = Long.parseLong(endNo);
+			Long startNo4Long = Long.parseLong(startNo.trim());
+			Long endNo4Long = Long.parseLong(endNo.trim());
 			this.json = this.eachListInvoice4Buy(bList, startNo4Long,
 					endNo4Long, json);
 			return "json";
@@ -184,16 +184,17 @@ public class Invoice4BuyAction extends FileEntityAction<Long, Invoice4Buy> {
 			Long endNo, Json json) {
 		for (int i = 0; i < bList.size(); i++) {
 			Invoice4Buy i4Buy = bList.get(i);
-			if (endNo < Long.parseLong(i4Buy.getStartNo())) {
+			if (endNo < Long.parseLong(i4Buy.getStartNo().trim())) {
 				json.put("checkResult", "0");
 				break;
-			} else if ((i == bList.size() - 1)
-					&& endNo > Long.parseLong(i4Buy.getEndNo())
-					&& startNo > Long.parseLong(i4Buy.getEndNo())) {// 遍历到集合的最后一个对象时
+			} else if (bList.size()==1
+					&& endNo > Long.parseLong(i4Buy.getEndNo().trim())
+					&& startNo > Long.parseLong(i4Buy.getEndNo().trim())) {// 遍历到集合的最后一个对象时
 				json.put("checkResult", "0");
 				break;
-			} else if (endNo > Long.parseLong(i4Buy.getEndNo())
-					&& startNo > Long.parseLong(i4Buy.getEndNo())) {
+			} else if (endNo > Long.parseLong(i4Buy.getEndNo().trim())
+					&& startNo > Long.parseLong(i4Buy.getEndNo().trim())) {	
+				bList.remove(0);//比较完第一个对象，下次再比较时已不需要再比较这个对象
 				eachListInvoice4Buy(bList, startNo, endNo, json);//继续递归
 			} else {
 				json.put("checkResult", "1");
