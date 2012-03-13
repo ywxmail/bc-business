@@ -56,8 +56,8 @@ CREATE INDEX BSIDX_INVOICEBUY_ENDNO ON BS_INVOICE_BUY (END_NO);
 CREATE TABLE BS_INVOICE_SELL (
    ID                   INTEGER          	NOT NULL,
    STATUS_              NUMERIC(1)      	NOT NULL,
-   BUYER_ID             INTEGER           	NOT NULL,
-   BUYER_NAME           VARCHAR(255)        	NOT NULL,
+   BUYER_ID             INTEGER,
+   BUYER_NAME           VARCHAR(255),
    CAR_ID               INTEGER          	NOT NULL,
    CAR_PLATE            VARCHAR(255)        	NOT NULL,
    MOTORCADE_ID        	INTEGER           	NOT NULL,
