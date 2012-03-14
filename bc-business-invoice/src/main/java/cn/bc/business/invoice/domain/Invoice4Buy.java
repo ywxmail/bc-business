@@ -55,6 +55,7 @@ public class Invoice4Buy extends FileEntityImpl {
 	private ActorHistory buyerId;// 采购人
 	private Calendar buyDate; //采购日期
 	private String desc;//备注
+	private int eachCount;//每（卷/本）数量
 	
 	@Column(name = "STATUS_")
 	public int getStatus() {
@@ -146,5 +147,13 @@ public class Invoice4Buy extends FileEntityImpl {
 	public void setDesc(String desc) {
 		this.desc = desc;
 	}
+	@Column(name = "EACH_COUNT")
+	public int getEachCount() {
+		return eachCount;
+	}
+	public void setEachCount(int eachCount) {
+		this.eachCount = eachCount;
+	}
+	
 	
 }
