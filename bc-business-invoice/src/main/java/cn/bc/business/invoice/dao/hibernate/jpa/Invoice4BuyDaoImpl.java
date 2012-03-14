@@ -49,7 +49,7 @@ public class Invoice4BuyDaoImpl extends HibernateCrudJpaDao<Invoice4Buy> impleme
 				hql += ")";
 			}
 		}
-		hql += " order by ib.code";
+		hql += " order by ib.buy_date DESC";
 		if (logger.isDebugEnabled()) {
 			logger.debug("hql=" + hql);
 		}
