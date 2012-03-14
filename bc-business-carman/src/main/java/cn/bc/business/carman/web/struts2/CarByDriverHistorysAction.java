@@ -30,6 +30,7 @@ import cn.bc.core.util.StringUtils;
 import cn.bc.db.jdbc.RowMapper;
 import cn.bc.db.jdbc.SqlObject;
 import cn.bc.identity.web.SystemContext;
+import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.formater.DateRangeFormater;
 import cn.bc.web.formater.KeyValueFormater;
 import cn.bc.web.formater.LinkFormater4Id;
@@ -120,7 +121,7 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 		sql.append("select d.id,m.phone,m.name,nc.plate_type newPlateType,nc.plate_no newPlateNo,d.to_classes");
 		sql.append(",nm.name newMotoreade,d.to_unit,oc.plate_type oldPlateType,oc.plate_no oldPlateNo,d.from_classes");
 		sql.append(",om.name oldMotoreade,d.from_unit,d.move_type,d.move_date,d.driver_id,d.from_car_id,d.to_car_id");
-		sql.append(",d.from_motorcade_id,d.to_motorcade_id,d.shiftwork,d.end_date,m.cert_fwzg");
+		sql.append(",d.from_motorcade_id,d.to_motorcade_id,d.shiftwork,d.end_date,m.cert_fwzg,d.hand_papers_date");
 		sql.append(" from BS_CAR_DRIVER_HISTORY d");
 		sql.append(" left join bs_carman m on m.id=d.driver_id");
 		sql.append(" left join bs_car  oc on oc.id=d.from_car_id");
@@ -174,6 +175,8 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 				map.put("shiftwork", rs[i++]);
 				map.put("end_date", rs[i++]);
 				map.put("cert_fwzg", rs[i++]);
+				map.put("hand_papers_date", rs[i++]);
+
 				return map;
 			}
 		});
@@ -226,6 +229,10 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 						return (Date) contract.get("end_date");
 					}
 				}.setUseEmptySymbol(true)));
+		columns.add(new TextColumn4MapKey("d.hand_papers_date",
+				"hand_papers_date",
+				getText("carByDriverHistory.handPapersDate"), 100).setSortable(
+				true).setValueFormater(new CalendarFormater("yyyy-MM-dd")));
 		// 迁往
 		columns.add(new TextColumn4MapKey("nc.plate_no", "newPlate",
 				getText("carByDriverHistory.moveTo"), 220)
@@ -273,7 +280,7 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 	protected String[] getGridSearchFields() {
 		return new String[] { "m.name", "nc.plate_type", "nc.plate_no",
 				"nm.name", "d.to_unit", "oc.plate_type", "oc.plate_no",
-				"om.name", "d.from_unit", "m.cert_fwzg" };
+				"om.name", "d.from_unit", "m.cert_fwzg", "d.shiftwork" };
 	}
 
 	@Override
@@ -425,6 +432,17 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 
 		}
 		return tb;
+	}
+
+	@Override
+	protected LikeCondition getGridSearchCondition4OneField(String field,
+			String value) {
+		if (field.indexOf("plate_no") != -1 || field.indexOf("shiftwork") != -1) {
+			return new LikeCondition(field, value != null ? value.toUpperCase()
+					: value);
+		} else {
+			return super.getGridSearchCondition4OneField(field, value);
+		}
 	}
 
 	// ==高级搜索代码开始==
