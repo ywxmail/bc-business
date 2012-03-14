@@ -306,8 +306,8 @@ public class CarByDriverHistoryAction extends
 		classes = this.getDriverClasses();
 		String fromClass = String.valueOf(this.getE().getFromClasses());
 		String toClass = String.valueOf(this.getE().getToClasses());
+		this.insertIfNotExist(classes, fromClass);
 		if (!this.getE().isNew()) {
-			this.insertIfNotExist(classes, fromClass);
 			this.insertIfNotExist(classes, toClass);
 		}
 

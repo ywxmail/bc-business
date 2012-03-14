@@ -355,6 +355,9 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 		return type;
 	}
 
+	/**特殊的营运班次(3，4都显示为顶班)
+	 * @return
+	 */
 	private Map<String, String> getDriverClasses() {
 		Map<String, String> type = new LinkedHashMap<String, String>();
 		type.put(String.valueOf(CarByDriver.TYPE_ZHENGBAN),
@@ -364,7 +367,7 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 		type.put(String.valueOf(CarByDriver.TYPE_DINGBAN),
 				getText("carByDriver.classes.dingban"));
 		type.put(String.valueOf(CarByDriver.TYPE_ZHUGUA),
-				getText("carByDriver.classes.zhugua"));
+				getText("carByDriver.classes.dingban"));
 		type.put(String.valueOf(CarByDriver.TYPE_WEIDINGYI),
 				getText("carByDriver.classes.weidingyi"));
 		return type;
