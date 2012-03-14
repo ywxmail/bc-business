@@ -3,7 +3,9 @@
  */
 package cn.bc.business.invoice.web.struts2;
 
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -18,6 +20,7 @@ import cn.bc.business.car.domain.Car;
 import cn.bc.business.car.service.CarService;
 import cn.bc.business.carman.domain.CarMan;
 import cn.bc.business.carman.service.CarManService;
+import cn.bc.business.invoice.domain.Invoice4Buy;
 import cn.bc.business.invoice.domain.Invoice4Sell;
 import cn.bc.business.invoice.service.Invoice4BuyService;
 import cn.bc.business.invoice.service.Invoice4SellService;
@@ -135,22 +138,38 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 		// 批量加载可选项列表
 		Map<String, List<Map<String, String>>> optionItems = this.optionService
 				.findOptionItemByGroupKeys(new String[] {
-						OptionConstants.CAR_COMPANY,
-						OptionConstants.INVOICE_TYPE,
-						OptionConstants.INVOICE_UNIT,
-						OptionConstants.INVOICE_PAYTYPE
+						OptionConstants.CAR_COMPANY
 						});
 
 		// 所属公司列表
 		this.companyList =optionItems.get(OptionConstants.CAR_COMPANY);
 		OptionItem.insertIfNotExist(companyList, null, getE().getCompany());
-		//发票类型
-		this.typeList=optionItems.get(OptionConstants.INVOICE_TYPE);
-		//发票单位
-		this.unitList=optionItems.get(OptionConstants.INVOICE_UNIT);	
+		// 发票类型
+		List<Map<String, String>> list = new ArrayList<Map<String, String>>();
+		list.add(this.getOptiomItems(String.valueOf(Invoice4Buy.TYPE_PRINT),
+				getText("invoice.type.dayinpiao")));
+		list.add(this.getOptiomItems(String.valueOf(Invoice4Buy.TYPE_TORE),
+				getText("invoice.type.shousipiao")));
+		this.typeList = list;
+
+		// 发票单位
+		list = new ArrayList<Map<String, String>>();
+		list.add(this.getOptiomItems(String.valueOf(Invoice4Buy.UNIT_JUAN),
+				getText("invoice.unit.juan")));
+		list.add(this.getOptiomItems(String.valueOf(Invoice4Buy.UNIT_BEN),
+				getText("invoice.unit.ben")));
+		this.unitList = list;	
 		
 		//发票代码
 		this.codeList=this.invoice4BuyService.findEnabled4Option();
 	}
-	
+	/**
+	 * 生成OptiomItem key、value值
+	 */
+	private Map<String, String> getOptiomItems(String key, String value) {
+		Map<String, String> map = new HashMap<String, String>();
+		map.put("key", key);
+		map.put("value", value);
+		return map;
+	}
 }
