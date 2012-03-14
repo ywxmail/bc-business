@@ -6,6 +6,7 @@ package cn.bc.business.carman.web.struts2;
 import java.util.List;
 import java.util.Map;
 
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
@@ -235,6 +236,51 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 		this.json = json.toString();
 		return "json";
 	}
+
 	// ========根据身份证号码匹配出司机的籍贯、生日和区域结束========
+
+	public String phone1;// 电话1
+	public String phone2;// 电话2
+	public String error;// 错误信息
+
+	/**
+	 * 车辆查询中 更新司机、责任人的联系电话信息的页面
+	 * 
+	 * @return
+	 * @throws Exception
+	 */
+	public String updatePhonePage() throws Exception {
+		// 判断权限:司机管理 或 更新司机联系电话
+		if (!((SystemContext) this.getContext()).hasAnyRole("BS_DRIVER",
+				"BS_DRIVER_UPDATE_PHONE")) {
+			error = "你没有更新联系电话的权限";
+		}
+		return SUCCESS;
+	}
+
+	/**
+	 * 更新司机、责任人的联系电话信息
+	 * 
+	 * @return
+	 * @throws Exception
+	 */
+	public String updatePhone() throws Exception {
+		JSONObject json = new JSONObject();
+
+		// 判断权限:司机管理 或 更新司机联系电话
+		if (((SystemContext) this.getContext()).hasAnyRole("BS_DRIVER",
+				"BS_DRIVER_UPDATE_PHONE")) {
+			// TODO: 更新联系电话并记录操作日志
+
+			json.put("success", true);
+			json.put("msg", "成功更新联系电话信息");
+		} else {
+			json.put("success", false);
+			json.put("msg", "你没有更新联系电话的权限");
+		}
+
+		this.json = json.toString();
+		return "json";
+	}
 
 }
