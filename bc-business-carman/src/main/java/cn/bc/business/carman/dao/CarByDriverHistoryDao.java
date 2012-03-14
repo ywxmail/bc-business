@@ -25,7 +25,7 @@ public interface CarByDriverHistoryDao extends CrudDao<CarByDriverHistory> {
 	void upDateCar4Driver(Long carManId);
 
 	/**
-	 * 查找司机最新营运记录
+	 * 查找司机最新迁移记录
 	 * 
 	 * @param carManId
 	 *            司机

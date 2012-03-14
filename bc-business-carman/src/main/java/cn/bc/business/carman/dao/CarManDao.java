@@ -52,4 +52,13 @@ public interface CarManDao extends CrudDao<CarMan> {
 	 * @return 如果服务资格证被占用，返回占用此服务资格证的CarManId，否则返回null
 	 */
 	Long checkCert4FWZGIsExists(Long excludeId, String cert4FWZG);
+
+	/**
+	 * 获取司机的最新营运车辆
+	 * 
+	 * @param driverId
+	 *            司机Id
+	 * @return
+	 */
+	String getNewestCarInfo4Driver(Long driverId);
 }
