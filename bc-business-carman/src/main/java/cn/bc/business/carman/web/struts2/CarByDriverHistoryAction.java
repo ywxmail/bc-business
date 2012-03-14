@@ -4,6 +4,7 @@
 package cn.bc.business.carman.web.struts2;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Controller;
 import cn.bc.business.OptionConstants;
 import cn.bc.business.car.domain.Car;
 import cn.bc.business.car.service.CarService;
+import cn.bc.business.carman.domain.CarByDriver;
 import cn.bc.business.carman.domain.CarByDriverHistory;
 import cn.bc.business.carman.service.CarByDriverHistoryService;
 import cn.bc.business.carman.service.CarByDriverService;
@@ -43,6 +45,7 @@ public class CarByDriverHistoryAction extends
 	private static final long serialVersionUID = 1L;
 	public CarByDriverHistoryService carByDriverHistoryService;
 	public String portrait;
+	public Map<String, String> classes;
 	public Map<String, String> statusesValueList;// 状态列表
 	public Map<String, String> moveTypeValueList;// 迁移类型列表
 	public List<Map<String, String>> motorcadeList; // 可选车队列表
@@ -299,6 +302,14 @@ public class CarByDriverHistoryAction extends
 		if (this.getE().getFromMotorcadeId() != null) {
 			getOldMotorcade(this.getE().getFromMotorcadeId());
 		}
+		// 加载驾驶状态
+		classes = this.getDriverClasses();
+		String fromClass = String.valueOf(this.getE().getFromClasses());
+		String toClass = String.valueOf(this.getE().getToClasses());
+		if (!this.getE().isNew()) {
+			this.insertIfNotExist(classes, fromClass);
+			this.insertIfNotExist(classes, toClass);
+		}
 
 		// 批量加载可选项列表
 		Map<String, List<Map<String, String>>> optionItems = this.optionService
@@ -355,6 +366,33 @@ public class CarByDriverHistoryAction extends
 
 	}
 
+	private void insertIfNotExist(Map<String, String> classes, String clazz) {
+		boolean exist = false;
+		for (Map.Entry<String, String> e : classes.entrySet()) {
+			if (e.getKey().equals(clazz)) {
+				exist = true;
+				break;
+			}
+		}
+		if (!exist) {
+			classes.put(clazz, getClassesDesc(Integer.parseInt(clazz)));
+		}
+	}
+
+	private String getClassesDesc(int clazz) {
+		if (clazz == CarByDriver.TYPE_ZHENGBAN)
+			return getText("carByDriver.classes.zhengban");
+		else if (clazz == CarByDriver.TYPE_FUBAN)
+			return getText("carByDriver.classes.fuban");
+		else if (clazz == CarByDriver.TYPE_DINGBAN)
+			return getText("carByDriver.classes.dingban");
+		else if (clazz == CarByDriver.TYPE_ZHUGUA)
+			return getText("carByDriver.classes.zhugua");
+		else if (clazz == CarByDriver.TYPE_WEIDINGYI)
+			return getText("carByDriver.classes.weidingyi");
+		return "";
+	}
+
 	/**
 	 * 获取旧车队名
 	 */
@@ -362,6 +400,16 @@ public class CarByDriverHistoryAction extends
 		Motorcade m = this.motorcadeService.load(motorcadeId);
 		OptionItem.insertIfNotExist(this.motorcadeList, m.getId().toString(),
 				m.getName());
+	}
+
+	// 驾驶状态
+	private Map<String, String> getDriverClasses() {
+		Map<String, String> type = new LinkedHashMap<String, String>();
+		type.put(String.valueOf(CarByDriver.TYPE_ZHENGBAN),
+				getText("carByDriver.classes.zhengban"));
+		type.put(String.valueOf(CarByDriver.TYPE_FUBAN),
+				getText("carByDriver.classes.fuban"));
+		return type;
 	}
 
 	@Override
