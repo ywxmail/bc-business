@@ -5,19 +5,20 @@ DROP TABLE IF EXISTS BS_INVOICE_BUY;
 -- 发票采购单
 CREATE TABLE BS_INVOICE_BUY (
    ID                   INTEGER           	NOT NULL,
-   STATUS_              NUMERIC(1)          	NOT NULL,
-   COMPANY              VARCHAR(255)        	NOT NULL,
-   CODE                 VARCHAR(255)        	NOT NULL,
-   TYPE_                NUMERIC(1)          	NOT NULL,
-   START_NO             VARCHAR(255)        	NOT NULL,
-   END_NO               VARCHAR(255)        	NOT NULL,
+   STATUS_              NUMERIC(1)			NOT NULL,
+   COMPANY              VARCHAR(255)		NOT NULL,
+   CODE                 VARCHAR(255)		NOT NULL,
+   TYPE_                NUMERIC(1)			NOT NULL,
+   START_NO             VARCHAR(255)		NOT NULL,
+   END_NO               VARCHAR(255)		NOT NULL,
    COUNT_               INTEGER           	NOT NULL,
+   EACH_COUNT			INTEGER				NOT NULL,
    UNIT_                INTEGER            	NOT NULL,
-   BUY_PRICE            NUMERIC(10,2)       	NOT NULL,
-   SELL_PRICE           NUMERIC(10,2)       	NOT NULL,
+   BUY_PRICE            NUMERIC(10,2)		NOT NULL,
+   SELL_PRICE           NUMERIC(10,2)		NOT NULL,
    BUYER_ID             INTEGER,
-   BUY_DATE             TIMESTAMP           	NOT NULL,
-   FILE_DATE            TIMESTAMP           	NOT NULL,
+   BUY_DATE             TIMESTAMP			NOT NULL,
+   FILE_DATE            TIMESTAMP			NOT NULL,
    AUTHOR_ID            INTEGER           	NOT NULL,
    MODIFIED_DATE        TIMESTAMP,
    MODIFIER_ID          INTEGER,
@@ -32,6 +33,7 @@ COMMENT ON COLUMN BS_INVOICE_BUY.TYPE_ IS '发票类型:1-打印票,2-手撕票'
 COMMENT ON COLUMN BS_INVOICE_BUY.START_NO IS '开始号';
 COMMENT ON COLUMN BS_INVOICE_BUY.END_NO IS '结束号';
 COMMENT ON COLUMN BS_INVOICE_BUY.COUNT_ IS '采购数量';
+COMMENT ON COLUMN BS_INVOICE_BUY.EACH_COUNT IS '每(卷/本)数量';
 COMMENT ON COLUMN BS_INVOICE_BUY.UNIT_ IS '单位:1-卷,2-本;每卷100张';
 COMMENT ON COLUMN BS_INVOICE_BUY.BUY_PRICE IS '采购单价';
 COMMENT ON COLUMN BS_INVOICE_BUY.SELL_PRICE IS '销售单价';
@@ -59,9 +61,9 @@ CREATE TABLE BS_INVOICE_SELL (
    BUYER_ID             INTEGER,
    BUYER_NAME           VARCHAR(255),
    CAR_ID               INTEGER          	NOT NULL,
-   CAR_PLATE            VARCHAR(255)        	NOT NULL,
+   CAR_PLATE            VARCHAR(255)		NOT NULL,
    MOTORCADE_ID        	INTEGER           	NOT NULL,
-   COMPANY              VARCHAR(255)        	NOT NULL,
+   COMPANY              VARCHAR(255)		NOT NULL,
    SELL_DATE            TIMESTAMP      		NOT NULL,
    CASHIER_ID           INTEGER           	NOT NULL,
    PAY_TYPE             NUMERIC(1)      	NOT NULL,
@@ -136,9 +138,9 @@ CREATE INDEX BSIDX_INVOICESELLDETAIL_ENDNO ON BS_INVOICE_SELL_DETAIL (END_NO);
 insert into BC_IDENTITY_RESOURCE (ID,STATUS_,INNER_,TYPE_,BELONG,ORDER_,NAME,URL,ICONCLASS) 
 	select NEXTVAL('CORE_SEQUENCE'), 0, false, 1, m.id, '031900','票务管理', null, 'i0402' from BC_IDENTITY_RESOURCE m where m.order_='030000';
 insert into BC_IDENTITY_RESOURCE (ID,STATUS_,INNER_,TYPE_,BELONG,ORDER_,NAME,URL,ICONCLASS) 
-	select NEXTVAL('CORE_SEQUENCE'), 0, false, 2, m.id, '031901','票据采购管理', '/bc-business/invoice4Buys/paging', 'i0402' from BC_IDENTITY_RESOURCE m where m.order_='031900';
+	select NEXTVAL('CORE_SEQUENCE'), 0, false, 2, m.id, '031901','票据采购', '/bc-business/invoice4Buys/paging', 'i0402' from BC_IDENTITY_RESOURCE m where m.order_='031900';
 insert into BC_IDENTITY_RESOURCE (ID,STATUS_,INNER_,TYPE_,BELONG,ORDER_,NAME,URL,ICONCLASS) 
-	select NEXTVAL('CORE_SEQUENCE'), 0, false, 2, m.id, '031902','票据销售管理', '/bc-business/invoice4Sells/paging', 'i0402' from BC_IDENTITY_RESOURCE m where m.order_='031900';
+	select NEXTVAL('CORE_SEQUENCE'), 0, false, 2, m.id, '031902','票据销售', '/bc-business/invoice4Sells/paging', 'i0402' from BC_IDENTITY_RESOURCE m where m.order_='031900';
 
 -- 插入票务管理角色数据
 insert into  BC_IDENTITY_ROLE (ID, STATUS_,INNER_,TYPE_,ORDER_,CODE,NAME) 
