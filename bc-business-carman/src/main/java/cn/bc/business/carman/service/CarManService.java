@@ -47,4 +47,11 @@ public interface CarManService extends CrudService<CarMan> {
 	 * @return 如果服务资格证被占用，返回占用此服务资格证的CarManId，否则返回null
 	 */
 	Long checkCert4FWZGIsExists(Long excludeId, String cert4FWZG);
+
+	/**
+	 * 保存司机表的沉余字段
+	 * 
+	 * @param entity
+	 */
+	abstract void setShiftworkInfo(CarMan entity);
 }

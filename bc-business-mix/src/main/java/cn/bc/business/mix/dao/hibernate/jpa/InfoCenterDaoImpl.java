@@ -26,6 +26,7 @@ import cn.bc.business.carman.domain.CarByDriver;
 import cn.bc.business.carman.domain.CarByDriverHistory;
 import cn.bc.business.carman.domain.CarMan;
 import cn.bc.business.contract.domain.Contract4Charger;
+import cn.bc.business.contract.domain.Contract4Labour;
 import cn.bc.business.mix.dao.InfoCenterDao;
 import cn.bc.business.mix.domain.InfoCenter;
 import cn.bc.business.policy.domain.Policy;
@@ -223,6 +224,29 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 			msg = buildContract4ChargerMessage(now, contract4Charger);
 			if (msg != null)
 				messages.put(msg);
+
+			// ==提醒信息/劳动合同==
+			// {module:"劳动合同",id:1,link:"张三",limit:"",date:"yyyy-MM-dd",subject:".."}
+			JSONObject man;
+			String judgeType;
+			for (int i = 0; i < mans.length(); i++) {
+				man = mans.getJSONObject(i);
+
+				// 不是在案的就不检验劳动合同提醒信息了
+				if (man.getInt("judgeStatus") != 0)
+					break;
+
+				// 不是司机或顶班司机 也不检验劳动合同提醒信息
+				judgeType = man.getString("judgeType");
+				if (!("司机".equals(judgeType) || "司机和责任人".equals(judgeType))
+						|| "顶班".equals(man.getString("judgeClasses")))
+					continue;
+
+				// 构建到期提醒信息
+				msg = buildContract4LabourMessage(now, man);
+				if (msg != null)
+					messages.put(msg);
+			}
 		}
 
 		// 返回
@@ -237,7 +261,7 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 			msg.put("id", contract4Charger.get("id"));
 			int status = contract4Charger.getInt("status");
 
-			// 获取保单的过期期限 判断保单是否已过期或将于30日后到期：
+			// 获取过期期限 判断是否已过期或将于30日后到期：
 			Date endDate = (Date) contract4Charger.get("endDate");
 
 			// 即将过期的日期
@@ -246,7 +270,7 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 			// 限制项目
 			msg.put("limit", "");
 
-			// 责任人:TODO
+			// 关系人:TODO
 			msg.put("link", "");
 
 			// 计算过期天数
@@ -257,28 +281,106 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 					msg.put("subject", "经济合同没有设置过期期限");
 				} else {
 					DateUtils.setToZeroTime(endDate);
-					// 24*64*60=86400,忽略毫秒的比较
-					long dc = (endDate.getTime() / 1000 - now.getTime() / 1000) / 86400;
-					if (dc < 0) {
-						msg.put("subject", "经济合同已过期");
-					} else if (dc == 0) {
-						msg.put("subject", "经济合同今日到期");
-					} else if (dc <= 30) {
-						msg.put("subject", "经济合同" + dc + "日后到期");
-					} else {
-						msg = null;// 不提醒
-					}
+					String subject = buildOverdueSubject(now, endDate, 30,
+							"经济合同");
+					if (subject != null)
+						msg.put("subject", subject);
+					else
+						msg = null;
 				}
 			}
 		} else {
 			msg.put("module", "经济合同");
 			msg.put("id", "");
-			msg.put("subject", "无有效经济合同信息");
+			msg.put("subject", "没有签订有效的经济合同");
 			msg.put("date", "");
 			msg.put("limit", "");
 			msg.put("link", "");
 		}
 		return msg;
+	}
+
+	private JSONObject buildContract4LabourMessage(Date now, JSONObject man)
+			throws JSONException {
+		JSONObject msg = new JSONObject();
+		JSONObject contract4Labour;
+		if (man.has("autoInfo")) {
+			// 获取劳动合同信息
+			contract4Labour = man.getJSONObject("autoInfo");
+		} else {
+			contract4Labour = null;
+		}
+
+		if (contract4Labour != null) {
+			msg.put("module", "劳动合同");
+			msg.put("id", contract4Labour.get("id"));
+			int status = contract4Labour.getInt("status");
+
+			Date endDate = DateUtils.getDate(contract4Labour
+					.getString("endDate"));
+
+			// 即将过期的日期
+			msg.put("date", contract4Labour.getString("endDate"));
+
+			// 限制项目
+			msg.put("limit", "");
+
+			// 关系人
+			msg.put("link", man.getString("name"));// 司机姓名
+
+			// 计算过期天数
+			if (status != Contract4Labour.STATUS_NORMAL) {
+				msg.put("subject", "劳动合同已注销");
+			} else {
+				if (endDate == null) {
+					msg.put("subject", "劳动合同没有设置过期期限");
+				} else {
+					DateUtils.setToZeroTime(endDate);
+					String subject = buildOverdueSubject(now, endDate, 30,
+							"劳动合同");
+					if (subject != null)
+						msg.put("subject", subject);
+					else
+						msg = null;
+				}
+			}
+		} else {
+			// 添加没有有效劳动合同的提醒信息
+			msg.put("module", "劳动合同");
+			msg.put("id", "");
+			msg.put("subject", "没有签定有效的劳动合同");
+			msg.put("date", "");
+			msg.put("limit", "");
+			msg.put("link", man.getString("name"));// 司机姓名
+		}
+		return msg;
+	}
+
+	/**
+	 * @param now
+	 *            当前时间
+	 * @param endDate
+	 *            到期时间
+	 * @param days
+	 *            到期提醒的天数
+	 * @param type
+	 *            提醒的类型
+	 * @return
+	 * @throws JSONException
+	 */
+	private String buildOverdueSubject(Date now, Date endDate, int days,
+			String type) throws JSONException {
+		// 忽略毫秒的比较（24*60*60=86400秒=1天）
+		long dc = (endDate.getTime() / 1000 - now.getTime() / 1000) / 86400;
+		if (dc < 0) {
+			return type + "已过期";
+		} else if (dc == 0) {
+			return type + "今日到期";
+		} else if (dc <= days) {
+			return type + dc + "日后到期";
+		} else {
+			return null;// 不提醒
+		}
 	}
 
 	private JSONObject buildPolicyMessage(Date now, JSONObject policy)
@@ -321,17 +423,11 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 					msg.put("subject", "保单没有设置过期期限");
 				} else {
 					DateUtils.setToZeroTime(endDate);
-					// 24*64*60=86400,忽略毫秒的比较
-					long dc = (endDate.getTime() / 1000 - now.getTime() / 1000) / 86400;
-					if (dc < 0) {
-						msg.put("subject", "保单已过期");
-					} else if (dc == 0) {
-						msg.put("subject", "保单今日到期");
-					} else if (dc <= 30) {
-						msg.put("subject", "保单" + dc + "日后到期");
-					} else {
-						msg = null;// 不提醒
-					}
+					String subject = buildOverdueSubject(now, endDate, 30, "保单");
+					if (subject != null)
+						msg.put("subject", subject);
+					else
+						msg = null;
 				}
 			}
 		} else {
@@ -913,7 +1009,7 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 		}
 		final StringBuffer sql = new StringBuffer();
 		final List<Object> args = new ArrayList<Object>();
-		sql.append("select c.id,c.status_,c.start_date,c.end_date,cc.joindate,cc.insurcode,cc.insurance_type");
+		sql.append("select c.id,c.status_,c.start_date,c.end_date,cc.joindate,cc.insurcode,cc.insurance_type,cc.remark");
 		sql.append(",carc.car_id car_id,m.id driver_id,m.name driver_name");
 		sql.append(" from bs_contract_labour cc");
 		sql.append(" inner join bs_contract c on c.id=cc.id");
@@ -980,6 +1076,7 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 									json.put("insurcode", null2Empty(obj[i++]));
 									json.put("insuranceType",
 											null2Empty(obj[i++]));
+									json.put("remark", null2Empty(obj[i++]));
 
 									// 车辆、司机的相关信息
 									json.put("car_id", obj[i++]);
@@ -1300,10 +1397,12 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 		json.put("houseType", null2Empty(obj[startIndex++]));
 		json.put("address1", null2Empty(obj[startIndex++]));
 		json.put("address2", null2Empty(obj[startIndex++]));
+		json.put("phone1", null2Empty(obj[startIndex++]));
+		json.put("phone2", null2Empty(obj[startIndex++]));
 		json.put(
 				"phones",
-				convert2ManPhones((String) obj[startIndex++],
-						(String) obj[startIndex++]));
+				convert2ManPhones(json.getString("phone1"),
+						json.getString("phone2")));
 		json.put("identity", null2Empty(obj[startIndex++]));
 		json.put("cert4fwzg", null2Empty(obj[startIndex++]));
 		json.put("classes", obj[startIndex++]);
@@ -1422,7 +1521,7 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 	private String convert2ManPhones(String phone1, String phone2) {
 		if (phone1 != null && phone1.length() > 0) {
 			if (phone2 != null && phone2.length() > 0) {
-				return phone1 + "，" + phone2;
+				return phone1 + ", " + phone2;
 			} else {
 				return phone1;
 			}
