@@ -30,5 +30,6 @@
 			<result name="form">/bc-business/invoice4Sell/form.jsp</result>
 		</action>
 		<action name="save" class="invoice4SellAction" method="save"/>
+		<action name="autoLoadInvoice4BuyCode" class="invoice4SellAction" method="autoLoadInvoice4BuyCode"/>
 	</package>
 </struts>
