@@ -6,9 +6,14 @@ package cn.bc.business.invoice.web.struts2;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
@@ -22,6 +27,7 @@ import cn.bc.business.carman.domain.CarMan;
 import cn.bc.business.carman.service.CarManService;
 import cn.bc.business.invoice.domain.Invoice4Buy;
 import cn.bc.business.invoice.domain.Invoice4Sell;
+import cn.bc.business.invoice.domain.Invoice4SellDetail;
 import cn.bc.business.invoice.service.Invoice4BuyService;
 import cn.bc.business.invoice.service.Invoice4SellService;
 import cn.bc.business.motorcade.service.MotorcadeService;
@@ -29,7 +35,10 @@ import cn.bc.business.web.struts2.FileEntityAction;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.option.domain.OptionItem;
 import cn.bc.option.service.OptionService;
+import cn.bc.web.ui.html.page.ButtonOption;
 import cn.bc.web.ui.html.page.PageOption;
+import cn.bc.web.ui.json.Json;
+import cn.bc.web.ui.json.JsonArray;
 
 /**
  * 票务采购Action
@@ -69,6 +78,11 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 	public void setInvoice4BuyService(Invoice4SellService invoice4SellService) {
 		this.setCrudService(invoice4SellService);
 		this.invoice4SellService = invoice4SellService;
+	}
+
+	@Autowired
+	public void setInvoice4BuyService(Invoice4BuyService invoice4BuyService) {
+		this.invoice4BuyService = invoice4BuyService;
 	}
 
 	@Autowired
@@ -123,6 +137,50 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 			entity.setBuyerName(carman.getName());
 		}
 	}
+	
+	public String sellDetails;//销售明细字符串JSON格式
+	
+	@Override
+	protected void beforeSave(Invoice4Sell entity) {
+		super.beforeSave(entity);
+		try {
+			//销售明细集合
+			Set<Invoice4SellDetail> details=null;
+			if(this.sellDetails!=null&&this.sellDetails.length()>0){
+				details=new LinkedHashSet<Invoice4SellDetail>();
+				Invoice4SellDetail resDetails;
+				JSONArray jsonArray=new JSONArray(this.sellDetails);
+				JSONObject json;
+				for (int i = 0; i < jsonArray.length(); i++) {
+					json = jsonArray.getJSONObject(i);
+					resDetails = new Invoice4SellDetail();
+					if (json.has("id"))
+						resDetails.setId(json.getLong("id"));
+					resDetails.setInvoice4Sell(this.getE());
+					resDetails.setBuyId(Long.parseLong(json.getString("buyId").trim()));
+					resDetails.setStartNo(json.getString("startNo").trim());
+					resDetails.setEndNo(json.getString("endNo").trim());
+					resDetails.setCount(Integer.parseInt(json.getString("count").trim()));
+					resDetails.setPrice(Float.parseFloat(json.getString("price").trim()));
+					details.add(resDetails);
+				}
+				//集合放进对象中
+				if(this.getE().getInvoice4SellDetail()!=null&&this.getE().getInvoice4SellDetail().size()>0){
+					this.getE().getInvoice4SellDetail().clear();
+					this.getE().getInvoice4SellDetail().addAll(details);
+				}else{
+					this.getE().setInvoice4SellDetail(details);
+				}
+			}
+		} catch (JSONException e) {
+			logger.error(e.getMessage(), e);
+			try {
+				throw e;
+			} catch (JSONException e1) {
+				e1.printStackTrace();
+			}
+		}
+	}
 
 	@Override
 	protected void initForm(boolean editable) throws Exception {
@@ -171,5 +229,47 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 		map.put("key", key);
 		map.put("value", value);
 		return map;
+	}
+	
+	@Override
+	protected void buildFormPageButtons(PageOption pageOption, boolean editable) {
+		if (editable) {// 可编辑时显示保存按钮
+			pageOption.addButton(new ButtonOption(getText("label.save"), null,
+					"bs.invoice4SellForm.save").setId("invoice4SellSave"));
+		} else {// open时
+			if (this.getE().getStatus() == Invoice4Buy.STATUS_NORMAL) {
+				// 维护
+				pageOption.addButton(new ButtonOption(
+						getText("invoice.optype.edit"), null,
+						"bs.invoice4SellForm.doMaintenance")
+						.setId("invoice4SellEdit"));
+			}
+
+		}
+	}
+	
+	//自动加载采购单发票代码信息
+	public String autoLoadInvoice4BuyCode(){
+		//JSONArray jsonArray=OptionItem.toLabelValues(this.invoice4BuyService.findEnabled4Option());
+		JsonArray jsonArray=new JsonArray();
+		Json json=null;
+		List<Map<String, String>> codeListMap= this.invoice4BuyService.findEnabled4Option();
+		for(Map<String,String> codMap:codeListMap){
+			json=new Json();
+			json.put("key", codMap.get("key").trim());
+			json.put("value", codMap.get("value").trim());
+			jsonArray.add(json);
+		}
+		this.json=jsonArray.toString();
+		return "json";
+	}
+	
+	//根据采购单的ID自动加载一个采购对象的信息
+	public Long i4BuyId;
+	
+	public String autoLoadInvoice4BuyId(){
+		Json json=new Json();
+		this.json=json.toString();
+		return "json";
 	}
 }

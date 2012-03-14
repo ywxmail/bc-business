@@ -78,6 +78,8 @@ public class Invoice4BuyAction extends FileEntityAction<Long, Invoice4Buy> {
 		entity.setBuyDate(Calendar.getInstance());
 		entity.setBuyPrice(7F);
 		entity.setStatus(BCConstants.STATUS_ENABLED);
+		//每（卷/本）默认值为100
+		entity.setEachCount(100);
 	}
 
 	@Override
