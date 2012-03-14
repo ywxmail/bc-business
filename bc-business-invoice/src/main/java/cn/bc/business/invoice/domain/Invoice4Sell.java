@@ -55,7 +55,7 @@ public class Invoice4Sell extends FileEntityImpl {
 	private String desc;//备注
 	private int status;//状态
 	
-	@OneToMany(mappedBy = "invoice4Sell", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE, orphanRemoval = true)
+	@OneToMany(mappedBy = "invoice4Sell", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
 	public Set<Invoice4SellDetail> getInvoice4SellDetail() {
 		return invoice4SellDetail;
 	}
@@ -91,7 +91,8 @@ public class Invoice4Sell extends FileEntityImpl {
 	public void setCarPlate(String carPlate) {
 		this.carPlate = carPlate;
 	}
-	@Column(name = "MOTORCADE_ID")
+	@ManyToOne(fetch = FetchType.EAGER, optional = true)
+	@JoinColumn(name = "MOTORCADE_ID", referencedColumnName = "ID")
 	public Motorcade getMotorcadeId() {
 		return motorcadeId;
 	}
