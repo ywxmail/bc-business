@@ -101,7 +101,7 @@ public class Invoice4SellsAction extends ViewAction<Map<String, Object>> {
 		sql.append(" from bs_invoice_sell_detail d");
 		sql.append(" inner join bs_invoice_buy b on b.id=d.buy_id");
 		sql.append(" inner join bs_invoice_sell s on s.id=d.sell_id");
-		sql.append(" inner join bc_identity_actor_history a on a.actor_id=s.cashier_id");
+		sql.append(" inner join bc_identity_actor_history a on a.id=s.cashier_id");
 		sql.append(" inner join bs_motorcade m on m.id=s.motorcade_id");
 		sql.append(" inner join bc_identity_actor bia on bia.id=m.unit_id");
 		sqlObject.setSql(sql.toString());
