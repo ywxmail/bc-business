@@ -153,4 +153,5 @@ public abstract class SyncViewAction extends ViewAction<Map<String, Object>> {
 	}
 
 	protected abstract int doSync(StringBuffer strMsg);
+	
 }

@@ -14,12 +14,20 @@
 		<action name="jinDunJTWF/open" class="jinDunJTWFAction" method="edit">
 			<result name="form" >/bc-business/sync/jinDunJTWF/form.jsp</result>
 		</action>
+		<!-- 高级搜索条件窗口 -->
+		<action name="jinDunJTWFs/conditions" class="jinDunJTWFsAction" method="conditions">
+			<result name="success">/bc-business/sync/jinDunJTWF/conditions.jsp</result>
+		</action>
 	</package>
 	
 	<!-- 交委交通违章 -->
 	<package name="jiaoWeiJTWF" extends="bc-default" namespace="/bc-business">
 		<action name="jiaoWeiJTWF/open" class="jiaoWeiJTWFAction" method="edit">
 			<result name="form" >/bc-business/sync/jiaoWeiJTWF/form.jsp</result>
+		</action>
+		<!-- 高级搜索条件窗口 -->
+		<action name="jiaoWeiJTWFs/conditions" class="jiaoWeiJTWFsAction" method="conditions">
+			<result name="success">/bc-business/sync/jiaoWeiJTWF/conditions.jsp</result>
 		</action>
 	</package>
 	

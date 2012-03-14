@@ -3,7 +3,10 @@
  */
 package cn.bc.business.car.web.struts2;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -176,6 +179,12 @@ public class CarAction extends FileEntityAction<Long, Car> {
 		if (entity.isLogout()) {
 			entity.setStatus(Car.CAR_STAUTS_LOGOUT);
 			entity.setScrapDate(entity.getReturnDate());
+			//车辆注销后在自编号后附加交车日期,如:xxxxxx_20001010
+			if(entity.getReturnDate() != null){
+				Date date = entity.getReturnDate().getTime();
+				DateFormat df = new SimpleDateFormat("yyyyMMdd");
+				entity.setCode(entity.getCode()+"_"+df.format(date));
+			}
 		} else {
 			entity.setStatus(Car.CAR_STAUTS_NORMAL);
 		}
