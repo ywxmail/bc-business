@@ -143,13 +143,29 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 	@Override
 	protected void beforeSave(Invoice4Sell entity) {
 		super.beforeSave(entity);
+	
+		//销售明细集合
+		Set<Invoice4SellDetail> details=this.parseSell4DetailString(this.sellDetails);
+
+		//集合放进对象中
+		if(this.getE().getInvoice4SellDetail()!=null&&this.getE().getInvoice4SellDetail().size()>0){
+			this.getE().getInvoice4SellDetail().clear();
+			this.getE().getInvoice4SellDetail().addAll(details);
+		}else{
+			this.getE().setInvoice4SellDetail(details);
+		}
+			
+	}
+	
+	//解析销售明细字符串返回销售明细集合
+	private Set<Invoice4SellDetail> parseSell4DetailString(String detailStr){
 		try {
 			//销售明细集合
 			Set<Invoice4SellDetail> details=null;
-			if(this.sellDetails!=null&&this.sellDetails.length()>0){
+			if(detailStr!=null&&detailStr.length()>0){
 				details=new LinkedHashSet<Invoice4SellDetail>();
 				Invoice4SellDetail resDetails;
-				JSONArray jsonArray=new JSONArray(this.sellDetails);
+				JSONArray jsonArray=new JSONArray(detailStr);
 				JSONObject json;
 				for (int i = 0; i < jsonArray.length(); i++) {
 					json = jsonArray.getJSONObject(i);
@@ -164,13 +180,7 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 					resDetails.setPrice(Float.parseFloat(json.getString("price").trim()));
 					details.add(resDetails);
 				}
-				//集合放进对象中
-				if(this.getE().getInvoice4SellDetail()!=null&&this.getE().getInvoice4SellDetail().size()>0){
-					this.getE().getInvoice4SellDetail().clear();
-					this.getE().getInvoice4SellDetail().addAll(details);
-				}else{
-					this.getE().setInvoice4SellDetail(details);
-				}
+				return details;
 			}
 		} catch (JSONException e) {
 			logger.error(e.getMessage(), e);
@@ -180,6 +190,7 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 				e1.printStackTrace();
 			}
 		}
+		return null;
 	}
 
 	@Override
@@ -272,4 +283,14 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 		this.json=json.toString();
 		return "json";
 	}
+	
+	
+	//检测销售明细的正确性
+	public String checkSell4Detail(){
+		
+		
+		return "json";
+	}
+	
+	
 }
