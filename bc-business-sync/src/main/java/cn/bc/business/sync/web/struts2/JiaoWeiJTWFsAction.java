@@ -11,16 +11,23 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.json.JSONArray;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
+import cn.bc.business.motorcade.service.MotorcadeService;
 import cn.bc.core.query.condition.Direction;
 import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.core.util.DateUtils;
 import cn.bc.db.jdbc.RowMapper;
 import cn.bc.db.jdbc.SqlObject;
+import cn.bc.identity.domain.Actor;
+import cn.bc.identity.service.ActorService;
 import cn.bc.identity.web.SystemContext;
+import cn.bc.option.domain.OptionItem;
 import cn.bc.sync.domain.SyncBase;
 import cn.bc.web.formater.AbstractFormater;
 import cn.bc.web.formater.CalendarFormater;
@@ -205,6 +212,9 @@ public class JiaoWeiJTWFsAction extends SyncViewAction {
 			// --同步上月的数据
 			menuButton.addMenuItem(getText("label.sync.type.lastMonth"),
 					"sync.lastMonth");
+			// --同步指定期限内的数据
+			menuButton.addMenuItem(getText("label.sync.type.customRange"),
+					"sync.customRange");
 		}
 
 		// 状态单选按钮组
@@ -213,13 +223,32 @@ public class JiaoWeiJTWFsAction extends SyncViewAction {
 				getText("title.click2changeSearchStatus")));
 
 		// 搜索按钮
-		tb.addButton(Toolbar
-				.getDefaultSearchToolbarButton(getText("title.click2search")));
+		tb.addButton(getDefaultSearchToolbarButton());
 
 		return tb;
 	}
 
 	public String dateType;// 同步时间范围的标记符
+	
+	// == 指定期限内同步 代码开始  ==
+	private Calendar customFromDate; //指定开始日期
+	private Calendar customToDate; //指定结束日期
+	
+	public Calendar getCustomFromDate() {
+		return customFromDate;
+	}
+
+	public void setCustomFromDate(Calendar customFromDate) {
+		this.customFromDate = customFromDate;
+	}
+
+	public Calendar getCustomToDate() {
+		return customToDate;
+	}
+
+	public void setCustomToDate(Calendar customToDate) {
+		this.customToDate = customToDate;
+	}
 
 	@Override
 	protected int doSync(StringBuffer strMsg) {
@@ -238,6 +267,9 @@ public class JiaoWeiJTWFsAction extends SyncViewAction {
 			DateUtils.setToZeroTime(fromDate);
 			fromDate.add(Calendar.DAY_OF_MONTH, -10);// 10天前的一天
 			DateUtils.setToMaxTime(toDate);
+		} else if ("customRange".equalsIgnoreCase(dateType)) {// 同步指定期限内的数据
+			fromDate = customFromDate;
+			toDate = customToDate;
 		} else {// 默认为今日
 			DateUtils.setToZeroTime(fromDate);
 			DateUtils.setToMaxTime(toDate);
@@ -248,4 +280,44 @@ public class JiaoWeiJTWFsAction extends SyncViewAction {
 				((SystemContext) this.getContext()).getUserHistory(), fromDate,
 				toDate, strMsg);
 	}
+	// == 指定期限内同步 代码结束  ==
+	
+	// ==高级搜索代码开始==
+	@Override
+	protected boolean useAdvanceSearch() {
+		return true;
+	}
+
+	private MotorcadeService motorcadeService;
+	private ActorService actorService;
+
+	@Autowired
+	public void setActorService(
+			@Qualifier("actorService") ActorService actorService) {
+		this.actorService = actorService;
+	}
+
+	@Autowired
+	public void setMotorcadeService(MotorcadeService motorcadeService) {
+		this.motorcadeService = motorcadeService;
+	}
+
+	public JSONArray motorcades;// 车队的下拉列表信息
+	public JSONArray units;// 分公司的下拉列表信息
+
+	@Override
+	protected void initConditionsFrom() throws Exception {
+		// 可选分公司列表
+		units = OptionItem.toLabelValues(this.actorService.find4option(
+				new Integer[] { Actor.TYPE_UNIT }, (Integer[]) null), "name",
+				"name");
+
+		// 可选车队列表
+		motorcades = OptionItem.toLabelValues(this.motorcadeService
+				.find4Option(null));
+
+	}
+
+	// ==高级搜索代码结束==
+
 }
