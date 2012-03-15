@@ -1107,7 +1107,7 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 	private List<JSONObject> getMansFromCarByDriverHistory(final Long carId,
 			StringBuffer manSql) {
 		final StringBuffer sql = new StringBuffer(manSql);
-		sql.append(",h.id h_id,h.move_type h_moveType,h.move_date h_moveDate,h.from_car_id h_fromCarId,h.to_car_id h_toCarId");
+		sql.append(",h.id h_id,h.move_type h_moveType,h.move_date h_moveDate,h.end_date h_endDate,h.from_car_id h_fromCarId,h.to_car_id h_toCarId");
 		sql.append(",h.from_classes h_fromClasses,h.to_classes h_toClasses");
 		sql.append(" from bs_carman m");
 		sql.append(" inner join bs_car_driver_history h on m.id=h.driver_id");
@@ -1145,8 +1145,10 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 							json.put("moveTypeDesc",
 									convert2ManMoveTypeDesc(json
 											.get("moveType")));
-							json.put("moveDate",
-									DateUtils.formatDate((Date) obj[i++]));
+							json.put(
+									"moveDate",
+									convert2ManMoveDate((Date) obj[i++],
+											(Date) obj[i++]));
 							json.put("fromCarId", null2Empty(obj[i++]));
 							json.put("toCarId", null2Empty(obj[i++]));
 							json.put("h_fromClasses", obj[i++]);
