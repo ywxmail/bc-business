@@ -6,6 +6,7 @@ package cn.bc.business.carman.web.struts2;
 import java.util.List;
 import java.util.Map;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -22,6 +23,7 @@ import cn.bc.business.carman.service.CarManService;
 import cn.bc.business.web.struts2.FileEntityAction;
 import cn.bc.identity.domain.ActorDetail;
 import cn.bc.identity.web.SystemContext;
+import cn.bc.option.domain.OptionItem;
 import cn.bc.option.service.OptionService;
 import cn.bc.placeorigin.domain.PlaceOrigin;
 import cn.bc.placeorigin.service.PlaceOriginService;
@@ -47,6 +49,7 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 	public List<Map<String, String>> carManHouseTypeList;// 司机责任人户口性质列表
 	public List<Map<String, String>> carManLevelList;// 司机责任人等级列表
 	public List<Map<String, String>> carManModelList;// 司机责任人准驾车型列表
+	public JSONArray companyNames; // 公司名称列表
 
 	@Autowired
 	public void setOptionService(OptionService optionService) {
@@ -107,7 +110,11 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 				.findOptionItemByGroupKeys(new String[] {
 						OptionConstants.CARMAN_HOUSETYPE,
 						OptionConstants.CARMAN_LEVEL,
-						OptionConstants.CARMAN_MODEL, });
+						OptionConstants.CARMAN_MODEL,
+						OptionConstants.COMPANY_NAME });
+		// 公司名称列表
+		this.companyNames = OptionItem.toLabelValues(optionItems
+				.get(OptionConstants.COMPANY_NAME));
 
 		// 司机责任人户口性质列表
 		this.carManHouseTypeList = optionItems
