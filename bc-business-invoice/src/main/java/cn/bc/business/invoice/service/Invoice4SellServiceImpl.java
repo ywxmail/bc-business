@@ -1,12 +1,12 @@
 package cn.bc.business.invoice.service;
 
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
 import cn.bc.business.invoice.dao.Invoice4SellDao;
 import cn.bc.business.invoice.domain.Invoice4Sell;
+import cn.bc.business.invoice.domain.Invoice4SellDetail;
 import cn.bc.core.service.DefaultCrudService;
 
 /**
@@ -24,13 +24,13 @@ public class Invoice4SellServiceImpl extends DefaultCrudService<Invoice4Sell> im
 		this.setCrudDao(invoice4SellDao);
 	}
 
-	public List<Map<String, Object>> selectSellDetailByCode(String code) {
-		return this.invoice4SellDao.selectSellDetailByCode(code);
+	public List<Invoice4SellDetail> selectSellDetailByCode(Long buyId) {
+		return this.invoice4SellDao.selectSellDetailByCode(buyId);
 	}
 
-	public List<Map<String, Object>> selectSellDetailByCode(String code,
+	public List<Invoice4SellDetail> selectSellDetailByCode(Long buyId,
 			Long sellId) {
-		return this.invoice4SellDao.selectSellDetailByCode(code,sellId);
+		return this.invoice4SellDao.selectSellDetailByCode(buyId,sellId);
 	}
 
 }
