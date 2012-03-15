@@ -110,4 +110,19 @@ public class CarServiceImpl extends DefaultCrudService<Car> implements
 	public Car save(Car entity) {
 		return this.carDao.save(entity);
 	}
+
+	public void saveRedundantData(Car entity) {
+		if (!entity.isNew()) {
+			// 获取迁移类型为转车队迁记录的车队与公司
+
+			// 获取司机信息
+			String driverInfo = this.carDao
+					.getDriverInfoByCarId(entity.getId());
+			entity.setDriver(driverInfo);
+			// 获取责任人信息
+			String chargerInfo = this.carDao.getChargerInfoByCarId(entity
+					.getId());
+			entity.setCharger(chargerInfo);
+		}
+	}
 }
