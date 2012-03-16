@@ -48,7 +48,7 @@ public class JiaoWeiADVICEsAction extends SyncViewAction {
 	public boolean isReadonly() {
 		// 交通违章管理员或系统管理员
 		SystemContext context = (SystemContext) this.getContext();
-		return !context.hasAnyRole(getText("key.role.bs.infractAdvice"),
+		return !context.hasAnyRole(getText("key.role.bs.advice.keguan"),
 				getText("key.role.bc.admin"));
 	}
 
