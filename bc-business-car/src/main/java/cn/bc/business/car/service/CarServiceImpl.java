@@ -15,6 +15,7 @@ import org.springframework.context.ApplicationEventPublisherAware;
 import cn.bc.business.car.dao.CarDao;
 import cn.bc.business.car.domain.Car;
 import cn.bc.business.car.event.BeforeSave4CarEvent;
+import cn.bc.business.motorcade.domain.Motorcade;
 import cn.bc.core.Page;
 import cn.bc.core.query.condition.Condition;
 import cn.bc.core.service.DefaultCrudService;
@@ -137,8 +138,12 @@ public class CarServiceImpl extends DefaultCrudService<Car> implements
 			BeforeSave4CarEvent beforeSave4CarEvent = new BeforeSave4CarEvent(
 					entity.getId(), null, null);
 			this.eventPublisher.publishEvent(beforeSave4CarEvent);
-			entity.setCompany(beforeSave4CarEvent.getCompany());
-			entity.setMotorcade(beforeSave4CarEvent.getMotorcade());
+			// String company = beforeSave4CarEvent.getCompany();
+			Motorcade m = beforeSave4CarEvent.getMotorcade();
+			if (m != null) {
+				entity.setCompany(beforeSave4CarEvent.getCompany());
+				entity.setMotorcade(m);
+			}
 
 		}
 	}
