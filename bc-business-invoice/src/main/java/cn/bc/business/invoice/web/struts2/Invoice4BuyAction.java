@@ -188,19 +188,19 @@ public class Invoice4BuyAction extends FileEntityAction<Long, Invoice4Buy> {
 			Invoice4Buy i4Buy = bList.get(i);
 			if (endNo < Long.parseLong(i4Buy.getStartNo().trim())) {
 				json.put("checkResult", "0");
-				break;
+				return json.toString();
 			} else if (bList.size()==1
 					&& endNo > Long.parseLong(i4Buy.getEndNo().trim())
 					&& startNo > Long.parseLong(i4Buy.getEndNo().trim())) {// 遍历到集合的最后一个对象时
 				json.put("checkResult", "0");
-				break;
+				return json.toString();
 			} else if (endNo > Long.parseLong(i4Buy.getEndNo().trim())
 					&& startNo > Long.parseLong(i4Buy.getEndNo().trim())) {	
 				bList.remove(0);//比较完第一个对象，下次再比较时已不需要再比较这个对象
 				eachListInvoice4Buy(bList, startNo, endNo, json);//继续递归
 			} else {
 				json.put("checkResult", "1");
-				break;
+				return json.toString();
 			}
 		}
 

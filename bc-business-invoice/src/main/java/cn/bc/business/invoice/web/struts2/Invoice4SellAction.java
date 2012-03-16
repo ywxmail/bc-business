@@ -158,10 +158,10 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 	}
 	
 	//解析销售明细字符串返回销售明细集合
-	private Set<Invoice4SellDetail> parseSell4DetailString(String detailStr){
+	private LinkedHashSet<Invoice4SellDetail> parseSell4DetailString(String detailStr){
 		try {
 			//销售明细集合
-			Set<Invoice4SellDetail> details=null;
+			LinkedHashSet<Invoice4SellDetail> details=null;
 			if(detailStr!=null&&detailStr.length()>0){
 				details=new LinkedHashSet<Invoice4SellDetail>();
 				Invoice4SellDetail resDetails;
@@ -275,22 +275,115 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 		return "json";
 	}
 	
-	//根据采购单的ID自动加载一个采购对象的信息
-	public Long i4BuyId;
+	//----------验证销售明细的正确性---------开始----
+	public Long sellId;
+	public String sellDetailsStr;
 	
-	public String autoLoadInvoice4BuyId(){
-		Json json=new Json();
-		this.json=json.toString();
-		return "json";
-	}
-	
-	
-	//检测销售明细的正确性
 	public String checkSell4Detail(){
-		
+		Json json=new Json();
+		LinkedHashSet<Invoice4SellDetail> details=this.parseSell4DetailString(this.sellDetailsStr);
+		// 检查结果：checkResult
+		String jsonStr=this.checkDetailItself(this.setChangeList4detail(details), json);
+		//自身验证正常时进入数据库信息验证
+		if(jsonStr.equals("")){
+			this.json=this.checkDetailScope(details,this.sellId,json);
+		}else{
+			this.json=jsonStr;
+		}
 		
 		return "json";
 	}
 	
+	//将set集合转为List集合
+	private List<Invoice4SellDetail> setChangeList4detail(LinkedHashSet<Invoice4SellDetail> details){
+		List<Invoice4SellDetail> detailList=new ArrayList<Invoice4SellDetail>();
+		for(Invoice4SellDetail detail:details){
+			detailList.add(detail);
+		}
+		return detailList;
+	}
 	
+	//先检测来自页面请求的明细本身是否带有同一code的编码范围是否有重叠
+	private String checkDetailItself(List<Invoice4SellDetail> dlist,Json json){
+		//比较开始 抽取每一个对象和本身集合中的每一个对象逐个比较
+		for(int i=0;i<dlist.size();i++){
+			//开始号必须要小于结束号,字符串长度必须相等
+			if(dlist.get(i).getStartNo().trim().length()==dlist.get(i).getEndNo().trim().length()
+					&&Long.parseLong(dlist.get(i).getStartNo().trim())
+					<Long.parseLong(dlist.get(i).getEndNo().trim())){
+				for(int j=0;j<dlist.size();j++){
+					//当i=j时，即为对象本身 不需要比较，所需要比较i!=j的情况
+					if(i!=j){
+						//开始号必须要小于结束号
+						if(Long.parseLong(dlist.get(j).getStartNo().trim())
+								<Long.parseLong(dlist.get(j).getEndNo().trim())){
+							//采购单ID相同时进行比较，要保证不出现开始结束号得范围不能够重叠
+							if(dlist.get(i).getBuyId().equals(dlist.get(j).getBuyId())){
+								//出现重叠的情况
+								if(!(Long.parseLong(dlist.get(i).getEndNo().trim())
+											<Long.parseLong(dlist.get(j).getStartNo().trim())
+											||Long.parseLong(dlist.get(i).getStartNo().trim())
+												>Long.parseLong(dlist.get(j).getEndNo().trim()))){
+									json.put("checkResult", getText("invoice4Sell.detail.tips3"));
+									return json.toString();
+								}
+							}
+						}else{
+							json.put("checkResult",getText("invoice4Sell.detail.tips3"));
+							return json.toString();
+						}
+					}
+				}
+			}else{
+				json.put("checkResult",getText("invoice4Sell.detail.tips3"));
+				return json.toString();
+			}
+		}
+		return "";
+	}
+	
+	//检测来自页面的明细对象的编码范围是否与系统中的明细对象集合中的范围重叠。
+	private String checkDetailScope(LinkedHashSet<Invoice4SellDetail> details,Long sellId,Json json){
+		//遍历每一个对象
+		for(Invoice4SellDetail detail:details){
+			//1.确定一条销售明细的开始和结束号范围在此明细对应的采购单之内
+			Invoice4Buy invoice4Buy=this.invoice4BuyService.load(detail.getBuyId());
+			if(detail.getStartNo().trim().length()==invoice4Buy.getStartNo().trim().length()
+					&&detail.getEndNo().trim().length()==invoice4Buy.getEndNo().trim().length()
+						&&Long.parseLong(detail.getStartNo().trim())>=Long.parseLong(invoice4Buy.getStartNo().trim())
+							&&Long.parseLong(detail.getEndNo().trim())<=Long.parseLong(invoice4Buy.getEndNo().trim())){
+				if(sellId==null){
+					//2.比对数据库中的销售明细信息				//通过每一个对象的buyID 相应查找到
+					for(Invoice4SellDetail findDetail:this.invoice4SellService.selectSellDetailByCode(detail.getBuyId())){
+						//出现重叠的情况
+						if(!(Long.parseLong(detail.getEndNo().trim())
+								<Long.parseLong(findDetail.getStartNo().trim())
+								||Long.parseLong(detail.getStartNo().trim())
+									>Long.parseLong(findDetail.getEndNo().trim()))){
+							json.put("checkResult",getText("invoice4Sell.detail.tips2"));
+							return json.toString();
+					}
+					}
+				}else{
+					//3.比对数据库中的销售明细信息，不包括本销售ID的
+					for(Invoice4SellDetail findDetail:this.invoice4SellService.selectSellDetailByCode(detail.getBuyId(),sellId)){
+						//出现重叠的情况
+						if(!(Long.parseLong(detail.getEndNo().trim())
+								<Long.parseLong(findDetail.getStartNo().trim())
+								||Long.parseLong(detail.getStartNo().trim())
+									>Long.parseLong(findDetail.getEndNo().trim()))){
+							json.put("checkResult",getText("invoice4Sell.detail.tips2"));
+							return json.toString();
+						}
+					}
+				}
+			}else{
+				json.put("checkResult",getText("invoice4Sell.detail.tips1"));
+				return json.toString();
+			}
+		}
+		return "";
+	}
+	
+	//----------验证销售明细的正确性---------结束----
 }
