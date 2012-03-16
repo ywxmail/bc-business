@@ -83,6 +83,7 @@ public class Contract4LabourOperateAction extends ActionSupport {
 
 	// ========劳动合同离职代码开始========
 	private Calendar resignDate;
+	private Calendar stopDate;
 
 	public Calendar getResignDate() {
 		return resignDate;
@@ -91,13 +92,21 @@ public class Contract4LabourOperateAction extends ActionSupport {
 	public void setResignDate(Calendar resignDate) {
 		this.resignDate = resignDate;
 	}
+	
+	public Calendar getStopDate() {
+		return stopDate;
+	}
+
+	public void setStopDate(Calendar stopDate) {
+		this.stopDate = stopDate;
+	}
 
 	/**
 	 * 劳动合同离职
 	 */
 	public String doResign() throws Exception {
 		Long fromContractId = this.getId();
-		this.contract4LabourService.doResign(fromContractId, resignDate);
+		this.contract4LabourService.doResign(fromContractId, resignDate,stopDate);
 		json = new Json();
 		json.put("id", fromContractId);
 		json.put("msg", getText("contract4Labour.resign.success"));

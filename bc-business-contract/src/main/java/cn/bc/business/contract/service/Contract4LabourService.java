@@ -47,8 +47,10 @@ public interface Contract4LabourService extends CrudService<Contract4Labour> {
 	 *            原合同id
 	 * @param resignDate
 	 *            指定的离职日期，为空则使用当前时间
+	 * @param resignDate
+	 *            指定的停保日期，为空则使用当前时间
 	 */
-	void doResign(Long contractId, Calendar resignDate);
+	void doResign(Long contractId, Calendar resignDate, Calendar stopDate);
 
 	/**
 	 * 转车处理：新纪录、主版本号加1
