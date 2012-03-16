@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceException;
 import javax.persistence.Query;
 import javax.sql.DataSource;
@@ -21,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.orm.jpa.JpaCallback;
+import org.springframework.orm.jpa.JpaTemplate;
 import org.springframework.util.StringUtils;
 
 import cn.bc.BCConstants;
@@ -40,6 +42,12 @@ import cn.bc.orm.hibernate.jpa.HibernateCrudJpaDao;
 public class CarDaoImpl extends HibernateCrudJpaDao<Car> implements CarDao {
 	private static Log logger = LogFactory.getLog(CarDaoImpl.class);
 	private JdbcTemplate jdbcTemplate;
+	private JpaTemplate jpaTemplate;
+
+	@Autowired
+	public void setJpaTemplate(JpaTemplate jpaTemplate) {
+		this.jpaTemplate = jpaTemplate;
+	}
 
 	@Autowired
 	public void setDataSource(DataSource dataSource) {
@@ -441,5 +449,77 @@ public class CarDaoImpl extends HibernateCrudJpaDao<Car> implements CarDao {
 
 		// 调用基类的保存
 		return super.save(entity);
+	}
+
+	public String getDriverInfoByCarId(final Long carId) {
+
+		final StringBuffer sql = new StringBuffer();
+		sql.append("select getDriverInfoByCarId(id) from bs_car where id = ?");
+
+		if (logger.isDebugEnabled()) {
+			logger.debug("driverId=" + carId + ";sql=" + sql);
+		}
+		// JpaCallback 返回函数的类型
+		return this.jpaTemplate.execute(new JpaCallback<String>() {
+			// JpaCallback接口的方法
+			public String doInJpa(EntityManager em) throws PersistenceException {
+				Query queryObject = em.createNativeQuery(sql.toString());
+				// 设置问号所对应的参数
+				queryObject.setParameter(1, carId);
+				// 设置从第几个开始查
+				queryObject.setFirstResult(0);
+				// 设置查几多个[如果想查所有,则不设]
+				queryObject.setMaxResults(1);
+				String driverInfo;
+				try {
+					driverInfo = (String) queryObject.getSingleResult();
+				} catch (NoResultException e) {
+					if (logger.isDebugEnabled())
+						logger.debug("driverInfo = null,id=" + carId);
+					return null;
+				}
+				if (driverInfo != null) {
+					return driverInfo;
+				}
+				return null;
+			}
+		});
+
+	}
+
+	public String getChargerInfoByCarId(final Long carId) {
+
+		final StringBuffer sql = new StringBuffer();
+		sql.append("select getChargerInfoByCarId(id) from bs_car where id = ?");
+
+		if (logger.isDebugEnabled()) {
+			logger.debug("driverId=" + carId + ";sql=" + sql);
+		}
+		// JpaCallback 返回函数的类型
+		return this.jpaTemplate.execute(new JpaCallback<String>() {
+			// JpaCallback接口的方法
+			public String doInJpa(EntityManager em) throws PersistenceException {
+				Query queryObject = em.createNativeQuery(sql.toString());
+				// 设置问号所对应的参数
+				queryObject.setParameter(1, carId);
+				// 设置从第几个开始查
+				queryObject.setFirstResult(0);
+				// 设置查几多个[如果想查所有,则不设]
+				queryObject.setMaxResults(1);
+				String chargerInfo;
+				try {
+					chargerInfo = (String) queryObject.getSingleResult();
+				} catch (NoResultException e) {
+					if (logger.isDebugEnabled())
+						logger.debug("driverInfo = null,id=" + carId);
+					return null;
+				}
+				if (chargerInfo != null) {
+					return chargerInfo;
+				}
+				return null;
+			}
+		});
+
 	}
 }

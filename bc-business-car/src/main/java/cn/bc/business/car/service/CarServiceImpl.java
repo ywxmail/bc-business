@@ -9,9 +9,12 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.ApplicationEventPublisherAware;
 
 import cn.bc.business.car.dao.CarDao;
 import cn.bc.business.car.domain.Car;
+import cn.bc.business.car.event.BeforeSave4CarEvent;
 import cn.bc.core.Page;
 import cn.bc.core.query.condition.Condition;
 import cn.bc.core.service.DefaultCrudService;
@@ -22,9 +25,15 @@ import cn.bc.core.service.DefaultCrudService;
  * @author dragon
  */
 public class CarServiceImpl extends DefaultCrudService<Car> implements
-		CarService {
+		CarService, ApplicationEventPublisherAware {
 	protected final Log logger = LogFactory.getLog(getClass());
 	private CarDao carDao;
+	private ApplicationEventPublisher eventPublisher;
+
+	public void setApplicationEventPublisher(
+			ApplicationEventPublisher applicationEventPublisher) {
+		this.eventPublisher = applicationEventPublisher;
+	}
 
 	public void setCarDao(CarDao carDao) {
 		this.carDao = carDao;
@@ -110,4 +119,28 @@ public class CarServiceImpl extends DefaultCrudService<Car> implements
 	public Car save(Car entity) {
 		return this.carDao.save(entity);
 	}
+
+	public void saveRedundantData(Car entity) {
+		if (!entity.isNew()) {
+			// 获取迁移类型为转车队迁记录的车队与公司
+
+			// 获取司机信息
+			String driverInfo = this.carDao
+					.getDriverInfoByCarId(entity.getId());
+			entity.setDriver(driverInfo);
+			// 获取责任人信息
+			String chargerInfo = this.carDao.getChargerInfoByCarId(entity
+					.getId());
+			entity.setCharger(chargerInfo);
+
+			// 保存车辆前事件
+			BeforeSave4CarEvent beforeSave4CarEvent = new BeforeSave4CarEvent(
+					entity.getId(), null, null);
+			this.eventPublisher.publishEvent(beforeSave4CarEvent);
+			entity.setCompany(beforeSave4CarEvent.getCompany());
+			entity.setMotorcade(beforeSave4CarEvent.getMotorcade());
+
+		}
+	}
+
 }
