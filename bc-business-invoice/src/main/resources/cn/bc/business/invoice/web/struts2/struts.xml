@@ -31,5 +31,6 @@
 		</action>
 		<action name="save" class="invoice4SellAction" method="save"/>
 		<action name="autoLoadInvoice4BuyCode" class="invoice4SellAction" method="autoLoadInvoice4BuyCode"/>
+		<action name="checkSell4Detail" class="invoice4SellAction" method="checkSell4Detail"/>
 	</package>
 </struts>
