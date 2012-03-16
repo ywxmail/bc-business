@@ -241,7 +241,7 @@ public class Invoice4SellsAction extends ViewAction<Map<String, Object>> {
 				.setUseTitleFromLabel(true));
 		// 发票编码结束号
 		columns.add(new TextColumn4MapKey("s.end_no", "end_no",
-				getText("invoice.endNo"), 60).setSortable(true)
+				getText("invoice.endNo"), 100).setSortable(true)
 				.setUseTitleFromLabel(true));
 		// 数量
 		columns.add(new TextColumn4MapKey("s.count_", "count_",
@@ -252,7 +252,7 @@ public class Invoice4SellsAction extends ViewAction<Map<String, Object>> {
 				.setValueFormater(new NubmerFormater("###,###.00")));
 		// 合计
 		columns.add(new TextColumn4MapKey("s.price", "amount",
-				getText("invoice.amount"), 60).setSortable(true)
+				getText("invoice.amount"), 100).setSortable(true)
 				.setValueFormater(new NubmerFormater("###,###.00")));
 		// 备注
 		columns.add(new TextColumn4MapKey("s.desc_", "desc",
