@@ -295,7 +295,7 @@ public class Contract4LabourServiceImpl extends
 	/**
 	 * 离职
 	 */
-	public void doResign(Long contractId, Calendar resignDate) {
+	public void doResign(Long contractId, Calendar resignDate,Calendar stopDate) {
 		// 获取原来的合同信息
 		Contract4Labour contract = this.contract4LabourDao.load(contractId);
 		if (contract == null)
@@ -305,6 +305,9 @@ public class Contract4LabourServiceImpl extends
 		contract.setStatus(Contract.STATUS_RESGIN);// 离职
 		// 设置离职日期
 		contract.setLeaveDate(resignDate); 
+		// 设置停保日期
+		contract.setStopDate(stopDate);
+		
 		this.contract4LabourDao.save(contract);
 		//throw new CoreException("need implement");
 	}

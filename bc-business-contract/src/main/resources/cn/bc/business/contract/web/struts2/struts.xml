@@ -81,4 +81,12 @@
 			<result name="success">/bc-business/contract4Charger/selectDateRange.jsp</result>
 		</action>
 	</package>
+	
+	<!-- 劳动合同 选择 -->
+	<package name="selectTwoDate" extends="bc-default" namespace="/bc-business/selectTwoDate">
+		<!-- 离职选择 -->
+		<action name="select" class="selectTwoDateAction" >
+			<result name="success">/bc-business/contract4Labour/selectTwoDate.jsp</result>
+		</action>
+	</package>
 </struts>
