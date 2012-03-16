@@ -275,6 +275,22 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 		return "json";
 	}
 	
+	public Long buyId;//采购单ID
+	//根据采购单ID查找一个采购单
+	public String findOneInvoice4Buy(){
+		Json json=null;
+		if(this.buyId!=null){
+			json=new Json();
+			Invoice4Buy invoice4Buy=this.invoice4BuyService.load(this.buyId);
+			json.put("startNo", invoice4Buy.getStartNo());
+			json.put("endNo", invoice4Buy.getEndNo());
+			json.put("sellPrice", invoice4Buy.getSellPrice());
+			json.put("eachCount", invoice4Buy.getEachCount());
+			this.json=json.toString();
+		}
+		return "json";
+	}
+	
 	//----------验证销售明细的正确性---------开始----
 	public Long sellId;
 	public String sellDetailsStr;

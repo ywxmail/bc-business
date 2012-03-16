@@ -32,5 +32,6 @@
 		<action name="save" class="invoice4SellAction" method="save"/>
 		<action name="autoLoadInvoice4BuyCode" class="invoice4SellAction" method="autoLoadInvoice4BuyCode"/>
 		<action name="checkSell4Detail" class="invoice4SellAction" method="checkSell4Detail"/>
+		<action name="findOneInvoice4Buy" class="invoice4SellAction" method="findOneInvoice4Buy"/>
 	</package>
 </struts>
