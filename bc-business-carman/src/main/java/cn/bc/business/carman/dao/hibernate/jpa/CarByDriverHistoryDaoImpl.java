@@ -93,4 +93,28 @@ public class CarByDriverHistoryDaoImpl extends
 
 	}
 
+	public CarByDriverHistory findNeWsetCarByDriverHistory4CarAndMoveType(
+			final Long carId, final int movety) {
+		final String hql = "select h from CarByDriverHistory h where h.fromCar.id = ? and h.moveType = ? order by h.moveDate desc";
+		CarByDriverHistory carByDriverHistory = this.getJpaTemplate().execute(
+				new JpaCallback<CarByDriverHistory>() {
+					public CarByDriverHistory doInJpa(EntityManager em)
+							throws PersistenceException {
+						Query queryObject = em.createQuery(hql);
+						queryObject.setParameter(1, carId);
+						queryObject.setParameter(2, movety);
+						getJpaTemplate().prepareQuery(queryObject);
+						queryObject.setFirstResult(0);
+						queryObject.setMaxResults(1);
+						try {
+							return (CarByDriverHistory) queryObject
+									.getSingleResult();
+						} catch (NoResultException e) {
+							return null;
+						}
+					}
+				});
+		return carByDriverHistory;
+	}
+
 }

@@ -85,4 +85,18 @@ public interface CarDao extends CrudDao<Car> {
 	 * @return 如果车牌被占用，返回占用此车牌的车辆id，否则返回null
 	 */
 	Long checkPlateIsExists(Long excludeId, String plateType, String plateNo);
+
+	/**
+	 * 根据车辆Id获取司机信息 [姓名1,班次1,ID1;姓名2,班次2,ID2;...]
+	 * 
+	 * @param carId
+	 *            车辆Id
+	 */
+	String getDriverInfoByCarId(Long carId);
+
+	/**根据车辆Id获取责任人信息 [姓名1,ID1;姓名2,ID2;...]
+	 * @param carId 车辆ID
+	 * @return
+	 */
+	String getChargerInfoByCarId(Long carId);
 }

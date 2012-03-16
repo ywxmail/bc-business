@@ -57,7 +57,6 @@ public class CarByDriverHistoryAction extends
 	private OptionService optionService;
 	public Long carManId;
 	public Long carId;
-	public Long toCarId;
 	public Long fromCarId;
 	public int moveType;
 	private MotorcadeService motorcadeService;
@@ -122,10 +121,10 @@ public class CarByDriverHistoryAction extends
 			this.getE().setDriver(this.carManService.load(carManId));
 
 		}
-		if (toCarId != null || fromCarId != null) {
+		if (carId != null || fromCarId != null) {
 			// 如果车辆Id不为空，直接转到转车队页面
-			if (toCarId != null) {
-				Car fromCar = this.carService.load(toCarId);
+			if (carId != null) {
+				Car fromCar = this.carService.load(carId);
 				this.getE().setFromCar(fromCar);
 				this.getE().setFromMotorcadeId(fromCar.getMotorcade().getId());
 				this.getE().setFromUnit(fromCar.getCompany());

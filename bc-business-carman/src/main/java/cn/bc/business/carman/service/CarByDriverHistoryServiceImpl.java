@@ -325,4 +325,11 @@ public class CarByDriverHistoryServiceImpl extends
 					BCConstants.STATUS_ENABLED, entity.getToClasses());
 		}
 	}
+
+	public CarByDriverHistory getNeWsetCarByDriverHistory4CarAndMoveType(
+			Long carId, int movety) {
+
+		return this.carByDriverHistoryDao
+				.findNeWsetCarByDriverHistory4CarAndMoveType(carId, movety);
+	}
 }

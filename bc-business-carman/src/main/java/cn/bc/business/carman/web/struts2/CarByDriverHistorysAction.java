@@ -76,10 +76,11 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 	@Override
 	protected String getGridRowClass(List<? extends Object> data,
 			Object rowData, int index, int type) {
-		if (this.carId != null || this.toCarId != null) {
+		Map<String, Object> row = (Map<String, Object>) rowData;
+		if ((this.carId != null || this.toCarId != null)
+				&& (Integer) row.get("move_type") != CarByDriverHistory.MOVETYPE_ZCD) {
 			// 车辆的迁移记录页签：同一司机最后的那条记录如果是在案的就添加高亮显示样式
 			Long _toCarId = (this.carId == null ? this.toCarId : this.carId);
-			Map<String, Object> row = (Map<String, Object>) rowData;
 			Integer thisToCarId = (Integer) row.get("to_car_id");
 			if (thisToCarId != null
 					&& thisToCarId.intValue() == _toCarId.intValue()) {
@@ -87,13 +88,14 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 				int driverId = (Integer) row.get("driver_id");
 				Date moveDate = (Date) row.get("move_date");
 				int moveType = (Integer) row.get("move_type");
-
 				// 查此司机所在列表中最新的那条信息
 				int topId = 0;
 				for (Map<String, Object> r : (List<Map<String, Object>>) data) {
-					if (((Integer) r.get("driver_id")).intValue() == driverId
-							&& moveDate.before((Date) r.get("move_date"))) {
-						topId = (Integer) r.get("id");
+					if ((Integer) r.get("move_type") != CarByDriverHistory.MOVETYPE_ZCD) {
+						if (((Integer) r.get("driver_id")).intValue() == driverId
+								&& moveDate.before((Date) r.get("move_date"))) {
+							topId = (Integer) r.get("id");
+						}
 					}
 				}
 

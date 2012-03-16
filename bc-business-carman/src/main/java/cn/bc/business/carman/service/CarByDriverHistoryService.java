@@ -41,4 +41,16 @@ public interface CarByDriverHistoryService extends
 	void upDateDriver4Car(Long carId);
 
 	void saveShiftwork(CarByDriverHistory entity, Long[] carIds);
+
+	/**
+	 * 根据车辆Id和迁移类型获取最新的迁移记录
+	 * 
+	 * @param carId
+	 *            车辆ID
+	 * @param movetypeZcd
+	 *            迁移类型
+	 * @return
+	 */
+	CarByDriverHistory getNeWsetCarByDriverHistory4CarAndMoveType(Long carId,
+			int movetypeZcd);
 }
