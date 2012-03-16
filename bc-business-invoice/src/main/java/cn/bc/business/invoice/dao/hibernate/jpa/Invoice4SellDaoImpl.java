@@ -26,7 +26,7 @@ public class Invoice4SellDaoImpl extends HibernateCrudJpaDao<Invoice4Sell> imple
 	@SuppressWarnings("unchecked")
 	public List<Invoice4SellDetail> selectSellDetailByCode(Long buyId) {
 		return this.getJpaTemplate().find(
-				"from Invoice4SellDetail where buyId=? and status=? order by startNo", 
+				"from Invoice4SellDetail where buyId=? and invoice4Sell.status=? order by startNo", 
 				new Object[] {buyId,BCConstants.STATUS_ENABLED});
 		
 	}
@@ -40,7 +40,7 @@ public class Invoice4SellDaoImpl extends HibernateCrudJpaDao<Invoice4Sell> imple
 	@SuppressWarnings("unchecked")
 	public List<Invoice4SellDetail> selectSellDetailByCode(Long buyId,Long sellId) {
 		return this.getJpaTemplate().find(
-				"from Invoice4SellDetail where buyId=? and sellId!=? and status=? order by startNo", 
+				"from Invoice4SellDetail where buyId=? and invoice4Sell.id!=? and invoice4Sell.status=? order by startNo", 
 				new Object[] {buyId,sellId,BCConstants.STATUS_ENABLED});
 	}
 
