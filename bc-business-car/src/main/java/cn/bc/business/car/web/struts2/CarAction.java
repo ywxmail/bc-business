@@ -12,14 +12,11 @@ import java.util.Map;
 import org.json.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
 import cn.bc.business.OptionConstants;
 import cn.bc.business.car.domain.Car;
-import cn.bc.business.car.event.BeforeSave4CarEvent;
 import cn.bc.business.car.service.CarService;
 import cn.bc.business.carlpg.domain.CarLPG;
 import cn.bc.business.carlpg.service.CarLPGService;
@@ -51,8 +48,7 @@ import cn.bc.web.ui.json.Json;
  */
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 @Controller
-public class CarAction extends FileEntityAction<Long, Car> implements
-		ApplicationEventPublisherAware {
+public class CarAction extends FileEntityAction<Long, Car> {
 	// private static Log logger = LogFactory.getLog(CarAction.class);
 	private static final long serialVersionUID = 1L;
 	private MotorcadeService motorcadeService;
@@ -82,12 +78,6 @@ public class CarAction extends FileEntityAction<Long, Car> implements
 
 	public String vinPrefix;// 车架号前缀
 	public String vinSuffix;// 车架号后缀
-	private ApplicationEventPublisher eventPublisher;
-
-	public void setApplicationEventPublisher(
-			ApplicationEventPublisher applicationEventPublisher) {
-		this.eventPublisher = applicationEventPublisher;
-	}
 
 	@Autowired
 	public void setCarService(CarService carService) {
@@ -193,12 +183,6 @@ public class CarAction extends FileEntityAction<Long, Car> implements
 
 		// 保存车辆的沉余字段[司机信息,责任人信息,所属公司,车队]
 		this.carService.saveRedundantData(entity);
-		if (!entity.isNew()) {
-			// 保存车辆前事件
-			BeforeSave4CarEvent beforeSave4CarEvent = new BeforeSave4CarEvent(
-					entity.getId());
-			this.eventPublisher.publishEvent(beforeSave4CarEvent);
-		}
 
 	}
 
