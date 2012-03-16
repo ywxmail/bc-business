@@ -82,9 +82,9 @@ public class BlacklistsAction extends ViewAction<Map<String, Object>> {
 		sql.append(" from BS_BLACKLIST b");
 		sql.append(" left join BS_CARMAN cm on cm.id=b.driver_id");
 		sql.append(" left join BS_MOTORCADE m on m.id=b.motorcade_id");
-		sql.append(" inner join bc_identity_actor unit on unit.id=m.unit_id");
+		sql.append(" left join bc_identity_actor unit on unit.id=m.unit_id");
 		sql.append(" left join BS_CAR c on c.id=b.car_id");
-		sql.append(" inner join BC_IDENTITY_ACTOR l on l.id=b.locker_id");
+		sql.append(" left join BC_IDENTITY_ACTOR l on l.id=b.locker_id");
 		sql.append(" left join BC_IDENTITY_ACTOR_HISTORY md on md.id=b.modifier_id");
 		sql.append(" left join BC_IDENTITY_ACTOR u on u.id=b.unlocker_id");
 		sqlObject.setSql(sql.toString());
