@@ -83,7 +83,7 @@ public class Invoice4SellDaoImpl extends HibernateCrudJpaDao<Invoice4Sell> imple
 		
 		
 		//jdbc 查询
-		count = this.jdbcTemplate.queryForInt(sql.toString(), args);
+		count = this.jdbcTemplate.queryForInt(sql.toString(), args.toArray());
 		
 		return count;
 	}
@@ -114,7 +114,7 @@ public class Invoice4SellDaoImpl extends HibernateCrudJpaDao<Invoice4Sell> imple
 		}
 		
 		//jdbc 查询
-		count = this.jdbcTemplate.queryForInt(sql.toString(), args);
+		count = this.jdbcTemplate.queryForInt(sql.toString(),  args.toArray());
 		
 		return count;
 	}
@@ -144,7 +144,7 @@ public class Invoice4SellDaoImpl extends HibernateCrudJpaDao<Invoice4Sell> imple
 		}
 		
 		//jdbc 查询
-		count = this.jdbcTemplate.queryForInt(sql.toString(), args);
+		count = this.jdbcTemplate.queryForInt(sql.toString(),  args.toArray());
 		
 		return count;
 	}
@@ -177,7 +177,7 @@ public class Invoice4SellDaoImpl extends HibernateCrudJpaDao<Invoice4Sell> imple
 		}
 		
 		//jdbc 查询
-		count = this.jdbcTemplate.queryForInt(sql.toString(), args);
+		count = this.jdbcTemplate.queryForInt(sql.toString(),  args.toArray());
 		
 		return count;
 	}
