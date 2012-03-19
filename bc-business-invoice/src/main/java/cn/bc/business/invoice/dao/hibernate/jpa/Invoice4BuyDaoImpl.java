@@ -91,4 +91,20 @@ public class Invoice4BuyDaoImpl extends HibernateCrudJpaDao<Invoice4Buy> impleme
 				new Object[] { code,id,BCConstants.STATUS_ENABLED});
 	}
 
+	/**
+	 * 获取采购单中公司列表
+	 * 
+	 * @return
+	 */
+	public List<Map<String, String>> findCompany4Option(){
+		String sql="select company,count(*) from bs_invoice_buy  GROUP BY company";
+		return HibernateJpaNativeQuery.executeNativeSql(getJpaTemplate(), sql, null,new RowMapper<Map<String, String>>() {
+			public Map<String, String> mapRow(Object[] rs, int rowNum) {
+				Map<String, String> oi = new HashMap<String, String>();
+				int i = 0;
+				oi.put("value", rs[i++].toString());
+				return oi;
+			}
+		});
+	}
 }

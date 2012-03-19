@@ -36,4 +36,7 @@ public class Invoice4BuyServiceImpl extends DefaultCrudService<Invoice4Buy> impl
 		return this.invoice4BuyDao.selectInvoice4BuyByCode(code,id);
 	}
 	
+	public List<Map<String, String>> findCompany4Option(){
+		return invoice4BuyDao.findCompany4Option();
+	}
 }

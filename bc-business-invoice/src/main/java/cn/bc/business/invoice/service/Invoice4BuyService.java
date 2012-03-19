@@ -38,4 +38,11 @@ public interface Invoice4BuyService extends CrudService<Invoice4Buy> {
 	 * @return
 	 */
 	List<Invoice4Buy> selectInvoice4BuyByCode(String code,Long id);
+	
+	/**
+	 * 获取采购单中公司列表
+	 * 
+	 * @return
+	 */
+	public List<Map<String, String>> findCompany4Option();
 }
