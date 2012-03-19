@@ -34,4 +34,13 @@
 		<action name="checkSell4Detail" class="invoice4SellAction" method="checkSell4Detail"/>
 		<action name="findOneInvoice4Buy" class="invoice4SellAction" method="findOneInvoice4Buy"/>
 	</package>
+	
+	<!-- 发票余额-->
+	<package name="invoice4Balance" extends="bc-default" namespace="/bc-business/invoice4Balance">
+		<action name="main" class="invoice4BalanceAction" method="execute">
+			<result name="success">/bc-business/invoice4Balance/form.jsp</result>
+		</action>
+		<!-- 返回查询结果 -->
+		<action name="select" class="invoice4BalanceAction" method="select"/>		
+	</package>
 </struts>
