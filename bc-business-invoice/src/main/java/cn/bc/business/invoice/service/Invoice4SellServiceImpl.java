@@ -2,6 +2,7 @@ package cn.bc.business.invoice.service;
 
 import java.util.Calendar;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -52,6 +53,10 @@ public class Invoice4SellServiceImpl extends DefaultCrudService<Invoice4Sell> im
 	public int countInvoiceSellCountBySellDate(Integer type,
 			Calendar SellDateFrom, Calendar SellDateTo, String company) {
 		return this.invoice4SellDao.countInvoiceSellCountBySellDate(type, SellDateFrom, SellDateTo, company);
+	}
+
+	public List<Map<String, String>> findCompany4Option() {
+		return this.invoice4SellDao.findCompany4Option();
 	}
 
 }

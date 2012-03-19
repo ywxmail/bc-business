@@ -5,7 +5,9 @@ package cn.bc.business.invoice.dao.hibernate.jpa;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.sql.DataSource;
 
@@ -17,7 +19,9 @@ import cn.bc.business.invoice.dao.Invoice4SellDao;
 import cn.bc.business.invoice.domain.Invoice4Buy;
 import cn.bc.business.invoice.domain.Invoice4Sell;
 import cn.bc.business.invoice.domain.Invoice4SellDetail;
+import cn.bc.db.jdbc.RowMapper;
 import cn.bc.orm.hibernate.jpa.HibernateCrudJpaDao;
+import cn.bc.orm.hibernate.jpa.HibernateJpaNativeQuery;
 
 /**
  * 票务销售Dao的hibernate jpa实现
@@ -182,4 +186,20 @@ public class Invoice4SellDaoImpl extends HibernateCrudJpaDao<Invoice4Sell> imple
 		return count;
 	}
 
+	/**
+	 * 获取销售单中公司列表
+	 * 
+	 * @return
+	 */
+	public List<Map<String, String>> findCompany4Option(){
+		String sql="select company,count(*) from bs_invoice_sell  GROUP BY company";
+		return HibernateJpaNativeQuery.executeNativeSql(getJpaTemplate(), sql, null,new RowMapper<Map<String, String>>() {
+			public Map<String, String> mapRow(Object[] rs, int rowNum) {
+				Map<String, String> oi = new HashMap<String, String>();
+				int i = 0;
+				oi.put("value", rs[i++].toString());
+				return oi;
+			}
+		});
+	}
 }

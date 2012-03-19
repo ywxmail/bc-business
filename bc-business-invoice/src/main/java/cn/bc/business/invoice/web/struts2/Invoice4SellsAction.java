@@ -19,6 +19,7 @@ import org.springframework.stereotype.Controller;
 import cn.bc.BCConstants;
 import cn.bc.business.invoice.domain.Invoice4Buy;
 import cn.bc.business.invoice.domain.Invoice4Sell;
+import cn.bc.business.invoice.service.Invoice4SellService;
 import cn.bc.business.motorcade.service.MotorcadeService;
 import cn.bc.business.web.struts2.ViewAction;
 import cn.bc.core.query.condition.Condition;
@@ -386,7 +387,8 @@ public class Invoice4SellsAction extends ViewAction<Map<String, Object>> {
 
 	private MotorcadeService motorcadeService;
 	private ActorService actorService;
-
+	private Invoice4SellService invoice4SellService;
+	
 	@Autowired
 	public void setActorService(
 			@Qualifier("actorService") ActorService actorService) {
@@ -397,9 +399,15 @@ public class Invoice4SellsAction extends ViewAction<Map<String, Object>> {
 	public void setMotorcadeService(MotorcadeService motorcadeService) {
 		this.motorcadeService = motorcadeService;
 	}
+	
+	@Autowired
+	public void setInvoice4SellService(Invoice4SellService invoice4SellService) {
+		this.invoice4SellService = invoice4SellService;
+	}
 
 	public JSONArray motorcades;// 车队的下拉列表信息
 	public JSONArray units;// 分公司的下拉列表信息
+	public JSONArray companies;// 公司的下拉列
 
 	@Override
 	protected void initConditionsFrom() throws Exception {
@@ -411,6 +419,9 @@ public class Invoice4SellsAction extends ViewAction<Map<String, Object>> {
 		units = OptionItem.toLabelValues(this.actorService.find4option(
 				new Integer[] { Actor.TYPE_UNIT }, (Integer[]) null), "name",
 				"id");
+		//公司
+		companies=OptionItem.toLabelValues(this.invoice4SellService.findCompany4Option());
+		
 	}
 	// ==高级搜索代码结束==
 }

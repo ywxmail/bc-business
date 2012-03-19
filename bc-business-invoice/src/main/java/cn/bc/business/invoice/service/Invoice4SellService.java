@@ -5,6 +5,7 @@ package cn.bc.business.invoice.service;
 
 import java.util.Calendar;
 import java.util.List;
+import java.util.Map;
 
 import cn.bc.business.invoice.domain.Invoice4Sell;
 import cn.bc.business.invoice.domain.Invoice4SellDetail;
@@ -70,4 +71,10 @@ public interface Invoice4SellService extends CrudService<Invoice4Sell> {
 	 */
 	int countInvoiceSellCountBySellDate(Integer type,Calendar SellDateFrom, Calendar SellDateTo, String company);
 	
+	/**
+	 * 获取销售单中公司列表
+	 * 
+	 * @return
+	 */
+	public List<Map<String, String>> findCompany4Option();
 }
