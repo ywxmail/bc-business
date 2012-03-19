@@ -64,7 +64,7 @@ public class Invoice4SellsAction extends ViewAction<Map<String, Object>> {
 	public boolean isReadonly() {
 		// 票务管理员或系统管理员
 		SystemContext context = (SystemContext) this.getContext();
-		return !context.hasAnyRole(getText("key.role.bs.invoice"),
+		return !context.hasAnyRole(getText("key.role.bs.invoice"),getText("key.role.bs.invoice4sell"),
 				getText("key.role.bc.admin"));
 	}
 

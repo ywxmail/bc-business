@@ -60,9 +60,10 @@ public class Invoice4BuyAction extends FileEntityAction<Long, Invoice4Buy> {
 
 	@Override
 	public boolean isReadonly() {
-		// 票务采购管理员或系统管理员
+		// 票务管理员或系统管理员
 		SystemContext context = (SystemContext) this.getContext();
-		return !context.hasAnyRole(getText("key.role.bs.invoice"),
+		//配置权限：发票管理员、发票采购管理员
+		return !context.hasAnyRole(getText("key.role.bs.invoice"),getText("key.role.bs.invoice4buy"),
 				getText("key.role.bc.admin"));
 	}
 
@@ -138,19 +139,21 @@ public class Invoice4BuyAction extends FileEntityAction<Long, Invoice4Buy> {
 
 	@Override
 	protected void buildFormPageButtons(PageOption pageOption, boolean editable) {
-		if (editable) {// 可编辑时显示保存按钮
-			pageOption.addButton(new ButtonOption(getText("label.save"), null,
-					"bs.invoice4BuyForm.save").setId("invoice4BuySave"));
-		} else {// open时
-			if (this.getE().getStatus() == Invoice4Buy.STATUS_NORMAL) {
-				// 维护
-				pageOption.addButton(new ButtonOption(
-						getText("invoice.optype.edit"), null,
-						"bs.invoice4BuyForm.doMaintenance")
-						.setId("invoice4BuyEdit"));
+		if(!this.isReadonly()){
+			if (editable) {// 可编辑时显示保存按钮
+				pageOption.addButton(new ButtonOption(getText("label.save"), null,
+						"bs.invoice4BuyForm.save").setId("invoice4BuySave"));
+			} else {// open时
+				if (this.getE().getStatus() == Invoice4Buy.STATUS_NORMAL) {
+					// 维护
+					pageOption.addButton(new ButtonOption(
+							getText("invoice.optype.edit"), null,
+							"bs.invoice4BuyForm.doMaintenance")
+							.setId("invoice4BuyEdit"));
+				}
 			}
-
 		}
+		
 	}
 
 	// ---检查相同发票代码的采购开始号和结束号是否出现在已保存的采购编码范围内---开始--

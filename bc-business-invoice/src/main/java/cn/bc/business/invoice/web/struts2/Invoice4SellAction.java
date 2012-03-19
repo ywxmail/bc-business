@@ -107,9 +107,9 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 
 	@Override
 	public boolean isReadonly() {
-		// 票务采购管理员或系统管理员
+		// 票务管理员或系统管理员
 		SystemContext context = (SystemContext) this.getContext();
-		return !context.hasAnyRole(getText("key.role.bs.invoice"),
+		return !context.hasAnyRole(getText("key.role.bs.invoice"),getText("key.role.bs.invoice4sell"),
 				getText("key.role.bc.admin"));
 	}
 
@@ -244,18 +244,20 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 	
 	@Override
 	protected void buildFormPageButtons(PageOption pageOption, boolean editable) {
-		if (editable) {// 可编辑时显示保存按钮
-			pageOption.addButton(new ButtonOption(getText("label.save"), null,
-					"bs.invoice4SellForm.save").setId("invoice4SellSave"));
-		} else {// open时
-			if (this.getE().getStatus() == Invoice4Buy.STATUS_NORMAL) {
-				// 维护
-				pageOption.addButton(new ButtonOption(
-						getText("invoice.optype.edit"), null,
-						"bs.invoice4SellForm.doMaintenance")
-						.setId("invoice4SellEdit"));
+		if(!this.isReadonly()){
+			if (editable) {// 可编辑时显示保存按钮
+				pageOption.addButton(new ButtonOption(getText("label.save"), null,
+						"bs.invoice4SellForm.save").setId("invoice4SellSave"));
+			} else {// open时
+				if (this.getE().getStatus() == Invoice4Buy.STATUS_NORMAL) {
+					// 维护
+					pageOption.addButton(new ButtonOption(
+							getText("invoice.optype.edit"), null,
+							"bs.invoice4SellForm.doMaintenance")
+							.setId("invoice4SellEdit"));
+				}
+	
 			}
-
 		}
 	}
 	
