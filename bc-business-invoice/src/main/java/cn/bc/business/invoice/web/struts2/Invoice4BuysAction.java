@@ -300,10 +300,14 @@ public class Invoice4BuysAction extends ViewAction<Map<String, Object>> {
 	}
 
 	public JSONArray codes;
+	public JSONArray companies;// 公司的下拉列
 
 	@Override
 	protected void initConditionsFrom() throws Exception {
 			codes=OptionItem.toLabelValues(this.invoice4BuyService.findEnabled4Option());
+			
+			//公司
+			companies=OptionItem.toLabelValues(this.invoice4BuyService.findCompany4Option());
 	}
 	// ==高级搜索代码结束==
 }
