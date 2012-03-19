@@ -111,4 +111,9 @@ public class CarManServiceImpl extends DefaultCrudService<CarMan> implements
 			}
 		}
 	}
+
+	public void updatePhone(Long carManId, String phone1, String phone2) {
+		this.carManDao.updatePhoneBycarManId(carManId, phone1, phone2);
+
+	}
 }

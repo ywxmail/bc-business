@@ -28,6 +28,9 @@
 		<action name="autoLoadCarManIdentityInfo" class="carManAction" method="autoLoadCarManIdentityInfo"/>
 		<action name="updatePhonePage" class="carManAction" method="updatePhonePage">
 			<result name="success">/bc-business/carMan/updatePhone.jsp</result>
+			<result name="error">/bc-business/carMan/error.jsp</result>
+		</action>
+		<action name="updatePhone" class="carManAction" method="updatePhone">
 		</action>
 	</package>
 	

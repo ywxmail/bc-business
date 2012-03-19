@@ -54,4 +54,11 @@ public interface CarManService extends CrudService<CarMan> {
 	 * @param entity
 	 */
 	abstract void setShiftworkInfo(CarMan entity);
+
+	/**更新司机的电话号码
+	 * @param carManId 司机Id
+	 * @param phone1 电话1
+	 * @param phone2 电话2
+	 */
+	void updatePhone(Long carManId, String phone1, String phone2);
 }

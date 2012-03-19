@@ -204,4 +204,11 @@ public class CarManDaoImpl extends HibernateCrudJpaDao<CarMan> implements
 		});
 
 	}
+
+	public void updatePhoneBycarManId(Long carManId, String phone1,
+			String phone2) {
+		String hql = "update CarMan c set c.phone = ?,c.phone1 = ? where c.id = ?";
+		this.executeUpdate(hql, new Object[] { phone1, phone2, carManId });
+
+	}
 }

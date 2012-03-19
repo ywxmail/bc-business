@@ -248,6 +248,7 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 
 	public String phone1;// 电话1
 	public String phone2;// 电话2
+	public Long carManId;// 司机ID
 	public String error;// 错误信息
 
 	/**
@@ -259,10 +260,12 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 	public String updatePhonePage() throws Exception {
 		// 判断权限:司机管理 或 更新司机联系电话
 		if (!((SystemContext) this.getContext()).hasAnyRole("BS_DRIVER",
-				"BS_DRIVER_UPDATE_PHONE")) {
+				"BS_DRIVER_UPDATE_PHONE", getText("key.role.bc.admin"))) {
 			error = "你没有更新联系电话的权限";
+			return ERROR;
+		} else {
+			return SUCCESS;
 		}
-		return SUCCESS;
 	}
 
 	/**
@@ -276,9 +279,9 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 
 		// 判断权限:司机管理 或 更新司机联系电话
 		if (((SystemContext) this.getContext()).hasAnyRole("BS_DRIVER",
-				"BS_DRIVER_UPDATE_PHONE")) {
+				"BS_DRIVER_UPDATE_PHONE", getText("key.role.bc.admin"))) {
 			// TODO: 更新联系电话并记录操作日志
-
+			this.carManService.updatePhone(carManId, phone1, phone2);
 			json.put("success", true);
 			json.put("msg", "成功更新联系电话信息");
 		} else {
