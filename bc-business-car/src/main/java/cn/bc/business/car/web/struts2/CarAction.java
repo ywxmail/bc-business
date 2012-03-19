@@ -210,8 +210,8 @@ public class CarAction extends FileEntityAction<Long, Car> {
 			json.put("msg", getText("car.error.plateIsExists2"));
 			return "json";
 		} else {
-			// 合并车架号的前缀和后缀
-			this.getE().setVin(this.vinPrefix + this.vinSuffix);
+//			// 合并车架号的前缀和后缀
+//			this.getE().setVin(this.vinPrefix + this.vinSuffix);
 
 			// 执行基类的保存
 			super.save();
