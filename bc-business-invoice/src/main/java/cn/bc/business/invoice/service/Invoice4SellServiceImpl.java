@@ -1,5 +1,6 @@
 package cn.bc.business.invoice.service;
 
+import java.util.Calendar;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,26 @@ public class Invoice4SellServiceImpl extends DefaultCrudService<Invoice4Sell> im
 	public List<Invoice4SellDetail> selectSellDetailByCode(Long buyId,
 			Long sellId) {
 		return this.invoice4SellDao.selectSellDetailByCode(buyId,sellId);
+	}
+
+	public int countInvoiceBuyCountByBuyDate(Integer type, Calendar buyDate,
+			String company) {
+		return this.invoice4SellDao.countInvoiceBuyCountByBuyDate(type, buyDate, company);
+	}
+
+	public int countInvoiceBuyCountByBuyDate(Integer type,
+			Calendar buyDateFrom, Calendar buyDateTo, String company) {
+		return this.invoice4SellDao.countInvoiceBuyCountByBuyDate(type, buyDateFrom, buyDateTo, company);
+	}
+
+	public int countInvoiceSellCountBySellDate(Integer type, Calendar SellDate,
+			String company) {
+		return this.invoice4SellDao.countInvoiceSellCountBySellDate(type, SellDate, company);
+	}
+
+	public int countInvoiceSellCountBySellDate(Integer type,
+			Calendar SellDateFrom, Calendar SellDateTo, String company) {
+		return this.invoice4SellDao.countInvoiceSellCountBySellDate(type, SellDateFrom, SellDateTo, company);
 	}
 
 }
