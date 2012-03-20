@@ -284,10 +284,43 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 		if(this.buyId!=null){
 			json=new Json();
 			Invoice4Buy invoice4Buy=this.invoice4BuyService.load(this.buyId);
-			json.put("startNo", invoice4Buy.getStartNo());
-			json.put("endNo", invoice4Buy.getEndNo());
+			List<Invoice4SellDetail> list=this.invoice4SellService.selectSellDetailByCode(this.buyId);
+			if(list!=null&&list.size()>0){
+				//如果查回来的结束号等于采购单的结束号
+				if(list.get(list.size()-1).getEndNo().trim().equals(invoice4Buy.getEndNo().trim())){
+					json.put("startNo","");
+					json.put("endNo", "");
+					json.put("count", "");
+					json.put("amount", "");
+				}else{
+					String str=list.get(list.size()-1).getEndNo().trim();
+					Long l=Long.parseLong(str);
+						l+=1;
+					String strLong=String.valueOf(l);
+					if(invoice4Buy.getCount()!=0){
+						Long sum=((Long.parseLong(invoice4Buy.getEndNo().trim())+1)-l);
+						Long eachCount=(long)invoice4Buy.getEachCount();
+						json.put("count", sum/eachCount);
+						json.put("amount", sum/eachCount*invoice4Buy.getSellPrice());
+					}else{
+						json.put("count", "");
+						json.put("amount", "");
+					}
+					json.put("endNo", invoice4Buy.getEndNo());
+					if(strLong.length()>=str.length()){
+						json.put("startNo", strLong);
+					}else{//处理0开头的字符串
+						json.put("startNo", str.substring(0,(str.length()-strLong.length()))+strLong);
+					}
+				}
+			}else{
+				json.put("startNo",invoice4Buy.getStartNo());
+				json.put("endNo", invoice4Buy.getEndNo());
+				json.put("count", invoice4Buy.getCount());
+				json.put("amount",invoice4Buy.getCount()*invoice4Buy.getSellPrice());
+			}
 			json.put("sellPrice", invoice4Buy.getSellPrice());
-			json.put("eachCount", invoice4Buy.getEachCount());
+			json.put("eachCount", invoice4Buy.getEachCount());//每份数量
 			this.json=json.toString();
 		}
 		return "json";
