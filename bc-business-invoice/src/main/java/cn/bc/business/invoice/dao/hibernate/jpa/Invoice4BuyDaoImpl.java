@@ -37,7 +37,7 @@ public class Invoice4BuyDaoImpl extends HibernateCrudJpaDao<Invoice4Buy> impleme
 	}
 	
 	public List<Map<String, String>> find4Option(Integer[] statuses) {
-		String hql = "select ib.id,ib.code,ib.start_no,ib.end_no from BS_INVOICE_BUY ib";
+		String hql = "select ib.id,ib.code,ib.start_no,ib.end_no,ib.type_ from BS_INVOICE_BUY ib";
 		if (statuses != null && statuses.length > 0) {
 			if (statuses.length == 1) {
 				hql += " where ib.status_ = ?";
@@ -59,8 +59,19 @@ public class Invoice4BuyDaoImpl extends HibernateCrudJpaDao<Invoice4Buy> impleme
 						Map<String, String> oi = new HashMap<String, String>();
 						int i = 0;
 						oi.put("key", rs[i++].toString());
-						oi.put("value", rs[i++]+"("+
-						rs[i++]+"~"+rs[i++]+")");
+						String code=rs[i++]+"";
+						String startNo=rs[i++]+"";
+						String endNo=rs[i++]+"";
+						String type=rs[i++]+"";
+						String typeStr="";
+						//打印票
+						if(Integer.parseInt(type)==Invoice4Buy.TYPE_PRINT){
+							typeStr=Invoice4Buy.TYPE_STR_PRINT;
+						//手撕票
+						}else if(Integer.parseInt(type)==Invoice4Buy.TYPE_TORE){
+							typeStr=Invoice4Buy.TYPE_STR_TORE;
+						}
+						oi.put("value", code+"("+startNo+"~"+endNo+")"+typeStr);
 						return oi;
 					}
 				});
@@ -103,6 +114,34 @@ public class Invoice4BuyDaoImpl extends HibernateCrudJpaDao<Invoice4Buy> impleme
 				Map<String, String> oi = new HashMap<String, String>();
 				int i = 0;
 				oi.put("value", rs[i++].toString());
+				return oi;
+			}
+		});
+	}
+	
+	/**
+	 * 通过采购单ID，获取指定的销售明细开始结束号
+	 * 
+	 * @return
+	 */
+	public List<Map<String, String>> findSellDetail(Long id){
+		StringBuffer sbSql=new StringBuffer("select d.start_no,d.end_no");
+		sbSql.append(" from bs_invoice_buy b");
+		sbSql.append(" left join bs_invoice_sell_detail d on d.buy_id=b.id");
+		sbSql.append(" left join bs_invoice_sell s on s.id=d.sell_id and s.status_=0");
+		sbSql.append(" where b.id=?");
+		String sql=sbSql.toString();
+		return HibernateJpaNativeQuery.executeNativeSql(getJpaTemplate(), sql,new Object[]{id},new RowMapper<Map<String, String>>() {
+			public Map<String, String> mapRow(Object[] rs, int rowNum) {
+				Map<String, String> oi = null; new HashMap<String, String>();
+				int i = 0;
+				Object a=rs[i++];
+				Object b=rs[i++];
+				if(a!=null&&!a.equals("")&&b!=null&&!b.equals("")){
+					oi=new HashMap<String, String>();
+					oi.put("startNo", a.toString());
+					oi.put("endNo", b.toString());
+				}
 				return oi;
 			}
 		});

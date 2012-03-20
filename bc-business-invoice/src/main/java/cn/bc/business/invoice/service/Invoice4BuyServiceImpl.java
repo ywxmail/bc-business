@@ -39,4 +39,8 @@ public class Invoice4BuyServiceImpl extends DefaultCrudService<Invoice4Buy> impl
 	public List<Map<String, String>> findCompany4Option(){
 		return invoice4BuyDao.findCompany4Option();
 	}
+
+	public List<Map<String, String>> findSellDetail(Long id) {
+		return invoice4BuyDao.findSellDetail(id);
+	}
 }

@@ -45,4 +45,11 @@ public interface Invoice4BuyService extends CrudService<Invoice4Buy> {
 	 * @return
 	 */
 	public List<Map<String, String>> findCompany4Option();
+	
+	/**
+	 * 通过采购单ID，获取指定的销售明细开始结束号
+	 * 
+	 * @return
+	 */
+	public List<Map<String, String>> findSellDetail(Long id);
 }
