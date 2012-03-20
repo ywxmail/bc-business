@@ -220,7 +220,7 @@ public class Invoice4BuysAction extends ViewAction<Map<String, Object>> {
 	
 	@Override
 	protected String[] getGridSearchFields() {
-		return new String[] { "b.code",	"a.actor_name"};
+		return new String[] { "b.code",	"a.actor_name" ,"b.start_no" ,"b.end_no"};
 	}
 
 	@Override
