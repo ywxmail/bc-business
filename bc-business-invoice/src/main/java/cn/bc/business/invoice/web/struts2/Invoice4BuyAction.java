@@ -161,11 +161,32 @@ public class Invoice4BuyAction extends FileEntityAction<Long, Invoice4Buy> {
 	public String startNo;
 	public String endNo;
 	public Long id4Buy;// 采购单Id
+	public int status;
 
 	public String checkSameCode4StartNoAndEndNo() {
 		Json json = new Json();
 		List<Invoice4Buy> bList = null;
+		List<Map<String,String>> sellList=null;
+		Long startNo4Long = Long.parseLong(startNo.trim());
+		Long endNo4Long = Long.parseLong(endNo.trim());
 		if (id4Buy != null) {// 编辑
+			sellList=invoice4BuyService.findSellDetail(id4Buy);
+			//判断采购单对应的销售单号码范围。
+			if(sellList!=null&&sellList.size()>0&&sellList.get(0)!=null){
+				//作废处理
+				if(this.status==Invoice4Buy.STATUS_INVALID){//此采购单带有销售单 不能够作废
+					json.put("checkResult", "3");
+					this.json=json.toString();
+					return "json";
+				}else{//不是作废
+					this.json=this.checkSellNumberRange(sellList, startNo4Long, endNo4Long, json);
+					//返回不为{}时，范围已不正确不能够保存
+					if(!this.json.equals("{}")){
+						return "json";
+					}
+				}
+			}
+			
 			bList = invoice4BuyService.selectInvoice4BuyByCode(code, id4Buy);
 		} else {// 新建
 			bList = invoice4BuyService.selectInvoice4BuyByCode(code);
@@ -176,8 +197,6 @@ public class Invoice4BuyAction extends FileEntityAction<Long, Invoice4Buy> {
 			this.json = json.toString();
 			return "json";
 		} else {
-			Long startNo4Long = Long.parseLong(startNo.trim());
-			Long endNo4Long = Long.parseLong(endNo.trim());
 			this.json = this.eachListInvoice4Buy(bList, startNo4Long,
 					endNo4Long, json);
 			return "json";
@@ -209,5 +228,24 @@ public class Invoice4BuyAction extends FileEntityAction<Long, Invoice4Buy> {
 
 		return json.toString();
 	}
+	
+	//检测需要保存的采购单 号码范围不能够小于对应销售单的号码范围
+	private String	checkSellNumberRange(List<Map<String,String>> list,Long startNo,
+			Long endNo, Json json){
+		Map<String,String> map=null;
+		for(int i=0;i<list.size();i++){
+			map=list.get(i);
+			if(map.get("startNo")!=null&&!map.get("startNo").equals("")){
+				//不在范围之内
+				if(!(Long.parseLong(map.get("startNo").trim())>=startNo
+						&&Long.parseLong(map.get("endNo").trim())<=endNo)){
+					json.put("checkResult", "2");
+					return json.toString();
+				}
+			}
+		}
+		return json.toString();
+	}
+	
 	// ---检查相同发票代码的采购开始号和结束号是否出现在已保存的采购编码范围内---结束--
 }
