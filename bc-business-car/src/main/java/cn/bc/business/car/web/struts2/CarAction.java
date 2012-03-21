@@ -180,19 +180,16 @@ public class CarAction extends FileEntityAction<Long, Car> {
 		if (entity.isLogout()) {
 			entity.setStatus(Car.CAR_STAUTS_LOGOUT);
 			entity.setScrapDate(entity.getReturnDate());
-			//车辆注销后在自编号后附加交车日期,如:xxxxxx_20001010
-			if(entity.getReturnDate() != null && entity.getCode().indexOf("_") < 0){
+			// 车辆注销后在自编号后附加交车日期,如:xxxxxx_20001010
+			if (entity.getReturnDate() != null
+					&& entity.getCode().indexOf("_") < 0) {
 				Date date = entity.getReturnDate().getTime();
 				DateFormat df = new SimpleDateFormat("yyyyMMdd");
-				entity.setCode(entity.getCode()+"_"+df.format(date));
+				entity.setCode(entity.getCode() + "_" + df.format(date));
 			}
 		} else {
 			entity.setStatus(Car.CAR_STAUTS_NORMAL);
 		}
-
-		// 保存车辆的沉余字段[司机信息,责任人信息,所属公司,车队]
-		this.carService.saveRedundantData(entity);
-
 	}
 
 	@Override
@@ -210,8 +207,8 @@ public class CarAction extends FileEntityAction<Long, Car> {
 			json.put("msg", getText("car.error.plateIsExists2"));
 			return "json";
 		} else {
-//			// 合并车架号的前缀和后缀
-//			this.getE().setVin(this.vinPrefix + this.vinSuffix);
+			// // 合并车架号的前缀和后缀
+			// this.getE().setVin(this.vinPrefix + this.vinSuffix);
 
 			// 执行基类的保存
 			super.save();
