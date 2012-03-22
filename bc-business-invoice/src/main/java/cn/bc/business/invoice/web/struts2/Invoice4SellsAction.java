@@ -105,7 +105,7 @@ public class Invoice4SellsAction extends ViewAction<Map<String, Object>> {
 		sql.append(" inner join bc_identity_actor_history a on a.id=s.cashier_id");
 		sql.append(" inner join bs_motorcade m on m.id=s.motorcade_id");
 		sql.append(" inner join bc_identity_actor bia on bia.id=m.unit_id");
-		sql.append(" inner join bs_carman cm on cm.id=s.buyer_id");
+		sql.append(" left join bs_carman cm on cm.id=s.buyer_id");
 		sqlObject.setSql(sql.toString());
 
 		// 注入参数
@@ -166,7 +166,7 @@ public class Invoice4SellsAction extends ViewAction<Map<String, Object>> {
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
 		// 销售员
 		columns.add(new TextColumn4MapKey("a.actor_name", "cashier",
-				getText("invoice4Sell.cashier"), 60).setUseTitleFromLabel(true));
+				getText("invoice4Sell.cashier"), 100).setUseTitleFromLabel(true));
 		// 公司
 		columns.add(new TextColumn4MapKey("s.company", "company",
 				getText("invoice.company"), 60).setSortable(true));
