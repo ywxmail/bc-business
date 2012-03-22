@@ -3,7 +3,6 @@
  */
 package cn.bc.business.invoice.web.struts2;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -59,8 +58,10 @@ public class Invoice4BalanceAction extends ActionSupport {
 	public Calendar startDate;
 	public Calendar endDate;
 
-	public String startCount;// 期初数量
-	public String endCount;// 收入数量
+	//public String startCount;// 期初数量
+	//public String endCount;// 剩余数量
+	//public String buyCount;// 收入数量
+	//public String sellCount;// 发出数量
 
 	@Override
 	public String execute() throws Exception {
@@ -69,9 +70,9 @@ public class Invoice4BalanceAction extends ActionSupport {
 				.setMaximizable(true)
 				.setMinimizable(true)
 				.setMinWidth(200)
-				.setWidth(310)
+				.setWidth(410)
 				.setMinHeight(200)
-				.setHeight(300)
+				.setHeight(380)
 				.addButton(
 						new ButtonOption(getText("invoice.optype.select"),
 								null, "bs.invoice4BalanceForm.select"));
@@ -91,13 +92,31 @@ public class Invoice4BalanceAction extends ActionSupport {
 		// 公司
 		this.companyList = this.invoice4BuyService.findCompany4Option();
 
-		int count = this.invoice4SellService.countInvoiceBuyCountByBuyDate(
-				Invoice4Buy.TYPE_PRINT, Calendar.getInstance(), null)
+		/*Calendar calendar=Calendar.getInstance();
+		calendar.set(Calendar.getInstance().YEAR, Calendar.getInstance().MONTH, Calendar.getInstance().DAY_OF_MONTH,0,0,0);
+		
+		int startCount = this.invoice4SellService
+				.countInvoiceBuyCountByBuyDate(Invoice4Buy.TYPE_PRINT,
+						calendar, null, false)
 				- this.invoice4SellService.countInvoiceSellCountBySellDate(
-						Invoice4Buy.TYPE_PRINT, Calendar.getInstance(), null);
+						Invoice4Buy.TYPE_PRINT, calendar, null,
+						false);
+		int endCount = this.invoice4SellService.countInvoiceBuyCountByBuyDate(
+				Invoice4Buy.TYPE_PRINT, calendar, null, true)
+				- this.invoice4SellService.countInvoiceSellCountBySellDate(
+						Invoice4Buy.TYPE_PRINT, calendar, null,
+						true);
+		int buyCount = this.invoice4SellService.countInvoiceBuyCountByBuyDate(
+				this.type, this.startDate, calendar, this.company);
+		int sellCount = this.invoice4SellService
+				.countInvoiceSellCountBySellDate(this.type, this.startDate,
+						calendar, this.company);
+
 		DecimalFormat format = new DecimalFormat("###,###.##");
-		this.startCount = format.format(count);
-		this.endCount = format.format(count);
+		this.startCount = format.format(startCount);
+		this.endCount = format.format(endCount);
+		this.buyCount = format.format(buyCount);
+		this.sellCount = format.format(sellCount);*/
 		return super.execute();
 	}
 
@@ -119,9 +138,9 @@ public class Invoice4BalanceAction extends ActionSupport {
 		Json json = new Json();
 		json.put("startCount", String.valueOf(this.invoice4SellService
 				.countInvoiceBuyCountByBuyDate(this.type, this.startDate,
-						this.company)
+						this.company, false)
 				- this.invoice4SellService.countInvoiceSellCountBySellDate(
-						this.type, this.startDate, this.company)));
+						this.type, this.startDate, this.company, false)));
 		json.put("buyCount", String.valueOf(this.invoice4SellService
 				.countInvoiceBuyCountByBuyDate(this.type, this.startDate,
 						this.endDate, this.company)));
@@ -130,9 +149,9 @@ public class Invoice4BalanceAction extends ActionSupport {
 						this.endDate, this.company)));
 		json.put("endCount", String.valueOf(this.invoice4SellService
 				.countInvoiceBuyCountByBuyDate(this.type, this.endDate,
-						this.company)
+						this.company, true)
 				- this.invoice4SellService.countInvoiceSellCountBySellDate(
-						this.type, this.endDate, this.company)));
+						this.type, this.endDate, this.company, true)));
 
 		this.json = json.toString();
 		return "json";
