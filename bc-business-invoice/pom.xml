@@ -1,0 +1,44 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>cn.bc.business</groupId>
+		<artifactId>bc-business-parent</artifactId>
+		<version>1.0-SNAPSHOT</version>
+		<relativePath>../bc-business-parent/pom.xml</relativePath>
+	</parent>
+	<artifactId>bc-business-invoice</artifactId>
+	<description>票务管理</description>
+	
+	<dependencies>
+		<!-- 本子系统的公共模块 -->
+		<dependency>
+			<groupId>cn.bc.business</groupId>
+			<artifactId>bc-business-base</artifactId>
+			<version>${project.version}</version>
+		</dependency>		
+		<!-- 车队 -->
+		<dependency>
+			<groupId>cn.bc.business</groupId>
+			<artifactId>bc-business-motorcade</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<!-- 司机责任人 -->
+		<dependency>
+			<groupId>cn.bc.business</groupId>
+			<artifactId>bc-business-carman</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<!-- 车辆 -->
+		<dependency>
+			<groupId>cn.bc.business</groupId>
+			<artifactId>bc-business-car</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<!-- 选项模块 -->
+		<dependency>
+			<groupId>cn.bc</groupId>
+			<artifactId>bc-option</artifactId>
+			<version>${framework.version}</version>
+		</dependency>
+	</dependencies>
+</project>
