@@ -68,14 +68,21 @@ public class Invoice4SellDaoImpl extends HibernateCrudJpaDao<Invoice4Sell> imple
 	 * @param type
 	 * @param buyDate
 	 * @param company
+	 * @param falg 是否包括本天
 	 * @return
 	 */
-	public int countInvoiceBuyCountByBuyDate(Integer type, Calendar buyDate,String company) {
+	public int countInvoiceBuyCountByBuyDate(Integer type, Calendar buyDate,String company,boolean flag) {
 		int count = 0;
 		ArrayList<Object> args = new ArrayList<Object>();
 		StringBuffer sql = new StringBuffer();
 		sql.append("select sum(b.count_) buyCount from bs_invoice_buy b");
-		sql.append(" where b.status_=0 and b.type_=? and b.buy_date<=?");
+		sql.append(" where b.status_=0 and b.type_=?");
+		
+		if(flag){
+			sql.append(" and b.buy_date<=?");
+		}else{
+			sql.append(" and b.buy_date<?");
+		}
 		
 		args.add(Invoice4Buy.TYPE_PRINT);
 		args.add(buyDate);
@@ -130,14 +137,20 @@ public class Invoice4SellDaoImpl extends HibernateCrudJpaDao<Invoice4Sell> imple
 	 * @param company
 	 * @return
 	 */
-	public int countInvoiceSellCountBySellDate(Integer type, Calendar SellDate,String company) {
+	public int countInvoiceSellCountBySellDate(Integer type, Calendar SellDate,String company,boolean flag) {
 		int count = 0;
 		ArrayList<Object> args = new ArrayList<Object>();
 		StringBuffer sql = new StringBuffer();
 		sql.append("select sum(d.count_) sellCount from bs_invoice_sell_detail d")
 		   .append(" inner join bs_invoice_sell s on s.id=d.sell_id")
 		   .append(" inner join bs_invoice_buy b on b.id=d.buy_id")
-		   .append(" where s.status_=0 and b.type_=? and s.sell_date<=?");
+		   .append(" where s.status_=0 and b.type_=?");
+		
+		if(flag){
+			sql.append(" and s.sell_date<=?");
+		}else{
+			sql.append(" and s.sell_date<?");
+		}
 		
 		args.add(Invoice4Buy.TYPE_PRINT);
 		args.add(SellDate);

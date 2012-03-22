@@ -36,8 +36,8 @@ public class Invoice4SellServiceImpl extends DefaultCrudService<Invoice4Sell> im
 	}
 
 	public int countInvoiceBuyCountByBuyDate(Integer type, Calendar buyDate,
-			String company) {
-		return this.invoice4SellDao.countInvoiceBuyCountByBuyDate(type, buyDate, company);
+			String company,boolean flag) {
+		return this.invoice4SellDao.countInvoiceBuyCountByBuyDate(type, buyDate, company,flag);
 	}
 
 	public int countInvoiceBuyCountByBuyDate(Integer type,
@@ -46,8 +46,8 @@ public class Invoice4SellServiceImpl extends DefaultCrudService<Invoice4Sell> im
 	}
 
 	public int countInvoiceSellCountBySellDate(Integer type, Calendar SellDate,
-			String company) {
-		return this.invoice4SellDao.countInvoiceSellCountBySellDate(type, SellDate, company);
+			String company,boolean flag) {
+		return this.invoice4SellDao.countInvoiceSellCountBySellDate(type, SellDate, company,flag);
 	}
 
 	public int countInvoiceSellCountBySellDate(Integer type,

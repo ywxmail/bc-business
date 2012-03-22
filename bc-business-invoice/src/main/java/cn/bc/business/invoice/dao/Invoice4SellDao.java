@@ -39,9 +39,10 @@ public interface Invoice4SellDao extends CrudDao<Invoice4Sell> {
 	 * @param type
 	 * @param buyDate
 	 * @param company
+	 * @param falg 是否包含本田
 	 * @return
 	 */
-	int countInvoiceBuyCountByBuyDate(Integer type,Calendar buyDate,String company);
+	int countInvoiceBuyCountByBuyDate(Integer type,Calendar buyDate,String company,boolean flag);
 	
 	/**
 	 * 指定采购日期范围 总采购数(company为null即查宝城和广发所有记录)
@@ -58,9 +59,10 @@ public interface Invoice4SellDao extends CrudDao<Invoice4Sell> {
 	 * @param type
 	 * @param SellDate
 	 * @param company
+	 * @param falg 是否包含本田
 	 * @return
 	 */
-	int countInvoiceSellCountBySellDate(Integer type,Calendar SellDate, String company);
+	int countInvoiceSellCountBySellDate(Integer type,Calendar SellDate, String company,boolean flag);
 	
 	/**
 	 * 指定销售日期范围  总销售数(company为null即查宝城和广发所有记录)
