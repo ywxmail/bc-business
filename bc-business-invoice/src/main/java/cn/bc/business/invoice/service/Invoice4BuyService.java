@@ -52,4 +52,11 @@ public interface Invoice4BuyService extends CrudService<Invoice4Buy> {
 	 * @return
 	 */
 	public List<Map<String, String>> findSellDetail(Long id);
+	
+	/**
+	 * 通过采购单ID，获取剩余号码段
+	 * 
+	 * @return
+	 */
+	public List<String> findBalanceNumberByInvoice4BuyId(Long id);
 }

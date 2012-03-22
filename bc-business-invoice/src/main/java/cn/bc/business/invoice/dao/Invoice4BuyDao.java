@@ -54,4 +54,10 @@ public interface Invoice4BuyDao extends CrudDao<Invoice4Buy> {
 	 */
 	public List<Map<String, String>> findSellDetail(Long id);
 
+	/**
+	 * 通过采购单ID，获取剩余号码段
+	 * 
+	 * @return
+	 */
+	public List<String> findBalanceNumberByInvoice4BuyId(Long id);
 }
