@@ -77,6 +77,8 @@ public class Invoice4BuysAction extends ViewAction<Map<String, Object>> {
 		sql.append("b.code as code,b.start_no as start_no,b.end_no as end_no");
 		sql.append(",b.company as company,b.type_ as type_,b.count_ as count_,b.buy_price as buy_price");
 		sql.append(",b.desc_ as desc,b.unit_ as unit_,b.sell_price as sell_price,a.actor_name as buyerName");
+		sql.append(",getbalancecountbyinvoicebuyid(b.id) as balance_count");
+		sql.append(",getbalancenumberbyinvoicebuyid(b.id,b.start_no,b.end_no) as balance_number");
 		sql.append(" from bs_invoice_buy b");
 		sql.append(" left join bc_identity_actor_history a on a.id=b.buyer_id");
 		sqlObject.setSql(sql.toString());
@@ -112,6 +114,8 @@ public class Invoice4BuysAction extends ViewAction<Map<String, Object>> {
 				map.put("unit_", rs[i++]); // 单位
 				map.put("sell_price", rs[i++]); // 销售单价
 				map.put("buyerName", rs[i++]); // 购买人
+				map.put("balance_count", rs[i++]); // 剩余数量
+				map.put("balance_number", rs[i++]); // 剩余号码段
 				return map;
 			}
 		});
@@ -159,7 +163,9 @@ public class Invoice4BuysAction extends ViewAction<Map<String, Object>> {
 		// 数量
 		columns.add(new TextColumn4MapKey("b.count_", "count_",
 				getText("invoice.count"), 60).setSortable(true));
-		
+		// 剩余数量
+		columns.add(new TextColumn4MapKey("", "balance_count",
+				getText("invoice4Buy.balanceCount"), 60).setSortable(true));
 		// 采购单价
 		columns.add(new TextColumn4MapKey("b.buy_price", "buy_price",
 				getText("invoice4Buy.buyPrice"), 60).setSortable(true)
@@ -172,6 +178,9 @@ public class Invoice4BuysAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("b.buy_price", "amount",
 				getText("invoice.amount"), 150).setSortable(true).setUseTitleFromLabel(true)
 				.setValueFormater(new NubmerFormater("###,##0.00")));
+		// 剩余号码段
+		columns.add(new TextColumn4MapKey("", "balance_number",
+				getText("invoice4Buy.balanceNumber"), 200).setUseTitleFromLabel(true));
 		// 备注
 		columns.add(new TextColumn4MapKey("b.desc_", "desc",
 				getText("invoice.desc")).setUseTitleFromLabel(true));
