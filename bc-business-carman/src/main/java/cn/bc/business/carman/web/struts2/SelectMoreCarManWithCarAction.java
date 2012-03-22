@@ -31,6 +31,15 @@ public class SelectMoreCarManWithCarAction extends
 	private static final long serialVersionUID = 1L;
 	public List<CarMan> carMans;
 	public HashMap<String, String> infoMap;
+	public boolean multiple = false;
+
+	public boolean isMultiple() {
+		return multiple;
+	}
+
+	public void setMultiple(boolean multiple) {
+		this.multiple = multiple;
+	}
 
 	private CarManService carManService;
 	public Long carId;

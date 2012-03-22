@@ -3,11 +3,15 @@
  */
 package cn.bc.business.blacklist.web.struts2;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -65,6 +69,7 @@ public class BlacklistAction extends FileEntityAction<Long, Blacklist> {
 	public boolean isMoreCarMan;// 标识是否一辆车对应多个司机
 	public boolean isNullCar;// 标识是否没有车和司机对应
 	public boolean isNullCarMan;// 标识是否没有司机和车对应
+	public List<Map<String, String>> driversInfoList; // 司机责任人Map
 
 	public Long getCarManId() {
 		return carManId;
@@ -129,17 +134,21 @@ public class BlacklistAction extends FileEntityAction<Long, Blacklist> {
 
 		if (carManId != null) {
 			// 如果司机Id不为空，加载司机信息
-			CarMan driver = this.carManService.load(carManId);
+			// CarMan driver = this.carManService.load(carManId);
 			List<Car> car = this.carService.selectAllCarByCarManId(carManId);
 			if (car.size() == 1) {
 				this.getE().setCar(car.get(0));
+				this.getE().setCompany(car.get(0).getCompany());
 				this.getE().setMotorcade(car.get(0).getMotorcade());
 			} else if (car.size() > 1) {
 				isMoreCar = true;
 			} else {
 				isNullCar = true;
 			}
-			this.getE().setDriver(driver);
+			String carMan = this.carManService
+					.getDriverInfoByDriverId(carManId);
+			this.getE().setDrivers(carMan);
+			this.driversInfoList = formatDrivers(carMan);
 
 		}
 
@@ -152,7 +161,10 @@ public class BlacklistAction extends FileEntityAction<Long, Blacklist> {
 			List<CarMan> carMan = this.carManService
 					.selectAllCarManByCarId(carId);
 			if (carMan.size() == 1) {
-				this.getE().setDriver(carMan.get(0));
+				String carManInfo = this.carManService
+						.getDriverInfoByDriverId(carMan.get(0).getId());
+				this.getE().setDrivers(carManInfo);
+				this.driversInfoList = formatDrivers(carManInfo);
 
 			} else if (carMan.size() > 1) {
 				isMoreCarMan = true;
@@ -171,6 +183,9 @@ public class BlacklistAction extends FileEntityAction<Long, Blacklist> {
 
 	}
 
+	// 司机的Id
+	public String blacklistDriverIds;
+
 	@Override
 	protected void beforeSave(Blacklist entity) {
 		super.beforeSave(entity);
@@ -180,10 +195,6 @@ public class BlacklistAction extends FileEntityAction<Long, Blacklist> {
 		Blacklist e = this.getE();
 		if (e.getUnlocker() != null && e.getUnlocker().getId() == null) {
 			e.setUnlocker(null);
-		}
-		// 司机可以为空
-		if (e.getDriver() != null && e.getDriver().getId() == null) {
-			e.setDriver(null);
 		}
 
 		// 设置最后更新人的信息
@@ -197,12 +208,36 @@ public class BlacklistAction extends FileEntityAction<Long, Blacklist> {
 			this.getE().setUnlockDate(Calendar.getInstance());
 		}
 
+		// 司机与黑名单的关系
+		blacklistDriverIds = this.getDriversId(this.getE().getDrivers());
+
+		Set<CarMan> carMans = null;
+		if (this.blacklistDriverIds != null
+				&& this.blacklistDriverIds.length() > 0) {
+			carMans = new HashSet<CarMan>();
+			String[] driverIds = this.blacklistDriverIds.split(",");
+			CarMan carMan;
+			for (String driverId : driverIds) {
+				carMan = new CarMan();
+				carMan.setId(new Long(driverId));
+				carMans.add(carMan);
+			}
+		}
+		if (this.getE().getCarMan() != null) {
+			this.getE().getCarMan().clear();
+			this.getE().getCarMan().addAll(carMans);
+		} else {
+			this.getE().setCarMan(carMans);
+		}
+
 	}
 
 	@Override
 	protected void afterEdit(Blacklist entity) {
 		super.afterEdit(entity);
 
+		// 组装司机
+		this.driversInfoList = this.formatDrivers(this.getE().getDrivers());
 		// 编辑时设置解锁人为登录用户
 		SystemContext context = this.getSystyemContext();
 		if (this.getE().getStatus() == Blacklist.STATUS_LOCK) {
@@ -307,6 +342,54 @@ public class BlacklistAction extends FileEntityAction<Long, Blacklist> {
 		statuses.put("", getText("bs.status.all"));
 
 		return statuses;
+	}
+
+	/**
+	 * 组装司机姓名
+	 * 
+	 * @param drivers
+	 * @return
+	 */
+	public List<Map<String, String>> formatDrivers(String driversStr) {
+		String name = "";
+		String classes = "";
+		String id = "";
+		List<Map<String, String>> driversInfo = new ArrayList<Map<String, String>>();
+		Map<String, String> driver;
+		if (null != driversStr && driversStr.trim().length() > 0) {
+			String[] driverAry = driversStr.split(";");
+			for (int i = 0; i < driverAry.length; i++) {
+				driver = new HashMap<String, String>();
+				name = driverAry[i].split(",")[0];
+				classes = driverAry[i].split(",")[1];
+				id = driverAry[i].split(",")[2];
+				driver.put("id", id);
+				driver.put("name", name);
+				driver.put("classes", classes);
+				driversInfo.add(driver);
+			}
+
+		}
+		return driversInfo;
+	}
+
+	/**
+	 * 获取司机的ID
+	 * 
+	 * @param drivers
+	 * @return
+	 */
+	public String getDriversId(String driversStr) {
+		String driversId = "";
+		if (null != driversStr && driversStr.trim().length() > 0) {
+			String[] driverAry = driversStr.split(";");
+			for (int i = 0; i < driverAry.length; i++) {
+				driversId += driverAry[i].split(",")[2];
+				if ((i + 1) < driverAry.length)
+					driversId += ",";
+			}
+		}
+		return driversId;
 	}
 
 }

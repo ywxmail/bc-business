@@ -73,4 +73,13 @@ public interface CarManDao extends CrudDao<CarMan> {
 	 *            电话2
 	 */
 	void updatePhoneBycarManId(Long carManId, String phone1, String phone2);
+
+	/**
+	 * 获取司机的信息
+	 * 
+	 * @param carManId
+	 *            司机id
+	 * @return
+	 */
+	String getCarManInfoByCarManId(Long carManId);
 }

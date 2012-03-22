@@ -211,4 +211,40 @@ public class CarManDaoImpl extends HibernateCrudJpaDao<CarMan> implements
 		this.executeUpdate(hql, new Object[] { phone1, phone2, carManId });
 
 	}
+
+	public String getCarManInfoByCarManId(final Long carManId) {
+
+		final StringBuffer sql = new StringBuffer();
+		sql.append("select getDriverInfoBydriverId(id) from bs_carman where id = ?");
+
+		if (logger.isDebugEnabled()) {
+			logger.debug("driverId=" + carManId + ";sql=" + sql);
+		}
+		// JpaCallback 返回函数的类型
+		return this.jpaTemplate.execute(new JpaCallback<String>() {
+			// JpaCallback接口的方法
+			public String doInJpa(EntityManager em) throws PersistenceException {
+				Query queryObject = em.createNativeQuery(sql.toString());
+				// 设置问号所对应的参数
+				queryObject.setParameter(1, carManId);
+				// 设置从第几个开始查
+				queryObject.setFirstResult(0);
+				// 设置查几多个[如果想查所有,则不设]
+				queryObject.setMaxResults(1);
+				String carManInfo;
+				try {
+					carManInfo = (String) queryObject.getSingleResult();
+				} catch (NoResultException e) {
+					if (logger.isDebugEnabled())
+						logger.debug("carManInfo = null,id=" + carManId);
+					return null;
+				}
+				if (carManInfo != null) {
+					return carManInfo;
+				}
+				return null;
+			}
+		});
+
+	}
 }

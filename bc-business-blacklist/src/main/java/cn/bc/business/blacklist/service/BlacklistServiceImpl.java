@@ -12,8 +12,8 @@ import cn.bc.core.service.DefaultCrudService;
  * 
  * @author dragon
  */
-public class BlacklistServiceImpl extends DefaultCrudService<Blacklist> implements
-		BlacklistService {
+public class BlacklistServiceImpl extends DefaultCrudService<Blacklist>
+		implements BlacklistService {
 	private BlacklistDao blacklistDao;
 
 	public BlacklistDao getBlacklistDao() {
@@ -24,4 +24,5 @@ public class BlacklistServiceImpl extends DefaultCrudService<Blacklist> implemen
 		this.blacklistDao = blacklistDao;
 		this.setCrudDao(blacklistDao);
 	}
+
 }

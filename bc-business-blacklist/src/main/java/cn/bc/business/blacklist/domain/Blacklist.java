@@ -4,6 +4,7 @@
 package cn.bc.business.blacklist.domain;
 
 import java.util.Calendar;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -11,6 +12,8 @@ import javax.persistence.FetchType;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
@@ -31,8 +34,8 @@ import cn.bc.identity.domain.FileEntityImpl;
 public class Blacklist extends FileEntityImpl {
 	private static final long serialVersionUID = 1L;
 	public static final String KEY_CODE = "blacklist.code";
-//	/** 状态：新建 */
-//	public static final int STATUS_CREATE = 2;
+	// /** 状态：新建 */
+	// public static final int STATUS_CREATE = 2;
 	/** 状态：锁定 */
 	public static final int STATUS_LOCK = 0;
 	/** 状态：解锁 */
@@ -54,7 +57,16 @@ public class Blacklist extends FileEntityImpl {
 	private String company;// 车属公司：如宝城、广发
 	private Motorcade motorcade;// 车队
 	private Car car;// 车辆
-	private CarMan driver;// 司机
+	private String drivers;// 司机信息
+	private Set<CarMan> carMan;// 司机列表
+
+	public String getDrivers() {
+		return drivers;
+	}
+
+	public void setDrivers(String drivers) {
+		this.drivers = drivers;
+	}
 
 	@Column(name = "STATUS_")
 	public int getStatus() {
@@ -183,13 +195,14 @@ public class Blacklist extends FileEntityImpl {
 		this.car = car;
 	}
 
-	@ManyToOne(fetch = FetchType.EAGER, optional = true)
-	@JoinColumn(name = "DRIVER_ID", referencedColumnName = "ID")
-	public CarMan getDriver() {
-		return driver;
+	@ManyToMany(fetch = FetchType.EAGER)
+	@JoinTable(name = "BS_CARMAN_BLACKLIST", joinColumns = @JoinColumn(name = "BLACKLIST_ID", referencedColumnName = "ID"), inverseJoinColumns = @JoinColumn(name = "MAN_ID", referencedColumnName = "ID"))
+	public Set<CarMan> getCarMan() {
+		return carMan;
 	}
 
-	public void setDriver(CarMan driver) {
-		this.driver = driver;
+	public void setCarMan(Set<CarMan> carMan) {
+		this.carMan = carMan;
 	}
+
 }
