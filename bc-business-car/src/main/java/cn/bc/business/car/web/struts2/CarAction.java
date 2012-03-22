@@ -3,7 +3,10 @@
  */
 package cn.bc.business.car.web.struts2;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -67,8 +70,8 @@ public class CarAction extends FileEntityAction<Long, Car> {
 	public List<Map<String, String>> companyList; // 所属公司列表（宝城、广发）
 	public List<Map<String, String>> logoutReasonList; // 注销原因列表
 	public List<Map<String, String>> carModelList; // 车型配置列表
-	//public List<Map<String, String>> carLPGList; // LPG配置列表
-	
+	// public List<Map<String, String>> carLPGList; // LPG配置列表
+
 	public Map<String, String> statusesValue;
 	public JSONArray vinPrefixes;// 车辆车架号前缀
 	public JSONArray taximeterTypes; // 计价器型号
@@ -128,8 +131,9 @@ public class CarAction extends FileEntityAction<Long, Car> {
 			if (editable) {// 编辑状态显示保存按钮
 				pageOption.addButton(new ButtonOption(getText("label.save"),
 						null, "bc.carForm.save"));
-				pageOption.addButton(new ButtonOption(getText("label.saveAndClose"),
-						null, "bc.carForm.saveAndClose"));
+				pageOption.addButton(new ButtonOption(
+						getText("label.saveAndClose"), null,
+						"bc.carForm.saveAndClose"));
 
 			}
 		}
@@ -176,6 +180,13 @@ public class CarAction extends FileEntityAction<Long, Car> {
 		if (entity.isLogout()) {
 			entity.setStatus(Car.CAR_STAUTS_LOGOUT);
 			entity.setScrapDate(entity.getReturnDate());
+			// 车辆注销后在自编号后附加交车日期,如:xxxxxx_20001010
+			if (entity.getReturnDate() != null
+					&& entity.getCode().indexOf("_") < 0) {
+				Date date = entity.getReturnDate().getTime();
+				DateFormat df = new SimpleDateFormat("yyyyMMdd");
+				entity.setCode(entity.getCode() + "_" + df.format(date));
+			}
 		} else {
 			entity.setStatus(Car.CAR_STAUTS_NORMAL);
 		}
@@ -196,8 +207,8 @@ public class CarAction extends FileEntityAction<Long, Car> {
 			json.put("msg", getText("car.error.plateIsExists2"));
 			return "json";
 		} else {
-			// 合并车架号的前缀和后缀
-			this.getE().setVin(this.vinPrefix + this.vinSuffix);
+			// // 合并车架号的前缀和后缀
+			// this.getE().setVin(this.vinPrefix + this.vinSuffix);
 
 			// 执行基类的保存
 			super.save();
@@ -225,10 +236,12 @@ public class CarAction extends FileEntityAction<Long, Car> {
 
 		// 加载可选车型配置列表
 		this.carModelList = this.carModelService.findEnabled4Option();
-		OptionItem.insertIfNotExist(carModelList, null, getE().getFactoryModel());
-		
+		OptionItem.insertIfNotExist(carModelList, null, getE()
+				.getFactoryModel());
+
 		// 加载可选LPG配置列表
-		this.carLPGList =OptionItem.toLabelValues(this.carLPGService.findEnabled4Option());
+		this.carLPGList = OptionItem.toLabelValues(this.carLPGService
+				.findEnabled4Option());
 
 		// 批量加载可选项列表
 		Map<String, List<Map<String, String>>> optionItems = this.optionService
@@ -290,19 +303,19 @@ public class CarAction extends FileEntityAction<Long, Car> {
 				this.vinSuffix = vin.substring(11);
 			}
 		}
-		
-		//加载车载电视
-		this.carTvScreenList=OptionItem.toLabelValues(this.getCarTvScreen());
+
+		// 加载车载电视
+		this.carTvScreenList = OptionItem.toLabelValues(this.getCarTvScreen());
 	}
-	
-	//车载电视屏参数
-	protected List<Map<String,String>> getCarTvScreen(){
-		List<Map<String,String>> tvList=new ArrayList<Map<String,String>>();
-		Map<String,String> tvMap=new HashMap<String, String>();
+
+	// 车载电视屏参数
+	protected List<Map<String, String>> getCarTvScreen() {
+		List<Map<String, String>> tvList = new ArrayList<Map<String, String>>();
+		Map<String, String> tvMap = new HashMap<String, String>();
 		tvMap.put("key", "0");
 		tvMap.put("value", "触动传媒Q屏");
 		tvList.add(tvMap);
-		tvMap=new HashMap<String, String>();
+		tvMap = new HashMap<String, String>();
 		tvMap.put("key", "1");
 		tvMap.put("value", "城市电视");
 		tvList.add(tvMap);
@@ -362,13 +375,12 @@ public class CarAction extends FileEntityAction<Long, Car> {
 		json.put("accessCount", obj.getAccessCount()); // 载客人数
 		return "json";
 	}
-	
 
 	// ======== 通过factoryModel查找车型配置的相关信息结束 ========
-	
+
 	// ======== 通过lpgName查找车型配置的相关信息开始 ========
 	private String lpgName;
-	
+
 	public String getLpgName() {
 		return lpgName;
 	}
@@ -377,9 +389,9 @@ public class CarAction extends FileEntityAction<Long, Car> {
 		this.lpgName = lpgName;
 	}
 
-	public String carLPGInfo(){
+	public String carLPGInfo() {
 		json = new Json();
-		CarLPG obj=this.carLPGService.findcarLPGByLPGModel(lpgName);
+		CarLPG obj = this.carLPGService.findcarLPGByLPGModel(lpgName);
 		json.put("lpgModel", obj.getModel());
 		json.put("lpgGpModel", obj.getGpmodel());
 		json.put("lpgJcfModel", obj.getJcfmodel());
@@ -387,6 +399,7 @@ public class CarAction extends FileEntityAction<Long, Car> {
 		json.put("lpgPsqModel", obj.getPsqmodel());
 		return "json";
 	}
+
 	// ======== 通过lpgName查找车型配置的相关信息开始 ========
 
 	// ======== 通过自编号生成原车号开始 ========

@@ -9,7 +9,7 @@ DECLARE
 	--定义变量
 	driverInfo varchar(4000);
 BEGIN
-	select string_agg(concat(name,',',(case when classes=1 then '正班' when classes=2 then '副班' when classes=3 then '顶班' when classes=4 then '主挂' else '无' end),',',id),';')
+	select string_agg(concat(name,',',(case when classes=1 then '正班' when classes=2 then '副班' when classes=3 then '主挂' when classes=4 then '顶班' else '无' end),',',id),';')
 		into driverInfo
 		from (select m.id as id,m.name as name,cm.classes as classes 
 			from BS_CAR_DRIVER cm
@@ -214,7 +214,7 @@ DECLARE
 BEGIN
 	select  c.car_id
 		into mainCarId
-		from BS_CAR_DRIVER c where c.status_=0 and (c.classes=1 or c.classes=2 or c.classes=4) and driver_id=did;
+		from BS_CAR_DRIVER c where c.status_=0 and (c.classes=1 or c.classes=2 or c.classes=3) and driver_id=did;
 	return mainCarId;
 END;
 $$ LANGUAGE plpgsql;

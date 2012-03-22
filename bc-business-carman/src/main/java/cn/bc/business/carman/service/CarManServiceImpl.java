@@ -8,8 +8,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import cn.bc.BCConstants;
+import cn.bc.business.carman.dao.CarByDriverHistoryDao;
 import cn.bc.business.carman.dao.CarManDao;
+import cn.bc.business.carman.domain.CarByDriverHistory;
 import cn.bc.business.carman.domain.CarMan;
 import cn.bc.business.cert.domain.Cert;
 import cn.bc.core.service.DefaultCrudService;
@@ -22,6 +26,13 @@ import cn.bc.core.service.DefaultCrudService;
 public class CarManServiceImpl extends DefaultCrudService<CarMan> implements
 		CarManService {
 	private CarManDao carManDao;
+	public CarByDriverHistoryDao carByDriverHistoryDao;
+
+	@Autowired
+	public void setCarByDriverHistoryDao(
+			CarByDriverHistoryDao carByDriverHistoryDao) {
+		this.carByDriverHistoryDao = carByDriverHistoryDao;
+	}
 
 	public CarManDao getCarManDao() {
 		return carManDao;
@@ -71,5 +82,38 @@ public class CarManServiceImpl extends DefaultCrudService<CarMan> implements
 
 	public Long checkCert4FWZGIsExists(Long excludeId, String cert4FWZG) {
 		return this.carManDao.checkCert4FWZGIsExists(excludeId, cert4FWZG);
+	}
+
+	public void setShiftworkInfo(CarMan entity) {
+		if (!entity.isNew()) {
+			CarByDriverHistory h = this.carByDriverHistoryDao
+					.findNewestCar(entity.getId());
+			if (h != null) {
+				if (h.getToCar() != null) {
+					entity.setMainCarId(h.getToCar().getId());
+				} else {
+					entity.setMainCarId(null);
+				}
+				String carInfo = this.carManDao.getNewestCarInfo4Driver(entity
+						.getId());
+				entity.setCarInFo(carInfo);
+				entity.setClasses(h.getToClasses());
+				entity.setMoveDate(h.getMoveDate());
+				entity.setMoveType(h.getMoveType());
+				entity.setShiftworkEndDate(h.getEndDate());
+				if (h.getMoveType() == CarByDriverHistory.MOVETYPE_GSDGSYZX
+						|| h.getMoveType() == CarByDriverHistory.MOVETYPE_JHWZX
+						|| h.getMoveType() == CarByDriverHistory.MOVETYPE_ZXWYQX) {
+					entity.setStatus(BCConstants.STATUS_DISABLED);
+				} else {
+					entity.setStatus(BCConstants.STATUS_ENABLED);
+				}
+			}
+		}
+	}
+
+	public void updatePhone(Long carManId, String phone1, String phone2) {
+		this.carManDao.updatePhoneBycarManId(carManId, phone1, phone2);
+
 	}
 }

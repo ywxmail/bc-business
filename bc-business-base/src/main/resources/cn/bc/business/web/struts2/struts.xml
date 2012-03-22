@@ -27,4 +27,24 @@
 		<!-- 通过司机id或名字查询相关信息 -->
 		<action name="findInfoByDriver" class="findInfoByDriverAction"/>
 	</package>
+
+	<!-- 车辆查询司机图片下载 -->
+	<package name="driverImageAction" extends="imageAction" namespace="/bc-business/cacheImage">
+		<action name="download" class="imageAction" method="download">
+			<interceptor-ref name="noCacheStack">
+				<!-- 缓存时间配置，正数单位为分钟，负数单位为月，为0代表禁用缓存 -->
+				<param name="noCacheInterceptor.expires">2880</param>
+			</interceptor-ref>
+			<result name="success" type="stream">
+				<!-- 下载文件类型定义 -->
+				<param name="contentType">${contentType}</param>
+				<param name="contentLength">${contentLength}</param>
+				<!-- 下载文件输出流定义 -->
+				<param name="inputName">inputStream</param>
+				<param name="bufferSize">4096</param>
+				<!-- 下载文件处理方法 -->
+				<param name="contentDisposition">inline</param>
+			</result>
+		</action>
+	</package>
 </struts>

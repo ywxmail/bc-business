@@ -6,6 +6,8 @@ package cn.bc.business.carman.web.struts2;
 import java.util.List;
 import java.util.Map;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
@@ -21,6 +23,7 @@ import cn.bc.business.carman.service.CarManService;
 import cn.bc.business.web.struts2.FileEntityAction;
 import cn.bc.identity.domain.ActorDetail;
 import cn.bc.identity.web.SystemContext;
+import cn.bc.option.domain.OptionItem;
 import cn.bc.option.service.OptionService;
 import cn.bc.placeorigin.domain.PlaceOrigin;
 import cn.bc.placeorigin.service.PlaceOriginService;
@@ -46,7 +49,7 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 	public List<Map<String, String>> carManHouseTypeList;// 司机责任人户口性质列表
 	public List<Map<String, String>> carManLevelList;// 司机责任人等级列表
 	public List<Map<String, String>> carManModelList;// 司机责任人准驾车型列表
-
+	public JSONArray companyNames; // 公司名称列表
 
 	@Autowired
 	public void setOptionService(OptionService optionService) {
@@ -88,6 +91,13 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 		this.getE().setGz(true);
 	}
 
+	protected void beforeSave(CarMan entity) {
+		super.beforeSave(entity);
+		// 获取迁移记录的信息，保存相应的沉余字段
+		this.carManService.setShiftworkInfo(entity);
+
+	}
+
 	@Override
 	protected void initForm(boolean editable) throws Exception {
 		super.initForm(editable);
@@ -100,7 +110,11 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 				.findOptionItemByGroupKeys(new String[] {
 						OptionConstants.CARMAN_HOUSETYPE,
 						OptionConstants.CARMAN_LEVEL,
-						OptionConstants.CARMAN_MODEL, });
+						OptionConstants.CARMAN_MODEL,
+						OptionConstants.COMPANY_NAME });
+		// 公司名称列表
+		this.companyNames = OptionItem.toLabelValues(optionItems
+				.get(OptionConstants.COMPANY_NAME));
 
 		// 司机责任人户口性质列表
 		this.carManHouseTypeList = optionItems
@@ -124,8 +138,9 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 		if (editable && !readonly) {
 			pageOption.addButton(new ButtonOption(getText("label.save"), null,
 					"bc.carManForm.save"));
-			pageOption.addButton(new ButtonOption(getText("label.saveAndClose"),
-					null, "bc.carManForm.saveAndClose"));
+			pageOption.addButton(new ButtonOption(
+					getText("label.saveAndClose"), null,
+					"bc.carManForm.saveAndClose"));
 
 		}
 	}
@@ -157,11 +172,12 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 		this.json = json.toString();
 		return "json";
 	}
+
 	// ========服务资格证唯一性检测代码结束========
-	
+
 	// ========根据身份证号码匹配出司机的籍贯、生日和区域开始========
 	private String identityId;
-	
+
 	public String getIdentityId() {
 		return identityId;
 	}
@@ -171,62 +187,110 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 	}
 
 	private PlaceOriginService placeOriginServie;
-	
+
 	@Autowired
 	public void setPlaceOriginServie(PlaceOriginService placeOriginServie) {
 		this.placeOriginServie = placeOriginServie;
 	}
 
-	public String autoLoadCarManIdentityInfo(){
-		Json json=new Json();
-		//根据编码找出籍贯
-		List<PlaceOrigin> pList=null;
-		String code= this.identityId.substring(0, 6);
-		//先按身份证前6位查找
-		pList=this.placeOriginServie.findPlaceOrigin(code);
-		if(pList==null||pList.size()==0){
-			//若前6位找不到然后按前4位
-			code=this.identityId.substring(0,4);
-			pList=this.placeOriginServie.findPlaceOrigin(code+"00");
-			if(pList==null||pList.size()==0){
-				code=this.identityId.substring(0,2);
-				pList=this.placeOriginServie.findPlaceOrigin(code+"0000");
+	public String autoLoadCarManIdentityInfo() {
+		Json json = new Json();
+		// 根据编码找出籍贯
+		List<PlaceOrigin> pList = null;
+		String code = this.identityId.substring(0, 6);
+		// 先按身份证前6位查找
+		pList = this.placeOriginServie.findPlaceOrigin(code);
+		if (pList == null || pList.size() == 0) {
+			// 若前6位找不到然后按前4位
+			code = this.identityId.substring(0, 4);
+			pList = this.placeOriginServie.findPlaceOrigin(code + "00");
+			if (pList == null || pList.size() == 0) {
+				code = this.identityId.substring(0, 2);
+				pList = this.placeOriginServie.findPlaceOrigin(code + "0000");
 			}
 		}
-		
-		if(pList!=null&&pList.size()>0){
-			//取集合中第一的对象
-		    PlaceOrigin po=pList.get(0);
-		    String fullname=po.getFullname();
-		    json.put("origin", fullname);
-		    //根据全名判断区域
-		    String[] isFlag=fullname.split("广东省广州市");
-		    if(isFlag.length>=2){
-		    	//本市
-		    	json.put("area", "1");
-		    }else{
-		    	isFlag=fullname.split("广东省");
-		    	if(isFlag.length>=2){
-		    		//本省
-			    	json.put("area", "2");
-			    }else{
-			    	//外省
-			    	json.put("area", "3");
-			    }
-		    }
-		    
+
+		if (pList != null && pList.size() > 0) {
+			// 取集合中第一的对象
+			PlaceOrigin po = pList.get(0);
+			String fullname = po.getFullname();
+			json.put("origin", fullname);
+			// 根据全名判断区域
+			String[] isFlag = fullname.split("广东省广州市");
+			if (isFlag.length >= 2) {
+				// 本市
+				json.put("area", "1");
+			} else {
+				isFlag = fullname.split("广东省");
+				if (isFlag.length >= 2) {
+					// 本省
+					json.put("area", "2");
+				} else {
+					// 外省
+					json.put("area", "3");
+				}
+			}
+
 		}
-		//生成出生日期
-		String birthday="";
-		birthday+=this.identityId.substring(6, 10);
-		birthday+="-";
-		birthday+=this.identityId.substring(10, 12);
-		birthday+="-";
-		birthday+=this.identityId.substring(12, 14);
+		// 生成出生日期
+		String birthday = "";
+		birthday += this.identityId.substring(6, 10);
+		birthday += "-";
+		birthday += this.identityId.substring(10, 12);
+		birthday += "-";
+		birthday += this.identityId.substring(12, 14);
 		json.put("birthday", birthday);
-		this.json=json.toString();
+		this.json = json.toString();
 		return "json";
 	}
+
 	// ========根据身份证号码匹配出司机的籍贯、生日和区域结束========
-	
+
+	public String phone1;// 电话1
+	public String phone2;// 电话2
+	public Long carManId;// 司机ID
+	public String error;// 错误信息
+
+	/**
+	 * 车辆查询中 更新司机、责任人的联系电话信息的页面
+	 * 
+	 * @return
+	 * @throws Exception
+	 */
+	public String updatePhonePage() throws Exception {
+		// 判断权限:司机管理 或 更新司机联系电话
+		if (!((SystemContext) this.getContext()).hasAnyRole("BS_DRIVER",
+				"BS_DRIVER_UPDATE_PHONE", getText("key.role.bc.admin"))) {
+			error = "你没有更新联系电话的权限";
+			return ERROR;
+		} else {
+			return SUCCESS;
+		}
+	}
+
+	/**
+	 * 更新司机、责任人的联系电话信息
+	 * 
+	 * @return
+	 * @throws Exception
+	 */
+	public String updatePhone() throws Exception {
+		JSONObject json = new JSONObject();
+
+		// 判断权限:司机管理 或 更新司机联系电话
+		if (((SystemContext) this.getContext()).hasAnyRole("BS_DRIVER",
+				"BS_DRIVER_UPDATE_PHONE", getText("key.role.bc.admin"))) {
+			// TODO: 更新联系电话并记录操作日志
+			this.carManService.updatePhone(carManId, phone1, phone2);
+			json.put("success", true);
+			json.put("msg", "成功更新联系电话信息");
+		} else {
+			json.put("success", false);
+			json.put("msg", "你没有更新联系电话的权限");
+		}
+
+		this.json = json.toString();
+		return "json";
+	}
+
 }

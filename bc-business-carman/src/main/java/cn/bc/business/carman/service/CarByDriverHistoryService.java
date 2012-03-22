@@ -24,7 +24,7 @@ public interface CarByDriverHistoryService extends
 	void upDateCarByDriver(Long carMan);
 
 	/**
-	 * 查找司机最新营运记录
+	 * 查找司机最新迁移记录
 	 * 
 	 * @param carManId
 	 *            司机ID
@@ -39,6 +39,18 @@ public interface CarByDriverHistoryService extends
 	 *            车辆Id
 	 */
 	void upDateDriver4Car(Long carId);
-	
-	void saveShiftwork(CarByDriverHistory entity,Long[] carIds);
+
+	void saveShiftwork(CarByDriverHistory entity, Long[] carIds);
+
+	/**
+	 * 根据车辆Id和迁移类型获取最新的迁移记录
+	 * 
+	 * @param carId
+	 *            车辆ID
+	 * @param movetypeZcd
+	 *            迁移类型
+	 * @return
+	 */
+	CarByDriverHistory getNeWsetCarByDriverHistory4CarAndMoveType(Long carId,
+			int movetypeZcd);
 }

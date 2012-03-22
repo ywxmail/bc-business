@@ -25,7 +25,7 @@ public interface CarByDriverHistoryDao extends CrudDao<CarByDriverHistory> {
 	void upDateCar4Driver(Long carManId);
 
 	/**
-	 * 查找司机最新营运记录
+	 * 查找司机最新迁移记录
 	 * 
 	 * @param carManId
 	 *            司机
@@ -82,5 +82,17 @@ public interface CarByDriverHistoryDao extends CrudDao<CarByDriverHistory> {
 	 *            产生该营运记录的迁移记录Id
 	 */
 	void updateCarByDriverStatus(Long driverId, Long pid);
+
+	/**
+	 * 根据车辆Id和迁移类型获取最新的迁移记录
+	 * 
+	 * @param carId
+	 *            车辆Id
+	 * @param movety
+	 *            迁移类型
+	 * @return
+	 */
+	CarByDriverHistory findNeWsetCarByDriverHistory4CarAndMoveType(Long carId,
+			int movety);
 
 }

@@ -4,6 +4,7 @@
 package cn.bc.business.carman.web.struts2;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Controller;
 import cn.bc.business.OptionConstants;
 import cn.bc.business.car.domain.Car;
 import cn.bc.business.car.service.CarService;
+import cn.bc.business.carman.domain.CarByDriver;
 import cn.bc.business.carman.domain.CarByDriverHistory;
 import cn.bc.business.carman.service.CarByDriverHistoryService;
 import cn.bc.business.carman.service.CarByDriverService;
@@ -43,6 +45,7 @@ public class CarByDriverHistoryAction extends
 	private static final long serialVersionUID = 1L;
 	public CarByDriverHistoryService carByDriverHistoryService;
 	public String portrait;
+	public Map<String, String> classes;
 	public Map<String, String> statusesValueList;// 状态列表
 	public Map<String, String> moveTypeValueList;// 迁移类型列表
 	public List<Map<String, String>> motorcadeList; // 可选车队列表
@@ -54,7 +57,6 @@ public class CarByDriverHistoryAction extends
 	private OptionService optionService;
 	public Long carManId;
 	public Long carId;
-	public Long toCarId;
 	public Long fromCarId;
 	public int moveType;
 	private MotorcadeService motorcadeService;
@@ -119,10 +121,10 @@ public class CarByDriverHistoryAction extends
 			this.getE().setDriver(this.carManService.load(carManId));
 
 		}
-		if (toCarId != null || fromCarId != null) {
+		if (carId != null || fromCarId != null) {
 			// 如果车辆Id不为空，直接转到转车队页面
-			if (toCarId != null) {
-				Car fromCar = this.carService.load(toCarId);
+			if (carId != null) {
+				Car fromCar = this.carService.load(carId);
 				this.getE().setFromCar(fromCar);
 				this.getE().setFromMotorcadeId(fromCar.getMotorcade().getId());
 				this.getE().setFromUnit(fromCar.getCompany());
@@ -299,6 +301,14 @@ public class CarByDriverHistoryAction extends
 		if (this.getE().getFromMotorcadeId() != null) {
 			getOldMotorcade(this.getE().getFromMotorcadeId());
 		}
+		// 加载驾驶状态
+		classes = this.getDriverClasses();
+		String fromClass = String.valueOf(this.getE().getFromClasses());
+		String toClass = String.valueOf(this.getE().getToClasses());
+		this.insertIfNotExist(classes, fromClass);
+		if (!this.getE().isNew()) {
+			this.insertIfNotExist(classes, toClass);
+		}
 
 		// 批量加载可选项列表
 		Map<String, List<Map<String, String>>> optionItems = this.optionService
@@ -355,6 +365,33 @@ public class CarByDriverHistoryAction extends
 
 	}
 
+	private void insertIfNotExist(Map<String, String> classes, String clazz) {
+		boolean exist = false;
+		for (Map.Entry<String, String> e : classes.entrySet()) {
+			if (e.getKey().equals(clazz)) {
+				exist = true;
+				break;
+			}
+		}
+		if (!exist) {
+			classes.put(clazz, getClassesDesc(Integer.parseInt(clazz)));
+		}
+	}
+
+	private String getClassesDesc(int clazz) {
+		if (clazz == CarByDriver.TYPE_ZHENGBAN)
+			return getText("carByDriver.classes.zhengban");
+		else if (clazz == CarByDriver.TYPE_FUBAN)
+			return getText("carByDriver.classes.fuban");
+		else if (clazz == CarByDriver.TYPE_DINGBAN)
+			return getText("carByDriver.classes.dingban");
+		else if (clazz == CarByDriver.TYPE_ZHUGUA)
+			return getText("carByDriver.classes.zhugua");
+		else if (clazz == CarByDriver.TYPE_WEIDINGYI)
+			return getText("carByDriver.classes.weidingyi");
+		return "";
+	}
+
 	/**
 	 * 获取旧车队名
 	 */
@@ -364,27 +401,36 @@ public class CarByDriverHistoryAction extends
 				m.getName());
 	}
 
+	// 驾驶状态
+	private Map<String, String> getDriverClasses() {
+		Map<String, String> type = new LinkedHashMap<String, String>();
+		type.put(String.valueOf(CarByDriver.TYPE_ZHENGBAN),
+				getText("carByDriver.classes.zhengban"));
+		type.put(String.valueOf(CarByDriver.TYPE_FUBAN),
+				getText("carByDriver.classes.fuban"));
+		return type;
+	}
+
 	@Override
 	protected PageOption buildFormPageOption(boolean editable) {
 		// 设置批量处理顶班车辆的表单
 		if (this.getE().getMoveType() == CarByDriverHistory.MOVETYPE_DINGBAN) {
-			return super.buildFormPageOption(editable).setWidth(430)
-					.setMinWidth(320).setHeight(470).setMinHeight(200)
-					.setModal(true);
-			// 设置迁移类型为交回未注销的表单高度
-		} else if (this.getE().getMoveType() == CarByDriverHistory.MOVETYPE_JHWZX) {
-			return super.buildFormPageOption(editable).setWidth(745)
-					.setMinWidth(320).setHeight(310).setMinHeight(200)
-					.setModal(true);
-			// 设置迁移类型为注销未有去向的表单高度
-		} else if (this.getE().getMoveType() == CarByDriverHistory.MOVETYPE_ZXWYQX) {
-			return super.buildFormPageOption(editable).setWidth(745)
-					.setMinWidth(320).setHeight(340).setMinHeight(200)
-					.setModal(true);
+			if (this.getE().isNew()) {
+				return super.buildFormPageOption(editable).setWidth(430)
+						.setMinWidth(320).setMinHeight(200).setModal(true);
+			} else {
+				return super.buildFormPageOption(editable).setWidth(430)
+						.setMinWidth(320).setMinHeight(200).setModal(false);
+			}
+
 		} else {
-			return super.buildFormPageOption(editable).setWidth(745)
-					.setMinWidth(320).setHeight(380).setMinHeight(200)
-					.setModal(true);
+			if (this.getE().isNew()) {
+				return super.buildFormPageOption(editable).setWidth(745)
+						.setMinWidth(320).setMinHeight(200).setModal(true);
+			} else {
+				return super.buildFormPageOption(editable).setWidth(745)
+						.setMinWidth(320).setMinHeight(200).setModal(false);
+			}
 		}
 
 	}

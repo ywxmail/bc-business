@@ -36,6 +36,7 @@ import cn.bc.db.jdbc.RowMapper;
 import cn.bc.db.jdbc.SqlObject;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.identity.web.formater.SexFormater;
+import cn.bc.web.formater.BooleanFormater;
 import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.formater.DateRangeFormater;
 import cn.bc.web.formater.EntityStatusFormater;
@@ -85,7 +86,7 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 		sql.append(",m.cert_cyzg,m.work_date,m.origin,m.former_unit,m.charger,m.cert_driving_first_date");
 		sql.append(",m.cert_driving,m.cert_driving_start_date,m.cert_driving_end_date,m.file_date,m.phone,m.phone1,m.sex,m.birthdate");
 		sql.append(",m.carinfo,m.move_type,mo.name motorcade,bia.name unit_name,m.classes,m.move_date,m.shiftwork_end_date,m.main_car_id");
-		sql.append(",c.company company,c.code");
+		sql.append(",c.company company,c.code,m.gz,m.model_");
 		sql.append(" from BS_CARMAN m");
 		sql.append(" left join bs_car c on m.main_car_id=c.id");
 		sql.append(" left join bs_motorcade mo on c.motorcade_id=mo.id");
@@ -133,6 +134,9 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 				map.put("mainCarId", rs[i++]);
 				map.put("company", rs[i++]);
 				map.put("carCode", rs[i++]);
+				// ===========================
+				map.put("gz", rs[i++]);
+				map.put("model_", rs[i++]);
 
 				return map;
 			}
@@ -233,7 +237,10 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 						return (Date) contract.get("cert_driving_end_date");
 					}
 				}));
-
+		columns.add(new TextColumn4MapKey("m.model_", "model_",
+				getText("carMan.model"), 60).setSortable(true));
+		columns.add(new TextColumn4MapKey("m.gz", "gz", getText("carMan.gz"),
+				80).setSortable(true).setValueFormater(new BooleanFormater()));
 		return columns;
 	}
 
@@ -348,6 +355,9 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 		return type;
 	}
 
+	/**特殊的营运班次(3，4都显示为顶班)
+	 * @return
+	 */
 	private Map<String, String> getDriverClasses() {
 		Map<String, String> type = new LinkedHashMap<String, String>();
 		type.put(String.valueOf(CarByDriver.TYPE_ZHENGBAN),

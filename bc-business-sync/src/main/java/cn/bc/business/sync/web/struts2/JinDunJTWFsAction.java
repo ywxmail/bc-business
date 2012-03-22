@@ -11,10 +11,14 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.json.JSONArray;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
+import cn.bc.business.motorcade.service.MotorcadeService;
 import cn.bc.core.query.condition.Condition;
 import cn.bc.core.query.condition.Direction;
 import cn.bc.core.query.condition.impl.AndCondition;
@@ -22,7 +26,10 @@ import cn.bc.core.query.condition.impl.EqualsCondition;
 import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.db.jdbc.RowMapper;
 import cn.bc.db.jdbc.SqlObject;
+import cn.bc.identity.domain.Actor;
+import cn.bc.identity.service.ActorService;
 import cn.bc.identity.web.SystemContext;
+import cn.bc.option.domain.OptionItem;
 import cn.bc.orm.hibernate.jpa.HibernateJpaNativeQuery;
 import cn.bc.sync.domain.SyncBase;
 import cn.bc.web.formater.AbstractFormater;
@@ -250,8 +257,7 @@ public class JinDunJTWFsAction extends SyncViewAction {
 				getText("title.click2changeSearchStatus")));
 
 		// 搜索按钮
-		tb.addButton(Toolbar
-				.getDefaultSearchToolbarButton(getText("title.click2search")));
+		tb.addButton(getDefaultSearchToolbarButton());
 
 		return tb;
 	}
@@ -307,4 +313,43 @@ public class JinDunJTWFsAction extends SyncViewAction {
 			return super.getSyncFailedMsg(newCount, strMsg);
 		}
 	}
+	
+	// ==高级搜索代码开始==
+	@Override
+	protected boolean useAdvanceSearch() {
+		return true;
+	}
+
+	private MotorcadeService motorcadeService;
+	private ActorService actorService;
+
+	@Autowired
+	public void setActorService(
+			@Qualifier("actorService") ActorService actorService) {
+		this.actorService = actorService;
+	}
+
+	@Autowired
+	public void setMotorcadeService(MotorcadeService motorcadeService) {
+		this.motorcadeService = motorcadeService;
+	}
+
+	public JSONArray motorcades;// 车队的下拉列表信息
+	public JSONArray units;// 分公司的下拉列表信息
+
+	@Override
+	protected void initConditionsFrom() throws Exception {
+		// 可选分公司列表
+		units = OptionItem.toLabelValues(this.actorService.find4option(
+				new Integer[] { Actor.TYPE_UNIT }, (Integer[]) null), "name",
+				"name");
+
+		// 可选车队列表
+		motorcades = OptionItem.toLabelValues(this.motorcadeService
+				.find4Option(null));
+
+	}
+
+	// ==高级搜索代码结束==
+
 }

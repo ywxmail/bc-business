@@ -82,8 +82,6 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 	private CarManService carManService;
 	private CarService carService;
 
-	
-	
 	public Long getCarId() {
 		return carId;
 	}
@@ -179,24 +177,24 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 	protected void buildFormPageButtons(PageOption pageOption, boolean editable) {
 		boolean readonly = this.isReadonly();
 		if (editable && !readonly) {
-			//新建时
-			if(getE().isNew()){
-				pageOption
-				.addButton(new ButtonOption(getText("label.save")
-						,null, "bc.caseAccidentForm.save").setId("caseAccidentSave"));
+			// 新建时
+			if (getE().isNew()) {
+				pageOption.addButton(new ButtonOption(getText("label.save"),
+						null, "bc.caseAccidentForm.save")
+						.setId("caseAccidentSave"));
 			}
-			//特殊处理结案按钮
-			//状态为在案时
-			if (Case4Accident.STATUS_ACTIVE == getE().getStatus()  &&!getE().isNew()
-					) {
+			// 特殊处理结案按钮
+			// 状态为在案时
+			if (Case4Accident.STATUS_ACTIVE == getE().getStatus()
+					&& !getE().isNew()) {
 				ButtonOption buttonOption = new ButtonOption(
 						getText("label.closefile"), null,
 						"bc.caseAccidentForm.closefile");
 				buttonOption.put("id", "bcSaveDlgButton");
 				pageOption.addButton(buttonOption);
-				pageOption
-				.addButton(new ButtonOption(getText("label.save")
-						,null, "bc.caseAccidentForm.save").setId("caseAccidentSave"));
+				pageOption.addButton(new ButtonOption(getText("label.save"),
+						null, "bc.caseAccidentForm.save")
+						.setId("caseAccidentSave"));
 			}
 		}
 	}
@@ -211,11 +209,10 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 			if (car.size() == 1) {
 				this.getE().setCarId(car.get(0).getId());
 				this.getE().setCarPlate(
-								car.get(0).getPlateType()
-								+ "."
+						car.get(0).getPlateType() + "."
 								+ car.get(0).getPlateNo());
 				this.getE().setMotorcadeId(car.get(0).getMotorcade().getId());
-				//公司
+				// 公司
 				this.getE().setCompany(car.get(0).getCompany());
 			} else if (car.size() > 1) {
 				isMoreCar = true;
@@ -226,7 +223,7 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 			this.getE().setDriverName(driver.getName());
 			this.getE().setDriverCert(driver.getCert4FWZG());
 			this.getE().setDriverArea(driver.getRegion());
-			this.getE().setDriverClasses(driver.getDrivingStatus());
+			this.getE().setDriverClasses(driver.getClasses());
 			this.getE().setOrigin(driver.getOrigin());
 			this.getE().setDriverType(driver.getType());
 		}
@@ -237,7 +234,7 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 					.setCarPlate(car.getPlateType() + "." + car.getPlateNo());
 			this.getE().setCarId(carId);
 			this.getE().setMotorcadeId(car.getMotorcade().getId());
-			//公司
+			// 公司
 			this.getE().setCompany(car.getCompany());
 			List<CarMan> carMan = this.carManService
 					.selectAllCarManByCarId(carId);
@@ -246,7 +243,7 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 				this.getE().setDriverId(carMan.get(0).getId());
 				this.getE().setDriverCert(carMan.get(0).getCert4FWZG());
 				this.getE().setDriverArea(carMan.get(0).getRegion());
-				this.getE().setDriverClasses(carMan.get(0).getDrivingStatus());
+				this.getE().setDriverClasses(carMan.get(0).getClasses());
 				this.getE().setOrigin(carMan.get(0).getOrigin());
 				this.getE().setDriverType(carMan.get(0).getType());
 			} else if (carMan.size() > 1) {
@@ -257,10 +254,11 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 		}
 		this.getE().setUid(
 				this.getIdGeneratorService().next(this.getE().ATTACH_TYPE));
-		//事故编号自动生成为流水号
-		this.getE().setCode(this.getIdGeneratorService()
-				.nextSN4Day(Case4Accident.KEY_CODE, "00"));
-		
+		// 事故编号自动生成为流水号
+		this.getE().setCode(
+				this.getIdGeneratorService().nextSN4Day(Case4Accident.KEY_CODE,
+						"00"));
+
 		// 初始化信息
 		this.getE().setType(CaseBase.TYPE_INFRACT_BUSINESS);
 		this.getE().setStatus(CaseBase.STATUS_ACTIVE);
@@ -272,10 +270,9 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 		attachsUI = buildAttachsUI(true);
 	}
 
-	
 	@Override
 	public String save() throws Exception {
-		String result="saveSuccess";
+		String result = "saveSuccess";
 		SystemContext context = this.getSystyemContext();
 		Case4Accident e = this.getE();
 
@@ -288,7 +285,7 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 		e.setModifier(context.getUserHistory());
 		e.setModifiedDate(Calendar.getInstance());
 		this.getCrudService().save(e);
-		
+
 		return result;
 	}
 
@@ -298,13 +295,13 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 		e.setCloserId(context.getUser().getId());
 		e.setCloserName(context.getUser().getName());
 		e.setCloseDate(Calendar.getInstance(Locale.CHINA));
-		
-		//{"id":"<@s.property value="e.id"/>","msg":"<@s.text name="form.save.success"/>"}
+
+		// {"id":"<@s.property value="e.id"/>","msg":"<@s.text name="form.save.success"/>"}
 		Json o;
 		o = new Json();
 		o.put("id", e.getId());
-		o.put("msg",getText("runcase.close.success"));
-		json =o.toString();
+		o.put("msg", getText("runcase.close.success"));
+		json = o.toString();
 
 	}
 
@@ -346,7 +343,7 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 				getText("runcase.select.source.sync.gen"));
 		return statuses;
 	}
-	
+
 	@Override
 	protected void initForm(boolean editable) throws Exception {
 		super.initForm(editable);
@@ -375,7 +372,8 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 		// 加载可选营运性质列表
 		this.sortList = optionItems.get(OptionConstants.CA_SORT);
 		// 加载可选执法机关列表
-		this.departmentList = OptionItem.toLabelValues(optionItems.get(OptionConstants.CA_DEPARTMENT));
+		this.departmentList = OptionItem.toLabelValues(optionItems
+				.get(OptionConstants.CA_DEPARTMENT));
 
 		// 加载可选保险公司列表
 		this.companyList = optionItems.get(OptionConstants.CA_COMPANY);
@@ -386,8 +384,8 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 	}
 
 	public String json;
-	
-	//		=======自动加载司机相关信息开始  =========
+
+	// =======自动加载司机相关信息开始 =========
 	public String selectCarMansInfo() {
 		List<CarMan> drivers = this.carManService.selectAllCarManByCarId(carId);
 		JsonArray jsons = new JsonArray();
@@ -398,9 +396,9 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 			o.put("id", driver.getId());
 			o.put("cert4FWZG", driver.getCert4FWZG());
 			o.put("region", driver.getRegion());
-			o.put("drivingStatus", driver.getDrivingStatus());
+			o.put("drivingStatus", driver.getClasses());
 			o.put("origin", driver.getOrigin());
-			o.put("type",driver.getType());
+			o.put("type", driver.getType());
 			jsons.add(o);
 		}
 
@@ -408,16 +406,17 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 		return "json";
 
 	}
-	//		====== 自动加载司机相关信息结束 ========
 
-	//		=======	自动加载相关保单开始  =========
+	// ====== 自动加载司机相关信息结束 ========
+
+	// ======= 自动加载相关保单开始 =========
 	private Calendar happenTime;
 	private PolicyService policyService;
-	
+
 	public PolicyService getPolicyService() {
 		return policyService;
 	}
-	
+
 	@Autowired
 	public void setPolicyService(PolicyService policyService) {
 		this.policyService = policyService;
@@ -431,54 +430,57 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 		this.happenTime = happenTime;
 	}
 
-	public String loadPolicyInfo(){
-		if(carId!=null&&happenTime!=null){
-			List<Policy> pList=this.policyService.getPolicise(carId, happenTime);
+	public String loadPolicyInfo() {
+		if (carId != null && happenTime != null) {
+			List<Policy> pList = this.policyService.getPolicise(carId,
+					happenTime);
 			JsonArray jsons = new JsonArray();
 			JsonArray jsonsbp = new JsonArray();
 			Json op;
 			Json obp;
-			SimpleDateFormat date_format=new SimpleDateFormat("yyyy-MM-dd");
+			SimpleDateFormat date_format = new SimpleDateFormat("yyyy-MM-dd");
 			for (Policy policy : pList) {
 				op = new Json();
-				//商业险号
+				// 商业险号
 				op.put("commerialNo", policy.getCommerialNo());
 				op.put("commerialCompany", policy.getCommerialCompany());
-				op.put("commerialStartDate", 
-						date_format.format(policy.getCommerialStartDate().getTime()));
-				op.put("commerialEndDate", 
-						date_format.format(policy.getCommerialEndDate().getTime()));
-				//责任险号
+				op.put("commerialStartDate", date_format.format(policy
+						.getCommerialStartDate().getTime()));
+				op.put("commerialEndDate", date_format.format(policy
+						.getCommerialEndDate().getTime()));
+				// 责任险号
 				op.put("liabilityNo", policy.getLiabilityNo());
-				//强制险号
-				op.put("greenslipNo", 
-						policy.getGreenslipNo()==null?"":policy.getGreenslipNo());
-				op.put("greenslipCompany", 
-						policy.getGreenslipCompany()==null?"":policy.getGreenslipCompany());
-				op.put("greenslipStartDate", 
-						policy.getGreenslipStartDate()==null?"":
-							date_format.format(policy.getGreenslipStartDate().getTime()));
-				op.put("greenslipEndDate", 
-						policy.getGreenslipEndDate()==null?"":
-							date_format.format(policy.getGreenslipEndDate().getTime()));
-				for(BuyPlant bp:policy.getBuyPlants()){
-					obp=new Json();
+				// 强制险号
+				op.put("greenslipNo", policy.getGreenslipNo() == null ? ""
+						: policy.getGreenslipNo());
+				op.put("greenslipCompany",
+						policy.getGreenslipCompany() == null ? "" : policy
+								.getGreenslipCompany());
+				op.put("greenslipStartDate",
+						policy.getGreenslipStartDate() == null ? ""
+								: date_format.format(policy
+										.getGreenslipStartDate().getTime()));
+				op.put("greenslipEndDate",
+						policy.getGreenslipEndDate() == null ? "" : date_format
+								.format(policy.getGreenslipEndDate().getTime()));
+				for (BuyPlant bp : policy.getBuyPlants()) {
+					obp = new Json();
 					obp.put("name", bp.getName());
-					obp.put("coverage", bp.getCoverage()==null?"":
-										bp.getCoverage());
-					obp.put("description", bp.getDescription()==null?"":
-											bp.getDescription());
+					obp.put("coverage",
+							bp.getCoverage() == null ? "" : bp.getCoverage());
+					obp.put("description", bp.getDescription() == null ? ""
+							: bp.getDescription());
 					jsonsbp.add(obp);
 				}
-				op.put("buyPlant",jsonsbp);
+				op.put("buyPlant", jsonsbp);
 				jsons.add(op);
 			}
-			
+
 			json = jsons.toString();
 		}
 		return "json";
 	}
-	
-	//		======= 自动加载相关保单单结束  =========
+
+	// ======= 自动加载相关保单单结束 =========
 
 }

@@ -1,6 +1,7 @@
 package cn.bc.business.mix.dao.hibernate.jpa;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -25,6 +26,7 @@ import cn.bc.business.carman.domain.CarByDriver;
 import cn.bc.business.carman.domain.CarByDriverHistory;
 import cn.bc.business.carman.domain.CarMan;
 import cn.bc.business.contract.domain.Contract4Charger;
+import cn.bc.business.contract.domain.Contract4Labour;
 import cn.bc.business.mix.dao.InfoCenterDao;
 import cn.bc.business.mix.domain.InfoCenter;
 import cn.bc.business.policy.domain.Policy;
@@ -222,6 +224,29 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 			msg = buildContract4ChargerMessage(now, contract4Charger);
 			if (msg != null)
 				messages.put(msg);
+
+			// ==提醒信息/劳动合同==
+			// {module:"劳动合同",id:1,link:"张三",limit:"",date:"yyyy-MM-dd",subject:".."}
+			JSONObject man;
+			String judgeType;
+			for (int i = 0; i < mans.length(); i++) {
+				man = mans.getJSONObject(i);
+
+				// 不是在案的就不检验劳动合同提醒信息了
+				if (man.getInt("judgeStatus") != 0)
+					break;
+
+				// 不是司机或顶班司机 也不检验劳动合同提醒信息
+				judgeType = man.getString("judgeType");
+				if (!("司机".equals(judgeType) || "司机和责任人".equals(judgeType))
+						|| "顶班".equals(man.getString("judgeClasses")))
+					continue;
+
+				// 构建到期提醒信息
+				msg = buildContract4LabourMessage(now, man);
+				if (msg != null)
+					messages.put(msg);
+			}
 		}
 
 		// 返回
@@ -236,7 +261,7 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 			msg.put("id", contract4Charger.get("id"));
 			int status = contract4Charger.getInt("status");
 
-			// 获取保单的过期期限 判断保单是否已过期或将于30日后到期：
+			// 获取过期期限 判断是否已过期或将于30日后到期：
 			Date endDate = (Date) contract4Charger.get("endDate");
 
 			// 即将过期的日期
@@ -245,7 +270,7 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 			// 限制项目
 			msg.put("limit", "");
 
-			// 责任人:TODO
+			// 关系人:TODO
 			msg.put("link", "");
 
 			// 计算过期天数
@@ -256,28 +281,106 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 					msg.put("subject", "经济合同没有设置过期期限");
 				} else {
 					DateUtils.setToZeroTime(endDate);
-					// 24*64*60=86400,忽略毫秒的比较
-					long dc = (endDate.getTime() / 1000 - now.getTime() / 1000) / 86400;
-					if (dc < 0) {
-						msg.put("subject", "经济合同已过期");
-					} else if (dc == 0) {
-						msg.put("subject", "经济合同今日到期");
-					} else if (dc <= 30) {
-						msg.put("subject", "经济合同" + dc + "日后到期");
-					} else {
-						msg = null;// 不提醒
-					}
+					String subject = buildOverdueSubject(now, endDate, 30,
+							"经济合同");
+					if (subject != null)
+						msg.put("subject", subject);
+					else
+						msg = null;
 				}
 			}
 		} else {
 			msg.put("module", "经济合同");
 			msg.put("id", "");
-			msg.put("subject", "无有效经济合同信息");
+			msg.put("subject", "没有签订有效的经济合同");
 			msg.put("date", "");
 			msg.put("limit", "");
 			msg.put("link", "");
 		}
 		return msg;
+	}
+
+	private JSONObject buildContract4LabourMessage(Date now, JSONObject man)
+			throws JSONException {
+		JSONObject msg = new JSONObject();
+		JSONObject contract4Labour;
+		if (man.has("autoInfo")) {
+			// 获取劳动合同信息
+			contract4Labour = man.getJSONObject("autoInfo");
+		} else {
+			contract4Labour = null;
+		}
+
+		if (contract4Labour != null) {
+			msg.put("module", "劳动合同");
+			msg.put("id", contract4Labour.get("id"));
+			int status = contract4Labour.getInt("status");
+
+			Date endDate = DateUtils.getDate(contract4Labour
+					.getString("endDate"));
+
+			// 即将过期的日期
+			msg.put("date", contract4Labour.getString("endDate"));
+
+			// 限制项目
+			msg.put("limit", "");
+
+			// 关系人
+			msg.put("link", man.getString("name"));// 司机姓名
+
+			// 计算过期天数
+			if (status != Contract4Labour.STATUS_NORMAL) {
+				msg.put("subject", "劳动合同已注销");
+			} else {
+				if (endDate == null) {
+					msg.put("subject", "劳动合同没有设置过期期限");
+				} else {
+					DateUtils.setToZeroTime(endDate);
+					String subject = buildOverdueSubject(now, endDate, 30,
+							"劳动合同");
+					if (subject != null)
+						msg.put("subject", subject);
+					else
+						msg = null;
+				}
+			}
+		} else {
+			// 添加没有有效劳动合同的提醒信息
+			msg.put("module", "劳动合同");
+			msg.put("id", "");
+			msg.put("subject", "没有签定有效的劳动合同");
+			msg.put("date", "");
+			msg.put("limit", "");
+			msg.put("link", man.getString("name"));// 司机姓名
+		}
+		return msg;
+	}
+
+	/**
+	 * @param now
+	 *            当前时间
+	 * @param endDate
+	 *            到期时间
+	 * @param days
+	 *            到期提醒的天数
+	 * @param type
+	 *            提醒的类型
+	 * @return
+	 * @throws JSONException
+	 */
+	private String buildOverdueSubject(Date now, Date endDate, int days,
+			String type) throws JSONException {
+		// 忽略毫秒的比较（24*60*60=86400秒=1天）
+		long dc = (endDate.getTime() / 1000 - now.getTime() / 1000) / 86400;
+		if (dc < 0) {
+			return type + "已过期";
+		} else if (dc == 0) {
+			return type + "今日到期";
+		} else if (dc <= days) {
+			return type + dc + "日后到期";
+		} else {
+			return null;// 不提醒
+		}
 	}
 
 	private JSONObject buildPolicyMessage(Date now, JSONObject policy)
@@ -320,17 +423,11 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 					msg.put("subject", "保单没有设置过期期限");
 				} else {
 					DateUtils.setToZeroTime(endDate);
-					// 24*64*60=86400,忽略毫秒的比较
-					long dc = (endDate.getTime() / 1000 - now.getTime() / 1000) / 86400;
-					if (dc < 0) {
-						msg.put("subject", "保单已过期");
-					} else if (dc == 0) {
-						msg.put("subject", "保单今日到期");
-					} else if (dc <= 30) {
-						msg.put("subject", "保单" + dc + "日后到期");
-					} else {
-						msg = null;// 不提醒
-					}
+					String subject = buildOverdueSubject(now, endDate, 30, "保单");
+					if (subject != null)
+						msg.put("subject", subject);
+					else
+						msg = null;
 				}
 			}
 		} else {
@@ -362,7 +459,7 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 		StringBuffer manSql = new StringBuffer();
 		manSql.append("select m.id,m.uid_,m.status_,m.type_,m.name,m.sex,m.origin,m.house_type,m.address,m.address1");
 		manSql.append(",m.phone,m.phone1,m.cert_identity,m.cert_fwzg,m.classes");
-		manSql.append(",m.move_type,m.move_date,m.shiftwork_end_date,m.carinfo,m.desc_");
+		manSql.append(",m.move_type,m.move_date,m.shiftwork_end_date,m.carinfo,m.main_car_id,m.desc_");
 
 		// 获取迁移记录对应的司机信息
 		List<JSONObject> mansFromCarByDriverHistory = this
@@ -395,10 +492,21 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 				charger = this.findCharger(mansFromContract4Charger,
 						man.getLong("id"));
 				if (charger != null) {
-					// 对司机信息做相应处理
-					man.put("judgeType", "司机和责任人");
-
 					exists.add(charger);
+					// 对司机信息做相应处理
+					if (charger.getInt("c_status") == 0) {
+						if (man.getInt("judgeStatus") == 0) {// 在案的经济合同 + 在案的司机
+							man.put("judgeType", "司机和责任人");
+						} else {// 在案经济合同 + 注销司机
+							man.put("judgeType", "责任人");
+						}
+					} else {
+						if (man.getInt("judgeStatus") == 0) {// 注销的经济合同 + 在案的司机
+							man.put("judgeType", "司机");
+						} else {// 注销的经济合同 + 注销司机
+							man.put("judgeType", "司机和责任人");
+						}
+					}
 				}
 				mans.add(man);
 			}
@@ -458,6 +566,9 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 				_man.put("autoInfo", autoInfos.get(id));
 			}
 		}
+
+		// 重新排序
+		Collections.sort(mans, new ManStatusComparator());
 
 		return new JSONArray(mans);
 	}
@@ -539,28 +650,29 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 							json.put("id", obj[i++]);
 							json.put("uid", obj[i++]);
 							json.put("status", obj[i++]);
-							json.put("type", getManTypeDesc(obj[i++]));
+							json.put("type", convert2ManTypeDesc(obj[i++]));
 							json.put("name", obj[i++]);
-							json.put("sex", getManSex(obj[i++]));
+							json.put("sex", convert2ManSexDesc(obj[i++]));
 							json.put("origin", null2Empty(obj[i++]));
 							json.put("houseType", null2Empty(obj[i++]));
 							json.put("address1", null2Empty(obj[i++]));
 							json.put("address2", null2Empty(obj[i++]));
 							json.put(
 									"phones",
-									getManPhones((String) obj[i++],
+									convert2ManPhones((String) obj[i++],
 											(String) obj[i++]));
 							json.put("identity", null2Empty(obj[i++]));
 							json.put("cert4fwzg", null2Empty(obj[i++]));
 							json.put("classes", obj[i++]);
 							json.put("classesDesc",
-									getManClasses(json.get("classes")));
+									convert2ManClassesDesc(json.get("classes")));
 							json.put("moveType", obj[i++]);
 							json.put("moveTypeDesc",
-									getManMoveType(json.get("moveType")));
+									convert2ManMoveTypeDesc(json
+											.get("moveType")));
 							json.put(
 									"moveDate",
-									getManMoveDate((Date) obj[i++],
+									convert2ManMoveDate((Date) obj[i++],
 											(Date) obj[i++]));
 							json.put("carInfo", null2Empty(obj[i++]));
 							json.put("desc", null2Empty(obj[i++]));
@@ -897,7 +1009,7 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 		}
 		final StringBuffer sql = new StringBuffer();
 		final List<Object> args = new ArrayList<Object>();
-		sql.append("select c.id,c.status_,c.start_date,c.end_date,cc.joindate,cc.insurcode,cc.insurance_type");
+		sql.append("select c.id,c.status_,c.start_date,c.end_date,cc.joindate,cc.insurcode,cc.insurance_type,cc.remark");
 		sql.append(",carc.car_id car_id,m.id driver_id,m.name driver_name");
 		sql.append(" from bs_contract_labour cc");
 		sql.append(" inner join bs_contract c on c.id=cc.id");
@@ -964,6 +1076,7 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 									json.put("insurcode", null2Empty(obj[i++]));
 									json.put("insuranceType",
 											null2Empty(obj[i++]));
+									json.put("remark", null2Empty(obj[i++]));
 
 									// 车辆、司机的相关信息
 									json.put("car_id", obj[i++]);
@@ -994,7 +1107,8 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 	private List<JSONObject> getMansFromCarByDriverHistory(final Long carId,
 			StringBuffer manSql) {
 		final StringBuffer sql = new StringBuffer(manSql);
-		sql.append(",h.id h_id,h.move_type h_moveType,h.move_date h_moveDate,h.from_car_id h_fromCarId,h.to_car_id h_toCarId");
+		sql.append(",h.id h_id,h.move_type h_moveType,h.move_date h_moveDate,h.end_date h_endDate,h.from_car_id h_fromCarId,h.to_car_id h_toCarId");
+		sql.append(",h.from_classes h_fromClasses,h.to_classes h_toClasses");
 		sql.append(" from bs_carman m");
 		sql.append(" inner join bs_car_driver_history h on m.id=h.driver_id");
 		sql.append(" where (h.from_car_id=? or h.to_car_id=?)");
@@ -1024,15 +1138,38 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 
 							// 司机的相关信息
 							i = buildManJson(json, obj, i);
-							json.put("judgeType", "司机");// 先假定全部都是司机
 
 							// 迁移记录的相关信息
 							json.put("h_id", obj[i++]);
-							json.put("h_moveType", obj[i++]);
-							json.put("h_moveDate",
-									DateUtils.formatDate((Date) obj[i++]));
-							json.put("h_fromCarId", null2Empty(obj[i++]));
-							json.put("h_toCarId", null2Empty(obj[i++]));
+							json.put("moveType", obj[i++]);
+							json.put("moveTypeDesc",
+									convert2ManMoveTypeDesc(json
+											.get("moveType")));
+							json.put(
+									"moveDate",
+									convert2ManMoveDate((Date) obj[i++],
+											(Date) obj[i++]));
+							json.put("fromCarId", null2Empty(obj[i++]));
+							json.put("toCarId", null2Empty(obj[i++]));
+							json.put("h_fromClasses", obj[i++]);
+							json.put("h_toClasses", obj[i++]);
+
+							// 特殊处理
+							json.put("judgeType", "司机");// 先假定全部都是司机
+							int moveType = json.getInt("moveType");
+							if (CarByDriverHistory.isActive(moveType)
+									&& carId.toString().equals(
+											json.getString("toCarId"))) {
+								json.put("judgeStatus", 0);// 当前营运司机
+								json.put("judgeClasses",
+										convert2ManClassesDesc(json
+												.get("h_toClasses")));// 按迁往的班次
+							} else {
+								json.put("judgeStatus", 1);// 已注销司机
+								json.put("judgeClasses",
+										convert2ManClassesDesc(json
+												.get("h_fromClasses")));// 按迁自的班次
+							}
 
 							jsons.add(json);
 						} catch (JSONException e) {
@@ -1094,9 +1231,13 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 							i = buildManJson(json, obj, i);
 
 							// 合同的相关信息
-							json.put("judgeType", "责任人");// 先假定全部为责任人
 							json.put("c_id", obj[i++]);
 							json.put("c_status", obj[i++]);
+
+							// 特殊处理
+							json.put("judgeType", "责任人");// 先假定全部为责任人
+							json.put("judgeStatus", json.getInt("c_status"));// 按合同的状态
+							json.put("judgeClasses", "");// 无营运班次
 
 							jsons.add(json);
 						} catch (JSONException e) {
@@ -1161,6 +1302,11 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 							json.put("c_id", obj[i++]);
 							json.put("c_status", obj[i++]);
 
+							// 特殊处理
+							json.put("judgeType", "司机");// 先假定全部为司机
+							json.put("judgeStatus", json.getInt("c_status"));// 按合同的状态
+							json.put("judgeClasses", "");// 无营运班次
+
 							jsons.add(json);
 						} catch (JSONException e) {
 							logger.error(e.getMessage(), e);
@@ -1214,12 +1360,18 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 
 							// 司机的相关信息
 							i = buildManJson(json, obj, i);
-							json.put("judgeType", "司机");
 
 							// 营运班次的相关信息
 							json.put("cd_id", obj[i++]);
 							json.put("cd_status", obj[i++]);
 							json.put("cd_classes", obj[i++]);
+
+							// 特殊处理
+							json.put("judgeType", "司机");
+							json.put("judgeStatus", json.getInt("cd_status"));// 按营运班次的状态
+							json.put("judgeClasses",
+									convert2ManClassesDesc(json
+											.get("cd_classes")));// 营运班次
 
 							jsons.add(json);
 						} catch (JSONException e) {
@@ -1239,29 +1391,35 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 		json.put("uid", obj[startIndex++]);
 		json.put("status", obj[startIndex++]);
 		json.put("type", obj[startIndex++]);
-		json.put("typeDesc", getManTypeDesc(json.get("type")));
+		json.put("judgeType", json.get("type"));
+		json.put("typeDesc", convert2ManTypeDesc(json.get("type")));
 		json.put("name", obj[startIndex++]);
-		json.put("sex", getManSex(obj[startIndex++]));
+		json.put("sex", convert2ManSexDesc(obj[startIndex++]));
 		json.put("origin", null2Empty(obj[startIndex++]));
 		json.put("houseType", null2Empty(obj[startIndex++]));
 		json.put("address1", null2Empty(obj[startIndex++]));
 		json.put("address2", null2Empty(obj[startIndex++]));
+		json.put("phone1", null2Empty(obj[startIndex++]));
+		json.put("phone2", null2Empty(obj[startIndex++]));
 		json.put(
 				"phones",
-				getManPhones((String) obj[startIndex++],
-						(String) obj[startIndex++]));
+				convert2ManPhones(json.getString("phone1"),
+						json.getString("phone2")));
 		json.put("identity", null2Empty(obj[startIndex++]));
 		json.put("cert4fwzg", null2Empty(obj[startIndex++]));
 		json.put("classes", obj[startIndex++]);
-		json.put("classesDesc", getManClasses(json.get("classes")));
+		json.put("classesDesc", convert2ManClassesDesc(json.get("classes")));
 		json.put("moveType", obj[startIndex++]);
-		json.put("moveTypeDesc", getManMoveType(json.get("moveType")));
+		json.put("moveTypeDesc", convert2ManMoveTypeDesc(json.get("moveType")));
 		json.put(
 				"moveDate",
-				getManMoveDate((Date) obj[startIndex++],
+				convert2ManMoveDate((Date) obj[startIndex++],
 						(Date) obj[startIndex++]));
-		json.put("carInfo", null2Empty(obj[startIndex++]));
+		json.put("carInfo", null2Empty(obj[startIndex++]));// 营运车辆
+		json.put("mainCarId", null2Empty(obj[startIndex++]));// 主车辆id
 		json.put("desc", null2Empty(obj[startIndex++]));
+
+		json.put("judgeStatus", json.get("status"));
 		return startIndex;
 	}
 
@@ -1271,7 +1429,7 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 		return obj.toString();
 	}
 
-	private String getManMoveDate(Date move_date, Date shiftwork_end_date) {
+	private String convert2ManMoveDate(Date move_date, Date shiftwork_end_date) {
 		if (move_date != null) {
 			if (shiftwork_end_date != null) {
 				return DateUtils.formatDate(move_date) + "～"
@@ -1288,7 +1446,7 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 		}
 	}
 
-	private String getManTypeDesc(Object type) {
+	private String convert2ManTypeDesc(Object type) {
 		if (type == null)
 			return "";
 
@@ -1305,7 +1463,7 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 			return "";
 	}
 
-	private String getManClasses(Object classes) {
+	private String convert2ManClassesDesc(Object classes) {
 		if (classes == null)
 			return "";
 
@@ -1322,7 +1480,7 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 			return "";
 	}
 
-	private String getManMoveType(Object moveType) {
+	private String convert2ManMoveTypeDesc(Object moveType) {
 		if (moveType == null)
 			return "";
 
@@ -1349,7 +1507,7 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 			return "";
 	}
 
-	private String getManSex(Object sex) {
+	private String convert2ManSexDesc(Object sex) {
 		if (sex == null)
 			return "无";
 
@@ -1362,10 +1520,10 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 			return "无";
 	}
 
-	private String getManPhones(String phone1, String phone2) {
+	private String convert2ManPhones(String phone1, String phone2) {
 		if (phone1 != null && phone1.length() > 0) {
 			if (phone2 != null && phone2.length() > 0) {
-				return phone1 + "，" + phone2;
+				return phone1 + ", " + phone2;
 			} else {
 				return phone1;
 			}

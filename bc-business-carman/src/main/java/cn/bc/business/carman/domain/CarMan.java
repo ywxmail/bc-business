@@ -75,7 +75,6 @@ public class CarMan extends RichFileEntityImpl {
 	private String cert4FWZG;// 服务资格证号
 	private String cert4FWZGID;// 服务资格ID
 	private String cert4CYZG;// 从业资格证号
-	private int drivingStatus;// 驾驶状态
 	private String oldUnitName;// 分支机构：用于历史数据的保存
 	private String charger;// 责任人信息：[责任人1姓名,责任人1id;责任人2姓名d,责任人2id;...]
 	private boolean gz;// 驾驶证是否广州:0-否,1-是
@@ -321,15 +320,6 @@ public class CarMan extends RichFileEntityImpl {
 
 	public void setCert4CYZG(String cert4cyzg) {
 		cert4CYZG = cert4cyzg;
-	}
-
-	@Column(name = "DRIVING_STATUS")
-	public int getDrivingStatus() {
-		return drivingStatus;
-	}
-
-	public void setDrivingStatus(int drivingStatus) {
-		this.drivingStatus = drivingStatus;
 	}
 
 	@Column(name = "OLD_UNIT_NAME")

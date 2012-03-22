@@ -190,6 +190,8 @@ public class BlacklistAction extends FileEntityAction<Long, Blacklist> {
 		if (this.getE().getStatus() == Blacklist.STATUS_LOCK) {
 			this.getE().setModifier(context.getUserHistory());
 			this.getE().setModifiedDate(Calendar.getInstance());
+			this.getE().setUnlocker(null);
+			this.getE().setUnlockDate(null);
 		} else {
 			this.getE().setUnlocker(context.getUser());
 			this.getE().setUnlockDate(Calendar.getInstance());

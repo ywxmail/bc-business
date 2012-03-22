@@ -7,6 +7,17 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
+import javax.persistence.PersistenceException;
+import javax.persistence.Query;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.orm.jpa.JpaCallback;
+import org.springframework.orm.jpa.JpaTemplate;
+
 import cn.bc.business.carman.dao.CarManDao;
 import cn.bc.business.carman.domain.CarMan;
 import cn.bc.business.cert.dao.CertDao;
@@ -21,10 +32,17 @@ import cn.bc.orm.hibernate.jpa.HibernateCrudJpaDao;
  */
 public class CarManDaoImpl extends HibernateCrudJpaDao<CarMan> implements
 		CarManDao {
+	protected static final Log logger = LogFactory.getLog(CarManDaoImpl.class);
+	private JpaTemplate jpaTemplate;
 	private CertDao certDao;
 
 	public void setCertDao(CertDao certDao) {
 		this.certDao = certDao;
+	}
+
+	@Autowired
+	public void setJpaTemplate(JpaTemplate jpaTemplate) {
+		this.jpaTemplate = jpaTemplate;
 	}
 
 	public CarMan saveCert4CarMan(Long carManId, Cert cert) {
@@ -97,8 +115,7 @@ public class CarManDaoImpl extends HibernateCrudJpaDao<CarMan> implements
 	public List<CarMan> findAllcarManBycarId(Long carId) {
 		String hql = "select c.driver from CarByDriver c where c.car.id=?";
 		// 0为启用中
-		return this.getJpaTemplate().find(hql,
-				new Object[] { carId });
+		return this.getJpaTemplate().find(hql, new Object[] { carId });
 	}
 
 	public Long checkCert4FWZGIsExists(Long excludeId, String cert4fwzg) {
@@ -150,5 +167,48 @@ public class CarManDaoImpl extends HibernateCrudJpaDao<CarMan> implements
 
 		// 调用基类的保存
 		return super.save(entity);
+	}
+
+	public String getNewestCarInfo4Driver(final Long driverId) {
+
+		final StringBuffer sql = new StringBuffer();
+		sql.append("select getCarInfoByDriverId(id) from bs_carman where id = ?");
+
+		if (logger.isDebugEnabled()) {
+			logger.debug("driverId=" + driverId + ";sql=" + sql);
+		}
+		// JpaCallback 返回函数的类型
+		return this.jpaTemplate.execute(new JpaCallback<String>() {
+			// JpaCallback接口的方法
+			public String doInJpa(EntityManager em) throws PersistenceException {
+				Query queryObject = em.createNativeQuery(sql.toString());
+				// 设置问号所对应的参数
+				queryObject.setParameter(1, driverId);
+				// 设置从第几个开始查
+				queryObject.setFirstResult(0);
+				// 设置查几多个[如果想查所有,则不设]
+				queryObject.setMaxResults(1);
+				String carInfo;
+				try {
+					carInfo = (String) queryObject.getSingleResult();
+				} catch (NoResultException e) {
+					if (logger.isDebugEnabled())
+						logger.debug("carInfo = null,id=" + driverId);
+					return null;
+				}
+				if (carInfo != null) {
+					return carInfo;
+				}
+				return null;
+			}
+		});
+
+	}
+
+	public void updatePhoneBycarManId(Long carManId, String phone1,
+			String phone2) {
+		String hql = "update CarMan c set c.phone = ?,c.phone1 = ? where c.id = ?";
+		this.executeUpdate(hql, new Object[] { phone1, phone2, carManId });
+
 	}
 }

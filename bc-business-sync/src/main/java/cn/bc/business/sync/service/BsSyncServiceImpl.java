@@ -574,7 +574,7 @@ public class BsSyncServiceImpl implements BsSyncService {
 		domain.setSyncDate(createDate);
 		domain.setSyncType(syncType);
 		domain.setSyncFrom(syncFrom);
-
+//		domain.setcId(row.getCellStringValue("c_id"));
 		domain.setcId(row.getCellStringValue("c_id"));
 		domain.setSyncCode(row.getCellStringValue("tis_handle_no"));
 		domain.setReceiveCode(row.getCellStringValue("handle_no"));
