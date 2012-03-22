@@ -140,11 +140,9 @@ insert into BC_IDENTITY_RESOURCE (ID,STATUS_,INNER_,TYPE_,BELONG,ORDER_,NAME,URL
 insert into BC_IDENTITY_RESOURCE (ID,STATUS_,INNER_,TYPE_,BELONG,ORDER_,NAME,URL,ICONCLASS) 
 	select NEXTVAL('CORE_SEQUENCE'), 0, false, 2, m.id, '031901','发票采购', '/bc-business/invoice4Buys/paging', 'i0404' from BC_IDENTITY_RESOURCE m where m.order_='031900';
 insert into BC_IDENTITY_RESOURCE (ID,STATUS_,INNER_,TYPE_,BELONG,ORDER_,NAME,URL,ICONCLASS) 
-	select NEXTVAL('CORE_SEQUENCE'), 0, false, 2, m.id, '031902','发票销售', '/bc-business/invoice4Sells/paging', 'i0801' from BC_IDENTITY_RESOURCE m where m.order_='031900';
+	select NEXTVAL('CORE_SEQUENCE'), 0, false, 2, m.id, '031902','发票销售', '/bc-business/invoice4Sells/paging', 'i0800' from BC_IDENTITY_RESOURCE m where m.order_='031900';
 insert into BC_IDENTITY_RESOURCE (ID,STATUS_,INNER_,TYPE_,BELONG,ORDER_,NAME,URL,ICONCLASS) 
-	select NEXTVAL('CORE_SEQUENCE'), 0, false, 2, m.id, '031903','发票库存', '/bc-business/invoice4Stock', 'i0801' from BC_IDENTITY_RESOURCE m where m.order_='031900';
-insert into BC_IDENTITY_RESOURCE (ID,STATUS_,INNER_,TYPE_,BELONG,ORDER_,NAME,URL,ICONCLASS) 
-	select NEXTVAL('CORE_SEQUENCE'), 0, false, 2, m.id, '031904','发票余额表', '/bc-business/invoice4Balance/main', 'i0801' from BC_IDENTITY_RESOURCE m where m.order_='031900';
+	select NEXTVAL('CORE_SEQUENCE'), 0, false, 2, m.id, '031903','发票余额表', '/bc-business/invoice4Balance/main', 'i0801' from BC_IDENTITY_RESOURCE m where m.order_='031900';
 
 	
 	
@@ -164,24 +162,21 @@ insert into  BC_IDENTITY_ROLE (ID, STATUS_,INNER_,TYPE_,ORDER_,CODE,NAME)
 --  发票销售管理：BS_INVOICE4SELL_MANAGE,对发票销售信息进行无限制的修改。
 insert into  BC_IDENTITY_ROLE (ID, STATUS_,INNER_,TYPE_,ORDER_,CODE,NAME) 
 	values(NEXTVAL('CORE_SEQUENCE'), 0, false,  0,'0123', 'BS_INVOICE4SELL_MANAGE','发票销售管理');
---  发票销售管理：BS_INVOICE4SELL_MANAGE,对发票销售信息进行无限制的修改。
+--  发票销售查询：BS_INVOICE4SELL_MANAGE,对发票销售信息进行无限制的修改。
 insert into  BC_IDENTITY_ROLE (ID, STATUS_,INNER_,TYPE_,ORDER_,CODE,NAME) 
 	values(NEXTVAL('CORE_SEQUENCE'), 0, false,  0,'0124', 'BS_INVOICE4SELL_READ','发票销售查询');
---  发票库存查询：BS_INVOICE4STOCK_READ,对发票库存信息只可以查询阅读不可以执行任何修改操作。
-insert into  BC_IDENTITY_ROLE (ID, STATUS_,INNER_,TYPE_,ORDER_,CODE,NAME) 
-	values(NEXTVAL('CORE_SEQUENCE'), 0, false,  0,'0125', 'BS_INVOICE4STOCK_READ','发票库存查询');
 --  发票余额表查询：BS_INVOICE4BALANCE_READ,对发票库存信息只可以查询阅读不可以执行任何修改操作。
 insert into  BC_IDENTITY_ROLE (ID, STATUS_,INNER_,TYPE_,ORDER_,CODE,NAME) 
-	values(NEXTVAL('CORE_SEQUENCE'), 0, false,  0,'0126', 'BS_INVOICE4BALANCE_READ','发票余额表查询');
+	values(NEXTVAL('CORE_SEQUENCE'), 0, false,  0,'0125', 'BS_INVOICE4BALANCE_READ','发票余额表查询');
 
 -- 发票管理
 insert into BC_IDENTITY_ROLE_RESOURCE (RID,SID) 
 	select r.id,m.id from BC_IDENTITY_ROLE r,BC_IDENTITY_RESOURCE m where r.code='BS_INVOICE_MANAGE' 
-	and m.type_ > 1 and m.order_ in ('031901','031902','031903','031904')
+	and m.type_ > 1 and m.order_ in ('031901','031902','031903')
 	order by m.order_;
 insert into BC_IDENTITY_ROLE_RESOURCE (RID,SID) 
 	select r.id,m.id from BC_IDENTITY_ROLE r,BC_IDENTITY_RESOURCE m where r.code='BS_INVOICE_READ' 
-	and m.type_ > 1 and m.order_ in ('031901','031902','031903','031904')
+	and m.type_ > 1 and m.order_ in ('031901','031902','031903')
 	order by m.order_;
 -- 发票采购
 insert into BC_IDENTITY_ROLE_RESOURCE (RID,SID) 
@@ -201,19 +196,165 @@ insert into BC_IDENTITY_ROLE_RESOURCE (RID,SID)
 	select r.id,m.id from BC_IDENTITY_ROLE r,BC_IDENTITY_RESOURCE m where r.code='BS_INVOICE4SELL_READ' 
 	and m.type_ > 1 and m.order_ in ('031902')
 	order by m.order_;
---  发票库存
-insert into BC_IDENTITY_ROLE_RESOURCE (RID,SID) 
-	select r.id,m.id from BC_IDENTITY_ROLE r,BC_IDENTITY_RESOURCE m where r.code='INVOICE4STOCK_READ' 
-	and m.type_ > 1 and m.order_ in ('031903')
-	order by m.order_;
 --  发票余额表
 insert into BC_IDENTITY_ROLE_RESOURCE (RID,SID) 
 	select r.id,m.id from BC_IDENTITY_ROLE r,BC_IDENTITY_RESOURCE m where r.code='BS_INVOICE4BALANCE_READ' 
-	and m.type_ > 1 and m.order_ in ('031904')
+	and m.type_ > 1 and m.order_ in ('031903')
 	order by m.order_;
 
 --  超级管理员
 insert into BC_IDENTITY_ROLE_RESOURCE (RID,SID) 
 	select r.id,m.id from BC_IDENTITY_ROLE r,BC_IDENTITY_RESOURCE m where r.code='BC_ADMIN' 
-	and m.type_ > 1 and m.order_ in ('031901','031902','031903','031904')
+	and m.type_ > 1 and m.order_ in ('031901','031902','031903')
 	order by m.order_;
+
+--	普通用户
+insert into BC_IDENTITY_ROLE_RESOURCE (RID,SID) 
+	select r.id,m.id from BC_IDENTITY_ROLE r,BC_IDENTITY_RESOURCE m where r.code='BC_COMMON' 
+	and m.type_ > 1 and m.order_ in ('031902')
+	order by m.order_;
+	
+-- 统计剩余数量函数
+CREATE OR REPLACE FUNCTION getbalancecountbyinvoicebuyid(bid integer)
+	RETURNS integer AS
+$BODY$
+DECLARE
+	-- 定义变量
+	count_ INTEGER;
+BEGIN
+	select b.count_-sum(d.count_) 
+	into count_
+	from bs_invoice_buy b
+		left join bs_invoice_sell_detail d on d.buy_id=b.id
+		left join bs_invoice_sell s on s.id=d.sell_id 
+		where b.id=bid and s.status_=0
+		group by b.id;
+		-- 若为空时，表示还没销售，所以剩余数量应该等于采购数量
+		IF count_ is null THEN
+			select b.count_ 
+			into count_
+			from bs_invoice_buy b
+				where b.id=bid;
+		END IF;
+		return count_;
+END
+$BODY$
+  LANGUAGE plpgsql;
+
+-- 统计采购单剩余号码段函数
+CREATE OR REPLACE FUNCTION getbalancenumberbyinvoicebuyid(bid integer,startno character varying,endno character varying)
+	RETURNS character varying  AS
+$BODY$
+DECLARE
+		-- 定义变量
+		-- 临时保存开始和结束号的值
+		startno_tmp character varying;
+		endno_tmp character varying;
+		startno_number_temp1 INTEGER;
+		startno_number_temp2 INTEGER;
+		-- 剩余号码段
+		remainingNumber VARCHAR(4000);
+		-- 一行的记录	
+		rowinfo RECORD;
+BEGIN
+	-- 变量赋值
+	remainingNumber := '';
+	-- 循环销售第一明细时将采购单的开始号 赋值 临时开始号变量；
+	startno_tmp := trim(startno);
+
+	-- 查询返回以开始号排序的记录，循环每一行的记录
+	FOR rowinfo IN select d.start_no,d.end_no
+										from bs_invoice_buy b
+										left join bs_invoice_sell_detail d on d.buy_id=b.id
+										left join bs_invoice_sell s on s.id=d.sell_id
+										where b.id=bid and s.status_=0
+										ORDER BY d.start_no
+	LOOP
+		-- 返回的记录为空则直接返回
+		IF rowinfo.start_no IS NULL THEN
+			remainingNumber := '['||startno||'~'||endno||']'; 
+			RETURN remainingNumber;
+		END IF;
+		-- 将明细的开始号和临时开始号变量转为数字临时变量
+		startno_number_temp1 := convert_stringtonumber(rowinfo.start_no);
+		startno_number_temp2 := convert_stringtonumber(startno_tmp);
+		-- 明细中的开始号大于临时变量的开始号
+		IF startno_number_temp1 > startno_number_temp2 THEN
+			-- 若结束号有 0 开始 需要进行补0操作
+			endno_tmp := convert_numbertostring(convert_stringtonumber(trim(rowinfo.start_no))-1,startno_tmp);
+			remainingNumber := remainingNumber||'['||startno_tmp||'~'||endno_tmp||'] '; 
+			-- 临时的开始号转为每条销售明细结束号+1
+			startno_tmp := convert_numbertostring(convert_stringtonumber(trim(rowinfo.end_no))+1,trim(rowinfo.end_no));
+			endno_tmp:= trim(rowinfo.end_no);
+		END IF;
+		IF startno_number_temp1=startno_number_temp2	THEN
+			startno_tmp := convert_numbertostring(convert_stringtonumber(trim(rowinfo.end_no))+1,trim(rowinfo.end_no));
+			endno_tmp:= trim(rowinfo.end_no);
+		END IF;
+	END LOOP;
+	IF remainingNumber = '' THEN
+			remainingNumber := '['||startno||'~'||endno||']'; 
+			RETURN remainingNumber;
+	END IF;
+	-- 若循环到明细最后，明细的结束号小于采购单的结束号 则范围[最后一条明细的结束号+1，采购单的结束号]
+	IF convert_stringtonumber(endno_tmp)<convert_stringtonumber(trim(endno)) THEN
+				startno_tmp= convert_numbertostring(convert_stringtonumber(endno_tmp)+1,endno_tmp);
+				endno_tmp=trim(endno);
+				remainingNumber := remainingNumber||'['||startno_tmp||'~'||endno_tmp||'] '; 
+	END IF;
+	
+	RETURN remainingNumber;
+END;
+$BODY$
+ LANGUAGE plpgsql;
+ 
+-- 字符串转数字
+CREATE OR REPLACE FUNCTION convert_stringtonumber(string_ character varying)
+	RETURNS integer  AS
+$BODY$
+DECLARE
+		-- 定义变量
+		number_ integer;
+		text_expression character varying;
+		length_ integer;
+		i integer;
+BEGIN
+	-- 检测字符串的长度
+	length_ := char_length(trim(string_));
+	text_expression := '';
+	FOR i IN 1..length_
+	LOOP
+	-- 生成匹配的表达式
+	text_expression := text_expression||'9';
+	END LOOP;
+	number_ := to_number(string_,text_expression);
+	return number_;
+END;
+$BODY$
+ LANGUAGE plpgsql;
+
+
+-- 数字转字符串函数
+CREATE OR REPLACE FUNCTION convert_numbertostring(int_ integer,text_ character varying)
+	RETURNS character varying  AS
+$BODY$
+DECLARE
+		-- 定义变量
+		string_ character varying;
+		text_expression character varying;
+		length_ integer;
+		i integer;
+BEGIN
+	-- 检测字符串的长度
+	length_ := char_length(trim(text_));
+	text_expression := '';
+	FOR i IN 1..length_
+	LOOP 
+	-- 生成匹配的表达式
+	text_expression := text_expression||'0';
+	END LOOP;
+	string_ := to_char(int_,text_expression);
+	RETURN string_;
+END;
+$BODY$
+ LANGUAGE plpgsql;
