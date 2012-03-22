@@ -78,7 +78,7 @@ public class Invoice4BuysAction extends ViewAction<Map<String, Object>> {
 		sql.append(",b.company as company,b.type_ as type_,b.count_ as count_,b.buy_price as buy_price");
 		sql.append(",b.desc_ as desc,b.unit_ as unit_,b.sell_price as sell_price,a.actor_name as buyerName");
 		sql.append(",getbalancecountbyinvoicebuyid(b.id) as balance_count");
-		sql.append(",getbalancenumberbyinvoicebuyid(b.id,b.start_no,b.end_no) as balance_number");
+		sql.append(",getbalancenumberbyinvoicebuyid(b.id,b.count_,b.start_no,b.end_no) as balance_number");
 		sql.append(" from bs_invoice_buy b");
 		sql.append(" left join bc_identity_actor_history a on a.id=b.buyer_id");
 		sqlObject.setSql(sql.toString());
