@@ -47,4 +47,8 @@ public class Invoice4BuyServiceImpl extends DefaultCrudService<Invoice4Buy> impl
 	public List<String> findBalanceNumberByInvoice4BuyId(Long id) {
 		return invoice4BuyDao.findBalanceNumberByInvoice4BuyId(id);
 	}
+
+	public List<String> findBalanceCountByInvoice4BuyId(Long id) {
+		return invoice4BuyDao.findBalanceCountByInvoice4BuyId(id);
+	}
 }

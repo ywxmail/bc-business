@@ -38,7 +38,7 @@ public class Invoice4BuyDaoImpl extends HibernateCrudJpaDao<Invoice4Buy>
 	}
 
 	public List<Map<String, String>> find4Option(Integer[] statuses) {
-		String hql = "select ib.id,ib.code,ib.start_no,ib.end_no,ib.type_ from BS_INVOICE_BUY ib";
+		String hql = "select ib.id,ib.code,ib.start_no,ib.end_no,ib.type_,getbalancecountbyinvoicebuyid(ib.id) from BS_INVOICE_BUY ib";
 		if (statuses != null && statuses.length > 0) {
 			if (statuses.length == 1) {
 				hql += " where ib.status_ = ?";
@@ -59,22 +59,30 @@ public class Invoice4BuyDaoImpl extends HibernateCrudJpaDao<Invoice4Buy>
 					public Map<String, String> mapRow(Object[] rs, int rowNum) {
 						Map<String, String> oi = new HashMap<String, String>();
 						int i = 0;
-						oi.put("key", rs[i++].toString());
-						String code = rs[i++] + "";
-						String startNo = rs[i++] + "";
-						String endNo = rs[i++] + "";
-						String type = rs[i++] + "";
+						String key=rs[i++].toString();
+						String code = rs[i++].toString();
+						String startNo = rs[i++].toString();
+						String endNo = rs[i++].toString();
+						String type = rs[i++].toString();
 						String typeStr = "";
-						// 打印票
-						if (Integer.parseInt(type) == Invoice4Buy.TYPE_PRINT) {
-							typeStr = Invoice4Buy.TYPE_STR_PRINT;
-							// 手撕票
-						} else if (Integer.parseInt(type) == Invoice4Buy.TYPE_TORE) {
-							typeStr = Invoice4Buy.TYPE_STR_TORE;
+						//剩余数量
+						String count_ = rs[i++].toString();
+						//剩余数量大于0时 才return
+						if(Integer.parseInt(count_)>0){
+							oi.put("key", key);
+							// 打印票
+							if (Integer.parseInt(type) == Invoice4Buy.TYPE_PRINT) {
+								typeStr = Invoice4Buy.TYPE_STR_PRINT;
+								// 手撕票
+							} else if (Integer.parseInt(type) == Invoice4Buy.TYPE_TORE) {
+								typeStr = Invoice4Buy.TYPE_STR_TORE;
+							}
+							oi.put("value", code + "(" + startNo + "~" + endNo
+									+ ")" + typeStr+",剩余数量："+count_);
+							return oi;
+						}else{
+							return null;
 						}
-						oi.put("value", code + "(" + startNo + "~" + endNo
-								+ ")" + typeStr);
-						return oi;
 					}
 				});
 	}
@@ -157,6 +165,18 @@ public class Invoice4BuyDaoImpl extends HibernateCrudJpaDao<Invoice4Buy>
 
 	public List<String> findBalanceNumberByInvoice4BuyId(Long id) {
 		String sql = "select getbalancenumberbyinvoicebuyid(b.id,b.count_,b.start_no,b.end_no),1";
+		sql += " from bs_invoice_buy b";
+		sql += " where b.id=?";
+		return HibernateJpaNativeQuery.executeNativeSql(getJpaTemplate(), sql,
+				new Object[] { id }, new RowMapper<String>() {
+					public String mapRow(Object[] rs, int rowNum) {
+						return rs[0].toString();
+					}
+				});
+	}
+	
+	public List<String> findBalanceCountByInvoice4BuyId(Long id){
+		String sql = "select getbalancecountbyinvoicebuyid(b.id),1";
 		sql += " from bs_invoice_buy b";
 		sql += " where b.id=?";
 		return HibernateJpaNativeQuery.executeNativeSql(getJpaTemplate(), sql,

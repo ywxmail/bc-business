@@ -47,6 +47,7 @@ public class Invoice4BuyAction extends FileEntityAction<Long, Invoice4Buy> {
 
 	public Float amount;// 合计
 	public String balanceNumber;// 剩余号码段
+	public String balanceCount;//剩余数量
 
 	@Autowired
 	public void setInvoice4BuyService(Invoice4BuyService invoice4BuyService) {
@@ -71,7 +72,7 @@ public class Invoice4BuyAction extends FileEntityAction<Long, Invoice4Buy> {
 
 	@Override
 	protected PageOption buildFormPageOption(boolean editable) {
-		return super.buildFormPageOption(editable).setWidth(550)
+		return super.buildFormPageOption(editable).setWidth(660)
 				.setMinWidth(250).setMinHeight(200);
 	}
 
@@ -91,6 +92,7 @@ public class Invoice4BuyAction extends FileEntityAction<Long, Invoice4Buy> {
 		this.amount = entity.getCount() * entity.getBuyPrice();
 		this.balanceNumber = this.invoice4BuyService
 				.findBalanceNumberByInvoice4BuyId(entity.getId()).get(0);
+		this.balanceCount = this.invoice4BuyService.findBalanceCountByInvoice4BuyId(entity.getId()).get(0);
 		super.afterEdit(entity);
 	}
 
@@ -100,6 +102,7 @@ public class Invoice4BuyAction extends FileEntityAction<Long, Invoice4Buy> {
 		this.amount = entity.getCount() * entity.getBuyPrice();
 		this.balanceNumber = this.invoice4BuyService
 				.findBalanceNumberByInvoice4BuyId(entity.getId()).get(0);
+		this.balanceCount = this.invoice4BuyService.findBalanceCountByInvoice4BuyId(entity.getId()).get(0);
 		super.afterOpen(entity);
 
 	}
