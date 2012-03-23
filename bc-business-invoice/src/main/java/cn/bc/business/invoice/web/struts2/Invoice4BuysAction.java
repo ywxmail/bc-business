@@ -308,12 +308,12 @@ public class Invoice4BuysAction extends ViewAction<Map<String, Object>> {
 		this.invoice4BuyService = invoice4BuyService;
 	}
 
-	public JSONArray codes;
+	//public JSONArray codes;
 	public JSONArray companies;// 公司的下拉列
 
 	@Override
 	protected void initConditionsFrom() throws Exception {
-			codes=OptionItem.toLabelValues(this.invoice4BuyService.findEnabled4Option());
+			//codes=OptionItem.toLabelValues(this.invoice4BuyService.findEnabled4Option());
 			
 			//公司
 			companies=OptionItem.toLabelValues(this.invoice4BuyService.findCompany4Option());
