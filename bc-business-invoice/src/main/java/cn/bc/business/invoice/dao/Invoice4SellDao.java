@@ -18,16 +18,25 @@ import cn.bc.core.dao.CrudDao;
  */
 public interface Invoice4SellDao extends CrudDao<Invoice4Sell> {
 
+	
 	/**
-	 * 根据发票代码查找相应的sell4Detail列表
-	 * @param code
+	 * 根据采购单id查找相应的销售明细信息
+	 * @param 
+	 * @return
+	 */
+	List<Map<String, String>> selectListSellDetailByCode(Long buyId);
+	
+	
+	/**
+	 * 根据采购单id查找相应的sell4Detail列表
+	 * @param 
 	 * @return
 	 */
 	List<Invoice4SellDetail> selectSellDetailByCode(Long buyId);
 
 	/**
-	 * 根据发票代码查找相应的sellDetail列表(排除此sellId)
-	 * @param code
+	 * 根据采购单id查找相应的sellDetail列表(排除此sellId)
+	 * @param 
 	 * @param sellId
 	 * @return
 	 */

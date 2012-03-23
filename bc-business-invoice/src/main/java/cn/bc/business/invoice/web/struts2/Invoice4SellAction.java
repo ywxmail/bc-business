@@ -230,8 +230,19 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 		this.unitList = list;	
 		
 		//发票代码
-		this.codeList=this.invoice4BuyService.findEnabled4Option();
+		this.codeList=this.removeListNullObj(this.invoice4BuyService.findEnabled4Option());
 	}
+	//清空LIST中保存的空对象
+	private List<Map<String,String>> removeListNullObj(List<Map<String,String>> List){
+		List<Map<String,String>> tempList=new ArrayList<Map<String,String>>();
+		for(Map<String,String> map: List){
+			if(map!=null){
+				tempList.add(map);
+			}
+		}
+		return tempList;
+	}
+	
 	/**
 	 * 生成OptiomItem key、value值
 	 */
@@ -263,15 +274,16 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 	
 	//自动加载采购单发票代码信息
 	public String autoLoadInvoice4BuyCode(){
-		//JSONArray jsonArray=OptionItem.toLabelValues(this.invoice4BuyService.findEnabled4Option());
 		JsonArray jsonArray=new JsonArray();
 		Json json=null;
 		List<Map<String, String>> codeListMap= this.invoice4BuyService.findEnabled4Option();
 		for(Map<String,String> codMap:codeListMap){
-			json=new Json();
-			json.put("key", codMap.get("key").trim());
-			json.put("value", codMap.get("value").trim());
-			jsonArray.add(json);
+			if(codMap!=null){
+				json=new Json();
+				json.put("key", codMap.get("key").trim());
+				json.put("value", codMap.get("value").trim());
+				jsonArray.add(json);
+			}
 		}
 		this.json=jsonArray.toString();
 		return "json";
@@ -283,44 +295,25 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 		Json json=null;
 		if(this.buyId!=null){
 			json=new Json();
-			Invoice4Buy invoice4Buy=this.invoice4BuyService.load(this.buyId);
-			List<Invoice4SellDetail> list=this.invoice4SellService.selectSellDetailByCode(this.buyId);
+			List<Map<String, String>> list=this.invoice4SellService.selectListSellDetailByCode(this.buyId);
 			if(list!=null&&list.size()>0){
-				//如果查回来的结束号等于采购单的结束号
-				if(list.get(list.size()-1).getEndNo().trim().equals(invoice4Buy.getEndNo().trim())){
-					json.put("startNo","");
-					json.put("endNo", "");
-					json.put("count", "");
-					json.put("amount", "");
+				json.put("sellPrice", list.get(0).get("sellPrice"));
+				json.put("eachCount", list.get(0).get("eachCount"));//每份数量
+				
+				//取此结束号
+				String str=list.get(0).get("endNo").trim();
+				//此结束号+1
+				Long l=Long.parseLong(str);
+				l+=1;
+				String strLong=String.valueOf(l);
+				if(strLong.length()>=str.length()){
+					json.put("startNo", strLong);
 				}else{
-					String str=list.get(list.size()-1).getEndNo().trim();
-					Long l=Long.parseLong(str);
-						l+=1;
-					String strLong=String.valueOf(l);
-					if(invoice4Buy.getCount()!=0){
-						Long sum=((Long.parseLong(invoice4Buy.getEndNo().trim())+1)-l);
-						Long eachCount=(long)invoice4Buy.getEachCount();
-						json.put("count", sum/eachCount);
-						json.put("amount", sum/eachCount*invoice4Buy.getSellPrice());
-					}else{
-						json.put("count", "");
-						json.put("amount", "");
-					}
-					json.put("endNo", invoice4Buy.getEndNo());
-					if(strLong.length()>=str.length()){
-						json.put("startNo", strLong);
-					}else{//处理0开头的字符串
-						json.put("startNo", str.substring(0,(str.length()-strLong.length()))+strLong);
-					}
+					//取此结束号+1作为开始号       //处理0开头的字符串
+					json.put("startNo", str.substring(0,(str.length()-strLong.length()))+strLong);
 				}
-			}else{
-				json.put("startNo",invoice4Buy.getStartNo());
-				json.put("endNo", invoice4Buy.getEndNo());
-				json.put("count", invoice4Buy.getCount());
-				json.put("amount",invoice4Buy.getCount()*invoice4Buy.getSellPrice());
+				
 			}
-			json.put("sellPrice", invoice4Buy.getSellPrice());
-			json.put("eachCount", invoice4Buy.getEachCount());//每份数量
 			this.json=json.toString();
 		}
 		return "json";
@@ -341,7 +334,6 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 		}else{
 			this.json=jsonStr;
 		}
-		
 		return "json";
 	}
 	
