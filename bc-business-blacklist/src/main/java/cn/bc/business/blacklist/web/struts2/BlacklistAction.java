@@ -322,6 +322,8 @@ public class BlacklistAction extends FileEntityAction<Long, Blacklist> {
 		this.blackLevelList = optionItems.get(OptionConstants.CARMAN_LEVEL);
 		// 加载黑名单限制项目
 		this.blackTypeList = optionItems.get(OptionConstants.BLACKLIST_TYPE);
+		// 组装司机
+		this.driversInfoList = this.formatDrivers(this.getE().getDrivers());
 
 		if (logger.isInfoEnabled())
 			logger.info("findOptionItem耗时：" + DateUtils.getWasteTime(startTime));
