@@ -67,12 +67,10 @@ public class Invoice4BalanceAction extends ActionSupport {
 	public String execute() throws Exception {
 		// 设置页面
 		this.pageOption = new PageOption()
-				.setMaximizable(true)
-				.setMinimizable(true)
 				.setMinWidth(200)
-				.setWidth(410)
+				.setWidth(580)
 				.setMinHeight(200)
-				.setHeight(380)
+				.setHeight(340)
 				.addButton(
 						new ButtonOption(getText("invoice.optype.select"),
 								null, "bs.invoice4BalanceForm.select"));

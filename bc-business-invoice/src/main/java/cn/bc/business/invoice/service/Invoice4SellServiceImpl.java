@@ -59,4 +59,8 @@ public class Invoice4SellServiceImpl extends DefaultCrudService<Invoice4Sell> im
 		return this.invoice4SellDao.findCompany4Option();
 	}
 
+	public List<Map<String, String>> selectListSellDetailByCode(Long buyId) {
+		return this.invoice4SellDao.selectListSellDetailByCode(buyId);
+	}
+
 }
