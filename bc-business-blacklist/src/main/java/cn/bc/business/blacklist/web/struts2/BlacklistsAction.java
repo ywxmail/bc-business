@@ -78,9 +78,10 @@ public class BlacklistsAction extends ViewAction<Map<String, Object>> {
 		StringBuffer sql = new StringBuffer();
 		sql.append("select b.id,b.status_,b.file_date,b.code,cm.name drivers,b.company,unit.name,m.name motorcade_name");
 		sql.append(",c.plate_type,c.plate_no,b.type_,b.subject,b.lock_date,l.name locker");
-		sql.append(",b.unlock_date,u.name unlocker,b.car_id,b.driver_id,md.actor_name modifier,b.modified_date");
+		sql.append(",b.unlock_date,u.name unlocker,b.car_id,cb.man_id,md.actor_name modifier,b.modified_date");
 		sql.append(" from BS_BLACKLIST b");
-		sql.append(" left join BS_CARMAN cm on cm.id=b.driver_id");
+		sql.append(" left join BS_CARMAN_BLACKLIST cb on cb.blacklist_id=b.id");
+		sql.append(" left join BS_CARMAN cm on cm.id=cb.man_id");
 		sql.append(" left join BS_MOTORCADE m on m.id=b.motorcade_id");
 		sql.append(" left join bc_identity_actor unit on unit.id=m.unit_id");
 		sql.append(" left join BS_CAR c on c.id=b.car_id");
@@ -274,7 +275,7 @@ public class BlacklistsAction extends ViewAction<Map<String, Object>> {
 
 		Condition carManIdCondition = null;
 		if (carManId != null) {
-			carManIdCondition = new EqualsCondition("b.driver_id", carManId);
+			carManIdCondition = new EqualsCondition("cb.man_id", carManId);
 		}
 		// carId条件
 		Condition carIdCondition = null;

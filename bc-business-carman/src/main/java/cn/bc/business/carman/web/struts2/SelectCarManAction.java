@@ -5,6 +5,7 @@ package cn.bc.business.carman.web.struts2;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Controller;
 
 import cn.bc.BCConstants;
 import cn.bc.business.BSConstants;
+import cn.bc.business.carman.domain.CarByDriver;
 import cn.bc.core.query.condition.Condition;
 import cn.bc.core.query.condition.Direction;
 import cn.bc.core.query.condition.impl.AndCondition;
@@ -24,6 +26,7 @@ import cn.bc.core.util.StringUtils;
 import cn.bc.db.jdbc.RowMapper;
 import cn.bc.db.jdbc.SqlObject;
 import cn.bc.web.formater.CalendarFormater;
+import cn.bc.web.formater.KeyValueFormater;
 import cn.bc.web.struts2.AbstractSelectPageAction;
 import cn.bc.web.ui.html.grid.Column;
 import cn.bc.web.ui.html.grid.IdColumn4MapKey;
@@ -59,7 +62,7 @@ public class SelectCarManAction extends
 
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer sql = new StringBuffer();
-		sql.append("select c.id,c.name,c.cert_fwzg,c.work_date,c.type_ from BS_CARMAN c");
+		sql.append("select c.id,c.name,c.cert_fwzg,c.work_date,c.classes,c.type_ from BS_CARMAN c");
 		sqlObject.setSql(sql.toString());
 
 		// 注入参数
@@ -74,6 +77,7 @@ public class SelectCarManAction extends
 				map.put("name", rs[i++]);
 				map.put("cert_fwzg", rs[i++]);
 				map.put("work_date", rs[i++]);
+				map.put("classes", rs[i++]);
 				return map;
 			}
 		});
@@ -91,6 +95,10 @@ public class SelectCarManAction extends
 		columns.add(new TextColumn4MapKey("c.work_date", "work_date",
 				getText("carMan.workDate"), 120).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+		columns.add(new TextColumn4MapKey("c.classes", "classes",
+				getText("carMan.classes"), 80)
+				.setValueFormater(new KeyValueFormater(getDriverClasses())));
+
 		return columns;
 	}
 
@@ -188,4 +196,25 @@ public class SelectCarManAction extends
 	protected String getHtmlPageNamespace() {
 		return this.getContextPath() + BSConstants.NAMESPACE;
 	}
+
+	/**
+	 * 特殊的营运班次(3，4都显示为顶班)
+	 * 
+	 * @return
+	 */
+	private Map<String, String> getDriverClasses() {
+		Map<String, String> type = new LinkedHashMap<String, String>();
+		type.put(String.valueOf(CarByDriver.TYPE_ZHENGBAN),
+				getText("carByDriver.classes.zhengban"));
+		type.put(String.valueOf(CarByDriver.TYPE_FUBAN),
+				getText("carByDriver.classes.fuban"));
+		type.put(String.valueOf(CarByDriver.TYPE_DINGBAN),
+				getText("carByDriver.classes.dingban"));
+		type.put(String.valueOf(CarByDriver.TYPE_ZHUGUA),
+				getText("carByDriver.classes.dingban"));
+		type.put(String.valueOf(CarByDriver.TYPE_WEIDINGYI),
+				getText("carByDriver.classes.weidingyi"));
+		return type;
+	}
+
 }

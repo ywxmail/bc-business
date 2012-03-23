@@ -30,6 +30,9 @@ drop table if exists BS_SYNC_JIAOWEI_YYWZ;
 drop table if exists BS_SYNC_JIAOWEI_ADVICE;
 
 -- 黑名单
+--黑名单关系表
+drop table if exists BS_CARMAN_BLACKLIST;
+--黑名单表
 drop table if exists BS_BLACKLIST;
 
 -- 合同
