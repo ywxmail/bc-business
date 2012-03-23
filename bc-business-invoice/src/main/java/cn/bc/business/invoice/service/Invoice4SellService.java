@@ -19,6 +19,13 @@ import cn.bc.core.service.CrudService;
 public interface Invoice4SellService extends CrudService<Invoice4Sell> {
 
 	/**
+	 * 根据采购单id查找相应的销售明细信息
+	 * @param 
+	 * @return
+	 */
+	List<Map<String, String>> selectListSellDetailByCode(Long buyId);
+	
+	/**
 	 * 根据采购ID查找相应的sell4Detail列表
 	 * @param code
 	 * @return

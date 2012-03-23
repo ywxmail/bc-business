@@ -78,7 +78,7 @@ public class Invoice4BuysAction extends ViewAction<Map<String, Object>> {
 		sql.append(",b.company as company,b.type_ as type_,b.count_ as count_,b.buy_price as buy_price");
 		sql.append(",b.desc_ as desc,b.unit_ as unit_,b.sell_price as sell_price,a.actor_name as buyerName");
 		sql.append(",getbalancecountbyinvoicebuyid(b.id) as balance_count");
-		sql.append(",getbalancenumberbyinvoicebuyid(b.id,b.count_,b.start_no,b.end_no) as balance_number");
+		//sql.append(",getbalancenumberbyinvoicebuyid(b.id,b.count_,b.start_no,b.end_no) as balance_number");
 		sql.append(" from bs_invoice_buy b");
 		sql.append(" left join bc_identity_actor_history a on a.id=b.buyer_id");
 		sqlObject.setSql(sql.toString());
@@ -115,7 +115,7 @@ public class Invoice4BuysAction extends ViewAction<Map<String, Object>> {
 				map.put("sell_price", rs[i++]); // 销售单价
 				map.put("buyerName", rs[i++]); // 购买人
 				map.put("balance_count", rs[i++]); // 剩余数量
-				map.put("balance_number", rs[i++]); // 剩余号码段
+				//map.put("balance_number", rs[i++]); // 剩余号码段
 				return map;
 			}
 		});
@@ -179,8 +179,8 @@ public class Invoice4BuysAction extends ViewAction<Map<String, Object>> {
 				getText("invoice.amount"), 150).setSortable(true).setUseTitleFromLabel(true)
 				.setValueFormater(new NubmerFormater("###,##0.00")));
 		// 剩余号码段
-		columns.add(new TextColumn4MapKey("", "balance_number",
-				getText("invoice4Buy.balanceNumber"), 200).setUseTitleFromLabel(true));
+		//columns.add(new TextColumn4MapKey("", "balance_number",
+				//getText("invoice4Buy.balanceNumber"), 200).setUseTitleFromLabel(true));
 		// 备注
 		columns.add(new TextColumn4MapKey("b.desc_", "desc",
 				getText("invoice.desc")).setUseTitleFromLabel(true));
@@ -308,12 +308,12 @@ public class Invoice4BuysAction extends ViewAction<Map<String, Object>> {
 		this.invoice4BuyService = invoice4BuyService;
 	}
 
-	public JSONArray codes;
+	//public JSONArray codes;
 	public JSONArray companies;// 公司的下拉列
 
 	@Override
 	protected void initConditionsFrom() throws Exception {
-			codes=OptionItem.toLabelValues(this.invoice4BuyService.findEnabled4Option());
+			//codes=OptionItem.toLabelValues(this.invoice4BuyService.findEnabled4Option());
 			
 			//公司
 			companies=OptionItem.toLabelValues(this.invoice4BuyService.findCompany4Option());

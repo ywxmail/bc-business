@@ -37,6 +37,28 @@ public class Invoice4SellDaoImpl extends HibernateCrudJpaDao<Invoice4Sell> imple
 		this.jdbcTemplate = new JdbcTemplate(dataSource);
 	}
 	
+	public List<Map<String, String>> selectListSellDetailByCode(Long buyId) {
+		StringBuffer strB=new StringBuffer("select b.sell_price,b.each_count,d.end_no");
+		strB.append(" from bs_invoice_buy b");
+		strB.append(" inner join bs_invoice_sell_detail d on d.buy_id=b.id");
+		strB.append(" inner join bs_invoice_sell s on s.id=d.sell_id");
+		strB.append(" where s.status_=0 and b.id=?");
+		strB.append(" order by d.start_no DESC");
+		strB.append(" limit 1");
+		String sql=strB.toString();
+		
+		return HibernateJpaNativeQuery.executeNativeSql(getJpaTemplate(), sql,new Object[] { buyId },new RowMapper<Map<String, String>>() {
+			public Map<String, String> mapRow(Object[] rs, int rowNum) {
+				Map<String, String> oi = new HashMap<String, String>();
+				int i = 0;
+				oi.put("sellPrice", rs[i++].toString());
+				oi.put("eachCount", rs[i++].toString());
+				oi.put("endNo", rs[i++].toString());
+				return oi;
+			}
+		});
+	}
+	
 	/**
 	 * 根据发票代码查找相应的sell4Detail列表
 	 * @param code
