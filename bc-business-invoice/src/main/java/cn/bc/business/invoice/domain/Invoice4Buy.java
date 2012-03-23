@@ -41,8 +41,10 @@ public class Invoice4Buy extends FileEntityImpl {
 	
 	/** 单位：卷*/
 	public static final int UNIT_JUAN = 2;
+	public static final String UNIT_STR_JUAN = "卷";
 	/** 单位：本 */
 	public static final int UNIT_BEN = 1;
+	public static final String UNIT_STR_BEN = "本";
 	
 	private int status;//状态
 	private String company;//所属公司
