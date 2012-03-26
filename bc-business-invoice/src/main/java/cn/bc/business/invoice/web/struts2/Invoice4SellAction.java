@@ -70,9 +70,9 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 	public List<Map<String,String>>	codeList;
 	
 	public boolean isMoreCar; // 是否存在多辆车
-	public boolean isMoreCarMan; // 是否存在多个司机
+	public boolean isMoreBuyer; // 是否存在多个购买人
 	public boolean isNullCar; // 此司机没有车
-	public boolean isNullCarMan; // 此车没有司机
+	public boolean isNullBuyer; // 此车没有购买人
 
 	@Autowired
 	public void setInvoice4BuyService(Invoice4SellService invoice4SellService) {
@@ -126,15 +126,39 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 		//entity.setBuyPrice(7F);
 		entity.setStatus(BCConstants.STATUS_ENABLED);
 		entity.setPayType(Invoice4Sell.PAY_TYPE_CASH);
+		entity.setCashierId(entity.getAuthor());
 		
-		if (carId != null && buyerId == null) {// 车辆页签中的新建
+		if (carId != null){// 车辆页签中的新建
 			Car car=this.carService.load(carId);
 			entity.setCarId(this.carId);
 			entity.setCarPlate(car.getPlate());
-		}else if(carId == null && buyerId != null){// 司机页签中的新建
+			entity.setMotorcadeId(car.getMotorcade());
+			entity.setCompany(car.getCompany());
+			List<CarMan> carman=this.carManService.selectAllCarManByCarId(this.carId);
+			if(carman.size()==1){
+				entity.setBuyerId(carman.get(0).getId());
+				entity.setBuyerName(carman.get(0).getName());
+			}else if(carman.size()>1){
+				isMoreBuyer=true;
+			}else{
+				isNullBuyer=true;
+			}
+			
+		}else if(buyerId != null){// 司机页签中的新建
 			CarMan carman=this.carManService.load(buyerId);
 			entity.setBuyerId(this.buyerId);
 			entity.setBuyerName(carman.getName());
+			List<Car> car= this.carService.selectAllCarByCarManId(this.buyerId);
+			if(car.size()==1){
+				entity.setCarId(car.get(0).getId());
+				entity.setCarPlate(car.get(0).getPlate());
+				entity.setMotorcadeId(car.get(0).getMotorcade());
+				entity.setCompany(car.get(0).getCompany());
+			}else if (car.size() > 1) {
+				isMoreCar = true;
+			} else {
+				isNullCar = true;
+			}
 		}
 		
 		//发票代码
@@ -174,8 +198,6 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 		//发票代码
 		this.codeList=code4list;
 	}
-
-
 
 
 	public String sellDetails;//销售明细字符串JSON格式

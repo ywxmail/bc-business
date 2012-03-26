@@ -46,6 +46,7 @@ import cn.bc.web.ui.html.grid.IdColumn4MapKey;
 import cn.bc.web.ui.html.grid.TextColumn4MapKey;
 import cn.bc.web.ui.html.page.PageOption;
 import cn.bc.web.ui.html.toolbar.Toolbar;
+import cn.bc.web.ui.json.Json;
 
 /**
  * 票务销售视图Action
@@ -60,6 +61,7 @@ public class Invoice4SellsAction extends ViewAction<Map<String, Object>> {
 	public String status = String.valueOf(BCConstants.STATUS_ENABLED); // 票务的状态，多个用逗号连接
 	public Long buyerId;
 	public Long carId;
+	
 
 	@Override
 	public boolean isReadonly() {
@@ -79,7 +81,7 @@ public class Invoice4SellsAction extends ViewAction<Map<String, Object>> {
 	@Override
 	protected LikeCondition getGridSearchCondition4OneField(String field,
 			String value) {
-		if (field.indexOf("s.car_plate") != -1) {
+		if (field.indexOf("car_plate") != -1) {
 			return new LikeCondition(field, value != null ? value.toUpperCase()
 					: value);
 		} else {
@@ -381,6 +383,24 @@ public class Invoice4SellsAction extends ViewAction<Map<String, Object>> {
 	@Override
 	protected String getGridDblRowMethod() {
 		return "bc.page.open";
+	}
+	
+	@Override
+	protected Json getGridExtrasData() {
+		Json json = new Json();
+		// 状态条件
+		if (this.status != null || this.status.length() != 0) {
+			json.put("status", status);
+		}
+		// carManId条件
+		if (buyerId != null) {
+			json.put("buyerId", buyerId);
+		}
+		// carId条件
+		if (carId != null) {
+			json.put("carId", carId);
+		}
+		return json.isEmpty() ? null : json;
 	}
 	
 	// ==高级搜索代码开始==
