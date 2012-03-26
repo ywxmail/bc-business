@@ -37,11 +37,10 @@ public class Invoice4SellDaoImpl extends HibernateCrudJpaDao<Invoice4Sell> imple
 	}
 	
 	public List<Map<String, String>> selectListSellDetailByCode(Long buyId) {
-		StringBuffer strB=new StringBuffer("select b.sell_price,b.each_count,d.end_no");
+		StringBuffer strB=new StringBuffer("select b.sell_price,b.each_count,d.end_no,b.start_no");
 		strB.append(" from bs_invoice_buy b");
 		strB.append(" inner join bs_invoice_sell_detail d on d.buy_id=b.id");
-		strB.append(" inner join bs_invoice_sell s on s.id=d.sell_id");
-		strB.append(" where s.status_=0 and b.id=?");
+		strB.append(" where d.status_=0 and b.id=?");
 		strB.append(" order by d.start_no DESC");
 		strB.append(" limit 1");
 		String sql=strB.toString();
@@ -52,7 +51,8 @@ public class Invoice4SellDaoImpl extends HibernateCrudJpaDao<Invoice4Sell> imple
 				int i = 0;
 				oi.put("sellPrice", rs[i++].toString());
 				oi.put("eachCount", rs[i++].toString());
-				oi.put("endNo", rs[i++].toString());
+				oi.put("endNo4Sell", rs[i++].toString());
+				oi.put("startNo4Buy", rs[i++].toString());
 				return oi;
 			}
 		});
@@ -66,7 +66,7 @@ public class Invoice4SellDaoImpl extends HibernateCrudJpaDao<Invoice4Sell> imple
 	@SuppressWarnings("unchecked")
 	public List<Invoice4SellDetail> selectSellDetailByCode(Long buyId) {
 		return this.getJpaTemplate().find(
-				"from Invoice4SellDetail where buyId=? and invoice4Sell.status=? order by startNo", 
+				"from Invoice4SellDetail where buyId=? and status=? order by startNo", 
 				new Object[] {buyId,BCConstants.STATUS_ENABLED});
 		
 	}
@@ -80,7 +80,7 @@ public class Invoice4SellDaoImpl extends HibernateCrudJpaDao<Invoice4Sell> imple
 	@SuppressWarnings("unchecked")
 	public List<Invoice4SellDetail> selectSellDetailByCode(Long buyId,Long sellId) {
 		return this.getJpaTemplate().find(
-				"from Invoice4SellDetail where buyId=? and invoice4Sell.id!=? and invoice4Sell.status=? order by startNo", 
+				"from Invoice4SellDetail where buyId=? and invoice4Sell.id!=? and status=? order by startNo", 
 				new Object[] {buyId,sellId,BCConstants.STATUS_ENABLED});
 	}
 	

@@ -39,23 +39,23 @@ public class Invoice4BuyDaoImpl extends HibernateCrudJpaDao<Invoice4Buy>
 	}
 
 	public List<Map<String, String>> find4Option(Integer[] statuses) {
-		String hql = "select ib.id,ib.code,ib.start_no,ib.end_no";
-				hql += ",ib.company,ib.buy_date,ib.type_,ib.unit_";
-				hql += ",getbalancecountbyinvoicebuyid(ib.id)";
-				hql += " from BS_INVOICE_BUY ib";
+		String hql = "select b.id,b.code,b.start_no,b.end_no";
+				hql += ",b.company,b.buy_date,b.type_,b.unit_,b.count_";
+				hql += ",(select sum(count_) from bs_invoice_sell_detail where buy_id=b.id and status_=0)";
+				hql += " from BS_INVOICE_BUY b";
 		
 		if (statuses != null && statuses.length > 0) {
 			if (statuses.length == 1) {
-				hql += " where ib.status_ = ?";
+				hql += " where b.status_ = ?";
 			} else {
-				hql += " where ib.status_ in (";
+				hql += " where b.status_ in (";
 				for (int i = 0; i < statuses.length; i++) {
 					hql += (i == 0 ? "?" : ",?");
 				}
 				hql += ")";
 			}
 		}
-		hql += " order by ib.buy_date DESC";
+		hql += " order by b.buy_date DESC";
 		if (logger.isDebugEnabled()) {
 			logger.debug("hql=" + hql);
 		}
@@ -70,13 +70,22 @@ public class Invoice4BuyDaoImpl extends HibernateCrudJpaDao<Invoice4Buy>
 						String endNo = rs[i++].toString();
 						String company = rs[i++].toString();
 						Object buy_date = rs[i++];
-						String unit = rs[i++].toString();	
 						String type = rs[i++].toString();
-						
-						//剩余数量
+						String unit = rs[i++].toString();	
 						String count_ = rs[i++].toString();
+						//销售数量
+						Object obj_sell_count = rs[i++];
+						//剩余数量
+						int balanceCount=0;
+						
+						if(obj_sell_count==null){
+							balanceCount=Integer.parseInt(count_);
+						}else{
+							balanceCount=Integer.parseInt(count_)-Integer.parseInt(obj_sell_count.toString());
+						}
+						
 						//剩余数量大于0时 才return
-						if(Integer.parseInt(count_)>0){
+						if(balanceCount>0){
 							String typeStr=null;
 							String unitStr=null;
 							
@@ -97,7 +106,7 @@ public class Invoice4BuyDaoImpl extends HibernateCrudJpaDao<Invoice4Buy>
 								String buyDateStr=dateformat.format(buy_date);
 							
 							String value = code + "(" + startNo + "~" + endNo
-									+ ")"+company+","+ buyDateStr+","+ typeStr+",剩余数量："+count_+unitStr;
+									+ ")"+company+","+ buyDateStr+","+ typeStr+",剩余数量："+balanceCount+unitStr;
 							
 							oi.put("value",value);
 							return oi;
@@ -204,9 +213,8 @@ public class Invoice4BuyDaoImpl extends HibernateCrudJpaDao<Invoice4Buy>
 	public List<Map<String, String>> findSellDetail(Long id) {
 		StringBuffer sbSql = new StringBuffer("select d.start_no,d.end_no");
 		sbSql.append(" from bs_invoice_buy b");
-		sbSql.append(" left join bs_invoice_sell_detail d on d.buy_id=b.id");
-		sbSql.append(" left join bs_invoice_sell s on s.id=d.sell_id and s.status_=0");
-		sbSql.append(" where b.id=?");
+		sbSql.append(" inner join bs_invoice_sell_detail d on d.buy_id=b.id");
+		sbSql.append(" where d.status_=0 and b.id=?");
 		String sql = sbSql.toString();
 		return HibernateJpaNativeQuery.executeNativeSql(getJpaTemplate(), sql,
 				new Object[] { id }, new RowMapper<Map<String, String>>() {
@@ -239,13 +247,19 @@ public class Invoice4BuyDaoImpl extends HibernateCrudJpaDao<Invoice4Buy>
 	}
 	
 	public List<String> findBalanceCountByInvoice4BuyId(Long id){
-		String sql = "select getbalancecountbyinvoicebuyid(b.id),1";
+		String sql = "select b.count_,(select sum(count_) from bs_invoice_sell_detail where buy_id=b.id and status_=0)";
 		sql += " from bs_invoice_buy b";
 		sql += " where b.id=?";
 		return HibernateJpaNativeQuery.executeNativeSql(getJpaTemplate(), sql,
 				new Object[] { id }, new RowMapper<String>() {
 					public String mapRow(Object[] rs, int rowNum) {
-						return rs[0].toString();
+						Object obj_sell_count=rs[1];
+						if(rs[1]==null){
+							return rs[0].toString();
+						}else{
+							int balanceCount=Integer.parseInt(rs[0].toString())-Integer.parseInt(obj_sell_count.toString());
+							return String.valueOf(balanceCount);
+						}
 					}
 				});
 	}
