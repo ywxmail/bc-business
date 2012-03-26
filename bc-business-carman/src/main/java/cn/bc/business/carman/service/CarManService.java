@@ -49,13 +49,6 @@ public interface CarManService extends CrudService<CarMan> {
 	Long checkCert4FWZGIsExists(Long excludeId, String cert4FWZG);
 
 	/**
-	 * 保存司机表的沉余字段
-	 * 
-	 * @param entity
-	 */
-	abstract void setShiftworkInfo(CarMan entity);
-
-	/**
 	 * 更新司机的电话号码
 	 * 
 	 * @param carManId

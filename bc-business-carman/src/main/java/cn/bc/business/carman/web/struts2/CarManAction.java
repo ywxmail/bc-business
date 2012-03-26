@@ -91,13 +91,6 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 		this.getE().setGz(true);
 	}
 
-	protected void beforeSave(CarMan entity) {
-		super.beforeSave(entity);
-		// 获取迁移记录的信息，保存相应的沉余字段
-		this.carManService.setShiftworkInfo(entity);
-
-	}
-
 	@Override
 	protected void initForm(boolean editable) throws Exception {
 		super.initForm(editable);
