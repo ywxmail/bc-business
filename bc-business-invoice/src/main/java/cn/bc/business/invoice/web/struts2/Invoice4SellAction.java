@@ -115,7 +115,7 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 
 	@Override
 	protected PageOption buildFormPageOption(boolean editable) {
-		return super.buildFormPageOption(editable).setWidth(800)
+		return super.buildFormPageOption(editable).setWidth(770)
 				.setMinWidth(250).setMinHeight(200);
 	}
 
@@ -143,6 +143,8 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 			}else{
 				isNullBuyer=true;
 			}
+			//发票代码
+			this.codeList=this.removeListNullObj(this.invoice4BuyService.findEnabled4Option());
 			
 		}else if(buyerId != null){// 司机页签中的新建
 			CarMan carman=this.carManService.load(buyerId);
@@ -159,10 +161,14 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 			} else {
 				isNullCar = true;
 			}
+			//发票代码
+			this.codeList=this.removeListNullObj(this.invoice4BuyService.findEnabled4Option());
+		}else if(buyId != null){
+			this.codeList=this.invoice4BuyService.findOneInvoice4Buy(buyId);
+		}else{
+			//发票代码
+			this.codeList=this.removeListNullObj(this.invoice4BuyService.findEnabled4Option());
 		}
-		
-		//发票代码
-		this.codeList=this.removeListNullObj(this.invoice4BuyService.findEnabled4Option());
 	}
 	
 	
@@ -207,7 +213,7 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 		super.beforeSave(entity);
 	
 		//销售明细集合
-		Set<Invoice4SellDetail> details=this.parseSell4DetailString(this.sellDetails);
+		Set<Invoice4SellDetail> details=this.parseSell4DetailString(this.sellDetails,this.status);
 
 		//集合放进对象中
 		if(this.getE().getInvoice4SellDetail()!=null&&this.getE().getInvoice4SellDetail().size()>0){
@@ -220,7 +226,7 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 	}
 	
 	//解析销售明细字符串返回销售明细集合
-	private LinkedHashSet<Invoice4SellDetail> parseSell4DetailString(String detailStr){
+	private LinkedHashSet<Invoice4SellDetail> parseSell4DetailString(String detailStr,int status){
 		try {
 			//销售明细集合
 			LinkedHashSet<Invoice4SellDetail> details=null;
@@ -235,6 +241,7 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 					if (json.has("id"))
 						resDetails.setId(json.getLong("id"));
 					resDetails.setInvoice4Sell(this.getE());
+					resDetails.setStatus(this.status);
 					resDetails.setBuyId(Long.parseLong(json.getString("buyId").trim()));
 					resDetails.setStartNo(json.getString("startNo").trim());
 					resDetails.setEndNo(json.getString("endNo").trim());
@@ -360,9 +367,8 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 			if(list!=null&&list.size()>0){
 				json.put("sellPrice", list.get(0).get("sellPrice"));
 				json.put("eachCount", list.get(0).get("eachCount"));//每份数量
-				
 				//取此结束号
-				String str=list.get(0).get("endNo").trim();
+				String str=list.get(0).get("endNo4Sell").trim();
 				//此结束号+1
 				Long l=Long.parseLong(str);
 				l+=1;
@@ -373,7 +379,6 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 					//取此结束号+1作为开始号       //处理0开头的字符串
 					json.put("startNo", str.substring(0,(str.length()-strLong.length()))+strLong);
 				}
-				
 			}
 			this.json=json.toString();
 		}
@@ -382,18 +387,24 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 	
 	//----------验证销售明细的正确性---------开始----
 	public Long sellId;
+	public int status;
 	public String sellDetailsStr;
 	
 	public String checkSell4Detail(){
 		Json json=new Json();
-		LinkedHashSet<Invoice4SellDetail> details=this.parseSell4DetailString(this.sellDetailsStr);
-		// 检查结果：checkResult
-		String jsonStr=this.checkDetailItself(this.setChangeList4detail(details), json);
-		//自身验证正常时进入数据库信息验证
-		if(jsonStr.equals("")){
-			this.json=this.checkDetailScope(details,this.sellId,json);
+		//作废不需要进入检测
+		if(this.status==Invoice4Sell.STATUS_NORMAL){
+			LinkedHashSet<Invoice4SellDetail> details=this.parseSell4DetailString(this.sellDetailsStr,this.status);
+			// 检查结果：checkResult
+			String jsonStr=this.checkDetailItself(this.setChangeList4detail(details), json);
+			//自身验证正常时进入数据库信息验证
+			if(jsonStr.equals("")){
+				this.json=this.checkDetailScope(details,this.sellId,json);
+			}else{
+				this.json=jsonStr;
+			}
 		}else{
-			this.json=jsonStr;
+			this.json="";
 		}
 		return "json";
 	}
