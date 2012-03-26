@@ -5,7 +5,6 @@ package cn.bc.business.contract.dao.hibernate.jpa;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -610,16 +609,15 @@ public class Contract4LabourDaoImpl extends
 	 * @param description
 	 */
 	public void updateCarMan4CarManInfo(Long driverId, String houseType,
-			Integer region, String origin, Calendar birthDate) {
+			Integer region, String origin) {
 		ArrayList<Object> args = new ArrayList<Object>();
 		StringBuffer hql = new StringBuffer();
 		hql.append("UPDATE CarMan c SET c.houseType=?,c.region=?");
-		hql.append(",c.origin=?,c.birthdate=?");
+		hql.append(",c.origin=?");
 		hql.append(" WHERE c.id =?");
 		args.add(houseType);
 		args.add(region);
 		args.add(origin);
-		args.add(birthDate);
 		args.add(driverId);
 		this.executeUpdate(hql.toString(), args);
 		
