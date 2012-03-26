@@ -16,7 +16,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 import cn.bc.BCConstants;
 import cn.bc.business.invoice.dao.Invoice4SellDao;
-import cn.bc.business.invoice.domain.Invoice4Buy;
 import cn.bc.business.invoice.domain.Invoice4Sell;
 import cn.bc.business.invoice.domain.Invoice4SellDetail;
 import cn.bc.db.jdbc.RowMapper;
@@ -106,7 +105,7 @@ public class Invoice4SellDaoImpl extends HibernateCrudJpaDao<Invoice4Sell> imple
 			sql.append(" and b.buy_date<?");
 		}
 		
-		args.add(Invoice4Buy.TYPE_PRINT);
+		args.add(type);
 		args.add(buyDate);
 		
 		if(company != null && company.length() >0){
@@ -137,7 +136,7 @@ public class Invoice4SellDaoImpl extends HibernateCrudJpaDao<Invoice4Sell> imple
 		sql.append("select sum(b.count_) buyCount from bs_invoice_buy b")
 		   .append(" where b.status_=0 and b.type_=? and b.buy_date>=? and b.buy_date<=?");
 		
-		args.add(Invoice4Buy.TYPE_PRINT);
+		args.add(type);
 		args.add(buyDateFrom);
 		args.add(buyDateTo);
 		
@@ -174,7 +173,7 @@ public class Invoice4SellDaoImpl extends HibernateCrudJpaDao<Invoice4Sell> imple
 			sql.append(" and s.sell_date<?");
 		}
 		
-		args.add(Invoice4Buy.TYPE_PRINT);
+		args.add(type);
 		args.add(SellDate);
 		
 		if(company != null && company.length() >0){
@@ -206,7 +205,7 @@ public class Invoice4SellDaoImpl extends HibernateCrudJpaDao<Invoice4Sell> imple
 		   .append(" inner join bs_invoice_buy b on b.id=d.buy_id")
 	       .append(" where s.status_=0 and b.type_=? and s.sell_date>=? and s.sell_date<=?");
 		
-		args.add(Invoice4Buy.TYPE_PRINT);
+		args.add(type);
 		args.add(SellDateFrom);
 		args.add(SellDateTo);
 		
