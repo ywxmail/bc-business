@@ -38,6 +38,10 @@ import cn.bc.web.ui.json.Json;
  * @author wis.ho
  * 
  */
+/**
+ * @author wis
+ *
+ */
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 @Controller
 public class Contract4LabourAction extends
@@ -57,7 +61,7 @@ public class Contract4LabourAction extends
 	public Map<String, Object> carManInfoMap; // 司机信息map
 	public List<Map<String, Object>> infoList;
 
-	public List<Map<String, String>> businessTypeList; // 可选营运性质列表
+	//public List<Map<String, String>> businessTypeList; // 可选营运性质列表
 	public List<Map<String, String>> insurancetypeList; // 可选营运性质列表
 	public List<Map<String, String>> houseTypeList; // 可选户口类型列表
 	public List<Map<String, String>> buyUnitList; // 可选购买单位列表
@@ -70,7 +74,7 @@ public class Contract4LabourAction extends
 	public Json json;
 
 	// public CertService certService;
-
+	
 	@Autowired
 	public void setContract4LabourService(
 			Contract4LabourService contract4LabourService) {
@@ -111,6 +115,63 @@ public class Contract4LabourAction extends
 		return !context.hasAnyRole(getText("key.role.bs.contract4labour"),
 				getText("key.role.bc.admin"));
 	}
+	
+	// ## 显示最新的车辆司机信息 ##
+	
+	private Calendar registerDate; //车辆登记日期
+	private String bsType; //车辆营运性质
+	private String certNo; //司机服务资格证
+	private Calendar birthDate; //司机出生日期
+	private String origin; //司机籍贯
+	private String certIdentity; //司机身份证
+
+	public Calendar getRegisterDate() {
+		return registerDate;
+	}
+
+	public void setRegisterDate(Calendar registerDate) {
+		this.registerDate = registerDate;
+	}
+
+	public String getBsType() {
+		return bsType;
+	}
+
+	public void setBsType(String bsType) {
+		this.bsType = bsType;
+	}
+
+	public String getCertNo() {
+		return certNo;
+	}
+
+	public void setCertNo(String certNo) {
+		this.certNo = certNo;
+	}
+
+	public Calendar getBirthDate() {
+		return birthDate;
+	}
+
+	public void setBirthDate(Calendar birthDate) {
+		this.birthDate = birthDate;
+	}
+
+	public String getOrigin() {
+		return origin;
+	}
+
+	public void setOrigin(String origin) {
+		this.origin = origin;
+	}
+	
+	public String getCertIdentity() {
+		return certIdentity;
+	}
+
+	public void setCertIdentity(String certIdentity) {
+		this.certIdentity = certIdentity;
+	}
 
 	@Override
 	protected void afterCreate(Contract4Labour entity){
@@ -136,17 +197,15 @@ public class Contract4LabourAction extends
 						isNullObject(infoList.get(0).get("name")));
 				entity.setSex(
 						Integer.valueOf(infoList.get(0).get("sex") + ""));
-				entity.setCertNo(
-						isNullObject(infoList.get(0).get("cert_fwzg")));
-				entity.setCertIdentity(
-						isNullObject(infoList.get(0).get("cert_identity")));
-				entity.setOrigin(
-						isNullObject(infoList.get(0).get("origin")));
+				this.certNo = isNullObject(infoList.get(0).get("cert_fwzg"));
+				this.certIdentity = 
+						isNullObject(infoList.get(0).get("cert_identity"));
+				this.origin =
+						isNullObject(infoList.get(0).get("origin"));
 				entity.setHouseType(
 						isNullObject(infoList.get(0).get("house_type")));
 
-				if (entity.getAge() == null
-						&& getDateToString(infoList.get(0).get("birthdate"))
+				if(getDateToString(infoList.get(0).get("birthdate"))
 								.length() > 0) {
 					try {
 						date = sdf.parse(infoList.get(0).get("birthdate") + "");
@@ -154,12 +213,12 @@ public class Contract4LabourAction extends
 						e.printStackTrace();
 					}
 					date2.setTime(date);
-					entity.setBirthDate(date2);
+					this.birthDate = date2;
 				}
-
-				entity.setAge(
-						Integer.valueOf(getBirthDateToString(infoList.get(0)
-								.get("birthdate"))));
+//
+//				entity.setAge(
+//						Integer.valueOf(getBirthDateToString(infoList.get(0)
+//								.get("birthdate"))));
 			} else if (infoList.size() > 1) {
 				isMoreCarMan = true;
 			} else {
@@ -176,9 +235,9 @@ public class Contract4LabourAction extends
 					e.printStackTrace();
 				}
 				date2.setTime(date);
-				entity.setRegisterDate(date2);
+				this.registerDate = date2;
 			}
-			entity.setBsType(isNullObject(carInfoMap.get("bs_type")));
+			this.bsType = isNullObject(carInfoMap.get("bs_type"));
 		}
 
 		if (driverId != null && carId == null) {// 司机页签中的新建
@@ -201,8 +260,7 @@ public class Contract4LabourAction extends
 											+ "."
 											+ isNullObject(infoList.get(0).get(
 													"plate_no")));
-					if (entity.getAge() == null
-							&& getDateToString(infoList.get(0).get("register_date"))
+					if (getDateToString(infoList.get(0).get("register_date"))
 									.length() > 0) {
 						try {
 							date = sdf.parse(infoList.get(0).get("register_date") + "");
@@ -210,10 +268,10 @@ public class Contract4LabourAction extends
 							e.printStackTrace();
 						}
 						date2.setTime(date);
-						entity.setRegisterDate(date2);
+						this.registerDate = date2;
 					}
-					entity.setBsType(
-							isNullObject(infoList.get(0).get("bs_type")));
+					this.bsType =
+							isNullObject(infoList.get(0).get("bs_type"));
 				} else if (infoList.size() > 1) {
 					isMoreCar = true;
 				} else {
@@ -222,10 +280,10 @@ public class Contract4LabourAction extends
 				// 填写司机信息
 				entity.setExt_str2(isNullObject(carManInfoMap.get("name")));
 				entity.setSex(Integer.valueOf(carManInfoMap.get("sex") + ""));
-				entity.setCertNo(isNullObject(carManInfoMap.get("cert_fwzg")));
-				entity.setCertIdentity(
-						isNullObject(carManInfoMap.get("cert_identity")));
-				entity.setOrigin(isNullObject(carManInfoMap.get("origin")));
+				this.certNo = isNullObject(carManInfoMap.get("cert_fwzg"));
+				this.certIdentity = 
+						isNullObject(carManInfoMap.get("cert_identity"));
+				this.origin = isNullObject(carManInfoMap.get("origin"));
 				entity.setHouseType(
 						isNullObject(carManInfoMap.get("house_type")));
 	
@@ -236,14 +294,14 @@ public class Contract4LabourAction extends
 						e.printStackTrace();
 					}
 					date2.setTime(date);
-					entity.setBirthDate(date2);
+					this.birthDate = date2;
 				}
 	
-				if(carManInfoMap.get("birthdate") != null){
-					entity.setAge(
-							Integer.valueOf(getBirthDateToString(carManInfoMap
-									.get("birthdate"))));
-				}
+//				if(carManInfoMap.get("birthdate") != null){
+//					entity.setAge(
+//							Integer.valueOf(getBirthDateToString(carManInfoMap
+//									.get("birthdate"))));
+//				}
 			}
 		}
 
@@ -278,9 +336,8 @@ public class Contract4LabourAction extends
 		// 构建附件控件
 		attachsUI = buildAttachsUI(false, false);
 
-		//根据合同id查找车辆id和司机id
-		carId = this.contract4LabourService.findCarIdByContractId(entity.getId());
-		driverId = this.contract4LabourService.findCarManIdByContractId(entity.getId());
+		// 组装车辆和司机信息
+		setupCarAndDriverInfo();
 		
 		// 将次版本号加1
 		entity.setVerMinor(entity.getVerMinor() + 1);
@@ -293,6 +350,57 @@ public class Contract4LabourAction extends
 	protected void afterOpen(Contract4Labour entity) {
 		// 构建附件控件
 		attachsUI = buildAttachsUI(false, true);
+		
+		// 组装车辆和司机信息
+		setupCarAndDriverInfo();
+	}
+	
+	
+	/**
+	 * 组装车辆和司机信息
+	 */
+	private void setupCarAndDriverInfo(){
+		//根据合同id查找车辆id和司机id
+		carId = this.contract4LabourService.findCarIdByContractId(this.getE().getId());
+		driverId = this.contract4LabourService.findCarManIdByContractId(this.getE().getId());
+		
+		// 根据carId查找车辆以及司机id
+		carInfoMap = this.contract4LabourService.findCarByCarId(carId);
+		
+		// 根据carManId查找司机以及车辆id
+		carManInfoMap = this.contract4LabourService
+				.findCarManByCarManId(driverId);
+		
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		Date date = null;
+		
+		//车辆信息
+		if (getDateToString(carInfoMap.get("register_date")).length() > 0) {
+			try {
+				date = sdf.parse(carInfoMap.get("register_date") + "");
+			} catch (ParseException e) {
+				e.printStackTrace();
+			}
+			registerDate = Calendar.getInstance();
+			registerDate.setTime(date); //车辆登记日期
+		}
+		this.bsType = isNullObject(carInfoMap.get("bs_type")); //营运性质
+		
+		//司机信息
+		this.certNo = isNullObject(carManInfoMap.get("cert_fwzg")); //资格证
+		this.certIdentity = 
+				isNullObject(carManInfoMap.get("cert_identity")); //身份证
+		this.origin = isNullObject(carManInfoMap.get("origin")); //籍贯
+
+		if (getDateToString(carManInfoMap.get("birthdate")).length() > 0) {
+			try {
+				date = sdf.parse(carManInfoMap.get("birthdate") + "");
+			} catch (ParseException e) {
+				e.printStackTrace();
+			}
+			birthDate = Calendar.getInstance();
+			birthDate.setTime(date); //出生日期
+		}
 	}
 
 	@Override
@@ -311,8 +419,8 @@ public class Contract4LabourAction extends
 						OptionConstants.LB_BUYUNIT });
 
 		// 加载可选营运性质列表
-		this.businessTypeList = optionItems
-				.get(OptionConstants.CAR_BUSINESS_NATURE);
+//		this.businessTypeList = optionItems
+//				.get(OptionConstants.CAR_BUSINESS_NATURE);
 		// 加载可选社保险种列表
 		this.insurancetypeList = optionItems
 				.get(OptionConstants.LB_INSURANCETYPE);
@@ -557,6 +665,7 @@ public class Contract4LabourAction extends
 	 * 
 	 * @return
 	 */
+	@SuppressWarnings("unused")
 	private String getBirthDateToString(Object object) {
 		String birthDay = getDateToString(object);
 		if (birthDay.length() > 0) {
