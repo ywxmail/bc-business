@@ -136,8 +136,48 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 			entity.setBuyerId(this.buyerId);
 			entity.setBuyerName(carman.getName());
 		}
+		
+		//发票代码
+		this.codeList=this.removeListNullObj(this.invoice4BuyService.findEnabled4Option());
 	}
 	
+	
+	@Override
+	protected void afterEdit(Invoice4Sell entity) {
+		super.afterEdit(entity);
+		Set<Invoice4SellDetail> isd4set=entity.getInvoice4SellDetail();
+		List<Map<String,String>> code4list=new ArrayList<Map<String,String>>();
+		//遍历销售单对应的set集合，查出每个集合对应的采购
+		for(Invoice4SellDetail isd: isd4set){
+			for(Map<String,String> map: this.invoice4BuyService.findOneInvoice4Buy(isd.getBuyId())){
+				code4list.add(map);
+			}
+		}
+		for(Map<String,String> map :this.removeListNullObj(this.invoice4BuyService.findEnabled4Option())){
+				code4list.add(map);
+		}
+		//发票代码
+		this.codeList=code4list;
+	}
+
+	@Override
+	protected void afterOpen(Invoice4Sell entity) {
+		super.afterOpen(entity);
+		Set<Invoice4SellDetail> isd4set=entity.getInvoice4SellDetail();
+		List<Map<String,String>> code4list=new ArrayList<Map<String,String>>();
+		//遍历销售单对应的set集合，查出每个集合对应的采购
+		for(Invoice4SellDetail isd: isd4set){
+			for(Map<String,String> map: this.invoice4BuyService.findOneInvoice4Buy(isd.getBuyId())){
+				code4list.add(map);
+			}
+		}
+		//发票代码
+		this.codeList=code4list;
+	}
+
+
+
+
 	public String sellDetails;//销售明细字符串JSON格式
 	
 	@Override
@@ -199,11 +239,11 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 		
 		// 加载可选车队列表
 		this.motorcadeList = this.motorcadeService.findEnabled4Option();
-		/*if (this.getE().getMotorcadeId() != null)
+		if (this.getE().getMotorcadeId() != null){
 			OptionItem.insertIfNotExist(this.motorcadeList, this.getE()
-					.getMotorcadeId().toString(), this.getE()
-					.getMotorcadeName());
-		*/
+					.getMotorcadeId().getId().toString(),this.getE().getMotorcadeId().getName());
+		}
+		
 		// 批量加载可选项列表
 		Map<String, List<Map<String, String>>> optionItems = this.optionService
 				.findOptionItemByGroupKeys(new String[] {
@@ -229,8 +269,7 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 				getText("invoice.unit.ben")));
 		this.unitList = list;	
 		
-		//发票代码
-		this.codeList=this.removeListNullObj(this.invoice4BuyService.findEnabled4Option());
+		
 	}
 	//清空LIST中保存的空对象
 	private List<Map<String,String>> removeListNullObj(List<Map<String,String>> List){

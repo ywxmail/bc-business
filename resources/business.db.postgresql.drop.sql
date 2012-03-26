@@ -16,6 +16,11 @@ drop table if exists BS_ARRANGE_MEMBER;
 drop table if exists BS_ARRANGE;
 drop table if exists BS_MEMBER;
 
+-- 发票管理
+drop table if exists BS_INVOICE_SELL_DETAIL;
+drop table if exists BS_INVOICE_SELL;
+drop table if exists BS_INVOICE_BUY;
+
 -- 证照遗失管理
 drop table if exists BS_CERT_LOST_ITEM;
 drop table if exists BS_CERT_LOST;

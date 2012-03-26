@@ -23,6 +23,14 @@ public interface Invoice4BuyDao extends CrudDao<Invoice4Buy> {
 	 * name -- Invoice4Buy的code(startNo-endNo),如:XXXX(10001~20000)
 	 */
 	List<Map<String, String>> findEnabled4Option();
+	
+	/**
+	 * 获取一个拼装为字符串的采购单信息
+	 * @param id
+	 * @return value--code(startNo-endNo)company,buy_date,type,balanceCount,
+	 * 		如：XXXX(10001~20000)宝城，2011-01-01，打印票，剩余数量：100卷
+	 */
+	List<Map<String, String>> findOneInvoice4Buy(Long id); 
 
 	/**
 	 * 通过发票代码查找对应可用的采购单列表
@@ -30,6 +38,7 @@ public interface Invoice4BuyDao extends CrudDao<Invoice4Buy> {
 	 * @return
 	 */
 	List<Invoice4Buy> selectInvoice4BuyByCode(String code);
+
 
 	/**
 	 * 通过发票代码查找对应可用的采购单列表(不包含自己本身)

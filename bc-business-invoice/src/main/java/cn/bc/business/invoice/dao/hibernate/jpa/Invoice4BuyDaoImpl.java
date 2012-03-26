@@ -3,6 +3,7 @@
  */
 package cn.bc.business.invoice.dao.hibernate.jpa;
 
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,7 +39,11 @@ public class Invoice4BuyDaoImpl extends HibernateCrudJpaDao<Invoice4Buy>
 	}
 
 	public List<Map<String, String>> find4Option(Integer[] statuses) {
-		String hql = "select ib.id,ib.code,ib.start_no,ib.end_no,ib.type_,getbalancecountbyinvoicebuyid(ib.id) from BS_INVOICE_BUY ib";
+		String hql = "select ib.id,ib.code,ib.start_no,ib.end_no";
+				hql += ",ib.company,ib.buy_date,ib.type_,ib.unit_";
+				hql += ",getbalancecountbyinvoicebuyid(ib.id)";
+				hql += " from BS_INVOICE_BUY ib";
+		
 		if (statuses != null && statuses.length > 0) {
 			if (statuses.length == 1) {
 				hql += " where ib.status_ = ?";
@@ -63,12 +68,18 @@ public class Invoice4BuyDaoImpl extends HibernateCrudJpaDao<Invoice4Buy>
 						String code = rs[i++].toString();
 						String startNo = rs[i++].toString();
 						String endNo = rs[i++].toString();
+						String company = rs[i++].toString();
+						Object buy_date = rs[i++];
+						String unit = rs[i++].toString();	
 						String type = rs[i++].toString();
-						String typeStr = "";
+						
 						//剩余数量
 						String count_ = rs[i++].toString();
 						//剩余数量大于0时 才return
 						if(Integer.parseInt(count_)>0){
+							String typeStr=null;
+							String unitStr=null;
+							
 							oi.put("key", key);
 							// 打印票
 							if (Integer.parseInt(type) == Invoice4Buy.TYPE_PRINT) {
@@ -77,12 +88,64 @@ public class Invoice4BuyDaoImpl extends HibernateCrudJpaDao<Invoice4Buy>
 							} else if (Integer.parseInt(type) == Invoice4Buy.TYPE_TORE) {
 								typeStr = Invoice4Buy.TYPE_STR_TORE;
 							}
-							oi.put("value", code + "(" + startNo + "~" + endNo
-									+ ")" + typeStr+",剩余数量："+count_);
+							if(Integer.parseInt(unit) == Invoice4Buy.UNIT_JUAN){
+								unitStr = Invoice4Buy.UNIT_STR_JUAN;
+							}else if(Integer.parseInt(unit) == Invoice4Buy.UNIT_BEN){
+								unitStr = Invoice4Buy.UNIT_STR_BEN;
+							}
+							SimpleDateFormat dateformat=new SimpleDateFormat("yyyy-MM-dd");
+								String buyDateStr=dateformat.format(buy_date);
+							
+							String value = code + "(" + startNo + "~" + endNo
+									+ ")"+company+","+ buyDateStr+","+ typeStr+",剩余数量："+count_+unitStr;
+							
+							oi.put("value",value);
 							return oi;
 						}else{
 							return null;
 						}
+					}
+				});
+	}
+	
+	public List<Map<String, String>> findOneInvoice4Buy(Long id){
+		String hql = "select ib.id,ib.code,ib.start_no,ib.end_no";
+		hql += ",ib.company,ib.buy_date,ib.type_";
+		hql += " from BS_INVOICE_BUY ib";
+		hql += " where ib.id=?";
+		if (logger.isDebugEnabled()) {
+			logger.debug("hql=" + hql);
+		}
+		return HibernateJpaNativeQuery.executeNativeSql(getJpaTemplate(), hql,
+				new Object[]{id}, new RowMapper<Map<String, String>>() {
+					public Map<String, String> mapRow(Object[] rs, int rowNum) {
+						Map<String, String> oi = new HashMap<String, String>();
+						int i = 0;
+						String key=rs[i++].toString();
+						String code = rs[i++].toString();
+						String startNo = rs[i++].toString();
+						String endNo = rs[i++].toString();
+						String company = rs[i++].toString();
+						Object buy_date = rs[i++];	
+						String type = rs[i++].toString();
+					
+						String typeStr=null;
+						oi.put("key", key);
+						// 打印票
+						if (Integer.parseInt(type) == Invoice4Buy.TYPE_PRINT) {
+							typeStr = Invoice4Buy.TYPE_STR_PRINT;
+							// 手撕票
+						} else if (Integer.parseInt(type) == Invoice4Buy.TYPE_TORE) {
+							typeStr = Invoice4Buy.TYPE_STR_TORE;
+						}
+						SimpleDateFormat dateformat=new SimpleDateFormat("yyyy-MM-dd");
+							String buyDateStr=dateformat.format(buy_date);
+						
+						String value = code + "(" + startNo + "~" + endNo
+								+ ")"+company+","+ buyDateStr+","+ typeStr;
+						
+						oi.put("value",value);
+						return oi;
 					}
 				});
 	}
