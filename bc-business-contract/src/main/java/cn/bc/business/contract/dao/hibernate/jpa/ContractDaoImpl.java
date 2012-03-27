@@ -55,6 +55,8 @@ public class ContractDaoImpl extends HibernateCrudJpaDao<Contract> implements
 			for (ContractCarManRelation entity : entities)
 				this.saveContractCarManRelation(entity);
 		}
+		// 如果不执行这句，实测结果是hibernate先执行了下面的更新语句再执行上面的保存语句而导致责任人信息没有更新
+		this.getJpaTemplate().flush();
 	}
 
 	public void updateContractCarRelation(Long contractId, Long carId) {
