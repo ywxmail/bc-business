@@ -116,7 +116,7 @@ public class CertLostsAction extends ViewAction<Map<String, Object>> {
 				map.put("cert_no", rs[i++]);
 				map.put("new_cert_no", rs[i++]);
 				map.put("alarmunit", rs[i++]);
-				
+
 				return map;
 			}
 		});
@@ -204,9 +204,11 @@ public class CertLostsAction extends ViewAction<Map<String, Object>> {
 				getText("certLost.lostDate"), 100).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
 		columns.add(new TextColumn4MapKey("l.lost_address", "lost_address",
-				getText("certLost.lostAddress")).setSortable(true));
+				getText("certLost.lostAddress")).setSortable(true)
+				.setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("i.alarmunit", "alarmunit",
-				getText("certLost.alarmUnit")).setSortable(true));
+				getText("certLost.alarmUnit")).setSortable(true)
+				.setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("i.is_replace", "is_replace",
 				getText("certLost.isReplace"), 75).setSortable(true)
 				.setUseTitleFromLabel(true)
