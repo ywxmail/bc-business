@@ -3,7 +3,6 @@
  */
 package cn.bc.business.contract.dao;
 
-import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
@@ -156,10 +155,9 @@ public interface Contract4LabourDao extends CrudDao<Contract4Labour> {
 	 * @param houseType
 	 * @param region
 	 * @param origin
-	 * @param birthDate
 	 */
 	void updateCarMan4CarManInfo(Long driverId, String houseType,
-			Integer region, String origin, Calendar birthDate);
+			Integer region, String origin);
 
 	
 //	/**

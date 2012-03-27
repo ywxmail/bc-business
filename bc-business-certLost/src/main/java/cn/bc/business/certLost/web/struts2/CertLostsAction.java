@@ -71,7 +71,7 @@ public class CertLostsAction extends ViewAction<Map<String, Object>> {
 		sql.append("select l.id,i.cert_name,c.code,c.plate_type,c.plate_no,l.lost_date,i.is_replace,i.replace_date");
 		sql.append(",l.transactor_name,l.driver,l.driver_id,l.car_id,c.company,unit.name unit_name");
 		sql.append(",m.name motorcade_name,i.lost_address,d.cert_fwzg,l.motorcade_id ");
-		sql.append(",i.is_remains,i.cert_no,i.new_cert_no from bs_cert_lost_item i ");
+		sql.append(",i.is_remains,i.cert_no,i.new_cert_no,i.alarmunit from bs_cert_lost_item i ");
 		sql.append(" left join bs_cert_lost l on l.id=i.pid");
 		sql.append(" left join bs_car c on c.id=l.car_id");
 		sql.append(" left join bs_carman d on d.id=l.driver_id");
@@ -115,6 +115,8 @@ public class CertLostsAction extends ViewAction<Map<String, Object>> {
 				map.put("is_remains", rs[i++]);
 				map.put("cert_no", rs[i++]);
 				map.put("new_cert_no", rs[i++]);
+				map.put("alarmunit", rs[i++]);
+
 				return map;
 			}
 		});
@@ -202,7 +204,11 @@ public class CertLostsAction extends ViewAction<Map<String, Object>> {
 				getText("certLost.lostDate"), 100).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
 		columns.add(new TextColumn4MapKey("l.lost_address", "lost_address",
-				getText("certLost.lostAddress")).setSortable(true));
+				getText("certLost.lostAddress")).setSortable(true)
+				.setUseTitleFromLabel(true));
+		columns.add(new TextColumn4MapKey("i.alarmunit", "alarmunit",
+				getText("certLost.alarmUnit")).setSortable(true)
+				.setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("i.is_replace", "is_replace",
 				getText("certLost.isReplace"), 75).setSortable(true)
 				.setUseTitleFromLabel(true)

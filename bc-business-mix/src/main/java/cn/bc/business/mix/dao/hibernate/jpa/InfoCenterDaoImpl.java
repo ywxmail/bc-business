@@ -701,10 +701,10 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 	 */
 	private JSONArray getBlacklist(final Long carId) {
 		final StringBuffer sql = new StringBuffer();
-		sql.append("select b.id,b.subject,b.lock_date,b.type_,m.name");
+		sql.append("select b.id,b.subject,b.lock_date,b.type_,b.drivers");
 		sql.append(" from bs_blacklist b");
-		sql.append(" left join bs_carman_blacklist cb on cb.blacklist_id=b.id");
-		sql.append(" left join bs_carman m on m.id=cb.man_id");
+		// sql.append(" left join bs_carman_blacklist cb on cb.blacklist_id=b.id");
+		// sql.append(" left join bs_carman m on m.id=cb.man_id");
 		sql.append(" where b.car_id = ? and b.status_ = 0");
 		sql.append(" order by b.file_date desc");
 
@@ -731,8 +731,8 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 							json.put("date",
 									DateUtils.formatDate((Date) obj[i++]));
 							json.put("limit", null2Empty(obj[i++]));
-							json.put("link", null2Empty(obj[i++]));
-
+							json.put("link",
+									getDriverInfo(null2Empty(obj[i++])));
 							jsons.put(json);
 						} catch (JSONException e) {
 							logger.error(e.getMessage(), e);
@@ -742,6 +742,39 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 				return jsons;
 			}
 		});
+	}
+
+	/**
+	 * 获取司机的信息{将姓名,班次,id;姓名2,班次2,id2...}转为[姓名(班次),姓名(班次)]
+	 * 
+	 * @param Drivers
+	 * @return
+	 */
+	private String getDriverInfo(String Drivers) {
+		if (Drivers == null || Drivers.trim().length() == 0) {
+			return "";
+		}
+		Drivers = Drivers.trim();
+		String[] vvs = Drivers.split(";");
+		// 循环每个司机执行格式化处理
+		String[] vs;
+		String driverInfo = "";
+		int i = 0;
+		for (String vv : vvs) {
+			if (i > 0)
+				driverInfo += ",";
+
+			vs = vv.split(",");// [0]-司机姓名,[1]-营运班次,[2]-司机id
+			if (vs.length == 3) {
+				driverInfo += vs[0] + "(" + vs[1] + ")";
+			} else {
+				driverInfo += vv;
+			}
+
+			i++;
+		}
+		return driverInfo;
+
 	}
 
 	/**

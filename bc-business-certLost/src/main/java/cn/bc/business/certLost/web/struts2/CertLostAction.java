@@ -143,6 +143,7 @@ public class CertLostAction extends FileEntityAction<Long, CertLost> {
 					resource.setCertNo(json.getString("certNo"));
 					resource.setReason(json.getString("reason"));
 					resource.setLostAddress(json.getString("lostAddress"));
+					resource.setAlarmUnit(json.getString("alarmUnit"));
 					resource.setDescription(json.getString("description"));
 					resource.setNewCertNo(json.getString("newCertNo"));
 					resource.setRemains(new Boolean(json.getString("remains")));

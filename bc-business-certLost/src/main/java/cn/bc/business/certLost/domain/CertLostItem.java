@@ -25,6 +25,7 @@ public class CertLostItem extends EntityImpl {
 	private boolean replace;// 是否补办
 	private Calendar replaceDate;// 补办日期
 	private String lostAddress;// 遗失地点
+	private String alarmUnit;// 报警单位
 	private String reason;// 补办原因
 	private String certNo;// 证件号码
 	private String newCertNo;// 新证件号码
@@ -119,6 +120,14 @@ public class CertLostItem extends EntityImpl {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	public String getAlarmUnit() {
+		return alarmUnit;
+	}
+
+	public void setAlarmUnit(String alarmUnit) {
+		this.alarmUnit = alarmUnit;
 	}
 
 }
