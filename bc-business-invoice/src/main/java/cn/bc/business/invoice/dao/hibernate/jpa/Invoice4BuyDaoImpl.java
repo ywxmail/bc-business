@@ -212,9 +212,9 @@ public class Invoice4BuyDaoImpl extends HibernateCrudJpaDao<Invoice4Buy>
 	 */
 	public List<Map<String, String>> findSellDetail(Long id) {
 		StringBuffer sbSql = new StringBuffer("select d.start_no,d.end_no");
-		sbSql.append(" from bs_invoice_buy b");
-		sbSql.append(" inner join bs_invoice_sell_detail d on d.buy_id=b.id");
-		sbSql.append(" where d.status_=0 and b.id=?");
+		sbSql.append(" from bs_invoice_sell_detail d");
+		sbSql.append(" where d.status_=0 and d.buy_id=?");
+		sbSql.append(" order by d.start_no");
 		String sql = sbSql.toString();
 		return HibernateJpaNativeQuery.executeNativeSql(getJpaTemplate(), sql,
 				new Object[] { id }, new RowMapper<Map<String, String>>() {
