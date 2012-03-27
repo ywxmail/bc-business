@@ -245,17 +245,10 @@ public class Invoice4BuyAction extends FileEntityAction<Long, Invoice4Buy> {
 	// 检测需要保存的采购单 号码范围不能够小于对应销售单的号码范围
 	private String checkSellNumberRange(List<Map<String, String>> list,
 			Long startNo, Long endNo, Json json) {
-		Map<String, String> map = null;
-		for (int i = 0; i < list.size(); i++) {
-			map = list.get(i);
-			if (map.get("startNo") != null && !map.get("startNo").equals("")) {
-				// 不在范围之内
-				if (!(Long.parseLong(map.get("startNo").trim()) >= startNo && Long
-						.parseLong(map.get("endNo").trim()) <= endNo)) {
-					json.put("checkResult", "2");
-					return json.toString();
-				}
-			}
+		if(!(Long.parseLong(list.get(0).get("startNo").trim())>=startNo
+				&& Long.parseLong(list.get(list.size()-1).get("endNo").trim())<=endNo)){
+			json.put("checkResult", "2");
+			return json.toString();
 		}
 		return json.toString();
 	}
