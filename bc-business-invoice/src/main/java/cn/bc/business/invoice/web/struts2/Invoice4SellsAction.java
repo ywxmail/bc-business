@@ -252,22 +252,22 @@ public class Invoice4SellsAction extends ViewAction<Map<String, Object>> {
 					.setUseTitleFromLabel(true));
 		}
 		// 发票编码开始号
-		columns.add(new TextColumn4MapKey("s.start_no", "start_no",
+		columns.add(new TextColumn4MapKey("d.start_no", "start_no",
 				getText("invoice.startNo"), 100).setSortable(true)
 				.setUseTitleFromLabel(true));
 		// 发票编码结束号
-		columns.add(new TextColumn4MapKey("s.end_no", "end_no",
+		columns.add(new TextColumn4MapKey("d.end_no", "end_no",
 				getText("invoice.endNo"), 100).setSortable(true)
 				.setUseTitleFromLabel(true));
 		// 数量
-		columns.add(new TextColumn4MapKey("s.count_", "count_",
+		columns.add(new TextColumn4MapKey("d.count_", "count_",
 				getText("invoice.count"), 65).setSortable(true));
 		// 销售单价
 		columns.add(new TextColumn4MapKey("d.price", "price",
 				getText("invoice4Sell.price"), 60).setSortable(true)
 				.setValueFormater(new NubmerFormater("###,###.00")));
 		// 合计
-		columns.add(new TextColumn4MapKey("s.price", "amount",
+		columns.add(new TextColumn4MapKey("d.price", "amount",
 				getText("invoice.amount"), 100).setSortable(true)
 				.setValueFormater(new NubmerFormater("###,###.00")));
 		// 备注
