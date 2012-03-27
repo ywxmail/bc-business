@@ -71,6 +71,8 @@ public class Contract4LabourAction extends
 	public boolean isNullCar; // 此司机没有车
 	public boolean isNullCarMan; // 此车没有司机
 	public boolean isExistContract; // 是否存在合同
+	public boolean isSupply; //是否补录
+	
 	public Json json;
 
 	// public CertService certService;
@@ -106,6 +108,14 @@ public class Contract4LabourAction extends
 
 	public void setDriverId(Long carManId) {
 		this.driverId = carManId;
+	}
+	
+	public boolean isSupply() {
+		return isSupply;
+	}
+
+	public void setSupply(boolean isSupply) {
+		this.isSupply = isSupply;
 	}
 
 	@Override
@@ -180,7 +190,6 @@ public class Contract4LabourAction extends
 		
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		Date date = null;
-		Calendar date2 = Calendar.getInstance();
 
 		if (carId != null && driverId == null) {// 车辆页签中的新建
 			
@@ -212,8 +221,8 @@ public class Contract4LabourAction extends
 					} catch (ParseException e) {
 						e.printStackTrace();
 					}
-					date2.setTime(date);
-					this.birthDate = date2;
+					birthDate = Calendar.getInstance();
+					birthDate.setTime(date); //出生日期
 				}
 //
 //				entity.setAge(
@@ -234,15 +243,18 @@ public class Contract4LabourAction extends
 				} catch (ParseException e) {
 					e.printStackTrace();
 				}
-				date2.setTime(date);
-				this.registerDate = date2;
+				registerDate = Calendar.getInstance();
+				registerDate.setTime(date); //车辆登记日期
 			}
 			this.bsType = isNullObject(carInfoMap.get("bs_type"));
 		}
 
 		if (driverId != null && carId == null) {// 司机页签中的新建
-			//查找此司机是否存在劳动合同,若存在前台提示
-			isExistContract = this.contract4LabourService.isExistContractByDriverId(driverId); 
+			
+			if(isSupply == false){ //新建
+				//查找此司机是否存在劳动合同,若存在前台提示
+				isExistContract = this.contract4LabourService.isExistContractByDriverId(driverId); 
+			}
 			
 			if(isExistContract == false){
 				// 根据carManId查找司机以及车辆id
@@ -267,8 +279,8 @@ public class Contract4LabourAction extends
 						} catch (ParseException e) {
 							e.printStackTrace();
 						}
-						date2.setTime(date);
-						this.registerDate = date2;
+						registerDate = Calendar.getInstance();
+						registerDate.setTime(date); //车辆登记日期
 					}
 					this.bsType =
 							isNullObject(infoList.get(0).get("bs_type"));
@@ -293,8 +305,8 @@ public class Contract4LabourAction extends
 					} catch (ParseException e) {
 						e.printStackTrace();
 					}
-					date2.setTime(date);
-					this.birthDate = date2;
+					birthDate = Calendar.getInstance();
+					birthDate.setTime(date); //出生日期
 				}
 	
 //				if(carManInfoMap.get("birthdate") != null){
@@ -305,23 +317,32 @@ public class Contract4LabourAction extends
 			}
 		}
 
-		// 自动生成UID
-		entity.setUid(
-				this.getIdGeneratorService().next(Contract4Labour.KEY_UID));
+
+		
+		if(isSupply == false){ //新建
+			entity.setMain(Contract.MAIN_NOW);
+			entity.setVerMajor(Contract.MAJOR_DEFALUT);
+			entity.setVerMinor(Contract.MINOR_DEFALUT);
+			entity.setStatus(Contract.STATUS_NORMAL);
+		}else{ //补录
+			entity.setMain(Contract.MAIN_HISTORY);
+			entity.setVerMajor(Contract.SUPPLY_MAJOR_DEFALUT);
+			entity.setVerMinor(Contract.SUPPLY_MINOR_DEFALUT);
+			entity.setStatus(Contract.STATUS_LOGOUT);
+		}
 		// 自动生成合同编号
 		entity.setCode(
 				this.getIdGeneratorService().nextSN4Month(
 						Contract4Labour.KEY_CODE));
+		// 自动生成UID
+		entity.setUid(
+				this.getIdGeneratorService().next(Contract4Labour.KEY_UID));
 		// 自动生成批号：与uid相同
 		entity.setPatchNo(entity.getUid());
 		entity.setType(Contract.TYPE_LABOUR);
 		entity.setOpType(Contract.OPTYPE_CREATE);
-		entity.setMain(Contract.MAIN_NOW);
-		entity.setVerMajor(Contract.MAJOR_DEFALUT);
-		entity.setVerMinor(Contract.MINOR_DEFALUT);
 		entity.setInsuranceType(getText("contract.wujin"));
 		entity.setBuyUnit(getText("contract.baocheng"));
-		entity.setStatus(Contract.STATUS_NORMAL);
 		entity.setIdentityCards(true);
 		entity.setHealthForm(true);
 		entity.setPhoto(true);
@@ -570,11 +591,20 @@ public class Contract4LabourAction extends
 	}
 
 	public String certInfo() {
-		certInfoMap = this.contract4LabourService.findCertByCarManId(driverId);
+		// 根据carManId查找司机以及车辆id
+		carManInfoMap = this.contract4LabourService
+				.findCarManByCarManId(driverId);
+		
 		json = new Json();
-		if (certInfoMap != null && certInfoMap.size() > 0) {
-			certCode = certInfoMap.get("cert_code") + "";
-			json.put("cert_code", certCode);
+		if (carManInfoMap != null && carManInfoMap.size() > 0) {
+			json.put("sex",Integer.valueOf(carManInfoMap.get("sex") + ""));
+			json.put("cert_fwzg",isNullObject(carManInfoMap.get("cert_fwzg")));
+			json.put("certIdentity", isNullObject(carManInfoMap.get("cert_identity")));
+			json.put("origin", isNullObject(carManInfoMap.get("origin")));
+			json.put("house_type", isNullObject(carManInfoMap.get("house_type")));
+			if (getDateToString(carManInfoMap.get("birthdate")).length() > 0) {
+				json.put("birthDate", getDateToString(carManInfoMap.get("birthdate")));
+			}
 		}
 		return "json";
 	}

@@ -43,6 +43,7 @@ import cn.bc.web.ui.html.grid.IdColumn4MapKey;
 import cn.bc.web.ui.html.grid.TextColumn4MapKey;
 import cn.bc.web.ui.html.page.PageOption;
 import cn.bc.web.ui.html.toolbar.Toolbar;
+import cn.bc.web.ui.html.toolbar.ToolbarButton;
 import cn.bc.web.ui.json.Json;
 
 /**
@@ -71,6 +72,11 @@ public class Contract4LaboursAction extends ViewAction<Map<String, Object>> {
 		SystemContext context = (SystemContext) this.getContext();
 		return !context.hasAnyRole(getText("key.role.bs.contract4labour"),
 				getText("key.role.bc.admin"));
+	}
+	
+	@Override
+	protected String getHtmlPageJs() {
+		return this.getContextPath() + "/bc-business/contract4Labour/view.js";
 	}
 
 	/**
@@ -102,6 +108,9 @@ public class Contract4LaboursAction extends ViewAction<Map<String, Object>> {
 					// 删除按钮
 					tb.addButton(this.getDefaultDeleteToolbarButton());
 				}
+				
+				tb.addButton(new ToolbarButton().setIcon("ui-icon-document").setText("补录")
+						.setClick("bs.contract4LabourView.clickOk"));
 			}
 		}
 
@@ -143,6 +152,7 @@ public class Contract4LaboursAction extends ViewAction<Map<String, Object>> {
 		sql.append(",cl.insurCode,cl.insurance_type,cl.cert_no,cl.leaveDate,c.author_id,c.ver_major,c.ver_minor,c.op_type,iah.actor_name");
 		sql.append(",car.id carId");
 		sql.append(",man.id manId");
+		sql.append(",man.cert_fwzg certfwzg");
 		sql.append(",car.company company");
 		sql.append(",bia.id batch_company_id,bia.name batch_company");
 		sql.append(",m.id motorcade_id,m.name motorcade_name");
@@ -193,6 +203,7 @@ public class Contract4LaboursAction extends ViewAction<Map<String, Object>> {
 				map.put("name", rs[i++]);
 				map.put("carId", rs[i++]);
 				map.put("manId", rs[i++]);
+				map.put("certfwzg", rs[i++]);
 				map.put("company", rs[i++]);
 				map.put("batch_company_id", rs[i++]);
 				map.put("batch_company", rs[i++]);
@@ -284,7 +295,7 @@ public class Contract4LaboursAction extends ViewAction<Map<String, Object>> {
 										.get("manId"));
 					}
 				}));
-		columns.add(new TextColumn4MapKey("cl.cert_no", "cert_no",
+		columns.add(new TextColumn4MapKey("man.cert_certfwzg", "certfwzg",
 				getText("contract4Labour.certNo"), 60)
 				.setUseTitleFromLabel(true));
 		// columns.add(new TextColumn4MapKey("c.sign_date", "sign_date",
