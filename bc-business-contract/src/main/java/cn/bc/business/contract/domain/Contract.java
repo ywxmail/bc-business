@@ -59,6 +59,10 @@ public class Contract extends RichFileEntityImpl {
 	public static final int MAJOR_DEFALUT	= 1;
 	/**次版本号默认值*/
 	public static final int MINOR_DEFALUT	= 0;
+	/**补录主版本号默认值*/
+	public static final int SUPPLY_MAJOR_DEFALUT	= 0;
+	/**补录次版本号默认值*/
+	public static final int SUPPLY_MINOR_DEFALUT	= 9;
 	
 	/**主体当前版本*/
 	public static final int MAIN_NOW	    = 0;
