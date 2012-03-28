@@ -172,17 +172,17 @@ public class Invoice4SellsAction extends ViewAction<Map<String, Object>> {
 				.setValueFormater(new EntityStatusFormater(getStatus())));
 		// 销售日期
 		columns.add(new TextColumn4MapKey("s.sell_date", "sell_date",
-				getText("invoice4Sell.selldate"), 100).setSortable(true).setUseTitleFromLabel(true)
+				getText("invoice4Sell.selldate"), 95).setSortable(true).setUseTitleFromLabel(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
 		// 销售员
 		columns.add(new TextColumn4MapKey("a.actor_name", "cashier",
-				getText("invoice4Sell.cashier"), 100).setUseTitleFromLabel(true));
+				getText("invoice4Sell.cashier"), 60).setUseTitleFromLabel(true));
 		// 公司
 		columns.add(new TextColumn4MapKey("s.company", "company",
-				getText("invoice.company"), 60).setSortable(true));
+				getText("invoice.company"), 45).setSortable(true));
 		// 分公司
 		columns.add(new TextColumn4MapKey("bia.name", "unit_name",
-				getText("invoice.unitCompany"), 60).setSortable(true));
+				getText("invoice.unitCompany"), 70).setSortable(true));
 		// 车队
 		columns.add(new TextColumn4MapKey("m.name", "motorcade_name",
 				getText("invoice.motorcade"), 70)
@@ -236,40 +236,39 @@ public class Invoice4SellsAction extends ViewAction<Map<String, Object>> {
 			columns.add(new TextColumn4MapKey("cm.cert_fwzg", "fwzg",
 					getText("invoice4Sell.fwzg"), 80));
 		}
-
-		if(buyId == null){
-			// 发票类型
-			columns.add(new TextColumn4MapKey("b.type_", "type_",
-					getText("invoice.type"), 65).setSortable(true)
-					.setValueFormater(new KeyValueFormater(getTypes())));
-			// 发票单位
-			columns.add(new TextColumn4MapKey("b.unit_", "unit_",
-					getText("invoice.unit"), 65).setSortable(true)
-					.setValueFormater(new KeyValueFormater(getUnits())));
-			// 发票代码
-			columns.add(new TextColumn4MapKey("b.code", "code",
-					getText("invoice.code"), 100).setSortable(true)
-					.setUseTitleFromLabel(true));
-		}
-		// 发票编码开始号
-		columns.add(new TextColumn4MapKey("d.start_no", "start_no",
-				getText("invoice.startNo"), 100).setSortable(true)
-				.setUseTitleFromLabel(true));
-		// 发票编码结束号
-		columns.add(new TextColumn4MapKey("d.end_no", "end_no",
-				getText("invoice.endNo"), 100).setSortable(true)
-				.setUseTitleFromLabel(true));
 		// 数量
 		columns.add(new TextColumn4MapKey("d.count_", "count_",
 				getText("invoice.count"), 65).setSortable(true));
+		// 发票代码
+		columns.add(new TextColumn4MapKey("b.code", "code",
+				getText("invoice.code"), 100).setSortable(true)
+				.setUseTitleFromLabel(true));
+		// 发票编码开始号
+		columns.add(new TextColumn4MapKey("d.start_no", "start_no",
+				getText("invoice.startNo"), 80).setSortable(true)
+				.setUseTitleFromLabel(true));
+		// 发票编码结束号
+		columns.add(new TextColumn4MapKey("d.end_no", "end_no",
+				getText("invoice.endNo"), 80).setSortable(true)
+				.setUseTitleFromLabel(true));
 		// 销售单价
 		columns.add(new TextColumn4MapKey("d.price", "price",
 				getText("invoice4Sell.price"), 60).setSortable(true)
 				.setValueFormater(new NubmerFormater("###,###.00")));
 		// 合计
 		columns.add(new TextColumn4MapKey("d.price", "amount",
-				getText("invoice.amount"), 100).setSortable(true)
+				getText("invoice4Sell.amount"), 100).setSortable(true)
 				.setValueFormater(new NubmerFormater("###,###.00")));
+		if(buyId == null){
+			// 发票类型
+			columns.add(new TextColumn4MapKey("b.type_", "type_",
+					getText("invoice4Sell.type"), 65).setSortable(true)
+					.setValueFormater(new KeyValueFormater(getTypes())));
+			// 发票单位
+			columns.add(new TextColumn4MapKey("b.unit_", "unit_",
+					getText("invoice4Sell.unit"), 65).setSortable(true)
+					.setValueFormater(new KeyValueFormater(getUnits())));
+		}
 		// 备注
 		columns.add(new TextColumn4MapKey("s.desc_", "desc",
 				getText("invoice.desc")).setUseTitleFromLabel(true));

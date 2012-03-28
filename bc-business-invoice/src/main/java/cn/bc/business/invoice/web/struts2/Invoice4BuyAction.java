@@ -23,7 +23,6 @@ import cn.bc.business.web.struts2.FileEntityAction;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.option.domain.OptionItem;
 import cn.bc.option.service.OptionService;
-import cn.bc.web.formater.NubmerFormater;
 import cn.bc.web.ui.html.page.ButtonOption;
 import cn.bc.web.ui.html.page.PageOption;
 import cn.bc.web.ui.json.Json;
