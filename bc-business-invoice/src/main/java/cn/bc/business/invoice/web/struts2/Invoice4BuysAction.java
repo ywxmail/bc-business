@@ -141,51 +141,52 @@ public class Invoice4BuysAction extends ViewAction<Map<String, Object>> {
 				.setValueFormater(new EntityStatusFormater(this.getStatus())));
 		// 公司
 		columns.add(new TextColumn4MapKey("b.company", "company",
-				getText("invoice.company"), 60).setSortable(true));
-		// 购买人
-		columns.add(new TextColumn4MapKey("a.actor_name", "buyerName",
-				getText("invoice4Buy.buyer"), 80).setSortable(true));
+				getText("invoice.company"), 40).setSortable(true));
 		// 采购日期
 		columns.add(new TextColumn4MapKey("b.buy_date", "buy_date",
-				getText("invoice4Buy.buydate"), 100).setSortable(true)
+				getText("invoice4Buy.buydate"), 90).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
-		// 发票类型
-		columns.add(new TextColumn4MapKey("b.type_", "type_",
-				getText("invoice.type"), 65).setSortable(true)
-				.setValueFormater(new KeyValueFormater(getTypes())));
-		// 发票单位
-		columns.add(new TextColumn4MapKey("b.unit_", "unit_",
-				getText("invoice.unit"), 65).setSortable(true)
-				.setValueFormater(new KeyValueFormater(getUnits())));
+		// 数量
+		columns.add(new TextColumn4MapKey("b.count_", "count_",
+				getText("invoice4Buy.count"), 80).setSortable(true));
+		// 剩余数量
+		columns.add(new TextColumn4MapKey("", "balance_count",
+				getText("invoice4Buy.balanceCount"), 80).setSortable(true));
+		
 		// 发票代码
 		columns.add(new TextColumn4MapKey("b.code", "code",
-				getText("invoice.code"), 100).setSortable(true)
+				getText("invoice.code"), 120).setSortable(true)
 				.setUseTitleFromLabel(true));
 		// 发票编码开始号
 		columns.add(new TextColumn4MapKey("b.start_no", "start_no",
-				getText("invoice.startNo"), 100).setSortable(true)
+				getText("invoice.startNo"), 80).setSortable(true)
 				.setUseTitleFromLabel(true));
 		// 发票编码结束号
 		columns.add(new TextColumn4MapKey("b.end_no", "end_no",
-				getText("invoice.endNo"), 100).setSortable(true)
+				getText("invoice.endNo"), 80).setSortable(true)
 				.setUseTitleFromLabel(true));
-		// 数量
-		columns.add(new TextColumn4MapKey("b.count_", "count_",
-				getText("invoice4Buy.count"), 65).setSortable(true));
-		// 剩余数量
-		columns.add(new TextColumn4MapKey("", "balance_count",
-				getText("invoice4Buy.balanceCount"), 65).setSortable(true));
 		// 采购单价
 		columns.add(new TextColumn4MapKey("b.buy_price", "buy_price",
-				getText("invoice4Buy.buyPrice"), 65).setSortable(true)
+				getText("invoice4Buy.buyPrice"), 85).setSortable(true)
 				.setValueFormater(new NubmerFormater("###,##0.00")));
 		// 销售单价
 		columns.add(new TextColumn4MapKey("b.sell_price", "sell_price",
-				getText("invoice4Buy.sellPrice"), 65).setSortable(true)
+				getText("invoice4Buy.sellPrice"), 85).setSortable(true)
 				.setValueFormater(new NubmerFormater("###,##0.00")));
+		// 发票类型
+		columns.add(new TextColumn4MapKey("b.type_", "type_",
+				getText("invoice4Buy.type"), 50).setSortable(true)
+				.setValueFormater(new KeyValueFormater(getTypes())));
+		// 发票单位
+		columns.add(new TextColumn4MapKey("b.unit_", "unit_",
+				getText("invoice4Buy.unit"), 40).setSortable(true)
+				.setValueFormater(new KeyValueFormater(getUnits())));
+		// 购买人
+		columns.add(new TextColumn4MapKey("a.actor_name", "buyerName",
+				getText("invoice4Buy.buyer"), 80).setSortable(true));
 		// 合计
 		columns.add(new TextColumn4MapKey("b.buy_price", "amount",
-				getText("invoice.amount"), 150).setSortable(true).setUseTitleFromLabel(true)
+				getText("invoice4Buy.amount"), 150).setSortable(true).setUseTitleFromLabel(true)
 				.setValueFormater(new NubmerFormater("###,##0.00")));
 		// 剩余号码段
 		//columns.add(new TextColumn4MapKey("", "balance_number",

@@ -3,6 +3,7 @@
  */
 package cn.bc.business.invoice.web.struts2;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -22,6 +23,7 @@ import cn.bc.business.web.struts2.FileEntityAction;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.option.domain.OptionItem;
 import cn.bc.option.service.OptionService;
+import cn.bc.web.formater.NubmerFormater;
 import cn.bc.web.ui.html.page.ButtonOption;
 import cn.bc.web.ui.html.page.PageOption;
 import cn.bc.web.ui.json.Json;
@@ -45,7 +47,7 @@ public class Invoice4BuyAction extends FileEntityAction<Long, Invoice4Buy> {
 	public List<Map<String, String>> typeList; // 发票类型列表（打印票、手撕票）
 	public List<Map<String, String>> unitList; // 发票单位列表（卷、本）
 
-	public Float amount;// 合计
+	public String amount;// 合计
 	public String balanceNumber;// 剩余号码段
 	public String balanceCount;//剩余数量
 
@@ -72,7 +74,7 @@ public class Invoice4BuyAction extends FileEntityAction<Long, Invoice4Buy> {
 
 	@Override
 	protected PageOption buildFormPageOption(boolean editable) {
-		return super.buildFormPageOption(editable).setWidth(660)
+		return super.buildFormPageOption(editable).setWidth(680)
 				.setMinWidth(250).setMinHeight(200);
 	}
 
@@ -88,8 +90,9 @@ public class Invoice4BuyAction extends FileEntityAction<Long, Invoice4Buy> {
 
 	@Override
 	protected void afterEdit(Invoice4Buy entity) {
+		DecimalFormat format = new DecimalFormat("###,##0.00");
 		// 计算合计
-		this.amount = entity.getCount() * entity.getBuyPrice();
+		this.amount = format.format(entity.getCount()*entity.getBuyPrice());
 		this.balanceNumber = this.invoice4BuyService
 				.findBalanceNumberByInvoice4BuyId(entity.getId()).get(0);
 		this.balanceCount = this.invoice4BuyService.findBalanceCountByInvoice4BuyId(entity.getId()).get(0);
@@ -98,8 +101,9 @@ public class Invoice4BuyAction extends FileEntityAction<Long, Invoice4Buy> {
 
 	@Override
 	protected void afterOpen(Invoice4Buy entity) {
+		DecimalFormat format = new DecimalFormat("###,##0.00");
 		// 计算合计
-		this.amount = entity.getCount() * entity.getBuyPrice();
+		this.amount = format.format(entity.getCount()*entity.getBuyPrice());
 		this.balanceNumber = this.invoice4BuyService
 				.findBalanceNumberByInvoice4BuyId(entity.getId()).get(0);
 		this.balanceCount = this.invoice4BuyService.findBalanceCountByInvoice4BuyId(entity.getId()).get(0);
