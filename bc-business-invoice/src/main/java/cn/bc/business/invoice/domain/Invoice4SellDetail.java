@@ -28,6 +28,7 @@ public class Invoice4SellDetail extends EntityImpl {
 	private Float price;//销售单价
 	private String startNo;//开始号
 	private String endNo;//结束号
+	private int status;//状态，对应销售单
 	
 	@ManyToOne(fetch = FetchType.EAGER, optional = false)
 	@JoinColumn(name = "SELL_ID", referencedColumnName = "ID")
@@ -82,5 +83,15 @@ public class Invoice4SellDetail extends EntityImpl {
 	public void setEndNo(String endNo) {
 		this.endNo = endNo;
 	}
+
+	@Column(name = "STATUS_")
+	public int getStatus() {
+		return status;
+	}
+
+	public void setStatus(int status) {
+		this.status = status;
+	}
+	
 	
 }

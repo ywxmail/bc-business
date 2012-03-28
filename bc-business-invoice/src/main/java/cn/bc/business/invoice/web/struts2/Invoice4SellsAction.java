@@ -19,6 +19,7 @@ import org.springframework.stereotype.Controller;
 import cn.bc.BCConstants;
 import cn.bc.business.invoice.domain.Invoice4Buy;
 import cn.bc.business.invoice.domain.Invoice4Sell;
+import cn.bc.business.invoice.service.Invoice4BuyService;
 import cn.bc.business.invoice.service.Invoice4SellService;
 import cn.bc.business.motorcade.service.MotorcadeService;
 import cn.bc.business.web.struts2.ViewAction;
@@ -46,6 +47,7 @@ import cn.bc.web.ui.html.grid.IdColumn4MapKey;
 import cn.bc.web.ui.html.grid.TextColumn4MapKey;
 import cn.bc.web.ui.html.page.PageOption;
 import cn.bc.web.ui.html.toolbar.Toolbar;
+import cn.bc.web.ui.json.Json;
 
 /**
  * 票务销售视图Action
@@ -60,6 +62,14 @@ public class Invoice4SellsAction extends ViewAction<Map<String, Object>> {
 	public String status = String.valueOf(BCConstants.STATUS_ENABLED); // 票务的状态，多个用逗号连接
 	public Long buyerId;
 	public Long carId;
+	public Long buyId;//采购单ID
+	
+	private Invoice4BuyService invoice4BuyService;
+	
+	@Autowired
+	public void setInvoice4BuyService(Invoice4BuyService invoice4BuyService) {
+		this.invoice4BuyService = invoice4BuyService;
+	}
 
 	@Override
 	public boolean isReadonly() {
@@ -79,7 +89,7 @@ public class Invoice4SellsAction extends ViewAction<Map<String, Object>> {
 	@Override
 	protected LikeCondition getGridSearchCondition4OneField(String field,
 			String value) {
-		if (field.indexOf("s.car_plate") != -1) {
+		if (field.indexOf("car_plate") != -1) {
 			return new LikeCondition(field, value != null ? value.toUpperCase()
 					: value);
 		} else {
@@ -227,36 +237,37 @@ public class Invoice4SellsAction extends ViewAction<Map<String, Object>> {
 					getText("invoice4Sell.fwzg"), 80));
 		}
 
-		// 发票类型
-		columns.add(new TextColumn4MapKey("b.type_", "type_",
-				getText("invoice.type"), 60).setSortable(true)
-				.setValueFormater(new KeyValueFormater(getTypes())));
-		// 发票单位
-		columns.add(new TextColumn4MapKey("b.unit_", "unit_",
-				getText("invoice.unit"), 40).setSortable(true)
-				.setValueFormater(new KeyValueFormater(getUnits())));
-		// 发票代码
-		columns.add(new TextColumn4MapKey("b.code", "code",
-				getText("invoice.code"), 100).setSortable(true)
-				.setUseTitleFromLabel(true));
-		 
+		if(buyId == null){
+			// 发票类型
+			columns.add(new TextColumn4MapKey("b.type_", "type_",
+					getText("invoice.type"), 65).setSortable(true)
+					.setValueFormater(new KeyValueFormater(getTypes())));
+			// 发票单位
+			columns.add(new TextColumn4MapKey("b.unit_", "unit_",
+					getText("invoice.unit"), 65).setSortable(true)
+					.setValueFormater(new KeyValueFormater(getUnits())));
+			// 发票代码
+			columns.add(new TextColumn4MapKey("b.code", "code",
+					getText("invoice.code"), 100).setSortable(true)
+					.setUseTitleFromLabel(true));
+		}
 		// 发票编码开始号
-		columns.add(new TextColumn4MapKey("s.start_no", "start_no",
+		columns.add(new TextColumn4MapKey("d.start_no", "start_no",
 				getText("invoice.startNo"), 100).setSortable(true)
 				.setUseTitleFromLabel(true));
 		// 发票编码结束号
-		columns.add(new TextColumn4MapKey("s.end_no", "end_no",
+		columns.add(new TextColumn4MapKey("d.end_no", "end_no",
 				getText("invoice.endNo"), 100).setSortable(true)
 				.setUseTitleFromLabel(true));
 		// 数量
-		columns.add(new TextColumn4MapKey("s.count_", "count_",
-				getText("invoice.count"), 60).setSortable(true));
+		columns.add(new TextColumn4MapKey("d.count_", "count_",
+				getText("invoice.count"), 65).setSortable(true));
 		// 销售单价
 		columns.add(new TextColumn4MapKey("d.price", "price",
 				getText("invoice4Sell.price"), 60).setSortable(true)
 				.setValueFormater(new NubmerFormater("###,###.00")));
 		// 合计
-		columns.add(new TextColumn4MapKey("s.price", "amount",
+		columns.add(new TextColumn4MapKey("d.price", "amount",
 				getText("invoice.amount"), 100).setSortable(true)
 				.setValueFormater(new NubmerFormater("###,###.00")));
 		// 备注
@@ -350,26 +361,34 @@ public class Invoice4SellsAction extends ViewAction<Map<String, Object>> {
 		if (carId != null) {
 			carIdCondition = new EqualsCondition("s.car_id", carId);
 		}
+		// buyId采购单条件
+		Condition buyIdCondition = null;
+		if(buyId!=null){
+			buyIdCondition= new EqualsCondition("d.buy_id", buyId);
+		}
+		
 		// 合并条件
 		return ConditionUtils.mix2AndCondition(statusCondition,
-				carManIdCondition, carIdCondition);
+				carManIdCondition, carIdCondition,buyIdCondition);
 	}
 
 	@Override
 	protected Toolbar getHtmlPageToolbar() {
 		Toolbar tb = new Toolbar();
-		if (this.isReadonly()) {
-			// 查看按钮
-			tb.addButton(this.getDefaultOpenToolbarButton());
-		} else {
-			// 新建按钮
-			tb.addButton(this.getDefaultCreateToolbarButton());
-			// 查看按钮
-			tb.addButton(this.getDefaultOpenToolbarButton());
-			// 作废按钮
-			/*tb.addButton(Toolbar
-					.getDefaultDisabledToolbarButton(getText("invoice.status.invalid")));*/
+		if (!this.isReadonly()) {
+			if(buyId!=null){//采购单页签状态新建，若库存数量大于0则显示新建按钮
+				List<String> balanceCount = this.invoice4BuyService.findBalanceCountByInvoice4BuyId(buyId);
+				if(balanceCount!=null&&Integer.parseInt(balanceCount.get(0))>0){
+					// 新建按钮
+					tb.addButton(this.getDefaultCreateToolbarButton());
+				}
+			}else{
+				// 新建按钮
+				tb.addButton(this.getDefaultCreateToolbarButton());
+			}
 		}
+		// 查看按钮
+		tb.addButton(this.getDefaultOpenToolbarButton());
 		// 搜索按钮
 		tb.addButton(this.getDefaultSearchToolbarButton());
 
@@ -381,6 +400,27 @@ public class Invoice4SellsAction extends ViewAction<Map<String, Object>> {
 	@Override
 	protected String getGridDblRowMethod() {
 		return "bc.page.open";
+	}
+	
+	@Override
+	protected Json getGridExtrasData() {
+		Json json = new Json();
+		// 状态条件
+		if (this.status != null || this.status.length() != 0) {
+			json.put("status", status);
+		}
+		// carManId条件
+		if (buyerId != null) {
+			json.put("buyerId", buyerId);
+		}
+		// carId条件
+		if (carId != null) {
+			json.put("carId", carId);
+		}
+		if(buyId !=null){
+			json.put("buyId", buyId);
+		}
+		return json.isEmpty() ? null : json;
 	}
 	
 	// ==高级搜索代码开始==

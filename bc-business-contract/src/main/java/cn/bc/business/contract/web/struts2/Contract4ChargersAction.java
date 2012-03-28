@@ -154,7 +154,7 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 			sql.append(" left join BS_CARMAN_CONTRACT manc on c.id = manc.contract_id");
 			sql.append(" left join BS_CARMAN man on manc.man_id = man.id");
 		}
-		sql.append(" left join BC_IDENTITY_ACTOR_HISTORY iah on c.author_id = iah.id");
+		sql.append(" left join BC_IDENTITY_ACTOR_HISTORY iah on c.logout_id = iah.id");
 		sql.append(" left join bs_motorcade m on m.id=car.motorcade_id");
 		sql.append(" left join bc_identity_actor bia on bia.id=m.unit_id");
 
@@ -284,9 +284,9 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 				"contract_version_no",
 				getText("contract4Charger.contractVersionNo"), 180)
 				.setUseTitleFromLabel(true));
-		columns.add(new TextColumn4MapKey("c.transactor_name",
-				"transactor_name", getText("contract.transactor"), 50)
-				.setUseTitleFromLabel(true));
+//		columns.add(new TextColumn4MapKey("c.transactor_name",
+//				"transactor_name", getText("contract.transactor"), 50)
+//				.setUseTitleFromLabel(true));
 		// if(status.equals(String.valueOf(Contract.STATUS_LOGOUT)) ||
 		// status.length() == 0){ //控制视图在在案注销下不显示注销人,注销时间
 		columns.add(new TextColumn4MapKey("c.logout_date", "logout_date",

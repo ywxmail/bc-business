@@ -120,9 +120,13 @@ public class Contract4ChargerServiceImpl extends
 		if (oldContract == null)
 			throw new CoreException("要处理的合同已不存在！contractId=" + contractId);
 
+		SystemContext context = SystemContextHolder.get();
+		
 		// 更新旧合同的相关信息
 		oldContract.setStatus(Contract.STATUS_LOGOUT);// 失效
 		oldContract.setMain(Contract.MAIN_HISTORY);// 历史
+		oldContract.setLogoutId(context.getUserHistory());//注销人
+		oldContract.setLogoutDate(Calendar.getInstance());//注销时间
 		this.contract4ChargerDao.save(oldContract);
 
 		// 复制出新的合同
@@ -151,7 +155,6 @@ public class Contract4ChargerServiceImpl extends
 		newContract.setEndDate(newEndDate);
 
 		// 设置创建人信息和最后修改人信息
-		SystemContext context = SystemContextHolder.get();
 		newContract.setAuthor(context.getUserHistory());
 		newContract.setFileDate(Calendar.getInstance());
 		newContract.setModifier(context.getUserHistory());
@@ -222,9 +225,12 @@ public class Contract4ChargerServiceImpl extends
 		if (oldContract == null)
 			throw new CoreException("要处理的合同已不存在！contractId=" + contractId);
 
+		SystemContext context = SystemContextHolder.get();
 		// 更新旧合同的相关信息
 		oldContract.setStatus(Contract.STATUS_LOGOUT);// 失效
 		oldContract.setMain(Contract.MAIN_HISTORY);// 历史
+		oldContract.setLogoutId(context.getUserHistory());//注销人
+		oldContract.setLogoutDate(Calendar.getInstance());//注销时间
 		this.contract4ChargerDao.save(oldContract);
 
 		// 复制出新的合同
@@ -260,7 +266,6 @@ public class Contract4ChargerServiceImpl extends
 		newContract.setExt_str2(assignChargerNames);
 
 		// 设置创建人信息和最后修改人信息
-		SystemContext context = SystemContextHolder.get();
 		newContract.setAuthor(context.getUserHistory());
 		newContract.setFileDate(Calendar.getInstance());
 		newContract.setModifier(context.getUserHistory());
@@ -331,9 +336,12 @@ public class Contract4ChargerServiceImpl extends
 		if (oldContract == null)
 			throw new CoreException("要处理的合同已不存在！contractId=" + contractId);
 
+		SystemContext context = SystemContextHolder.get();
 		// 更新旧合同的相关信息
 		oldContract.setStatus(Contract.STATUS_LOGOUT);// 失效
 		oldContract.setMain(Contract.MAIN_HISTORY);// 历史
+		oldContract.setLogoutId(context.getUserHistory());//注销人
+		oldContract.setLogoutDate(Calendar.getInstance());//注销时间
 		this.contract4ChargerDao.save(oldContract);
 
 		// 复制出新的合同
@@ -370,7 +378,6 @@ public class Contract4ChargerServiceImpl extends
 		newContract.setExt_str2(assignChargerNames);
 
 		// 设置创建人信息和最后修改人信息
-		SystemContext context = SystemContextHolder.get();
 		newContract.setAuthor(context.getUserHistory());
 		newContract.setFileDate(Calendar.getInstance());
 		newContract.setModifier(context.getUserHistory());

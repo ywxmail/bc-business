@@ -70,9 +70,9 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 	public List<Map<String,String>>	codeList;
 	
 	public boolean isMoreCar; // 是否存在多辆车
-	public boolean isMoreCarMan; // 是否存在多个司机
+	public boolean isMoreBuyer; // 是否存在多个购买人
 	public boolean isNullCar; // 此司机没有车
-	public boolean isNullCarMan; // 此车没有司机
+	public boolean isNullBuyer; // 此车没有购买人
 
 	@Autowired
 	public void setInvoice4BuyService(Invoice4SellService invoice4SellService) {
@@ -115,7 +115,7 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 
 	@Override
 	protected PageOption buildFormPageOption(boolean editable) {
-		return super.buildFormPageOption(editable).setWidth(800)
+		return super.buildFormPageOption(editable).setWidth(770)
 				.setMinWidth(250).setMinHeight(200);
 	}
 
@@ -126,19 +126,49 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 		//entity.setBuyPrice(7F);
 		entity.setStatus(BCConstants.STATUS_ENABLED);
 		entity.setPayType(Invoice4Sell.PAY_TYPE_CASH);
+		entity.setCashierId(entity.getAuthor());
 		
-		if (carId != null && buyerId == null) {// 车辆页签中的新建
+		if (carId != null){// 车辆页签中的新建
 			Car car=this.carService.load(carId);
 			entity.setCarId(this.carId);
 			entity.setCarPlate(car.getPlate());
-		}else if(carId == null && buyerId != null){// 司机页签中的新建
+			entity.setMotorcadeId(car.getMotorcade());
+			entity.setCompany(car.getCompany());
+			List<CarMan> carman=this.carManService.selectAllCarManByCarId(this.carId);
+			if(carman.size()==1){
+				entity.setBuyerId(carman.get(0).getId());
+				entity.setBuyerName(carman.get(0).getName());
+			}else if(carman.size()>1){
+				isMoreBuyer=true;
+			}else{
+				isNullBuyer=true;
+			}
+			//发票代码
+			this.codeList=this.removeListNullObj(this.invoice4BuyService.findEnabled4Option());
+			
+		}else if(buyerId != null){// 司机页签中的新建
 			CarMan carman=this.carManService.load(buyerId);
 			entity.setBuyerId(this.buyerId);
 			entity.setBuyerName(carman.getName());
+			List<Car> car= this.carService.selectAllCarByCarManId(this.buyerId);
+			if(car.size()==1){
+				entity.setCarId(car.get(0).getId());
+				entity.setCarPlate(car.get(0).getPlate());
+				entity.setMotorcadeId(car.get(0).getMotorcade());
+				entity.setCompany(car.get(0).getCompany());
+			}else if (car.size() > 1) {
+				isMoreCar = true;
+			} else {
+				isNullCar = true;
+			}
+			//发票代码
+			this.codeList=this.removeListNullObj(this.invoice4BuyService.findEnabled4Option());
+		}else if(buyId != null){
+			this.codeList=this.invoice4BuyService.findOneInvoice4Buy(buyId);
+		}else{
+			//发票代码
+			this.codeList=this.removeListNullObj(this.invoice4BuyService.findEnabled4Option());
 		}
-		
-		//发票代码
-		this.codeList=this.removeListNullObj(this.invoice4BuyService.findEnabled4Option());
 	}
 	
 	
@@ -176,8 +206,6 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 	}
 
 
-
-
 	public String sellDetails;//销售明细字符串JSON格式
 	
 	@Override
@@ -185,7 +213,7 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 		super.beforeSave(entity);
 	
 		//销售明细集合
-		Set<Invoice4SellDetail> details=this.parseSell4DetailString(this.sellDetails);
+		Set<Invoice4SellDetail> details=this.parseSell4DetailString(this.sellDetails,entity.getStatus());
 
 		//集合放进对象中
 		if(this.getE().getInvoice4SellDetail()!=null&&this.getE().getInvoice4SellDetail().size()>0){
@@ -198,7 +226,7 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 	}
 	
 	//解析销售明细字符串返回销售明细集合
-	private LinkedHashSet<Invoice4SellDetail> parseSell4DetailString(String detailStr){
+	private LinkedHashSet<Invoice4SellDetail> parseSell4DetailString(String detailStr,int status){
 		try {
 			//销售明细集合
 			LinkedHashSet<Invoice4SellDetail> details=null;
@@ -213,6 +241,7 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 					if (json.has("id"))
 						resDetails.setId(json.getLong("id"));
 					resDetails.setInvoice4Sell(this.getE());
+					resDetails.setStatus(status);
 					resDetails.setBuyId(Long.parseLong(json.getString("buyId").trim()));
 					resDetails.setStartNo(json.getString("startNo").trim());
 					resDetails.setEndNo(json.getString("endNo").trim());
@@ -338,9 +367,8 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 			if(list!=null&&list.size()>0){
 				json.put("sellPrice", list.get(0).get("sellPrice"));
 				json.put("eachCount", list.get(0).get("eachCount"));//每份数量
-				
 				//取此结束号
-				String str=list.get(0).get("endNo").trim();
+				String str=list.get(0).get("endNo4Sell").trim();
 				//此结束号+1
 				Long l=Long.parseLong(str);
 				l+=1;
@@ -351,27 +379,38 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 					//取此结束号+1作为开始号       //处理0开头的字符串
 					json.put("startNo", str.substring(0,(str.length()-strLong.length()))+strLong);
 				}
-				
+				this.json=json.toString();
+			}else{//list为空，此采购单还有销售记录
+				Invoice4Buy i4buy=this.invoice4BuyService.load(this.buyId);
+				json.put("sellPrice", i4buy.getSellPrice());
+				json.put("eachCount", i4buy.getEachCount());//每份数量
+				json.put("startNo", i4buy.getStartNo());
+				this.json=json.toString();
 			}
-			this.json=json.toString();
 		}
 		return "json";
 	}
 	
 	//----------验证销售明细的正确性---------开始----
 	public Long sellId;
+	public int status;
 	public String sellDetailsStr;
 	
 	public String checkSell4Detail(){
 		Json json=new Json();
-		LinkedHashSet<Invoice4SellDetail> details=this.parseSell4DetailString(this.sellDetailsStr);
-		// 检查结果：checkResult
-		String jsonStr=this.checkDetailItself(this.setChangeList4detail(details), json);
-		//自身验证正常时进入数据库信息验证
-		if(jsonStr.equals("")){
-			this.json=this.checkDetailScope(details,this.sellId,json);
+		//作废销售单不需要进入检测
+		if(this.status==Invoice4Sell.STATUS_NORMAL){
+			LinkedHashSet<Invoice4SellDetail> details=this.parseSell4DetailString(this.sellDetailsStr,this.status);
+			// 检查结果：checkResult
+			String jsonStr=this.checkDetailItself(this.setChangeList4detail(details), json);
+			//自身验证正常时进入数据库信息验证
+			if(jsonStr.equals("")){
+				this.json=this.checkDetailScope(details,this.sellId,json);
+			}else{
+				this.json=jsonStr;
+			}
 		}else{
-			this.json=jsonStr;
+			this.json="";
 		}
 		return "json";
 	}

@@ -77,7 +77,8 @@ public class Invoice4BuysAction extends ViewAction<Map<String, Object>> {
 		sql.append("b.code as code,b.start_no as start_no,b.end_no as end_no");
 		sql.append(",b.company as company,b.type_ as type_,b.count_ as count_,b.buy_price as buy_price");
 		sql.append(",b.desc_ as desc,b.unit_ as unit_,b.sell_price as sell_price,a.actor_name as buyerName");
-		sql.append(",getbalancecountbyinvoicebuyid(b.id) as balance_count");
+		//计算剩余数量
+		sql.append(",(select sum(count_) from bs_invoice_sell_detail where buy_id=b.id and status_=0) as balance_count");
 		//sql.append(",getbalancenumberbyinvoicebuyid(b.id,b.count_,b.start_no,b.end_no) as balance_number");
 		sql.append(" from bs_invoice_buy b");
 		sql.append(" left join bc_identity_actor_history a on a.id=b.buyer_id");
@@ -114,7 +115,15 @@ public class Invoice4BuysAction extends ViewAction<Map<String, Object>> {
 				map.put("unit_", rs[i++]); // 单位
 				map.put("sell_price", rs[i++]); // 销售单价
 				map.put("buyerName", rs[i++]); // 购买人
-				map.put("balance_count", rs[i++]); // 剩余数量
+				Object obj_sell_count=rs[i++];
+				if(obj_sell_count==null){
+					map.put("balance_count", map.get("count_"));// 剩余数量
+				}else{
+					int balanceCount=Integer.parseInt(map.get("count_").toString())-Integer.parseInt(obj_sell_count.toString());
+					map.put("balance_count",balanceCount);// 剩余数量
+				}
+				
+				//map.put("balance_count", rs[i++]); 
 				//map.put("balance_number", rs[i++]); // 剩余号码段
 				return map;
 			}
@@ -142,11 +151,11 @@ public class Invoice4BuysAction extends ViewAction<Map<String, Object>> {
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
 		// 发票类型
 		columns.add(new TextColumn4MapKey("b.type_", "type_",
-				getText("invoice.type"), 60).setSortable(true)
+				getText("invoice.type"), 65).setSortable(true)
 				.setValueFormater(new KeyValueFormater(getTypes())));
 		// 发票单位
 		columns.add(new TextColumn4MapKey("b.unit_", "unit_",
-				getText("invoice.unit"), 40).setSortable(true)
+				getText("invoice.unit"), 65).setSortable(true)
 				.setValueFormater(new KeyValueFormater(getUnits())));
 		// 发票代码
 		columns.add(new TextColumn4MapKey("b.code", "code",
@@ -162,17 +171,17 @@ public class Invoice4BuysAction extends ViewAction<Map<String, Object>> {
 				.setUseTitleFromLabel(true));
 		// 数量
 		columns.add(new TextColumn4MapKey("b.count_", "count_",
-				getText("invoice.count"), 60).setSortable(true));
+				getText("invoice4Buy.count"), 65).setSortable(true));
 		// 剩余数量
 		columns.add(new TextColumn4MapKey("", "balance_count",
-				getText("invoice4Buy.balanceCount"), 60).setSortable(true));
+				getText("invoice4Buy.balanceCount"), 65).setSortable(true));
 		// 采购单价
 		columns.add(new TextColumn4MapKey("b.buy_price", "buy_price",
-				getText("invoice4Buy.buyPrice"), 60).setSortable(true)
+				getText("invoice4Buy.buyPrice"), 65).setSortable(true)
 				.setValueFormater(new NubmerFormater("###,##0.00")));
 		// 销售单价
 		columns.add(new TextColumn4MapKey("b.sell_price", "sell_price",
-				getText("invoice4Buy.sellPrice"), 60).setSortable(true)
+				getText("invoice4Buy.sellPrice"), 65).setSortable(true)
 				.setValueFormater(new NubmerFormater("###,##0.00")));
 		// 合计
 		columns.add(new TextColumn4MapKey("b.buy_price", "amount",

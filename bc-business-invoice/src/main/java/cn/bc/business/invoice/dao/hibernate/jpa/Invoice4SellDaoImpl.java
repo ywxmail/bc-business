@@ -16,7 +16,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 import cn.bc.BCConstants;
 import cn.bc.business.invoice.dao.Invoice4SellDao;
-import cn.bc.business.invoice.domain.Invoice4Buy;
 import cn.bc.business.invoice.domain.Invoice4Sell;
 import cn.bc.business.invoice.domain.Invoice4SellDetail;
 import cn.bc.db.jdbc.RowMapper;
@@ -38,11 +37,10 @@ public class Invoice4SellDaoImpl extends HibernateCrudJpaDao<Invoice4Sell> imple
 	}
 	
 	public List<Map<String, String>> selectListSellDetailByCode(Long buyId) {
-		StringBuffer strB=new StringBuffer("select b.sell_price,b.each_count,d.end_no");
+		StringBuffer strB=new StringBuffer("select b.sell_price,b.each_count,d.end_no,b.start_no");
 		strB.append(" from bs_invoice_buy b");
 		strB.append(" inner join bs_invoice_sell_detail d on d.buy_id=b.id");
-		strB.append(" inner join bs_invoice_sell s on s.id=d.sell_id");
-		strB.append(" where s.status_=0 and b.id=?");
+		strB.append(" where d.status_=0 and b.id=?");
 		strB.append(" order by d.start_no DESC");
 		strB.append(" limit 1");
 		String sql=strB.toString();
@@ -53,7 +51,8 @@ public class Invoice4SellDaoImpl extends HibernateCrudJpaDao<Invoice4Sell> imple
 				int i = 0;
 				oi.put("sellPrice", rs[i++].toString());
 				oi.put("eachCount", rs[i++].toString());
-				oi.put("endNo", rs[i++].toString());
+				oi.put("endNo4Sell", rs[i++].toString());
+				oi.put("startNo4Buy", rs[i++].toString());
 				return oi;
 			}
 		});
@@ -67,7 +66,7 @@ public class Invoice4SellDaoImpl extends HibernateCrudJpaDao<Invoice4Sell> imple
 	@SuppressWarnings("unchecked")
 	public List<Invoice4SellDetail> selectSellDetailByCode(Long buyId) {
 		return this.getJpaTemplate().find(
-				"from Invoice4SellDetail where buyId=? and invoice4Sell.status=? order by startNo", 
+				"from Invoice4SellDetail where buyId=? and status=? order by startNo", 
 				new Object[] {buyId,BCConstants.STATUS_ENABLED});
 		
 	}
@@ -81,7 +80,7 @@ public class Invoice4SellDaoImpl extends HibernateCrudJpaDao<Invoice4Sell> imple
 	@SuppressWarnings("unchecked")
 	public List<Invoice4SellDetail> selectSellDetailByCode(Long buyId,Long sellId) {
 		return this.getJpaTemplate().find(
-				"from Invoice4SellDetail where buyId=? and invoice4Sell.id!=? and invoice4Sell.status=? order by startNo", 
+				"from Invoice4SellDetail where buyId=? and invoice4Sell.id!=? and status=? order by startNo", 
 				new Object[] {buyId,sellId,BCConstants.STATUS_ENABLED});
 	}
 	
@@ -106,7 +105,7 @@ public class Invoice4SellDaoImpl extends HibernateCrudJpaDao<Invoice4Sell> imple
 			sql.append(" and b.buy_date<?");
 		}
 		
-		args.add(Invoice4Buy.TYPE_PRINT);
+		args.add(type);
 		args.add(buyDate);
 		
 		if(company != null && company.length() >0){
@@ -137,7 +136,7 @@ public class Invoice4SellDaoImpl extends HibernateCrudJpaDao<Invoice4Sell> imple
 		sql.append("select sum(b.count_) buyCount from bs_invoice_buy b")
 		   .append(" where b.status_=0 and b.type_=? and b.buy_date>=? and b.buy_date<=?");
 		
-		args.add(Invoice4Buy.TYPE_PRINT);
+		args.add(type);
 		args.add(buyDateFrom);
 		args.add(buyDateTo);
 		
@@ -174,7 +173,7 @@ public class Invoice4SellDaoImpl extends HibernateCrudJpaDao<Invoice4Sell> imple
 			sql.append(" and s.sell_date<?");
 		}
 		
-		args.add(Invoice4Buy.TYPE_PRINT);
+		args.add(type);
 		args.add(SellDate);
 		
 		if(company != null && company.length() >0){
@@ -206,7 +205,7 @@ public class Invoice4SellDaoImpl extends HibernateCrudJpaDao<Invoice4Sell> imple
 		   .append(" inner join bs_invoice_buy b on b.id=d.buy_id")
 	       .append(" where s.status_=0 and b.type_=? and s.sell_date>=? and s.sell_date<=?");
 		
-		args.add(Invoice4Buy.TYPE_PRINT);
+		args.add(type);
 		args.add(SellDateFrom);
 		args.add(SellDateTo);
 		

@@ -133,12 +133,6 @@ public class Invoice4BalanceAction extends ActionSupport {
 	public String company;// 公司
 
 	public String select() {
-
-		System.out.println(this.invoice4SellService
-				.countInvoiceBuyCountByBuyDate(this.type, this.startDate,
-						this.company, false));
-		
-		
 		Json json = new Json();
 		json.put("startCount", String.valueOf(this.invoice4SellService
 				.countInvoiceBuyCountByBuyDate(this.type, this.startDate,
