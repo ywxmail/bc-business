@@ -69,6 +69,9 @@ drop table if exists BS_CAR_POLICY;
 -- 迁移记录
 drop table if exists BS_CAR_DRIVER_HISTORY;
 
+-- 车辆经营权
+drop table if exists BS_CAR_OWNERSHIP;
+
 -- 司机营运车辆
 drop table if exists BS_CAR_DRIVER;
 
