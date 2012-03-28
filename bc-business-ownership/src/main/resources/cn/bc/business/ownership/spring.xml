@@ -15,7 +15,7 @@
 	<!-- 需要在主配置文件配置entityManagerFactory和transactionManager的实现 -->
 
 	<!-- ownership -->
-	<bean id="ownershipDao" class="cn.bc.business.ownership.dao.hibernate.jpa.PolicyDaoImpl"
+	<bean id="ownershipDao" class="cn.bc.business.ownership.dao.hibernate.jpa.OwnershipDaoImpl"
 		p:entityManagerFactory-ref="entityManagerFactory" />
 	<bean id="ownershipService" class="cn.bc.business.ownership.service.OwnershipServiceImpl"
 		p:ownershipDao-ref="ownershipDao" />
