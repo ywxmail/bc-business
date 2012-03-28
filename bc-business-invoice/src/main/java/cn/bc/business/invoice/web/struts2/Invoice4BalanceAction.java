@@ -89,33 +89,7 @@ public class Invoice4BalanceAction extends ActionSupport {
 
 		// 公司
 		this.companyList = this.invoice4BuyService.findCompany4Option();
-
-		/*Calendar calendar=Calendar.getInstance();
-		calendar.set(Calendar.getInstance().YEAR, Calendar.getInstance().MONTH, Calendar.getInstance().DAY_OF_MONTH,0,0,0);
-		
-		int startCount = this.invoice4SellService
-				.countInvoiceBuyCountByBuyDate(Invoice4Buy.TYPE_PRINT,
-						calendar, null, false)
-				- this.invoice4SellService.countInvoiceSellCountBySellDate(
-						Invoice4Buy.TYPE_PRINT, calendar, null,
-						false);
-		int endCount = this.invoice4SellService.countInvoiceBuyCountByBuyDate(
-				Invoice4Buy.TYPE_PRINT, calendar, null, true)
-				- this.invoice4SellService.countInvoiceSellCountBySellDate(
-						Invoice4Buy.TYPE_PRINT, calendar, null,
-						true);
-		int buyCount = this.invoice4SellService.countInvoiceBuyCountByBuyDate(
-				this.type, this.startDate, calendar, this.company);
-		int sellCount = this.invoice4SellService
-				.countInvoiceSellCountBySellDate(this.type, this.startDate,
-						calendar, this.company);
-
-		DecimalFormat format = new DecimalFormat("###,###.##");
-		this.startCount = format.format(startCount);
-		this.endCount = format.format(endCount);
-		this.buyCount = format.format(buyCount);
-		this.sellCount = format.format(sellCount);*/
-		return super.execute();
+	return super.execute();
 	}
 
 	/**
@@ -133,6 +107,8 @@ public class Invoice4BalanceAction extends ActionSupport {
 	public String company;// 公司
 
 	public String select() {
+		Calendar endDate=this.endDate;
+		endDate.add(Calendar.DAY_OF_MONTH, 1);
 		Json json = new Json();
 		json.put("startCount", String.valueOf(this.invoice4SellService
 				.countInvoiceBuyCountByBuyDate(this.type, this.startDate,
@@ -141,15 +117,15 @@ public class Invoice4BalanceAction extends ActionSupport {
 						this.type, this.startDate, this.company, false)));
 		json.put("buyCount", String.valueOf(this.invoice4SellService
 				.countInvoiceBuyCountByBuyDate(this.type, this.startDate,
-						this.endDate, this.company)));
+						endDate, this.company)));
 		json.put("sellCount", String.valueOf(this.invoice4SellService
 				.countInvoiceSellCountBySellDate(this.type, this.startDate,
-						this.endDate, this.company)));
+						endDate, this.company)));
 		json.put("endCount", String.valueOf(this.invoice4SellService
 				.countInvoiceBuyCountByBuyDate(this.type, this.endDate,
 						this.company, true)
 				- this.invoice4SellService.countInvoiceSellCountBySellDate(
-						this.type, this.endDate, this.company, true)));
+						this.type, endDate, this.company, true)));
 
 		this.json = json.toString();
 		return "json";
