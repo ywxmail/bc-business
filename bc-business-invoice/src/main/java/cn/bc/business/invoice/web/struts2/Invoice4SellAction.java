@@ -213,7 +213,7 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 		super.beforeSave(entity);
 	
 		//销售明细集合
-		Set<Invoice4SellDetail> details=this.parseSell4DetailString(this.sellDetails,this.status);
+		Set<Invoice4SellDetail> details=this.parseSell4DetailString(this.sellDetails,entity.getStatus());
 
 		//集合放进对象中
 		if(this.getE().getInvoice4SellDetail()!=null&&this.getE().getInvoice4SellDetail().size()>0){
@@ -241,7 +241,7 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 					if (json.has("id"))
 						resDetails.setId(json.getLong("id"));
 					resDetails.setInvoice4Sell(this.getE());
-					resDetails.setStatus(this.status);
+					resDetails.setStatus(status);
 					resDetails.setBuyId(Long.parseLong(json.getString("buyId").trim()));
 					resDetails.setStartNo(json.getString("startNo").trim());
 					resDetails.setEndNo(json.getString("endNo").trim());
@@ -379,8 +379,14 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 					//取此结束号+1作为开始号       //处理0开头的字符串
 					json.put("startNo", str.substring(0,(str.length()-strLong.length()))+strLong);
 				}
+				this.json=json.toString();
+			}else{//list为空，此采购单还有销售记录
+				Invoice4Buy i4buy=this.invoice4BuyService.load(this.buyId);
+				json.put("sellPrice", i4buy.getSellPrice());
+				json.put("eachCount", i4buy.getEachCount());//每份数量
+				json.put("startNo", i4buy.getStartNo());
+				this.json=json.toString();
 			}
-			this.json=json.toString();
 		}
 		return "json";
 	}
@@ -392,7 +398,7 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 	
 	public String checkSell4Detail(){
 		Json json=new Json();
-		//作废不需要进入检测
+		//作废销售单不需要进入检测
 		if(this.status==Invoice4Sell.STATUS_NORMAL){
 			LinkedHashSet<Invoice4SellDetail> details=this.parseSell4DetailString(this.sellDetailsStr,this.status);
 			// 检查结果：checkResult
