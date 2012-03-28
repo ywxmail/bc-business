@@ -80,7 +80,7 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 		StringBuffer sql = new StringBuffer();
 		sql.append("select c.id,c.status_,c.company,bia.name as unit_name,m.name,c.code,c.plate_type,c.plate_no");
 		sql.append(",c.driver,c.charger,c.bs_type,c.register_date,c.origin_no");
-		sql.append(",c.cert_no2,c.cert_no1,c.cert_no3,c.original_value");
+		sql.append(",c.cert_no2,c.cert_no1,c.cert_no3,c.cert_no4,c.original_value");
 		sql.append(",c.vin ,c.engine_no,c.factory_type,c.factory_model");
 		sql.append(",c.taximeter_no,c.taximeter_factory,c.taximeter_type");
 		sql.append(",m.id as motorcade_id,c.scrap_date,c.return_date");
@@ -113,6 +113,7 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 				map.put("cert_no2", rs[i++]); // 经营权证
 				map.put("cert_no1", rs[i++]); // 购置税证号
 				map.put("cert_no3", rs[i++]); // 强检证号
+				map.put("cert_no4", rs[i++]); // 道路运输证号
 				map.put("original_value", rs[i++]);// 固定资产原值
 				map.put("vin", rs[i++]); // 车架号
 				map.put("engine_no", rs[i++]); // 发动机号
@@ -210,13 +211,12 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 		// 购置税证号
 		columns.add(new TextColumn4MapKey("c.cert_no1", "cert_no1",
 				getText("car.certNo1"), 100).setUseTitleFromLabel(true));
+		// 道路运输证号
+		columns.add(new TextColumn4MapKey("c.cert_no4", "cert_no4",
+				getText("car.certNo4"), 90).setUseTitleFromLabel(true));
 		// 强检证号
 		columns.add(new TextColumn4MapKey("c.cert_no3", "cert_no3",
 				getText("car.certNo3"), 70).setUseTitleFromLabel(true));
-		// 固定资产原值
-//		columns.add(new TextColumn4MapKey("c.original_value", "original_value",
-//				getText("car.originalValue"), 100).setUseTitleFromLabel(true)
-//				.setValueFormater(new NubmerFormater()));
 		// 车架号
 		columns.add(new TextColumn4MapKey("c.vin", "vin", getText("car.vin"),
 				150).setUseTitleFromLabel(true));
