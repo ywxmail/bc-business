@@ -106,7 +106,7 @@ public class Invoice4BuyDaoImpl extends HibernateCrudJpaDao<Invoice4Buy>
 								String buyDateStr=dateformat.format(buy_date);
 							
 							String value = code + "(" + startNo + "~" + endNo
-									+ ")"+company+","+ buyDateStr+","+ typeStr+",剩余数量："+balanceCount+unitStr;
+									+ ")"+company+","+ buyDateStr+","+ typeStr+",剩余数量"+balanceCount+unitStr;
 							
 							oi.put("value",value);
 							return oi;
