@@ -14,10 +14,8 @@ import javax.sql.DataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-import cn.bc.BCConstants;
 import cn.bc.business.invoice.dao.Invoice4SellDao;
 import cn.bc.business.invoice.domain.Invoice4Sell;
-import cn.bc.business.invoice.domain.Invoice4SellDetail;
 import cn.bc.db.jdbc.RowMapper;
 import cn.bc.orm.hibernate.jpa.HibernateCrudJpaDao;
 import cn.bc.orm.hibernate.jpa.HibernateJpaNativeQuery;
@@ -63,11 +61,21 @@ public class Invoice4SellDaoImpl extends HibernateCrudJpaDao<Invoice4Sell> imple
 	 * @param code
 	 * @return
 	 */
-	@SuppressWarnings("unchecked")
-	public List<Invoice4SellDetail> selectSellDetailByCode(Long buyId) {
-		return this.getJpaTemplate().find(
-				"from Invoice4SellDetail where buyId=? and status=? order by startNo", 
-				new Object[] {buyId,BCConstants.STATUS_ENABLED});
+	public List<Map<String,String>> selectSellDetailByCode(Long buyId) {
+		String sql="select d.start_no,d.end_no";
+		sql+=" from  bs_invoice_sell_detail d"; 
+		sql+=" where d.status_=0 and d.buy_id=? order by d.start_no";
+		
+		return HibernateJpaNativeQuery.executeNativeSql(getJpaTemplate(), sql,
+				new Object[]{buyId},new RowMapper<Map<String, String>>() {
+			public Map<String, String> mapRow(Object[] rs, int rowNum) {
+				Map<String, String> oi = new HashMap<String, String>();
+				int i = 0;
+				oi.put("startNo", rs[i++].toString());
+				oi.put("endNo", rs[i++].toString());
+				return oi;
+			}
+		});
 		
 	}
 
@@ -77,11 +85,21 @@ public class Invoice4SellDaoImpl extends HibernateCrudJpaDao<Invoice4Sell> imple
 	 * @param sellId
 	 * @return
 	 */
-	@SuppressWarnings("unchecked")
-	public List<Invoice4SellDetail> selectSellDetailByCode(Long buyId,Long sellId) {
-		return this.getJpaTemplate().find(
-				"from Invoice4SellDetail where buyId=? and invoice4Sell.id!=? and status=? order by startNo", 
-				new Object[] {buyId,sellId,BCConstants.STATUS_ENABLED});
+	public List<Map<String,String>> selectSellDetailByCode(Long buyId,Long sellId) {
+		String sql="select d.start_no,d.end_no";
+				sql+=" from  bs_invoice_sell_detail d"; 
+				sql+=" where d.status_=0 and d.buy_id=? and d.sell_id!=? order by d.start_no";
+				
+		return HibernateJpaNativeQuery.executeNativeSql(getJpaTemplate(), sql,
+				new Object[]{buyId,sellId},new RowMapper<Map<String, String>>() {
+			public Map<String, String> mapRow(Object[] rs, int rowNum) {
+				Map<String, String> oi = new HashMap<String, String>();
+				int i = 0;
+				oi.put("startNo", rs[i++].toString());
+				oi.put("endNo", rs[i++].toString());
+				return oi;
+			}
+		});
 	}
 	
 	/**
