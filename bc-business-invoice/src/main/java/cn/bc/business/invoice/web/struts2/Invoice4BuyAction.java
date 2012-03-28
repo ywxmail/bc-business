@@ -222,26 +222,19 @@ public class Invoice4BuyAction extends FileEntityAction<Long, Invoice4Buy> {
 	// 遍历采购单集合，检查相同发票代码的采购单开始号和结束号是否出现在已保存的采购编码范围内
 	private String eachListInvoice4Buy(List<Invoice4Buy> bList, Long startNo,
 			Long endNo, Json json) {
-		for (int i = 0; i < bList.size(); i++) {
-			Invoice4Buy i4Buy = bList.get(i);
-			if (endNo < Long.parseLong(i4Buy.getStartNo().trim())) {
-				json.put("checkResult", "0");
-				return json.toString();
-			} else if (bList.size() == 1
-					&& endNo > Long.parseLong(i4Buy.getEndNo().trim())
-					&& startNo > Long.parseLong(i4Buy.getEndNo().trim())) {// 遍历到集合的最后一个对象时
-				json.put("checkResult", "0");
-				return json.toString();
-			} else if (endNo > Long.parseLong(i4Buy.getEndNo().trim())
-					&& startNo > Long.parseLong(i4Buy.getEndNo().trim())) {
-				bList.remove(0);// 比较完第一个对象，下次再比较时已不需要再比较这个对象
-				eachListInvoice4Buy(bList, startNo, endNo, json);// 继续递归
-			} else {
-				json.put("checkResult", "1");
-				return json.toString();
+		if(endNo>startNo){
+			for(Invoice4Buy i4Buy:bList){
+				if(!(endNo < Long.parseLong(i4Buy.getStartNo().trim())
+						|| startNo > Long.parseLong(i4Buy.getEndNo().trim()))){
+					json.put("checkResult", "1");
+					return json.toString();
+				}
 			}
+		}else{
+			json.put("checkResult", "1");
+			return json.toString();
 		}
-
+		json.put("checkResult", "0");
 		return json.toString();
 	}
 
