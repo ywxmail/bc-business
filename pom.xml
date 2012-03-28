@@ -33,6 +33,7 @@
 		<module>bc-business-carlpg</module>
 		<module>bc-business-mix</module>
 		<module>bc-business-invoice</module>
+		<module>bc-business-ownership</module>
 	</modules>
 	<scm>
 		<connection>scm:git:git@192.168.0.222:bc-business.git</connection>
