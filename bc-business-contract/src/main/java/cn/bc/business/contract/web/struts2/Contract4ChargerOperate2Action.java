@@ -171,6 +171,14 @@ public class Contract4ChargerOperate2Action extends
 		// 构建附件控件
 		attachsUI = buildAttachsUI(false, false);
 		
+		// 设置最后更新人的信息
+		SystemContext context = this.getSystyemContext();
+		
+		e.setAuthor(context.getUserHistory());
+		e.setModifier(context.getUserHistory());
+		e.setFileDate(Calendar.getInstance());
+		e.setModifiedDate(Calendar.getInstance());
+		
 		//设置操作的信息
 		e.setCode("CLHT" + DateUtils.format(new Date(), "yyyyMM")); // 自动生成经济合同编号的前缀
 		e.setSignType(this.signType);

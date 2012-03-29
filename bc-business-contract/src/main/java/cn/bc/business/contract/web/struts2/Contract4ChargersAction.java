@@ -117,7 +117,8 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 			return new OrderCondition("c.file_date", Direction.Desc).add(
 					"c.status_", Direction.Asc);
 		} else { // 历史版本
-			return new OrderCondition("c.file_date", Direction.Desc);
+			return new OrderCondition("c.status_", Direction.Asc)
+					.add("c.file_date", Direction.Desc);
 		}
 	}
 
