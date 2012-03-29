@@ -587,7 +587,7 @@ public class Contract4LabourAction extends
 
 	@Override
 	protected PageOption buildFormPageOption(boolean editable) {
-		return super.buildFormPageOption(editable).setWidth(775).setHeight(460);
+		return super.buildFormPageOption(editable).setWidth(740).setHeight(490);
 	}
 
 	public String certInfo() {
