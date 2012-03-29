@@ -292,8 +292,8 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 	// 结案信息设置
 	private void setCloserInfo(SystemContext context, Case4Accident e) {
 		e.setStatus(CaseBase.STATUS_CLOSED);
-		e.setCloserId(context.getUser().getId());
-		e.setCloserName(context.getUser().getName());
+		e.setCloserId(context.getUserHistory().getId());
+		e.setCloserName(context.getUserHistory().getName());
 		e.setCloseDate(Calendar.getInstance(Locale.CHINA));
 
 		// {"id":"<@s.property value="e.id"/>","msg":"<@s.text name="form.save.success"/>"}
