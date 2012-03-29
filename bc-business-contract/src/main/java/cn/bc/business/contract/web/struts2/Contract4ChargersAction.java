@@ -272,10 +272,10 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 					}
 				}));
 		columns.add(new TextColumn4MapKey("c.start_date", "start_date",
-				getText("contract4Charger.startDate"), 90)
+				getText("contract4Charger.startDate"), 90).setSortable(true)
 				.setValueFormater(new CalendarFormater()));
 		columns.add(new TextColumn4MapKey("c.end_date", "end_date",
-				getText("contract4Charger.endDate"), 90)
+				getText("contract4Charger.endDate"), 90).setSortable(true)
 				.setValueFormater(new CalendarFormater()));
 		columns.add(new TextColumn4MapKey("c.sign_date", "sign_date",
 				getText("contract.signDate"), 90).setSortable(true)

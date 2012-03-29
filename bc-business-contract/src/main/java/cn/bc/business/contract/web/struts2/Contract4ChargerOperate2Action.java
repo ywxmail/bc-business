@@ -3,13 +3,13 @@
  */
 package cn.bc.business.contract.web.struts2;
 
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.tools.ant.util.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
@@ -37,7 +37,7 @@ import cn.bc.web.ui.json.Json;
  */
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 @Controller
-public class Contract4ChargerAction extends
+public class Contract4ChargerOperate2Action extends
 		FileEntityAction<Long, Contract4Charger> {
 	// private static Log logger = LogFactory.getLog(ContractAction.class);
 	private static final long serialVersionUID = 1L;
@@ -63,27 +63,12 @@ public class Contract4ChargerAction extends
 	public boolean isExistContract; // 是否存在合同
 	public Json json;
 
-	// public Long driverId;
-	// public String certCode;
-	// public ContractService contractService;
-
-	// @Autowired
-	// public void setContractService(ContractService contractService) {
-	// this.contractService = contractService;
-	// }
-
 	@Autowired
 	public void setContract4ChargerService(
 			Contract4ChargerService contract4ChargerService) {
 		this.contract4ChargerService = contract4ChargerService;
 		this.setCrudService(contract4ChargerService);
 	}
-
-	// @Autowired
-	// public void setContract4LabourService(Contract4LabourService
-	// contract4LabourService) {
-	// this.contract4LabourService = contract4LabourService;
-	// }
 
 	@Autowired
 	public void setAttachService(AttachService attachService) {
@@ -111,103 +96,6 @@ public class Contract4ChargerAction extends
 				getText("key.role.bc.admin"));
 	}
 
-	@Override
-	protected void afterCreate(Contract4Charger entity) {
-
-		super.afterCreate(entity);
-		if (carId != null) {
-			// 查找此车辆是否存在经济合同,若存在前台提示
-			// isExistContract =
-			// this.contract4ChargerService.isExistContract(carId);
-			// if(isExistContract == false){
-			// 根据carId查找车辆的车牌号码
-			carInfoMap = this.contract4ChargerService.findCarByCarId(carId);
-			entity.setExt_str1(isNullObject(carInfoMap.get("plate_type") + "."
-					+ carInfoMap.get("plate_no")));
-			entity.setWordNo(isNullObject(carInfoMap.get("code")));// 车辆自编号
-			entity.setBusinessType(isNullObject(carInfoMap.get("bs_type")));// 车辆自编号
-			// }
-		}
-
-		if (driverId != null) {
-			// 根据driverId查找车辆的车牌号码
-			carInfoMap = this.contract4ChargerService
-					.findCarByCarManId(driverId);
-			if (carInfoMap != null && !carInfoMap.isEmpty()) {
-				entity.setExt_str1(isNullObject(carInfoMap.get("plate_type")
-						+ "." + carInfoMap.get("plate_no")));
-				entity.setWordNo(isNullObject(carInfoMap.get("code")));
-				entity.setBusinessType(isNullObject(carInfoMap.get("bs_type")));
-				carId = Long.valueOf(isNullObject(carInfoMap.get("id")));
-			}
-		}
-
-		entity.setPatchNo(this.getIdGeneratorService().next(
-				Contract4Charger.KEY_UID));
-		entity.setOpType(Contract.OPTYPE_CREATE);
-		entity.setMain(Contract.MAIN_NOW);
-		entity.setVerMajor(Contract.MAJOR_DEFALUT);
-		entity.setVerMinor(Contract.MINOR_DEFALUT);
-		entity.setUid(this.getIdGeneratorService().next(
-				Contract4Charger.KEY_UID));
-		SimpleDateFormat format4month = new SimpleDateFormat("yyyyMM");
-		entity.setCode("CLHT" + format4month.format(new Date()));
-		entity.setType(Contract.TYPE_CHARGER);
-		entity.setStatus(Contract.STATUS_NORMAL);
-		entity.setSignType(getText("contract4Charger.optype.create"));
-		entity.setIncludeCost(true);
-
-		// 构建附件控件
-		attachsUI = buildAttachsUI(true, false);
-	}
-
-	@Override
-	public String save() throws Exception {
-		json = new Json();
-		Contract4Charger e = this.getE();
-		Long excludeId = null;
-		// 保存之前检测自编号是否唯一:仅在新建时检测
-		excludeId = this.contract4ChargerService.checkCodeIsExist(
-				e.getId(), e.getCode());
-		if (excludeId != null) {
-			json.put("success", false);
-			json.put("msg", getText("contract4Labour.code.exist2"));
-			return "json";
-		} else {
-			// 执行基类的保存
-			this.beforeSave(e);
-
-			// 设置最后更新人的信息
-			SystemContext context = this.getSystyemContext();
-			e.setModifier(context.getUserHistory());
-			e.setModifiedDate(Calendar.getInstance());
-			// 设置责任人姓名
-			e.setExt_str2(setChargerName(assignChargerIds, assignChargerNames));
-
-			this.contract4ChargerService.save(e, this.getCarId(),
-					assignChargerIds, assignChargerNames);
-
-			this.afterSave(e);
-
-			json.put("id", e.getId());
-			json.put("success", true);
-			json.put("msg", getText("form.save.success"));
-			return "json";
-		}
-
-		// //保存证件与车辆的关联表信息
-		// this.contract4ChargerService.carNContract4Save(carId,getE().getId());
-		//
-		// //保存证件与责任人的关联表信息
-		// this.contract4ChargerService.carMansNContract4Save(assignChargerIds,
-		// getE().getId());
-		// //更新车辆的chager列显示责任人姓名
-		// this.contract4ChargerService.updateCar4dirverName(assignChargerNames,carId);
-		// //更新司机的chager列显示责任人姓名
-		// this.contract4ChargerService.updateCarMan4dirverName(assignChargerNames,carId);
-
-	}
-
 	/**
 	 * 设置责任人姓名
 	 * 
@@ -229,29 +117,159 @@ public class Contract4ChargerAction extends
 		return chargerName;
 	}
 
+	//=== 经济合同续约,过户,重发包 代码开始  ====//
+	private Long id;
+	private String signType;
+	private int opType;
+	private Boolean isDisableSignType;
+	private Long oldId;
+	
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public String getSignType() {
+		return signType;
+	}
+
+	public void setSignType(String signType) {
+		this.signType = signType;
+	}
+
+	public int getOpType() {
+		return opType;
+	}
+
+	public void setOpType(int opType) {
+		this.opType = opType;
+	}
+
+	public Boolean getIsDisableSignType() {
+		return isDisableSignType;
+	}
+
+	public void setIsDisableSignType(Boolean isDisableSignType) {
+		this.isDisableSignType = isDisableSignType;
+	}
+	
+	public Long getOldId() {
+		return oldId;
+	}
+
+	public void setOldId(Long oldId) {
+		this.oldId = oldId;
+	}
+
 	@Override
 	protected void afterEdit(Contract4Charger e) {
-		// == 合同维护处理
+
 		setChargerList(e);
 		// 构建附件控件
 		attachsUI = buildAttachsUI(false, false);
-
-		// 将次版本号加1
-		if (e.getVerMinor() != null) {
-			e.setVerMinor(e.getVerMinor() + 1);
+		
+		//设置操作的信息
+		e.setCode("CLHT" + DateUtils.format(new Date(), "yyyyMM")); // 自动生成经济合同编号的前缀
+		e.setSignType(this.signType);
+		e.setOpType(this.opType);
+		e.setSignDate(null);
+		e.setStartDate(null);
+		e.setId(null);
+		e.setVerMajor(e.getVerMajor()+1);//版本号+1
+		if(e.getOpType() == Contract.OPTYPE_CHANGECHARGER){
+			e.setTakebackOrigin(true);
 		}
+		//记录旧的保存合同id
+		oldId = this.id;
+	}
+	
+	private Boolean isSaved; //是否已保存
+	
+	public Boolean getIsSaved() {
+		return isSaved;
+	}
 
-		// 操作类型设置为维护
-		e.setOpType(Contract.OPTYPE_MAINTENANCE);
+	public void setIsSaved(Boolean isSaved) {
+		this.isSaved = isSaved;
 	}
 
 	@Override
-	protected void afterOpen(Contract4Charger e) {
-		// == 合同维护处理
-		setChargerList(e);
-		// 构建附件控件
-		attachsUI = buildAttachsUI(false, true);
+	public String save() throws Exception {
+		json = new Json();
+		Contract4Charger e = this.getE();
+		Long excludeId = null;
+		// 保存之前检测自编号是否唯一:仅在新建时检测
+		excludeId = this.contract4ChargerService.checkCodeIsExist(
+				e.getId(), e.getCode());
+		if (isSaved == false && excludeId != null) {
+			json.put("success", false);
+			json.put("msg", getText("contract4Labour.code.exist2"));
+			return "json";
+		} else {
+			
+			if(isSaved){//普通保存
+				// 执行基类的保存
+				this.beforeSave(e);
+				
+				// 设置最后更新人的信息
+				SystemContext context = this.getSystyemContext();
+				e.setModifier(context.getUserHistory());
+				e.setModifiedDate(Calendar.getInstance());
+				// 设置责任人姓名
+				e.setExt_str2(setChargerName(assignChargerIds, assignChargerNames));
+				
+				this.contract4ChargerService.save(e, this.getCarId(),
+						assignChargerIds, assignChargerNames);
+				
+				this.afterSave(e);
+				json.put("id", e.getId());
+				json.put("success", true);
+				json.put("msg", getText("form.save.success"));
+				return "json";
+			}else{//操作保存
+				//获取旧合同id
+				Long fromContractId = this.oldId;
+				Contract newContract = null;
+				String msg = "";
+				json = new Json();
+				if(e.getOpType() == Contract.OPTYPE_RENEW){//续约
+					newContract = this.contract4ChargerService.doRenew(
+							fromContractId, e.getStartDate(), e.getEndDate(), e.getCode());
+					msg = getText("contract4Charger.renew.success");
+				}else if(e.getOpType() == Contract.OPTYPE_CHANGECHARGER){//过户
+					// 组装责任人字符串如:姓名1,id1;姓名2,id2;
+					String assignChargerNamesStr = setChargerName(assignChargerIds,
+							assignChargerNames);
+					newContract = this.contract4ChargerService.doChaneCharger(
+							carId, e.isTakebackOrigin(), assignChargerIds, assignChargerNamesStr,
+							fromContractId, e.getStartDate(), e.getEndDate(), e.getCode());
+					msg = getText("contract4Charger.changeCharger.success");
+				}else{//重发包
+					// 组装责任人字符串如:姓名1,id1;姓名2,id2;
+					String assignChargerNamesStr = setChargerName(assignChargerIds,
+							assignChargerNames);
+
+					newContract = this.contract4ChargerService.doChaneCharger(
+							carId, e.isTakebackOrigin(), assignChargerIds, assignChargerNamesStr,
+							fromContractId, e.getStartDate(), e.getEndDate(), e.getCode());
+					msg = getText("contract4Charger.changeCharger.success");
+					
+				}
+				json.put("id", newContract.getId());
+				json.put("oldId", fromContractId);
+				json.put("success", true);
+				json.put("msg", msg);
+				return "json";
+			}
+
+		}
+
 	}
+	
+	//=== 经济合同续约,过户,重发包 代码结束  ===//
 
 	@Override
 	protected void initForm(boolean editable) throws Exception {
@@ -283,47 +301,6 @@ public class Contract4ChargerAction extends
 			}
 		}
 	}
-
-	// /** 设置责任人显示列表*/
-	// private void setChargerList(Contract4Charger e){
-	// //根据contractId查找所属的carId
-	// carId = this.contract4ChargerService.findCarIdByContractId(e.getId());
-	// //根据contractId查找所属的driverId列表
-	// List<String> chargerIdList =
-	// this.contract4ChargerService.findChargerIdByContractId(e.getId());
-	// if((chargerIdList != null && chargerIdList.size() > 0) &&
-	// (e.getExt_str2() != null && e.getExt_str2().length() > 0)){
-	// chargerNameAry = this.getE().getExt_str2().split(";");
-	// chargerInfoMap = new HashMap<String, String>();
-	// String names = "";
-	// List<String> list = new ArrayList<String>();
-	// for(int i=0; i<chargerNameAry.length;i++){
-	// names = chargerNameAry[i];
-	// list.add(names.split(",")[0]);
-	// chargerInfoMap.put(chargerIdList.get(i), list.get(i));
-	// }
-	// }
-	// }
-
-	// private void dealCharger4Save() {
-	// Set<CarMan> chargers = null;
-	// if(this.assignChargerIds != null && this.assignChargerIds.length() > 0){
-	// chargers = new HashSet<CarMan>();
-	// String[] chargerIds = this.assignChargerIds.split(",");
-	// CarMan carMan;
-	// for(String cid : chargerIds){
-	// carMan = new CarMan();
-	// carMan.setId(new Long(cid));
-	// chargers.add(carMan);
-	// }
-	// }
-	// if(this.getE().getChargers() != null){
-	// this.getE().getChargers().clear();
-	// this.getE().getChargers().addAll(chargers);
-	// }else{
-	// this.getE().setChargers(chargers);
-	// }
-	// }
 
 	/** 判断指定的车辆是否已经存在经济合同 */
 	public String isExistContract() {
@@ -394,12 +371,6 @@ public class Contract4ChargerAction extends
 	protected PageOption buildFormPageOption(boolean editable) {
 		return super.buildFormPageOption(editable).setWidth(720)
 				.setMinWidth(250).setMinHeight(160).setHeight(405);
-		// option.addButton(new ButtonOption(getText("label.save"), "save"));
-		// if (!this.isReadonly()) {
-		// option.addButton(new ButtonOption(getText("label.save"), null,
-		// "bc.contractChargerForm.save"));
-		// }
-		// return option;
 	}
 
 	@Override
@@ -408,30 +379,11 @@ public class Contract4ChargerAction extends
 		if (!this.isReadonly()) {// 有权限
 			if (editable) {// 编辑状态显示保存按钮
 				pageOption.addButton(new ButtonOption(getText("label.save"),
-						null, "bc.contract4ChargerForm.save"));
+						null, "bc.contract4ChargerFormOperate.save"));
 				pageOption.addButton(new ButtonOption(
 						getText("label.saveAndClose"), null,
-						"bc.contract4ChargerForm.saveAndClose"));
+						"bc.contract4ChargerFormOperate.saveAndClose"));
 
-			} else {// 只读状态显示操作按钮
-				if (this.getE().getMain() == Contract.MAIN_NOW
-						&& this.getE().getStatus() != Contract.STATUS_LOGOUT) {
-					pageOption.addButton(new ButtonOption(
-							getText("contract4Labour.optype.maintenance"),
-							null, "bc.contract4ChargerForm.doMaintenance"));
-					pageOption.addButton(new ButtonOption(
-							getText("contract4Labour.optype.renew"), null,
-							"bc.contract4ChargerForm.doRenew"));
-					pageOption.addButton(new ButtonOption(
-							getText("contract4Charger.optype.changeCharger"),
-							null, "bc.contract4ChargerForm.doChangeCharger"));
-					pageOption.addButton(new ButtonOption(
-							getText("contract4Charger.optype.changeCharger2"),
-							null, "bc.contract4ChargerForm.doChangeCharger2"));
-					pageOption.addButton(new ButtonOption(
-							getText("contract4Charger.logout"), null,
-							"bc.contract4ChargerForm.doLogout"));
-				}
 			}
 		}
 	}
