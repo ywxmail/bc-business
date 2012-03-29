@@ -4,10 +4,12 @@
 package cn.bc.business.contract.web.struts2;
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.tools.ant.util.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
@@ -170,6 +172,7 @@ public class Contract4ChargerOperate2Action extends
 		attachsUI = buildAttachsUI(false, false);
 		
 		//设置操作的信息
+		e.setCode("CLHT" + DateUtils.format(new Date(), "yyyyMM")); // 自动生成经济合同编号的前缀
 		e.setSignType(this.signType);
 		e.setOpType(this.opType);
 		e.setSignDate(null);
