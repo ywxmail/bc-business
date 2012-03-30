@@ -122,7 +122,6 @@ public class Contract4ChargerOperate2Action extends
 	private String signType;
 	private int opType;
 	private Boolean isDisableSignType;
-	private Long oldId;
 	
 	public Long getId() {
 		return id;
@@ -156,14 +155,6 @@ public class Contract4ChargerOperate2Action extends
 		this.isDisableSignType = isDisableSignType;
 	}
 	
-	public Long getOldId() {
-		return oldId;
-	}
-
-	public void setOldId(Long oldId) {
-		this.oldId = oldId;
-	}
-
 	@Override
 	protected void afterEdit(Contract4Charger e) {
 
@@ -187,11 +178,12 @@ public class Contract4ChargerOperate2Action extends
 		e.setStartDate(null);
 		e.setId(null);
 		e.setVerMajor(e.getVerMajor()+1);//版本号+1
-		if(e.getOpType() == Contract.OPTYPE_CHANGECHARGER){
+		if(e.getOpType() == Contract.OPTYPE_CHANGECHARGER
+		  || e.getOpType() == Contract.OPTYPE_CHANGECHARGER){
 			e.setTakebackOrigin(true);
 		}
 		//记录旧的保存合同id
-		oldId = this.id;
+		e.setPid(this.id);
 	}
 	
 	private Boolean isSaved; //是否已保存
@@ -239,7 +231,7 @@ public class Contract4ChargerOperate2Action extends
 				return "json";
 			}else{//操作保存
 				//获取旧合同id
-				Long fromContractId = this.oldId;
+				Long fromContractId = e.getPid();
 				Contract newContract = null;
 				String msg = "";
 				json = new Json();
