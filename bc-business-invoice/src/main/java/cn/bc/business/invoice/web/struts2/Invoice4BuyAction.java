@@ -49,7 +49,8 @@ public class Invoice4BuyAction extends FileEntityAction<Long, Invoice4Buy> {
 	public String amount;// 合计
 	public String balanceNumber;// 剩余号码段
 	public String balanceCount;//剩余数量
-
+	public String unitName;
+	
 	@Autowired
 	public void setInvoice4BuyService(Invoice4BuyService invoice4BuyService) {
 		this.setCrudService(invoice4BuyService);
@@ -85,6 +86,9 @@ public class Invoice4BuyAction extends FileEntityAction<Long, Invoice4Buy> {
 		entity.setStatus(BCConstants.STATUS_ENABLED);
 		// 每（卷/本）默认值为100
 		entity.setEachCount(100);
+		
+		this.unitName=getText("invoice.unit.juan");
+		entity.setUnit(Invoice4Buy.UNIT_JUAN);
 	}
 
 	@Override
@@ -95,6 +99,12 @@ public class Invoice4BuyAction extends FileEntityAction<Long, Invoice4Buy> {
 		this.balanceNumber = this.invoice4BuyService
 				.findBalanceNumberByInvoice4BuyId(entity.getId()).get(0);
 		this.balanceCount = this.invoice4BuyService.findBalanceCountByInvoice4BuyId(entity.getId()).get(0);
+		
+		if(entity.getUnit()==Invoice4Buy.UNIT_BEN){
+			this.unitName=getText("invoice.unit.ben");
+		}else{
+			this.unitName=getText("invoice.unit.juan");
+		}
 		super.afterEdit(entity);
 	}
 
@@ -106,6 +116,11 @@ public class Invoice4BuyAction extends FileEntityAction<Long, Invoice4Buy> {
 		this.balanceNumber = this.invoice4BuyService
 				.findBalanceNumberByInvoice4BuyId(entity.getId()).get(0);
 		this.balanceCount = this.invoice4BuyService.findBalanceCountByInvoice4BuyId(entity.getId()).get(0);
+		if(entity.getUnit()==Invoice4Buy.UNIT_BEN){
+			this.unitName=getText("invoice.unit.ben");
+		}else{
+			this.unitName=getText("invoice.unit.juan");
+		}
 		super.afterOpen(entity);
 
 	}
@@ -130,6 +145,7 @@ public class Invoice4BuyAction extends FileEntityAction<Long, Invoice4Buy> {
 		this.typeList = list;
 
 		// 发票单位
+		
 		list = new ArrayList<Map<String, String>>();
 		list.add(this.getOptiomItems(String.valueOf(Invoice4Buy.UNIT_JUAN),
 				getText("invoice.unit.juan")));

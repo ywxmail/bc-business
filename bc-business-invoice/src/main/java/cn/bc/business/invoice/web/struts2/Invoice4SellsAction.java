@@ -109,6 +109,8 @@ public class Invoice4SellsAction extends ViewAction<Map<String, Object>> {
 		sql.append(",s.buyer_id as buyer_id,s.buyer_name as buyer_name,b.type_ as type,b.unit_ as unit_");
 		sql.append(",d.count_ as count_,d.price as price,s.desc_ as desc,b.code as code,a.actor_name as cashier");
 		sql.append(",bia.name as unit_name,cm.cert_fwzg as fwzg");
+		sql.append(",au.actor_name as author_name,s.file_date as file_date");
+		sql.append(",am.actor_name as modified_name,s.modified_date as modified_date");
 		sql.append(" from bs_invoice_sell_detail d");
 		sql.append(" inner join bs_invoice_buy b on b.id=d.buy_id");
 		sql.append(" inner join bs_invoice_sell s on s.id=d.sell_id");
@@ -116,6 +118,8 @@ public class Invoice4SellsAction extends ViewAction<Map<String, Object>> {
 		sql.append(" inner join bs_motorcade m on m.id=s.motorcade_id");
 		sql.append(" inner join bc_identity_actor bia on bia.id=m.unit_id");
 		sql.append(" left join bs_carman cm on cm.id=s.buyer_id");
+		sql.append(" inner join bc_identity_actor_history au on au.id=s.author_id");
+		sql.append(" left join bc_identity_actor_history am on am.id=s.modifier_id");
 		sqlObject.setSql(sql.toString());
 
 		// 注入参数
@@ -135,7 +139,7 @@ public class Invoice4SellsAction extends ViewAction<Map<String, Object>> {
 				map.put("motorcade_id", rs[i++]); // 车队id
 				map.put("motorcade_name", rs[i++]); // 车队名称
 				map.put("car_id", rs[i++]); // 车id
-				map.put("car_plate", rs[i++]); // 车票
+				map.put("car_plate", rs[i++]); // 车辆
 				map.put("buyer_id", rs[i++]); // 购买人id
 				map.put("buyer_name", rs[i++]); // 购买人名称
 				map.put("type_", rs[i++]); // 发票类型
@@ -156,6 +160,10 @@ public class Invoice4SellsAction extends ViewAction<Map<String, Object>> {
 				map.put("cashier", rs[i++]); // 销售员
 				map.put("unit_name", rs[i++]); // 分公司
 				map.put("fwzg", rs[i++]); // 购买人服务资格证
+				map.put("author_name", rs[i++]); // 创建人
+				map.put("file_date", rs[i++]); // 创建时间
+				map.put("modified_name", rs[i++]); // 最后修改人
+				map.put("modified_date", rs[i++]); // 最后修改时间
 				return map;
 			}
 		});
@@ -262,13 +270,23 @@ public class Invoice4SellsAction extends ViewAction<Map<String, Object>> {
 		if(buyId == null){
 			// 发票类型
 			columns.add(new TextColumn4MapKey("b.type_", "type_",
-					getText("invoice4Sell.type"), 65).setSortable(true)
+					getText("invoice4Sell.type"), 55).setSortable(true)
 					.setValueFormater(new KeyValueFormater(getTypes())));
 			// 发票单位
 			columns.add(new TextColumn4MapKey("b.unit_", "unit_",
-					getText("invoice4Sell.unit"), 65).setSortable(true)
+					getText("invoice4Sell.unit"), 40).setSortable(true)
 					.setValueFormater(new KeyValueFormater(getUnits())));
 		}
+		columns.add(new TextColumn4MapKey("au.actor_name", "author_name",
+				getText("invoice.author"), 60));
+		columns.add(new TextColumn4MapKey("s.file_date", "file_date",
+				getText("invoice.fileDate"), 160)
+				.setValueFormater(new CalendarFormater("yyyy-MM-dd hh:mm:ss")));
+		columns.add(new TextColumn4MapKey("am.actor_name", "modified_name",
+				getText("invoice.modifier"), 80));
+		columns.add(new TextColumn4MapKey("s.modified_date", "modified_date",
+				getText("invoice.modifiedDate"), 160)
+				.setValueFormater(new CalendarFormater("yyyy-MM-dd hh:mm:ss")));
 		// 备注
 		columns.add(new TextColumn4MapKey("s.desc_", "desc",
 				getText("invoice.desc")).setUseTitleFromLabel(true));
@@ -317,7 +335,8 @@ public class Invoice4SellsAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected String[] getGridSearchFields() {
-		return new String[] { "m.name", "car_plate", "s.buyer_name","a.actor_name","d.start_no","d.end_no" };
+		return new String[] { "m.name", "car_plate", "s.buyer_name"
+				,"a.actor_name","d.start_no","d.end_no","au.actor_name","am.actor_name" };
 	}
 
 	@Override
@@ -333,7 +352,7 @@ public class Invoice4SellsAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected String getGridRowLabelExpression() {
-		return "'购买人' + ['buyer_name']";
+		return "['car_plate']+'的发票销售单'";
 	}
 	
 	@Override
