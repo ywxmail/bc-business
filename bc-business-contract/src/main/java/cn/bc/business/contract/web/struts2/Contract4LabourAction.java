@@ -319,7 +319,7 @@ public class Contract4LabourAction extends
 
 
 		
-		if(isSupply == false){ //新建
+		if(this.isSupply == false){ //新建
 			entity.setMain(Contract.MAIN_NOW);
 			entity.setVerMajor(Contract.MAJOR_DEFALUT);
 			entity.setVerMinor(Contract.MINOR_DEFALUT);
@@ -460,8 +460,8 @@ public class Contract4LabourAction extends
 		json = new Json();
 		Contract4Labour e = this.getE();
 		Long carManId = null;
-		// 保存之前检测社保号是否唯一:仅在新建时检测
-		if (e.getId() == null) {
+		// 保存之前检测社保号是否唯一:仅在新建时检测,补录不检测
+		if (this.isSupply == false && e.getId() == null) {
 			carManId = this.contract4LabourService.checkInsurCodeIsExist(
 					e.getId(), e.getInsurCode());
 		}

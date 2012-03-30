@@ -122,7 +122,6 @@ public class Contract4ChargerOperate2Action extends
 	private String signType;
 	private int opType;
 	private Boolean isDisableSignType;
-	private Long oldId;
 	
 	public Long getId() {
 		return id;
@@ -156,20 +155,20 @@ public class Contract4ChargerOperate2Action extends
 		this.isDisableSignType = isDisableSignType;
 	}
 	
-	public Long getOldId() {
-		return oldId;
-	}
-
-	public void setOldId(Long oldId) {
-		this.oldId = oldId;
-	}
-
 	@Override
 	protected void afterEdit(Contract4Charger e) {
 
 		setChargerList(e);
 		// 构建附件控件
 		attachsUI = buildAttachsUI(false, false);
+		
+		// 设置最后更新人的信息
+		SystemContext context = this.getSystyemContext();
+		
+		e.setAuthor(context.getUserHistory());
+		e.setModifier(context.getUserHistory());
+		e.setFileDate(Calendar.getInstance());
+		e.setModifiedDate(Calendar.getInstance());
 		
 		//设置操作的信息
 		e.setCode("CLHT" + DateUtils.format(new Date(), "yyyyMM")); // 自动生成经济合同编号的前缀
@@ -179,11 +178,12 @@ public class Contract4ChargerOperate2Action extends
 		e.setStartDate(null);
 		e.setId(null);
 		e.setVerMajor(e.getVerMajor()+1);//版本号+1
-		if(e.getOpType() == Contract.OPTYPE_CHANGECHARGER){
+		if(e.getOpType() == Contract.OPTYPE_CHANGECHARGER
+		  || e.getOpType() == Contract.OPTYPE_CHANGECHARGER){
 			e.setTakebackOrigin(true);
 		}
 		//记录旧的保存合同id
-		oldId = this.id;
+		e.setPid(this.id);
 	}
 	
 	private Boolean isSaved; //是否已保存
@@ -231,7 +231,7 @@ public class Contract4ChargerOperate2Action extends
 				return "json";
 			}else{//操作保存
 				//获取旧合同id
-				Long fromContractId = this.oldId;
+				Long fromContractId = e.getPid();
 				Contract newContract = null;
 				String msg = "";
 				json = new Json();
