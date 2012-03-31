@@ -80,13 +80,14 @@ public class Invoice4BuyAction extends FileEntityAction<Long, Invoice4Buy> {
 
 	@Override
 	protected void afterCreate(Invoice4Buy entity) {
+		SystemContext context = this.getSystyemContext();
 		super.afterCreate(entity);
 		entity.setBuyDate(Calendar.getInstance());
 		entity.setBuyPrice(7F);
 		entity.setStatus(BCConstants.STATUS_ENABLED);
 		// 每（卷/本）默认值为100
 		entity.setEachCount(100);
-		
+		entity.setBuyerId(context.getUserHistory());
 		this.unitName=getText("invoice.unit.juan");
 		entity.setUnit(Invoice4Buy.UNIT_JUAN);
 	}
