@@ -405,12 +405,17 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 					this.setChangeList4detail(details), json);
 			// 自身验证正常时进入数据库信息验证
 			if (jsonStr.equals("")) {
-				this.json = this.checkDetailScope(details, this.sellId, json);
+				String reslt = this.checkDetailScope(details, this.sellId, json);
+				if(reslt.equals("")){
+					this.json=json.toString();
+				}else{
+					this.json=reslt;
+				}
 			} else {
 				this.json = jsonStr;
 			}
 		} else {
-			this.json = "";
+			this.json = json.toString();
 		}
 		return "json";
 	}
@@ -497,8 +502,14 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 								.parseLong(findDetail.get("startNo").trim()) || Long
 								.parseLong(detail.getStartNo().trim()) > Long
 								.parseLong(findDetail.get("endNo").trim()))) {
-							json.put("checkResult",
-									getText("invoice4Sell.detail.tips2"));
+							Json jr=new Json();
+							jr.put("code",invoice4Buy.getCode());
+							jr.put("save_startNo", detail.getStartNo());
+							jr.put("save_endNo", detail.getEndNo());
+							jr.put("data_startNo", findDetail.get("startNo"));
+							jr.put("data_endNo", findDetail.get("endNo"));
+							jr.put("data_sellId", findDetail.get("sellId"));
+							json.put("checkResult4Sell",jr);
 							return json.toString();
 						}
 					}
@@ -513,14 +524,27 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 								.parseLong(findDetail.get("startNo").trim()) || Long
 								.parseLong(detail.getStartNo().trim()) > Long
 								.parseLong(findDetail.get("endNo").trim()))) {
-							json.put("checkResult",
-									getText("invoice4Sell.detail.tips2"));
+							Json jr=new Json();
+							jr.put("code",invoice4Buy.getCode());
+							jr.put("save_startNo", detail.getStartNo());
+							jr.put("save_endNo", detail.getEndNo());
+							jr.put("data_startNo", findDetail.get("startNo"));
+							jr.put("data_endNo", findDetail.get("endNo"));
+							jr.put("data_sellId", findDetail.get("sellId"));
+							json.put("checkResult4Sell",jr);
 							return json.toString();
 						}
 					}
 				}
 			} else {
-				json.put("checkResult", getText("invoice4Sell.detail.tips1"));
+				Json jr=new Json();
+				jr.put("code",invoice4Buy.getCode());
+				jr.put("save_startNo", detail.getStartNo());
+				jr.put("save_endNo", detail.getEndNo());
+				jr.put("data_startNo", invoice4Buy.getStartNo());
+				jr.put("data_endNo", invoice4Buy.getEndNo());
+				jr.put("data_buyId", invoice4Buy.getId());
+				json.put("checkResult4Buy",jr);
 				return json.toString();
 			}
 		}

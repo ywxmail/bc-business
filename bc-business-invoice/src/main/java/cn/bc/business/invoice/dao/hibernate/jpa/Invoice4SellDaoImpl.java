@@ -62,7 +62,7 @@ public class Invoice4SellDaoImpl extends HibernateCrudJpaDao<Invoice4Sell> imple
 	 * @return
 	 */
 	public List<Map<String,String>> selectSellDetailByCode(Long buyId) {
-		String sql="select d.start_no,d.end_no";
+		String sql="select d.start_no,d.end_no,d.sell_id";
 		sql+=" from  bs_invoice_sell_detail d"; 
 		sql+=" where d.status_=0 and d.buy_id=? order by d.start_no";
 		
@@ -73,6 +73,7 @@ public class Invoice4SellDaoImpl extends HibernateCrudJpaDao<Invoice4Sell> imple
 				int i = 0;
 				oi.put("startNo", rs[i++].toString());
 				oi.put("endNo", rs[i++].toString());
+				oi.put("sellId", rs[i++].toString());
 				return oi;
 			}
 		});
@@ -86,7 +87,7 @@ public class Invoice4SellDaoImpl extends HibernateCrudJpaDao<Invoice4Sell> imple
 	 * @return
 	 */
 	public List<Map<String,String>> selectSellDetailByCode(Long buyId,Long sellId) {
-		String sql="select d.start_no,d.end_no";
+		String sql="select d.start_no,d.end_no,d.sell_id";
 				sql+=" from  bs_invoice_sell_detail d"; 
 				sql+=" where d.status_=0 and d.buy_id=? and d.sell_id!=? order by d.start_no";
 				
@@ -97,6 +98,7 @@ public class Invoice4SellDaoImpl extends HibernateCrudJpaDao<Invoice4Sell> imple
 				int i = 0;
 				oi.put("startNo", rs[i++].toString());
 				oi.put("endNo", rs[i++].toString());
+				oi.put("sellId", rs[i++].toString());
 				return oi;
 			}
 		});
