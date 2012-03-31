@@ -115,7 +115,13 @@ public class Invoice4SellDaoImpl extends HibernateCrudJpaDao<Invoice4Sell> imple
 		ArrayList<Object> args = new ArrayList<Object>();
 		StringBuffer sql = new StringBuffer();
 		sql.append("select sum(b.count_) buyCount from bs_invoice_buy b");
-		sql.append(" where b.status_=0 and b.type_=?");
+		sql.append(" where b.status_=0 ");
+		
+		if(type!=null){
+			sql.append(" and b.type_=?");
+			args.add(type);
+		} 
+		
 		
 		if(flag){
 			sql.append(" and b.buy_date<=?");
@@ -123,7 +129,6 @@ public class Invoice4SellDaoImpl extends HibernateCrudJpaDao<Invoice4Sell> imple
 			sql.append(" and b.buy_date<?");
 		}
 		
-		args.add(type);
 		args.add(buyDate);
 		
 		if(company != null && company.length() >0){
@@ -152,12 +157,16 @@ public class Invoice4SellDaoImpl extends HibernateCrudJpaDao<Invoice4Sell> imple
 		ArrayList<Object> args = new ArrayList<Object>();
 		StringBuffer sql = new StringBuffer();
 		sql.append("select sum(b.count_) buyCount from bs_invoice_buy b")
-		   .append(" where b.status_=0 and b.type_=? and b.buy_date>=? and b.buy_date<=?");
+		   .append(" where b.status_=0 and b.buy_date>=? and b.buy_date<=?");
 		
-		args.add(type);
 		args.add(buyDateFrom);
 		args.add(buyDateTo);
 		
+		if(type!=null){
+			sql.append(" and b.type_=?");
+			args.add(type);
+		} 
+
 		if(company != null && company.length() >0){
 			sql.append(" and b.company=?");
 			args.add(company);
@@ -183,15 +192,19 @@ public class Invoice4SellDaoImpl extends HibernateCrudJpaDao<Invoice4Sell> imple
 		sql.append("select sum(d.count_) sellCount from bs_invoice_sell_detail d")
 		   .append(" inner join bs_invoice_sell s on s.id=d.sell_id")
 		   .append(" inner join bs_invoice_buy b on b.id=d.buy_id")
-		   .append(" where s.status_=0 and b.type_=?");
+		   .append(" where s.status_=0 ");
 		
+		if(type!=null){
+			sql.append(" and b.type_=?");
+			args.add(type);
+		} 
+
 		if(flag){
 			sql.append(" and s.sell_date<=?");
 		}else{
 			sql.append(" and s.sell_date<?");
 		}
 		
-		args.add(type);
 		args.add(SellDate);
 		
 		if(company != null && company.length() >0){
@@ -221,12 +234,16 @@ public class Invoice4SellDaoImpl extends HibernateCrudJpaDao<Invoice4Sell> imple
 		sql.append("select sum(d.count_) sellCount from bs_invoice_sell_detail d")
 		   .append(" inner join bs_invoice_sell s on s.id=d.sell_id")
 		   .append(" inner join bs_invoice_buy b on b.id=d.buy_id")
-	       .append(" where s.status_=0 and b.type_=? and s.sell_date>=? and s.sell_date<=?");
+	       .append(" where s.status_=0 and s.sell_date>=? and s.sell_date<=?");
 		
-		args.add(type);
 		args.add(SellDateFrom);
 		args.add(SellDateTo);
 		
+		if(type!=null){
+			sql.append(" and b.type_=?");
+			args.add(type);
+		} 
+
 		if(company != null && company.length() >0){
 			sql.append(" and b.company=?");
 			args.add(company);

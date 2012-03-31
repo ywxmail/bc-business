@@ -146,9 +146,7 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 				isNullBuyer = true;
 			}
 			// 发票代码
-			this.codeList = this.removeListNullObj(this.invoice4BuyService
-					.findEnabled4Option());
-
+			this.codeList = this.invoice4BuyService.findEnabled4Option();
 		} else if (buyerId != null) {// 司机页签中的新建
 			CarMan carman = this.carManService.load(buyerId);
 			entity.setBuyerId(this.buyerId);
@@ -166,14 +164,12 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 				isNullCar = true;
 			}
 			// 发票代码
-			this.codeList = this.removeListNullObj(this.invoice4BuyService
-					.findEnabled4Option());
+			this.codeList = this.invoice4BuyService.findEnabled4Option();
 		} else if (buyId != null) {
 			this.codeList = this.invoice4BuyService.findOneInvoice4Buy(buyId);
 		} else {
 			// 发票代码
-			this.codeList = this.removeListNullObj(this.invoice4BuyService
-					.findEnabled4Option());
+			this.codeList = this.invoice4BuyService.findEnabled4Option();
 		}
 	}
 
@@ -181,20 +177,14 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 	protected void afterEdit(Invoice4Sell entity) {
 		super.afterEdit(entity);
 		Set<Invoice4SellDetail> isd4set = entity.getInvoice4SellDetail();
-		List<Map<String, String>> code4list = new ArrayList<Map<String, String>>();
+		this.codeList = this.invoice4BuyService.findEnabled4Option();
+		
 		// 遍历销售单对应的set集合，查出每个集合对应的采购
 		for (Invoice4SellDetail isd : isd4set) {
-			for (Map<String, String> map : this.invoice4BuyService
-					.findOneInvoice4Buy(isd.getBuyId())) {
-				code4list.add(map);
-			}
+			OptionItem.insertIfNotExist(codeList, isd.getBuyId().toString(), 
+			this.invoice4BuyService.findOneInvoice4Buy(isd.getBuyId()).get(0).get("value"));
 		}
-		for (Map<String, String> map : this
-				.removeListNullObj(this.invoice4BuyService.findEnabled4Option())) {
-			code4list.add(map);
-		}
-		// 发票代码
-		this.codeList = code4list;
+
 	}
 
 	@Override
@@ -312,17 +302,6 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 
 	}
 
-	// 清空LIST中保存的空对象
-	private List<Map<String, String>> removeListNullObj(
-			List<Map<String, String>> List) {
-		List<Map<String, String>> tempList = new ArrayList<Map<String, String>>();
-		for (Map<String, String> map : List) {
-			if (map != null) {
-				tempList.add(map);
-			}
-		}
-		return tempList;
-	}
 
 	/**
 	 * 生成OptiomItem key、value值
