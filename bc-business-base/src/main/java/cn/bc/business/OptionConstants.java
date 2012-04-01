@@ -95,4 +95,10 @@ public class OptionConstants extends cn.bc.option.OptionConstants {
 
 	/** 证件名称 */
 	public final static String CERT_NAME = "cert.name";
+	/** 车辆经营权性质 */
+	public final static String OWNERSHIP_NATURE = "ownership.nature";
+	/** 车辆经营情况 */
+	public final static String OWNERSHIP_SITUATION = "ownership.situation";
+	/** 车辆产权 */
+	public final static String OWNERSHIP_OWNER = "ownership.owner";
 }
