@@ -41,7 +41,7 @@ public class Invoice4BuyDaoImpl extends HibernateCrudJpaDao<Invoice4Buy>
 	public List<Map<String, String>> find4Option(Integer[] statuses) {
 		String hql = "select b.id,b.code,b.start_no,b.end_no";
 				hql += ",b.company,b.buy_date,b.type_,b.unit_,b.count_";
-				hql += ",(select sum(count_) from bs_invoice_sell_detail where buy_id=b.id and status_=0)";
+				hql += ",getbalancecountbyinvoicebuyid(b.id)";
 				hql += " from BS_INVOICE_BUY b";
 		
 		if (statuses != null && statuses.length > 0) {
@@ -55,6 +55,7 @@ public class Invoice4BuyDaoImpl extends HibernateCrudJpaDao<Invoice4Buy>
 				hql += ")";
 			}
 		}
+		hql += " and getbalancecountbyinvoicebuyid(b.id)>0";
 		hql += " order by b.buy_date DESC";
 		if (logger.isDebugEnabled()) {
 			logger.debug("hql=" + hql);
@@ -72,49 +73,34 @@ public class Invoice4BuyDaoImpl extends HibernateCrudJpaDao<Invoice4Buy>
 						Object buy_date = rs[i++];
 						String type = rs[i++].toString();
 						String unit = rs[i++].toString();	
-						String count_ = rs[i++].toString();
-						//销售数量
-						Object obj_sell_count = rs[i++];
-						//剩余数量
-						int balanceCount=0;
+						String balance_count = rs[i++].toString();
+	
+						String typeStr=null;
+						String unitStr=null;
 						
-						if(obj_sell_count==null){
-							balanceCount=Integer.parseInt(count_);
-						}else{
-							balanceCount=Integer.parseInt(count_)-Integer.parseInt(obj_sell_count.toString());
+						oi.put("key", key);
+						// 打印票
+						if (Integer.parseInt(type) == Invoice4Buy.TYPE_PRINT) {
+							typeStr = Invoice4Buy.TYPE_STR_PRINT;
+							// 手撕票
+						} else if (Integer.parseInt(type) == Invoice4Buy.TYPE_TORE) {
+							typeStr = Invoice4Buy.TYPE_STR_TORE;
 						}
+						if(Integer.parseInt(unit) == Invoice4Buy.UNIT_JUAN){
+							unitStr = Invoice4Buy.UNIT_STR_JUAN;
+						}else if(Integer.parseInt(unit) == Invoice4Buy.UNIT_BEN){
+							unitStr = Invoice4Buy.UNIT_STR_BEN;
+						}
+						SimpleDateFormat dateformat=new SimpleDateFormat("yyyy-MM-dd");
+							String buyDateStr=dateformat.format(buy_date);
 						
-						//剩余数量大于0时 才return
-						if(balanceCount>0){
-							String typeStr=null;
-							String unitStr=null;
-							
-							oi.put("key", key);
-							// 打印票
-							if (Integer.parseInt(type) == Invoice4Buy.TYPE_PRINT) {
-								typeStr = Invoice4Buy.TYPE_STR_PRINT;
-								// 手撕票
-							} else if (Integer.parseInt(type) == Invoice4Buy.TYPE_TORE) {
-								typeStr = Invoice4Buy.TYPE_STR_TORE;
-							}
-							if(Integer.parseInt(unit) == Invoice4Buy.UNIT_JUAN){
-								unitStr = Invoice4Buy.UNIT_STR_JUAN;
-							}else if(Integer.parseInt(unit) == Invoice4Buy.UNIT_BEN){
-								unitStr = Invoice4Buy.UNIT_STR_BEN;
-							}
-							SimpleDateFormat dateformat=new SimpleDateFormat("yyyy-MM-dd");
-								String buyDateStr=dateformat.format(buy_date);
-							
-							String value = code + "(" + startNo + "~" + endNo
-									+ ")"+company+","+ buyDateStr+","+ typeStr+",库存数量"+balanceCount+unitStr;
-							
-							oi.put("value",value);
-							return oi;
-						}else{
-							return null;
-						}
+						String value = code + "(" + startNo + "~" + endNo
+								+ ")"+company+","+ buyDateStr+","+ typeStr+",库存数量"+balance_count+unitStr;
+						
+						oi.put("value",value);
+						return oi;
 					}
-				});
+					});
 	}
 	
 	public List<Map<String, String>> findOneInvoice4Buy(Long id){

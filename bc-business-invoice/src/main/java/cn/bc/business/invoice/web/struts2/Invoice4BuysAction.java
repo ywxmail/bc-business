@@ -80,8 +80,12 @@ public class Invoice4BuysAction extends ViewAction<Map<String, Object>> {
 		//计算剩余数量
 		sql.append(",(select sum(count_) from bs_invoice_sell_detail where buy_id=b.id and status_=0) as balance_count");
 		//sql.append(",getbalancenumberbyinvoicebuyid(b.id,b.count_,b.start_no,b.end_no) as balance_number");
+		sql.append(",au.actor_name as author_name,b.file_date as file_date");
+		sql.append(",am.actor_name as modified_name,b.modified_date as modified_date");
 		sql.append(" from bs_invoice_buy b");
+		sql.append(" inner join bc_identity_actor_history au on au.id=b.author_id");
 		sql.append(" left join bc_identity_actor_history a on a.id=b.buyer_id");
+		sql.append(" left join bc_identity_actor_history am on am.id=b.modifier_id");
 		sqlObject.setSql(sql.toString());
 
 		// 注入参数
@@ -122,7 +126,10 @@ public class Invoice4BuysAction extends ViewAction<Map<String, Object>> {
 					int balanceCount=Integer.parseInt(map.get("count_").toString())-Integer.parseInt(obj_sell_count.toString());
 					map.put("balance_count",balanceCount);// 剩余数量
 				}
-				
+				map.put("author_name", rs[i++]); // 创建人
+				map.put("file_date", rs[i++]); // 创建时间
+				map.put("modified_name", rs[i++]); // 最后修改人
+				map.put("modified_date", rs[i++]); // 最后修改时间
 				//map.put("balance_count", rs[i++]); 
 				//map.put("balance_number", rs[i++]); // 剩余号码段
 				return map;
@@ -146,6 +153,9 @@ public class Invoice4BuysAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("b.buy_date", "buy_date",
 				getText("invoice4Buy.buydate"), 90).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+		// 购买人
+		columns.add(new TextColumn4MapKey("a.actor_name", "buyerName",
+				getText("invoice4Buy.buyer"), 60).setSortable(true));
 		// 数量
 		columns.add(new TextColumn4MapKey("b.count_", "count_",
 				getText("invoice4Buy.count"), 80).setSortable(true));
@@ -181,13 +191,20 @@ public class Invoice4BuysAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("b.unit_", "unit_",
 				getText("invoice4Buy.unit"), 40).setSortable(true)
 				.setValueFormater(new KeyValueFormater(getUnits())));
-		// 购买人
-		columns.add(new TextColumn4MapKey("a.actor_name", "buyerName",
-				getText("invoice4Buy.buyer"), 80).setSortable(true));
 		// 合计
 		columns.add(new TextColumn4MapKey("b.buy_price", "amount",
 				getText("invoice4Buy.amount"), 150).setSortable(true).setUseTitleFromLabel(true)
 				.setValueFormater(new NubmerFormater("###,##0.00")));
+		columns.add(new TextColumn4MapKey("au.actor_name", "author_name",
+				getText("invoice.author"), 60));
+		columns.add(new TextColumn4MapKey("b.file_date", "file_date",
+				getText("invoice.fileDate"), 160)
+				.setValueFormater(new CalendarFormater("yyyy-MM-dd hh:mm:ss")));
+		columns.add(new TextColumn4MapKey("am.actor_name", "modified_name",
+				getText("invoice.modifier"), 80));
+		columns.add(new TextColumn4MapKey("b.modified_date", "modified_date",
+				getText("invoice.modifiedDate"), 160)
+				.setValueFormater(new CalendarFormater("yyyy-MM-dd hh:mm:ss")));
 		// 剩余号码段
 		//columns.add(new TextColumn4MapKey("", "balance_number",
 				//getText("invoice4Buy.balanceNumber"), 200).setUseTitleFromLabel(true));
@@ -239,7 +256,8 @@ public class Invoice4BuysAction extends ViewAction<Map<String, Object>> {
 	
 	@Override
 	protected String[] getGridSearchFields() {
-		return new String[] { "b.code",	"a.actor_name" ,"b.start_no" ,"b.end_no"};
+		return new String[] { "b.code",	"a.actor_name" 
+				,"b.start_no" ,"b.end_no","au.actor_name","am.actor_name"};
 	}
 
 	@Override

@@ -117,7 +117,8 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 			return new OrderCondition("c.file_date", Direction.Desc).add(
 					"c.status_", Direction.Asc);
 		} else { // 历史版本
-			return new OrderCondition("c.file_date", Direction.Desc);
+			return new OrderCondition("c.status_", Direction.Asc)
+					.add("c.file_date", Direction.Desc);
 		}
 	}
 
@@ -272,10 +273,10 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 					}
 				}));
 		columns.add(new TextColumn4MapKey("c.start_date", "start_date",
-				getText("contract4Charger.startDate"), 90)
+				getText("contract4Charger.startDate"), 90).setSortable(true)
 				.setValueFormater(new CalendarFormater()));
 		columns.add(new TextColumn4MapKey("c.end_date", "end_date",
-				getText("contract4Charger.endDate"), 90)
+				getText("contract4Charger.endDate"), 90).setSortable(true)
 				.setValueFormater(new CalendarFormater()));
 		columns.add(new TextColumn4MapKey("c.sign_date", "sign_date",
 				getText("contract.signDate"), 90).setSortable(true)
@@ -360,7 +361,7 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 		// 状态条件
 		Condition statusCondition = null;
 		Condition mainsCondition = null;
-		Condition patchCondtion = null;
+		//Condition patchCondtion = null;
 		Condition typeCondtion = new EqualsCondition("c.type_", type);
 		Condition carCondition = null;
 		Condition driverCondition = null;
@@ -373,19 +374,20 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 			// mainsCondition = ConditionUtils // 控制显示最新版本main为0的经济合同
 			// .toConditionByComma4IntegerValue(this.mains, "c.main");
 			// }
-		} else {
-			// 查看历史版本
-			if (this.contractId != 0) {
-				// 显示实例本身
-				patchCondtion = new EqualsCondition("c.patch_no", patchNo);
-			} else {
-				// 不显示实例本身
-				patchCondtion = new EqualsCondition("c.patch_no", patchNo);
-				mainsCondition = new EqualsCondition("c.main",
-						Contract.MAIN_HISTORY);
-
-			}
-		}
+		} 
+//		else {
+//			// 查看历史版本
+//			if (this.contractId != 0) {
+//				// 显示实例本身
+//				patchCondtion = new EqualsCondition("c.patch_no", patchNo);
+//			} else {
+//				// 不显示实例本身
+//				patchCondtion = new EqualsCondition("c.patch_no", patchNo);
+//				mainsCondition = new EqualsCondition("c.main",
+//						Contract.MAIN_HISTORY);
+//
+//			}
+//		}
 
 		if (carId != null) {
 			carCondition = new EqualsCondition("carc.car_id", carId);
@@ -395,7 +397,7 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 			driverCondition = new EqualsCondition("manc.man_id", driverId);
 		}
 		return ConditionUtils.mix2AndCondition(typeCondtion, statusCondition,
-				patchCondtion, mainsCondition, carCondition, driverCondition);
+				mainsCondition, carCondition, driverCondition);
 	}
 
 	@Override

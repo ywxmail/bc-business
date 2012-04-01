@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 
 import cn.bc.business.invoice.domain.Invoice4Sell;
-import cn.bc.business.invoice.domain.Invoice4SellDetail;
 import cn.bc.core.dao.CrudDao;
 
 /**
@@ -32,7 +31,7 @@ public interface Invoice4SellDao extends CrudDao<Invoice4Sell> {
 	 * @param 
 	 * @return
 	 */
-	List<Invoice4SellDetail> selectSellDetailByCode(Long buyId);
+	List<Map<String,String>>  selectSellDetailByCode(Long buyId);
 
 	/**
 	 * 根据采购单id查找相应的sellDetail列表(排除此sellId)
@@ -40,7 +39,7 @@ public interface Invoice4SellDao extends CrudDao<Invoice4Sell> {
 	 * @param sellId
 	 * @return
 	 */
-	List<Invoice4SellDetail> selectSellDetailByCode(Long buyId, Long sellId);
+	List<Map<String,String>> selectSellDetailByCode(Long buyId, Long sellId);
 	
 	
 	/**

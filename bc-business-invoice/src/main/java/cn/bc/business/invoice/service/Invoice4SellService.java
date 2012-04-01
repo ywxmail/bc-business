@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 
 import cn.bc.business.invoice.domain.Invoice4Sell;
-import cn.bc.business.invoice.domain.Invoice4SellDetail;
 import cn.bc.core.service.CrudService;
 
 /**
@@ -30,7 +29,7 @@ public interface Invoice4SellService extends CrudService<Invoice4Sell> {
 	 * @param code
 	 * @return
 	 */
-	List<Invoice4SellDetail> selectSellDetailByCode(Long buyId);
+	List<Map<String,String>> selectSellDetailByCode(Long buyId);
 	
 	/**
 	 * 根据发票代码查找相应的sellDetail列表(排除此sellId)
@@ -38,7 +37,7 @@ public interface Invoice4SellService extends CrudService<Invoice4Sell> {
 	 * @param sellId
 	 * @return
 	 */
-	List<Invoice4SellDetail> selectSellDetailByCode(Long buyId,Long sellId);
+	List<Map<String,String>> selectSellDetailByCode(Long buyId,Long sellId);
 	
 	/**
 	 * 指定采购日期 总采购数 (company为null即查宝城和广发所有记录)

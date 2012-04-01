@@ -49,7 +49,8 @@ public class Invoice4BuyAction extends FileEntityAction<Long, Invoice4Buy> {
 	public String amount;// 合计
 	public String balanceNumber;// 剩余号码段
 	public String balanceCount;//剩余数量
-
+	public String unitName;
+	
 	@Autowired
 	public void setInvoice4BuyService(Invoice4BuyService invoice4BuyService) {
 		this.setCrudService(invoice4BuyService);
@@ -79,12 +80,16 @@ public class Invoice4BuyAction extends FileEntityAction<Long, Invoice4Buy> {
 
 	@Override
 	protected void afterCreate(Invoice4Buy entity) {
+		SystemContext context = this.getSystyemContext();
 		super.afterCreate(entity);
 		entity.setBuyDate(Calendar.getInstance());
 		entity.setBuyPrice(7F);
 		entity.setStatus(BCConstants.STATUS_ENABLED);
 		// 每（卷/本）默认值为100
 		entity.setEachCount(100);
+		entity.setBuyerId(context.getUserHistory());
+		this.unitName=getText("invoice.unit.juan");
+		entity.setUnit(Invoice4Buy.UNIT_JUAN);
 	}
 
 	@Override
@@ -95,6 +100,12 @@ public class Invoice4BuyAction extends FileEntityAction<Long, Invoice4Buy> {
 		this.balanceNumber = this.invoice4BuyService
 				.findBalanceNumberByInvoice4BuyId(entity.getId()).get(0);
 		this.balanceCount = this.invoice4BuyService.findBalanceCountByInvoice4BuyId(entity.getId()).get(0);
+		
+		if(entity.getUnit()==Invoice4Buy.UNIT_BEN){
+			this.unitName=getText("invoice.unit.ben");
+		}else{
+			this.unitName=getText("invoice.unit.juan");
+		}
 		super.afterEdit(entity);
 	}
 
@@ -106,6 +117,11 @@ public class Invoice4BuyAction extends FileEntityAction<Long, Invoice4Buy> {
 		this.balanceNumber = this.invoice4BuyService
 				.findBalanceNumberByInvoice4BuyId(entity.getId()).get(0);
 		this.balanceCount = this.invoice4BuyService.findBalanceCountByInvoice4BuyId(entity.getId()).get(0);
+		if(entity.getUnit()==Invoice4Buy.UNIT_BEN){
+			this.unitName=getText("invoice.unit.ben");
+		}else{
+			this.unitName=getText("invoice.unit.juan");
+		}
 		super.afterOpen(entity);
 
 	}
@@ -130,6 +146,7 @@ public class Invoice4BuyAction extends FileEntityAction<Long, Invoice4Buy> {
 		this.typeList = list;
 
 		// 发票单位
+		
 		list = new ArrayList<Map<String, String>>();
 		list.add(this.getOptiomItems(String.valueOf(Invoice4Buy.UNIT_JUAN),
 				getText("invoice.unit.juan")));
@@ -222,26 +239,19 @@ public class Invoice4BuyAction extends FileEntityAction<Long, Invoice4Buy> {
 	// 遍历采购单集合，检查相同发票代码的采购单开始号和结束号是否出现在已保存的采购编码范围内
 	private String eachListInvoice4Buy(List<Invoice4Buy> bList, Long startNo,
 			Long endNo, Json json) {
-		for (int i = 0; i < bList.size(); i++) {
-			Invoice4Buy i4Buy = bList.get(i);
-			if (endNo < Long.parseLong(i4Buy.getStartNo().trim())) {
-				json.put("checkResult", "0");
-				return json.toString();
-			} else if (bList.size() == 1
-					&& endNo > Long.parseLong(i4Buy.getEndNo().trim())
-					&& startNo > Long.parseLong(i4Buy.getEndNo().trim())) {// 遍历到集合的最后一个对象时
-				json.put("checkResult", "0");
-				return json.toString();
-			} else if (endNo > Long.parseLong(i4Buy.getEndNo().trim())
-					&& startNo > Long.parseLong(i4Buy.getEndNo().trim())) {
-				bList.remove(0);// 比较完第一个对象，下次再比较时已不需要再比较这个对象
-				eachListInvoice4Buy(bList, startNo, endNo, json);// 继续递归
-			} else {
-				json.put("checkResult", "1");
-				return json.toString();
+		if(endNo>startNo){
+			for(Invoice4Buy i4Buy:bList){
+				if(!(endNo < Long.parseLong(i4Buy.getStartNo().trim())
+						|| startNo > Long.parseLong(i4Buy.getEndNo().trim()))){
+					json.put("checkResult", "1");
+					return json.toString();
+				}
 			}
+		}else{
+			json.put("checkResult", "1");
+			return json.toString();
 		}
-
+		json.put("checkResult", "0");
 		return json.toString();
 	}
 
