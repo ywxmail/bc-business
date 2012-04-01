@@ -3,6 +3,18 @@
     "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
     "http://struts.apache.org/dtds/struts-2.0.dtd">
 <struts>
-		
-		
+	<package name="batchChange" extends="bc-default" namespace="/bc-business/batchChange">
+		<action name="save" class="batchChangeAction" method="save" />
+		<action name="data" class="batchChangeAction" method="data" />
+		<action name="delete" class="batchChangeAction" method="delete" />
+		<action name="create" class="batchChangeAction" method="create" >
+		    <result name="form">/bc-business/ownership/piliangXiuGaiForm.jsp</result>
+		</action>
+		<action name="edit" class="batchChangeAction" method="edit" >
+		    <result name="dingban">/bc-business/ownership/piliangXiuGaiForm.jsp</result>
+		</action>
+		<action name="open" class="batchChangeAction" method="open" >
+			<result name="dingban">/bc-business/ownership/piliangXiuGaiForm.jsp</result>
+		</action>
+	</package>
 </struts>
