@@ -72,7 +72,9 @@ public class OwnershipsAction extends ViewAction<Map<String, Object>> {
 	protected OrderCondition getGridDefaultOrderCondition() {
 		// 默认排序方向：车辆状态|创建日期
 		return new OrderCondition("c.status_", Direction.Asc).add(
-				"c.file_date", Direction.Desc);
+				"c.register_date", Direction.Desc)
+				.add("c.code", Direction.Desc);
+
 	}
 
 	@Override
