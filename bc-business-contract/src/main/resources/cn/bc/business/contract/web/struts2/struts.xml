@@ -72,8 +72,8 @@
 	
 	<!-- 经济合同的版本管理集成 -->
 	<package name="Contract4ChargerOperate2Action" extends="bc-default" namespace="/bc-business/contract4ChargerOperate2">
-		<!-- 续约,过户,重发包  编辑-->
-		<action name="edit" class="contract4ChargerOperate2Action" method="edit">
+		<!-- 续约,过户,重发包  新建-->
+		<action name="create" class="contract4ChargerOperate2Action" method="create">
 			<result name="form">/bc-business/contract4Charger/formOperate.jsp</result>
 		</action>
 		<!-- 续约,过户,重发包  保存-->
