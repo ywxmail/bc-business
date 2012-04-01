@@ -232,4 +232,26 @@ public interface Contract4ChargerService extends CrudService<Contract4Charger> {
 	 */
 	Long checkCodeIsExist(Long excludeId, String code);
 
+	
+	/**
+	 * 根据旧合同id复制出新合同
+	 * @param id
+	 * @param opType
+	 * @param signType
+	 * @return
+	 */
+	Contract4Charger doCopyContract(Long id,int opType,String signType);
+	
+	/**
+	 * 经济合同操处理
+	 * @param carId   -- 车辆id
+	 * @param e    -- 新的经济合同
+	 * @param assignChargerIds  -- 责任人id列表
+	 * @param fromContractId    -- 旧经济合同id
+	 * @return
+	 */
+	Contract4Charger doOperate(Long carId, Contract4Charger e,String assignChargerIds, Long fromContractId);
+
+
+
 }
