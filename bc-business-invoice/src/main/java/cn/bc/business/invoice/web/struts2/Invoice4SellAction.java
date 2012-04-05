@@ -320,6 +320,9 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 				pageOption.addButton(new ButtonOption(getText("label.save"),
 						null, "bs.invoice4SellForm.save")
 						.setId("invoice4SellSave"));
+				pageOption.addButton(new ButtonOption(getText("invoice.saveAndClose"), 
+						null,"bs.invoice4SellForm.saveAndClose")
+						.setId("invoice4SellSave"));
 			} else {// open时
 				if (this.getE().getStatus() == Invoice4Buy.STATUS_NORMAL) {
 					// 维护
@@ -328,7 +331,6 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 							"bs.invoice4SellForm.doMaintenance")
 							.setId("invoice4SellEdit"));
 				}
-
 			}
 		}
 	}

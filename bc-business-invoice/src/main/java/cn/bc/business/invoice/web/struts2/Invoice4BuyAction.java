@@ -173,6 +173,9 @@ public class Invoice4BuyAction extends FileEntityAction<Long, Invoice4Buy> {
 				pageOption.addButton(new ButtonOption(getText("label.save"),
 						null, "bs.invoice4BuyForm.save")
 						.setId("invoice4BuySave"));
+				pageOption.addButton(new ButtonOption(getText("invoice.saveAndClose"), 
+						null,"bs.invoice4BuyForm.saveAndClose")
+						.setId("invoice4BuySave"));
 			} else {// open时
 				if (this.getE().getStatus() == Invoice4Buy.STATUS_NORMAL) {
 					// 维护
