@@ -137,6 +137,7 @@ public class Invoice4SellStatsAction extends ViewAction<Map<String, Object>> {
 				try {
 					cal.setTime(sdf.parse(this.endDate));
 					sql.append(" and s.sell_date<");
+					//加一天
 			        cal.add(Calendar.DAY_OF_MONTH, 1);
 			        sql.append("'");
 			        sql.append(calf.format(cal));
@@ -306,8 +307,13 @@ public class Invoice4SellStatsAction extends ViewAction<Map<String, Object>> {
 		conta.addStyle("padding-left", "0.2em");
 		Text text=new Text("~");
 		
+		Div div=new Div();
+		div.addStyle("display", "inline-block");
+		div.addStyle("width", "8px");
+		
 		//容器div添加内容
 		conta.addChild(button);
+		conta.addChild(div);
 		conta.addChild(sellDate);
 		conta.addChild(divS);
 		conta.addChild(text);
