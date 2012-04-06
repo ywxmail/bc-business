@@ -209,6 +209,11 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 	
 	@Override
 	protected void buildFormPageButtons(PageOption pageOption, boolean editable) {
+		if (this.useFormPrint()) {
+			// 添加打印按钮
+			pageOption.addButton(this.getDefaultPrintButtonOption());
+		}
+		
 		boolean readonly = this.isReadonly();
 //		if (editable && !readonly) {
 //			if(!getE().isNew()){

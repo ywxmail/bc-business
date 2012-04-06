@@ -178,6 +178,11 @@ public class PolicyAction extends FileEntityAction<Long, Policy> {
 	@Override
 	protected void buildFormPageButtons(PageOption pageOption, boolean editable) {
 		boolean readonly = this.isReadonly();
+		
+		if (this.useFormPrint()) {
+			// 添加打印按钮
+			pageOption.addButton(this.getDefaultPrintButtonOption());
+		}
 
 		if (editable) {// edit,create
 			// if (this.getE().isNew()) {
