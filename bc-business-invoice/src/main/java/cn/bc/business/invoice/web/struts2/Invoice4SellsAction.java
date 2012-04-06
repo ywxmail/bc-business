@@ -83,7 +83,7 @@ public class Invoice4SellsAction extends ViewAction<Map<String, Object>> {
 	protected OrderCondition getGridDefaultOrderCondition() {
 		// 默认排序方向：状态
 		return new OrderCondition("s.status_", Direction.Asc).add(
-				"s.sell_date", Direction.Desc);
+				"s.sell_date", Direction.Desc).add("s.file_date",Direction.Desc);
 	}
 
 	@Override
@@ -281,12 +281,12 @@ public class Invoice4SellsAction extends ViewAction<Map<String, Object>> {
 				getText("invoice.author"), 60));
 		columns.add(new TextColumn4MapKey("s.file_date", "file_date",
 				getText("invoice.fileDate"), 160)
-				.setValueFormater(new CalendarFormater("yyyy-MM-dd hh:mm:ss")));
+				.setValueFormater(new CalendarFormater("yyyy-MM-dd HH:mm:ss")));
 		columns.add(new TextColumn4MapKey("am.actor_name", "modified_name",
 				getText("invoice.modifier"), 80));
 		columns.add(new TextColumn4MapKey("s.modified_date", "modified_date",
 				getText("invoice.modifiedDate"), 160)
-				.setValueFormater(new CalendarFormater("yyyy-MM-dd hh:mm:ss")));
+				.setValueFormater(new CalendarFormater("yyyy-MM-dd HH:mm:ss")));
 		// 备注
 		columns.add(new TextColumn4MapKey("s.desc_", "desc",
 				getText("invoice.desc")).setUseTitleFromLabel(true));

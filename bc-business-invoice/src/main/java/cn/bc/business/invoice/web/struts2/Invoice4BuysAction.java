@@ -64,7 +64,7 @@ public class Invoice4BuysAction extends ViewAction<Map<String, Object>> {
 	protected OrderCondition getGridDefaultOrderCondition() {
 		// 默认排序方向：状态
 		return new OrderCondition("b.status_", Direction.Asc).add("b.buy_date",
-				Direction.Desc);
+				Direction.Desc).add("b.file_date", Direction.Desc);
 	}
 
 	@Override
@@ -199,12 +199,12 @@ public class Invoice4BuysAction extends ViewAction<Map<String, Object>> {
 				getText("invoice.author"), 60));
 		columns.add(new TextColumn4MapKey("b.file_date", "file_date",
 				getText("invoice.fileDate"), 160)
-				.setValueFormater(new CalendarFormater("yyyy-MM-dd hh:mm:ss")));
+				.setValueFormater(new CalendarFormater("yyyy-MM-dd HH:mm:ss")));
 		columns.add(new TextColumn4MapKey("am.actor_name", "modified_name",
 				getText("invoice.modifier"), 80));
 		columns.add(new TextColumn4MapKey("b.modified_date", "modified_date",
 				getText("invoice.modifiedDate"), 160)
-				.setValueFormater(new CalendarFormater("yyyy-MM-dd hh:mm:ss")));
+				.setValueFormater(new CalendarFormater("yyyy-MM-dd HH:mm:ss")));
 		// 剩余号码段
 		//columns.add(new TextColumn4MapKey("", "balance_number",
 				//getText("invoice4Buy.balanceNumber"), 200).setUseTitleFromLabel(true));
