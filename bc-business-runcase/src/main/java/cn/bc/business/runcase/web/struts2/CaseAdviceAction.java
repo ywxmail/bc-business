@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import org.jsoup.helper.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
@@ -410,12 +411,11 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 			this.getE().setResult(jiaoWeiADVICE.getResult());
 			this.getE().setSubject(jiaoWeiADVICE.getSubject());
 			this.getE().setSubject2(jiaoWeiADVICE.getSubject2());
-			if(jiaoWeiADVICE.getMachinePrice() != null && !jiaoWeiADVICE.getMachinePrice().equals("无")
-			 && !jiaoWeiADVICE.getMachinePrice().equals("没打表")){
+			if(jiaoWeiADVICE.getMachinePrice() != null && StringUtil.isNumeric(jiaoWeiADVICE.getMachinePrice())){
 				this.getE().setMachinePrice(Float.parseFloat(jiaoWeiADVICE.getMachinePrice()));
 			}
 			this.getE().setTicket(jiaoWeiADVICE.getTicket());
-			if(jiaoWeiADVICE.getCharge() != null && !jiaoWeiADVICE.getCharge().equals("无")){
+			if(jiaoWeiADVICE.getCharge() != null && StringUtil.isNumeric(jiaoWeiADVICE.getCharge())){
 				this.getE().setCharge(Float.parseFloat(jiaoWeiADVICE.getCharge()));
 			}
 			this.getE().setCarColor(jiaoWeiADVICE.getBusColor());

@@ -276,7 +276,8 @@ public class BlacklistsAction extends ViewAction<Map<String, Object>> {
 	protected String[] getGridSearchFields() {
 		return new String[] { "b.code", "b.company", "unit.name", "m.name",
 				"c.plate_type", "c.plate_no", "b.subject", "b.type_",
-				"cm.name", "l.name", "u.name" };
+				 "l.name", "u.name","b.drivers" };
+	
 	}
 
 	@Override
