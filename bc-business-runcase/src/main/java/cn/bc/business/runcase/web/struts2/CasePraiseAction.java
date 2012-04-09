@@ -166,6 +166,12 @@ public class CasePraiseAction extends FileEntityAction<Long, Case4Praise> {
 	@Override
 	protected void buildFormPageButtons(PageOption pageOption, boolean editable) {
 		boolean readonly = this.isReadonly();
+		
+		if (this.useFormPrint()) {
+			// 添加打印按钮
+			pageOption.addButton(this.getDefaultPrintButtonOption());
+		}
+
 		if (editable && !readonly) {
 			//特殊处理结案按钮
 			if(Case4Praise.STATUS_ACTIVE == getE().getStatus() && !getE().isNew()){

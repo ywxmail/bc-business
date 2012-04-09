@@ -256,6 +256,12 @@ public class BlacklistAction extends FileEntityAction<Long, Blacklist> {
 	@Override
 	protected void buildFormPageButtons(PageOption pageOption, boolean editable) {
 		boolean readonly = this.isReadonly();
+		
+		if (this.useFormPrint()) {
+			// 添加打印按钮
+			pageOption.addButton(this.getDefaultPrintButtonOption());
+		}
+		
 		if (editable && !readonly) {
 			// 新建时为显示锁定按钮
 			if (isReadonly() == false && this.getE().isNew()) {

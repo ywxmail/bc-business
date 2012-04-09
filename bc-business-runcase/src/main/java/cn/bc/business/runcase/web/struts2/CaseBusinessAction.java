@@ -251,6 +251,12 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 	@Override
 	protected void buildFormPageButtons(PageOption pageOption, boolean editable) {
 		boolean readonly = this.isReadonly();
+		
+		if (this.useFormPrint()) {
+			// 添加打印按钮
+			pageOption.addButton(this.getDefaultPrintButtonOption());
+		}
+		
 		if (editable && !readonly) {
 			if(!getE().isNew()){
 				//生成通知单

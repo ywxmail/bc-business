@@ -6,9 +6,11 @@ package cn.bc.business.contract.service;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.tools.ant.util.DateUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
@@ -120,15 +122,6 @@ public class Contract4ChargerServiceImpl extends
 		if (oldContract == null)
 			throw new CoreException("要处理的合同已不存在！contractId=" + contractId);
 
-		SystemContext context = SystemContextHolder.get();
-		
-		// 更新旧合同的相关信息
-		oldContract.setStatus(Contract.STATUS_LOGOUT);// 失效
-		oldContract.setMain(Contract.MAIN_HISTORY);// 历史
-		oldContract.setLogoutId(context.getUserHistory());//注销人
-		oldContract.setLogoutDate(Calendar.getInstance());//注销时间
-		this.contract4ChargerDao.save(oldContract);
-
 		// 复制出新的合同
 		Contract4Charger newContract = new Contract4Charger();
 		try {
@@ -138,6 +131,15 @@ public class Contract4ChargerServiceImpl extends
 		}
 		newContract.setId(null);
 
+		// 更新旧合同的相关信息
+		SystemContext context = SystemContextHolder.get();
+
+		oldContract.setStatus(Contract.STATUS_LOGOUT);// 失效
+		oldContract.setMain(Contract.MAIN_HISTORY);// 历史
+		oldContract.setLogoutId(context.getUserHistory());//注销人
+		oldContract.setLogoutDate(Calendar.getInstance());//注销时间
+		this.contract4ChargerDao.save(oldContract);
+		
 		/*
 		 * //生成合同编号 String oldContractCode = oldContract.getCode();
 		 * if(oldContractCode.lastIndexOf("-") > 0){ //判断旧合同编号是否存在字符"-"
@@ -225,14 +227,6 @@ public class Contract4ChargerServiceImpl extends
 		if (oldContract == null)
 			throw new CoreException("要处理的合同已不存在！contractId=" + contractId);
 
-		SystemContext context = SystemContextHolder.get();
-		// 更新旧合同的相关信息
-		oldContract.setStatus(Contract.STATUS_LOGOUT);// 失效
-		oldContract.setMain(Contract.MAIN_HISTORY);// 历史
-		oldContract.setLogoutId(context.getUserHistory());//注销人
-		oldContract.setLogoutDate(Calendar.getInstance());//注销时间
-		this.contract4ChargerDao.save(oldContract);
-
 		// 复制出新的合同
 		Contract4Charger newContract = new Contract4Charger();
 		try {
@@ -242,6 +236,16 @@ public class Contract4ChargerServiceImpl extends
 		}
 		newContract.setId(null);
 
+		
+		// 更新旧合同的相关信息
+		SystemContext context = SystemContextHolder.get();
+
+		oldContract.setStatus(Contract.STATUS_LOGOUT);// 失效
+		oldContract.setMain(Contract.MAIN_HISTORY);// 历史
+		oldContract.setLogoutId(context.getUserHistory());//注销人
+		oldContract.setLogoutDate(Calendar.getInstance());//注销时间
+		this.contract4ChargerDao.save(oldContract);
+		
 		/*
 		 * 
 		 * // 生成新的合同编号 String oldContractCode = oldContract.getCode();
@@ -336,13 +340,6 @@ public class Contract4ChargerServiceImpl extends
 		if (oldContract == null)
 			throw new CoreException("要处理的合同已不存在！contractId=" + contractId);
 
-		SystemContext context = SystemContextHolder.get();
-		// 更新旧合同的相关信息
-		oldContract.setStatus(Contract.STATUS_LOGOUT);// 失效
-		oldContract.setMain(Contract.MAIN_HISTORY);// 历史
-		oldContract.setLogoutId(context.getUserHistory());//注销人
-		oldContract.setLogoutDate(Calendar.getInstance());//注销时间
-		this.contract4ChargerDao.save(oldContract);
 
 		// 复制出新的合同
 		Contract4Charger newContract = new Contract4Charger();
@@ -353,6 +350,15 @@ public class Contract4ChargerServiceImpl extends
 		}
 		newContract.setId(null);
 
+		// 更新旧合同的相关信息
+		SystemContext context = SystemContextHolder.get();
+
+		oldContract.setStatus(Contract.STATUS_LOGOUT);// 失效
+		oldContract.setMain(Contract.MAIN_HISTORY);// 历史
+		oldContract.setLogoutId(context.getUserHistory());//注销人
+		oldContract.setLogoutDate(Calendar.getInstance());//注销时间
+		this.contract4ChargerDao.save(oldContract);
+		
 		/*
 		 * // 生成新的合同编号
 		 * 
@@ -452,6 +458,116 @@ public class Contract4ChargerServiceImpl extends
 		contract.setLogoutDate(logoutDate != null ? logoutDate : Calendar
 				.getInstance());
 		this.contract4ChargerDao.save(contract);
+	}
+	
+	/**
+	 * 复制新合同
+	 */
+	public Contract4Charger doCopyContract(Long id,int opType,String signType) {
+		// 获取原来的合同信息
+		Contract4Charger oldContract = this.contract4ChargerDao
+				.load(id);
+		if (oldContract == null)
+			throw new CoreException("要处理的合同已不存在！contractId=" + id);
+
+
+		// 复制出新的合同
+		Contract4Charger newContract = new Contract4Charger();
+		try {
+			BeanUtils.copyProperties(oldContract, newContract);
+		} catch (Exception e) {
+			throw new CoreException("复制合同信息错误！", e);
+		}
+		
+		// 保存新的合同信息以获取id
+		newContract.setUid(this.idGeneratorService
+				.next(Contract4Charger.KEY_UID));
+
+		// 复制原合同的附件给新的合同
+		String oldUid = oldContract.getUid();
+		attachService.doCopy(Contract4Charger.KEY_UID, oldUid,
+				Contract4Charger.KEY_UID, newContract.getUid(), true);
+		
+		// 设置创建人,最后更新人的信息
+		SystemContext context = SystemContextHolder.get();
+		
+		newContract.setAuthor(context.getUserHistory());
+		newContract.setModifier(context.getUserHistory());
+		newContract.setFileDate(Calendar.getInstance());
+		newContract.setModifiedDate(Calendar.getInstance());
+		
+		//设置操作的信息
+		newContract.setId(null);
+		newContract.setCode("CLHT" + DateUtils.format(new Date(), "yyyyMM")); // 自动生成经济合同编号的前缀
+		newContract.setSignType(signType);
+		newContract.setOpType(opType);
+		newContract.setSignDate(null);
+		newContract.setStartDate(null);
+		newContract.setVerMajor(newContract.getVerMajor()+1);//版本号+1
+		if(newContract.getOpType() == Contract.OPTYPE_CHANGECHARGER
+		  || newContract.getOpType() == Contract.OPTYPE_CHANGECHARGER2){
+			newContract.setTakebackOrigin(true);
+		}
+		//记录旧的保存合同id
+		newContract.setPid(id);
+		
+		return newContract;
+	}
+	
+	/**
+	 * 操作
+	 */
+	public Contract4Charger doOperate(Long carId, Contract4Charger e,String assignChargerIds,
+			Long contractId) {
+		
+		// 获取原来的合同信息
+		Contract4Charger oldContract = this.contract4ChargerDao
+				.load(contractId);
+		if (oldContract == null)
+			throw new CoreException("要处理的合同已不存在！contractId=" + contractId);
+	
+		//保存旧合同信息
+		//更新旧合同的相关信息
+		SystemContext context = SystemContextHolder.get();
+		oldContract.setStatus(Contract.STATUS_LOGOUT);// 失效
+		oldContract.setMain(Contract.MAIN_HISTORY);// 历史
+		oldContract.setLogoutId(context.getUserHistory());//注销人
+		oldContract.setLogoutDate(Calendar.getInstance());//注销时间
+		this.contract4ChargerDao.save(oldContract);
+		
+		//保存新合同信息
+		Contract4Charger newContract = e;
+		newContract = this.contract4ChargerDao.save(newContract);
+		Long newId = newContract.getId();
+
+		// 参数有效性验证
+		Assert.notNull(carId);
+
+		// 处理责任人id列表
+		Long[] chargerIdAry = StringUtils
+				.stringArray2LongArray(assignChargerIds.split(","));
+
+		// 处理与车辆的关联关系
+		ContractCarRelation carRelation = new ContractCarRelation(newId, carId);
+		this.contractDao.saveContractCarRelation(carRelation);
+
+		// 处理与责任人的关联关系
+		List<ContractCarManRelation> chargerRelationList = new ArrayList<ContractCarManRelation>();
+		ContractCarManRelation driverRelation = null;
+		for (Long chargerId : chargerIdAry) {
+			driverRelation = new ContractCarManRelation(newId, chargerId);
+			chargerRelationList.add(driverRelation);
+		}
+		this.contractDao.saveContractCarManRelation(chargerRelationList);
+
+		// 更新车辆视图的charger列显示责任人姓名
+		this.contract4ChargerDao.updateCar4ChargerName(carId);
+		// 更新司机视图的charger列显示责任人姓名
+		this.contract4ChargerDao.updateCarMan4ChargerName(carId);
+
+		// 返回续签的合同
+		return newContract;
+
 	}
 
 	@Override

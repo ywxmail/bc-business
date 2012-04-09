@@ -40,7 +40,7 @@ public class Invoice4BuyDaoImpl extends HibernateCrudJpaDao<Invoice4Buy>
 
 	public List<Map<String, String>> find4Option(Integer[] statuses) {
 		String hql = "select b.id,b.code,b.start_no,b.end_no";
-				hql += ",b.company,b.buy_date,b.type_,b.unit_,b.count_";
+				hql += ",b.company,b.buy_date,b.type_,b.unit_";
 				hql += ",getbalancecountbyinvoicebuyid(b.id)";
 				hql += " from BS_INVOICE_BUY b";
 		
@@ -72,7 +72,7 @@ public class Invoice4BuyDaoImpl extends HibernateCrudJpaDao<Invoice4Buy>
 						String company = rs[i++].toString();
 						Object buy_date = rs[i++];
 						String type = rs[i++].toString();
-						String unit = rs[i++].toString();	
+						String unit = rs[i++].toString();
 						String balance_count = rs[i++].toString();
 	
 						String typeStr=null;
