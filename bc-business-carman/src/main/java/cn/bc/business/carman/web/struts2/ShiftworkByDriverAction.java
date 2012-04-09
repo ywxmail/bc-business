@@ -97,13 +97,17 @@ public class ShiftworkByDriverAction extends
 		this.getE().setToUnit(toCar.getCompany());
 
 		// 将顶班车辆组装成字符串赋值给shiftwork字段：plate1,id1;plate2,id2;...
-		String shiftwork = this.getE().getShiftwork();
-		this.getE().setShiftwork(shiftwork + ";");
-		String[] shiftworks = shiftwork.split(";");
-		Long[] carIds = new Long[shiftworks.length];
-		for (int i = 0; i < shiftworks.length; i++) {
-			carIds[i] = new Long(shiftworks[i].split(",")[1]);
-
+		Long[] carIds = null;
+		String shiftwork = this.getE().getShiftwork().trim();
+		if (shiftwork.length() != 0) {
+			this.getE().setShiftwork(shiftwork + ";");
+			String[] shiftworks = shiftwork.split(";");
+			carIds = new Long[shiftworks.length];
+			if (carIds.length > 0) {
+				for (int i = 0; i < shiftworks.length; i++) {
+					carIds[i] = new Long(shiftworks[i].split(",")[1]);
+				}
+			}
 		}
 		this.carByDriverHistoryService.saveShiftwork(this.getE(), carIds);
 		return "saveSuccess";

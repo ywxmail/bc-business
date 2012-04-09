@@ -194,20 +194,23 @@ public class CarByDriverHistoryServiceImpl extends
 		CarByDriver carByDriver;
 		// 顶班车辆
 		Car car;
-		for (Long carId : carIds) {
-			carByDriver = new CarByDriver();
-			car = new Car();
-			car.setId(carId);
-			carByDriver.setDriver(driver);
-			carByDriver.setCar(car);
-			carByDriver.setClasses(CarByDriver.TYPE_DINGBAN);
-			carByDriver.setAuthor(entity.getAuthor());
-			carByDriver.setFileDate(entity.getFileDate());
-			carByDriver.setModifier(entity.getModifier());
-			carByDriver.setModifiedDate(entity.getModifiedDate());
-			carByDriver.setDescription(entity.getDescription());
-			carByDriver.setPid(entity.getId());
-			carByDrivers.add(carByDriver);
+		// 如果顶班车不为空
+		if (carIds != null) {
+			for (Long carId : carIds) {
+				carByDriver = new CarByDriver();
+				car = new Car();
+				car.setId(carId);
+				carByDriver.setDriver(driver);
+				carByDriver.setCar(car);
+				carByDriver.setClasses(CarByDriver.TYPE_DINGBAN);
+				carByDriver.setAuthor(entity.getAuthor());
+				carByDriver.setFileDate(entity.getFileDate());
+				carByDriver.setModifier(entity.getModifier());
+				carByDriver.setModifiedDate(entity.getModifiedDate());
+				carByDriver.setDescription(entity.getDescription());
+				carByDriver.setPid(entity.getId());
+				carByDrivers.add(carByDriver);
+			}
 		}
 		// 主挂车辆
 		CarByDriver zhugaCarByDriver = new CarByDriver();
@@ -332,4 +335,5 @@ public class CarByDriverHistoryServiceImpl extends
 		return this.carByDriverHistoryDao
 				.findNeWsetCarByDriverHistory4CarAndMoveType(carId, movety);
 	}
+
 }

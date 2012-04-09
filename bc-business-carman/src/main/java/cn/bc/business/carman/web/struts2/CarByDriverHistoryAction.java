@@ -354,12 +354,14 @@ public class CarByDriverHistoryAction extends
 			cars = new HashMap<Long, String>();
 
 			String shiftwork = this.getE().getShiftwork();
-			String[] shiftworks = shiftwork.split(";");
-			// 顶班车辆
-			cars = new HashMap<Long, String>();
-			for (int i = 0; i < shiftworks.length; i++) {
-				cars.put(new Long(shiftworks[i].split(",")[1]),
-						shiftworks[i].split(",")[0]);
+			if (shiftwork.length() != 0) {
+				String[] shiftworks = shiftwork.split(";");
+				// 顶班车辆
+				cars = new HashMap<Long, String>();
+				for (int i = 0; i < shiftworks.length; i++) {
+					cars.put(new Long(shiftworks[i].split(",")[1]),
+							shiftworks[i].split(",")[0]);
+				}
 			}
 		}
 
