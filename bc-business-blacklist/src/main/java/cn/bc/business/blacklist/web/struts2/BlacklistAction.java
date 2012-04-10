@@ -256,12 +256,12 @@ public class BlacklistAction extends FileEntityAction<Long, Blacklist> {
 	@Override
 	protected void buildFormPageButtons(PageOption pageOption, boolean editable) {
 		boolean readonly = this.isReadonly();
-		
+
 		if (this.useFormPrint()) {
 			// 添加打印按钮
 			pageOption.addButton(this.getDefaultPrintButtonOption());
 		}
-		
+
 		if (editable && !readonly) {
 			// 新建时为显示锁定按钮
 			if (isReadonly() == false && this.getE().isNew()) {
@@ -313,10 +313,13 @@ public class BlacklistAction extends FileEntityAction<Long, Blacklist> {
 
 		// 加载可选车队列表
 		this.motorcadeList = this.motorcadeService.findEnabled4Option();
-		Motorcade m = this.getE().getMotorcade();
-		if (m != null) {
-			OptionItem.insertIfNotExist(this.motorcadeList, m.getId()
-					.toString(), m.getName());
+		if (carId != null) {
+			Motorcade m = this.carService.load(carId).getMotorcade();
+			if (m != null) {
+				OptionItem.insertIfNotExist(this.motorcadeList, m.getId()
+						.toString(), m.getName());
+			}
+
 		}
 		// 批量加载可选项列表
 		Map<String, List<Map<String, String>>> optionItems = this.optionService
