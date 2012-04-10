@@ -745,7 +745,7 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 	}
 
 	/**
-	 * 获取司机的信息{将姓名,班次,id;姓名2,班次2,id2...}转为[姓名(班次),姓名(班次)]
+	 * 获取司机的信息{将姓名,班次,id;姓名2,班次2,id2...}转为[姓名1,姓名2]
 	 * 
 	 * @param Drivers
 	 * @return
@@ -766,7 +766,7 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 
 			vs = vv.split(",");// [0]-司机姓名,[1]-营运班次,[2]-司机id
 			if (vs.length == 3) {
-				driverInfo += vs[0] + "(" + vs[1] + ")";
+				driverInfo += vs[0];
 			} else {
 				driverInfo += vv;
 			}
