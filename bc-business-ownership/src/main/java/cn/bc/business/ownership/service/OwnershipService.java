@@ -23,8 +23,7 @@ public interface OwnershipService extends CrudService<Ownership> {
 	 *            修改以营权信息
 	 * @param carIds
 	 *            车辆的Id
-	 * @param o 经营权对象
 	 */
-	void saveBatchTaxis(Map<String, Object> ownershipInfo, Long[] carIds, Ownership o);
+	void saveBatchTaxis(Map<String, Object> ownershipInfo, Long[] carIds);
 
 }
