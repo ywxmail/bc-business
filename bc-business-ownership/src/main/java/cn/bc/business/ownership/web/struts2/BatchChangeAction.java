@@ -13,6 +13,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
 import cn.bc.business.OptionConstants;
+import cn.bc.business.car.domain.Car;
 import cn.bc.business.car.service.CarService;
 import cn.bc.business.ownership.domain.Ownership;
 import cn.bc.business.ownership.service.OwnershipService;
@@ -46,6 +47,25 @@ public class BatchChangeAction extends FileEntityAction<Long, Ownership> {
 	public String situationValue;
 	public String ownerValue;
 	public Map<String, Object> ownershipInfo;// 修改信息
+	public String ids;// 视图选择多辆车进行修改时的车辆id
+	public Long id;// 选一辆车时
+	public String changeCars;// 视图选择多辆车
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public String getIds() {
+		return ids;
+	}
+
+	public void setIds(String ids) {
+		this.ids = ids;
+	}
 
 	@Autowired
 	public void setOptionService(OptionService optionService) {
@@ -80,7 +100,29 @@ public class BatchChangeAction extends FileEntityAction<Long, Ownership> {
 		super.afterCreate(entity);
 		// 车辆
 		cars = new HashMap<Long, String>();
+		if (ids != null) {
+			String[] id = ids.split(",");
+			// 顶班车辆
+			changeCars = "";
+			for (int i = 0; i < id.length; i++) {
+				Car car = this.carService.load(new Long(id[i]));
+				cars.put(new Long(id[i]),
+						car.getPlateType() + "." + car.getPlateNo());
+				if (i > 0) {
+					changeCars = changeCars + ";";
+				}
+				changeCars += car.getPlateType() + "." + car.getPlateNo() + ","
+						+ id[i];
+			}
 
+		}
+		if (id != null) {
+			Car car = this.carService.load(new Long(id));
+			cars.put(new Long(id), car.getPlateType() + "." + car.getPlateNo());
+			changeCars = car.getPlateType() + "." + car.getPlateNo() + "," + id;
+
+		}
+		vehicles = changeCars;
 	}
 
 	public String save() throws Exception {
@@ -94,20 +136,17 @@ public class BatchChangeAction extends FileEntityAction<Long, Ownership> {
 		ownershipInfo.put("modifier", o.getModifier().getId());
 		// 如果经营权性质有改动则设置经营权性质值
 		if (isNature) {
-			natureValue = natureValue.replaceAll(",", "").trim();
 			ownershipInfo.put("nature", natureValue);
 			o.setNature(natureValue);
 		}
 		// 如果经营权情况有改动则设置经营权情况值
 		if (isSituation) {
-			situationValue = situationValue.replaceAll(",", "").trim();
 			ownershipInfo.put("situation", situationValue);
 			o.setSituation(situationValue);
 
 		}
 		// 如果车辆产权有改动则设置车辆产权值
 		if (isOwner) {
-			ownerValue = ownerValue.replaceAll(",", "").trim();
 			ownershipInfo.put("owner", ownerValue);
 			o.setOwner(ownerValue);
 
@@ -123,7 +162,7 @@ public class BatchChangeAction extends FileEntityAction<Long, Ownership> {
 		for (int i = 0; i < taxis.length; i++) {
 			carIds[i] = new Long(taxis[i].split(",")[1]);
 		}
-		this.ownershipService.saveBatchTaxis(ownershipInfo, carIds,o);
+		this.ownershipService.saveBatchTaxis(ownershipInfo, carIds);
 		return "saveSuccess";
 	}
 
