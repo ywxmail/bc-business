@@ -22,6 +22,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.orm.jpa.JpaCallback;
 import org.springframework.util.StringUtils;
 
+import cn.bc.BCConstants;
 import cn.bc.business.contract.dao.Contract4LabourDao;
 import cn.bc.business.contract.domain.Contract;
 import cn.bc.business.contract.domain.Contract4Labour;
@@ -578,7 +579,7 @@ public class Contract4LabourDaoImpl extends
 	public boolean isExistContractByDriverId(Long driverId) {
 		String sql = "select c.* from BS_CONTRACT c"
 				+ " inner join BS_CARMAN_CONTRACT cc ON c.id = cc.contract_id where c.type_="+Contract.TYPE_LABOUR+" and cc.man_id="
-				+ driverId;
+				+ driverId + " and c.status_="+ BCConstants.STATUS_ENABLED;
 
 		List<Map<String, Object>> list = this.jdbcTemplate.queryForList(sql);
 		return list != null && list.size() > 0;
