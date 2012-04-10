@@ -1,5 +1,6 @@
 package cn.bc.business.ownership.dao;
 
+import java.util.ArrayList;
 import java.util.Map;
 
 import cn.bc.business.ownership.domain.Ownership;
@@ -27,5 +28,14 @@ public interface OwnershipDao extends CrudDao<Ownership> {
 	 *            车辆id
 	 */
 	void updateOwnershipByCarId(Map<String, Object> ownershipInfo, Long[] carIds);
+
+	/**
+	 * 查找出需要更新车辆经营权信息的车辆ID
+	 * 
+	 * @param carIds
+	 *            批量处理的车辆ID
+	 * @return
+	 */
+	ArrayList<Object> getUpdateCarIdsList(Long[] carIds);
 
 }

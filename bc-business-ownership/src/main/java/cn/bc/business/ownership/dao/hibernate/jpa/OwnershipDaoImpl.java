@@ -79,4 +79,33 @@ public class OwnershipDaoImpl extends HibernateCrudJpaDao<Ownership> implements
 		}
 
 	}
+
+	@SuppressWarnings("unchecked")
+	public ArrayList<Object> getUpdateCarIdsList(Long[] carIds) {
+		List<?> updateCarIds;
+		if (carIds.length == 1) {
+			String hql = "select o.car.id from Ownership o where o.car.id=?";
+			updateCarIds = this.getJpaTemplate().find(hql,
+					new Object[] { carIds[0] });
+
+		} else {
+			List<Long> args = new ArrayList<Long>();
+			StringBuffer hql = new StringBuffer();
+			hql.append("select o.car.id from Ownership o where o.car.id in (?");
+			args.add(carIds[0]);
+			for (int i = 1; i < carIds.length; i++) {
+				hql.append(",?");
+				args.add(carIds[i]);
+			}
+			hql.append(")");
+			updateCarIds = this.getJpaTemplate().find(hql.toString(),
+					args.toArray());
+
+		}
+		if (updateCarIds.size() == 0) {
+			return null;
+		} else {
+			return ((ArrayList<Object>) updateCarIds);
+		}
+	}
 }
