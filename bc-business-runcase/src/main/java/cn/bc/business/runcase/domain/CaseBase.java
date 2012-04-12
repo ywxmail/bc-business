@@ -42,6 +42,8 @@ public class CaseBase extends RichFileEntityImpl {
 	public static final int TYPE_ACCIDENT = 5;
 	/** 事件类型：公司投诉 */
 	public static final int TYPE_COMPANY_COMPLAIN = 6;
+	/** 事件类型：报失 */
+	public static final int TYPE_LOST = 7;
 
 	/** 事件来源：自建 */
 	public static final int SOURCE_SYS = 0;
