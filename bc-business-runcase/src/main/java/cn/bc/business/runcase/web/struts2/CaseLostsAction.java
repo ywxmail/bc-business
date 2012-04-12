@@ -44,7 +44,6 @@ import cn.bc.web.formater.NubmerFormater;
 import cn.bc.web.ui.html.grid.Column;
 import cn.bc.web.ui.html.grid.IdColumn4MapKey;
 import cn.bc.web.ui.html.grid.TextColumn4MapKey;
-import cn.bc.web.ui.html.page.HtmlPage;
 import cn.bc.web.ui.html.page.PageOption;
 import cn.bc.web.ui.html.toolbar.Toolbar;
 import cn.bc.web.ui.json.Json;
@@ -64,11 +63,11 @@ public class CaseLostsAction extends ViewAction<Map<String, Object>> {
 	public Long carManId;
 	public Long carId;
 	
-	public Map<String, String> levels;
-	public Map<String, String> sitePostions;
-	public Map<String, String> results;
-	public Map<String, String> handleResults;
-
+	private Map<String, String> levels;
+	private Map<String, String> sitePostions;
+	private Map<String, String> results;
+	private Map<String, String> handleResults;
+	
 	@Override
 	public boolean isReadonly() {
 		SystemContext context = (SystemContext) this.getContext();
@@ -159,11 +158,26 @@ public class CaseLostsAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected List<Column> getGridColumns() {
+		// 初始化optionItem列表
+		Map<String,List<Map<String, String>>> map = this.optionService.findOptionItemByGroupKeys(new String[] {
+				OptionConstants.LOST_SITE_POSTION,OptionConstants.LOST_LEVEL,
+				OptionConstants.LOST_RESULT,OptionConstants.LOST_HANDLE_RESULT,
+			});
+		this.sitePostions = this.getItems(map.get(OptionConstants.LOST_SITE_POSTION));
+		this.levels = this.getItems(map.get(OptionConstants.LOST_LEVEL));
+		this.results = this.getItems(map.get(OptionConstants.LOST_RESULT));
+		this.handleResults = this.getItems(map.get(OptionConstants.LOST_HANDLE_RESULT));
+		
+		// 设置视图列
 		List<Column> columns = new ArrayList<Column>();
+		
 		columns.add(new IdColumn4MapKey("l.id", "id"));
 		columns.add(new TextColumn4MapKey("b.status_", "status_",
 				getText("runcase.status"), 40).setSortable(true)
 				.setValueFormater(new EntityStatusFormater(getBSStatuses2())));
+		// 受理号
+		columns.add(new TextColumn4MapKey("b.code", "code",
+				getText("runcase.receiveCode"), 100));
 		// 事发时间
 		columns.add(new TextColumn4MapKey("b.happen_date", "happen_date",
 				getText("runcase.happenDate"), 125).setSortable(true)
@@ -288,9 +302,6 @@ public class CaseLostsAction extends ViewAction<Map<String, Object>> {
 		// 领取人证件
 		columns.add(new TextColumn4MapKey("l.taker_identity", "taker_identity",
 				getText("runcase.lost.takerIdentity"), 100));
-		// 受理号
-		columns.add(new TextColumn4MapKey("b.code", "code",
-				getText("runcase.receiveCode"), 100));
 		// 创建人
 		columns.add(new TextColumn4MapKey("iah.actor_name", "author",
 				getText("runcase.lost.author"), 80)
@@ -394,20 +405,6 @@ public class CaseLostsAction extends ViewAction<Map<String, Object>> {
 		} else {
 			return super.getGridSearchCondition4OneField(field, value);
 		}
-	}
-	
-	@Override
-	protected HtmlPage buildHtmlPage() {
-		Map<String,List<Map<String, String>>> map = this.optionService.findOptionItemByGroupKeys(new String[] {
-				OptionConstants.LOST_SITE_POSTION,OptionConstants.LOST_LEVEL,
-				OptionConstants.LOST_RESULT,OptionConstants.LOST_HANDLE_RESULT,
-			});
-		this.sitePostions = this.getItems(map.get(OptionConstants.LOST_SITE_POSTION));
-		this.levels = this.getItems(map.get(OptionConstants.LOST_LEVEL));
-		this.results = this.getItems(map.get(OptionConstants.LOST_RESULT));
-		this.handleResults = this.getItems(map.get(OptionConstants.LOST_HANDLE_RESULT));
-		
-		return super.buildHtmlPage();
 	}
 	
 	/**
