@@ -10,6 +10,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import cn.bc.BCConstants;
+import cn.bc.business.car.dao.CarDao;
 import cn.bc.business.car.domain.Car;
 import cn.bc.business.carman.dao.CarByDriverDao;
 import cn.bc.business.carman.dao.CarByDriverHistoryDao;
@@ -17,6 +18,8 @@ import cn.bc.business.carman.domain.CarByDriver;
 import cn.bc.business.carman.domain.CarByDriverHistory;
 import cn.bc.business.carman.domain.CarMan;
 import cn.bc.core.service.DefaultCrudService;
+import cn.bc.log.domain.OperateLog;
+import cn.bc.log.service.OperateLogService;
 
 /**
  * 迁移记录Service的实现
@@ -30,6 +33,25 @@ public class CarByDriverHistoryServiceImpl extends
 	private CarByDriverHistoryDao carByDriverHistoryDao;
 	public CarByDriverService carByDriverService;
 	public CarByDriverDao carByDriverDao;
+	private OperateLogService operateLogService;
+	// public CarManDao carManDao;
+	public CarDao carDao;
+
+	//
+	// @Autowired
+	// public void setCarManDao(CarManDao carManDao) {
+	// this.carManDao = carManDao;
+	// }
+	//
+	@Autowired
+	public void setCarDao(CarDao carDao) {
+		this.carDao = carDao;
+	}
+
+	@Autowired
+	public void setOperateLogService(OperateLogService operateLogService) {
+		this.operateLogService = operateLogService;
+	}
 
 	@Autowired
 	public void setCarByDriverDao(CarByDriverDao carByDriverDao) {
@@ -67,10 +89,44 @@ public class CarByDriverHistoryServiceImpl extends
 
 	@Override
 	public CarByDriverHistory save(CarByDriverHistory entity) {
-
+		boolean isNew = entity.isNew();
 		// 保存迁移历史记录
 		entity = super.save(entity);
+		// 记录司机迁移记录的操作日志
+		if (entity.getDriver() != null) {
+			if (isNew) {
+				// 记录新建日志
+				this.operateLogService.saveWorkLog(CarByDriverHistory.class
+						.getSimpleName(), entity.getId().toString(), "新建司机"
+						+ entity.getDriver().getName() + "的迁移记录", null,
+						OperateLog.OPERATE_CREATE);
+			} else {
+				// 记录更新日志
+				this.operateLogService.saveWorkLog(CarByDriverHistory.class
+						.getSimpleName(), entity.getId().toString(), "更新司机"
+						+ entity.getDriver().getName() + "的迁移记录", null,
+						OperateLog.OPERATE_UPDATE);
+			}
 
+		} else {
+			// 记录车辆迁移记录的操作日志
+			if (isNew) {
+				// 记录新建日志
+				Car c = this.carDao.load(entity.getFromCar().getId());
+				this.operateLogService.saveWorkLog(CarByDriverHistory.class
+						.getSimpleName(), entity.getId().toString(),
+						"新建车辆" + c.getPlate() + "的迁移记录", null,
+						OperateLog.OPERATE_CREATE);
+			} else {
+				// 记录更新日志
+				this.operateLogService.saveWorkLog(CarByDriverHistory.class
+						.getSimpleName(), entity.getId().toString(), "更新车辆"
+						+ entity.getFromCar().getPlateType() + "."
+						+ entity.getFromCar().getPlateNo() + "的迁移记录", null,
+						OperateLog.OPERATE_UPDATE);
+			}
+
+		}
 		if (entity.getDriver() != null) {
 			// // 加载该司机的营运班次记录
 			// CarByDriver carByDriver = this.carByDriverService
@@ -185,9 +241,28 @@ public class CarByDriverHistoryServiceImpl extends
 	 */
 	public void saveShiftwork(CarByDriverHistory entity, Long[] carIds) {
 		// 保存迁移记录
-
+		boolean isNew = entity.isNew();
 		this.carByDriverHistoryDao.save(entity);
 
+		// 保存迁移历史记录
+		entity = super.save(entity);
+		// 记录司机迁移记录的操作日志
+		if (entity.getDriver() != null) {
+			if (isNew) {
+				// 记录新建日志
+				this.operateLogService.saveWorkLog(CarByDriverHistory.class
+						.getSimpleName(), entity.getId().toString(), "新建顶班司机"
+						+ entity.getDriver().getName() + "的迁移记录", null,
+						OperateLog.OPERATE_CREATE);
+			} else {
+				// 记录更新日志
+				this.operateLogService.saveWorkLog(CarByDriverHistory.class
+						.getSimpleName(), entity.getId().toString(), "更新顶班司机"
+						+ entity.getDriver().getName() + "的迁移记录", null,
+						OperateLog.OPERATE_UPDATE);
+			}
+
+		}
 		// 保存营运班次信息
 		CarMan driver = entity.getDriver();
 		List<CarByDriver> carByDrivers = new ArrayList<CarByDriver>();
