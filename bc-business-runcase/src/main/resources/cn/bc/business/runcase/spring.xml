@@ -55,5 +55,11 @@
 		p:entityManagerFactory-ref="entityManagerFactory" />
 	<bean id="casePraiseService" class="cn.bc.business.runcase.service.CasePraiseServiceImpl"
 		p:casePraiseDao-ref="casePraiseDao" />	
-		
+	
+	<!-- caseLostDao -->
+	<bean id="caseLostDao" class="cn.bc.business.runcase.dao.hibernate.jpa.CaseLostDaoImpl"
+		p:entityManagerFactory-ref="entityManagerFactory" />
+	<bean id="caseLostService" class="cn.bc.business.runcase.service.CaseLostServiceImpl"
+		p:caseLostDao-ref="caseLostDao" />	
+	
 </beans>
