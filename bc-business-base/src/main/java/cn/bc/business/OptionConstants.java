@@ -81,7 +81,14 @@ public class OptionConstants extends cn.bc.option.OptionConstants {
 	public final static String PR_TYPE = "pr.type";
 	/** 投诉-责任 */
 	public final static String AD_DUTY = "ad.duty";
-
+	/** 营运事件报失- 遗失位置*/
+	public final static String LOST_SITE_POSTION = "lost.site.postion";
+	/** 营运事件报失- 级别*/
+	public final static String LOST_LEVEL = "lost.level";
+	/** 营运事件报失- 失物去向*/
+	public final static String LOST_RESULT = "lost.result";
+	/** 营运事件报失- 处理结果*/
+	public final static String LOST_HANDLE_RESULT = "lost.handle.result";
 	/** 社保险种 */
 	public final static String LB_INSURANCETYPE = "lb.insuranceType";
 	/** 购买单位 */
