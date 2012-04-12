@@ -25,6 +25,7 @@ public class BlacklistServiceImpl extends DefaultCrudService<Blacklist>
 	private BlacklistDao blacklistDao;
 	private OperateLogService operateLogService;
 	public CarDao carDao;
+
 	@Autowired
 	public void setCarDao(CarDao carDao) {
 		this.carDao = carDao;
@@ -64,20 +65,31 @@ public class BlacklistServiceImpl extends DefaultCrudService<Blacklist>
 		boolean isNew = entity.isNew();
 		entity = super.save(entity);
 		if (isNew) {
-			Car c=this.carDao.load(entity.getCar().getId());
+			Car c = this.carDao.load(entity.getCar().getId());
 			// 记录新建日志
 			this.operateLogService.saveWorkLog(Blacklist.class.getSimpleName(),
-					entity.getId().toString(), "新建车辆"
-							+ c.getPlate() + "的黑名单", null,
-					OperateLog.OPERATE_CREATE);
+					entity.getId().toString(), "锁定车辆" + c.getPlate() + "的黑名单",
+					null, OperateLog.OPERATE_CREATE);
 
 		} else {
-			// 记录更新日志
-			this.operateLogService.saveWorkLog(Blacklist.class.getSimpleName(),
-					entity.getId().toString(), "更新车辆"
-							+ entity.getCar().getPlateType() + "."
-							+ entity.getCar().getPlateNo() + "的黑名单", null,
-					OperateLog.OPERATE_UPDATE);
+
+			// 如果执行解锁操作就生成一条解锁日志
+			if (entity.getStatus() == Blacklist.STATUS_UNLOCK) {
+				this.operateLogService.saveWorkLog(Blacklist.class
+						.getSimpleName(), entity.getId().toString(), "解锁车辆"
+						+ entity.getCar().getPlateType() + "."
+						+ entity.getCar().getPlateNo() + "的黑名单", null,
+						OperateLog.OPERATE_UPDATE);
+			} else {
+				// 记录更新日志
+				this.operateLogService.saveWorkLog(Blacklist.class
+						.getSimpleName(), entity.getId().toString(), "更新车辆"
+						+ entity.getCar().getPlateType() + "."
+						+ entity.getCar().getPlateNo() + "的黑名单", null,
+						OperateLog.OPERATE_UPDATE);
+
+			}
+
 		}
 		return entity;
 	}
