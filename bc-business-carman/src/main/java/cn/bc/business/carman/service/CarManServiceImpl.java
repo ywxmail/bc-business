@@ -147,12 +147,12 @@ public class CarManServiceImpl extends DefaultCrudService<CarMan> implements
 		if (isNew) {
 			// 记录新建日志
 			this.operateLogService.saveWorkLog(CarMan.class.getSimpleName(),
-					entity.getId().toString(), "新建" + entity.getName(), null,
+					entity.getId().toString(), "新建" + entity.getName()+"的司机信息", null,
 					OperateLog.OPERATE_CREATE);
 		} else {
 			// 记录更新日志
 			this.operateLogService.saveWorkLog(CarMan.class.getSimpleName(),
-					entity.getId().toString(), "更新" + entity.getName(), null,
+					entity.getId().toString(), "更新" + entity.getName()+"的司机信息", null,
 					OperateLog.OPERATE_UPDATE);
 		}
 
@@ -161,6 +161,11 @@ public class CarManServiceImpl extends DefaultCrudService<CarMan> implements
 
 	public void updatePhone(Long carManId, String phone1, String phone2) {
 		this.carManDao.updatePhoneBycarManId(carManId, phone1, phone2);
+		CarMan cm = this.carManDao.load(carManId);
+		// 记录更新电话日志
+		this.operateLogService.saveWorkLog(CarMan.class.getSimpleName(), cm
+				.getId().toString(), "更新司机" + cm.getName() + "的电话号码", null,
+				OperateLog.OPERATE_UPDATE);
 
 	}
 

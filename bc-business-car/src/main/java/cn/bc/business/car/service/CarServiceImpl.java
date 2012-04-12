@@ -168,13 +168,13 @@ public class CarServiceImpl extends DefaultCrudService<Car> implements
 		if (isNew) {
 			// 记录新建日志
 			this.operateLogService.saveWorkLog(Car.class.getSimpleName(),
-					entity.getId().toString(), "新建" + entity.getPlate(), null,
-					OperateLog.OPERATE_CREATE);
+					entity.getId().toString(), "新建" + entity.getPlate()
+							+ "的车辆信息", null, OperateLog.OPERATE_CREATE);
 		} else {
 			// 记录更新日志
 			this.operateLogService.saveWorkLog(Car.class.getSimpleName(),
-					entity.getId().toString(), "更新" + entity.getPlate(), null,
-					OperateLog.OPERATE_UPDATE);
+					entity.getId().toString(), "更新" + entity.getPlate()
+							+ "的车辆信息", null, OperateLog.OPERATE_UPDATE);
 		}
 
 		return entity;
