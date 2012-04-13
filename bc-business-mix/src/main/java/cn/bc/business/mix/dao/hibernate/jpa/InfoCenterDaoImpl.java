@@ -1147,7 +1147,8 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 		sql.append(" inner join bs_car_driver_history h on m.id=h.driver_id");
 		sql.append(" where (h.from_car_id=? or h.to_car_id=?)");
 		// 排除相同司机的旧记录
-		sql.append(" and not exists (select 1 from bs_car_driver_history hi where hi.driver_id=h.driver_id and hi.move_date > h.move_date)");
+		sql.append(" and not exists (select 1 from bs_carman mi inner join bs_car_driver_history hi on mi.id=hi.driver_id");
+		sql.append(" where (hi.from_car_id=h.from_car_id or hi.to_car_id=h.to_car_id) and hi.driver_id=h.driver_id and hi.move_date > h.move_date)");
 		sql.append(" order by h.move_date desc");
 
 		if (logger.isDebugEnabled()) {
