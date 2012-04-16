@@ -86,11 +86,12 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 		sql.append(",m.cert_cyzg,m.work_date,m.origin,m.former_unit,m.charger,m.cert_driving_first_date");
 		sql.append(",m.cert_driving,m.cert_driving_start_date,m.cert_driving_end_date,m.file_date,m.phone,m.phone1,m.sex,m.birthdate");
 		sql.append(",m.carinfo,m.move_type,mo.name motorcade,bia.name unit_name,m.classes,m.move_date,m.shiftwork_end_date,m.main_car_id");
-		sql.append(",c.company company,c.code,m.gz,m.model_");
+		sql.append(",c.company company,c.code,m.gz,m.model_,m.region_,m.modified_date,md.actor_name modifier");
 		sql.append(" from BS_CARMAN m");
 		sql.append(" left join bs_car c on m.main_car_id=c.id");
 		sql.append(" left join bs_motorcade mo on c.motorcade_id=mo.id");
 		sql.append(" left join bc_identity_actor bia on bia.id=mo.unit_id");
+		sql.append(" left join BC_IDENTITY_ACTOR_HISTORY md on md.id=m.modifier_id");
 		// sql.append(" left join bs_car_driver d on d.car_id=m.main_car_id and d.driver_id=m.id");
 		sqlObject.setSql(sql.toString());
 
@@ -139,6 +140,9 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 				// ===========================
 				map.put("gz", rs[i++]);
 				map.put("model_", rs[i++]);
+				map.put("region_", rs[i++]);
+				map.put("modified_date", rs[i++]);
+				map.put("modifier", rs[i++]);
 
 				return map;
 			}
@@ -249,6 +253,15 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 				getText("carMan.model"), 60).setSortable(true));
 		columns.add(new TextColumn4MapKey("m.gz", "gz", getText("carMan.gz"),
 				80).setSortable(true).setValueFormater(new BooleanFormater()));
+		columns.add(new TextColumn4MapKey("m.region_", "region_",
+				getText("carMan.region"), 60)
+				.setValueFormater(new KeyValueFormater(getRegion())));
+		columns.add(new TextColumn4MapKey("md.actor_name", "modifier",
+				getText("carMan.modifier"), 80).setSortable(true));
+		columns.add(new TextColumn4MapKey("m.modified_date", "modified_date",
+				getText("carMan.modifiedDate"), 120).setSortable(true)
+				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+
 		return columns;
 	}
 
@@ -381,6 +394,24 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 		type.put(String.valueOf(CarByDriver.TYPE_WEIDINGYI),
 				getText("carByDriver.classes.weidingyi"));
 		return type;
+	}
+
+	/**
+	 * 获取区域
+	 * 
+	 * @return
+	 */
+	private Map<String, String> getRegion() {
+		Map<String, String> region = new LinkedHashMap<String, String>();
+		region.put(String.valueOf(CarMan.REGION_),
+				getText("carMan.region.kong"));
+		region.put(String.valueOf(CarMan.REGION_BEN_SHI),
+				getText("carMan.region.benshi"));
+		region.put(String.valueOf(CarMan.REGION_BEN_SHENG),
+				getText("carMan.region.bensheng"));
+		region.put(String.valueOf(CarMan.REGION_WAI_SHENG),
+				getText("carMan.region.waisheng"));
+		return region;
 	}
 
 	@Override

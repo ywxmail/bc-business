@@ -39,6 +39,15 @@ public class CarMan extends RichFileEntityImpl {
 	/** 类别：非编 */
 	public static final int TYPE_FEIBIAN = 3;
 
+	/** 区域：本市 */
+	public static final int REGION_BEN_SHI = 1;
+	/** 区域：本省 */
+	public static final int REGION_BEN_SHENG = 2;
+	/** 区域：外省 */
+	public static final int REGION_WAI_SHENG = 3;
+	/** 区域：空 */
+	public static final int REGION_ = 0;
+
 	private int type;// 类别
 	private String orderNo;// 排序号
 	private String name;// 姓名
