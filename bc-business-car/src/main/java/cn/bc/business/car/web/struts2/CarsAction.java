@@ -69,7 +69,8 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 	protected OrderCondition getGridDefaultOrderCondition() {
 		// 默认排序方向：状态|登记日期|自编号
 		return new OrderCondition("c.status_", Direction.Asc).add(
-				"c.register_date", Direction.Desc).add("c.code", Direction.Desc);
+				"c.register_date", Direction.Desc)
+				.add("c.code", Direction.Desc);
 	}
 
 	@Override
@@ -83,7 +84,7 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 		sql.append(",c.cert_no2,c.cert_no1,c.cert_no3,c.cert_no4,c.original_value");
 		sql.append(",c.vin ,c.engine_no,c.factory_type,c.factory_model");
 		sql.append(",c.taximeter_no,c.taximeter_factory,c.taximeter_type");
-		sql.append(",m.id as motorcade_id,c.scrap_date,c.return_date");
+		sql.append(",m.id as motorcade_id,c.scrap_date,c.return_date,c.fuel_type");
 		sql.append(" from bs_car c");
 		sql.append(" inner join bs_motorcade m on m.id=c.motorcade_id");
 		sql.append(" inner join bc_identity_actor bia on bia.id=m.unit_id");
@@ -125,6 +126,7 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 				map.put("motorcade_id", rs[i++]);// 车队id
 				map.put("scrap_date", rs[i++]);// 报废日期
 				map.put("return_date", rs[i++]);// 交车日期
+				map.put("fuel_type", rs[i++]);//
 				return map;
 			}
 		});
@@ -256,6 +258,9 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 		// 计价器型号
 		columns.add(new TextColumn4MapKey("c.taximeter_type", "taximeter_type",
 				getText("car.taximeterType"), 80).setUseTitleFromLabel(true));
+		columns.add(new TextColumn4MapKey("c.fuel_type", "fuel_type",
+				getText("car.fuelType"), 60).setUseTitleFromLabel(true));
+
 		// 报废日期
 		columns.add(new TextColumn4MapKey("c.scrap_date", "scrap_date",
 				getText("car.scrapDate"), 90).setSortable(true)
@@ -272,7 +277,7 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 	protected String[] getGridSearchFields() {
 		return new String[] { "c.plate_no", "c.driver", "c.charger",
 				"c.cert_no2", "c.factory_type", "m.name", "c.engine_no",
-				"c.code","c.bs_type" };
+				"c.code", "c.bs_type" };
 	}
 
 	@Override
