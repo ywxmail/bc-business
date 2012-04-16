@@ -82,7 +82,7 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer sql = new StringBuffer();
-		sql.append("select m.id,m.status_,m.type_,m.name drvierName,m.cert_fwzg,m.cert_fwzg_id,m.cert_identity,m.address");
+		sql.append("select m.id,m.status_,m.type_,m.name drvierName,m.cert_fwzg,m.cert_fwzg_id,m.cert_identity,m.address,m.address1");
 		sql.append(",m.cert_cyzg,m.work_date,m.origin,m.former_unit,m.charger,m.cert_driving_first_date");
 		sql.append(",m.cert_driving,m.cert_driving_start_date,m.cert_driving_end_date,m.file_date,m.phone,m.phone1,m.sex,m.birthdate");
 		sql.append(",m.carinfo,m.move_type,mo.name motorcade,bia.name unit_name,m.classes,m.move_date,m.shiftwork_end_date,m.main_car_id");
@@ -110,6 +110,7 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 				map.put("cert_fwzg_id", rs[i++]);
 				map.put("cert_identity", rs[i++]);
 				map.put("address", rs[i++]);
+				map.put("address1", rs[i++]);
 				map.put("cert_cyzg", rs[i++]);
 				map.put("work_date", rs[i++]);
 				map.put("origin", rs[i++]);
@@ -225,6 +226,9 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 				getText("carMan.cert4Indentity"), 160).setSortable(true));
 		columns.add(new TextColumn4MapKey("m.address", "address",
 				getText("carMan.address"), 160).setSortable(true)
+				.setUseTitleFromLabel(true));
+		columns.add(new TextColumn4MapKey("m.address1", "address1",
+				getText("carMan.address1"), 160).setSortable(true)
 				.setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("m.cert_cyzg", "cert_cyzg",
 				getText("carMan.cert4CYZG"), 120));
