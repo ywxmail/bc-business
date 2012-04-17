@@ -136,7 +136,7 @@ public class JiaoWeiJTWFsAction extends SyncViewAction {
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd HH:mm")));
 		// 金盾网的违章地点
 		columns.add(new TextColumn4MapKey("b.sync_code", "address",
-				getText("jiaoWeiJTWF.address"), 120)
+				getText("jiaoWeiJTWF.address"), 160)
 				.setValueFormater(new LinkFormater4JinDunPlace(this
 						.getContextPath())));
 		columns.add(new TextColumn4MapKey("t.unit_name", "unitName",

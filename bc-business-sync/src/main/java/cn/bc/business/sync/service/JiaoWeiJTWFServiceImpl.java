@@ -14,8 +14,8 @@ import cn.bc.core.service.DefaultCrudService;
  * 
  * @author wis
  */
-public class JiaoWeiJTWFServiceImpl extends DefaultCrudService<JiaoWeiJTWF> implements
-	JiaoWeiJTWFService {
+public class JiaoWeiJTWFServiceImpl extends DefaultCrudService<JiaoWeiJTWF>
+		implements JiaoWeiJTWFService {
 	private JiaoWeiJTWFDao jiaoWeiJTWFDao;
 
 	public JiaoWeiJTWFDao getJiaoWeiJTWFDao() {
@@ -29,7 +29,7 @@ public class JiaoWeiJTWFServiceImpl extends DefaultCrudService<JiaoWeiJTWF> impl
 
 	public String getJinDunAddress(String syncCode, String plateNo,
 			Calendar happenDate) {
-		// TODO Auto-generated method stub
-		return null;
+		return this.jiaoWeiJTWFDao.findJinDunAddress(syncCode, plateNo,
+				happenDate);
 	}
 }
