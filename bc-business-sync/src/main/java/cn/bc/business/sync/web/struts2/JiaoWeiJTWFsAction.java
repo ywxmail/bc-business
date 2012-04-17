@@ -19,6 +19,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
 import cn.bc.business.motorcade.service.MotorcadeService;
+import cn.bc.business.web.struts2.LinkFormater4JinDunPlace;
 import cn.bc.core.query.condition.Direction;
 import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.core.util.DateUtils;
@@ -85,6 +86,7 @@ public class JiaoWeiJTWFsAction extends SyncViewAction {
 		StringBuffer sql = new StringBuffer();
 		sql.append("select b.id,b.status_,b.sync_type,b.sync_code,b.sync_from,b.sync_date");
 		sql.append(",t.happen_date,t.unit_name,t.motorcade_name,t.car_plate_type,t.car_plate_no,t.driver_cert,t.driver_name,t.jeom,t.content");
+		sql.append(",findJinDunByJiaoWei(b.sync_code,t.car_plate_no,t.happen_date) ");
 		sql.append(" from bs_sync_jiaowei_jtwf t");
 		sql.append(" inner join bc_sync_base b on b.id=t.id");
 		sqlObject.setSql(sql.toString());
@@ -112,6 +114,7 @@ public class JiaoWeiJTWFsAction extends SyncViewAction {
 				map.put("driverName", rs[i++]);
 				map.put("jeom", rs[i++]);
 				map.put("content", rs[i++]);
+				map.put("address", rs[i++]);
 				return map;
 			}
 		});
@@ -131,12 +134,15 @@ public class JiaoWeiJTWFsAction extends SyncViewAction {
 		columns.add(new TextColumn4MapKey("t.happen_date", "happenDate",
 				getText("jiaoWeiJTWF.happenDate"), 130).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd HH:mm")));
+		// 金盾网的违章地点
+		columns.add(new TextColumn4MapKey("b.sync_code", "address",
+				getText("jiaoWeiJTWF.address"), 120)
+				.setValueFormater(new LinkFormater4JinDunPlace(this
+						.getContextPath())));
 		columns.add(new TextColumn4MapKey("t.unit_name", "unitName",
-				getText("jiaoWeiJTWF.unitName"), 80)
-				.setSortable(true));
+				getText("jiaoWeiJTWF.unitName"), 80).setSortable(true));
 		columns.add(new TextColumn4MapKey("t.motorcade_name", "motorcadeName",
-				getText("jiaoWeiJTWF.motorcadeName"), 80)
-				.setSortable(true));
+				getText("jiaoWeiJTWF.motorcadeName"), 80).setSortable(true));
 		columns.add(new TextColumn4MapKey("t.car_plate", "carPlateNo",
 				getText("jiaoWeiJTWF.carPlate"), 80).setSortable(true)
 				.setValueFormater(new AbstractFormater<String>() {
@@ -229,11 +235,11 @@ public class JiaoWeiJTWFsAction extends SyncViewAction {
 	}
 
 	public String dateType;// 同步时间范围的标记符
-	
-	// == 指定期限内同步 代码开始  ==
-	private Calendar customFromDate; //指定开始日期
-	private Calendar customToDate; //指定结束日期
-	
+
+	// == 指定期限内同步 代码开始 ==
+	private Calendar customFromDate; // 指定开始日期
+	private Calendar customToDate; // 指定结束日期
+
 	public Calendar getCustomFromDate() {
 		return customFromDate;
 	}
@@ -280,8 +286,9 @@ public class JiaoWeiJTWFsAction extends SyncViewAction {
 				((SystemContext) this.getContext()).getUserHistory(), fromDate,
 				toDate, strMsg);
 	}
-	// == 指定期限内同步 代码结束  ==
-	
+
+	// == 指定期限内同步 代码结束 ==
+
 	// ==高级搜索代码开始==
 	@Override
 	protected boolean useAdvanceSearch() {

@@ -3,6 +3,8 @@
  */
 package cn.bc.business.sync.service;
 
+import java.util.Calendar;
+
 import cn.bc.business.sync.dao.JiaoWeiJTWFDao;
 import cn.bc.business.sync.domain.JiaoWeiJTWF;
 import cn.bc.core.service.DefaultCrudService;
@@ -23,5 +25,11 @@ public class JiaoWeiJTWFServiceImpl extends DefaultCrudService<JiaoWeiJTWF> impl
 	public void setJiaoWeiJTWFDao(JiaoWeiJTWFDao jiaoWeiJTWFDao) {
 		this.jiaoWeiJTWFDao = jiaoWeiJTWFDao;
 		this.setCrudDao(jiaoWeiJTWFDao);
+	}
+
+	public String getJinDunAddress(String syncCode, String plateNo,
+			Calendar happenDate) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
