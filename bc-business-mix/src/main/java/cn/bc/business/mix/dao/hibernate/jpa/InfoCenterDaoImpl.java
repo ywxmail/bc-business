@@ -1161,6 +1161,8 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 				Query queryObject = em.createNativeQuery(sql.toString());
 				queryObject.setParameter(1, carId);
 				queryObject.setParameter(2, carId);
+				queryObject.setParameter(3, carId);
+				queryObject.setParameter(4, carId);
 				@SuppressWarnings("unchecked")
 				List<Object[]> objs = queryObject.getResultList();
 				List<JSONObject> jsons = new ArrayList<JSONObject>();
