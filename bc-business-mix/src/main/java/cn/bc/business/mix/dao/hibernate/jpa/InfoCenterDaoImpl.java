@@ -499,6 +499,7 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 							man.put("judgeType", "司机和责任人");
 						} else {// 在案经济合同 + 注销司机
 							man.put("judgeType", "责任人");
+							man.put("judgeStatus", 0);
 						}
 					} else {
 						if (man.getInt("judgeStatus") == 0) {// 注销的经济合同 + 在案的司机
