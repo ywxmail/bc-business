@@ -174,6 +174,11 @@ public class Contract4ChargerOperate2Action extends
 		// 初始化E
 		this.setE(newContract);
 
+		// 默认新合同的签订日期，合同始日期与上一份合同的结束日期相同
+		Calendar signDate4Charger = DateUtils.getCalendar(this.stopDate);
+		this.getE().setSignDate(signDate4Charger);
+		this.getE().setStartDate(signDate4Charger);
+
 		this.formPageOption = buildFormPageOption(true);
 
 		// 设置责任人列表信息
