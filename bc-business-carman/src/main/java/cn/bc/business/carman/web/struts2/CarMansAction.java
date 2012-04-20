@@ -4,6 +4,7 @@
 package cn.bc.business.carman.web.struts2;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -31,11 +32,13 @@ import cn.bc.core.query.condition.impl.EqualsCondition;
 import cn.bc.core.query.condition.impl.InCondition;
 import cn.bc.core.query.condition.impl.LikeCondition;
 import cn.bc.core.query.condition.impl.OrderCondition;
+import cn.bc.core.util.DateUtils;
 import cn.bc.core.util.StringUtils;
 import cn.bc.db.jdbc.RowMapper;
 import cn.bc.db.jdbc.SqlObject;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.identity.web.formater.SexFormater;
+import cn.bc.web.formater.AbstractFormater;
 import cn.bc.web.formater.BooleanFormater;
 import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.formater.DateRangeFormater;
@@ -204,6 +207,25 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("m.birthdate", "birth_date",
 				getText("carMan.birthdate"), 85).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+		columns.add(new TextColumn4MapKey("m.birthdate", "birth_date",
+				getText("carMan.age"),50)
+				.setValueFormater(new AbstractFormater<String>() {
+					@Override
+					public String format(Object context, Object value) {
+						@SuppressWarnings("unchecked")
+						Map<String, Object> map = (Map<String, Object>) context;
+						Date birthdate = (Date) map.get("birth_date");
+						if (birthdate != null) {
+							Calendar cal=Calendar.getInstance();
+							cal.setTime(birthdate);
+							String age =String.valueOf(DateUtils.getAge(cal));
+							int a=age.indexOf(".");
+							return age.substring(0, a+2);
+						} else {
+							return null;
+						}
+					}
+				}));
 		columns.add(new TextColumn4MapKey("m.cert_fwzg", "cert_fwzg",
 				getText("carMan.cert4FWZG"), 80));
 		columns.add(new TextColumn4MapKey("m.phone", "phone1",
