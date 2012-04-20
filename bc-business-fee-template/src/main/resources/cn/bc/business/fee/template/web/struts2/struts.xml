@@ -4,4 +4,20 @@
     "http://struts.apache.org/dtds/struts-2.0.dtd">
 <struts>
 	
+	<package name="feeTemplate" extends="bc-default" namespace="/bc-business/feeTemplate">
+		<action name="create" class="feeTemplateAction" method="create">
+			<result name="form">/bc-business/feeTemplate/form.jsp</result>
+		</action>		
+		<action name="open" class="feeTemplateAction" method="open">
+			<result name="formr">/bc-business/feeTemplate/form.jsp</result>
+		</action>
+		<action name="edit" class="feeTemplateAction" method="edit">
+			<result name="form">/bc-business/feeTemplate/form.jsp</result>
+		</action>
+		<action name="save" class="feeTemplateAction" method="save"/>
+		<action name="delete" class="feeTemplateAction" method="delete" />
+		<action name="isTemplateExistFee" class="feeTemplateAction" method="isTemplateExistFee" />
+		<action name="isFeeBelong2Template" class="feeTemplateAction" method="isFeeBelong2Template" />
+		<action name="getTemplateModule" class="feeTemplateAction" method="getTemplateModule" />
+	</package>
 </struts>

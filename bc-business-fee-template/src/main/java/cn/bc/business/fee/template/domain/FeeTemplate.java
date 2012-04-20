@@ -14,7 +14,7 @@ import cn.bc.identity.domain.FileEntityImpl;
  */
 
 @Entity
-@Table(name = "BC_FEE_TEMPLATE")
+@Table(name = "BS_FEE_TEMPLATE")
 public class FeeTemplate extends FileEntityImpl {
 	private static final long serialVersionUID = 1L;
 	
@@ -25,16 +25,16 @@ public class FeeTemplate extends FileEntityImpl {
 	/** 收费方式：每年  */
 	public static final int PAY_TYPE_YEAR=3;
 	/** 收费方式:一次性  */
-	public static final int PAY_TYPE_ALL=4;
+	public static final int PAY_TYPE_ALL=4; 
 	
 	/** 类型:费用  */
-	public static final int TYPE_FEE=0;
+	public static final int TYPE_FEE=1;
 	/** 类型:模板  */
-	public static final int TYPE_TEMPLATE=1;
+	public static final int TYPE_TEMPLATE=0;
 	
 	private int status = BCConstants.STATUS_ENABLED;
 	private String module;//所属模块
-	private Integer type;//类型
+	private int type;//类型
 	private Long pid;//所属模板
 	private String order;//排序号
 	private String name;//名称
@@ -60,10 +60,10 @@ public class FeeTemplate extends FileEntityImpl {
 	}
 	
 	@Column(name="TYPE_")
-	public Integer getType() {
+	public int getType() {
 		return type;
 	}
-	public void setType(Integer type) {
+	public void setType(int type) {
 		this.type = type;
 	}
 	public Long getPid() {

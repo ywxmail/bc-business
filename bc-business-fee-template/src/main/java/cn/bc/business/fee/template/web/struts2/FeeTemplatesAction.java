@@ -16,7 +16,9 @@ import org.springframework.stereotype.Controller;
 import cn.bc.BCConstants;
 import cn.bc.business.fee.template.domain.FeeTemplate;
 import cn.bc.business.web.struts2.ViewAction;
+import cn.bc.core.query.condition.Condition;
 import cn.bc.core.query.condition.Direction;
+import cn.bc.core.query.condition.impl.EqualsCondition;
 import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.db.jdbc.RowMapper;
 import cn.bc.db.jdbc.SqlObject;
@@ -28,6 +30,7 @@ import cn.bc.web.ui.html.grid.IdColumn4MapKey;
 import cn.bc.web.ui.html.grid.TextColumn4MapKey;
 import cn.bc.web.ui.html.page.PageOption;
 import cn.bc.web.ui.html.toolbar.Toolbar;
+import cn.bc.web.ui.html.toolbar.ToolbarButton;
 
 /**
  * 
@@ -39,8 +42,7 @@ import cn.bc.web.ui.html.toolbar.Toolbar;
 @Controller
 public class FeeTemplatesAction extends ViewAction<Map<String, Object>> {
 	private static final long serialVersionUID = 1L;
-
-	
+	public String status = String.valueOf(BCConstants.STATUS_ENABLED); 
 	
 	@Override
 	public boolean isReadonly() {
@@ -112,7 +114,7 @@ public class FeeTemplatesAction extends ViewAction<Map<String, Object>> {
 				.setSortable(true)
 				.setValueFormater(new KeyValueFormater(this.getStatuses())));
 		//所属模块
-		columns.add(new TextColumn4MapKey("a.module_", "a.module",
+		columns.add(new TextColumn4MapKey("a.module_", "module",
 				getText("feeTemplate.module"), 80).setSortable(true)
 				.setUseTitleFromLabel(true));
 		//类型
@@ -133,7 +135,7 @@ public class FeeTemplatesAction extends ViewAction<Map<String, Object>> {
 				getText("feeTemplate.count"), 80).setSortable(true));
 		//收费方式
 		columns.add(new TextColumn4MapKey("t.pay_type", "pay_type",
-				getText("feeTemplate.payType"), 60).setSortable(true)
+				getText("feeTemplate.payType"), 65).setSortable(true)
 				.setValueFormater(new KeyValueFormater(this.getPayTypes())));	
 		columns.add(new TextColumn4MapKey("a.desc_", "desc",
 				getText("feeTemplate.desc")).setUseTitleFromLabel(true));
@@ -143,6 +145,7 @@ public class FeeTemplatesAction extends ViewAction<Map<String, Object>> {
 	//收费方式值转换
 	private Map<String, String> getPayTypes() {
 		Map<String,String> paytypes=new HashMap<String, String>();
+		paytypes.put(null, "");
 		paytypes.put(String.valueOf(FeeTemplate.PAY_TYPE_MONTH), 
 				getText("feeTemplate.payType.month"));
 		paytypes.put(String.valueOf(FeeTemplate.PAY_TYPE_SEASON), 
@@ -199,14 +202,16 @@ public class FeeTemplatesAction extends ViewAction<Map<String, Object>> {
 			tb.addButton(this.getDefaultEditToolbarButton());
 
 			// 禁用按钮
-			tb.addButton(this.getDefaultDisabledToolbarButton());
+			tb.addButton(new ToolbarButton().setIcon("ui-icon-cancel")
+					.setText(getText("label.disabled"))
+					.setClick("bs.feeTemplateList.disabled"));
 		}else{
 			//查看
 			tb.addButton(this.getDefaultOpenToolbarButton());
 		}
 
 		tb.addButton(Toolbar.getDefaultToolbarRadioGroup(
-				this.getStatuses(), "a.status_", 0, getText("feeTemplate.status.tips")));
+				this.getStatuses(), "status", 0, getText("feeTemplate.status.tips")));
 		
 		// 搜索按钮
 		tb.addButton(this.getDefaultSearchToolbarButton());
@@ -214,6 +219,21 @@ public class FeeTemplatesAction extends ViewAction<Map<String, Object>> {
 		return tb;
 	}
 	
+	@Override
+	protected Condition getGridSpecalCondition() {
+		// 状态条件
+		Condition statusCondition = null;
+		if(status != null && status.length() > 0){
+			statusCondition = new EqualsCondition("a.status_",Integer.parseInt(status));
+		}
+		return statusCondition;
+	}
+	
+	@Override
+	protected String getHtmlPageJs() {
+		return this.getHtmlPageNamespace()+"/feeTemplate/list.js";
+	}
+
 	//高级搜索
 	@Override
 	protected boolean useAdvanceSearch() {
