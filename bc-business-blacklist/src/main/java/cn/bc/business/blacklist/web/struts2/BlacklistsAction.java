@@ -4,6 +4,7 @@
 package cn.bc.business.blacklist.web.struts2;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -33,6 +34,7 @@ import cn.bc.identity.domain.Actor;
 import cn.bc.identity.service.ActorService;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.option.domain.OptionItem;
+import cn.bc.web.formater.AbstractFormater;
 import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.formater.EntityStatusFormater;
 import cn.bc.web.formater.LinkFormater4Id;
@@ -138,7 +140,7 @@ public class BlacklistsAction extends ViewAction<Map<String, Object>> {
 			StringBuffer sql = new StringBuffer();
 			sql.append("select b.id,b.status_,b.file_date,b.code,b.drivers,b.company,unit.name,m.name motorcade_name");
 			sql.append(",c.plate_type,c.plate_no,b.type_,b.subject,b.lock_date,l.name locker");
-			sql.append(",b.unlock_date,u.name unlocker,b.car_id,md.actor_name modifier,b.modified_date");
+			sql.append(",b.unlock_date,u.name unlocker,b.car_id,md.actor_name modifier,b.modified_date,b.appoint_date,b.conversion_type");
 			sql.append(" from BS_BLACKLIST b");
 			sql.append(" left join BS_MOTORCADE m on m.id=b.motorcade_id");
 			sql.append(" left join bc_identity_actor unit on unit.id=m.unit_id");
@@ -182,6 +184,8 @@ public class BlacklistsAction extends ViewAction<Map<String, Object>> {
 					map.put("carId", rs[i++]);
 					map.put("modifier", rs[i++]);
 					map.put("modified_date", rs[i++]);
+					map.put("appoint_date", rs[i++]);
+					map.put("conversion_type", rs[i++]);
 
 					return map;
 				}
@@ -247,7 +251,28 @@ public class BlacklistsAction extends ViewAction<Map<String, Object>> {
 
 		}
 		columns.add(new TextColumn4MapKey("b.type_", "type_",
-				getText("blacklist.type"), 100));
+				getText("blacklist.type"), 100)
+				.setValueFormater(new AbstractFormater<String>() {
+					@Override
+					public String format(Object context, Object value) {
+						@SuppressWarnings("unchecked")
+						Map<String, Object> map = (Map<String, Object>) context;
+						Date appointDate = (Date) map.get("appoint_date");
+						String conversionType = (String) map
+								.get("conversion_type");
+						Date now = new Date();
+						if (appointDate != null) {
+							if (now.after(appointDate)
+									|| appointDate.equals(now)) {
+								return conversionType;
+							} else {
+								return (String) value;
+							}
+						} else {
+							return (String) value;
+						}
+					}
+				}));
 		columns.add(new TextColumn4MapKey("b.subject", "subject",
 				getText("blacklist.subject"), 160).setSortable(true)
 				.setUseTitleFromLabel(true));
@@ -275,9 +300,9 @@ public class BlacklistsAction extends ViewAction<Map<String, Object>> {
 	@Override
 	protected String[] getGridSearchFields() {
 		return new String[] { "b.code", "b.company", "unit.name", "m.name",
-				"c.plate_type", "c.plate_no", "b.subject", "b.type_",
-				 "l.name", "u.name","b.drivers" };
-	
+				"c.plate_type", "c.plate_no", "b.subject", "b.type_", "l.name",
+				"u.name", "b.drivers" };
+
 	}
 
 	@Override

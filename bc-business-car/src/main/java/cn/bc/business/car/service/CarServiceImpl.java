@@ -179,4 +179,8 @@ public class CarServiceImpl extends DefaultCrudService<Car> implements
 
 		return entity;
 	}
+
+	public Car findcarOriginNoByOwnership(String ownership) {
+		return this.carDao.findcarOriginNoByOwnership(ownership);
+	}
 }

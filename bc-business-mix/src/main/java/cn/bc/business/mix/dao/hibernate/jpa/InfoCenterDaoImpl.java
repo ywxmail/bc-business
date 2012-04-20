@@ -499,6 +499,7 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 							man.put("judgeType", "司机和责任人");
 						} else {// 在案经济合同 + 注销司机
 							man.put("judgeType", "责任人");
+							man.put("judgeStatus", 0);
 						}
 					} else {
 						if (man.getInt("judgeStatus") == 0) {// 注销的经济合同 + 在案的司机
@@ -701,7 +702,7 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 	 */
 	private JSONArray getBlacklist(final Long carId) {
 		final StringBuffer sql = new StringBuffer();
-		sql.append("select b.id,b.subject,b.lock_date,b.type_,b.drivers");
+		sql.append("select b.id,b.subject,b.lock_date,b.type_,b.drivers,appoint_date,conversion_type");
 		sql.append(" from bs_blacklist b");
 		// sql.append(" left join bs_carman_blacklist cb on cb.blacklist_id=b.id");
 		// sql.append(" left join bs_carman m on m.id=cb.man_id");
@@ -730,9 +731,27 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 							json.put("subject", null2Empty(obj[i++]));
 							json.put("date",
 									DateUtils.formatDate((Date) obj[i++]));
-							json.put("limit", null2Empty(obj[i++]));
+							String type = (String) null2Empty(obj[i++]);
 							json.put("link",
 									getDriverInfo(null2Empty(obj[i++])));
+							// 黑名单指定日期
+							Date appointDate = (Date) obj[i++];
+							// 指定日期后变换的限制项目
+							String conversionType = null2Empty(obj[i++]);
+							// 现在的时间
+							Date now = new Date();
+							//如果有指定时间
+							if (appointDate != null) {
+								// 到了指定日期或指定日期后就将限制项目更变为指定日期后变换的限制项目
+								if (now.after(appointDate)
+										|| appointDate.equals(now)) {
+									json.put("limit", conversionType);
+								} else {
+									json.put("limit", type);
+								}
+							}else{
+								json.put("limit", type);
+							}
 							jsons.put(json);
 						} catch (JSONException e) {
 							logger.error(e.getMessage(), e);
