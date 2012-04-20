@@ -52,7 +52,7 @@ public class GzTaxiXhAction extends ActionSupport {
 		// 初始化页面配置信息
 		this.pageOption = new PageOption().setMaximizable(true)
 				.setMinimizable(true).setMinWidth(500).setWidth(650)
-				.setMinHeight(200).setHeight(350);
+				.setMinHeight(200).setHeight(350).setPrint("default.form");
 		// this.pageOption.setHelp("cheliangchaxun");// 添加帮助按钮
 
 		// 可选类型:http://www.gztaxixh.com/peccancySearch.aspx
