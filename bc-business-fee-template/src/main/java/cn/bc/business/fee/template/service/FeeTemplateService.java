@@ -41,10 +41,10 @@ public interface FeeTemplateService extends CrudService<FeeTemplate> {
 	
 
 	/**
-	 * 获取属于此模板的费用集合
+	 * 获取费用集合
 	 * 
-	 * @param pid
+	 * @param pid 模板id
 	 * @return
 	 */
-	public List<Map<String, String>> getFeeBelong2Template(Long pid);
+	public List<Map<String, String>> findFee(Long pid);
 }

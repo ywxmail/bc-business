@@ -50,7 +50,7 @@ public class FeeTemplateDaoImpl extends HibernateCrudJpaDao<FeeTemplate> impleme
 	
 	//返回属于此模板的费用集合
 	public List<Map<String, String>> getFeeBelong2Template(Long pid){
-		String hql="SELECT a.id,a.name ";
+		String hql="SELECT a.id,a.name,a.price,a.count_,a.pay_type,a.desc_";
 		   hql+=" FROM bs_fee_template a";
 		   hql+=" WHERE a.status_="; 
 		   hql+=BCConstants.STATUS_ENABLED;
@@ -62,6 +62,10 @@ public class FeeTemplateDaoImpl extends HibernateCrudJpaDao<FeeTemplate> impleme
 					int i = 0;
 					oi.put("id", rs[i++].toString());
 					oi.put("name", rs[i++].toString());
+					oi.put("price", rs[i++].toString());
+					oi.put("count", rs[i++].toString());
+					oi.put("payType", rs[i++].toString());
+					oi.put("desc", rs[i++].toString());
 					return oi;
 				}
 		});

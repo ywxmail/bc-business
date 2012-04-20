@@ -39,8 +39,8 @@ public class FeeTemplateServiceImpl extends DefaultCrudService<FeeTemplate> impl
 		return this.feeTemplateDao.isTemplateExistFee(id);
 	}
 
-	public List<Map<String, String>> getFeeBelong2Template(Long pid) {
-		return this.getFeeBelong2Template(pid);
+	public List<Map<String, String>> findFee(Long pid) {
+		return this.feeTemplateDao.getFeeBelong2Template(pid);
 	}
 
 	
