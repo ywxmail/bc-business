@@ -499,6 +499,7 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 							man.put("judgeType", "司机和责任人");
 						} else {// 在案经济合同 + 注销司机
 							man.put("judgeType", "责任人");
+							man.put("judgeStatus", 0);
 						}
 					} else {
 						if (man.getInt("judgeStatus") == 0) {// 注销的经济合同 + 在案的司机
@@ -701,7 +702,7 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 	 */
 	private JSONArray getBlacklist(final Long carId) {
 		final StringBuffer sql = new StringBuffer();
-		sql.append("select b.id,b.subject,b.lock_date,b.type_,b.drivers");
+		sql.append("select b.id,b.subject,b.lock_date,b.type_,b.drivers,appoint_date,conversion_type");
 		sql.append(" from bs_blacklist b");
 		// sql.append(" left join bs_carman_blacklist cb on cb.blacklist_id=b.id");
 		// sql.append(" left join bs_carman m on m.id=cb.man_id");
@@ -730,9 +731,27 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 							json.put("subject", null2Empty(obj[i++]));
 							json.put("date",
 									DateUtils.formatDate((Date) obj[i++]));
-							json.put("limit", null2Empty(obj[i++]));
+							String type = (String) null2Empty(obj[i++]);
 							json.put("link",
 									getDriverInfo(null2Empty(obj[i++])));
+							// 黑名单指定日期
+							Date appointDate = (Date) obj[i++];
+							// 指定日期后变换的限制项目
+							String conversionType = null2Empty(obj[i++]);
+							// 现在的时间
+							Date now = new Date();
+							//如果有指定时间
+							if (appointDate != null) {
+								// 到了指定日期或指定日期后就将限制项目更变为指定日期后变换的限制项目
+								if (now.after(appointDate)
+										|| appointDate.equals(now)) {
+									json.put("limit", conversionType);
+								} else {
+									json.put("limit", type);
+								}
+							}else{
+								json.put("limit", type);
+							}
 							jsons.put(json);
 						} catch (JSONException e) {
 							logger.error(e.getMessage(), e);
@@ -1148,7 +1167,7 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 		sql.append(" where (h.from_car_id=? or h.to_car_id=?)");
 		// 排除相同司机的旧记录
 		sql.append(" and not exists (select 1 from bs_carman mi inner join bs_car_driver_history hi on mi.id=hi.driver_id");
-		sql.append(" where (hi.from_car_id=h.from_car_id or hi.to_car_id=h.to_car_id) and hi.driver_id=h.driver_id and hi.move_date > h.move_date)");
+		sql.append(" where (hi.from_car_id=? or hi.to_car_id=?) and hi.driver_id=h.driver_id and hi.move_date > h.move_date)");
 		sql.append(" order by h.move_date desc");
 
 		if (logger.isDebugEnabled()) {
@@ -1161,6 +1180,8 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 				Query queryObject = em.createNativeQuery(sql.toString());
 				queryObject.setParameter(1, carId);
 				queryObject.setParameter(2, carId);
+				queryObject.setParameter(3, carId);
+				queryObject.setParameter(4, carId);
 				@SuppressWarnings("unchecked")
 				List<Object[]> objs = queryObject.getResultList();
 				List<JSONObject> jsons = new ArrayList<JSONObject>();

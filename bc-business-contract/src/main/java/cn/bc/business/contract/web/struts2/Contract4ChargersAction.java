@@ -117,8 +117,8 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 			return new OrderCondition("c.file_date", Direction.Desc).add(
 					"c.status_", Direction.Asc);
 		} else { // 历史版本
-			return new OrderCondition("c.status_", Direction.Asc)
-					.add("c.file_date", Direction.Desc);
+			return new OrderCondition("c.status_", Direction.Asc).add(
+					"c.file_date", Direction.Desc);
 		}
 	}
 
@@ -146,7 +146,7 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 		sql.append(",c.ver_major,c.ver_minor,c.op_type,c.file_date");
 		sql.append(",car.company company");
 		sql.append(",bia.id batch_company_id,bia.name batch_company");
-		sql.append(",m.id motorcade_id,m.name motorcade_name");
+		sql.append(",m.id motorcade_id,m.name motorcade_name,c.stop_date");
 		sql.append(" from BS_CONTRACT_CHARGER cc");
 		sql.append(" inner join BS_CONTRACT c on cc.id = c.id");
 		sql.append(" inner join BS_CAR_CONTRACT carc on c.id = carc.contract_id");
@@ -197,6 +197,7 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 				map.put("batch_company", rs[i++]);
 				map.put("motorcade_id", rs[i++]);
 				map.put("motorcade_name", rs[i++]);
+				map.put("stop_date", rs[i++]);
 				return map;
 			}
 		});
@@ -281,13 +282,16 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("c.sign_date", "sign_date",
 				getText("contract.signDate"), 90).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+		columns.add(new TextColumn4MapKey("c.stop_date", "stop_date",
+				getText("contract.stopDate"), 120).setSortable(true)
+				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
 		columns.add(new TextColumn4MapKey("cc.contract_version_no",
 				"contract_version_no",
 				getText("contract4Charger.contractVersionNo"), 180)
 				.setUseTitleFromLabel(true));
-//		columns.add(new TextColumn4MapKey("c.transactor_name",
-//				"transactor_name", getText("contract.transactor"), 50)
-//				.setUseTitleFromLabel(true));
+		// columns.add(new TextColumn4MapKey("c.transactor_name",
+		// "transactor_name", getText("contract.transactor"), 50)
+		// .setUseTitleFromLabel(true));
 		// if(status.equals(String.valueOf(Contract.STATUS_LOGOUT)) ||
 		// status.length() == 0){ //控制视图在在案注销下不显示注销人,注销时间
 		columns.add(new TextColumn4MapKey("c.logout_date", "logout_date",
@@ -361,7 +365,7 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 		// 状态条件
 		Condition statusCondition = null;
 		Condition mainsCondition = null;
-		//Condition patchCondtion = null;
+		// Condition patchCondtion = null;
 		Condition typeCondtion = new EqualsCondition("c.type_", type);
 		Condition carCondition = null;
 		Condition driverCondition = null;
@@ -374,20 +378,20 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 			// mainsCondition = ConditionUtils // 控制显示最新版本main为0的经济合同
 			// .toConditionByComma4IntegerValue(this.mains, "c.main");
 			// }
-		} 
-//		else {
-//			// 查看历史版本
-//			if (this.contractId != 0) {
-//				// 显示实例本身
-//				patchCondtion = new EqualsCondition("c.patch_no", patchNo);
-//			} else {
-//				// 不显示实例本身
-//				patchCondtion = new EqualsCondition("c.patch_no", patchNo);
-//				mainsCondition = new EqualsCondition("c.main",
-//						Contract.MAIN_HISTORY);
-//
-//			}
-//		}
+		}
+		// else {
+		// // 查看历史版本
+		// if (this.contractId != 0) {
+		// // 显示实例本身
+		// patchCondtion = new EqualsCondition("c.patch_no", patchNo);
+		// } else {
+		// // 不显示实例本身
+		// patchCondtion = new EqualsCondition("c.patch_no", patchNo);
+		// mainsCondition = new EqualsCondition("c.main",
+		// Contract.MAIN_HISTORY);
+		//
+		// }
+		// }
 
 		if (carId != null) {
 			carCondition = new EqualsCondition("carc.car_id", carId);

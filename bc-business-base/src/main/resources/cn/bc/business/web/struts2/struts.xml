@@ -47,4 +47,14 @@
 			</result>
 		</action>
 	</package>
+	<!-- 金盾网交通违章 -->
+	<package name="jinDunJTWFAction" extends="bc-default" namespace="/bc-business/sync">
+		<action name="jinDunJTWF/open" class="jinDunJTWFAction" method="edit">
+			<result name="form" >/bc-business/sync/jinDunJTWF/form.jsp</result>
+		</action>
+		<action name="jinDunJTWF/edit" class="jinDunJTWFAction" method="edit">
+			<result name="form" >/bc-business/sync/jinDunJTWF/form.jsp</result>
+		</action>
+	</package>
+	
 </struts>

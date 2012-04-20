@@ -28,57 +28,56 @@ import cn.bc.identity.domain.RichFileEntityImpl;
 public class Contract extends RichFileEntityImpl {
 	private static final long serialVersionUID = 1L;
 	public static final String ATTACH_TYPE = Contract.class.getSimpleName();
-	/**合同类型：司机劳动合同*/
-	public static final int TYPE_LABOUR 	= 1;
-	/**合同类型：责任人合同*/
-	public static final int TYPE_CHARGER 	= 2;
-	
-	/**状态：正常*/
-	public static final int STATUS_NORMAL	= 0;
-	/**状态：注销*/
-	public static final int STATUS_LOGOUT	= 1;
-	/**状态：离职*/
-	public static final int STATUS_RESGIN	= 2;
-	
-	/**操作类型  新建*/
-	public static final int OPTYPE_CREATE			= 1;
-	/**操作类型  维护*/
-	public static final int OPTYPE_MAINTENANCE		= 2;
-	/**操作类型 转车*/
-	public static final int OPTYPE_CHANGECAR		= 3;
-	/**操作类型  续约*/
-	public static final int OPTYPE_RENEW			= 4;
-	/**操作类型  离职*/
-	public static final int OPTYPE_RESIGN			= 5;
-	/**操作类型  过户*/
-	public static final int OPTYPE_CHANGECHARGER	= 6;
-	/**操作类型  重发包*/
-	public static final int OPTYPE_CHANGECHARGER2	= 7;
-	
-	/**主版本号默认值*/
-	public static final int MAJOR_DEFALUT	= 1;
-	/**次版本号默认值*/
-	public static final int MINOR_DEFALUT	= 0;
-	/**补录主版本号默认值*/
-	public static final int SUPPLY_MAJOR_DEFALUT	= 0;
-	/**补录次版本号默认值*/
-	public static final int SUPPLY_MINOR_DEFALUT	= 9;
-	
-	/**主体当前版本*/
-	public static final int MAIN_NOW	    = 0;
-	/**主体历史版本*/
-	public static final int MAIN_HISTORY 	= 1;
-	
+	/** 合同类型：司机劳动合同 */
+	public static final int TYPE_LABOUR = 1;
+	/** 合同类型：责任人合同 */
+	public static final int TYPE_CHARGER = 2;
+
+	/** 状态：正常 */
+	public static final int STATUS_NORMAL = 0;
+	/** 状态：注销 */
+	public static final int STATUS_LOGOUT = 1;
+	/** 状态：离职 */
+	public static final int STATUS_RESGIN = 2;
+
+	/** 操作类型 新建 */
+	public static final int OPTYPE_CREATE = 1;
+	/** 操作类型 维护 */
+	public static final int OPTYPE_MAINTENANCE = 2;
+	/** 操作类型 转车 */
+	public static final int OPTYPE_CHANGECAR = 3;
+	/** 操作类型 续约 */
+	public static final int OPTYPE_RENEW = 4;
+	/** 操作类型 离职 */
+	public static final int OPTYPE_RESIGN = 5;
+	/** 操作类型 过户 */
+	public static final int OPTYPE_CHANGECHARGER = 6;
+	/** 操作类型 重发包 */
+	public static final int OPTYPE_CHANGECHARGER2 = 7;
+
+	/** 主版本号默认值 */
+	public static final int MAJOR_DEFALUT = 1;
+	/** 次版本号默认值 */
+	public static final int MINOR_DEFALUT = 0;
+	/** 补录主版本号默认值 */
+	public static final int SUPPLY_MAJOR_DEFALUT = 0;
+	/** 补录次版本号默认值 */
+	public static final int SUPPLY_MINOR_DEFALUT = 9;
+
+	/** 主体当前版本 */
+	public static final int MAIN_NOW = 0;
+	/** 主体历史版本 */
+	public static final int MAIN_HISTORY = 1;
 
 	private String code;// 合同编号
-	private int    type;// 合同类型，参考常数TYPE_XXX的定义，如劳动合同、经济合同等
-	private Long   Pid;// 父级ID
-	private Integer verMajor;//主版本号
-	private Integer verMinor;//次版本号
-	private int     main; //主体： 0-当前版本,1-历史版本
-	private String  patchNo;//批号 
-	private int     opType; //操作类型：1-新建,2-维护,3-转车,4-续约,5-离职,6-过户,7-重发包
-	
+	private int type;// 合同类型，参考常数TYPE_XXX的定义，如劳动合同、经济合同等
+	private Long Pid;// 父级ID
+	private Integer verMajor;// 主版本号
+	private Integer verMinor;// 次版本号
+	private int main; // 主体： 0-当前版本,1-历史版本
+	private String patchNo;// 批号
+	private int opType; // 操作类型：1-新建,2-维护,3-转车,4-续约,5-离职,6-过户,7-重发包
+
 	private String wordNo;// 文书号
 	private Long transactorId;// 经办人ID
 	private String transactorName;// 经办人姓名
@@ -86,17 +85,27 @@ public class Contract extends RichFileEntityImpl {
 	private Calendar signDate;// 签订日期
 	private Calendar startDate;// 生效日期
 	private Calendar endDate;// 到期日期
+	private Calendar stopDate;// 合同实际结束日期
 	private String content;// 内容
 
-	private String ext_str1;// 扩展域(车牌)	
+	private String ext_str1;// 扩展域(车牌)
 	private String ext_str2;// 扩展域(司机)
 	private String ext_str3;// 扩展域
 	private Integer ext_num1;// 扩展域
 	private Integer ext_num2;// 扩展域
 	private Integer ext_num3;// 扩展域
-	
+
 	private ActorHistory logoutId;// 注销人
 	private Calendar logoutDate;// 注销时间
+
+	@Column(name = "STOP_DATE")
+	public Calendar getStopDate() {
+		return stopDate;
+	}
+
+	public void setStopDate(Calendar stopDate) {
+		this.stopDate = stopDate;
+	}
 
 	@Column(name = "WORD_NO")
 	public String getWordNo() {
@@ -295,6 +304,5 @@ public class Contract extends RichFileEntityImpl {
 	public void setLogoutDate(Calendar logoutDate) {
 		this.logoutDate = logoutDate;
 	}
-	
-	
+
 }

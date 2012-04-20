@@ -54,11 +54,32 @@ public class Blacklist extends FileEntityImpl {
 	private Calendar lockDate;// 锁定时间
 	private Calendar unlockDate;// 解锁时间
 
+	private Calendar appointDate;// 指定日期
+	private String conversionType;// 替换的限制项目，如提醒、限制一切业务
+
 	private String company;// 车属公司：如宝城、广发
 	private Motorcade motorcade;// 车队
 	private Car car;// 车辆
 	private String drivers;// 司机信息
 	private Set<CarMan> carMan;// 司机列表
+
+	@Column(name = "APPOINT_DATE ")
+	public Calendar getAppointDate() {
+		return appointDate;
+	}
+
+	public void setAppointDate(Calendar appointDate) {
+		this.appointDate = appointDate;
+	}
+
+	@Column(name = "CONVERSION_TYPE ")
+	public String getConversionType() {
+		return conversionType;
+	}
+
+	public void setConversionType(String conversionType) {
+		this.conversionType = conversionType;
+	}
 
 	public String getDrivers() {
 		return drivers;

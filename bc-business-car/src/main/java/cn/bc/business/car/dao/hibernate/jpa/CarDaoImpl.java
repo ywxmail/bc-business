@@ -368,6 +368,25 @@ public class CarDaoImpl extends HibernateCrudJpaDao<Car> implements CarDao {
 		}
 	}
 
+	public Car findcarOriginNoByOwnership(String ownership) {
+		Car car = null;
+		String hql = "select c from Car c where c.certNo2 = ?";
+		hql += " order by c.registerDate Desc";
+		List<?> list = this.getJpaTemplate().find(hql, ownership);
+		if (list.size() == 1) {
+			car = (Car) list.get(0);
+			return car;
+		} else if (list.size() < 1) {
+			return null;
+		} else {
+			car = (Car) list.get(0);
+			if (logger.isDebugEnabled()) {
+				logger.debug("有两辆或两辆以上的车辆，根据登记日期选择最新的一车辆");
+			}
+			return car;
+		}
+	}
+
 	public Map<String, Object> findcarInfoByCarPlateNo2(String carPlateNo) {
 		Map<String, Object> queryMap = null;
 		String sql = "SELECT bia.name as unit_name,m.name as motorcade_name"

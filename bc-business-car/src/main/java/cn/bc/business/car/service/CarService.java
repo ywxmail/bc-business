@@ -55,6 +55,15 @@ public interface CarService extends CrudService<Car> {
 	Car findcarOriginNoByCode(String code);
 
 	/**
+	 * 
+	 * 通过经营权号生成原车号
+	 * 
+	 * @param ownership
+	 * @return 经营权号
+	 */
+	Car findcarOriginNoByOwnership(String ownership);
+
+	/**
 	 * 通过车牌号查找此车辆所属的分公司与车队
 	 * 
 	 * @parma carPlateNo

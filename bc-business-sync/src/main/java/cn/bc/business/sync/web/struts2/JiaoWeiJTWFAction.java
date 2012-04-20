@@ -27,28 +27,42 @@ import cn.bc.web.ui.html.page.PageOption;
 @Controller
 public class JiaoWeiJTWFAction extends EntityAction<Long, JiaoWeiJTWF> {
 	// private static Log logger = LogFactory.getLog(CarAction.class);
-	private static 	final long 				serialVersionUID 	= 1L;
-	public	Map<String,String>				statusesValue;
-	@SuppressWarnings("unused")
-	private JiaoWeiJTWFService				jiaoWeiJTWFService;
+	private static final long serialVersionUID = 1L;
+	public Map<String, String> statusesValue;
+	private JiaoWeiJTWFService jiaoWeiJTWFService;
+	public String jinDunAddress;// 金盾网的交通违法地点
+	public String jinDunInfoId;
 
 	@Autowired
 	public void setJiaoWeiJTWFService(JiaoWeiJTWFService jiaoWeiJTWFService) {
 		this.jiaoWeiJTWFService = jiaoWeiJTWFService;
 		this.setCrudService(jiaoWeiJTWFService);
 	}
-	
+
 	@Override
 	public boolean isReadonly() {
 		return true;
 	}
 
-
 	@Override
 	protected PageOption buildFormPageOption(boolean editable) {
-		PageOption option = super.buildFormPageOption(editable).setWidth(615).setMinWidth(250).setHeight(230)
-				.setMinHeight(200);
+		PageOption option = super.buildFormPageOption(editable).setWidth(630)
+				.setMinWidth(250);
 		return option;
+	}
+
+	@Override
+	protected void afterEdit(JiaoWeiJTWF entity) {
+		super.afterEdit(entity);
+		jinDunAddress = this.jiaoWeiJTWFService.getJinDunAddress(this.getE()
+				.getSyncCode(), this.getE().getCarPlateNo(), this.getE()
+				.getHappenDate());
+		if (jinDunAddress != null) {
+			String[] vvs = jinDunAddress.split(";");
+			jinDunAddress = vvs[0];
+			jinDunInfoId = vvs[1];
+		}
+
 	}
 
 	@Override
@@ -57,7 +71,7 @@ public class JiaoWeiJTWFAction extends EntityAction<Long, JiaoWeiJTWF> {
 		// 状态列表
 		statusesValue = this.getSyncStatuses();
 	}
-	
+
 	protected Map<String, String> getSyncStatuses() {
 		Map<String, String> statuses = new LinkedHashMap<String, String>();
 		statuses.put(String.valueOf(SyncBase.STATUS_NEW),
@@ -69,12 +83,10 @@ public class JiaoWeiJTWFAction extends EntityAction<Long, JiaoWeiJTWF> {
 		statuses.put("", getText("bs.status.all"));
 		return statuses;
 	}
-	
-//	//复写搜索URL方法
-//	protected String getEntityConfigName() {
-//		return "jiaoWeiJTWF";
-//	}
 
+	// //复写搜索URL方法
+	// protected String getEntityConfigName() {
+	// return "jiaoWeiJTWF";
+	// }
 
-	
 }

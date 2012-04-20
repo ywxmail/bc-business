@@ -27,29 +27,27 @@ import cn.bc.web.ui.html.page.PageOption;
 @Controller
 public class JinDunJTWFAction extends EntityAction<Long, JinDunJTWF> {
 	// private static Log logger = LogFactory.getLog(CarAction.class);
-	private static 	final long 				serialVersionUID 	= 1L;
-	public 	Map<String,String> 				statusesValue;
-	
+	private static final long serialVersionUID = 1L;
+	public Map<String, String> statusesValue;
+
 	@SuppressWarnings("unused")
-	private JinDunJTWFService				jinDunJTWFService;
+	private JinDunJTWFService jinDunJTWFService;
 
 	@Autowired
 	public void setJinDunJTWFService(JinDunJTWFService jinDunJTWFService) {
 		this.jinDunJTWFService = jinDunJTWFService;
 		this.setCrudService(jinDunJTWFService);
 	}
-	
 
 	@Override
 	public boolean isReadonly() {
 		return true;
 	}
 
-
 	@Override
 	protected PageOption buildFormPageOption(boolean editable) {
-		PageOption option = super.buildFormPageOption(editable).setWidth(615).setMinWidth(250).setHeight(290)
-				.setMinHeight(200);
+		PageOption option = super.buildFormPageOption(editable).setWidth(615)
+				.setMinWidth(250);
 		return option;
 	}
 
@@ -59,7 +57,7 @@ public class JinDunJTWFAction extends EntityAction<Long, JinDunJTWF> {
 		// 状态列表
 		statusesValue = this.getSyncStatuses();
 	}
-	
+
 	protected Map<String, String> getSyncStatuses() {
 		Map<String, String> statuses = new LinkedHashMap<String, String>();
 		statuses.put(String.valueOf(SyncBase.STATUS_NEW),
@@ -71,11 +69,9 @@ public class JinDunJTWFAction extends EntityAction<Long, JinDunJTWF> {
 		statuses.put("", getText("bs.status.all"));
 		return statuses;
 	}
-//	//复写搜索URL方法
-//	protected String getEntityConfigName() {
-//		return "jinDunJTWF";
-//	}
+	// //复写搜索URL方法
+	// protected String getEntityConfigName() {
+	// return "jinDunJTWF";
+	// }
 
-
-	
 }

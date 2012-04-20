@@ -175,15 +175,15 @@ public class Contract4ChargerOperateAction extends ActionSupport {
 	// ========劳动合同重发包代码结束========
 
 	// ========劳动合同注销代码开始========
-	public String logoutDate;// 注销日期
+	public String stopDate;// 合同的实际结束日期
 
 	/**
 	 * 经济合同注销
 	 */
 	public String doLogout() throws Exception {
 		Long contractId = this.getId();
-		Calendar logoutDate = DateUtils.getCalendar(this.logoutDate);
-		this.contract4ChargerService.doLogout(contractId, logoutDate);
+		Calendar stopDate = DateUtils.getCalendar(this.stopDate);
+		this.contract4ChargerService.doLogout(contractId, stopDate);
 		json = new Json();
 		json.put("id", contractId);
 		json.put("msg", getText("contract4Charger.logout.success"));

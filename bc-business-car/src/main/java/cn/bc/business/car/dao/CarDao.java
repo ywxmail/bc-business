@@ -55,6 +55,15 @@ public interface CarDao extends CrudDao<Car> {
 	Car findcarOriginNoByCode(String code);
 
 	/**
+	 * 
+	 * 通过经营权号生成原车号
+	 * 
+	 * @param ownership
+	 * @return 经营权号
+	 */
+	Car findcarOriginNoByOwnership(String ownership);
+
+	/**
 	 * 通过车牌号查找此车辆所属的分公司与车队
 	 * 
 	 * @parma carPlateNo
@@ -94,8 +103,11 @@ public interface CarDao extends CrudDao<Car> {
 	 */
 	String getDriverInfoByCarId(Long carId);
 
-	/**根据车辆Id获取责任人信息 [姓名1,ID1;姓名2,ID2;...]
-	 * @param carId 车辆ID
+	/**
+	 * 根据车辆Id获取责任人信息 [姓名1,ID1;姓名2,ID2;...]
+	 * 
+	 * @param carId
+	 *            车辆ID
 	 * @return
 	 */
 	String getChargerInfoByCarId(Long carId);
