@@ -34,6 +34,8 @@
 		<module>bc-business-mix</module>
 		<module>bc-business-invoice</module>
 		<module>bc-business-ownership</module>
+		<module>bc-business-fee-template</module>
+		<module>bc-business-fee</module>
 	</modules>
 	<scm>
 		<connection>scm:git:git@192.168.0.222:bc-business.git</connection>

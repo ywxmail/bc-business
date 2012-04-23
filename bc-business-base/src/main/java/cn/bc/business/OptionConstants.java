@@ -108,4 +108,6 @@ public class OptionConstants extends cn.bc.option.OptionConstants {
 	public final static String OWNERSHIP_SITUATION = "ownership.situation";
 	/** 车辆产权 */
 	public final static String OWNERSHIP_OWNER = "ownership.owner";
+	/** 收费月份 */
+	public final static String FEE_MONTH = "fee.month";
 }
