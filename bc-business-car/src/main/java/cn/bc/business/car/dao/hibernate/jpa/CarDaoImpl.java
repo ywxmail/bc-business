@@ -5,6 +5,7 @@ package cn.bc.business.car.dao.hibernate.jpa;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -368,11 +369,11 @@ public class CarDaoImpl extends HibernateCrudJpaDao<Car> implements CarDao {
 		}
 	}
 
-	public Car findcarOriginNoByOwnership(String ownership) {
+	public Car findcarOriginNoByOwnership(String ownership, Calendar fileDate) {
 		Car car = null;
-		String hql = "select c from Car c where c.certNo2 = ?";
+		String hql = "select c from Car c where c.certNo2 = ? and c.fileDate < ? and c.status = 1";
 		hql += " order by c.registerDate Desc";
-		List<?> list = this.getJpaTemplate().find(hql, ownership);
+		List<?> list = this.getJpaTemplate().find(hql, ownership, fileDate);
 		if (list.size() == 1) {
 			car = (Car) list.get(0);
 			return car;

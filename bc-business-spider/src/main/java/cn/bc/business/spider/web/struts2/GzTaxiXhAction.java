@@ -76,7 +76,10 @@ public class GzTaxiXhAction extends ActionSupport {
 		String userPassword = optionService.getItemValue("account",
 				"account.gztaxixh.password");// 出租协会帐号的密码
 		String rootPath = getText("app.data.realPath");// 司机图片保存的父目录
-
+		// 如果资格证补办过，取前六位如[249442A 取249442来进行查询]
+		if ("服务资格证".equals(this.type) && this.value != null && this.value.length() > 6 ) {
+			this.value = this.value.substring(0, 6);
+		}
 		try {
 			Spider<GzTaxiXhDriverInfo> spider = new Spider4GzTaxiXhDriverInfo(
 					this.type, this.value, userName, userPassword, rootPath,
