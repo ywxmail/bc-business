@@ -57,6 +57,7 @@ public class PolicyAction extends FileEntityAction<Long, Policy> {
 	public Map<String, String> statusesValue;
 	public List<Map<String, String>> companyList; // 可选保险公司列表
 	public String buyPlants;// 所买险种的json字符串
+	public boolean canCopy;
 
 	@Autowired
 	public void setPolicyService(PolicyService policyService) {
@@ -101,9 +102,9 @@ public class PolicyAction extends FileEntityAction<Long, Policy> {
 		if (carId != null) {
 			Car car = this.carService.load(carId);
 			this.getE().setCar(car);
-			if(car.getCompany().equals("宝城")){
+			if (car.getCompany().equals("宝城")) {
 				this.getE().setAssured("广州市宝城汽车出租有限公司");
-			}else if(car.getCompany().equals("广发")){
+			} else if (car.getCompany().equals("广发")) {
 				this.getE().setAssured("广州市广发出租汽车有限公司");
 			}
 		}
@@ -145,7 +146,7 @@ public class PolicyAction extends FileEntityAction<Long, Policy> {
 					buyPlantStr += ":";
 					resource.setCoverage(json.getString("coverage"));
 					buyPlantStr += json.getString("coverage");
-					//只要备注不为空，也显示备注
+					// 只要备注不为空，也显示备注
 					if (json.getString("description") != null
 							&& json.getString("description").length() > 0) {
 						buyPlantStr += ":";
@@ -178,7 +179,7 @@ public class PolicyAction extends FileEntityAction<Long, Policy> {
 	@Override
 	protected void buildFormPageButtons(PageOption pageOption, boolean editable) {
 		boolean readonly = this.isReadonly();
-		
+
 		if (this.useFormPrint()) {
 			// 添加打印按钮
 			pageOption.addButton(this.getDefaultPrintButtonOption());
@@ -254,6 +255,14 @@ public class PolicyAction extends FileEntityAction<Long, Policy> {
 
 	@Override
 	protected PageOption buildFormPageOption(boolean editable) {
+
+		if (editable && !this.isReadonly()) {
+			canCopy = false;
+
+		} else {
+			canCopy = true;
+		}
+
 		return super.buildFormPageOption(editable).setWidth(730)
 				.setMinWidth(300).setHeight(540).setMinHeight(300);
 	}
