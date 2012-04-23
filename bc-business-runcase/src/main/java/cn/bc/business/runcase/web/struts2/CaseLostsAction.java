@@ -93,12 +93,12 @@ public class CaseLostsAction extends ViewAction<Map<String, Object>> {
 		sql.append(",b.car_plate,c.code carCode,b.company,bia.name batch_company,b.motorcade_name,l.result_,l.handle_result,l.receive_date,l.site_postion,l.is_took");
 		sql.append(",l.taker_name,l.took_date,l.taker_identity,b.code,iah.actor_name author,b.file_date,iah2.actor_name modifier,b.modified_date,b.closer_name,b.close_date");
 		sql.append(",b.from_,b.source");
-		sql.append(",b.motorcade_id,b.car_id,b.driver_id");
+		sql.append(",b.motorcade_id,b.car_id,b.driver_id,b.desc_");
 		sql.append(" from BS_CASE_LOST l");
 		sql.append(" inner join BS_CASE_BASE b on b.id=l.id");
 		sql.append(" left join BS_CAR c on b.car_id = c.id");
 		sql.append(" left join BS_CARMAN man on b.driver_id=man.id");
-		sql.append(" left join bs_motorcade m on m.id=c.motorcade_id");
+		sql.append(" left join bs_motorcade m on m.id=b.motorcade_id");
 		sql.append(" left join bc_identity_actor bia on bia.id=m.unit_id");
 		sql.append(" left join bc_identity_actor_history iah on b.author_id = iah.id");
 		sql.append(" left join bc_identity_actor_history iah2 on b.modifier_id = iah2.id");
@@ -149,6 +149,7 @@ public class CaseLostsAction extends ViewAction<Map<String, Object>> {
 				map.put("motorcade_id", rs[i++]);
 				map.put("carId", rs[i++]);
 				map.put("driverId", rs[i++]);
+				map.put("desc_", rs[i++]);
 				
 				return map;
 			}
@@ -177,7 +178,7 @@ public class CaseLostsAction extends ViewAction<Map<String, Object>> {
 				.setValueFormater(new EntityStatusFormater(getBSStatuses2())));
 		// 受理号
 		columns.add(new TextColumn4MapKey("b.code", "code",
-				getText("runcase.receiveCode"), 100));
+				getText("runcase.receiveCode"), 120).setUseTitleFromLabel(true));
 		// 事发时间
 		columns.add(new TextColumn4MapKey("b.happen_date", "happen_date",
 				getText("runcase.happenDate"), 125).setSortable(true)
@@ -202,7 +203,7 @@ public class CaseLostsAction extends ViewAction<Map<String, Object>> {
 				setValueFormater(new KeyValueFormater(getSexs())));
 		// 联系电话
 		columns.add(new TextColumn4MapKey("l.owner_tel", "owner_tel",
-				getText("runcase.lost.ownerTel"), 80));
+				getText("runcase.lost.ownerTel"), 90).setUseTitleFromLabel(true));
 
 		
 		if (carManId == null) {
@@ -318,6 +319,10 @@ public class CaseLostsAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("b.modified_date", "modified_date",
 				getText("runcase.lost.modifiedDate"),125).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd HH:mm")));
+		//备注
+		columns.add(new TextColumn4MapKey("b.desc_", "desc_",
+				getText("runcase.description"))
+				.setUseTitleFromLabel(true));
 		
 		return columns;
 	}
@@ -325,7 +330,7 @@ public class CaseLostsAction extends ViewAction<Map<String, Object>> {
 	@Override
 	protected String[] getGridSearchFields() {
 		return new String[] { "b.subject", "b.car_plate",
-				 "b.driver_name", "b.driver_cert","c.code","b.code" };
+				 "b.driver_name", "b.driver_cert","c.code","b.code","l.items" };
 	}
 
 	@Override
@@ -482,6 +487,7 @@ public class CaseLostsAction extends ViewAction<Map<String, Object>> {
 	public JSONArray motorcades;// 车队的下拉列表信息
 	public JSONArray units;// 分公司的下拉列表信息
 	public JSONArray handleResult;// 处理结果列表
+	public JSONArray result;// 处理结果列表
 
 	@Override
 	protected void initConditionsFrom() throws Exception {
@@ -497,12 +503,18 @@ public class CaseLostsAction extends ViewAction<Map<String, Object>> {
 		// 批量加载可选项列表
 				Map<String, List<Map<String, String>>> optionItems = this.optionService
 						.findOptionItemByGroupKeys(new String[] {
-							OptionConstants.LOST_HANDLE_RESULT
+							OptionConstants.LOST_HANDLE_RESULT,
+							OptionConstants.LOST_RESULT
 						});
 		
 		// 处理结果列表
 		this.handleResult = OptionItem.toLabelValues(
 				optionItems.get(OptionConstants.LOST_HANDLE_RESULT), "value","key");
+		
+		// 失物去向列表
+		this.result = OptionItem.toLabelValues(
+				optionItems.get(OptionConstants.LOST_RESULT), "value","key");
+
 
 	}
 

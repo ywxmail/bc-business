@@ -98,7 +98,7 @@ public class CaseAdvicesAction extends ViewAction<Map<String, Object>> {
 		sql.append(" inner join BS_CASE_BASE b on b.id=a.id");
 		sql.append(" left join BS_CAR c on b.car_id = c.id");
 		sql.append(" left join BS_CARMAN man on b.driver_id=man.id");
-		sql.append(" left join bs_motorcade m on m.id=c.motorcade_id");
+		sql.append(" left join bs_motorcade m on m.id=b.motorcade_id");
 		sql.append(" left join bc_identity_actor bia on bia.id=m.unit_id");
 
 		sqlObject.setSql(sql.toString());
