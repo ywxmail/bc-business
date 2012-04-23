@@ -6,6 +6,7 @@ package cn.bc.business.car.web.struts2;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -402,9 +403,20 @@ public class CarAction extends FileEntityAction<Long, Car> {
 
 	// ======== 通过lpgName查找车型配置的相关信息开始 ========
 
-	// ======== 通过自编号生成原车号开始 ========
+	// ======== 通过以营权号生成原车号开始 ========
 
+	private String ownershipNo;
 	private String code;
+	private Calendar fileDate;
+	
+
+	public Calendar getFileDate() {
+		return fileDate;
+	}
+
+	public void setFileDate(Calendar fileDate) {
+		this.fileDate = fileDate;
+	}
 
 	public String getCode() {
 		return code;
@@ -414,12 +426,20 @@ public class CarAction extends FileEntityAction<Long, Car> {
 		this.code = code;
 	}
 
+	public String getOwnershipNo() {
+		return ownershipNo;
+	}
+
+	public void setOwnershipNo(String ownershipNo) {
+		this.ownershipNo = ownershipNo;
+	}
+
 	/**
 	 * 通过自编号是否被其他车辆使用过,并且将使用过此编号的车辆的车牌号生成到新车的原车号. 如果返回多辆车只取最新登记日期那辆车牌号.
 	 */
 	public String autoSetOriginNo() {
 		json = new Json();
-		Car obj = this.carService.findcarOriginNoByCode(code);
+		Car obj = this.carService.findcarOriginNoByOwnership(ownershipNo,fileDate);
 		if (obj != null && obj.getPlateNo() != null) {
 			json.put("plateNo", obj.getPlateNo());
 		}

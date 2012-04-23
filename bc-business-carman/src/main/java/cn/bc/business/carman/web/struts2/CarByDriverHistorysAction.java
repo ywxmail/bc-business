@@ -68,8 +68,8 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected OrderCondition getGridDefaultOrderCondition() {
-		// 默认排序方向：状态|创建日期
-		return new OrderCondition("d.file_date", Direction.Desc);
+		// 默认排序方向：状态|迁移日期
+		return new OrderCondition("d.move_date", Direction.Desc);
 	}
 
 	@SuppressWarnings("unchecked")

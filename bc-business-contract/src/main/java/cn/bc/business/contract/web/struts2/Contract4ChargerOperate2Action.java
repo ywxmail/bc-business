@@ -18,6 +18,7 @@ import cn.bc.business.contract.domain.Contract;
 import cn.bc.business.contract.domain.Contract4Charger;
 import cn.bc.business.contract.service.Contract4ChargerService;
 import cn.bc.business.web.struts2.FileEntityAction;
+import cn.bc.core.util.DateUtils;
 import cn.bc.docs.service.AttachService;
 import cn.bc.docs.web.ui.html.AttachWidget;
 import cn.bc.identity.web.SystemContext;
@@ -115,12 +116,13 @@ public class Contract4ChargerOperate2Action extends
 		return chargerName;
 	}
 
-	//=== 经济合同续约,过户,重发包 代码开始  ====//
+	// === 经济合同续约,过户,重发包 代码开始 ====//
 	private Long id;
 	private String signType;
 	private int opType;
 	private Boolean isDisableSignType;
-	
+	public String stopDate;// 合同实际结束日期
+
 	public Long getId() {
 		return id;
 	}
@@ -152,9 +154,9 @@ public class Contract4ChargerOperate2Action extends
 	public void setIsDisableSignType(Boolean isDisableSignType) {
 		this.isDisableSignType = isDisableSignType;
 	}
-	
-	private Boolean isSaved; //是否已保存
-	
+
+	private Boolean isSaved; // 是否已保存
+
 	public Boolean getIsSaved() {
 		return isSaved;
 	}
@@ -162,86 +164,94 @@ public class Contract4ChargerOperate2Action extends
 	public void setIsSaved(Boolean isSaved) {
 		this.isSaved = isSaved;
 	}
-	
+
 	@Override
 	public String create() throws Exception {
-		
+
 		Contract4Charger newContract = this.contract4ChargerService
-				.doCopyContract(this.id,this.opType,this.signType);
-		
+				.doCopyContract(this.id, this.opType, this.signType);
+
 		// 初始化E
 		this.setE(newContract);
-		
+
+		// 默认新合同的签订日期，合同始日期与上一份合同的结束日期相同
+		Calendar signDate4Charger = DateUtils.getCalendar(this.stopDate);
+		this.getE().setSignDate(signDate4Charger);
+		this.getE().setStartDate(signDate4Charger);
+
 		this.formPageOption = buildFormPageOption(true);
-		
-		//设置责任人列表信息
+
+		// 设置责任人列表信息
 		setChargerList();
-		//操作保存是否成功标识
+		// 操作保存是否成功标识
 		isSaved = false;
-		//设置附件
+		// 设置附件
 		attachsUI = buildAttachsUI(false, false);
-		
+
 		// 初始化表单的其他配置
 		this.initForm(true);
 
 		return "form";
 	}
-	
 
 	@Override
 	public String save() throws Exception {
+
+		// 合同实际结束日期
+		Calendar stopDate4Charger = DateUtils.getCalendar(this.stopDate);
 		json = new Json();
 		Contract4Charger e = this.getE();
 		Long excludeId = null;
 		// 保存之前检测自编号是否唯一:仅在新建时检测
-		excludeId = this.contract4ChargerService.checkCodeIsExist(
-				e.getId(), e.getCode());
-		if(excludeId != null){
+		excludeId = this.contract4ChargerService.checkCodeIsExist(e.getId(),
+				e.getCode());
+		if (excludeId != null) {
 			json.put("success", false);
 			json.put("msg", getText("contract4Labour.code.exist2"));
 			return "json";
 		}
-			
+
 		// 设置最后更新人的信息
 		SystemContext context = this.getSystyemContext();
 		e.setModifier(context.getUserHistory());
 		e.setModifiedDate(Calendar.getInstance());
-		
+
 		// 设置责任人姓名
 		e.setExt_str2(setChargerName(assignChargerIds, assignChargerNames));
-		
-		if(isSaved){//普通保存
+
+		if (isSaved) {// 普通保存
 			// 执行基类的保存
 			this.beforeSave(e);
-			
+
 			this.contract4ChargerService.save(e, this.getCarId(),
 					assignChargerIds, assignChargerNames);
-			
+
 			this.afterSave(e);
 			json.put("id", e.getId());
 			json.put("success", true);
 			json.put("msg", getText("form.save.success"));
 			return "json";
-		}else{//操作保存
-			
-			//设置创建人
+		} else {// 操作保存
+
+			// 设置创建人
 			e.setAuthor(context.getUserHistory());
 			e.setFileDate(Calendar.getInstance());
-			
-			//获取旧合同id
+
+			// 获取旧合同id
 			Long fromContractId = e.getPid();
 			Contract newContract = null;
 			String msg = "";
 			json = new Json();
-			
-			newContract = this.contract4ChargerService.doOperate(
-					carId,this.getE(),assignChargerIds,fromContractId);
-			if(e.getOpType() == Contract.OPTYPE_RENEW){//续约
+
+			newContract = this.contract4ChargerService.doOperate(carId,
+					this.getE(), assignChargerIds, fromContractId,
+					stopDate4Charger);
+			if (e.getOpType() == Contract.OPTYPE_RENEW) {// 续约
 				msg = getText("contract4Charger.renew.success");
-			}else if(e.getOpType() == Contract.OPTYPE_CHANGECHARGER){//过户
+			} else if (e.getOpType() == Contract.OPTYPE_CHANGECHARGER) {// 过户
 				msg = getText("contract4Charger.changeCharger.success");
-			}else if(e.getOpType() == Contract.OPTYPE_CHANGECHARGER2){//重发包
-				msg = getText("contract4Charger.changeCharger.success");
+			} else if (e.getOpType() == Contract.OPTYPE_CHANGECHARGER2) {// 重发包
+				msg = getText("contract4Charger.changeCharger2.success");
 			}
 			json.put("id", newContract.getId());
 			json.put("oldId", fromContractId);
@@ -250,10 +260,9 @@ public class Contract4ChargerOperate2Action extends
 			return "json";
 		}
 
-
 	}
-	
-	//=== 经济合同续约,过户,重发包 代码结束  ===//
+
+	// === 经济合同续约,过户,重发包 代码结束 ===//
 
 	@Override
 	protected void initForm(boolean editable) throws Exception {
@@ -337,8 +346,8 @@ public class Contract4ChargerOperate2Action extends
 		AttachWidget attachsUI = new AttachWidget();
 		attachsUI.setFlashUpload(isFlashUpload());
 		attachsUI.addClazz("formAttachs");
-		attachsUI.addAttach(this.attachService.findByPtype(ptype, this
-					.getE().getUid()));
+		attachsUI.addAttach(this.attachService.findByPtype(ptype, this.getE()
+				.getUid()));
 		attachsUI.setPuid(this.getE().getUid()).setPtype(ptype);
 
 		// 上传附件的限制

@@ -4,6 +4,7 @@
 package cn.bc.business.car.service;
 
 import java.io.Serializable;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
@@ -178,5 +179,9 @@ public class CarServiceImpl extends DefaultCrudService<Car> implements
 		}
 
 		return entity;
+	}
+
+	public Car findcarOriginNoByOwnership(String ownership, Calendar fileDate) {
+		return this.carDao.findcarOriginNoByOwnership(ownership, fileDate);
 	}
 }

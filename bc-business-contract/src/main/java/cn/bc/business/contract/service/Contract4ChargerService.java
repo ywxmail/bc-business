@@ -218,10 +218,10 @@ public interface Contract4ChargerService extends CrudService<Contract4Charger> {
 	 * 注销处理：记录不变、次版本号不变
 	 * 
 	 * @param contractId
-	 * @param logoutDate
-	 *            指定的注销日期 原合同id
+	 * @param stopDate
+	 *            合同实际结束日期
 	 */
-	void doLogout(Long contractId, Calendar logoutDate);
+	void doLogout(Long contractId, Calendar stopDate);
 
 	/**
 	 * 判断经济合同自编号唯一
@@ -232,26 +232,32 @@ public interface Contract4ChargerService extends CrudService<Contract4Charger> {
 	 */
 	Long checkCodeIsExist(Long excludeId, String code);
 
-	
 	/**
 	 * 根据旧合同id复制出新合同
+	 * 
 	 * @param id
 	 * @param opType
 	 * @param signType
 	 * @return
 	 */
-	Contract4Charger doCopyContract(Long id,int opType,String signType);
-	
+	Contract4Charger doCopyContract(Long id, int opType, String signType);
+
 	/**
 	 * 经济合同操处理
-	 * @param carId   -- 车辆id
-	 * @param e    -- 新的经济合同
-	 * @param assignChargerIds  -- 责任人id列表
-	 * @param fromContractId    -- 旧经济合同id
+	 * 
+	 * @param carId
+	 *            -- 车辆id
+	 * @param e
+	 *            -- 新的经济合同
+	 * @param assignChargerIds
+	 *            -- 责任人id列表
+	 * @param fromContractId
+	 *            -- 旧经济合同id
+	 * @param stopDate
+	 *            合同实际结束日期
 	 * @return
 	 */
-	Contract4Charger doOperate(Long carId, Contract4Charger e,String assignChargerIds, Long fromContractId);
-
-
+	Contract4Charger doOperate(Long carId, Contract4Charger e,
+			String assignChargerIds, Long fromContractId, Calendar stopDate);
 
 }

@@ -5,6 +5,7 @@ package cn.bc.business.car.dao.hibernate.jpa;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -363,6 +364,25 @@ public class CarDaoImpl extends HibernateCrudJpaDao<Car> implements CarDao {
 			car = (Car) list.get(0);
 			if (logger.isDebugEnabled()) {
 				logger.debug("有两辆或两辆以上的车辆，已选择其第一辆");
+			}
+			return car;
+		}
+	}
+
+	public Car findcarOriginNoByOwnership(String ownership, Calendar fileDate) {
+		Car car = null;
+		String hql = "select c from Car c where c.certNo2 = ? and c.fileDate < ? and c.status = 1";
+		hql += " order by c.registerDate Desc";
+		List<?> list = this.getJpaTemplate().find(hql, ownership, fileDate);
+		if (list.size() == 1) {
+			car = (Car) list.get(0);
+			return car;
+		} else if (list.size() < 1) {
+			return null;
+		} else {
+			car = (Car) list.get(0);
+			if (logger.isDebugEnabled()) {
+				logger.debug("有两辆或两辆以上的车辆，根据登记日期选择最新的一车辆");
 			}
 			return car;
 		}

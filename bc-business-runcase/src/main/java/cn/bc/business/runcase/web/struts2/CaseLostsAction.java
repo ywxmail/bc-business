@@ -185,7 +185,7 @@ public class CaseLostsAction extends ViewAction<Map<String, Object>> {
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd HH:mm")));
 		// 报失物品
 		columns.add(new TextColumn4MapKey("l.items", "items",
-				getText("runcase.lost.items"), 140));
+				getText("runcase.lost.items"), 140).setUseTitleFromLabel(true));
 		// 价值估算
 		columns.add(new TextColumn4MapKey("l.money", "money",
 				getText("runcase.lost.money"), 60).setUseTitleFromLabel(true)
@@ -203,7 +203,7 @@ public class CaseLostsAction extends ViewAction<Map<String, Object>> {
 				setValueFormater(new KeyValueFormater(getSexs())));
 		// 联系电话
 		columns.add(new TextColumn4MapKey("l.owner_tel", "owner_tel",
-				getText("runcase.lost.ownerTel"), 90).setUseTitleFromLabel(true));
+				getText("runcase.lost.ownerTel"), 110).setUseTitleFromLabel(true));
 
 		
 		if (carManId == null) {
