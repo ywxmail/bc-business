@@ -3,6 +3,7 @@
  */
 package cn.bc.business.car.dao;
 
+import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
@@ -59,9 +60,12 @@ public interface CarDao extends CrudDao<Car> {
 	 * 通过经营权号生成原车号
 	 * 
 	 * @param ownership
-	 * @return 经营权号
+	 *            经营权号
+	 * @param fileDate
+	 *            车辆信息的创建时间
+	 * @return
 	 */
-	Car findcarOriginNoByOwnership(String ownership);
+	Car findcarOriginNoByOwnership(String ownership, Calendar fileDate);
 
 	/**
 	 * 通过车牌号查找此车辆所属的分公司与车队

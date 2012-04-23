@@ -6,6 +6,7 @@ package cn.bc.business.car.web.struts2;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -406,6 +407,16 @@ public class CarAction extends FileEntityAction<Long, Car> {
 
 	private String ownershipNo;
 	private String code;
+	private Calendar fileDate;
+	
+
+	public Calendar getFileDate() {
+		return fileDate;
+	}
+
+	public void setFileDate(Calendar fileDate) {
+		this.fileDate = fileDate;
+	}
 
 	public String getCode() {
 		return code;
@@ -428,7 +439,7 @@ public class CarAction extends FileEntityAction<Long, Car> {
 	 */
 	public String autoSetOriginNo() {
 		json = new Json();
-		Car obj = this.carService.findcarOriginNoByOwnership(ownershipNo);
+		Car obj = this.carService.findcarOriginNoByOwnership(ownershipNo,fileDate);
 		if (obj != null && obj.getPlateNo() != null) {
 			json.put("plateNo", obj.getPlateNo());
 		}
