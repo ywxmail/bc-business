@@ -251,7 +251,7 @@ public class Contract4ChargerOperate2Action extends
 			} else if (e.getOpType() == Contract.OPTYPE_CHANGECHARGER) {// 过户
 				msg = getText("contract4Charger.changeCharger.success");
 			} else if (e.getOpType() == Contract.OPTYPE_CHANGECHARGER2) {// 重发包
-				msg = getText("contract4Charger.changeCharger.success");
+				msg = getText("contract4Charger.changeCharger2.success");
 			}
 			json.put("id", newContract.getId());
 			json.put("oldId", fromContractId);
