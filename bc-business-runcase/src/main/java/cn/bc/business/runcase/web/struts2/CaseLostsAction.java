@@ -203,7 +203,7 @@ public class CaseLostsAction extends ViewAction<Map<String, Object>> {
 				setValueFormater(new KeyValueFormater(getSexs())));
 		// 联系电话
 		columns.add(new TextColumn4MapKey("l.owner_tel", "owner_tel",
-				getText("runcase.lost.ownerTel"), 90).setUseTitleFromLabel(true));
+				getText("runcase.lost.ownerTel"), 110).setUseTitleFromLabel(true));
 
 		
 		if (carManId == null) {
