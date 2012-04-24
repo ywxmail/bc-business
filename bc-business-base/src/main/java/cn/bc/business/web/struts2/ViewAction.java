@@ -59,6 +59,23 @@ public abstract class ViewAction<T extends Object> extends
 				getText("bs.status.active"));
 		statuses.put(String.valueOf(BCConstants.STATUS_DISABLED),
 				getText("bs.status.logout"));
+		statuses.put("0,1", getText("bs.status.all"));
+		return statuses;
+	}
+
+	/**
+	 * 状态值转换列表：在案|注销|草稿|全部
+	 * 
+	 * @return
+	 */
+	protected Map<String, String> getBSStatuses3() {
+		Map<String, String> statuses = new LinkedHashMap<String, String>();
+		statuses.put(String.valueOf(BCConstants.STATUS_ENABLED),
+				getText("bs.status.active"));
+		statuses.put(String.valueOf(BCConstants.STATUS_DISABLED),
+				getText("bs.status.logout"));
+		statuses.put(String.valueOf(BCConstants.STATUS_DRAFT),
+				getText("bc.status.draft"));
 		statuses.put("", getText("bs.status.all"));
 		return statuses;
 	}
