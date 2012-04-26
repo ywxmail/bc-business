@@ -542,4 +542,13 @@ public class CarDaoImpl extends HibernateCrudJpaDao<Car> implements CarDao {
 		});
 
 	}
+
+	@SuppressWarnings("unchecked")
+	public List<Car> selectCarByStatus(Integer status) {
+		String hql = "from Car car";
+		if(status != null){
+			hql += " where car.status=?";
+		}
+		return this.getJpaTemplate().find(hql,status);
+	}
 }

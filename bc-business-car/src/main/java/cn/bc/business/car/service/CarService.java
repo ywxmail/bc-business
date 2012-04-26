@@ -98,4 +98,11 @@ public interface CarService extends CrudService<Car> {
 	 * @return 如果车牌被占用，返回占用此车牌的车辆id，否则返回null
 	 */
 	Long checkPlateIsExists(Long excludeId, String plateType, String plateNo);
+	
+	/**
+	 * 根据状态查找车辆列表
+	 * @param status
+	 * @return
+	 */
+	List<Car> selectCarByStatus(Integer status);
 }

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<package name="batchInit" extends="bc-default" namespace="/bc-business/batchInit">
+		<action name="save" class="batchInitAction" method="save" />
+		<action name="data" class="batchInitAction" method="data" />
+		<action name="create" class="batchInitAction" method="create" >
+		    <result name="form">/bc-business/fee/batchInitForm.jsp</result>
+		</action>
+		<action name="selectAllCar" class="batchInitAction" method="selectAllCar" />
+	</package>
+</struts>

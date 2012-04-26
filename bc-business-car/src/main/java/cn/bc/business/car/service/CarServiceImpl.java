@@ -184,4 +184,13 @@ public class CarServiceImpl extends DefaultCrudService<Car> implements
 	public Car findcarOriginNoByOwnership(String ownership, Calendar fileDate) {
 		return this.carDao.findcarOriginNoByOwnership(ownership, fileDate);
 	}
+
+	/**
+	 * 根据状态查找车辆列表
+	 * @param status
+	 * @return
+	 */
+	public List<Car> selectCarByStatus(Integer status) {
+		return this.carDao.selectCarByStatus(status);
+	}
 }

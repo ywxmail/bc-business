@@ -115,4 +115,11 @@ public interface CarDao extends CrudDao<Car> {
 	 * @return
 	 */
 	String getChargerInfoByCarId(Long carId);
+
+	/**
+	 * 根据状态查找车辆列表
+	 * @param status
+	 * @return
+	 */
+	List<Car> selectCarByStatus(Integer status);
 }
