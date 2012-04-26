@@ -63,6 +63,7 @@ public class Contract4ChargerAction extends
 	public Map<String, Object> carInfoMap; // 车辆Map
 	public boolean isExistContract; // 是否存在合同
 	public Json json;
+	public boolean isDoMaintenance = false;// 是否进行维护操作
 
 	// public Long driverId;
 	// public String certCode;
@@ -430,9 +431,10 @@ public class Contract4ChargerAction extends
 
 		// 特殊处理的部分
 		if (!this.isReadonly()) {// 有权限
-
-			if (editable && this.getE().getStatus() != BCConstants.STATUS_DRAFT) {// 编辑状态显示保存按钮
-				if (this.getE().getMain() == Contract.MAIN_NOW
+			if (this.getE().getStatus() != BCConstants.STATUS_DRAFT) {// 编辑状态显示保存按钮
+				// 非草稿状态下双击
+				if (!isDoMaintenance
+						&& this.getE().getMain() == Contract.MAIN_NOW
 						&& this.getE().getStatus() != Contract.STATUS_LOGOUT) {
 					pageOption.addButton(new ButtonOption(
 							getText("contract4Labour.optype.maintenance"),
@@ -456,6 +458,15 @@ public class Contract4ChargerAction extends
 				pageOption.addButton(new ButtonOption(
 						getText("label.warehousing"), null,
 						"bc.contract4ChargerForm.warehousing"));
+
+			}
+			// 维护操作
+			if (isDoMaintenance) {
+				pageOption.addButton(new ButtonOption(getText("label.save"),
+						null, "bc.contract4ChargerForm.save"));
+				pageOption.addButton(new ButtonOption(
+						getText("label.saveAndClose"), null,
+						"bc.contract4ChargerForm.saveAndClose"));
 
 			}
 		}
@@ -530,20 +541,20 @@ public class Contract4ChargerAction extends
 		}
 	}
 
-//	/**
-//	 * 获取合同的状态列表
-//	 * 
-//	 * @return
-//	 */
-//	private Map<String, String> getContractStatuses() {
-//		Map<String, String> types = new HashMap<String, String>();
-//		types.put(String.valueOf(Contract.STATUS_NORMAL),
-//				getText("contract.status.normal"));
-//		types.put(String.valueOf(Contract.STATUS_LOGOUT),
-//				getText("contract.status.logout"));
-//		types.put(String.valueOf(Contract.STATUS_RESGIN),
-//				getText("contract.status.resign"));
-//		return types;
-//	}
+	// /**
+	// * 获取合同的状态列表
+	// *
+	// * @return
+	// */
+	// private Map<String, String> getContractStatuses() {
+	// Map<String, String> types = new HashMap<String, String>();
+	// types.put(String.valueOf(Contract.STATUS_NORMAL),
+	// getText("contract.status.normal"));
+	// types.put(String.valueOf(Contract.STATUS_LOGOUT),
+	// getText("contract.status.logout"));
+	// types.put(String.valueOf(Contract.STATUS_RESGIN),
+	// getText("contract.status.resign"));
+	// return types;
+	// }
 
 }

@@ -360,10 +360,12 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 		// 强制为只读表单
 		return "bs.contract4ChargerView.dblclick";
 	}
+
 	@Override
 	protected String getHtmlPageJs() {
 		return this.getContextPath() + "/bc-business/contract4Charger/view.js";
 	}
+
 	@Override
 	protected String[] getGridSearchFields() {
 		return new String[] { "c.code", "c.ext_str1", "c.ext_str2",
@@ -400,8 +402,6 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 				statusCondition = new InCondition("c.status_",
 						StringUtils.stringArray2IntegerArray(ss));
 			}
-		} else {
-			return null;
 		}
 		Condition mainsCondition = null;
 		// Condition patchCondtion = null;
