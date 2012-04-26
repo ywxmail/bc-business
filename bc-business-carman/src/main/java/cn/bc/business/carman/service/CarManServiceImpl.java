@@ -105,6 +105,8 @@ public class CarManServiceImpl extends DefaultCrudService<CarMan> implements
 	@Override
 	public CarMan save(CarMan entity) {
 		boolean isNew = entity.isNew();
+		Long oldManId = entity.getId();
+
 		// 更新司机的冗余字段
 		if (!isNew) {
 			// 获取最新迁移记录信息
@@ -132,40 +134,89 @@ public class CarManServiceImpl extends DefaultCrudService<CarMan> implements
 				// 顶班合同结束日期
 				entity.setShiftworkEndDate(h.getEndDate());
 				// 迁移类型为公司到公司，交回未注销，注销未有去向的司机状态为注销
-				if (h.getMoveType() == CarByDriverHistory.MOVETYPE_GSDGSYZX
-						|| h.getMoveType() == CarByDriverHistory.MOVETYPE_JHWZX
-						|| h.getMoveType() == CarByDriverHistory.MOVETYPE_ZXWYQX) {
-					entity.setStatus(BCConstants.STATUS_DISABLED);
-				} else {
-					entity.setStatus(BCConstants.STATUS_ENABLED);
+				// 非草稿状态下
+				if (entity.getStatus() != BCConstants.STATUS_DRAFT) {
+					if (h.getMoveType() == CarByDriverHistory.MOVETYPE_GSDGSYZX
+							|| h.getMoveType() == CarByDriverHistory.MOVETYPE_JHWZX
+							|| h.getMoveType() == CarByDriverHistory.MOVETYPE_ZXWYQX) {
+						entity.setStatus(BCConstants.STATUS_DISABLED);
+					} else {
+						entity.setStatus(BCConstants.STATUS_ENABLED);
+					}
 				}
 			}
-
 		}
-		entity = this.carManDao.save(entity);
 
 		if (isNew) {
-			// 记录新建日志
-			this.operateLogService.saveWorkLog(CarMan.class.getSimpleName(),
-					entity.getId().toString(), "新建" + entity.getName()+"的司机信息", null,
-					OperateLog.OPERATE_CREATE);
+			entity = this.carManDao.save(entity);
+
+			if (entity.getStatus() == BCConstants.STATUS_DRAFT) {
+				// 记录草稿日志
+				this.operateLogService.saveWorkLog(
+						CarMan.class.getSimpleName(),
+						entity.getId().toString(), "新建司机" + entity.getName(),
+						null, OperateLog.OPERATE_CREATE);
+
+			} else if (entity.getStatus() == BCConstants.STATUS_ENABLED) {
+				// 记录新建日志
+				this.operateLogService.saveWorkLog(
+						CarMan.class.getSimpleName(),
+						entity.getId().toString(), "新建司机" + entity.getName()
+								+ "并入库", null, OperateLog.OPERATE_CREATE);
+
+			}
 		} else {
-			// 记录更新日志
-			this.operateLogService.saveWorkLog(CarMan.class.getSimpleName(),
-					entity.getId().toString(), "更新" + entity.getName()+"的司机信息", null,
-					OperateLog.OPERATE_UPDATE);
+			if (oldManId != null) {
+				CarMan om = this.carManDao.load(oldManId);
+				if (om.getStatus() == BCConstants.STATUS_DRAFT
+						&& entity.getStatus() == BCConstants.STATUS_ENABLED) {
+					this.operateLogService.saveWorkLog(CarMan.class
+							.getSimpleName(), entity.getId().toString(), "将司机"
+							+ entity.getName() + "入库", null,
+							OperateLog.OPERATE_CREATE);
+				} else {
+					// 记录更新日志
+					this.operateLogService.saveWorkLog(CarMan.class
+							.getSimpleName(), entity.getId().toString(), "更新"
+							+ entity.getName() + "司机的信息", null,
+							OperateLog.OPERATE_UPDATE);
+
+				}
+
+			}
+
 		}
 
 		return super.save(entity);
 	}
 
 	public void updatePhone(Long carManId, String phone1, String phone2) {
+		CarMan old = this.carManDao.load(carManId);
 		this.carManDao.updatePhoneBycarManId(carManId, phone1, phone2);
 		CarMan cm = this.carManDao.load(carManId);
-		// 记录更新电话日志
-		this.operateLogService.saveWorkLog(CarMan.class.getSimpleName(), cm
-				.getId().toString(), "更新司机" + cm.getName() + "的电话号码", null,
-				OperateLog.OPERATE_UPDATE);
+		String oldphone1 = old.getPhone();
+		String oldphone2 = old.getPhone1();
+		if ((oldphone1 == null && oldphone2 == null)
+				|| (oldphone1.length() == 0 && oldphone2.length() == 0)) {
+			// 记录更新电话日志
+			this.operateLogService.saveWorkLog(CarMan.class.getSimpleName(), cm
+					.getId().toString(), "更新司机" + cm.getName() + "的电话号码,由空改为 "
+					+ phone1 + " " + phone2, null, OperateLog.OPERATE_UPDATE);
+		} else if ((phone1 == null && phone2 == null)
+				|| (phone1.length() == 0 && phone2.length() == 0)) {
+			this.operateLogService.saveWorkLog(CarMan.class.getSimpleName(), cm
+					.getId().toString(), "更新司机" + cm.getName() + "的电话号码,由"
+					+ oldphone1 + " " + oldphone2 + "改为空 ", null,
+					OperateLog.OPERATE_UPDATE);
+
+		} else {
+			// 记录更新电话日志
+			this.operateLogService.saveWorkLog(CarMan.class.getSimpleName(), cm
+					.getId().toString(), "更新司机" + cm.getName() + "的电话号码,由"
+					+ oldphone1 + " " + oldphone2 + "改为 " + phone1 + " "
+					+ phone2, null, OperateLog.OPERATE_UPDATE);
+
+		}
 
 	}
 
