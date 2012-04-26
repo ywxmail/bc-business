@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -16,6 +17,7 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
+import cn.bc.BCConstants;
 import cn.bc.business.carman.domain.CarByDriver;
 import cn.bc.business.carman.domain.CarByDriverHistory;
 import cn.bc.business.web.struts2.LinkFormater4CarInfo;
@@ -24,6 +26,7 @@ import cn.bc.core.query.condition.Condition;
 import cn.bc.core.query.condition.ConditionUtils;
 import cn.bc.core.query.condition.Direction;
 import cn.bc.core.query.condition.impl.EqualsCondition;
+import cn.bc.core.query.condition.impl.InCondition;
 import cn.bc.core.query.condition.impl.LikeCondition;
 import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.core.util.StringUtils;
@@ -57,6 +60,8 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 	public Long carManId;
 	public Long carId;
 	public Long toCarId;
+	public String status = String.valueOf(BCConstants.STATUS_ENABLED) + ","
+			+ String.valueOf(BCConstants.STATUS_DISABLED); // 车辆的状态，多个用逗号连接
 
 	@Override
 	public boolean isReadonly() {
@@ -287,6 +292,20 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected Condition getGridSpecalCondition() {
+		// 状态条件
+		Condition statusCondition = null;
+		if (status != null && status.length() > 0) {
+			String[] ss = status.split(",");
+			if (ss.length == 1) {
+				statusCondition = new EqualsCondition("m.status_", new Integer(
+						ss[0]));
+			} else {
+				statusCondition = new InCondition("m.status_",
+						StringUtils.stringArray2IntegerArray(ss));
+			}
+		} else {
+			return null;
+		}
 
 		// carManId条件
 		Condition carManIdCondition = null;
@@ -313,8 +332,9 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 
 		// 合并条件
 		return ConditionUtils.mix2AndCondition(carManIdCondition,
-				ConditionUtils.mix2OrCondition(carId2ToCarIdCondition,
-						oldCarIdCondition, carId2ShiftworkCarIdCondition));
+				statusCondition, ConditionUtils.mix2OrCondition(
+						carId2ToCarIdCondition, oldCarIdCondition,
+						carId2ShiftworkCarIdCondition));
 	}
 
 	@Override
@@ -329,6 +349,13 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 		if (carId != null) {
 			json.put("carId", carId);
 		}
+		// 司机状态
+		if (this.status == null || this.status.length() == 0) {
+			return null;
+		} else {
+			json.put("status", status);
+		}
+
 		return json.isEmpty() ? null : json;
 	}
 
@@ -430,10 +457,32 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 										.setText("顶班处理")
 										.setClick(
 												"bc.business.chuLiDingBan.create"));
+
+				// 如果有权限的用户可以看到草稿状态的车
+				if (!isReadonly()) {
+					tb.addButton(Toolbar.getDefaultToolbarRadioGroup(
+							this.getBSStatuses(), "status", 0,
+							getText("title.click2changeSearchStatus")));
+
+				}
 			}
 
 		}
 		return tb;
+	}
+
+	/**
+	 * 状态值转换列表：入库|草稿|全部
+	 * 
+	 * @return
+	 */
+	protected Map<String, String> getBSStatuses() {
+		Map<String, String> statuses = new LinkedHashMap<String, String>();
+		statuses.put("0,1", getText("label.warehousing"));
+		statuses.put(String.valueOf(BCConstants.STATUS_DRAFT),
+				getText("bc.status.draft"));
+		statuses.put("", getText("bs.status.all"));
+		return statuses;
 	}
 
 	@Override
