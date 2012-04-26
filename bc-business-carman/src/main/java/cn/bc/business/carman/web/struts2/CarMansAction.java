@@ -72,6 +72,12 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 				getText("key.role.bc.admin"));
 	}
 
+	private boolean isEntering() {
+		// 司机录入管理员
+		SystemContext context = (SystemContext) this.getContext();
+		return !context.hasAnyRole(getText("key.role.bs.driver.entering"));
+	}
+
 	@Override
 	protected OrderCondition getGridDefaultOrderCondition() {
 		// 默认排序方向：状态|创建日期
@@ -159,7 +165,7 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 		columns.add(new IdColumn4MapKey("m.id", "id"));
 		columns.add(new TextColumn4MapKey("m.status_", "status_",
 				getText("carMan.status"), 40).setSortable(true)
-				.setValueFormater(new EntityStatusFormater(getBSStatuses1())));
+				.setValueFormater(new EntityStatusFormater(getBSStatuses3())));
 		columns.add(new TextColumn4MapKey("m.file_date", "file_date",
 				getText("carMan.fileDate"), 85).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
@@ -208,7 +214,7 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 				getText("carMan.birthdate"), 85).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
 		columns.add(new TextColumn4MapKey("m.birthdate", "birth_date",
-				getText("carMan.age"),50)
+				getText("carMan.age"), 50)
 				.setValueFormater(new AbstractFormater<String>() {
 					@Override
 					public String format(Object context, Object value) {
@@ -216,11 +222,11 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 						Map<String, Object> map = (Map<String, Object>) context;
 						Date birthdate = (Date) map.get("birth_date");
 						if (birthdate != null) {
-							Calendar cal=Calendar.getInstance();
+							Calendar cal = Calendar.getInstance();
 							cal.setTime(birthdate);
-							String age =String.valueOf(DateUtils.getAge(cal));
-							int a=age.indexOf(".");
-							return age.substring(0, a+2);
+							String age = String.valueOf(DateUtils.getAge(cal));
+							int a = age.indexOf(".");
+							return age.substring(0, a + 2);
 						} else {
 							return null;
 						}
@@ -443,6 +449,12 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 		if (this.isReadonly()) {
 			// 查看按钮
 			tb.addButton(this.getDefaultOpenToolbarButton());
+			// 如果有录入权限的有新建按钮
+			if (!this.isEntering()) {
+				// 新建按钮
+				tb.addButton(this.getDefaultCreateToolbarButton());
+
+			}
 		} else {
 			// 新建按钮
 			tb.addButton(this.getDefaultCreateToolbarButton());
@@ -456,10 +468,17 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 		// 搜索按钮
 		tb.addButton(this.getDefaultSearchToolbarButton());
 
-		// 状态单选按钮组
-		tb.addButton(Toolbar.getDefaultToolbarRadioGroup(this.getBSStatuses1(),
-				"status", 0, getText("title.click2changeSearchStatus")));
+		// 如果有权限的用户可以看到草稿状态的车
+		if (!isReadonly() || !this.isEntering()) {
+			tb.addButton(Toolbar.getDefaultToolbarRadioGroup(
+					this.getBSStatuses3(), "status", 0,
+					getText("title.click2changeSearchStatus")));
 
+		} else {
+			tb.addButton(Toolbar.getDefaultToolbarRadioGroup(
+					this.getBSStatuses1(), "status", 0,
+					getText("title.click2changeSearchStatus")));
+		}
 		// 出租协会网查询:司机管理员、系统管理员或出租协会网查询角色
 		if (!this.isReadonly()
 				|| ((SystemContext) this.getContext())
