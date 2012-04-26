@@ -15,6 +15,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.util.StringUtils;
 
+import cn.bc.BCConstants;
 import cn.bc.business.car.dao.CarDao;
 import cn.bc.business.car.domain.Car;
 import cn.bc.business.car.event.BeforeSave4CarEvent;
@@ -139,6 +140,7 @@ public class CarServiceImpl extends DefaultCrudService<Car> implements
 	@Override
 	public Car save(Car entity) {
 		boolean isNew = entity.isNew();
+		Long oldCarId = entity.getId();
 		if (!isNew) {
 			// ==重新获取车辆的沉余字段信息[司机信息,责任人信息,所属公司,车队]==
 
@@ -164,18 +166,49 @@ public class CarServiceImpl extends DefaultCrudService<Car> implements
 				entity.setMotorcade(m);
 			}
 		}
-		entity = this.carDao.save(entity);
 
 		if (isNew) {
-			// 记录新建日志
-			this.operateLogService.saveWorkLog(Car.class.getSimpleName(),
-					entity.getId().toString(), "新建" + entity.getPlate()
-							+ "的车辆信息", null, OperateLog.OPERATE_CREATE);
+			entity = this.carDao.save(entity);
+			if (entity.getStatus() == BCConstants.STATUS_DRAFT) {
+				// 记录草稿日志
+
+				// 记录新建日志
+				this.operateLogService.saveWorkLog(Car.class.getSimpleName(),
+						entity.getId().toString(), "新建" + entity.getPlate()
+								+ "的车辆信息", null, OperateLog.OPERATE_CREATE);
+
+			} else if (entity.getStatus() == BCConstants.STATUS_ENABLED) {
+				// 记录新建日志
+
+				// 记录新建日志
+				this.operateLogService.saveWorkLog(Car.class.getSimpleName(),
+						entity.getId().toString(), "新建" + entity.getPlate()
+								+ "的车辆信息并录入", null, OperateLog.OPERATE_CREATE);
+
+			}
+
 		} else {
-			// 记录更新日志
-			this.operateLogService.saveWorkLog(Car.class.getSimpleName(),
-					entity.getId().toString(), "更新" + entity.getPlate()
-							+ "的车辆信息", null, OperateLog.OPERATE_UPDATE);
+
+			if (oldCarId != null) {
+				Car c = this.carDao.load(oldCarId);
+				if (c.getStatus() == BCConstants.STATUS_DRAFT
+						&& entity.getStatus() == BCConstants.STATUS_ENABLED) {
+					// 记录更新日志
+					this.operateLogService.saveWorkLog(Car.class
+							.getSimpleName(), entity.getId().toString(), "将车辆"
+							+ entity.getPlate() + "入库", null,
+							OperateLog.OPERATE_UPDATE);
+				} else {
+					// 记录更新日志
+					this.operateLogService.saveWorkLog(Car.class
+							.getSimpleName(), entity.getId().toString(), "更新"
+							+ entity.getPlate() + "的车辆信息", null,
+							OperateLog.OPERATE_UPDATE);
+
+				}
+
+			}
+
 		}
 
 		return entity;
