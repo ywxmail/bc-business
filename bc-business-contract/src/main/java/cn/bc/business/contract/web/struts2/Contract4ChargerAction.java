@@ -15,6 +15,7 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
+import cn.bc.BCConstants;
 import cn.bc.business.OptionConstants;
 import cn.bc.business.contract.domain.Contract;
 import cn.bc.business.contract.domain.Contract4Charger;
@@ -111,6 +112,13 @@ public class Contract4ChargerAction extends
 				getText("key.role.bc.admin"));
 	}
 
+	private boolean isEntering() {
+		// 经济合同录入管理员
+		SystemContext context = (SystemContext) this.getContext();
+		return !context
+				.hasAnyRole(getText("key.role.bs.contract4charger.entering"));
+	}
+
 	@Override
 	protected void afterCreate(Contract4Charger entity) {
 
@@ -153,7 +161,7 @@ public class Contract4ChargerAction extends
 		SimpleDateFormat format4month = new SimpleDateFormat("yyyyMM");
 		entity.setCode("CLHT" + format4month.format(new Date()));
 		entity.setType(Contract.TYPE_CHARGER);
-		entity.setStatus(Contract.STATUS_NORMAL);
+		// entity.setStatus(Contract.STATUS_NORMAL);
 		entity.setSignType(getText("contract4Charger.optype.create"));
 		entity.setIncludeCost(true);
 
@@ -167,8 +175,8 @@ public class Contract4ChargerAction extends
 		Contract4Charger e = this.getE();
 		Long excludeId = null;
 		// 保存之前检测自编号是否唯一:仅在新建时检测
-		excludeId = this.contract4ChargerService.checkCodeIsExist(
-				e.getId(), e.getCode());
+		excludeId = this.contract4ChargerService.checkCodeIsExist(e.getId(),
+				e.getCode());
 		if (excludeId != null) {
 			json.put("success", false);
 			json.put("msg", getText("contract4Labour.code.exist2"));
@@ -258,7 +266,7 @@ public class Contract4ChargerAction extends
 		super.initForm(editable);
 
 		// 状态列表
-		statusesValue = this.getContractStatuses();
+		statusesValue = this.getBSStatuses3();
 		// 表单可选项的加载
 		initSelects();
 	}
@@ -392,28 +400,38 @@ public class Contract4ChargerAction extends
 
 	@Override
 	protected PageOption buildFormPageOption(boolean editable) {
-		return super.buildFormPageOption(editable).setWidth(720)
-				.setMinWidth(250).setMinHeight(160).setHeight(405);
-		// option.addButton(new ButtonOption(getText("label.save"), "save"));
-		// if (!this.isReadonly()) {
-		// option.addButton(new ButtonOption(getText("label.save"), null,
-		// "bc.contractChargerForm.save"));
-		// }
-		// return option;
+
+		PageOption pageOption = new PageOption().setWidth(720).setMinWidth(250)
+				.setMinHeight(160).setHeight(405);
+
+		if (this.useFormPrint())
+			pageOption.setPrint("default.form");
+
+		// 只有可编辑表单才按权限配置，其它情况一律配置为只读状态
+		boolean readonly = this.isReadonly();
+		if (editable && !readonly) {
+			pageOption.put("readonly", readonly);
+			// 如果有录入权限且状态为草稿的可以进行修改
+		} else if (this.getE().getStatus() == BCConstants.STATUS_DRAFT
+				&& !this.isEntering()) {
+			pageOption.put("readonly", false);
+		} else {
+			pageOption.put("readonly", true);
+		}
+
+		// 添加按钮
+		buildFormPageButtons(pageOption, editable);
+
+		return pageOption;
 	}
 
 	@Override
 	protected void buildFormPageButtons(PageOption pageOption, boolean editable) {
+
 		// 特殊处理的部分
 		if (!this.isReadonly()) {// 有权限
-			if (editable) {// 编辑状态显示保存按钮
-				pageOption.addButton(new ButtonOption(getText("label.save"),
-						null, "bc.contract4ChargerForm.save"));
-				pageOption.addButton(new ButtonOption(
-						getText("label.saveAndClose"), null,
-						"bc.contract4ChargerForm.saveAndClose"));
 
-			} else {// 只读状态显示操作按钮
+			if (editable && this.getE().getStatus() != BCConstants.STATUS_DRAFT) {// 编辑状态显示保存按钮
 				if (this.getE().getMain() == Contract.MAIN_NOW
 						&& this.getE().getStatus() != Contract.STATUS_LOGOUT) {
 					pageOption.addButton(new ButtonOption(
@@ -432,8 +450,30 @@ public class Contract4ChargerAction extends
 							getText("contract4Charger.logout"), null,
 							"bc.contract4ChargerForm.doLogout"));
 				}
+			} else {
+				pageOption.addButton(new ButtonOption(getText("label.save"),
+						null, "bc.contract4ChargerForm.save"));
+				pageOption.addButton(new ButtonOption(
+						getText("label.warehousing"), null,
+						"bc.contract4ChargerForm.warehousing"));
+
 			}
 		}
+		// 如果有录入权限的就有保存按钮
+		if (!this.isEntering()
+				&& this.getE().getStatus() == BCConstants.STATUS_DRAFT) {
+			pageOption.addButton(new ButtonOption(getText("label.save"), null,
+					"bc.contract4ChargerFormOperate.save"));
+
+		}
+
+	}
+
+	@Override
+	protected Contract4Charger createEntity() {
+		Contract4Charger c = super.createEntity();
+		c.setStatus(BCConstants.STATUS_DRAFT);
+		return c;
 	}
 
 	// 表单可选项的加载
@@ -490,20 +530,20 @@ public class Contract4ChargerAction extends
 		}
 	}
 
-	/**
-	 * 获取合同的状态列表
-	 * 
-	 * @return
-	 */
-	private Map<String, String> getContractStatuses() {
-		Map<String, String> types = new HashMap<String, String>();
-		types.put(String.valueOf(Contract.STATUS_NORMAL),
-				getText("contract.status.normal"));
-		types.put(String.valueOf(Contract.STATUS_LOGOUT),
-				getText("contract.status.logout"));
-		types.put(String.valueOf(Contract.STATUS_RESGIN),
-				getText("contract.status.resign"));
-		return types;
-	}
+//	/**
+//	 * 获取合同的状态列表
+//	 * 
+//	 * @return
+//	 */
+//	private Map<String, String> getContractStatuses() {
+//		Map<String, String> types = new HashMap<String, String>();
+//		types.put(String.valueOf(Contract.STATUS_NORMAL),
+//				getText("contract.status.normal"));
+//		types.put(String.valueOf(Contract.STATUS_LOGOUT),
+//				getText("contract.status.logout"));
+//		types.put(String.valueOf(Contract.STATUS_RESGIN),
+//				getText("contract.status.resign"));
+//		return types;
+//	}
 
 }

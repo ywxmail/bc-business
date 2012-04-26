@@ -25,6 +25,7 @@ import cn.bc.core.query.condition.Condition;
 import cn.bc.core.query.condition.ConditionUtils;
 import cn.bc.core.query.condition.Direction;
 import cn.bc.core.query.condition.impl.EqualsCondition;
+import cn.bc.core.query.condition.impl.InCondition;
 import cn.bc.core.query.condition.impl.LikeCondition;
 import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.core.util.StringUtils;
@@ -73,6 +74,13 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 				getText("key.role.bc.admin"));
 	}
 
+	private boolean isEntering() {
+		// 经济合同录入管理员
+		SystemContext context = (SystemContext) this.getContext();
+		return !context
+				.hasAnyRole(getText("key.role.bs.contract4charger.entering"));
+	}
+
 	/**
 	 * @param useDisabledReplaceDelete
 	 *            控制是使用删除按钮还是禁用按钮
@@ -85,6 +93,12 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 		if (this.isReadonly()) {
 			// 查看按钮
 			tb.addButton(this.getDefaultOpenToolbarButton());
+			if (!this.isEntering()) {
+				// 新建按钮
+				tb.addButton(this.getDefaultCreateToolbarButton());
+
+			}
+
 		} else {
 
 			if (contractId == null) {
@@ -104,7 +118,18 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 				}
 			}
 		}
+		// 状态单选按钮组
+		// 如果有权限的用户可以看到草稿状态的车
+		if (!isReadonly() || !this.isEntering()) {
+			tb.addButton(Toolbar.getDefaultToolbarRadioGroup(
+					this.getBSStatuses3(), "status", 0,
+					getText("title.click2changeSearchStatus")));
 
+		} else {
+			tb.addButton(Toolbar.getDefaultToolbarRadioGroup(
+					this.getBSStatuses1(), "status", 0,
+					getText("title.click2changeSearchStatus")));
+		}
 		// 搜索按钮
 		tb.addButton(this.getDefaultSearchToolbarButton());
 		return tb;
@@ -209,9 +234,8 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 		List<Column> columns = new ArrayList<Column>();
 		columns.add(new IdColumn4MapKey("cc.id", "id"));
 		columns.add(new TextColumn4MapKey("c.status_", "status_",
-				getText("contract.status"), 35)
-				.setSortable(true)
-				.setValueFormater(new EntityStatusFormater(getEntityStatuses())));
+				getText("contract.status"), 35).setSortable(true)
+				.setValueFormater(new EntityStatusFormater(getBSStatuses3())));
 		columns.add(new TextColumn4MapKey("car.company", "company",
 				getText("contract.company"), 50).setSortable(true));
 		columns.add(new TextColumn4MapKey("bia.name", "batch_company",
@@ -334,9 +358,12 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 	@Override
 	protected String getGridDblRowMethod() {
 		// 强制为只读表单
-		return "bc.page.open";
+		return "bs.contract4ChargerView.dblclick";
 	}
-
+	@Override
+	protected String getHtmlPageJs() {
+		return this.getContextPath() + "/bc-business/contract4Charger/view.js";
+	}
 	@Override
 	protected String[] getGridSearchFields() {
 		return new String[] { "c.code", "c.ext_str1", "c.ext_str2",
@@ -364,6 +391,18 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 	protected Condition getGridSpecalCondition() {
 		// 状态条件
 		Condition statusCondition = null;
+		if (status != null && status.length() > 0) {
+			String[] ss = status.split(",");
+			if (ss.length == 1) {
+				statusCondition = new EqualsCondition("c.status_", new Integer(
+						ss[0]));
+			} else {
+				statusCondition = new InCondition("c.status_",
+						StringUtils.stringArray2IntegerArray(ss));
+			}
+		} else {
+			return null;
+		}
 		Condition mainsCondition = null;
 		// Condition patchCondtion = null;
 		Condition typeCondtion = new EqualsCondition("c.type_", type);
@@ -430,17 +469,17 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 		}
 	}
 
-	@Override
-	protected Toolbar getHtmlPageToolbar() {
-		if (contractId == null) {
-			return super.getHtmlPageToolbar().addButton(
-					Toolbar.getDefaultToolbarRadioGroup(
-							this.getEntityStatuses(), "status", 0,
-							getText("title.click2changeSearchStatus")));
-		} else {
-			return super.getHtmlPageToolbar();
-		}
-	}
+	// @Override
+	// protected Toolbar getHtmlPageToolbar() {
+	// if (contractId == null) {
+	// return super.getHtmlPageToolbar().addButton(
+	// Toolbar.getDefaultToolbarRadioGroup(
+	// this.getEntityStatuses(), "status", 0,
+	// getText("title.click2changeSearchStatus")));
+	// } else {
+	// return super.getHtmlPageToolbar();
+	// }
+	// }
 
 	/**
 	 * 状态值转换列表：正常|注销|离职|全部
