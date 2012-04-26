@@ -1173,6 +1173,7 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 		sql.append(" from bs_carman m");
 		sql.append(" inner join bs_car_driver_history h on m.id=h.driver_id");
 		sql.append(" where (h.from_car_id=? or h.to_car_id=?)");
+		sql.append(" and m.status_ in (0,1)");
 		// 排除相同司机的旧记录
 		sql.append(" and not exists (select 1 from bs_carman mi inner join bs_car_driver_history hi on mi.id=hi.driver_id");
 		sql.append(" where (hi.from_car_id=? or hi.to_car_id=?) and hi.driver_id=h.driver_id and hi.move_date > h.move_date)");
@@ -1265,6 +1266,7 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 		sql.append(" inner join bs_contract_charger cc on cc.id=c.id");
 		sql.append(" inner join bs_car_contract carc on carc.contract_id=c.id");
 		sql.append(" where carc.car_id = ?");
+		sql.append(" and m.status_ in (0,1)");
 		// 排除相同责任人的旧记录
 		sql.append(" and not exists (select 1 from bs_carman_contract mci");
 		sql.append(" 	inner join bs_contract ci on ci.id = mci.contract_id");
@@ -1398,6 +1400,7 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 		sql.append(" from bs_carman m");
 		sql.append(" inner join bs_car_driver cd on cd.driver_id=m.id");
 		sql.append(" where cd.car_id = ? and cd.classes = 4");
+		sql.append(" and m.status_ in (0,1)");
 		// 排除相同司机的旧记录
 		sql.append(" and not exists (select 1 from bs_car_driver cdi");
 		sql.append(" 	where cdi.car_id = cd.car_id and cdi.classes = cd.classes and cdi.driver_id=cd.driver_id");
