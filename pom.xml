@@ -36,6 +36,7 @@
 		<module>bc-business-ownership</module>
 		<module>bc-business-fee-template</module>
 		<module>bc-business-fee</module>
+		<module>bc-business-socialSecurityRule</module>
 	</modules>
 	<scm>
 		<connection>scm:git:git@192.168.0.222:bc-business.git</connection>
