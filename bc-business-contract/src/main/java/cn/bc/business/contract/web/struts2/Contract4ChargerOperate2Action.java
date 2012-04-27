@@ -13,6 +13,7 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
+import cn.bc.BCConstants;
 import cn.bc.business.OptionConstants;
 import cn.bc.business.contract.domain.Contract;
 import cn.bc.business.contract.domain.Contract4Charger;
@@ -93,6 +94,13 @@ public class Contract4ChargerOperate2Action extends
 		SystemContext context = (SystemContext) this.getContext();
 		return !context.hasAnyRole(getText("key.role.bs.contract4charger"),
 				getText("key.role.bc.admin"));
+	}
+
+	private boolean isEntering() {
+		// 经济合同录入管理员
+		SystemContext context = (SystemContext) this.getContext();
+		return !context
+				.hasAnyRole(getText("key.role.bs.contract4charger.entering"));
 	}
 
 	/**
@@ -178,7 +186,7 @@ public class Contract4ChargerOperate2Action extends
 		Calendar signDate4Charger = DateUtils.getCalendar(this.stopDate);
 		this.getE().setSignDate(signDate4Charger);
 		this.getE().setStartDate(signDate4Charger);
-
+		this.getE().setStatus(BCConstants.STATUS_DRAFT);
 		this.formPageOption = buildFormPageOption(true);
 
 		// 设置责任人列表信息
@@ -269,7 +277,7 @@ public class Contract4ChargerOperate2Action extends
 		super.initForm(editable);
 
 		// 状态列表
-		statusesValue = this.getContractStatuses();
+		statusesValue = this.getBSStatuses3();
 		// 表单可选项的加载
 		initSelects();
 	}
@@ -362,23 +370,72 @@ public class Contract4ChargerOperate2Action extends
 
 	@Override
 	protected PageOption buildFormPageOption(boolean editable) {
-		return super.buildFormPageOption(editable).setWidth(720)
-				.setMinWidth(250).setMinHeight(160).setHeight(405);
+
+		PageOption pageOption = new PageOption().setWidth(720).setMinWidth(250)
+				.setMinHeight(160).setHeight(405);
+
+		if (this.useFormPrint())
+			pageOption.setPrint("default.form");
+
+		// 只有可编辑表单才按权限配置，其它情况一律配置为只读状态
+		boolean readonly = this.isReadonly();
+		if (editable && !readonly) {
+			pageOption.put("readonly", readonly);
+			// 如果有录入权限且状态为草稿的可以进行修改
+		} else if (this.getE().getStatus() == BCConstants.STATUS_DRAFT
+				&& !this.isEntering()) {
+			pageOption.put("readonly", false);
+		} else {
+			pageOption.put("readonly", true);
+		}
+
+		// 添加按钮
+		buildFormPageButtons(pageOption, editable);
+
+		return pageOption;
 	}
 
 	@Override
 	protected void buildFormPageButtons(PageOption pageOption, boolean editable) {
+
 		// 特殊处理的部分
 		if (!this.isReadonly()) {// 有权限
-			if (editable) {// 编辑状态显示保存按钮
+			if (this.getE().getStatus() != BCConstants.STATUS_DRAFT) {// 编辑状态显示保存按钮
+				if (this.getE().getMain() == Contract.MAIN_NOW
+						&& this.getE().getStatus() != Contract.STATUS_LOGOUT) {
+					pageOption.addButton(new ButtonOption(
+							getText("contract4Labour.optype.maintenance"),
+							null, "bc.contract4ChargerForm.doMaintenance"));
+					pageOption.addButton(new ButtonOption(
+							getText("contract4Labour.optype.renew"), null,
+							"bc.contract4ChargerForm.doRenew"));
+					pageOption.addButton(new ButtonOption(
+							getText("contract4Charger.optype.changeCharger"),
+							null, "bc.contract4ChargerForm.doChangeCharger"));
+					pageOption.addButton(new ButtonOption(
+							getText("contract4Charger.optype.changeCharger2"),
+							null, "bc.contract4ChargerForm.doChangeCharger2"));
+					pageOption.addButton(new ButtonOption(
+							getText("contract4Charger.logout"), null,
+							"bc.contract4ChargerForm.doLogout"));
+				}
+			} else {
 				pageOption.addButton(new ButtonOption(getText("label.save"),
-						null, "bc.contract4ChargerFormOperate.save"));
+						null, "bc.contract4ChargerForm.save"));
 				pageOption.addButton(new ButtonOption(
-						getText("label.saveAndClose"), null,
-						"bc.contract4ChargerFormOperate.saveAndClose"));
+						getText("label.warehousing"), null,
+						"bc.contract4ChargerForm.warehousing"));
 
 			}
 		}
+		// 如果有录入权限的就有保存按钮
+		if (!this.isEntering()
+				&& this.getE().getStatus() == BCConstants.STATUS_DRAFT) {
+			pageOption.addButton(new ButtonOption(getText("label.save"), null,
+					"bc.contract4ChargerFormOperate.save"));
+
+		}
+
 	}
 
 	// 表单可选项的加载
@@ -435,20 +492,20 @@ public class Contract4ChargerOperate2Action extends
 		}
 	}
 
-	/**
-	 * 获取合同的状态列表
-	 * 
-	 * @return
-	 */
-	private Map<String, String> getContractStatuses() {
-		Map<String, String> types = new HashMap<String, String>();
-		types.put(String.valueOf(Contract.STATUS_NORMAL),
-				getText("contract.status.normal"));
-		types.put(String.valueOf(Contract.STATUS_LOGOUT),
-				getText("contract.status.logout"));
-		types.put(String.valueOf(Contract.STATUS_RESGIN),
-				getText("contract.status.resign"));
-		return types;
-	}
+	// /**
+	// * 获取合同的状态列表
+	// *
+	// * @return
+	// */
+	// private Map<String, String> getContractStatuses() {
+	// Map<String, String> types = new HashMap<String, String>();
+	// types.put(String.valueOf(Contract.STATUS_NORMAL),
+	// getText("contract.status.normal"));
+	// types.put(String.valueOf(Contract.STATUS_LOGOUT),
+	// getText("contract.status.logout"));
+	// types.put(String.valueOf(Contract.STATUS_RESGIN),
+	// getText("contract.status.resign"));
+	// return types;
+	// }
 
 }

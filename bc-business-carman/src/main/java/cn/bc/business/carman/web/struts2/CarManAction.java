@@ -70,12 +70,26 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 				getText("key.role.bc.admin"));
 	}
 
+	private boolean isEntering() {
+		// 司机录入管理员
+		SystemContext context = (SystemContext) this.getContext();
+		return !context.hasAnyRole(getText("key.role.bs.driver.entering"));
+	}
+
+	@Override
+	protected CarMan createEntity() {
+		CarMan carMan = super.createEntity();
+		// 新建时默认为草稿状态
+		carMan.setStatus(BCConstants.STATUS_DRAFT);
+		return carMan;
+	}
+
 	@Override
 	protected void afterCreate(CarMan entity) {
 		super.afterCreate(entity);
 
 		// 额外参数的设置
-		this.getE().setStatus(BCConstants.STATUS_ENABLED);
+		// this.getE().setStatus(BCConstants.STATUS_ENABLED);
 		this.getE().setType(CarMan.TYPE_DRIVER_AND_CHARGER);
 		this.getE().setUid(this.getIdGeneratorService().next(CarMan.KEY_UID));
 		this.getE().setOrderNo(
@@ -96,7 +110,7 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 		super.initForm(editable);
 
 		// 状态列表
-		statusesValue = this.getBSStatuses1();
+		statusesValue = this.getBSStatuses3();
 
 		// 批量加载可选项列表
 		Map<String, List<Map<String, String>>> optionItems = this.optionService
@@ -122,20 +136,58 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 
 	@Override
 	protected PageOption buildFormPageOption(boolean editable) {
-		return super.buildFormPageOption(editable).setWidth(760)
-				.setMinWidth(250).setMinHeight(200);
+		PageOption pageOption = new PageOption().setWidth(760).setMinWidth(250)
+				.setMinHeight(200);
+
+		if (this.useFormPrint())
+			pageOption.setPrint("default.form");
+
+		// 只有可编辑表单才按权限配置，其它情况一律配置为只读状态
+		boolean readonly = this.isReadonly();
+		if (editable && !readonly) {
+			pageOption.put("readonly", readonly);
+			// 如果有录入权限且状态为草稿的可以进行修改
+		} else if (this.getE().getStatus() == BCConstants.STATUS_DRAFT
+				&& !this.isEntering()) {
+			pageOption.put("readonly", false);
+		} else {
+			pageOption.put("readonly", true);
+		}
+
+		// 添加按钮
+		buildFormPageButtons(pageOption, editable);
+
+		return pageOption;
 	}
 
 	protected void buildFormPageButtons(PageOption pageOption, boolean editable) {
 		boolean readonly = this.isReadonly();
-		if (editable && !readonly) {
-			pageOption.addButton(new ButtonOption(getText("label.save"), null,
-					"bc.carManForm.save"));
-			pageOption.addButton(new ButtonOption(
-					getText("label.saveAndClose"), null,
-					"bc.carManForm.saveAndClose"));
+		if (!readonly) {
+			if (editable && this.getE().getStatus() != BCConstants.STATUS_DRAFT) {
+				pageOption.addButton(new ButtonOption(getText("label.save"),
+						null, "bc.carManForm.save"));
+				pageOption.addButton(new ButtonOption(
+						getText("label.saveAndClose"), null,
+						"bc.carManForm.saveAndClose"));
+
+			} else {
+				pageOption.addButton(new ButtonOption(getText("label.save"),
+						null, "bc.carManForm.save"));
+				pageOption.addButton(new ButtonOption(
+						getText("label.warehousing"), null,
+						"bc.carManForm.warehousing"));
+
+			}
 
 		}
+
+		// 如果有录入权限的就有保存按钮
+		if (!this.isEntering()
+				&& this.getE().getStatus() == BCConstants.STATUS_DRAFT) {
+			pageOption.addButton(new ButtonOption(getText("label.save"), null,
+					"bc.carManForm.save"));
+		}
+
 	}
 
 	// ========服务资格证唯一性检测代码开始========

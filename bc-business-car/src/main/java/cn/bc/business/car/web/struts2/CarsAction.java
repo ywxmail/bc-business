@@ -23,6 +23,8 @@ import cn.bc.business.web.struts2.ViewAction;
 import cn.bc.core.query.condition.Condition;
 import cn.bc.core.query.condition.ConditionUtils;
 import cn.bc.core.query.condition.Direction;
+import cn.bc.core.query.condition.impl.EqualsCondition;
+import cn.bc.core.query.condition.impl.InCondition;
 import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.core.util.StringUtils;
 import cn.bc.db.jdbc.RowMapper;
@@ -63,6 +65,12 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 		SystemContext context = (SystemContext) this.getContext();
 		return !context.hasAnyRole(getText("key.role.bs.car"),
 				getText("key.role.bc.admin"));
+	}
+
+	private boolean isEntering() {
+		// 车辆录入管理员
+		SystemContext context = (SystemContext) this.getContext();
+		return !context.hasAnyRole(getText("key.role.bs.car.entering"));
 	}
 
 	@Override
@@ -140,7 +148,7 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 		// 状态
 		columns.add(new TextColumn4MapKey("c.status_", "status_",
 				getText("car.status"), 40).setSortable(true).setValueFormater(
-				new EntityStatusFormater(getBSStatuses1())));
+				new EntityStatusFormater(getBSStatuses3())));
 		// 公司
 		columns.add(new TextColumn4MapKey("c.company", "company",
 				getText("label.carCompany"), 40).setSortable(true)
@@ -299,8 +307,21 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 	@Override
 	protected Condition getGridSpecalCondition() {
 		// 状态条件
-		return ConditionUtils.toConditionByComma4IntegerValue(this.status,
-				"c.status_");
+		Condition statusCondition = null;
+		if (status != null && status.length() > 0) {
+			String[] ss = status.split(",");
+			if (ss.length == 1) {
+				statusCondition = new EqualsCondition("c.status_", new Integer(
+						ss[0]));
+			} else {
+				statusCondition = new InCondition("c.status_",
+						StringUtils.stringArray2IntegerArray(ss));
+			}
+		} else {
+			return null;
+		}
+		// 合并条件
+		return ConditionUtils.mix2AndCondition(statusCondition);
 	}
 
 	@Override
@@ -316,10 +337,15 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 	@Override
 	protected Toolbar getHtmlPageToolbar() {
 		Toolbar tb = new Toolbar();
-
 		if (this.isReadonly()) {
 			// 查看按钮
 			tb.addButton(this.getDefaultOpenToolbarButton());
+			// 如果有录入权限的有新建按钮
+			if (!this.isEntering()) {
+				// 新建按钮
+				tb.addButton(this.getDefaultCreateToolbarButton());
+
+			}
 		} else {
 			// 新建按钮
 			tb.addButton(this.getDefaultCreateToolbarButton());
@@ -334,9 +360,17 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 		tb.addButton(this.getDefaultSearchToolbarButton());
 
 		// 状态单选按钮组
-		tb.addButton(Toolbar.getDefaultToolbarRadioGroup(this.getBSStatuses1(),
-				"status", 0, getText("title.click2changeSearchStatus")));
+		// 如果有权限的用户可以看到草稿状态的车
+		if (!isReadonly() || !this.isEntering()) {
+			tb.addButton(Toolbar.getDefaultToolbarRadioGroup(
+					this.getBSStatuses3(), "status", 0,
+					getText("title.click2changeSearchStatus")));
 
+		} else {
+			tb.addButton(Toolbar.getDefaultToolbarRadioGroup(
+					this.getBSStatuses1(), "status", 0,
+					getText("title.click2changeSearchStatus")));
+		}
 		// 辅助操作
 		tb.addButton(new ToolbarMenuButton("辅助操作")
 				.addMenuItem("金盾网交通违法查询：跳转", "jinDun-jiaoTongWeiFa")
