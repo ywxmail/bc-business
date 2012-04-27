@@ -183,7 +183,7 @@ public class CarServiceImpl extends DefaultCrudService<Car> implements
 				// 记录新建日志
 				this.operateLogService.saveWorkLog(Car.class.getSimpleName(),
 						entity.getId().toString(), "新建" + entity.getPlate()
-								+ "的车辆信息并录入", null, OperateLog.OPERATE_CREATE);
+								+ "的车辆信息并入库", null, OperateLog.OPERATE_CREATE);
 
 			}
 
