@@ -191,6 +191,7 @@ public class CarServiceImpl extends DefaultCrudService<Car> implements
 
 			if (oldCarId != null) {
 				Car c = this.carDao.load(oldCarId);
+				entity = this.carDao.save(entity);
 				if (c.getStatus() == BCConstants.STATUS_DRAFT
 						&& entity.getStatus() == BCConstants.STATUS_ENABLED) {
 					// 记录更新日志
