@@ -474,7 +474,7 @@ public class Contract4ChargerAction extends
 		if (!this.isEntering()
 				&& this.getE().getStatus() == BCConstants.STATUS_DRAFT) {
 			pageOption.addButton(new ButtonOption(getText("label.save"), null,
-					"bc.contract4ChargerFormOperate.save"));
+					"bc.contract4ChargerForm.save"));
 
 		}
 

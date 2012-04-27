@@ -150,14 +150,8 @@ public class LinkFormater4Move extends LinkFormater4Id {
 		} else if (map.get(unit) != null) {
 
 			if (label != null && label.length() > 0) {
-				// Object[] params = getParams(context, _value);
-				// String href = MessageFormat.format(this.urlPattern, params);
-				String t;
 				String tpl = (String) ((map.get(unit) != null && !("")
 						.equals(map.get(unit))) ? map.get(unit) : "");
-
-				// 任务栏显示的标题
-				t = this.getTaskbarTitle(context, value);
 
 				// 鼠标移到单元格时的提示内容
 				if (this.showTip) {
