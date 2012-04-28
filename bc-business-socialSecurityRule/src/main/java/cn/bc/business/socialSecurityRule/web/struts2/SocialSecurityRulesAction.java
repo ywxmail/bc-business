@@ -8,17 +8,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.json.JSONArray;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
 import cn.bc.BCConstants;
+import cn.bc.business.socialSecurityRule.service.SocialSecurityRuleService;
 import cn.bc.business.web.struts2.ViewAction;
 import cn.bc.core.query.condition.Direction;
 import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.db.jdbc.RowMapper;
 import cn.bc.db.jdbc.SqlObject;
 import cn.bc.identity.web.SystemContext;
+import cn.bc.option.domain.OptionItem;
 import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.ui.html.grid.Column;
 import cn.bc.web.ui.html.grid.IdColumn4MapKey;
@@ -59,7 +63,8 @@ public class SocialSecurityRulesAction extends ViewAction<Map<String, Object>> {
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer sql = new StringBuffer();
 		sql.append("select s.id,s.area_name,s.start_year,s.start_month,s.house_type");
-		sql.append("a.actor_name as aname,s.file_date,m.actor_name as mname,s.modified_date");
+		sql.append(",a.actor_name as aname,s.file_date,m.actor_name as mname,s.modified_date");
+		sql.append(",getsocialsecurityruledetail(s.id)");
 		sql.append(" from bs_socialsecurityrule s");
 		sql.append(" inner join bc_identity_actor_history a on a.id=s.author_id ");
 		sql.append(" left join bc_identity_actor_history m on m.id=s.modifier_id ");
@@ -83,6 +88,7 @@ public class SocialSecurityRulesAction extends ViewAction<Map<String, Object>> {
 				map.put("file_date", rs[i++]);
 				map.put("mname", rs[i++]);
 				map.put("modified_date", rs[i++]);
+				map.put("detail", rs[i++]);
 				return map;
 			}
 		});
@@ -91,7 +97,7 @@ public class SocialSecurityRulesAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected String getGridRowLabelExpression() {
-		return "['name']";
+		return "['area_name']+['start_year']+'年'+['start_month']+'月起'+['house_type']+'社保收费规则'";
 	}
 
 	@Override
@@ -105,14 +111,15 @@ public class SocialSecurityRulesAction extends ViewAction<Map<String, Object>> {
 		columns.add(new IdColumn4MapKey("s.id", "id"));
 		columns.add(new TextColumn4MapKey("s.area_name", "area_name",
 						getText("socialSecurityRule.areaName"), 90)
-						.setUseTitleFromLabel(true));
-		
+						.setUseTitleFromLabel(true));	
 		columns.add(new TextColumn4MapKey("s.start_year", "startDate",
 				getText("socialSecurityRule.starDate"), 90)
 				.setUseTitleFromLabel(true));
-		
 		columns.add(new TextColumn4MapKey("s.house_type", "house_type",
 				getText("socialSecurityRule.houseType"), 80)
+				.setUseTitleFromLabel(true));
+		columns.add(new TextColumn4MapKey("", "detail",
+				getText("socialSecurityRuleDetail.detail"))
 				.setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("a.actor_name", "aname",
 				getText("socialSecurityRule.aname"), 80));
@@ -122,11 +129,10 @@ public class SocialSecurityRulesAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("m.actor_name", "mname",
 				getText("socialSecurityRule.mname"), 80));
 		columns.add(new TextColumn4MapKey("m.modified_date", "modified_date",
-				getText("socialSecurityRule.modifierDate"), 130)
+				getText("socialSecurityRule.modifierDate"),130)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd HH:mm")));
 		return columns;
 	}
-	
 
 	@Override
 	protected String getFormActionName() {
@@ -135,8 +141,8 @@ public class SocialSecurityRulesAction extends ViewAction<Map<String, Object>> {
 	
 	@Override
 	protected PageOption getHtmlPageOption() {
-		return super.getHtmlPageOption().setWidth(600).setMinWidth(400)
-				.setHeight(400).setMinHeight(300);
+		return super.getHtmlPageOption().setWidth(700).setMinWidth(400)
+				.setHeight(300).setMinHeight(300);
 	}
 	
 	@Override
@@ -162,11 +168,32 @@ public class SocialSecurityRulesAction extends ViewAction<Map<String, Object>> {
 
 		return tb;
 	}
-
-
+	
 	//高级搜索
 	@Override
 	protected boolean useAdvanceSearch() {
 		return true;
 	}
+	
+	private SocialSecurityRuleService socialSecurityRuleService;
+
+	@Autowired
+	public void setSocialSecurityRuleService(
+			SocialSecurityRuleService socialSecurityRuleService) {
+		this.socialSecurityRuleService = socialSecurityRuleService;
+	}
+	
+	public JSONArray areas;// 使用区域下拉列表信息
+	public JSONArray houseTypes;// 可选户口类型信息
+	
+	@Override
+	protected void initConditionsFrom() throws Exception {
+		// 加载可选户口类型列表
+		this.houseTypes =OptionItem.toLabelValues(this.socialSecurityRuleService.findHouseTypeOption());
+		
+		this.areas=OptionItem.toLabelValues(this.socialSecurityRuleService.findAreaOption());
+	}
+	
+	
+	
 }

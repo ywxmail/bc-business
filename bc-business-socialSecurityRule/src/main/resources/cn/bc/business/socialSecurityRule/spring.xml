@@ -14,8 +14,8 @@
 
 	<!-- 需要在主配置文件配置entityManagerFactory和transactionManager的实现 -->
 
-	<bean id="socialSecurityRuleDao" class="cn.bc.business.socialSecurityRule.dao.hibernate.jpa.socialSecurityRuleDaoImpl"
+	<bean id="socialSecurityRuleDao" class="cn.bc.business.socialSecurityRule.dao.hibernate.jpa.SocialSecurityRuleDaoImpl"
 		p:entityManagerFactory-ref="entityManagerFactory" />
-	<bean id="socialSecurityRuleService" class="cn.bc.business.socialSecurityRule.service.socialSecurityRuleServiceImpl"
+	<bean id="socialSecurityRuleService" class="cn.bc.business.socialSecurityRule.service.SocialSecurityRuleServiceImpl"
 		p:socialSecurityRuleDao-ref="socialSecurityRuleDao" />	
 </beans>
