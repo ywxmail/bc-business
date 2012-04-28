@@ -26,8 +26,9 @@ public class Contract4Charger extends Contract {
 	private boolean takebackOrigin;// 已经收回原件:0-未1-已
 	private boolean includeCost;// 包含检审费用:0-不包含,1-包含
 	private String businessType;// 合同性质
-	private String contractVersionNo;//合同版本号
-	private String paymentDate;//缴费日
+	private String contractVersionNo;// 合同版本号
+	private String paymentDate;// 缴费日
+	private String scrapTo;// 残值归属
 
 	public Contract4Charger() {
 		this.setCode("[经济合同]");
@@ -68,7 +69,7 @@ public class Contract4Charger extends Contract {
 	public void setIncludeCost(boolean hiringProcedure) {
 		this.includeCost = hiringProcedure;
 	}
-	
+
 	@Column(name = "BS_TYPE")
 	public String getBusinessType() {
 		return businessType;
@@ -96,7 +97,12 @@ public class Contract4Charger extends Contract {
 		this.paymentDate = paymentDate;
 	}
 
-	
-	
+	public String getScrapTo() {
+		return scrapTo;
+	}
+
+	public void setScrapTo(String scrapTo) {
+		this.scrapTo = scrapTo;
+	}
 
 }

@@ -62,6 +62,8 @@ public class Contract4ChargerOperate2Action extends
 	public boolean isExistContract; // 是否存在合同
 	public Json json;
 
+	public List<Map<String, String>> scrapToList; // 残值归属
+
 	@Autowired
 	public void setContract4ChargerService(
 			Contract4ChargerService contract4ChargerService) {
@@ -390,7 +392,8 @@ public class Contract4ChargerOperate2Action extends
 						OptionConstants.CONTRACT_SIGNTYPE,
 						OptionConstants.CAR_BUSINESS_NATURE,
 						OptionConstants.CONTRACT_VERSION_NO,
-						OptionConstants.MOTORCADE_PAYMENT_DATE });
+						OptionConstants.MOTORCADE_PAYMENT_DATE,
+						OptionConstants.CONTRACT4CHARGER_SCRAPTO });
 
 		// 加载可选签约类型
 		this.signTypeList = optionItems.get(OptionConstants.CONTRACT_SIGNTYPE);
@@ -410,6 +413,10 @@ public class Contract4ChargerOperate2Action extends
 		// 加载缴费日列表
 		this.paymentDates = optionItems
 				.get(OptionConstants.MOTORCADE_PAYMENT_DATE);
+
+		// 经济合同残值归属列表
+		this.scrapToList = optionItems
+				.get(OptionConstants.CONTRACT4CHARGER_SCRAPTO);
 
 	}
 

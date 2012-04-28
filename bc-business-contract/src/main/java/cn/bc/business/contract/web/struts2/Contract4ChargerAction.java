@@ -63,6 +63,8 @@ public class Contract4ChargerAction extends
 	public boolean isExistContract; // 是否存在合同
 	public Json json;
 
+	public List<Map<String, String>> scrapToList; // 残值归属
+
 	// public Long driverId;
 	// public String certCode;
 	// public ContractService contractService;
@@ -167,8 +169,8 @@ public class Contract4ChargerAction extends
 		Contract4Charger e = this.getE();
 		Long excludeId = null;
 		// 保存之前检测自编号是否唯一:仅在新建时检测
-		excludeId = this.contract4ChargerService.checkCodeIsExist(
-				e.getId(), e.getCode());
+		excludeId = this.contract4ChargerService.checkCodeIsExist(e.getId(),
+				e.getCode());
 		if (excludeId != null) {
 			json.put("success", false);
 			json.put("msg", getText("contract4Labour.code.exist2"));
@@ -445,7 +447,8 @@ public class Contract4ChargerAction extends
 						OptionConstants.CONTRACT_SIGNTYPE,
 						OptionConstants.CAR_BUSINESS_NATURE,
 						OptionConstants.CONTRACT_VERSION_NO,
-						OptionConstants.MOTORCADE_PAYMENT_DATE });
+						OptionConstants.MOTORCADE_PAYMENT_DATE,
+						OptionConstants.CONTRACT4CHARGER_SCRAPTO });
 
 		// 加载可选签约类型
 		this.signTypeList = optionItems.get(OptionConstants.CONTRACT_SIGNTYPE);
@@ -465,6 +468,9 @@ public class Contract4ChargerAction extends
 		// 加载缴费日列表
 		this.paymentDates = optionItems
 				.get(OptionConstants.MOTORCADE_PAYMENT_DATE);
+		// 经济合同残值归属列表
+		this.scrapToList = optionItems
+				.get(OptionConstants.CONTRACT4CHARGER_SCRAPTO);
 
 	}
 
