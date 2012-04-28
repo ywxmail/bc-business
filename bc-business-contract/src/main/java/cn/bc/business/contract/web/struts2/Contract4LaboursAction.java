@@ -17,6 +17,7 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
+import cn.bc.BCConstants;
 import cn.bc.business.contract.domain.Contract;
 import cn.bc.business.motorcade.service.MotorcadeService;
 import cn.bc.business.web.struts2.ViewAction;
@@ -24,6 +25,7 @@ import cn.bc.core.query.condition.Condition;
 import cn.bc.core.query.condition.ConditionUtils;
 import cn.bc.core.query.condition.Direction;
 import cn.bc.core.query.condition.impl.EqualsCondition;
+import cn.bc.core.query.condition.impl.InCondition;
 import cn.bc.core.query.condition.impl.LikeCondition;
 import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.core.util.StringUtils;
@@ -65,7 +67,6 @@ public class Contract4LaboursAction extends ViewAction<Map<String, Object>> {
 	public Long carId;
 	public Long driverId;
 
-	
 	@Override
 	public boolean isReadonly() {
 		// 劳动合同管理员或系统管理员
@@ -73,7 +74,14 @@ public class Contract4LaboursAction extends ViewAction<Map<String, Object>> {
 		return !context.hasAnyRole(getText("key.role.bs.contract4labour"),
 				getText("key.role.bc.admin"));
 	}
-	
+
+	private boolean isEntering() {
+		// 劳动合同录入管理员
+		SystemContext context = (SystemContext) this.getContext();
+		return !context
+				.hasAnyRole(getText("key.role.bs.contract4labour.entering"));
+	}
+
 	@Override
 	protected String getHtmlPageJs() {
 		return this.getContextPath() + "/bc-business/contract4Labour/view.js";
@@ -91,6 +99,12 @@ public class Contract4LaboursAction extends ViewAction<Map<String, Object>> {
 		if (this.isReadonly()) {
 			// 查看按钮
 			tb.addButton(this.getDefaultOpenToolbarButton());
+			if (!this.isEntering()) {
+				// 新建按钮
+				tb.addButton(this.getDefaultCreateToolbarButton());
+
+			}
+
 		} else {
 
 			if (contractId == null) {
@@ -108,12 +122,24 @@ public class Contract4LaboursAction extends ViewAction<Map<String, Object>> {
 					// 删除按钮
 					tb.addButton(this.getDefaultDeleteToolbarButton());
 				}
-				
-				tb.addButton(new ToolbarButton().setIcon("ui-icon-document").setText("补录")
+				tb.addButton(new ToolbarButton().setIcon("ui-icon-document")
+						.setText("补录")
 						.setClick("bs.contract4LabourView.clickOk"));
+
 			}
 		}
+		// 状态单选按钮组
+		// 如果有权限的用户可以看到草稿状态的车
+		if (!isReadonly() || !this.isEntering()) {
+			tb.addButton(Toolbar.getDefaultToolbarRadioGroup(
+					this.getEntityStatuses2(), "status", 0,
+					getText("title.click2changeSearchStatus")));
 
+		} else {
+			tb.addButton(Toolbar.getDefaultToolbarRadioGroup(
+					this.getEntityStatuses(), "status", 0,
+					getText("title.click2changeSearchStatus")));
+		}
 		// 搜索按钮
 		tb.addButton(this.getDefaultSearchToolbarButton());
 		return tb;
@@ -223,7 +249,7 @@ public class Contract4LaboursAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("c.status_", "status_",
 				getText("contract.status"), 35)
 				.setSortable(true)
-				.setValueFormater(new EntityStatusFormater(getEntityStatuses())));
+				.setValueFormater(new EntityStatusFormater(getEntityStatuses2())));
 		columns.add(new TextColumn4MapKey("c.file_date", "fileDate",
 				getText("label.fileDate"), 90).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
@@ -342,14 +368,14 @@ public class Contract4LaboursAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("iah.name", "name",
 				getText("contract.author"), 55).setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("c.code", "code",
-				getText("contract.code"),130).setUseTitleFromLabel(true));
+				getText("contract.code"), 130).setUseTitleFromLabel(true));
 		return columns;
 	}
 
 	@Override
 	protected String getGridDblRowMethod() {
 		// 强制为只读表单
-		return "bc.page.open";
+		return "bs.contract4LabourView.dblclick";
 	}
 
 	@Override
@@ -392,6 +418,25 @@ public class Contract4LaboursAction extends ViewAction<Map<String, Object>> {
 	}
 
 	/**
+	 * 状态值转换列表：正常|注销|离职|草稿|全部
+	 * 
+	 * @return
+	 */
+	protected Map<String, String> getEntityStatuses2() {
+		Map<String, String> statuses = new LinkedHashMap<String, String>();
+		statuses.put(String.valueOf(Contract.STATUS_NORMAL),
+				getText("contract.status.normal"));
+		statuses.put(String.valueOf(Contract.STATUS_LOGOUT),
+				getText("contract.status.logout"));
+		statuses.put(String.valueOf(Contract.STATUS_RESGIN),
+				getText("contract.status.resign"));
+		statuses.put(String.valueOf(BCConstants.STATUS_DRAFT),
+				getText("bc.status.draft"));
+		statuses.put("", getText("bs.status.all"));
+		return statuses;
+	}
+
+	/**
 	 * 获取Contract的操作类型列表
 	 * 
 	 * @return
@@ -415,11 +460,22 @@ public class Contract4LaboursAction extends ViewAction<Map<String, Object>> {
 	protected Condition getGridSpecalCondition() {
 		// 状态条件
 		Condition statusCondition = null;
+		if (status != null && status.length() > 0) {
+			String[] ss = status.split(",");
+			if (ss.length == 1) {
+				statusCondition = new EqualsCondition("c.status_", new Integer(
+						ss[0]));
+			} else {
+				statusCondition = new InCondition("c.status_",
+						StringUtils.stringArray2IntegerArray(ss));
+			}
+		}
+
 		Condition mainsCondition = null;
 		Condition carCondition = null;
 		Condition driverCondition = null;
-//		Condition patchCondtion = null;
-//		Condition typeCondtion = new EqualsCondition("c.type_", type);
+		// Condition patchCondtion = null;
+		// Condition typeCondtion = new EqualsCondition("c.type_", type);
 
 		if (contractId == null) {
 			// 查看最新合同列表
@@ -429,26 +485,25 @@ public class Contract4LaboursAction extends ViewAction<Map<String, Object>> {
 			mainsCondition = ConditionUtils.toConditionByComma4IntegerValue(
 					this.mains, "c.main");
 			// }
-		} 
-//		else {
-//			// 查看历史版本
-//			patchCondtion = new EqualsCondition("c.patch_no", patchNo);
-//			mainsCondition = new EqualsCondition("c.main",
-//					Contract.MAIN_HISTORY);
-//		}
-//		
+		}
+		// else {
+		// // 查看历史版本
+		// patchCondtion = new EqualsCondition("c.patch_no", patchNo);
+		// mainsCondition = new EqualsCondition("c.main",
+		// Contract.MAIN_HISTORY);
+		// }
+		//
 		if (carId != null) {
-			carCondition = new EqualsCondition("carc.car_id",
-					carId);
+			carCondition = new EqualsCondition("carc.car_id", carId);
 		}
-		
+
 		if (driverId != null) {
-			driverCondition = new EqualsCondition("manc.man_id",
-					driverId);
+			driverCondition = new EqualsCondition("manc.man_id", driverId);
 		}
-//		return ConditionUtils.mix2AndCondition(typeCondtion, statusCondition,
-//				mainsCondition, patchCondtion,carCondition,driverCondition);
-		return ConditionUtils.mix2AndCondition(statusCondition,mainsCondition,driverCondition,carCondition);
+		// return ConditionUtils.mix2AndCondition(typeCondtion, statusCondition,
+		// mainsCondition, patchCondtion,carCondition,driverCondition);
+		return ConditionUtils.mix2AndCondition(statusCondition, mainsCondition,
+				driverCondition, carCondition);
 	}
 
 	@Override
@@ -467,7 +522,7 @@ public class Contract4LaboursAction extends ViewAction<Map<String, Object>> {
 		if (patchNo != null) {
 			json.put("patchNo", patchNo);
 		}
-		
+
 		if (carId != null) {
 			json.put("carId", carId);
 		}
@@ -479,17 +534,17 @@ public class Contract4LaboursAction extends ViewAction<Map<String, Object>> {
 		json.put("type", type);
 	}
 
-	@Override
-	protected Toolbar getHtmlPageToolbar() {
-		if (contractId == null) {
-			return super.getHtmlPageToolbar().addButton(
-					Toolbar.getDefaultToolbarRadioGroup(
-							this.getEntityStatuses(), "status", 0,
-							getText("title.click2changeSearchStatus")));
-		} else {
-			return super.getHtmlPageToolbar();
-		}
-	}
+	// @Override
+	// protected Toolbar getHtmlPageToolbar() {
+	// if (contractId == null) {
+	// return super.getHtmlPageToolbar().addButton(
+	// Toolbar.getDefaultToolbarRadioGroup(
+	// this.getEntityStatuses(), "status", 0,
+	// getText("title.click2changeSearchStatus")));
+	// } else {
+	// return super.getHtmlPageToolbar();
+	// }
+	// }
 
 	// ==高级搜索代码开始==
 
@@ -497,7 +552,7 @@ public class Contract4LaboursAction extends ViewAction<Map<String, Object>> {
 	protected boolean useAdvanceSearch() {
 		return true;
 	}
-	
+
 	private MotorcadeService motorcadeService;
 	private ActorService actorService;
 
@@ -526,7 +581,6 @@ public class Contract4LaboursAction extends ViewAction<Map<String, Object>> {
 		motorcades = OptionItem.toLabelValues(this.motorcadeService
 				.find4Option(null));
 	}
-
 
 	// ==高级搜索代码结束==
 }

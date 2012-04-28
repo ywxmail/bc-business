@@ -92,6 +92,9 @@ public class LinkFormater4Move extends LinkFormater4Id {
 					+ (!("0".toString()).equals(map.get(classes).toString()) ? "("
 							+ type.get(map.get(classes).toString()) + ")"
 							: "");
+		} else if (map.get(unit) != null) {
+			return (String) (map.get(unit) != null
+					&& !("").equals(map.get(unit)) ? map.get(unit) : "");
 		} else {
 			return "";
 		}
@@ -144,6 +147,21 @@ public class LinkFormater4Move extends LinkFormater4Id {
 					return tpl.toString();
 				}
 			}
+		} else if (map.get(unit) != null) {
+
+			if (label != null && label.length() > 0) {
+				String tpl = (String) ((map.get(unit) != null && !("")
+						.equals(map.get(unit))) ? map.get(unit) : "");
+
+				// 鼠标移到单元格时的提示内容
+				if (this.showTip) {
+					return "<div title=\"" + getLinkText(context, value)
+							+ "\">" + tpl.toString() + "</div>";
+				} else {
+					return tpl.toString();
+				}
+			}
+
 		}
 		return "";
 

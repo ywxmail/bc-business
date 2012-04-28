@@ -19,6 +19,7 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
+import cn.bc.BCConstants;
 import cn.bc.business.OptionConstants;
 import cn.bc.business.car.domain.Car;
 import cn.bc.business.car.service.CarService;
@@ -125,25 +126,71 @@ public class CarAction extends FileEntityAction<Long, Car> {
 				getText("key.role.bc.admin"));
 	}
 
+	private boolean isEntering() {
+		// 车辆录入管理员
+		SystemContext context = (SystemContext) this.getContext();
+		return !context.hasAnyRole(getText("key.role.bs.car.entering"));
+	}
+
 	@Override
 	protected void buildFormPageButtons(PageOption pageOption, boolean editable) {
 		// 特殊处理的部分
 		if (!this.isReadonly()) {// 有权限
-			if (editable) {// 编辑状态显示保存按钮
+			if (editable && this.getE().getStatus() != BCConstants.STATUS_DRAFT) {// 编辑状态显示保存按钮
 				pageOption.addButton(new ButtonOption(getText("label.save"),
 						null, "bc.carForm.save"));
 				pageOption.addButton(new ButtonOption(
 						getText("label.saveAndClose"), null,
 						"bc.carForm.saveAndClose"));
 
+			} else {
+				pageOption.addButton(new ButtonOption(getText("label.save"),
+						null, "bc.carForm.save"));
+				pageOption.addButton(new ButtonOption(
+						getText("label.warehousing"), null,
+						"bc.carForm.warehousing"));
+
 			}
+		}
+		// 如果有录入权限的就有保存按钮
+		if (!this.isEntering()
+				&& this.getE().getStatus() == BCConstants.STATUS_DRAFT) {
+			pageOption.addButton(new ButtonOption(getText("label.save"), null,
+					"bc.carForm.save"));
 		}
 	}
 
 	@Override
 	protected PageOption buildFormPageOption(boolean editable) {
-		return super.buildFormPageOption(editable).setWidth(765)
-				.setMinWidth(250).setMinHeight(200);
+		PageOption pageOption = new PageOption().setWidth(765).setMinWidth(250)
+				.setMinHeight(200);
+
+		if (this.useFormPrint())
+			pageOption.setPrint("default.form");
+
+		// 只有可编辑表单才按权限配置，其它情况一律配置为只读状态
+		boolean readonly = this.isReadonly();
+		if (editable && !readonly) {
+			pageOption.put("readonly", readonly);
+			// 如果有录入权限且状态为草稿的可以进行修改
+		} else if (this.getE().getStatus() == BCConstants.STATUS_DRAFT
+				&& !this.isEntering()) {
+			pageOption.put("readonly", false);
+		} else {
+			pageOption.put("readonly", true);
+		}
+
+		// 添加按钮
+		buildFormPageButtons(pageOption, editable);
+
+		return pageOption;
+	}
+
+	@Override
+	protected Car createEntity() {
+		Car car = super.createEntity();
+		car.setStatus(BCConstants.STATUS_DRAFT);
+		return car;
 	}
 
 	@Override
@@ -152,8 +199,9 @@ public class CarAction extends FileEntityAction<Long, Car> {
 		// 自动生成uid
 		this.getE().setUid(this.getIdGeneratorService().next(Car.KEY_UID));
 
-		// 初始化车辆的状态
-		this.getE().setStatus(Car.CAR_STAUTS_NORMAL);
+		// 初始化车辆的状态:草稿
+		this.getE().setStatus(BCConstants.STATUS_DRAFT);
+		// this.getE().setStatus(Car.CAR_STAUTS_NORMAL);
 		// 车辆表单初始化信息
 		this.getE().setLevel("一级");// 车辆定级
 		this.getE().setColor("绿灰");// 车辆颜色
@@ -170,7 +218,7 @@ public class CarAction extends FileEntityAction<Long, Car> {
 
 	@Override
 	protected void afterOpen(Car entity) {
-		if (isReadonly()) {
+		if (isReadonly() && this.getE().getStatus() != BCConstants.STATUS_DRAFT) {
 			this.getE().setCertNo2("******");
 		}
 	}
@@ -188,9 +236,10 @@ public class CarAction extends FileEntityAction<Long, Car> {
 				DateFormat df = new SimpleDateFormat("yyyyMMdd");
 				entity.setCode(entity.getCode() + "_" + df.format(date));
 			}
-		} else {
-			entity.setStatus(Car.CAR_STAUTS_NORMAL);
 		}
+		// else {
+		// entity.setStatus(Car.CAR_STAUTS_NORMAL);
+		// }
 	}
 
 	@Override
@@ -324,7 +373,7 @@ public class CarAction extends FileEntityAction<Long, Car> {
 	}
 
 	/**
-	 * 状态值转换列表：在案|注销|全部
+	 * 状态值转换列表：在案|注销|草稿|全部
 	 * 
 	 * @return
 	 */
@@ -334,6 +383,8 @@ public class CarAction extends FileEntityAction<Long, Car> {
 				getText("bs.status.active"));
 		statuses.put(String.valueOf(Car.CAR_STAUTS_LOGOUT),
 				getText("bs.status.logout"));
+		statuses.put(String.valueOf(BCConstants.STATUS_DRAFT),
+				getText("bc.status.draft"));
 		statuses.put(" ", getText("bs.status.all"));
 		return statuses;
 	}
@@ -408,7 +459,6 @@ public class CarAction extends FileEntityAction<Long, Car> {
 	private String ownershipNo;
 	private String code;
 	private Calendar fileDate;
-	
 
 	public Calendar getFileDate() {
 		return fileDate;
@@ -439,7 +489,8 @@ public class CarAction extends FileEntityAction<Long, Car> {
 	 */
 	public String autoSetOriginNo() {
 		json = new Json();
-		Car obj = this.carService.findcarOriginNoByOwnership(ownershipNo,fileDate);
+		Car obj = this.carService.findcarOriginNoByOwnership(ownershipNo,
+				fileDate);
 		if (obj != null && obj.getPlateNo() != null) {
 			json.put("plateNo", obj.getPlateNo());
 		}
