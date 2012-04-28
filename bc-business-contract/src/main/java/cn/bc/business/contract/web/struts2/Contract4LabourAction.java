@@ -17,6 +17,8 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
+import com.sun.tools.javac.comp.Todo;
+
 import cn.bc.BCConstants;
 import cn.bc.business.OptionConstants;
 import cn.bc.business.contract.domain.Contract;
@@ -75,6 +77,7 @@ public class Contract4LabourAction extends
 	public boolean isDoMaintenance = false;// 是否进行维护操作
 	public Json json;
 
+	public boolean isDoChangeCar=false;//是否执行转车操作
 	// public CertService certService;
 
 	@Autowired
@@ -190,6 +193,26 @@ public class Contract4LabourAction extends
 		this.certIdentity = certIdentity;
 	}
 
+	// 新建表单
+	public String create() throws Exception {
+		
+		//如果是转车操作就复制上一份合同
+		if(isDoChangeCar){
+			
+		}
+		// 初始化E
+		this.setE(createEntity());
+
+		// 初始化表单的配置信息
+		this.formPageOption = buildFormPageOption(true);
+
+		// 初始化表单的其他配置
+		this.initForm(true);
+
+		this.afterCreate(this.getE());
+
+		return "form";
+	}
 	@Override
 	protected void afterCreate(Contract4Labour entity) {
 
