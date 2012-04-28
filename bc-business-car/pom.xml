@@ -3,9 +3,10 @@
 	<parent>
 		<groupId>cn.bc.business</groupId>
 		<artifactId>bc-business-parent</artifactId>
-		<version>1.2.3.1</version>
+		<version>1.2.3</version>
 		<relativePath>../bc-business-parent/pom.xml</relativePath>
 	</parent>
+	<version>1.2.3.1</version>
 	<artifactId>bc-business-car</artifactId>
 	<description>车辆管理</description>
 	
