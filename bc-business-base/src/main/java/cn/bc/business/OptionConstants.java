@@ -110,4 +110,7 @@ public class OptionConstants extends cn.bc.option.OptionConstants {
 	public final static String OWNERSHIP_OWNER = "ownership.owner";
 	/** 收费月份 */
 	public final static String FEE_MONTH = "fee.month";
+	
+	/** 社保收费规则明细险种名称 */
+	public final static String SOCIALSECURTYRULEDETAIL_NAME = "socialSecurtyRuleDetail.name";
 }
