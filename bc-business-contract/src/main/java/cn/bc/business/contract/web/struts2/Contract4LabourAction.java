@@ -448,6 +448,8 @@ public class Contract4LabourAction extends
 				.getInsuranceType(), null);
 		// 加载可选户口类型列表
 		this.houseTypeList = optionItems.get(OptionConstants.CARMAN_HOUSETYPE);
+		OptionItem.insertIfNotExist(this.houseTypeList, null, this.getE().getHouseType());
+		
 		// 加载可选购买单位列表
 		this.buyUnitList = optionItems.get(OptionConstants.LB_BUYUNIT);
 		OptionItem.insertIfNotExist(this.buyUnitList, this.getE().getBuyUnit(),
