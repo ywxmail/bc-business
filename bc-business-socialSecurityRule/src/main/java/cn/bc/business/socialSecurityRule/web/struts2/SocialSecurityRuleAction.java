@@ -78,7 +78,7 @@ public class SocialSecurityRuleAction extends FileEntityAction<Long, SocialSecur
 	@Override
 	protected PageOption buildFormPageOption(boolean editable) {
 		return super.buildFormPageOption(editable).setWidth(560)
-				.setMinWidth(250).setMinHeight(200);
+				.setMinWidth(380).setMinHeight(250);
 	}
 
 	@Override
@@ -144,6 +144,7 @@ public class SocialSecurityRuleAction extends FileEntityAction<Long, SocialSecur
 		// 加载可选户口类型列表
 		this.houseTypeList =optionItems.get(OptionConstants.CARMAN_HOUSETYPE);
 		this.names=OptionItem.toLabelValues(optionItems.get(OptionConstants.SOCIALSECURTYRULEDETAIL_NAME));
-
+		
 	}
+
 }

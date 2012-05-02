@@ -102,7 +102,7 @@ public class SocialSecurityRulesAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected String[] getGridSearchFields() {
-		return new String[]{"s.area_name","s.house_type","s.a.actor_name"};
+		return new String[]{"s.area_name","s.house_type","a.actor_name"};
 	}
 
 	@Override
