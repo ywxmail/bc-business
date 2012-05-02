@@ -21,4 +21,14 @@ public interface SocialSecurityRuleDao extends CrudDao<SocialSecurityRule> {
 	 * @return
 	 */
 	public List<Map<String,String>> findHouseTypeOption();
+	
+	/**
+	 * 根据使用区域、户口类型、年份、月份查找社保信息
+	 * 
+	 * @param areaName 使用区域
+	 * @param houseType 户口类型
+	 * @param year 年份
+	 * @return 根据startYear降序的集合
+	 */
+	public List<SocialSecurityRule> findSocialSecurityRules(String areaName,String houseType,int year);
 }

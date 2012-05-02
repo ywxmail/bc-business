@@ -29,4 +29,25 @@ public interface SocialSecurityRuleService extends CrudService<SocialSecurityRul
 	 * @return
 	 */
 	public List<Map<String,String>> findHouseTypeOption();
+	
+	/**
+	 * 计算个人社保费用接口
+	 * @param areaName 使用区域
+	 * @param houseType 户口类型
+	 * @param year 年
+	 * @param month 月
+	 * @return 返回根据年月计算个人需要缴纳的社保费用
+	 */
+	public String countPersonal(String areaName,String houseType,int year,int month);
+	
+	/**
+	 * 计算单位社保费用接口
+	 * @param areaName 使用区域
+	 * @param houseType 户口类型
+	 * @param year 年
+	 * @param month 月
+	 * @return 返回根据年月计算单位每月需要为个人缴纳的社保费用
+	 */
+	public String countUnit(String areaName,String houseType,int year,int month);
+
 }

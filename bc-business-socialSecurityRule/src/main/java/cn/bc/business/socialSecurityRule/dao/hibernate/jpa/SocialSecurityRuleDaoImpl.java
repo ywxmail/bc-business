@@ -42,6 +42,16 @@ public class SocialSecurityRuleDaoImpl extends HibernateCrudJpaDao<SocialSecurit
 				}
 		});
 	}
+	
+	@SuppressWarnings("unchecked")
+	public List<SocialSecurityRule> findSocialSecurityRules(String areaName,String houseType,int year){
+		String hql="from SocialSecurityRule s";
+		hql+=" where s.areaName=? and s.houseType=? and s.startYear <= ?";
+		hql+=" order by s.startYear desc,s.startMonth desc";
+		return this.getJpaTemplate().find(hql,areaName,houseType,year);
+	}
+	
+	
 
 	
 }
