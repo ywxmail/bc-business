@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import cn.bc.business.socialSecurityRule.dao.SocialSecurityRuleDao;
@@ -22,6 +24,8 @@ import cn.bc.core.service.DefaultCrudService;
  */
 public class SocialSecurityRuleServiceImpl extends DefaultCrudService<SocialSecurityRule> implements
 		SocialSecurityRuleService {
+	private static Log logger = LogFactory.getLog(SocialSecurityRuleServiceImpl.class);
+	
 	private SocialSecurityRuleDao socialSecurityRuleDao;
 
 	@Autowired
@@ -47,12 +51,19 @@ public class SocialSecurityRuleServiceImpl extends DefaultCrudService<SocialSecu
 	}
 	
 	private String count(String areaName, String houseType,int year,int month,String countType){
-		if(month<1||month>12)return null;
+		if(month<1||month>12){
+			logger.warn(month + "月,无此月份！");
+			return null;
+		}
 		
 		List<SocialSecurityRule> list=this.socialSecurityRuleDao
 				.findSocialSecurityRules(areaName, houseType, year);
 		
-		if(list==null)return null;
+		if(list==null){
+			logger.warn("找不到区域为"+areaName+",户口类型为"+houseType+",年份小于或等于"+year+"年的社保规则！");
+			return null;
+		}
+		
 		//声明社保规则
 		SocialSecurityRule ssr=null;
 		
@@ -69,13 +80,22 @@ public class SocialSecurityRuleServiceImpl extends DefaultCrudService<SocialSecu
 				break;
 			}
 		}
-		if(index==null)return null;
+		
+		if(index==null){
+			logger.warn("根据使用区域"+areaName+"、户口类型"+houseType+"、年份"
+						+year+"、月份"+month+",找不到相应社保规则！");
+			return null;
+		}
 		ssr=list.get(index);
 		
 		Set<SocialSecurityRuleDetail> ssrdSet=ssr.getSocialSecurityRuleDetail();
 		
-		if(ssrdSet==null)return null;
-		
+		if(ssrdSet==null){
+			logger.warn(ssr.getAreaName()+ssr.getHouseType()
+					+ssr.getStartYear()+"年"+ssr.getStartMonth()+"社保收费规则没明细！");
+			return null;
+		}
+			
 		//声明保存社保费用的值。
 		Float fee=new Float(0);
 		
@@ -86,6 +106,7 @@ public class SocialSecurityRuleServiceImpl extends DefaultCrudService<SocialSecu
 				float f=ssrd.getPersonalRate()*ssrd.getBaseNumber();
 				if(f!=0){
 					BigDecimal b=new BigDecimal(f/100);
+					//四舍五入，去小点后两位
 					fee+=b.setScale(2,BigDecimal.ROUND_HALF_UP).floatValue();
 				}
 			}else if(countType.equals("unit")){
