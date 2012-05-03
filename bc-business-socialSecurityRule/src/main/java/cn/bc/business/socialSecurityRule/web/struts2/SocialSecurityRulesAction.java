@@ -142,8 +142,8 @@ public class SocialSecurityRulesAction extends ViewAction<Map<String, Object>> {
 	
 	@Override
 	protected PageOption getHtmlPageOption() {
-		return super.getHtmlPageOption().setWidth(700).setMinWidth(400)
-				.setHeight(300).setMinHeight(300);
+		return super.getHtmlPageOption().setWidth(800).setMinWidth(400)
+				.setHeight(400).setMinHeight(300);
 	}
 	
 	@Override
