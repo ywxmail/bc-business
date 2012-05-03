@@ -227,7 +227,7 @@ public class Contract4ChargerOperate2Action extends
 		// 设置责任人姓名
 		e.setExt_str2(setChargerName(assignChargerIds, assignChargerNames));
 
-		if (isSaved) {// 普通保存
+		if (isSaved || e.getId() != null) {// 普通保存
 			// 执行基类的保存
 			this.beforeSave(e);
 
