@@ -4,6 +4,7 @@
 package cn.bc.business.socialSecurityRule.web.struts2;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -185,6 +186,8 @@ public class SocialSecurityRulesAction extends ViewAction<Map<String, Object>> {
 	
 	public JSONArray areas;// 使用区域下拉列表信息
 	public JSONArray houseTypes;// 可选户口类型信息
+	public JSONArray months;// 可选月份
+	public JSONArray years;// 可选年份
 	
 	@Override
 	protected void initConditionsFrom() throws Exception {
@@ -192,8 +195,36 @@ public class SocialSecurityRulesAction extends ViewAction<Map<String, Object>> {
 		this.houseTypes =OptionItem.toLabelValues(this.socialSecurityRuleService.findHouseTypeOption());
 		
 		this.areas=OptionItem.toLabelValues(this.socialSecurityRuleService.findAreaOption());
+		this.months=OptionItem.toLabelValues(this.getMonthList());
+		this.years=OptionItem.toLabelValues(this.getYearList());
 	}
 	
+	private List<Map<String,String>> getMonthList(){
+		List<Map<String,String>> list=new ArrayList<Map<String,String>>();
+		Map<String,String> map=null;
+		for(int i=1;i<13;i++){
+			map=new HashMap<String,String>();
+			map.put("key", i+"");
+			map.put("value", i+"");
+			list.add(map);
+		}
+		return list;
+	}
+	
+	private List<Map<String,String>> getYearList(){
+		int year=Calendar.getInstance().get(Calendar.YEAR);
+		year=year-5;
+		List<Map<String,String>> list=new ArrayList<Map<String,String>>();
+		Map<String,String> map=null;
+		for(int i=0;i<10;i++){
+			map=new HashMap<String,String>();
+			int y=year+i;
+			map.put("key", y+"");
+			map.put("value", y+"");
+			list.add(map);
+		}
+		return list;
+	}
 	
 	
 }
