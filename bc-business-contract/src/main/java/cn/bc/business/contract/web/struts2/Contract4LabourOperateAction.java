@@ -163,7 +163,7 @@ public class Contract4LabourOperateAction extends
 	 * 劳动合同转车
 	 */
 	public String doChangeCar() throws Exception {
-		Long fromContractId = this.getId();
+		// Long fromContractId = this.getId();
 		// Contract newContract =
 		// this.contract4LabourService.doChangeCar(fromContractId, newCarId ,
 		// newCarPlate);

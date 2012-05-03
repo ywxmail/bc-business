@@ -17,8 +17,6 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
-import com.sun.tools.javac.comp.Todo;
-
 import cn.bc.BCConstants;
 import cn.bc.business.OptionConstants;
 import cn.bc.business.contract.domain.Contract;
@@ -77,7 +75,8 @@ public class Contract4LabourAction extends
 	public boolean isDoMaintenance = false;// 是否进行维护操作
 	public Json json;
 
-	public boolean isDoChangeCar=false;//是否执行转车操作
+	public boolean isDoChangeCar = false;// 是否执行转车操作
+
 	// public CertService certService;
 
 	@Autowired
@@ -193,15 +192,27 @@ public class Contract4LabourAction extends
 		this.certIdentity = certIdentity;
 	}
 
+	// 执行转车，续约，操作时需要的参数
+	public Long contractId;
+	public int opType;
+	public String stopDate;// 合同实际结束日期
+
 	// 新建表单
 	public String create() throws Exception {
-		
-		//如果是转车操作就复制上一份合同
-		if(isDoChangeCar){
-			
+
+		// 如果是转车操作就复制上一份合同
+		if (opType == Contract.OPTYPE_CHANGECAR
+				|| opType == Contract.OPTYPE_RENEW) {
+			Contract4Labour newContract = this.contract4LabourService
+					.doCopyContract(contractId, this.opType);
+			// 初始化E
+			this.setE(newContract);
+
+		} else {
+			// 初始化E
+			this.setE(createEntity());
+
 		}
-		// 初始化E
-		this.setE(createEntity());
 
 		// 初始化表单的配置信息
 		this.formPageOption = buildFormPageOption(true);
@@ -213,6 +224,7 @@ public class Contract4LabourAction extends
 
 		return "form";
 	}
+
 	@Override
 	protected void afterCreate(Contract4Labour entity) {
 
@@ -275,8 +287,8 @@ public class Contract4LabourAction extends
 		}
 
 		if (driverId != null && carId == null) {// 司机页签中的新建
-
-			if (isSupply == false) { // 新建
+			if (isSupply == false
+					&& (opType != Contract.OPTYPE_RENEW && opType != Contract.OPTYPE_CHANGECAR)) { // 新建
 				// 查找此司机是否存在劳动合同,若存在前台提示
 				isExistContract = this.contract4LabourService
 						.isExistContractByDriverId(driverId);
@@ -341,17 +353,20 @@ public class Contract4LabourAction extends
 				// }
 			}
 		}
-
-		if (this.isSupply == false) { // 新建
-			entity.setMain(Contract.MAIN_NOW);
-			entity.setVerMajor(Contract.MAJOR_DEFALUT);
-			entity.setVerMinor(Contract.MINOR_DEFALUT);
-			//entity.setStatus(Contract.STATUS_NORMAL);
-		} else { // 补录
-			entity.setMain(Contract.MAIN_HISTORY);
-			entity.setVerMajor(Contract.SUPPLY_MAJOR_DEFALUT);
-			entity.setVerMinor(Contract.SUPPLY_MINOR_DEFALUT);
-			entity.setStatus(Contract.STATUS_LOGOUT);
+		// 非转车，续约的情况下
+		if (opType != Contract.OPTYPE_RENEW
+				&& opType != Contract.OPTYPE_CHANGECAR) {
+			if (this.isSupply == false) { // 新建
+				entity.setMain(Contract.MAIN_NOW);
+				entity.setVerMajor(Contract.MAJOR_DEFALUT);
+				entity.setVerMinor(Contract.MINOR_DEFALUT);
+				// entity.setStatus(Contract.STATUS_NORMAL);
+			} else { // 补录
+				entity.setMain(Contract.MAIN_HISTORY);
+				entity.setVerMajor(Contract.SUPPLY_MAJOR_DEFALUT);
+				entity.setVerMinor(Contract.SUPPLY_MINOR_DEFALUT);
+				entity.setStatus(Contract.STATUS_LOGOUT);
+			}
 		}
 		// 自动生成合同编号
 		entity.setCode(this.getIdGeneratorService().nextSN4Month(
@@ -618,6 +633,7 @@ public class Contract4LabourAction extends
 		}
 
 	}
+
 	@Override
 	protected Contract4Labour createEntity() {
 		Contract4Labour c = super.createEntity();
