@@ -36,7 +36,9 @@
 		<!-- 续签 -->
 		<action name="doRenew" class="contract4LabourOperateAction" method="doRenew"/>
 		<!-- 转车 -->
-		<action name="doChangeCar" class="contract4LabourOperateAction" method="doChangeCar"/>
+		<action name="doChangeCar" class="contract4LabourOperateAction" method="doChangeCar">
+			<result name="form">/bc-business/contract4Labour/form.jsp</result>
+		</action>
 		<!-- 离职 -->
 		<action name="doResign" class="contract4LabourOperateAction" method="doResign"/>
 	</package>

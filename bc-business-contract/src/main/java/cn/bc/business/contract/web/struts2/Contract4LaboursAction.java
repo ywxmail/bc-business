@@ -182,7 +182,7 @@ public class Contract4LaboursAction extends ViewAction<Map<String, Object>> {
 		sql.append(",car.company company");
 		sql.append(",bia.id batch_company_id,bia.name batch_company");
 		sql.append(",m.id motorcade_id,m.name motorcade_name");
-		sql.append(",car.code car_code");
+		sql.append(",car.code car_code,c.stop_date");
 		sql.append(" from BS_CONTRACT_LABOUR cl");
 		sql.append(" inner join BS_CONTRACT c on cl.id = c.id");
 		sql.append(" left join BS_CAR_CONTRACT carc on c.id = carc.contract_id");
@@ -236,6 +236,7 @@ public class Contract4LaboursAction extends ViewAction<Map<String, Object>> {
 				map.put("motorcade_id", rs[i++]);
 				map.put("motorcade_name", rs[i++]);
 				map.put("car_code", rs[i++]);
+				map.put("stop_date", rs[i++]);
 				return map;
 			}
 		});
@@ -247,9 +248,9 @@ public class Contract4LaboursAction extends ViewAction<Map<String, Object>> {
 		List<Column> columns = new ArrayList<Column>();
 		columns.add(new IdColumn4MapKey("cl.id", "id"));
 		columns.add(new TextColumn4MapKey("c.status_", "status_",
-				getText("contract.status"), 35)
-				.setSortable(true)
-				.setValueFormater(new EntityStatusFormater(getEntityStatuses2())));
+				getText("contract.status"), 35).setSortable(true)
+				.setValueFormater(
+						new EntityStatusFormater(getEntityStatuses2())));
 		columns.add(new TextColumn4MapKey("c.file_date", "fileDate",
 				getText("label.fileDate"), 90).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
@@ -362,6 +363,9 @@ public class Contract4LaboursAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("cl.leaveDate", "leaveDate",
 				getText("contract4Labour.leaveDate"), 90)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+		columns.add(new TextColumn4MapKey("c.stop_date", "stop_date",
+				getText("contract.stopDate"), 120).setSortable(true)
+				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
 		columns.add(new TextColumn4MapKey("c.op_type", "op_type",
 				getText("contract4Labour.op"), 40).setSortable(true)
 				.setValueFormater(new EntityStatusFormater(getEntityOpTypes())));
@@ -448,7 +452,7 @@ public class Contract4LaboursAction extends ViewAction<Map<String, Object>> {
 		types.put(String.valueOf(Contract.OPTYPE_MAINTENANCE),
 				getText("contract4Labour.optype.maintenance"));
 		types.put(String.valueOf(Contract.OPTYPE_CHANGECAR),
-				getText("contract4Labour.optype.transfer"));
+				getText("contract4Labour.optype.changeCar"));
 		types.put(String.valueOf(Contract.OPTYPE_RENEW),
 				getText("contract4Labour.optype.renew"));
 		types.put(String.valueOf(Contract.OPTYPE_RESIGN),

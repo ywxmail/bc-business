@@ -22,12 +22,16 @@ public interface Contract4LabourService extends CrudService<Contract4Labour> {
 	/**
 	 * 保存劳动合同并处理车辆和司机的关联关系
 	 * 
-	 * @param contract4Labour 要保存的合同信息
-	 * @param carId 要关联的车辆id
-	 * @param driverId 要关联的司机id
-	 * @return 
+	 * @param contract4Labour
+	 *            要保存的合同信息
+	 * @param carId
+	 *            要关联的车辆id
+	 * @param driverId
+	 *            要关联的司机id
+	 * @return
 	 */
-	Contract4Labour save(Contract4Labour contract4Labour, Long carId, Long driverId);
+	Contract4Labour save(Contract4Labour contract4Labour, Long carId,
+			Long driverId);
 
 	/**
 	 * 续签处理：新纪录、主版本号加1
@@ -63,7 +67,8 @@ public interface Contract4LabourService extends CrudService<Contract4Labour> {
 	 *            指定新车的车牌
 	 * @return 转车后的合同信息
 	 */
-	Contract4Labour doChangeCar(Long contractId, Long newCarId, String newCarPlate);
+	Contract4Labour doChangeCar(Long contractId, Long newCarId,
+			String newCarPlate);
 
 	/**
 	 * 查找劳动合同列表
@@ -164,5 +169,30 @@ public interface Contract4LabourService extends CrudService<Contract4Labour> {
 	 * @return
 	 */
 	Long checkInsurCodeIsExist(Long excludeId, String insurCode);
+
+	/**
+	 * 根据旧合同id复制出新合同
+	 * 
+	 * @param id
+	 * @param opType
+	 * @return
+	 */
+	Contract4Labour doCopyContract(Long id, int opType);
+
+	/**
+	 * 劳动合同操处理
+	 * 
+	 * @param carId
+	 *            -- 车辆id
+	 * @param e
+	 *            -- 新的经济合同
+	 * @param fromContractId
+	 *            -- 旧经济合同id
+	 * @param stopDate
+	 *            合同实际结束日期
+	 * @return
+	 */
+	Contract4Labour doOperate(Long carId, Contract4Labour e,
+			Long fromContractId, Calendar stopDate);
 
 }
