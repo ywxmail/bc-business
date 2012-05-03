@@ -7,11 +7,9 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.tools.ant.util.DateUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
@@ -503,16 +501,71 @@ public class Contract4LabourServiceImpl extends
 
 		// 设置操作的信息
 		newContract.setId(null);
-		newContract.setCode("CLHT" + DateUtils.format(new Date(), "yyyyMM")); // 自动生成经济合同编号的前缀
 		newContract.setOpType(opType);
 		newContract.setSignDate(null);
-		// newContract.setStartDate(null);
+		newContract.setStartDate(null);
 		newContract.setVerMajor(oldContract.getVerMajor() + 1);// 版本号+1
 		newContract.setVerMinor(0);
 		// 记录旧的保存合同id
 		newContract.setPid(id);
 
 		return newContract;
+	}
+
+	/**
+	 * 操作
+	 */
+	public Contract4Labour doOperate(Long carId, Contract4Labour e,
+			Long contractId, Calendar stopDate) {
+
+		// 获取原来的合同信息
+		Contract4Labour oldContract = this.contract4LabourDao.load(contractId);
+		if (oldContract == null)
+			throw new CoreException("要处理的合同已不存在！contractId=" + contractId);
+
+		// 保存旧合同信息
+		// 更新旧合同的相关信息
+		SystemContext context = SystemContextHolder.get();
+		oldContract.setStatus(Contract.STATUS_LOGOUT);// 失效
+		oldContract.setMain(Contract.MAIN_HISTORY);// 历史
+		oldContract.setLogoutId(context.getUserHistory());// 注销人
+		oldContract.setLogoutDate(Calendar.getInstance());// 注销时间
+		oldContract.setStopDate(stopDate);// 合同实际结束日期
+		this.contract4LabourDao.save(oldContract);
+
+		// 保存新合同信息
+		Contract4Labour newContract = e;
+		newContract = this.contract4LabourDao.save(newContract);
+		Long newId = newContract.getId();
+
+		// 复制合同与车辆的关系
+		List<ContractCarRelation> oldCCRelations = this.contractDao
+				.findContractCarRelation(contractId);
+		if (!oldCCRelations.isEmpty()) {
+			List<ContractCarRelation> copyCCRelations = new ArrayList<ContractCarRelation>();
+			for (ContractCarRelation old : oldCCRelations) {
+				copyCCRelations.add(new ContractCarRelation(newId, old
+						.getCarId()));
+			}
+			this.contractDao.saveContractCarRelation(copyCCRelations);
+		}
+
+		// 复制合同与司机的关系：劳动合同
+		// 复制合同与责任人的关系：经济合同
+		List<ContractCarManRelation> oldCMRelations = this.contractDao
+				.findContractCarManRelation(contractId);
+		if (!oldCMRelations.isEmpty()) {
+			List<ContractCarManRelation> copyCMRelations = new ArrayList<ContractCarManRelation>();
+			for (ContractCarManRelation old : oldCMRelations) {
+				copyCMRelations.add(new ContractCarManRelation(newId, old
+						.getCarManId()));
+			}
+			this.contractDao.saveContractCarManRelation(copyCMRelations);
+		}
+
+		// 返回续签的合同
+		return newContract;
+
 	}
 
 }

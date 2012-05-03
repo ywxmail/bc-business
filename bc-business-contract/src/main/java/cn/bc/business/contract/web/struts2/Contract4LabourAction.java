@@ -23,6 +23,7 @@ import cn.bc.business.contract.domain.Contract;
 import cn.bc.business.contract.domain.Contract4Labour;
 import cn.bc.business.contract.service.Contract4LabourService;
 import cn.bc.business.web.struts2.FileEntityAction;
+import cn.bc.core.util.DateUtils;
 import cn.bc.docs.service.AttachService;
 import cn.bc.docs.web.ui.html.AttachWidget;
 import cn.bc.identity.web.SystemContext;
@@ -360,32 +361,39 @@ public class Contract4LabourAction extends
 				entity.setMain(Contract.MAIN_NOW);
 				entity.setVerMajor(Contract.MAJOR_DEFALUT);
 				entity.setVerMinor(Contract.MINOR_DEFALUT);
-				// entity.setStatus(Contract.STATUS_NORMAL);
+				entity.setOpType(Contract.OPTYPE_CREATE);
 			} else { // 补录
 				entity.setMain(Contract.MAIN_HISTORY);
 				entity.setVerMajor(Contract.SUPPLY_MAJOR_DEFALUT);
 				entity.setVerMinor(Contract.SUPPLY_MINOR_DEFALUT);
 				entity.setStatus(Contract.STATUS_LOGOUT);
+				entity.setOpType(Contract.OPTYPE_CREATE);
 			}
+
+			// 自动生成UID
+			entity.setUid(this.getIdGeneratorService().next(
+					Contract4Labour.KEY_UID));
+			// 自动生成批号：与uid相同
+			entity.setPatchNo(entity.getUid());
+			entity.setType(Contract.TYPE_LABOUR);
+			entity.setInsuranceType(getText("contract.wujin"));
+			entity.setBuyUnit(getText("contract.baocheng"));
+			entity.setIdentityCards(true);
+			entity.setHealthForm(true);
+			entity.setPhoto(true);
+			// 构建附件控件
+			attachsUI = buildAttachsUI(true, false);
+
+		} else {
+			// 设置附件
+			attachsUI = buildAttachsUI(false, false);
 		}
 		// 自动生成合同编号
 		entity.setCode(this.getIdGeneratorService().nextSN4Month(
 				Contract4Labour.KEY_CODE));
-		// 自动生成UID
-		entity.setUid(this.getIdGeneratorService()
-				.next(Contract4Labour.KEY_UID));
-		// 自动生成批号：与uid相同
-		entity.setPatchNo(entity.getUid());
-		entity.setType(Contract.TYPE_LABOUR);
-		entity.setOpType(Contract.OPTYPE_CREATE);
-		entity.setInsuranceType(getText("contract.wujin"));
-		entity.setBuyUnit(getText("contract.baocheng"));
-		entity.setIdentityCards(true);
-		entity.setHealthForm(true);
-		entity.setPhoto(true);
 
-		// 构建附件控件
-		attachsUI = buildAttachsUI(true, false);
+		entity.setStatus(BCConstants.STATUS_DRAFT);
+
 	}
 
 	@Override
@@ -494,35 +502,64 @@ public class Contract4LabourAction extends
 
 	@Override
 	public String save() throws Exception {
-		json = new Json();
-		Contract4Labour e = this.getE();
-		Long carManId = null;
-		// 保存之前检测社保号是否唯一:仅在新建时检测,补录不检测
-		if (this.isSupply == false && e.getId() == null) {
-			carManId = this.contract4LabourService.checkInsurCodeIsExist(
-					e.getId(), e.getInsurCode());
-		}
-		if (carManId != null) {
-			json.put("success", false);
-			json.put("msg", getText("contract4Labour.insurCode.exist2"));
+		// 如果Pid不为空，且为新建的则该合同执行的是转车或续约操作
+		SystemContext context = this.getSystyemContext();
+		if (this.getE().isNew() && this.getE().getPid() != null) {
+			Contract4Labour e = this.getE();
+			// 设置创建人
+			e.setAuthor(context.getUserHistory());
+			e.setFileDate(Calendar.getInstance());
+
+			// 获取旧合同id
+			Long fromContractId = e.getPid();
+			Contract newContract = null;
+			String msg = "";
+			json = new Json();
+			// 合同实际结束日期
+			Calendar stopDate4Charger = DateUtils.getCalendar(this.stopDate);
+
+			newContract = this.contract4LabourService.doOperate(carId,
+					this.getE(), fromContractId, stopDate4Charger);
+			if (e.getOpType() == Contract.OPTYPE_RENEW) {// 续约
+				msg = getText("contract4Labour.renew.success");
+			} else if (e.getOpType() == Contract.OPTYPE_CHANGECAR) {// 转车
+				msg = getText("contract4Labour.changeCar.success");
+			}
+			json.put("id", newContract.getId());
+			json.put("oldId", fromContractId);
+			json.put("success", true);
+			json.put("msg", msg);
 			return "json";
 		} else {
-			this.beforeSave(e);
+			// 正常操作
+			json = new Json();
+			Contract4Labour e = this.getE();
+			Long carManId = null;
+			// 保存之前检测社保号是否唯一:仅在新建时检测,补录不检测
+			if (this.isSupply == false && e.getId() == null) {
+				carManId = this.contract4LabourService.checkInsurCodeIsExist(
+						e.getId(), e.getInsurCode());
+			}
+			if (carManId != null) {
+				json.put("success", false);
+				json.put("msg", getText("contract4Labour.insurCode.exist2"));
+				return "json";
+			} else {
+				this.beforeSave(e);
 
-			// 设置最后更新人的信息
-			SystemContext context = this.getSystyemContext();
-			e.setModifier(context.getUserHistory());
-			e.setModifiedDate(Calendar.getInstance());
+				e.setModifier(context.getUserHistory());
+				e.setModifiedDate(Calendar.getInstance());
 
-			this.contract4LabourService.save(e, this.getCarId(),
-					this.getDriverId());
+				this.contract4LabourService.save(e, this.getCarId(),
+						this.getDriverId());
 
-			this.afterSave(e);
+				this.afterSave(e);
 
-			json.put("id", e.getId());
-			json.put("success", true);
-			json.put("msg", getText("form.save.success"));
-			return "json";
+				json.put("id", e.getId());
+				json.put("success", true);
+				json.put("msg", getText("form.save.success"));
+				return "json";
+			}
 		}
 	}
 
@@ -588,7 +625,8 @@ public class Contract4LabourAction extends
 
 		// 特殊处理的部分
 		if (!this.isReadonly()) {// 有权限
-			if (this.getE().getStatus() != BCConstants.STATUS_DRAFT) {// 编辑状态显示保存按钮
+			if (this.getE().getStatus() != BCConstants.STATUS_DRAFT
+					&& (opType != Contract.OPTYPE_RENEW && opType != Contract.OPTYPE_CHANGECAR)) {// 编辑状态显示保存按钮
 				// 非草稿状态下双击
 				if (!isDoMaintenance
 						&& this.getE().getMain() == Contract.MAIN_NOW

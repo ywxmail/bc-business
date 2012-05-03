@@ -179,4 +179,20 @@ public interface Contract4LabourService extends CrudService<Contract4Labour> {
 	 */
 	Contract4Labour doCopyContract(Long id, int opType);
 
+	/**
+	 * 劳动合同操处理
+	 * 
+	 * @param carId
+	 *            -- 车辆id
+	 * @param e
+	 *            -- 新的经济合同
+	 * @param fromContractId
+	 *            -- 旧经济合同id
+	 * @param stopDate
+	 *            合同实际结束日期
+	 * @return
+	 */
+	Contract4Labour doOperate(Long carId, Contract4Labour e,
+			Long fromContractId, Calendar stopDate);
+
 }
