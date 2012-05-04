@@ -402,8 +402,7 @@ public class Contract4ChargerAction extends
 	@Override
 	protected PageOption buildFormPageOption(boolean editable) {
 
-		PageOption pageOption = new PageOption().setWidth(720).setMinWidth(250)
-				.setMinHeight(160).setHeight(405);
+		PageOption pageOption = new PageOption().setWidth(720).setMinWidth(250);
 
 		if (this.useFormPrint())
 			pageOption.setPrint("default.form");
