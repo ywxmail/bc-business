@@ -488,8 +488,8 @@ public class Contract4LabourServiceImpl extends
 
 		// 复制原合同的附件给新的合同
 		String oldUid = oldContract.getUid();
-		attachService.doCopy(Contract4Charger.KEY_UID, oldUid,
-				Contract4Charger.KEY_UID, newContract.getUid(), true);
+		attachService.doCopy(Contract4Labour.KEY_UID, oldUid,
+				Contract4Labour.KEY_UID, newContract.getUid(), true);
 
 		// 设置创建人,最后更新人的信息
 		SystemContext context = SystemContextHolder.get();
