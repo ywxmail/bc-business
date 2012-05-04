@@ -385,7 +385,8 @@ public class Contract4LaboursAction extends ViewAction<Map<String, Object>> {
 	@Override
 	protected String[] getGridSearchFields() {
 		return new String[] { "c.code", "c.ext_str1", "c.ext_str2",
-				"cl.insurance_type", "cl.cert_no", "cl.insurCode", "car.code" };
+				"cl.insurance_type", "cl.cert_no", "cl.insurCode", "car.code",
+				"bia.name", "car.company" };
 	}
 
 	@Override
@@ -537,18 +538,6 @@ public class Contract4LaboursAction extends ViewAction<Map<String, Object>> {
 
 		json.put("type", type);
 	}
-
-	// @Override
-	// protected Toolbar getHtmlPageToolbar() {
-	// if (contractId == null) {
-	// return super.getHtmlPageToolbar().addButton(
-	// Toolbar.getDefaultToolbarRadioGroup(
-	// this.getEntityStatuses(), "status", 0,
-	// getText("title.click2changeSearchStatus")));
-	// } else {
-	// return super.getHtmlPageToolbar();
-	// }
-	// }
 
 	// ==高级搜索代码开始==
 
