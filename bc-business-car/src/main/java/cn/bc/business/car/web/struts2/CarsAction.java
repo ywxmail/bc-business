@@ -93,6 +93,7 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 		sql.append(",c.vin ,c.engine_no,c.factory_type,c.factory_model");
 		sql.append(",c.taximeter_no,c.taximeter_factory,c.taximeter_type");
 		sql.append(",m.id as motorcade_id,c.scrap_date,c.return_date,c.fuel_type");
+		sql.append(",getContract4ChargerScrapTo(c.id) scrapto");
 		sql.append(" from bs_car c");
 		sql.append(" inner join bs_motorcade m on m.id=c.motorcade_id");
 		sql.append(" inner join bc_identity_actor bia on bia.id=m.unit_id");
@@ -135,6 +136,8 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 				map.put("scrap_date", rs[i++]);// 报废日期
 				map.put("return_date", rs[i++]);// 交车日期
 				map.put("fuel_type", rs[i++]);//
+				map.put("scrapto", rs[i++]);//经济合同残值
+				
 				return map;
 			}
 		});
@@ -277,6 +280,10 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("c.return_date", "return_date",
 				getText("car.returnDate"), 90).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+		//残值归属
+		columns.add(new TextColumn4MapKey("c.fuel_type", "scrapto",
+				getText("car.scrapto"), 60).setUseTitleFromLabel(true));
+
 
 		return columns;
 	}

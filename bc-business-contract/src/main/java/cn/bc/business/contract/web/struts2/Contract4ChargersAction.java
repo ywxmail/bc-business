@@ -171,7 +171,7 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 		sql.append(",c.ver_major,c.ver_minor,c.op_type,c.file_date");
 		sql.append(",car.company company");
 		sql.append(",bia.id batch_company_id,bia.name batch_company");
-		sql.append(",m.id motorcade_id,m.name motorcade_name,c.stop_date");
+		sql.append(",m.id motorcade_id,m.name motorcade_name,c.stop_date,cc.scrapto");
 		sql.append(" from BS_CONTRACT_CHARGER cc");
 		sql.append(" inner join BS_CONTRACT c on cc.id = c.id");
 		sql.append(" inner join BS_CAR_CONTRACT carc on c.id = carc.contract_id");
@@ -223,6 +223,7 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 				map.put("motorcade_id", rs[i++]);
 				map.put("motorcade_name", rs[i++]);
 				map.put("stop_date", rs[i++]);
+				map.put("scrapto", rs[i++]);
 				return map;
 			}
 		});
@@ -352,6 +353,10 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 						}
 					}
 				}));
+		columns.add(new TextColumn4MapKey("cc.scrapto", "scrapto",
+				getText("contract4Charger.scrapTo"), 60)
+				.setUseTitleFromLabel(true));
+
 		return columns;
 	}
 
