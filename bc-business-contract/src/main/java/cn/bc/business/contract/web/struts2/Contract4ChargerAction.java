@@ -64,17 +64,9 @@ public class Contract4ChargerAction extends
 	public boolean isExistContract; // 是否存在合同
 	public Json json;
 	public boolean isDoMaintenance = false;// 是否进行维护操作
+	public boolean scrapToPower;// 是否能看残值归属
 
 	public List<Map<String, String>> scrapToList; // 残值归属
-
-	// public Long driverId;
-	// public String certCode;
-	// public ContractService contractService;
-
-	// @Autowired
-	// public void setContractService(ContractService contractService) {
-	// this.contractService = contractService;
-	// }
 
 	@Autowired
 	public void setContract4ChargerService(
@@ -82,12 +74,6 @@ public class Contract4ChargerAction extends
 		this.contract4ChargerService = contract4ChargerService;
 		this.setCrudService(contract4ChargerService);
 	}
-
-	// @Autowired
-	// public void setContract4LabourService(Contract4LabourService
-	// contract4LabourService) {
-	// this.contract4LabourService = contract4LabourService;
-	// }
 
 	@Autowired
 	public void setAttachService(AttachService attachService) {
@@ -111,6 +97,13 @@ public class Contract4ChargerAction extends
 	public boolean isReadonly() {
 		// 经济合同管理员或系统管理员
 		SystemContext context = (SystemContext) this.getContext();
+		// 是否能读写经济合同残值归属管理角色
+		scrapToPower = context.hasAnyRole(
+				getText("key.role.bs.contract4charger.scrapTo"),
+				getText("key.role.bc.admin"),
+				getText("key.role.bs.contract4charger"),
+				getText("key.role.bs.contract4charger.entering"));
+
 		return !context.hasAnyRole(getText("key.role.bs.contract4charger"),
 				getText("key.role.bc.admin"));
 	}

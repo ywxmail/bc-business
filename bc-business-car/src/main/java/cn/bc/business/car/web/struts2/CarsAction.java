@@ -73,6 +73,16 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 		return !context.hasAnyRole(getText("key.role.bs.car.entering"));
 	}
 
+	private boolean isScrapTo() {
+		// 是否能读写经济合同残值归属管理角色
+		SystemContext context = (SystemContext) this.getContext();
+		return context.hasAnyRole(
+				getText("key.role.bs.contract4charger.scrapTo"),
+				getText("key.role.bc.admin"),
+				getText("key.role.bs.contract4charger"),
+				getText("key.role.bs.contract4charger.entering"));
+	}
+
 	@Override
 	protected OrderCondition getGridDefaultOrderCondition() {
 		// 默认排序方向：状态|登记日期|自编号
@@ -136,8 +146,8 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 				map.put("scrap_date", rs[i++]);// 报废日期
 				map.put("return_date", rs[i++]);// 交车日期
 				map.put("fuel_type", rs[i++]);//
-				map.put("scrapto", rs[i++]);//经济合同残值
-				
+				map.put("scrapto", rs[i++]);// 经济合同残值
+
 				return map;
 			}
 		});
@@ -280,10 +290,11 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("c.return_date", "return_date",
 				getText("car.returnDate"), 90).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
-		//残值归属
-		columns.add(new TextColumn4MapKey("c.fuel_type", "scrapto",
-				getText("car.scrapto"), 60).setUseTitleFromLabel(true));
-
+		if (isScrapTo()) {
+			// 残值归属
+			columns.add(new TextColumn4MapKey("c.fuel_type", "scrapto",
+					getText("car.scrapto"), 60).setUseTitleFromLabel(true));
+		}
 
 		return columns;
 	}

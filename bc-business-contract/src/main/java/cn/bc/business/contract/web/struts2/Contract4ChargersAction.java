@@ -81,6 +81,16 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 				.hasAnyRole(getText("key.role.bs.contract4charger.entering"));
 	}
 
+	private boolean isScrapTo() {
+		// 是否能读写经济合同残值归属管理角色
+		SystemContext context = (SystemContext) this.getContext();
+		return context.hasAnyRole(
+				getText("key.role.bs.contract4charger.scrapTo"),
+				getText("key.role.bc.admin"),
+				getText("key.role.bs.contract4charger"),
+				getText("key.role.bs.contract4charger.entering"));
+	}
+
 	/**
 	 * @param useDisabledReplaceDelete
 	 *            控制是使用删除按钮还是禁用按钮
@@ -353,10 +363,11 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 						}
 					}
 				}));
-		columns.add(new TextColumn4MapKey("cc.scrapto", "scrapto",
-				getText("contract4Charger.scrapTo"), 60)
-				.setUseTitleFromLabel(true));
-
+		if (isScrapTo()) {
+			columns.add(new TextColumn4MapKey("cc.scrapto", "scrapto",
+					getText("contract4Charger.scrapTo"), 60)
+					.setUseTitleFromLabel(true));
+		}
 		return columns;
 	}
 
