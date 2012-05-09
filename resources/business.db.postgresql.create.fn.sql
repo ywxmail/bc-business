@@ -219,3 +219,184 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+-- 统计采购库存号码段函数
+-- 输入参数：bid采购单id,buy_count采购数量,start_no采购单开始号,end_no采购单结束号
+CREATE OR REPLACE FUNCTION getbalancenumberbyinvoicebuyid(bid INTEGER,buy_count INTEGER,start_no CHARACTER VARYING,end_no CHARACTER VARYING)
+	RETURNS CHARACTER VARYING  AS
+$BODY$
+DECLARE
+		-- 定义变量
+		-- 临时开始号,每比较一条销售明细临时开始号都会根据情况变化
+		startno_tmp CHARACTER VARYING;
+		-- 临时结束号,每比较一条销售明细临时结束号都会根据情况变化
+		endno_tmp CHARACTER VARYING;
+		-- 数字类型临时变量
+		number_temp1 INTEGER;
+		-- 数字类型临时变量
+		number_temp2 INTEGER;
+		-- 销售数量
+		sell_count INTEGER;
+		-- 记录库存号码段
+		remainingNumber CHARACTER VARYING;
+		-- 变量一行结果的记录	
+		rowinfo RECORD;
+BEGIN
+	-- 先根据采购单id,查销售数量
+	SELECT SUM(count_) INTO sell_count
+	FROM bs_invoice_sell_detail 
+	WHERE buy_id=bid AND status_=0;
+	-- 当sell_count为空,没有销售,所以库存号码段为采购单的开始号到结束号
+	IF sell_count IS NULL THEN
+		RETURN '['||start_no||'~'||end_no||']';
+	-- 当销售数量大于或等采购数量时,此采购单已经销售完,库存号码返回空
+	ELSEIF sell_count>=buy_count THEN
+		RETURN '';
+	-- 其他情况此采购单有对应的销售单,并且采购数量大于销售数量,有库存号码
+	ELSE
+			-- 初始化库存号码段变量
+			remainingNumber := '';
+			-- 将采购单的开始号赋值给临时开始号变量；
+			startno_tmp := trim(start_no);
+							-- 根据采购单ID查出对应的销售明细结果，并将结果排序
+			FOR rowinfo IN SELECT d.start_no,d.end_no
+											FROM  bs_invoice_sell_detail d
+											WHERE d.buy_id=bid and d.status_=0
+											ORDER BY d.start_no
+			-- 循环开始
+			LOOP
+					-- 第一次循环时将明细开始号和临时开始号转为数字临时变量,后续作两号比较时使用
+					number_temp1 := convert_stringtonumber(rowinfo.start_no);
+					number_temp2 := convert_stringtonumber(startno_tmp);
+					-- 明细开始号大于临时开始号，表明从临时号到明细结束号这一段号码中临时开始号到明细开始号减1为未出售的库存号码段
+					IF number_temp1 > number_temp2 THEN
+						-- 临时开始号到明细开始号减1保存临时结束号,若有0前序需要进行补0操作
+						endno_tmp := trim(convert_numbertostring(convert_stringtonumber(trim(rowinfo.start_no))-1,startno_tmp));
+						-- 记录这一段未出售的号码段
+						remainingNumber := remainingNumber||'['||startno_tmp||'~'||endno_tmp||'] ';
+						-- 临时的开始号变为明细结束号+1
+						startno_tmp := trim(convert_numbertostring(convert_stringtonumber(trim(rowinfo.end_no))+1,trim(rowinfo.end_no)));
+						-- 临时结束号等于明细结束号。
+						endno_tmp := trim(rowinfo.end_no);
+					END IF;
+					-- 明细开始号等于临时开始号,历史开始号到明细结束号这一段为已出售的
+					IF number_temp1=number_temp2	THEN
+						startno_tmp := trim(convert_numbertostring(convert_stringtonumber(trim(rowinfo.end_no))+1,trim(rowinfo.end_no)));
+						endno_tmp:= trim(rowinfo.end_no);
+					END IF;
+			END LOOP;	
+			-- 循环结束,若最后一条明细结束号小于采购单的结束号，则范围[最后一条明细的结束号+1，采购单的结束号]为库存号码段
+			IF convert_stringtonumber(endno_tmp)<convert_stringtonumber(trim(end_no)) THEN
+						startno_tmp= trim(convert_numbertostring(convert_stringtonumber(endno_tmp)+1,endno_tmp));
+						endno_tmp=trim(end_no);
+						remainingNumber := remainingNumber||'['||startno_tmp||'~'||endno_tmp||'] '; 
+			END IF;
+			-- 返回统计好的库存号码段
+			RETURN remainingNumber;
+
+	END IF;
+END;
+$BODY$
+LANGUAGE plpgsql;
+ 
+-- 字符串转数字函数
+CREATE OR REPLACE FUNCTION convert_stringtonumber(string_ character varying)
+	RETURNS integer  AS
+$BODY$
+DECLARE
+		-- 定义变量
+		number_ integer;
+		text_expression character varying;
+		length_ integer;
+		i integer;
+BEGIN
+	-- 检测字符串的长度
+	length_ := char_length(trim(string_));
+	text_expression := '';
+	FOR i IN 1..length_
+	LOOP
+	-- 生成匹配的表达式
+	text_expression := text_expression||'9';
+	END LOOP;
+	number_ := to_number(string_,text_expression);
+	return number_;
+END;
+$BODY$
+ LANGUAGE plpgsql;
+
+-- 数字转字符串函数
+CREATE OR REPLACE FUNCTION convert_numbertostring(int_ integer,text_ character varying)
+	RETURNS character varying  AS
+$BODY$
+DECLARE
+		-- 定义变量
+		string_ character varying;
+		text_expression character varying;
+		length_ integer;
+		i integer;
+BEGIN
+	-- 检测字符串的长度
+	length_ := char_length(trim(text_));
+	text_expression := '';
+	FOR i IN 1..length_
+	LOOP 
+	-- 生成匹配的表达式
+	text_expression := text_expression||'0';
+	END LOOP;
+	string_ := trim(to_char(int_,text_expression));
+	RETURN string_;
+END;
+$BODY$
+LANGUAGE plpgsql;
+ 
+-- 统计剩余数量函数
+CREATE OR REPLACE FUNCTION getbalancecountbyinvoicebuyid(bid integer)
+	RETURNS integer AS
+$BODY$
+DECLARE
+	-- 定义变量
+	-- 采购数量
+	buy_count INTEGER;
+	-- 销售数量
+	sell_count INTEGER;
+BEGIN
+	select b.count_,sum(d.count_) 
+	into buy_count,sell_count
+	from bs_invoice_buy b
+		left join bs_invoice_sell_detail d on d.buy_id=b.id and d.status_=0
+		where b.id=bid 
+		group by b.id;
+		-- 若为空时，表示还没销售，所以剩余数量应该等于采购数量
+		IF sell_count is null THEN
+			return buy_count;
+		ELSE 
+			return buy_count-sell_count;
+		END IF;
+END
+$BODY$
+LANGUAGE plpgsql;
+
+ -- 判断发票销售开始号、结束号、数量异常函数
+CREATE OR REPLACE FUNCTION checkI4SellDetailCount(sell_count INTEGER,start_no CHARACTER VARYING,end_no CHARACTER VARYING)
+	RETURNS INTEGER  AS
+$BODY$
+DECLARE
+		-- 定义变量
+		count_ INTEGER;
+		-- 数字类型临时变量
+		start_temp INTEGER;
+		-- 数字类型临时变量
+		end_temp INTEGER;
+BEGIN
+	start_temp := convert_stringtonumber(start_no);
+	end_temp :=	convert_stringtonumber(end_no);
+	count_ := (end_temp-start_temp+1)/100;
+		IF sell_count = count_ THEN
+			RETURN 0;
+		ELSE
+			RETURN 1;
+		END IF;
+END;
+$BODY$
+ LANGUAGE plpgsql
+ IMMUTABLE;
+ 
