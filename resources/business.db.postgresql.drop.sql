@@ -16,6 +16,9 @@ drop table if exists BS_ARRANGE_MEMBER;
 drop table if exists BS_ARRANGE;
 drop table if exists BS_MEMBER;
 
+-- 费用模板表
+drop table if exists BS_FEE_TEMPLATE;
+
 -- 发票管理
 drop table if exists BS_INVOICE_SELL_DETAIL;
 drop table if exists BS_INVOICE_SELL;
@@ -49,6 +52,7 @@ drop table if exists BS_CONTRACT_CHARGER;
 drop table if exists BS_CONTRACT;
 
 -- 营运事件
+DROP TABLE IF EXISTS BS_CASE_LOST;
 DROP TABLE IF EXISTS BS_CASE_ADVICE;
 DROP TABLE IF EXISTS BS_CASE_PRAISE;
 DROP TABLE IF EXISTS BS_CASE_ACCIDENT;
