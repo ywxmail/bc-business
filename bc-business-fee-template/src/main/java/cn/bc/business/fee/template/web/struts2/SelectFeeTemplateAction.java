@@ -181,23 +181,21 @@ public class SelectFeeTemplateAction extends
 
 	@Override
 	protected Condition getGridSpecalCondition() {
-		if(module==null||module==""){
-			return new AndCondition(new EqualsCondition("a.status_", BCConstants.STATUS_ENABLED));
-		}else{
-			return new AndCondition(new EqualsCondition("a.status_", BCConstants.STATUS_ENABLED)
-			,new EqualsCondition("a.module_", module.trim()));
+		AndCondition andCondition=new AndCondition(new EqualsCondition("a.status_", BCConstants.STATUS_ENABLED));
+		if(module!=null||module.length()>0){
+			 andCondition.add(new EqualsCondition("a.module_", module.trim()));
 		}
+		return andCondition;
 	}
 
 	@Override
 	protected Json getGridExtrasData() {
-		if (this.status == null || this.status.length() == 0) {
-			return null;
-		} else {
-			Json json = new Json();
-			json.put("status", status);
-			return json;
+		Json json = new Json();
+		json.put("status", status);
+		if(module!=null&&module.length()>0){
+			json.put("module", module);
 		}
+		return json;
 	}
 
 	@Override

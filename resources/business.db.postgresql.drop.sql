@@ -16,6 +16,13 @@ drop table if exists BS_ARRANGE_MEMBER;
 drop table if exists BS_ARRANGE;
 drop table if exists BS_MEMBER;
 
+-- 承包费
+drop table if exists BS_FEE_DETAIL;
+drop table if exists BS_FEE;
+
+-- 费用模板表
+drop table if exists BS_FEE_TEMPLATE;
+
 -- 发票管理
 drop table if exists BS_INVOICE_SELL_DETAIL;
 drop table if exists BS_INVOICE_SELL;
@@ -49,6 +56,7 @@ drop table if exists BS_CONTRACT_CHARGER;
 drop table if exists BS_CONTRACT;
 
 -- 营运事件
+DROP TABLE IF EXISTS BS_CASE_LOST;
 DROP TABLE IF EXISTS BS_CASE_ADVICE;
 DROP TABLE IF EXISTS BS_CASE_PRAISE;
 DROP TABLE IF EXISTS BS_CASE_ACCIDENT;
@@ -66,14 +74,14 @@ drop table if exists BS_BUY_PLANT;
 -- 车辆保单
 drop table if exists BS_CAR_POLICY;
 
+-- 司机营运车辆
+drop table if exists BS_CAR_DRIVER;
+
 -- 迁移记录
 drop table if exists BS_CAR_DRIVER_HISTORY;
 
 -- 车辆经营权
 drop table if exists BS_CAR_OWNERSHIP;
-
--- 司机营运车辆
-drop table if exists BS_CAR_DRIVER;
 
 -- 司机责任人与证件的关联
 drop table if exists BS_CARMAN_CERT;
