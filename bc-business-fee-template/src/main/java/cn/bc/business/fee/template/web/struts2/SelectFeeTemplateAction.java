@@ -26,6 +26,7 @@ import cn.bc.web.formater.KeyValueFormater;
 import cn.bc.web.formater.NubmerFormater;
 import cn.bc.web.struts2.AbstractSelectPageAction;
 import cn.bc.web.ui.html.grid.Column;
+import cn.bc.web.ui.html.grid.HiddenColumn4MapKey;
 import cn.bc.web.ui.html.grid.IdColumn4MapKey;
 import cn.bc.web.ui.html.grid.TextColumn4MapKey;
 import cn.bc.web.ui.html.page.HtmlPage;
@@ -59,7 +60,7 @@ public class SelectFeeTemplateAction extends
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer sql = new StringBuffer();
 		sql.append("select a.id,a.status_ as status,a.module_ as module,a.type_ as type,b.name as pname,a.order_ as order");
-		sql.append(",a.name,a.price,a.count_ as count,a.pay_type,a.desc_ as desc");
+		sql.append(",a.name,a.price,a.count_ as count,a.pay_type,a.desc_ as desc,a.spec");
 		sql.append(" from bs_fee_template a");
 		sql.append(" left join bs_fee_template b on b.id=a.pid ");
 		sqlObject.setSql(sql.toString());
@@ -83,6 +84,8 @@ public class SelectFeeTemplateAction extends
 				map.put("count", rs[i++]);
 				map.put("pay_type", rs[i++]);
 				map.put("desc", rs[i++]);
+				map.put("spec", rs[i++]);
+				
 				return map;
 			}
 		});
@@ -115,6 +118,8 @@ public class SelectFeeTemplateAction extends
 				.setValueFormater(new KeyValueFormater(this.getPayTypes())));	
 		columns.add(new TextColumn4MapKey("a.desc_", "desc",
 				getText("feeTemplate.desc")).setUseTitleFromLabel(true));
+		//特殊配置
+		columns.add(new HiddenColumn4MapKey("spec", "spec"));
 		return columns;
 	}
 
