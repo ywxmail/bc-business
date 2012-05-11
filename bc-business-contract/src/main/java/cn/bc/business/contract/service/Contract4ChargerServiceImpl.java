@@ -15,6 +15,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 
+import cn.bc.BCConstants;
 import cn.bc.business.contract.dao.Contract4ChargerDao;
 import cn.bc.business.contract.dao.ContractDao;
 import cn.bc.business.contract.domain.Contract;
@@ -501,6 +502,8 @@ public class Contract4ChargerServiceImpl extends
 		newContract.setOpType(opType);
 		newContract.setSignDate(null);
 		newContract.setStartDate(null);
+		newContract.setContractFeeDetail(null);
+		newContract.setStatus(BCConstants.STATUS_DRAFT);
 		newContract.setVerMajor(newContract.getVerMajor() + 1);// 版本号+1
 		if (newContract.getOpType() == Contract.OPTYPE_CHANGECHARGER
 				|| newContract.getOpType() == Contract.OPTYPE_CHANGECHARGER2) {

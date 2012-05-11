@@ -4,7 +4,9 @@
 package cn.bc.business.contract.domain;
 
 import java.util.Calendar;
+import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -12,6 +14,8 @@ import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 import javax.persistence.Table;
 
 import cn.bc.identity.domain.ActorHistory;
@@ -97,6 +101,8 @@ public class Contract extends RichFileEntityImpl {
 
 	private ActorHistory logoutId;// 注销人
 	private Calendar logoutDate;// 注销时间
+
+	private Set<ContractFeeDetail> contractFeeDetail;// 收费明细
 
 	@Column(name = "STOP_DATE")
 	public Calendar getStopDate() {
@@ -303,6 +309,16 @@ public class Contract extends RichFileEntityImpl {
 
 	public void setLogoutDate(Calendar logoutDate) {
 		this.logoutDate = logoutDate;
+	}
+
+	@OneToMany(mappedBy = "contract", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+	@OrderBy(value = "orderNo asc")
+	public Set<ContractFeeDetail> getContractFeeDetail() {
+		return contractFeeDetail;
+	}
+
+	public void setContractFeeDetail(Set<ContractFeeDetail> contractFeeDetail) {
+		this.contractFeeDetail = contractFeeDetail;
 	}
 
 }
