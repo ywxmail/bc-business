@@ -58,6 +58,8 @@ public class SelectTemplateWithFeeTemplateAction extends FileEntityAction<Long, 
 						o.put("count", it.get("count"));
 						o.put("payType", it.get("payType"));
 						o.put("desc", it.get("desc") != null ? it.get("desc") : "");
+						o.put("spec", it.get("spec") != null ? it.get("spec") : "");
+						
 						jsons.add(o);
 					}
 				}
