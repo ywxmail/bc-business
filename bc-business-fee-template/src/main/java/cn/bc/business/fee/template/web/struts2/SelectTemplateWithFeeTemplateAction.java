@@ -6,17 +6,16 @@ package cn.bc.business.fee.template.web.struts2;
 import java.util.List;
 import java.util.Map;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
-
-import cn.bc.business.fee.template.service.FeeTemplateService;
 import cn.bc.business.fee.template.domain.FeeTemplate;
+import cn.bc.business.fee.template.service.FeeTemplateService;
 import cn.bc.business.web.struts2.FileEntityAction;
-import cn.bc.web.ui.json.Json;
-import cn.bc.web.ui.json.JsonArray;
 
 /**
  * 根据模板ID选择多个费用信息
@@ -26,7 +25,8 @@ import cn.bc.web.ui.json.JsonArray;
  */
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 @Controller
-public class SelectTemplateWithFeeTemplateAction extends FileEntityAction<Long, FeeTemplate> {
+public class SelectTemplateWithFeeTemplateAction extends
+		FileEntityAction<Long, FeeTemplate> {
 	/**
 	 * 
 	 */
@@ -39,32 +39,36 @@ public class SelectTemplateWithFeeTemplateAction extends FileEntityAction<Long, 
 		this.feeTemplateService = feeTemplateService;
 		this.setCrudService(feeTemplateService);
 	}
-	
+
 	public String json;
+
 	public String selectFeeTemplates() throws Exception {
-		if(pid!=null){
-			String[] sarr=pid.split(",");
-			JsonArray jsons = new JsonArray();
-			for(String sid:sarr){
-				System.out.println(sid);
-				if(sid!=""){
-					List<Map<String,String>> iList=this.feeTemplateService.findFee(Long.parseLong(sid));
-					Json o;
-					for(Map<String,String> it:iList){
-						o=new Json();
+		if (pid != null) {
+			String[] sarr = pid.split(",");
+			JSONArray jsons = new JSONArray();
+			for (String sid : sarr) {
+				if (sid != "") {
+					List<Map<String, String>> iList = this.feeTemplateService
+							.findFee(Long.parseLong(sid));
+					JSONObject o;
+					for (Map<String, String> it : iList) {
+						o = new JSONObject();
 						o.put("id", it.get("id"));
 						o.put("name", it.get("name"));
 						o.put("price", it.get("price"));
 						o.put("count", it.get("count"));
 						o.put("payType", it.get("payType"));
-						o.put("desc", it.get("desc") != null ? it.get("desc") : "");
-						o.put("spec", it.get("spec") != null ? it.get("spec") : "");
-						
-						jsons.add(o);
+						o.put("desc", it.get("desc") != null ? it.get("desc")
+								: "");
+						String spec = it.get("spec");
+						o.put("spec",
+								spec != null && spec.length() > 0 ? new JSONObject(
+										spec) : new JSONObject());
+						jsons.put(o);
 					}
 				}
 			}
-			json=jsons.toString();
+			json = jsons.toString();
 		}
 		return "json";
 	}
