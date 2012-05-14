@@ -9,6 +9,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -21,6 +22,7 @@ import cn.bc.BCConstants;
 import cn.bc.business.OptionConstants;
 import cn.bc.business.contract.domain.Contract;
 import cn.bc.business.contract.domain.Contract4Labour;
+import cn.bc.business.contract.domain.ContractFeeDetail;
 import cn.bc.business.contract.service.Contract4LabourService;
 import cn.bc.business.web.struts2.FileEntityAction;
 import cn.bc.core.util.DateUtils;
@@ -507,6 +509,12 @@ public class Contract4LabourAction extends
 	public String save() throws Exception {
 		// 如果Pid不为空，且为新建的则该合同执行的是转车或续约操作
 		SystemContext context = this.getSystyemContext();
+
+		// 将收费明细设置为空
+
+		this.getE()
+				.setContractFeeDetail(new LinkedHashSet<ContractFeeDetail>());
+
 		if (this.getE().isNew() && this.getE().getPid() != null) {
 			Contract4Labour e = this.getE();
 			// 设置创建人
