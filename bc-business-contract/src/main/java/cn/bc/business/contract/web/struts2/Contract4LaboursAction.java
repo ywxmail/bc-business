@@ -175,7 +175,7 @@ public class Contract4LaboursAction extends ViewAction<Map<String, Object>> {
 		StringBuffer sql = new StringBuffer();
 		sql.append("select cl.id,c.type_,c.status_,c.ext_str1,c.ext_str2,c.transactor_name,c.file_date,c.sign_date");
 		sql.append(",c.start_date,c.end_date,c.code,cl.joinDate,cl.get_startDate,cl.get_endDate,cl.stopDate");
-		sql.append(",cl.insurCode,cl.insurance_type,cl.cert_no,cl.leaveDate,c.author_id,c.ver_major,c.ver_minor,c.op_type,iah.actor_name");
+		sql.append(",cl.insurCode,cl.insurance_type,cl.cert_no,cl.leaveDate,c.author_id,c.ver_major,c.ver_minor,c.op_type");
 		sql.append(",car.id carId");
 		sql.append(",man.id manId");
 		sql.append(",man.cert_fwzg certfwzg");
@@ -183,6 +183,7 @@ public class Contract4LaboursAction extends ViewAction<Map<String, Object>> {
 		sql.append(",bia.id batch_company_id,bia.name batch_company");
 		sql.append(",m.id motorcade_id,m.name motorcade_name");
 		sql.append(",car.code car_code,c.stop_date");
+		sql.append(",c.modified_date,md.actor_name modifier,c.file_date,ad.actor_name author");
 		sql.append(" from BS_CONTRACT_LABOUR cl");
 		sql.append(" inner join BS_CONTRACT c on cl.id = c.id");
 		sql.append(" left join BS_CAR_CONTRACT carc on c.id = carc.contract_id");
@@ -192,6 +193,8 @@ public class Contract4LaboursAction extends ViewAction<Map<String, Object>> {
 		sql.append(" left join BC_IDENTITY_ACTOR_HISTORY iah on c.author_id = iah.id");
 		sql.append(" left join bs_motorcade m on m.id=car.motorcade_id");
 		sql.append(" left join bc_identity_actor bia on bia.id=m.unit_id");
+		sql.append(" left join BC_IDENTITY_ACTOR_HISTORY md on md.id=c.modifier_id");
+		sql.append(" left join BC_IDENTITY_ACTOR_HISTORY ad on ad.id=c.author_id");
 
 		sqlObject.setSql(sql.toString());
 
@@ -226,7 +229,6 @@ public class Contract4LaboursAction extends ViewAction<Map<String, Object>> {
 				map.put("ver_major", rs[i++]);
 				map.put("ver_minor", rs[i++]);
 				map.put("op_type", rs[i++]);
-				map.put("name", rs[i++]);
 				map.put("carId", rs[i++]);
 				map.put("manId", rs[i++]);
 				map.put("certfwzg", rs[i++]);
@@ -237,6 +239,11 @@ public class Contract4LaboursAction extends ViewAction<Map<String, Object>> {
 				map.put("motorcade_name", rs[i++]);
 				map.put("car_code", rs[i++]);
 				map.put("stop_date", rs[i++]);
+				map.put("modified_date", rs[i++]);
+				map.put("modifier", rs[i++]);
+				map.put("file_date", rs[i++]);
+				map.put("author", rs[i++]);
+
 				return map;
 			}
 		});
@@ -369,10 +376,19 @@ public class Contract4LaboursAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("c.op_type", "op_type",
 				getText("contract4Labour.op"), 40).setSortable(true)
 				.setValueFormater(new EntityStatusFormater(getEntityOpTypes())));
-		columns.add(new TextColumn4MapKey("iah.name", "name",
-				getText("contract.author"), 55).setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("c.code", "code",
 				getText("contract.code"), 130).setUseTitleFromLabel(true));
+		columns.add(new TextColumn4MapKey("ad.actor_name", "author",
+				getText("contract.author"), 80).setSortable(true));
+		columns.add(new TextColumn4MapKey("c.file_date", "file_date",
+				getText("contract.fileDate"), 120).setSortable(true)
+				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+		columns.add(new TextColumn4MapKey("md.actor_name", "modifier",
+				getText("contract.modifier"), 80).setSortable(true));
+		columns.add(new TextColumn4MapKey("c.modified_date", "modified_date",
+				getText("contract.modifiedDate"), 120).setSortable(true)
+				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+
 		return columns;
 	}
 

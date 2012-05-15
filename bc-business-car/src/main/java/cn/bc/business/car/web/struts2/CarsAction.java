@@ -103,10 +103,13 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 		sql.append(",c.vin ,c.engine_no,c.factory_type,c.factory_model");
 		sql.append(",c.taximeter_no,c.taximeter_factory,c.taximeter_type");
 		sql.append(",m.id as motorcade_id,c.scrap_date,c.return_date,c.fuel_type");
-		sql.append(",getContract4ChargerScrapTo(c.id) scrapto");
+		sql.append(",getContract4ChargerScrapTo(c.id) scrapto,c.modified_date,md.actor_name modifier");
+		sql.append(",c.file_date,ad.actor_name author");
 		sql.append(" from bs_car c");
 		sql.append(" inner join bs_motorcade m on m.id=c.motorcade_id");
 		sql.append(" inner join bc_identity_actor bia on bia.id=m.unit_id");
+		sql.append(" left join BC_IDENTITY_ACTOR_HISTORY md on md.id=c.modifier_id");
+		sql.append(" left join BC_IDENTITY_ACTOR_HISTORY ad on ad.id=c.author_id");
 		sqlObject.setSql(sql.toString());
 
 		// 注入参数
@@ -147,6 +150,10 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 				map.put("return_date", rs[i++]);// 交车日期
 				map.put("fuel_type", rs[i++]);//
 				map.put("scrapto", rs[i++]);// 经济合同残值
+				map.put("modified_date", rs[i++]);
+				map.put("modifier", rs[i++]);
+				map.put("file_date", rs[i++]);
+				map.put("author", rs[i++]);
 
 				return map;
 			}
@@ -295,6 +302,16 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 			columns.add(new TextColumn4MapKey("c.fuel_type", "scrapto",
 					getText("car.scrapto"), 60).setUseTitleFromLabel(true));
 		}
+		columns.add(new TextColumn4MapKey("ad.actor_name", "author",
+				getText("car.author"), 80).setSortable(true));
+		columns.add(new TextColumn4MapKey("c.file_date", "file_date",
+				getText("car.fileDate"), 120).setSortable(true)
+				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+		columns.add(new TextColumn4MapKey("md.actor_name", "modifier",
+				getText("car.modifier"), 80).setSortable(true));
+		columns.add(new TextColumn4MapKey("c.modified_date", "modified_date",
+				getText("car.modifiedDate"), 120).setSortable(true)
+				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
 
 		return columns;
 	}
