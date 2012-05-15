@@ -3,6 +3,7 @@
  */
 package cn.bc.business.contract.service;
 
+import java.io.IOException;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +12,7 @@ import cn.bc.business.contract.domain.Contract4Charger;
 import cn.bc.core.Page;
 import cn.bc.core.query.condition.Condition;
 import cn.bc.core.service.CrudService;
+import cn.bc.docs.domain.Attach;
 
 /**
  * 责任人合同Service
@@ -260,4 +262,14 @@ public interface Contract4ChargerService extends CrudService<Contract4Charger> {
 	Contract4Charger doOperate(Long carId, Contract4Charger e,
 			String assignChargerIds, Long fromContractId, Calendar stopDate);
 
+	/**
+	 * 从模版添加附件
+	 * 
+	 * @param id
+	 *            经济合同的id
+	 * @param templateCodes
+	 *            模板编码列表
+	 * @return 返回生成的附件信息
+	 */
+	List<Attach> doAddAttachFromTemplate(Long id, String[] templateCodes) throws IOException;
 }
