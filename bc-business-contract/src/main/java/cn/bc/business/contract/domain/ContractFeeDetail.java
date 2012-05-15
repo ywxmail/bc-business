@@ -10,6 +10,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import cn.bc.core.EntityImpl;
+import cn.bc.core.util.DateUtils;
 
 /**
  * 合同收费明细
@@ -20,17 +21,15 @@ import cn.bc.core.EntityImpl;
 @Table(name = "BS_CONTRACT_FEE_DETAIL")
 public class ContractFeeDetail extends EntityImpl {
 	private static final long serialVersionUID = 1L;
-	
-	
-	
-	/** 收费方式：每月  */
-	public static final int PAY_TYPE_MONTH=1; 
-	/** 收费方式：每季  */
-	public static final int PAY_TYPE_SEASON=2; 
-	/** 收费方式：每年  */
-	public static final int PAY_TYPE_YEAR=3;
-	/** 收费方式:一次性  */
-	public static final int PAY_TYPE_ALL=4; 
+
+	/** 收费方式：每月 */
+	public static final int PAY_TYPE_MONTH = 1;
+	/** 收费方式：每季 */
+	public static final int PAY_TYPE_SEASON = 2;
+	/** 收费方式：每年 */
+	public static final int PAY_TYPE_YEAR = 3;
+	/** 收费方式:一次性 */
+	public static final int PAY_TYPE_ALL = 4;
 
 	private String name;// 项目
 	private float price;// 金额
@@ -84,6 +83,7 @@ public class ContractFeeDetail extends EntityImpl {
 
 	public void setEndDate(Calendar endDate) {
 		this.endDate = endDate;
+		DateUtils.setToMaxTime(this.endDate);
 	}
 
 	@ManyToOne(fetch = FetchType.EAGER, optional = false)
