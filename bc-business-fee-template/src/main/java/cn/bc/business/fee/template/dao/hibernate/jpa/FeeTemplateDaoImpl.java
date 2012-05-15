@@ -55,7 +55,7 @@ public class FeeTemplateDaoImpl extends HibernateCrudJpaDao<FeeTemplate>
 		hql += " FROM bs_fee_template a";
 		hql += " WHERE a.status_=";
 		hql += BCConstants.STATUS_ENABLED;
-		hql += " and a.pid=?";
+		hql += " and a.pid=? order by a.order_ asc";
 		return HibernateJpaNativeQuery.executeNativeSql(getJpaTemplate(), hql,
 				new Object[] { pid }, new RowMapper<Map<String, String>>() {
 					public Map<String, String> mapRow(Object[] rs, int rowNum) {
