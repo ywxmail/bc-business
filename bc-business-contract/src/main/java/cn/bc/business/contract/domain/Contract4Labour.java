@@ -28,6 +28,7 @@ import org.apache.commons.logging.LogFactory;
 public class Contract4Labour extends Contract {
 	private static final long serialVersionUID = 1L;
 	private static Log logger = LogFactory.getLog(Contract4Labour.class);
+	public static final String ATTACH_TYPE = Contract4Labour.class.getSimpleName();
 	public static final String KEY_UID = Contract4Labour.class.getSimpleName();
 	public static final String KEY_CODE = "contract.code";
 	private String certNo;// 资格证号

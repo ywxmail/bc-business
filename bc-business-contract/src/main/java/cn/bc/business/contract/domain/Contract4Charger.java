@@ -19,7 +19,7 @@ import javax.persistence.Table;
 @Inheritance(strategy = InheritanceType.JOINED)
 public class Contract4Charger extends Contract {
 	private static final long serialVersionUID = 1L;
-	public static final String ATTACH_TYPE = Contract.class.getSimpleName();
+	public static final String ATTACH_TYPE = Contract4Charger.class.getSimpleName();
 	public static final String KEY_UID = Contract4Charger.class.getSimpleName();
 	public static final String KEY_CODE = "contract.code";
 	private String signType;// 签约类型:如新户
