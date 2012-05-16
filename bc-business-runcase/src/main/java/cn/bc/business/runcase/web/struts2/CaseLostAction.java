@@ -285,7 +285,6 @@ public class CaseLostAction extends FileEntityAction<Long, Case4Lost> {
 		
 	}
 	
-	public String json;
 	public String selectCarMansInfo() {
 		List<CarMan> drivers = this.carManService.selectAllCarManByCarId(carId);
 		JsonArray jsons = new JsonArray();

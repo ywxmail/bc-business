@@ -109,8 +109,6 @@ public class MotorcadeAction extends FileEntityAction<Long, Motorcade> {
 			e.setParent(null);
 	}
 
-	public Json json;
-
 	@Override
 	public String delete() throws Exception {
 		SystemContext context = this.getSystyemContext();
@@ -131,8 +129,9 @@ public class MotorcadeAction extends FileEntityAction<Long, Motorcade> {
 				throw new CoreException("must set property id or ids");
 			}
 		}
-		json = new Json();
+		Json json = new Json();
 		json.put("msg", getText("form.disabled.success"));
+		this.json = json.toString();
 		return "json";
 	}
 }

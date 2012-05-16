@@ -282,8 +282,6 @@ public class BlacklistAction extends FileEntityAction<Long, Blacklist> {
 	}
 
 	// 返回所选司机的信息
-	public Json json;
-
 	public String carManMess() {
 		Car car = this.carByDriverService
 				.selectCarByCarManId(new Long(carManId));
@@ -294,12 +292,13 @@ public class BlacklistAction extends FileEntityAction<Long, Blacklist> {
 			unitName = car.getCompany();
 			motorcadeName = car.getMotorcade().getName();
 		}
-		json = new Json();
+		Json json = new Json();
 		json.put("carId", carId);
 		json.put("carPlate", carPlate);
 		json.put("motorcadeId", motorcadeId);
 		json.put("unitName", unitName);
 		json.put("motorcadeName", motorcadeName);
+		this.json = json.toString();
 		return "json";
 
 	}

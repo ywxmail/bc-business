@@ -174,10 +174,9 @@ public class CertVehicelicenseAction extends FileEntityAction<Long, Cert4VehiceL
 	 * @parma carId 
 	 * @return
 	 */
-	public Json json;
 	public String carInfo(){
 		carMessInfoMap = this.certService.findCarByCarId(carId);
-		json = new Json();
+		Json json = new Json();
 		
 		if(carMessInfoMap != null && carMessInfoMap.size() > 0){
 			json.put("factorytype", 	isNullObject(carMessInfoMap.get("factory_type"))+isNullObject(carMessInfoMap.get("factory_model")));
@@ -194,6 +193,7 @@ public class CertVehicelicenseAction extends FileEntityAction<Long, Cert4VehiceL
 			json.put("accesscount", 	isNullObject(carMessInfoMap.get("access_count")+""));
 		}
 
+		this.json = json.toString();
 		return "json";
 	}
 

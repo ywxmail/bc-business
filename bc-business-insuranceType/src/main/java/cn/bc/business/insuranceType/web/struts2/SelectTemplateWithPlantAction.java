@@ -38,7 +38,6 @@ public class SelectTemplateWithPlantAction extends FileEntityAction<Long, Insura
 		this.insuranceTypeService = insuranceTypeService;
 		this.setCrudService(insuranceTypeService);
 	}
-	public String json;
 	public String selectInsuranceTypes() throws Exception {
 		if(pid!=null){
 			String[] sarr=pid.split(",");

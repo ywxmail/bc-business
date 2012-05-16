@@ -3,14 +3,15 @@
  */
 package cn.bc.business.contract.service;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.tools.ant.util.DateUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
@@ -26,11 +27,15 @@ import cn.bc.core.Page;
 import cn.bc.core.exception.CoreException;
 import cn.bc.core.query.condition.Condition;
 import cn.bc.core.service.DefaultCrudService;
+import cn.bc.core.util.DateUtils;
 import cn.bc.core.util.StringUtils;
+import cn.bc.docs.domain.Attach;
 import cn.bc.docs.service.AttachService;
 import cn.bc.identity.service.IdGeneratorService;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.identity.web.SystemContextHolder;
+import cn.bc.template.domain.Template;
+import cn.bc.template.service.TemplateService;
 
 /**
  * 责任人合同Service的实现
@@ -43,6 +48,12 @@ public class Contract4ChargerServiceImpl extends
 	private ContractDao contractDao;
 	private IdGeneratorService idGeneratorService;// 用于生成uid的服务
 	private AttachService attachService;// 附件服务
+	private TemplateService templateService;// 模板服务
+
+	@Autowired
+	public void setTemplateService(TemplateService templateService) {
+		this.templateService = templateService;
+	}
 
 	@Autowired
 	public void setContractDao(ContractDao contractDao) {
@@ -497,7 +508,8 @@ public class Contract4ChargerServiceImpl extends
 
 		// 设置操作的信息
 		newContract.setId(null);
-		newContract.setCode("CLHT" + DateUtils.format(new Date(), "yyyyMM")); // 自动生成经济合同编号的前缀
+		newContract.setCode("CLHT"
+				+ DateUtils.formatDateTime(new Date(), "yyyyMM")); // 自动生成经济合同编号的前缀
 		newContract.setSignType(signType);
 		newContract.setOpType(opType);
 		newContract.setSignDate(null);
@@ -768,4 +780,29 @@ public class Contract4ChargerServiceImpl extends
 		return this.contract4ChargerDao.checkCodeIsExist(excludeId, code);
 	}
 
+	public List<Attach> doAddAttachFromTemplate(Long id, String[] templateCodes)
+			throws IOException {
+		// 加载合同
+		Contract4Charger c = this.load(id);
+
+		// 生成格式化参数
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("车牌", c.getExt_str1());
+		params.put("责任人", c.getExt_str2());
+		params.put("合同开始日期", DateUtils.formatCalendar2Day(c.getStartDate()));
+		params.put("合同结束日期", DateUtils.formatCalendar2Day(c.getEndDate()));
+
+		Template template;
+		List<Attach> attachs = new ArrayList<Attach>();
+		Attach attach;
+		String ptype = Contract4Charger.ATTACH_TYPE;
+		String puid = c.getUid();
+		for (String code : templateCodes) {
+			template = this.templateService.loadByCode(code);
+			attach = template.format2Attach(params, ptype, puid);
+			if (attach != null)
+				attachs.add(attach);
+		}
+		return attachs;
+	}
 }

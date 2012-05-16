@@ -389,8 +389,6 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 
 	}
 
-	public String json;
-
 	// =======自动加载司机相关信息开始 =========
 	public String selectCarMansInfo() {
 		List<CarMan> drivers = this.carManService.selectAllCarManByCarId(carId);

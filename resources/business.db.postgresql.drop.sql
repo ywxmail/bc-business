@@ -22,6 +22,8 @@ drop table if exists BS_FEE;
 
 -- 费用模板表
 drop table if exists BS_FEE_TEMPLATE;
+-- 合同的收费明细
+drop table if exists bs_contract_fee_detail;
 
 -- 发票管理
 drop table if exists BS_INVOICE_SELL_DETAIL;

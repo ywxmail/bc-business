@@ -46,7 +46,6 @@ public class BatchInitAction extends FileEntityAction<Long, Fee> {
 	private OptionService optionService;
 	private Integer feeYear;
 	private Integer feeMonth;
-	public String json;
 
 	public Integer getFeeYear() {
 		return feeYear;

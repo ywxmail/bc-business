@@ -65,8 +65,6 @@ public class InsuranceTypeAction extends FileEntityAction<Long, InsuranceType> {
 				.setMinWidth(300).setHeight(340).setMinHeight(200);
 	}
 
-	public Json json;
-
 	@Override
 	public String delete() throws Exception {
 		SystemContext context = this.getSystyemContext();
@@ -87,8 +85,9 @@ public class InsuranceTypeAction extends FileEntityAction<Long, InsuranceType> {
 				throw new CoreException("must set property id or ids");
 			}
 		}
-		json = new Json();
+		Json json = new Json();
 		json.put("msg", getText("form.disabled.success"));
+		this.json = json.toString();
 		return "json";
 	}
 

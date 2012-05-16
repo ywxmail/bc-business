@@ -58,6 +58,7 @@
 		<action name="save" class="contract4ChargerAction" method="save"/>
 		<action name="isExistContract" class="contract4ChargerAction" method="isExistContract" />
 		<action name="checkCodeIsExist" class="contract4ChargerAction" method="checkCodeIsExist" />
+		<action name="addAttachFromTemplate" class="contract4ChargerAction" method="addAttachFromTemplate" />
 	</package>
 	
 	<!-- 经济合同的版本管理 -->

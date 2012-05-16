@@ -59,17 +59,6 @@ public class Policy4CarOperateAction extends FileEntityAction<Long, Policy> {
 		this.attachService = attachService;
 	}
 
-	private Long id;
-	public Json json;
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
-
 	public boolean isReadonly() {
 		// 车辆保单管理员或系统管理员
 		SystemContext context = (SystemContext) this.getContext();
@@ -140,7 +129,7 @@ public class Policy4CarOperateAction extends FileEntityAction<Long, Policy> {
 	public String doRenew() throws Exception {
 		Long oldPolicyId = this.getId();
 		Policy newPolicy = this.policyService.doRenew(oldPolicyId);
-		json = new Json();
+		Json json = new Json();
 		json.put("id", newPolicy.getId());
 		json.put("msg", getText("policy.renew.success"));
 		this.initForm(true);
@@ -148,6 +137,7 @@ public class Policy4CarOperateAction extends FileEntityAction<Long, Policy> {
 		this.setE(newPolicy);
 		// 构建附件控件
 		attachsUI = buildAttachsUI(false, false, newPolicy);
+		this.json = json.toString();
 		return "formr";
 	}
 
@@ -170,8 +160,9 @@ public class Policy4CarOperateAction extends FileEntityAction<Long, Policy> {
 	public String doSurrender() throws Exception {
 		Long fromPolicyId = this.getId();
 		this.policyService.doSurrender(fromPolicyId, surrenderDate);
-		json = new Json();
+		Json json = new Json();
 		json.put("msg", getText("policy.surrender.success"));
+		this.json = json.toString();
 		return "json";
 	}
 
@@ -182,8 +173,9 @@ public class Policy4CarOperateAction extends FileEntityAction<Long, Policy> {
 	public String doLogout() throws Exception{		
 		Long fromPolicyId = this.getId();
 		this.policyService.doLogout(fromPolicyId);
-		json = new Json();
+		Json json = new Json();
 		json.put("msg", getText("policy.logout.success"));
+		this.json = json.toString();
 		return "json";
 	}
 	

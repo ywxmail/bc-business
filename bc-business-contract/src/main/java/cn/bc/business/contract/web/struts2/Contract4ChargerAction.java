@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.Assert;
 
 import cn.bc.BCConstants;
 import cn.bc.business.OptionConstants;
@@ -29,6 +30,7 @@ import cn.bc.business.contract.domain.ContractFeeDetail;
 import cn.bc.business.contract.service.Contract4ChargerService;
 import cn.bc.business.web.struts2.FileEntityAction;
 import cn.bc.core.util.DateUtils;
+import cn.bc.docs.domain.Attach;
 import cn.bc.docs.service.AttachService;
 import cn.bc.docs.web.ui.html.AttachWidget;
 import cn.bc.identity.web.SystemContext;
@@ -70,7 +72,6 @@ public class Contract4ChargerAction extends
 	public String[] chargerNameAry;
 	public Map<String, Object> carInfoMap; // 车辆Map
 	public boolean isExistContract; // 是否存在合同
-	public Json json;
 	public boolean isDoMaintenance = false;// 是否进行维护操作
 	public boolean scrapToPower;// 是否能看残值归属
 	public String feeDetails;// 收费明细的json字符串
@@ -289,8 +290,7 @@ public class Contract4ChargerAction extends
 
 	@Override
 	public String save() throws Exception {
-
-		json = new Json();
+		Json json = new Json();
 		Contract4Charger e = this.getE();
 		Long excludeId = null;
 		// 保存之前检测自编号是否唯一:仅在新建时检测
@@ -299,6 +299,7 @@ public class Contract4ChargerAction extends
 		if (excludeId != null) {
 			json.put("success", false);
 			json.put("msg", getText("contract4Labour.code.exist2"));
+			this.json = json.toString();
 			return "json";
 		} else {
 			// 如果Pid不为空，且为新建的则该合同执行的是过户或生发包或续约操作
@@ -335,6 +336,7 @@ public class Contract4ChargerAction extends
 				json.put("oldId", fromContractId);
 				json.put("success", true);
 				json.put("msg", msg);
+				this.json = json.toString();
 				return "json";
 
 			} else {
@@ -357,6 +359,7 @@ public class Contract4ChargerAction extends
 				json.put("id", e.getId());
 				json.put("success", true);
 				json.put("msg", getText("form.save.success"));
+				this.json = json.toString();
 				return "json";
 			}
 		}
@@ -459,9 +462,10 @@ public class Contract4ChargerAction extends
 
 	/** 判断指定的车辆是否已经存在经济合同 */
 	public String isExistContract() {
-		json = new Json();
+		Json json = new Json();
 		json.put("isExistContract",
 				this.contract4ChargerService.isExistContract(carId));
+		this.json = json.toString();
 		return "json";
 	}
 
@@ -486,7 +490,7 @@ public class Contract4ChargerAction extends
 	}
 
 	public String checkCodeIsExist() {
-		json = new Json();
+		Json json = new Json();
 		Long excludeId = this.contract4ChargerService.checkCodeIsExist(
 				this.excludeId, this.code);
 		if (excludeId != null) {
@@ -496,6 +500,7 @@ public class Contract4ChargerAction extends
 		} else {
 			json.put("isExist", "false");
 		}
+		this.json = json.toString();
 		return "json";
 	}
 
@@ -519,6 +524,19 @@ public class Contract4ChargerAction extends
 
 		// 只读控制
 		attachsUI.setReadOnly(forceReadonly ? true : this.isReadonly());
+
+		// 自定义附件总控制按钮
+		if (!attachsUI.isReadOnly()) {
+			attachsUI.addHeadButton(AttachWidget.createButton("添加模板", null,
+					"bc.contract4ChargerForm.addAttachFromTemplate", null));// 添加模板
+		}
+		attachsUI.addHeadButton(AttachWidget
+				.defaultHeadButton4DownloadAll(null));// 打包下载
+		if (!attachsUI.isReadOnly()) {
+			attachsUI.addHeadButton(AttachWidget
+					.defaultHeadButton4DeleteAll(null));// 删除
+		}
+
 		return attachsUI;
 	}
 
@@ -699,4 +717,39 @@ public class Contract4ChargerAction extends
 		return map;
 	}
 
+	// ==== 从模板添加附件 开始 ====
+	public String tpl;
+
+	/**
+	 * 从模板添加附件
+	 * 
+	 * @throws Exception
+	 */
+	public String addAttachFromTemplate() throws Exception {
+		Assert.notNull(this.getId());
+		Assert.hasText(tpl);
+
+		// 根据模板生成附件
+		List<Attach> attachs = this.contract4ChargerService
+				.doAddAttachFromTemplate(this.getId(), tpl.split(","));
+
+		// 返回附件信息
+		JSONArray jsons = new JSONArray();
+		JSONObject json, msg;
+		for (Attach attach : attachs) {
+			json = new JSONObject();
+			// {"err":"","msg":{"url":"/bs/bc/attach/download?id=10040140","localfile":"chart_fixedSize.xls","id":"10040140"}}
+			json.put("err", "");
+			msg = new JSONObject();
+			msg.put("url", this.getContextPath() + "/bc/attach/download?id="
+					+ attach.getId());
+			msg.put("localfile", attach.getSubject());
+			msg.put("id", attach.getId());
+			json.put("msg", msg);
+			jsons.put(json);
+		}
+		this.json = jsons.toString();
+		return "json";
+	}
+	// ==== 从模板添加附件结束始 ====
 }
