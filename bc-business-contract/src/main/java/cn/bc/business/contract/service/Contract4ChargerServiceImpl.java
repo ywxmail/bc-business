@@ -12,6 +12,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
@@ -44,6 +46,8 @@ import cn.bc.template.service.TemplateService;
  */
 public class Contract4ChargerServiceImpl extends
 		DefaultCrudService<Contract4Charger> implements Contract4ChargerService {
+	private static Log logger = LogFactory
+			.getLog(Contract4ChargerServiceImpl.class);
 	private Contract4ChargerDao contract4ChargerDao;
 	private ContractDao contractDao;
 	private IdGeneratorService idGeneratorService;// 用于生成uid的服务
@@ -780,29 +784,31 @@ public class Contract4ChargerServiceImpl extends
 		return this.contract4ChargerDao.checkCodeIsExist(excludeId, code);
 	}
 
-	public List<Attach> doAddAttachFromTemplate(Long id, String[] templateCodes)
+	public Attach doAddAttachFromTemplate(Long id, String templateCode)
 			throws IOException {
 		// 加载合同
 		Contract4Charger c = this.load(id);
 
-		// 生成格式化参数
+		// TODO: 生成格式化参数
 		Map<String, Object> params = new HashMap<String, Object>();
-		params.put("车牌", c.getExt_str1());
-		params.put("责任人", c.getExt_str2());
-		params.put("合同开始日期", DateUtils.formatCalendar2Day(c.getStartDate()));
-		params.put("合同结束日期", DateUtils.formatCalendar2Day(c.getEndDate()));
+		params.put("name", c.getExt_str1());
+		params.put("age", c.getExt_str1());
+		params.put("plate", c.getExt_str1());
+		params.put("chargers", c.getExt_str2());
+		params.put("startDate", DateUtils.formatCalendar2Day(c.getStartDate()));
+		params.put("endDate", DateUtils.formatCalendar2Day(c.getEndDate()));
 
-		Template template;
-		List<Attach> attachs = new ArrayList<Attach>();
-		Attach attach;
+		// 生成附件
 		String ptype = Contract4Charger.ATTACH_TYPE;
 		String puid = c.getUid();
-		for (String code : templateCodes) {
-			template = this.templateService.loadByCode(code);
-			attach = template.format2Attach(params, ptype, puid);
-			if (attach != null)
-				attachs.add(attach);
+		Template template = this.templateService.loadByCode(templateCode);
+		if (template == null) {
+			logger.warn("模板不存在,返回null:code=" + templateCode);
+			return null;
+		} else {
+			Attach attach = template.format2Attach(params, ptype, puid);
+			this.attachService.save(attach);
+			return attach;
 		}
-		return attachs;
 	}
 }

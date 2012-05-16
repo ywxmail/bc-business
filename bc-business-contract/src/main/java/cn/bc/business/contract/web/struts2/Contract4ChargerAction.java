@@ -729,26 +729,31 @@ public class Contract4ChargerAction extends
 		Assert.notNull(this.getId());
 		Assert.hasText(tpl);
 
-		// 根据模板生成附件
-		List<Attach> attachs = this.contract4ChargerService
-				.doAddAttachFromTemplate(this.getId(), tpl.split(","));
-
 		// 返回附件信息
-		JSONArray jsons = new JSONArray();
-		JSONObject json, msg;
-		for (Attach attach : attachs) {
-			json = new JSONObject();
+		JSONObject result = new JSONObject();
+		try {
+			// 根据模板生成附件
+			Attach attach = this.contract4ChargerService
+					.doAddAttachFromTemplate(this.getId(), tpl);
+
+			// 附件参数
+			result.put("id", attach.getId());
+			result.put("subject", attach.getSubject());
+			result.put("size", attach.getSize());
+			result.put("extension", attach.getExtension());
+			result.put("path", attach.getPath());
+
 			// {"err":"","msg":{"url":"/bs/bc/attach/download?id=10040140","localfile":"chart_fixedSize.xls","id":"10040140"}}
-			json.put("err", "");
-			msg = new JSONObject();
-			msg.put("url", this.getContextPath() + "/bc/attach/download?id="
-					+ attach.getId());
-			msg.put("localfile", attach.getSubject());
-			msg.put("id", attach.getId());
-			json.put("msg", msg);
-			jsons.put(json);
+			// 成功信息
+			result.put("success", true);
+			result.put("msg", "添加模板成功！");
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+			// 失败信息
+			result.put("success", false);
+			result.put("msg", e.getMessage());
 		}
-		this.json = jsons.toString();
+		this.json = result.toString();
 		return "json";
 	}
 	// ==== 从模板添加附件结束始 ====
