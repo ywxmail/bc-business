@@ -83,7 +83,6 @@ public class CaseTrafficAction extends
 	public Map<String, String> statusesValue;
 	public Map<String, String> sourcesValue;
 	private Map<String, List<Map<String, String>>> allList;
-	public String json;
 
 	public Long getCarId() {
 		return carId;

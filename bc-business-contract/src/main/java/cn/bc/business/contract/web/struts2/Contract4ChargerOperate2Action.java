@@ -61,7 +61,6 @@ public class Contract4ChargerOperate2Action extends
 	public String[] chargerNameAry;
 	public Map<String, Object> carInfoMap; // 车辆Map
 	public boolean isExistContract; // 是否存在合同
-	public Json json;
 
 	public List<Map<String, String>> scrapToList; // 残值归属
 
@@ -209,7 +208,7 @@ public class Contract4ChargerOperate2Action extends
 
 		// 合同实际结束日期
 		Calendar stopDate4Charger = DateUtils.getCalendar(this.stopDate);
-		json = new Json();
+		Json json = new Json();
 		Contract4Charger e = this.getE();
 		Long excludeId = null;
 		// 保存之前检测自编号是否唯一:仅在新建时检测
@@ -218,6 +217,7 @@ public class Contract4ChargerOperate2Action extends
 		if (excludeId != null) {
 			json.put("success", false);
 			json.put("msg", getText("contract4Labour.code.exist2"));
+			this.json = json.toString();
 			return "json";
 		}
 
@@ -240,6 +240,7 @@ public class Contract4ChargerOperate2Action extends
 			json.put("id", e.getId());
 			json.put("success", true);
 			json.put("msg", getText("form.save.success"));
+			this.json = json.toString();
 			return "json";
 		} else {// 操作保存
 
@@ -267,6 +268,7 @@ public class Contract4ChargerOperate2Action extends
 			json.put("oldId", fromContractId);
 			json.put("success", true);
 			json.put("msg", msg);
+			this.json = json.toString();
 			return "json";
 		}
 
@@ -308,9 +310,10 @@ public class Contract4ChargerOperate2Action extends
 
 	/** 判断指定的车辆是否已经存在经济合同 */
 	public String isExistContract() {
-		json = new Json();
+		Json json = new Json();
 		json.put("isExistContract",
 				this.contract4ChargerService.isExistContract(carId));
+		this.json = json.toString();
 		return "json";
 	}
 
@@ -335,7 +338,7 @@ public class Contract4ChargerOperate2Action extends
 	}
 
 	public String checkCodeIsExist() {
-		json = new Json();
+		Json json = new Json();
 		Long excludeId = this.contract4ChargerService.checkCodeIsExist(
 				this.excludeId, this.code);
 		if (excludeId != null) {
@@ -345,6 +348,7 @@ public class Contract4ChargerOperate2Action extends
 		} else {
 			json.put("isExist", "false");
 		}
+		this.json = json.toString();
 		return "json";
 	}
 

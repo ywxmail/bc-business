@@ -529,7 +529,6 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 	}
 */
 	
-	public String json;
 	public String selectCarMansInfo() {
 		List<CarMan> drivers = this.carManService.selectAllCarManByCarId(carId);
 		JsonArray jsons = new JsonArray();

@@ -76,8 +76,6 @@ public class Contract4LabourAction extends
 	public boolean isExistContract; // 是否存在合同
 	public boolean isSupply; // 是否补录
 	public boolean isDoMaintenance = false;// 是否进行维护操作
-	public Json json;
-
 	public boolean isDoChangeCar = false;// 是否执行转车操作
 
 	// public CertService certService;
@@ -525,7 +523,7 @@ public class Contract4LabourAction extends
 			Long fromContractId = e.getPid();
 			Contract newContract = null;
 			String msg = "";
-			json = new Json();
+			Json json = new Json();
 			// 合同实际结束日期
 			Calendar stopDate4Charger = DateUtils.getCalendar(this.stopDate);
 
@@ -540,10 +538,11 @@ public class Contract4LabourAction extends
 			json.put("oldId", fromContractId);
 			json.put("success", true);
 			json.put("msg", msg);
+			this.json = json.toString();
 			return "json";
 		} else {
 			// 正常操作
-			json = new Json();
+			Json json = new Json();
 			Contract4Labour e = this.getE();
 			Long carManId = null;
 			// 保存之前检测社保号是否唯一:仅在新建时检测,补录不检测
@@ -554,6 +553,7 @@ public class Contract4LabourAction extends
 			if (carManId != null) {
 				json.put("success", false);
 				json.put("msg", getText("contract4Labour.insurCode.exist2"));
+				this.json = json.toString();
 				return "json";
 			} else {
 				this.beforeSave(e);
@@ -569,6 +569,7 @@ public class Contract4LabourAction extends
 				json.put("id", e.getId());
 				json.put("success", true);
 				json.put("msg", getText("form.save.success"));
+				this.json = json.toString();
 				return "json";
 			}
 		}
@@ -595,7 +596,7 @@ public class Contract4LabourAction extends
 	}
 
 	public String checkInsurCodeIsExist() {
-		json = new Json();
+		Json json = new Json();
 		Long carManId = this.contract4LabourService.checkInsurCodeIsExist(
 				this.excludeId, this.insurCode);
 		if (carManId != null) {
@@ -605,6 +606,7 @@ public class Contract4LabourAction extends
 		} else {
 			json.put("isExist", "false");
 		}
+		this.json = json.toString();
 		return "json";
 	}
 
@@ -721,7 +723,7 @@ public class Contract4LabourAction extends
 		carManInfoMap = this.contract4LabourService
 				.findCarManByCarManId(driverId);
 
-		json = new Json();
+		Json json = new Json();
 		if (carManInfoMap != null && carManInfoMap.size() > 0) {
 			json.put("sex", Integer.valueOf(carManInfoMap.get("sex") + ""));
 			json.put("cert_fwzg", isNullObject(carManInfoMap.get("cert_fwzg")));
@@ -735,11 +737,12 @@ public class Contract4LabourAction extends
 						getDateToString(carManInfoMap.get("birthdate")));
 			}
 		}
+		this.json = json.toString();
 		return "json";
 	}
 
 	public String carManInfo() {
-		json = new Json();
+		Json json = new Json();
 		infoList = this.contract4LabourService.selectRelateCarManByCarId(carId);
 		if (infoList.size() == 1) {
 			json.put("id", isNullObject(infoList.get(0).get("driver_id")));
@@ -750,14 +753,16 @@ public class Contract4LabourAction extends
 		if (infoList.size() > 1) {
 			json.put("isMore", "true");
 		}
+		this.json = json.toString();
 		return "json";
 	}
 
 	/** 判断指定的司机是否已经存在劳动合同 */
 	public String isExistContract() {
-		json = new Json();
+		Json json = new Json();
 		json.put("isExistContract",
 				this.contract4LabourService.isExistContractByDriverId(driverId));
+		this.json = json.toString();
 		return "json";
 	}
 

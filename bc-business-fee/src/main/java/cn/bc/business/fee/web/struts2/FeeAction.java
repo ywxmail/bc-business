@@ -56,7 +56,6 @@ public class FeeAction extends FileEntityAction<Long, Fee> {
 	public JSONArray feeNames; // 承包费明细名称列表
 	public String feeDetails;// 承包费本期实收明细的json字符串
 	public Set<FeeDetail> b4feeOweDetail;// 前期欠费明细
-	public Json json;
 	
 	public FeeService feeService;
 	public CarManService carManService;
@@ -228,7 +227,7 @@ public class FeeAction extends FileEntityAction<Long, Fee> {
 	
 	@Override
 	public String save() throws Exception {
-		json = new Json();
+		Json json = new Json();
 		Fee e = this.getE();
 		Long excludeId = null;
 		//保存之前检测此车辆是否存在本年本月的承包费用
@@ -254,6 +253,7 @@ public class FeeAction extends FileEntityAction<Long, Fee> {
 			json.put("success", true);
 			json.put("msg", getText("form.save.success"));
 		}
+		this.json = json.toString();
 		return "json";
 	}
 

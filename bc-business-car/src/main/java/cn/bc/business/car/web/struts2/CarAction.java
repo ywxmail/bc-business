@@ -79,8 +79,6 @@ public class CarAction extends FileEntityAction<Long, Car> {
 	public JSONArray taximeterTypes; // 计价器型号
 	public JSONArray carTvScreenList;
 	public JSONArray carLPGList;
-	public Json json;
-
 	public String vinPrefix;// 车架号前缀
 	public String vinSuffix;// 车架号后缀
 
@@ -244,7 +242,7 @@ public class CarAction extends FileEntityAction<Long, Car> {
 
 	@Override
 	public String save() throws Exception {
-		json = new Json();
+		Json json = new Json();
 		Car e = this.getE();
 		Long existsId = null;
 		// 保存之前检测车牌号是否唯一:仅在新建时检测
@@ -255,6 +253,7 @@ public class CarAction extends FileEntityAction<Long, Car> {
 		if (existsId != null) {
 			json.put("success", false);
 			json.put("msg", getText("car.error.plateIsExists2"));
+			this.json = json.toString();
 			return "json";
 		} else {
 			// // 合并车架号的前缀和后缀
@@ -265,6 +264,7 @@ public class CarAction extends FileEntityAction<Long, Car> {
 			json.put("id", e.getId());
 			json.put("success", true);
 			json.put("msg", getText("form.save.success"));
+			this.json = json.toString();
 			return "json";
 		}
 	}
@@ -402,7 +402,7 @@ public class CarAction extends FileEntityAction<Long, Car> {
 	}
 
 	public String carModelInfo() {
-		json = new Json();
+		Json json = new Json();
 		CarModel obj = this.carModelService
 				.findcarModelByFactoryModel(factoryModel);
 
@@ -425,6 +425,7 @@ public class CarAction extends FileEntityAction<Long, Car> {
 		json.put("totalWeight", obj.getTotalWeight());// 总质量
 		json.put("accessWeight", obj.getAccessWeight());// 核定承载量
 		json.put("accessCount", obj.getAccessCount()); // 载客人数
+		this.json = json.toString();
 		return "json";
 	}
 
@@ -442,13 +443,14 @@ public class CarAction extends FileEntityAction<Long, Car> {
 	}
 
 	public String carLPGInfo() {
-		json = new Json();
+		Json json = new Json();
 		CarLPG obj = this.carLPGService.findcarLPGByLPGModel(lpgName);
 		json.put("lpgModel", obj.getModel());
 		json.put("lpgGpModel", obj.getGpmodel());
 		json.put("lpgJcfModel", obj.getJcfmodel());
 		json.put("lpgQhqModel", obj.getQhqmodel());
 		json.put("lpgPsqModel", obj.getPsqmodel());
+		this.json = json.toString();
 		return "json";
 	}
 
@@ -488,12 +490,13 @@ public class CarAction extends FileEntityAction<Long, Car> {
 	 * 通过自编号是否被其他车辆使用过,并且将使用过此编号的车辆的车牌号生成到新车的原车号. 如果返回多辆车只取最新登记日期那辆车牌号.
 	 */
 	public String autoSetOriginNo() {
-		json = new Json();
+		Json json = new Json();
 		Car obj = this.carService.findcarOriginNoByOwnership(ownershipNo,
 				fileDate);
 		if (obj != null && obj.getPlateNo() != null) {
 			json.put("plateNo", obj.getPlateNo());
 		}
+		this.json = json.toString();
 		return "json";
 	}
 
@@ -511,7 +514,7 @@ public class CarAction extends FileEntityAction<Long, Car> {
 	}
 
 	public String checkCodeIsExists() {
-		json = new Json();
+		Json json = new Json();
 		Long existsId = this.carService.checkCodeIsExists(this.excludeId,
 				this.code);
 		if (existsId != null) {
@@ -521,6 +524,7 @@ public class CarAction extends FileEntityAction<Long, Car> {
 		} else {
 			json.put("isExists", "false");
 		}
+		this.json = json.toString();
 		return "json";
 	}
 
@@ -531,7 +535,7 @@ public class CarAction extends FileEntityAction<Long, Car> {
 	public String plateNo;
 
 	public String checkPlateIsExists() {
-		json = new Json();
+		Json json = new Json();
 		Long existsId = this.carService.checkPlateIsExists(this.excludeId,
 				this.plateType, this.plateNo);
 		if (existsId != null) {
@@ -541,6 +545,7 @@ public class CarAction extends FileEntityAction<Long, Car> {
 		} else {
 			json.put("isExists", "false");
 		}
+		this.json = json.toString();
 		return "json";
 	}
 	// ========判断车牌号唯一性代码结束========

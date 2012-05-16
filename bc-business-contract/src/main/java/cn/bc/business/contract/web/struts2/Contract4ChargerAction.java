@@ -72,7 +72,6 @@ public class Contract4ChargerAction extends
 	public String[] chargerNameAry;
 	public Map<String, Object> carInfoMap; // 车辆Map
 	public boolean isExistContract; // 是否存在合同
-	public String json;
 	public boolean isDoMaintenance = false;// 是否进行维护操作
 	public boolean scrapToPower;// 是否能看残值归属
 	public String feeDetails;// 收费明细的json字符串

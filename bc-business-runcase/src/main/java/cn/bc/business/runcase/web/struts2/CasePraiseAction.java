@@ -322,7 +322,6 @@ public class CasePraiseAction extends FileEntityAction<Long, Case4Praise> {
 	
 */
 	
-	public String json;
 	public String selectCarMansInfo() {
 		List<CarMan> drivers = this.carManService.selectAllCarManByCarId(carId);
 		JsonArray jsons = new JsonArray();
