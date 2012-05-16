@@ -30,6 +30,7 @@ import cn.bc.business.carmodel.service.CarModelService;
 import cn.bc.business.motorcade.domain.Motorcade;
 import cn.bc.business.motorcade.service.MotorcadeService;
 import cn.bc.business.web.struts2.FileEntityAction;
+import cn.bc.core.exception.CoreException;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.option.domain.OptionItem;
 import cn.bc.option.service.OptionService;
@@ -543,5 +544,18 @@ public class CarAction extends FileEntityAction<Long, Car> {
 		}
 		return "json";
 	}
+
 	// ========判断车牌号唯一性代码结束========
+
+	@Override
+	public String delete() throws Exception {
+		try {
+			return super.delete();
+		} catch (CoreException e) {
+			this.json = new Json();
+			this.json.put("msg", "因关联而无法删除");
+			return "json";
+		}
+	}
+
 }

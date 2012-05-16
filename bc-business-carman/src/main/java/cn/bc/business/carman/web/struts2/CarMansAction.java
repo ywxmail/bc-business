@@ -477,7 +477,10 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 			// 编辑按钮
 			tb.addButton(this.getDefaultEditToolbarButton());
 
-			// 取消删除按钮
+			// 删除按钮
+			tb.addButton(new ToolbarButton().setIcon("ui-icon-trash")
+					.setText("删除草稿").setClick("bs.carManView.delete_"));
+
 		}
 
 		// 搜索按钮

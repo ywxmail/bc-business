@@ -4,12 +4,9 @@
 package cn.bc.business.carman.service;
 
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.StringUtils;
 
 import cn.bc.BCConstants;
 import cn.bc.business.carman.dao.CarByDriverHistoryDao;
@@ -17,6 +14,7 @@ import cn.bc.business.carman.dao.CarManDao;
 import cn.bc.business.carman.domain.CarByDriverHistory;
 import cn.bc.business.carman.domain.CarMan;
 import cn.bc.business.cert.domain.Cert;
+import cn.bc.core.exception.CoreException;
 import cn.bc.core.service.DefaultCrudService;
 import cn.bc.log.domain.OperateLog;
 import cn.bc.log.service.OperateLogService;
@@ -63,28 +61,59 @@ public class CarManServiceImpl extends DefaultCrudService<CarMan> implements
 	// 将删除方法改为更新方法
 	@Override
 	public void delete(Serializable id) {
-		// TODO Auto-generated method stub
-		Map<String, Object> attrs = new HashMap<String, Object>();
-		attrs.put("status", BCConstants.STATUS_DELETED);
-		super.update(id, attrs);
-		// 记录删除日志(更新司机的状态为注销)
-		this.operateLogService.saveWorkLog(CarMan.class.getSimpleName(),
-				String.valueOf(id), "删除司机", null, OperateLog.OPERATE_DELETE);
+		CarMan cm = this.load(id);
+		// 只能删除草稿状态下的司机
+		if (BCConstants.STATUS_DRAFT == cm.getStatus()) {
+			// 删除司机
+			super.delete(id);
+			// 记录操作日志
+			this.operateLogService.saveWorkLog(CarMan.class.getSimpleName(),
+					String.valueOf(id), "删除草稿状态的司机" + cm.getName(), null,
+					OperateLog.OPERATE_DELETE);
+		} else {
+			// 如果不是草稿状态的司机，抛出异常
+			throw new CoreException("coreException");
+		}
+
+		// // TODO Auto-generated method stub
+		// Map<String, Object> attrs = new HashMap<String, Object>();
+		// attrs.put("status", BCConstants.STATUS_DELETED);
+		// super.update(id, attrs);
+		// // // 记录删除日志(更新司机的状态为注销)
+		// this.operateLogService.saveWorkLog(CarMan.class.getSimpleName(),
+		// String.valueOf(id), "删除司机", null, OperateLog.OPERATE_DELETE);
 
 	}
 
 	// 将删除方法改为更新方法
 	@Override
 	public void delete(Serializable[] ids) {
-		// TODO Auto-generated method stub
-		Map<String, Object> attrs = new HashMap<String, Object>();
-		attrs.put("status", BCConstants.STATUS_DELETED);
-		super.update(ids, attrs);
-		// 记录删除日志(更新司机的状态为注销)
-		this.operateLogService.saveWorkLog(CarMan.class.getSimpleName(),
-				StringUtils.arrayToCommaDelimitedString(ids), "删除司机", null,
-				OperateLog.OPERATE_DELETE);
+		// // TODO Auto-generated method stub
+		// Map<String, Object> attrs = new HashMap<String, Object>();
+		// attrs.put("status", BCConstants.STATUS_DELETED);
+		// super.update(ids, attrs);
+		// // 记录删除日志(更新司机的状态为注销)
+		// this.operateLogService.saveWorkLog(CarMan.class.getSimpleName(),
+		// StringUtils.arrayToCommaDelimitedString(ids), "删除司机", null,
+		// OperateLog.OPERATE_DELETE);
 
+		for (Serializable id : ids) {
+			CarMan cm = this.load(id);
+			// 只能删除草稿状态下的司机
+			if (BCConstants.STATUS_DRAFT == cm.getStatus()) {
+				// 删除司机
+				super.delete(id);
+				// 记录操作日志
+				this.operateLogService.saveWorkLog(
+						CarMan.class.getSimpleName(), String.valueOf(id),
+						"删除草稿状态的司机" + cm.getName(), null,
+						OperateLog.OPERATE_DELETE);
+			} else {
+				// 如果不是草稿状态的司机，抛出异常
+				throw new CoreException("coreException");
+			}
+
+		}
 	}
 
 	/**
