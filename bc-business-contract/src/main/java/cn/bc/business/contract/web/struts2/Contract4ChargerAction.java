@@ -54,7 +54,6 @@ public class Contract4ChargerAction extends
 	private static final long serialVersionUID = 1L;
 	private Contract4ChargerService contract4ChargerService;
 	// private Contract4LabourService contract4LabourService;
-	private AttachService attachService;
 	private OptionService optionService;
 	private Long carId;
 	public Long driverId;
@@ -87,11 +86,6 @@ public class Contract4ChargerAction extends
 			Contract4ChargerService contract4ChargerService) {
 		this.contract4ChargerService = contract4ChargerService;
 		this.setCrudService(contract4ChargerService);
-	}
-
-	@Autowired
-	public void setAttachService(AttachService attachService) {
-		this.attachService = attachService;
 	}
 
 	@Autowired
@@ -509,21 +503,10 @@ public class Contract4ChargerAction extends
 	private AttachWidget buildAttachsUI(boolean isNew, boolean forceReadonly) {
 		// 构建附件控件
 		String ptype = Contract4Charger.KEY_UID;
-		AttachWidget attachsUI = new AttachWidget();
-		attachsUI.setFlashUpload(isFlashUpload());
-		attachsUI.addClazz("formAttachs");
-		if (!isNew)
-			attachsUI.addAttach(this.attachService.findByPtype(ptype, this
-					.getE().getUid()));
-		attachsUI.setPuid(this.getE().getUid()).setPtype(ptype);
-
-		// 上传附件的限制
-		attachsUI.addExtension(getText("app.attachs.extensions"))
-				.setMaxCount(Integer.parseInt(getText("app.attachs.maxCount")))
-				.setMaxSize(Integer.parseInt(getText("app.attachs.maxSize")));
-
-		// 只读控制
-		attachsUI.setReadOnly(forceReadonly ? true : this.isReadonly());
+		String puid = this.getE().getUid();
+		boolean readonly = forceReadonly ? true : this.isReadonly();
+		AttachWidget attachsUI = this.buildAttachsUI(isNew, readonly, ptype,
+				puid);
 
 		// 自定义附件总控制按钮
 		if (!attachsUI.isReadOnly()) {
