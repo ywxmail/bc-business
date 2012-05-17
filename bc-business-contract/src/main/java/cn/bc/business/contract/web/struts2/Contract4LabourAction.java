@@ -26,7 +26,7 @@ import cn.bc.business.contract.domain.ContractFeeDetail;
 import cn.bc.business.contract.service.Contract4LabourService;
 import cn.bc.business.web.struts2.FileEntityAction;
 import cn.bc.core.util.DateUtils;
-import cn.bc.docs.service.AttachService;
+import cn.bc.docs.domain.Attach;
 import cn.bc.docs.web.ui.html.AttachWidget;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.option.domain.OptionItem;
@@ -53,7 +53,6 @@ public class Contract4LabourAction extends
 	private static final long serialVersionUID = 1L;
 	private Contract4LabourService contract4LabourService;
 	private OptionService optionService;
-	private AttachService attachService;
 	private Long driverId;
 	private Long carId;
 	public String certCode; // 证件编号
@@ -85,11 +84,6 @@ public class Contract4LabourAction extends
 			Contract4LabourService contract4LabourService) {
 		this.contract4LabourService = contract4LabourService;
 		this.setCrudService(contract4LabourService);
-	}
-
-	@Autowired
-	public void setAttachService(AttachService attachService) {
-		this.attachService = attachService;
 	}
 
 	@Autowired
@@ -614,22 +608,24 @@ public class Contract4LabourAction extends
 
 	private AttachWidget buildAttachsUI(boolean isNew, boolean forceReadonly) {
 		// 构建附件控件
-		String ptype = Contract4Labour.KEY_UID;
-		AttachWidget attachsUI = new AttachWidget();
-		attachsUI.setFlashUpload(isFlashUpload());
-		attachsUI.addClazz("formAttachs");
-		if (!isNew)
-			attachsUI.addAttach(this.attachService.findByPtype(ptype, this
-					.getE().getUid()));
-		attachsUI.setPuid(this.getE().getUid()).setPtype(ptype);
+		String ptype = Contract4Labour.ATTACH_TYPE;
+		String puid = this.getE().getUid();
+		boolean readonly = forceReadonly ? true : this.isReadonly();
+		AttachWidget attachsUI = this.buildAttachsUI(isNew, readonly, ptype,
+				puid);
 
-		// 上传附件的限制
-		attachsUI.addExtension(getText("app.attachs.extensions"))
-				.setMaxCount(Integer.parseInt(getText("app.attachs.maxCount")))
-				.setMaxSize(Integer.parseInt(getText("app.attachs.maxSize")));
+		// 自定义附件总控制按钮
+		if (!attachsUI.isReadOnly()) {
+			attachsUI.addHeadButton(AttachWidget.createButton("添加模板", null,
+					"bc.contract4LabourForm.addAttachFromTemplate", null));// 添加模板
+		}
+		attachsUI.addHeadButton(AttachWidget
+				.defaultHeadButton4DownloadAll(null));// 打包下载
+		if (!attachsUI.isReadOnly()) {
+			attachsUI.addHeadButton(AttachWidget
+					.defaultHeadButton4DeleteAll(null));// 删除
+		}
 
-		// 只读控制
-		attachsUI.setReadOnly(forceReadonly ? true : this.isReadonly());
 		return attachsUI;
 	}
 
@@ -854,5 +850,12 @@ public class Contract4LabourAction extends
 			// birthDay = age+"";
 		}
 		return birthDay;
+	}
+
+	// 从模板添加附件
+	@Override
+	protected Attach buildAttachFromTemplate() throws Exception {
+		return this.contract4LabourService.doAddAttachFromTemplate(
+				this.getId(), this.tpl);
 	}
 }
