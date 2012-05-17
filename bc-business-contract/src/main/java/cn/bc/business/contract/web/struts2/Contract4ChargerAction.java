@@ -54,7 +54,6 @@ public class Contract4ChargerAction extends
 	private static final long serialVersionUID = 1L;
 	private Contract4ChargerService contract4ChargerService;
 	// private Contract4LabourService contract4LabourService;
-	private AttachService attachService;
 	private OptionService optionService;
 	private Long carId;
 	public Long driverId;
@@ -87,11 +86,6 @@ public class Contract4ChargerAction extends
 			Contract4ChargerService contract4ChargerService) {
 		this.contract4ChargerService = contract4ChargerService;
 		this.setCrudService(contract4ChargerService);
-	}
-
-	@Autowired
-	public void setAttachService(AttachService attachService) {
-		this.attachService = attachService;
 	}
 
 	@Autowired
@@ -509,21 +503,10 @@ public class Contract4ChargerAction extends
 	private AttachWidget buildAttachsUI(boolean isNew, boolean forceReadonly) {
 		// 构建附件控件
 		String ptype = Contract4Charger.KEY_UID;
-		AttachWidget attachsUI = new AttachWidget();
-		attachsUI.setFlashUpload(isFlashUpload());
-		attachsUI.addClazz("formAttachs");
-		if (!isNew)
-			attachsUI.addAttach(this.attachService.findByPtype(ptype, this
-					.getE().getUid()));
-		attachsUI.setPuid(this.getE().getUid()).setPtype(ptype);
-
-		// 上传附件的限制
-		attachsUI.addExtension(getText("app.attachs.extensions"))
-				.setMaxCount(Integer.parseInt(getText("app.attachs.maxCount")))
-				.setMaxSize(Integer.parseInt(getText("app.attachs.maxSize")));
-
-		// 只读控制
-		attachsUI.setReadOnly(forceReadonly ? true : this.isReadonly());
+		String puid = this.getE().getUid();
+		boolean readonly = forceReadonly ? true : this.isReadonly();
+		AttachWidget attachsUI = this.buildAttachsUI(isNew, readonly, ptype,
+				puid);
 
 		// 自定义附件总控制按钮
 		if (!attachsUI.isReadOnly()) {
@@ -729,26 +712,31 @@ public class Contract4ChargerAction extends
 		Assert.notNull(this.getId());
 		Assert.hasText(tpl);
 
-		// 根据模板生成附件
-		List<Attach> attachs = this.contract4ChargerService
-				.doAddAttachFromTemplate(this.getId(), tpl.split(","));
-
 		// 返回附件信息
-		JSONArray jsons = new JSONArray();
-		JSONObject json, msg;
-		for (Attach attach : attachs) {
-			json = new JSONObject();
+		JSONObject result = new JSONObject();
+		try {
+			// 根据模板生成附件
+			Attach attach = this.contract4ChargerService
+					.doAddAttachFromTemplate(this.getId(), tpl);
+
+			// 附件参数
+			result.put("id", attach.getId());
+			result.put("subject", attach.getSubject());
+			result.put("size", attach.getSize());
+			result.put("extension", attach.getExtension());
+			result.put("path", attach.getPath());
+
 			// {"err":"","msg":{"url":"/bs/bc/attach/download?id=10040140","localfile":"chart_fixedSize.xls","id":"10040140"}}
-			json.put("err", "");
-			msg = new JSONObject();
-			msg.put("url", this.getContextPath() + "/bc/attach/download?id="
-					+ attach.getId());
-			msg.put("localfile", attach.getSubject());
-			msg.put("id", attach.getId());
-			json.put("msg", msg);
-			jsons.put(json);
+			// 成功信息
+			result.put("success", true);
+			result.put("msg", "添加模板成功！");
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+			// 失败信息
+			result.put("success", false);
+			result.put("msg", e.getMessage());
 		}
-		this.json = jsons.toString();
+		this.json = result.toString();
 		return "json";
 	}
 	// ==== 从模板添加附件结束始 ====

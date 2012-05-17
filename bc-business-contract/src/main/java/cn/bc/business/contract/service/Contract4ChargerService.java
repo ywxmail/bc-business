@@ -267,9 +267,9 @@ public interface Contract4ChargerService extends CrudService<Contract4Charger> {
 	 * 
 	 * @param id
 	 *            经济合同的id
-	 * @param templateCodes
-	 *            模板编码列表
+	 * @param templateCode
+	 *            模板编码
 	 * @return 返回生成的附件信息
 	 */
-	List<Attach> doAddAttachFromTemplate(Long id, String[] templateCodes) throws IOException;
+	Attach doAddAttachFromTemplate(Long id, String templateCode) throws IOException;
 }
