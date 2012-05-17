@@ -31,7 +31,6 @@ import cn.bc.business.contract.service.Contract4ChargerService;
 import cn.bc.business.web.struts2.FileEntityAction;
 import cn.bc.core.util.DateUtils;
 import cn.bc.docs.domain.Attach;
-import cn.bc.docs.service.AttachService;
 import cn.bc.docs.web.ui.html.AttachWidget;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.option.domain.OptionItem;
@@ -253,14 +252,21 @@ public class Contract4ChargerAction extends
 							&& json.getString("startDate").length() > 0) {
 						Calendar startDate = DateUtils.getCalendar(json
 								.getString("startDate"));
-						Calendar endDate = DateUtils.getCalendar(json
-								.getString("endDate"));
 						if (startDate != null) {
 							resource.setStartDate(startDate);
-							resource.setEndDate(endDate);
 
 						}
 					}
+					if (json.getString("endDate") != null
+							&& json.getString("endDate").length() > 0) {
+						Calendar endDate = DateUtils.getCalendar(json
+								.getString("endDate"));
+						if (endDate != null) {
+							resource.setEndDate(endDate);
+						}
+
+					}
+
 					resource.setDescription(json.getString("description"));
 					feeDetails.add(resource);
 				}
@@ -586,8 +592,9 @@ public class Contract4ChargerAction extends
 				}
 			} else {
 				// 经过续约，过户，重发包后
-				pageOption.addButton(new ButtonOption(getText("label.save"),
-						null, "bc.contract4ChargerForm.save"));
+				pageOption.addButton(new ButtonOption(
+						getText("labe.save4Draft"), null,
+						"bc.contract4ChargerForm.save"));
 				pageOption.addButton(new ButtonOption(
 						getText("label.warehousing"), null,
 						"bc.contract4ChargerForm.warehousing"));
@@ -595,8 +602,9 @@ public class Contract4ChargerAction extends
 			}
 			// 维护操作
 			if (isDoMaintenance) {
-				pageOption.addButton(new ButtonOption(getText("label.save"),
-						null, "bc.contract4ChargerForm.save"));
+				pageOption.addButton(new ButtonOption(
+						getText("labe.save4Draft"), null,
+						"bc.contract4ChargerForm.save"));
 				pageOption.addButton(new ButtonOption(
 						getText("label.saveAndClose"), null,
 						"bc.contract4ChargerForm.saveAndClose"));
