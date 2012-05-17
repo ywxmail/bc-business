@@ -20,7 +20,7 @@ import cn.bc.business.car.domain.Car;
 import cn.bc.business.car.event.BeforeSave4CarEvent;
 import cn.bc.business.motorcade.domain.Motorcade;
 import cn.bc.core.Page;
-import cn.bc.core.exception.CoreException;
+import cn.bc.core.exception.PermissionDeniedException;
 import cn.bc.core.query.condition.Condition;
 import cn.bc.core.service.DefaultCrudService;
 import cn.bc.log.domain.OperateLog;
@@ -65,8 +65,8 @@ public class CarServiceImpl extends DefaultCrudService<Car> implements
 					String.valueOf(id), "删除草稿状态的车辆" + car.getPlate(), null,
 					OperateLog.OPERATE_DELETE);
 		} else {
-			// 抛出不能删除的异常
-			throw new CoreException("coreException");
+			// 抛出不能删除非草稿状态车辆的异常
+			throw new PermissionDeniedException();
 		}
 	}
 
@@ -74,21 +74,8 @@ public class CarServiceImpl extends DefaultCrudService<Car> implements
 	public void delete(Serializable[] ids) {
 
 		for (Serializable id : ids) {
-			Car car = this.load(id);
-			// 如果车辆状态为草稿的，可以删除
-			if (BCConstants.STATUS_DRAFT == car.getStatus()) {
-				// 删除车辆
-				this.carDao.delete(id);
-				// 记录删除日志
-				this.operateLogService.saveWorkLog(Car.class.getSimpleName(),
-						String.valueOf(id), "删除草稿状态的车辆" + car.getPlate(), null,
-						OperateLog.OPERATE_DELETE);
-			} else {
-				// 抛出不能删除的异常
-				throw new CoreException("coreException");
-
-			}
-
+			this.delete(id);
+			//
 		}
 
 		// // 批量删除车辆

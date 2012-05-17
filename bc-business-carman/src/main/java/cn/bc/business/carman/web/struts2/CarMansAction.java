@@ -479,7 +479,7 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 
 			// 删除按钮
 			tb.addButton(new ToolbarButton().setIcon("ui-icon-trash")
-					.setText("删除草稿").setClick("bs.carManView.delete_"));
+					.setText("删除草稿").setAction("delete"));
 
 		}
 

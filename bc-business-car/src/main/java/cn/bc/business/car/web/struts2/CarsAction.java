@@ -391,7 +391,7 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 			// 删除按钮
 			tb.addButton(new ToolbarButton().setIcon("ui-icon-trash")
 					.setText("删除草稿").setAction("delete"));
-			// .setClick("bs.carView.delete_")
+			//
 		}
 
 		// 搜索按钮

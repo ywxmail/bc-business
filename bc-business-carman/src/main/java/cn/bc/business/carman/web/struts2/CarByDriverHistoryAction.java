@@ -25,6 +25,7 @@ import cn.bc.business.carman.service.CarManService;
 import cn.bc.business.motorcade.domain.Motorcade;
 import cn.bc.business.motorcade.service.MotorcadeService;
 import cn.bc.business.web.struts2.FileEntityAction;
+import cn.bc.core.exception.PermissionDeniedException;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.option.domain.OptionItem;
 import cn.bc.option.service.OptionService;
@@ -435,5 +436,15 @@ public class CarByDriverHistoryAction extends
 			}
 		}
 
+	}
+
+	// 提示只能删除草稿状态司机的迁移记录
+	@Override
+	protected String getDeleteExceptionMsg(Exception e) {
+		//
+		if (e instanceof PermissionDeniedException) {
+			return "只能删除草稿状态司机的迁移记录";
+		}
+		return super.getDeleteExceptionMsg(e);
 	}
 }

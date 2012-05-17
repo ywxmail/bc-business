@@ -21,7 +21,7 @@ import cn.bc.business.carman.domain.CarByDriverHistory;
 import cn.bc.business.carman.domain.CarMan;
 import cn.bc.business.carman.service.CarManService;
 import cn.bc.business.web.struts2.FileEntityAction;
-import cn.bc.core.exception.CoreException;
+import cn.bc.core.exception.PermissionDeniedException;
 import cn.bc.identity.domain.ActorDetail;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.option.domain.OptionItem;
@@ -339,16 +339,14 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 		return "json";
 	}
 
+	// 提示只能删除草稿状态的司机
 	@Override
-	public String delete() throws Exception {
-		try {
-			return super.delete();
-		} catch (CoreException e) {
-			JSONObject json = new JSONObject();
-			json.put("msg", "因关联而无法删除");
-			this.json = json.toString();
-			return "json";
+	protected String getDeleteExceptionMsg(Exception e) {
+		//
+		if (e instanceof PermissionDeniedException) {
+			return "只能删除草稿状态的司机";
 		}
+		return super.getDeleteExceptionMsg(e);
 	}
 
 }

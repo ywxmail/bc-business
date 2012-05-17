@@ -14,7 +14,7 @@ import cn.bc.business.carman.dao.CarManDao;
 import cn.bc.business.carman.domain.CarByDriverHistory;
 import cn.bc.business.carman.domain.CarMan;
 import cn.bc.business.cert.domain.Cert;
-import cn.bc.core.exception.CoreException;
+import cn.bc.core.exception.PermissionDeniedException;
 import cn.bc.core.service.DefaultCrudService;
 import cn.bc.log.domain.OperateLog;
 import cn.bc.log.service.OperateLogService;
@@ -72,7 +72,7 @@ public class CarManServiceImpl extends DefaultCrudService<CarMan> implements
 					OperateLog.OPERATE_DELETE);
 		} else {
 			// 如果不是草稿状态的司机，抛出异常
-			throw new CoreException("coreException");
+			throw new PermissionDeniedException();
 		}
 
 		// // TODO Auto-generated method stub
@@ -98,21 +98,7 @@ public class CarManServiceImpl extends DefaultCrudService<CarMan> implements
 		// OperateLog.OPERATE_DELETE);
 
 		for (Serializable id : ids) {
-			CarMan cm = this.load(id);
-			// 只能删除草稿状态下的司机
-			if (BCConstants.STATUS_DRAFT == cm.getStatus()) {
-				// 删除司机
-				super.delete(id);
-				// 记录操作日志
-				this.operateLogService.saveWorkLog(
-						CarMan.class.getSimpleName(), String.valueOf(id),
-						"删除草稿状态的司机" + cm.getName(), null,
-						OperateLog.OPERATE_DELETE);
-			} else {
-				// 如果不是草稿状态的司机，抛出异常
-				throw new CoreException("coreException");
-			}
-
+			this.delete(id);
 		}
 	}
 

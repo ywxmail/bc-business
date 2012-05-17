@@ -467,11 +467,8 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 										.setText("编辑").setAction("edit"))
 						// 删除按钮
 						.addButton(
-								new ToolbarButton()
-										.setIcon("ui-icon-trash")
-										.setText("删除草稿")
-										.setClick(
-												"bs.carByDriverHistoryView.delete_"))
+								new ToolbarButton().setIcon("ui-icon-trash")
+										.setText("删除草稿").setAction("delete"))
 
 						// 搜索按钮
 						.addButton(this.getDefaultSearchToolbarButton())
@@ -552,9 +549,7 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 		return this.getContextPath()
 				+ "/bc-business/carByDriverHistory/list.js,"
 				+ this.getContextPath()
-				+ "/bc-business/carByDriverHistory/dingBan.js,"
-				+ this.getContextPath()
-				+ "/bc-business/carByDriverHistory/view.js";
+				+ "/bc-business/carByDriverHistory/dingBan.js";
 	}
 
 }
