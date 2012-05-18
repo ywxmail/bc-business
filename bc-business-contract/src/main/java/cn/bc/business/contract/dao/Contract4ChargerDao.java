@@ -64,6 +64,13 @@ public interface Contract4ChargerDao extends CrudDao<Contract4Charger> {
 	 * @return
 	 */
 	Map<String, Object> findCarInfoByContractId(Long contractId);
+	
+	/**
+	 * 根据contractId查找car信息
+	 * @parma contractId 
+	 * @return
+	 */
+	List<Map<String, String>> findCarByContractId(Long contractId);
 
 	/**
 	 * 根据contractId查找car信息
@@ -160,5 +167,12 @@ public interface Contract4ChargerDao extends CrudDao<Contract4Charger> {
 	 */
 	Long checkCodeIsExist(Long excludeId,String code);
 
+	/**
+	 * 获取去责任人信息
+	 * 
+	 * @param contractId 合同id
+	 * @return
+	 */
+	List<Map<String, String>> findChargerByContractId(Long contractId);
 
 }
