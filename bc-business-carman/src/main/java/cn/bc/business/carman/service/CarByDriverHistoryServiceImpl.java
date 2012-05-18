@@ -22,6 +22,7 @@ import cn.bc.business.carman.domain.CarByDriver;
 import cn.bc.business.carman.domain.CarByDriverHistory;
 import cn.bc.business.carman.domain.CarMan;
 import cn.bc.business.motorcade.dao.MotorcadeDao;
+import cn.bc.core.exception.PermissionDeniedException;
 import cn.bc.core.service.DefaultCrudService;
 import cn.bc.log.domain.OperateLog;
 import cn.bc.log.service.OperateLogService;
@@ -98,55 +99,35 @@ public class CarByDriverHistoryServiceImpl extends
 	}
 
 	@Override
+	public void delete(Serializable id) {
+		CarByDriverHistory cbh = this.load(id);
+		CarMan cm = cbh.getDriver();
+		if (cm != null) {
+			if (cm.getStatus() == BCConstants.STATUS_DRAFT) {
+				super.delete(id);
+			} else {
+				// 抛出不能删除的异常
+				throw new PermissionDeniedException();
+			}
+		} else {
+			// 抛出不能删除的异常
+			throw new PermissionDeniedException();
+		}
+
+	}
+
+	@Override
+	public void delete(Serializable[] ids) {
+		for (Serializable id : ids) {
+			this.delete(id);
+		}
+	}
+
+	@Override
 	public CarByDriverHistory save(CarByDriverHistory entity) {
 		boolean isNew = entity.isNew();
 		// 保存迁移历史记录
 		entity = super.save(entity);
-		// // 记录司机迁移记录的操作日志
-		// if (entity.getDriver() != null) {
-		// if (isNew) {
-		// // 记录新建日志
-		// this.operateLogService.saveWorkLog(
-		// CarByDriverHistory.class.getSimpleName(),
-		// entity.getId().toString(),
-		// "新建司机"
-		// + entity.getDriver().getName()
-		// + "迁移类型为"
-		// + this.getMoveType().get(
-		// String.valueOf(entity.getMoveType()))
-		// + "的迁移记录", null, OperateLog.OPERATE_CREATE);
-		// } else {
-		// // 记录更新日志
-		// this.operateLogService.saveWorkLog(
-		// CarByDriverHistory.class.getSimpleName(),
-		// entity.getId().toString(),
-		// "更新司机"
-		// + entity.getDriver().getName()
-		// + "迁移类型为"
-		// + this.getMoveType().get(
-		// String.valueOf(entity.getMoveType()))
-		// + "的迁移记录", null, OperateLog.OPERATE_UPDATE);
-		// }
-		//
-		// } else {
-		// // 记录车辆迁移记录的操作日志
-		// if (isNew) {
-		// // 记录新建日志
-		// Car c = this.carDao.load(entity.getFromCar().getId());
-		// this.operateLogService.saveWorkLog(CarByDriverHistory.class
-		// .getSimpleName(), entity.getId().toString(),
-		// "新建车辆" + c.getPlate() + "迁移类型为转车队的迁移记录", null,
-		// OperateLog.OPERATE_CREATE);
-		// } else {
-		// // 记录更新日志
-		// this.operateLogService.saveWorkLog(CarByDriverHistory.class
-		// .getSimpleName(), entity.getId().toString(), "更新车辆"
-		// + entity.getFromCar().getPlateType() + "."
-		// + entity.getFromCar().getPlateNo() + "移类型为转车队的迁移记录",
-		// null, OperateLog.OPERATE_UPDATE);
-		// }
-		//
-		// }
 		if (entity.getDriver() != null) {
 			CarMan driver = this.carManDao.load(entity.getDriver().getId());
 			// // 加载该司机的营运班次记录
@@ -231,32 +212,6 @@ public class CarByDriverHistoryServiceImpl extends
 						.getId());
 				updateDriverRelatedInfo(entity, driver, isNew,
 						BCConstants.STATUS_DISABLED, null, null);
-
-				// if (entity.getToCar() != null) {
-				// // 更新该司机表营运车辆信息，主车辆Id,迁移类型,迁移日期，顶班会同期结束日期，司状态(注销)，驾驶状态
-				// this.carByDriverHistoryDao.updateDriverOperationCar(entity
-				// .getDriver().getId(), entity.getToCar().getId(),
-				// entity.getMoveType(), entity.getMoveDate(), null,
-				// BCConstants.STATUS_DISABLED, entity.getToClasses());
-				// } else {
-				// // 主车辆Id为空时，营运班次为空
-				// this.carByDriverHistoryDao.updateDriverOperationCar(entity
-				// .getDriver().getId(), null, entity.getMoveType(),
-				// entity.getMoveDate(), null,
-				// BCConstants.STATUS_DISABLED, entity.getToClasses());
-				//
-				// }
-				// // 记录司机的更新日志
-				// this.operateLogService.saveWorkLog(
-				// CarMan.class.getSimpleName(),
-				// entity.getId().toString(),
-				// "新建"
-				// + driver.getName()
-				// + "迁移类型为"
-				// + this.getMoveType().get(
-				// String.valueOf(entity.getMoveType()))
-				// + "的迁移记录 而将" + "该司机的状态设为注销和更新相应的基本信息", null,
-				// OperateLog.OPERATE_UPDATE);
 
 			}
 
@@ -344,43 +299,6 @@ public class CarByDriverHistoryServiceImpl extends
 		this.carByDriverHistoryDao.updateDriverOperationCar(entity.getDriver()
 				.getId(), toCarId, entity.getMoveType(), entity.getMoveDate(),
 				endDate, status, entity.getToClasses());
-		// String content = "将司机" + entity.getDriver().getName();
-		// if (status == BCConstants.STATUS_ENABLED) {
-		// content = content + "的状态更新为:在案";
-		// } else if (status == BCConstants.STATUS_DISABLED) {
-		// content = content + "的状态更新为:注销";
-		// } else if (status == BCConstants.STATUS_DRAFT) {
-		// content = content + "的状态更新为:草稿";
-		// }
-		// // 如果主营运车辆不为空
-		// if (toCarId != null) {
-		// Car mainCar = this.carDao.load(toCarId);
-		// content = content + "," + "主车辆更新为:" + mainCar.getPlateType() + "."
-		// + mainCar.getPlateNo();
-		// } else {
-		// content = content + "," + "主车辆更新为:空";
-		//
-		// }
-		// // 迁移类型
-		// content = content + "," + "迁移类型更新为:"
-		// + this.getMoveType().get(String.valueOf(entity.getMoveType()));
-		// // 迁移日期
-		// if (entity.getMoveDate() != null) {
-		// content = content + "," + "迁移日期更新为:"
-		// + DateUtils.formatCalendar2Day(entity.getMoveDate());
-		// }
-		// // 顶班合同结束日期
-		// if (endDate != null) {
-		// content = content + "," + "顶班合同结束日期:"
-		// + DateUtils.formatCalendar2Day(endDate);
-		// }
-		// // 营运班次
-		// content = content
-		// + ","
-		// + "更新营运班次为:"
-		// + this.getDriverClasses().get(
-		// String.valueOf(entity.getToClasses()));
-		// // 车辆的营运司机
 
 		// 日志
 		this.operateLogService
@@ -406,33 +324,6 @@ public class CarByDriverHistoryServiceImpl extends
 
 		// 保存迁移历史记录
 		entity = super.save(entity);
-		// 记录司机迁移记录的操作日志
-		// if (entity.getDriver() != null) {
-		// if (isNew) {
-		// // 记录新建日志
-		// this.operateLogService.saveWorkLog(
-		// CarByDriverHistory.class.getSimpleName(),
-		// entity.getId().toString(),
-		// "新建顶班司机"
-		// + entity.getDriver().getName()
-		// + "迁移类型为"
-		// + this.getMoveType().get(
-		// String.valueOf(entity.getMoveType()))
-		// + "的迁移记录", null, OperateLog.OPERATE_CREATE);
-		// } else {
-		// // 记录更新日志
-		// this.operateLogService.saveWorkLog(
-		// CarByDriverHistory.class.getSimpleName(),
-		// entity.getId().toString(),
-		// "更新顶班司机"
-		// + entity.getDriver().getName()
-		// + "迁移类型为"
-		// + this.getMoveType().get(
-		// String.valueOf(entity.getMoveType()))
-		// + "的迁移记录", null, OperateLog.OPERATE_UPDATE);
-		// }
-		//
-		// }
 		// 保存营运班次信息
 		CarMan driver = entity.getDriver();
 		List<CarByDriver> carByDrivers = new ArrayList<CarByDriver>();

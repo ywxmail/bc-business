@@ -654,8 +654,9 @@ public class Contract4LabourAction extends
 							"bc.contract4LabourForm.doResign"));
 				}
 			} else {
-				pageOption.addButton(new ButtonOption(getText("label.save"),
-						null, "bc.contract4LabourForm.save"));
+				pageOption.addButton(new ButtonOption(
+						getText("labe.save4Draft"), null,
+						"bc.contract4LabourForm.save"));
 				pageOption.addButton(new ButtonOption(
 						getText("label.warehousing"), null,
 						"bc.contract4LabourForm.warehousing"));
@@ -674,8 +675,8 @@ public class Contract4LabourAction extends
 		// 如果有录入权限的就有保存按钮
 		if (!this.isEntering()
 				&& this.getE().getStatus() == BCConstants.STATUS_DRAFT) {
-			pageOption.addButton(new ButtonOption(getText("label.save"), null,
-					"bc.contract4LabourForm.save"));
+			pageOption.addButton(new ButtonOption(getText("labe.save4Draft"),
+					null, "bc.contract4LabourForm.save"));
 
 		}
 

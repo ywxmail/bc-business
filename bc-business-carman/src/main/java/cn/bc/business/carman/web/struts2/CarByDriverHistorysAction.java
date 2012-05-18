@@ -27,6 +27,7 @@ import cn.bc.core.query.condition.ConditionUtils;
 import cn.bc.core.query.condition.Direction;
 import cn.bc.core.query.condition.impl.EqualsCondition;
 import cn.bc.core.query.condition.impl.InCondition;
+import cn.bc.core.query.condition.impl.IsNullCondition;
 import cn.bc.core.query.condition.impl.LikeCondition;
 import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.core.util.StringUtils;
@@ -38,6 +39,7 @@ import cn.bc.web.formater.DateRangeFormater;
 import cn.bc.web.formater.KeyValueFormater;
 import cn.bc.web.formater.LinkFormater4Id;
 import cn.bc.web.ui.html.grid.Column;
+import cn.bc.web.ui.html.grid.HiddenColumn4MapKey;
 import cn.bc.web.ui.html.grid.IdColumn4MapKey;
 import cn.bc.web.ui.html.grid.TextColumn4MapKey;
 import cn.bc.web.ui.html.page.PageOption;
@@ -60,6 +62,7 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 	public Long carManId;
 	public Long carId;
 	public Long toCarId;
+	public int status4tab;// 页签传递的车辆状态参数
 	public String status = String.valueOf(BCConstants.STATUS_ENABLED) + ","
 			+ String.valueOf(BCConstants.STATUS_DISABLED); // 车辆的状态，多个用逗号连接
 
@@ -129,7 +132,7 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 		sql.append(",nm.name newMotoreade,d.to_unit,oc.plate_type oldPlateType,oc.plate_no oldPlateNo,d.from_classes");
 		sql.append(",om.name oldMotoreade,d.from_unit,d.move_type,d.move_date,d.driver_id,d.from_car_id,d.to_car_id");
 		sql.append(",d.from_motorcade_id,d.to_motorcade_id,d.shiftwork,d.end_date,m.cert_fwzg,d.hand_papers_date");
-		sql.append(" from BS_CAR_DRIVER_HISTORY d");
+		sql.append(",m.status_ status from BS_CAR_DRIVER_HISTORY d");
 		sql.append(" left join bs_carman m on m.id=d.driver_id");
 		sql.append(" left join bs_car  oc on oc.id=d.from_car_id");
 		sql.append(" left join bs_car  nc on nc.id=d.to_car_id");
@@ -183,6 +186,7 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 				map.put("end_date", rs[i++]);
 				map.put("cert_fwzg", rs[i++]);
 				map.put("hand_papers_date", rs[i++]);
+				map.put("status", rs[i++]);
 
 				return map;
 			}
@@ -264,6 +268,7 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 				getText("carByDriverHistory.shiftwork"), 400)
 				.setValueFormater(new LinkFormater4CarInfo(this
 						.getContextPath())));
+		columns.add(new HiddenColumn4MapKey("status", "status"));// 司机的状态，用于是否能删除草稿状态的迁移记录
 		return columns;
 	}
 
@@ -292,16 +297,23 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected Condition getGridSpecalCondition() {
-		// 状态条件
-		Condition statusCondition = null;
+		// 司机状态条件
+		Condition status4CarManCondition = null;
+		// 迁移类型条件
+		Condition status4NullCondition = null;
 		if (status != null && status.length() > 0) {
 			String[] ss = status.split(",");
 			if (ss.length == 1) {
-				statusCondition = new EqualsCondition("m.status_", new Integer(
-						ss[0]));
+				status4CarManCondition = new EqualsCondition("m.status_",
+						new Integer(ss[0]));
 			} else {
-				statusCondition = new InCondition("m.status_",
+				status4CarManCondition = new InCondition("m.status_",
 						StringUtils.stringArray2IntegerArray(ss));
+			}
+			for (String s : ss) {
+				// 如果是草稿状态下的，不添加转车队的查询条件[状态为null]
+				if (!s.endsWith(String.valueOf(BCConstants.STATUS_DRAFT)))
+					status4NullCondition = new IsNullCondition("m.status_");
 			}
 		}
 
@@ -330,8 +342,12 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 		}
 
 		// 合并条件
-		return ConditionUtils.mix2AndCondition(carManIdCondition,
-				statusCondition, ConditionUtils.mix2OrCondition(
+		return ConditionUtils.mix2AndCondition(
+				carManIdCondition,
+				(status4CarManCondition != null ? ConditionUtils
+						.mix2OrCondition(status4CarManCondition,
+								status4NullCondition).setAddBracket(true)
+						: null), ConditionUtils.mix2OrCondition(
 						carId2ToCarIdCondition, oldCarIdCondition,
 						carId2ShiftworkCarIdCondition));
 	}
@@ -425,15 +441,20 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 		} else {
 			if (carId != null) {
 				// 如果车辆Id不这空，调用标准的工具条
-				tb.addButton(
-						new ToolbarButton().setIcon("ui-icon-document")
-								.setText("转车队").setAction("create")).addButton(
-						new ToolbarButton().setIcon("ui-icon-pencil")
-								.setText("编辑").setAction("edit"));
-				// 不能删除历史记录
-				// .addButton(
-				// new ToolbarButton().setIcon("ui-icon-trash")
-				// .setText("删除").setAction("delete"))
+				// 草稿状态下不能转车，可以在车辆表单中进行修改
+				if (status4tab == BCConstants.STATUS_DRAFT) {
+					tb.addButton(new ToolbarButton().setIcon("ui-icon-pencil")
+							.setText("编辑").setAction("edit"));
+
+				} else {
+					tb.addButton(
+							new ToolbarButton().setIcon("ui-icon-document")
+									.setText("转车队").setAction("create"))
+							.addButton(
+									new ToolbarButton()
+											.setIcon("ui-icon-pencil")
+											.setText("编辑").setAction("edit"));
+				}
 				// 搜索按钮
 				tb.addButton(this.getDefaultSearchToolbarButton());
 			} else {
@@ -444,10 +465,11 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 						.addButton(
 								new ToolbarButton().setIcon("ui-icon-pencil")
 										.setText("编辑").setAction("edit"))
-						// 不能删除历史记录
-						// .addButton(
-						// new ToolbarButton().setIcon("ui-icon-trash")
-						// .setText("删除").setAction("delete"))
+						// 删除按钮
+						.addButton(
+								new ToolbarButton().setIcon("ui-icon-trash")
+										.setText("删除草稿").setAction("delete"))
+
 						// 搜索按钮
 						.addButton(this.getDefaultSearchToolbarButton())
 						.addButton(

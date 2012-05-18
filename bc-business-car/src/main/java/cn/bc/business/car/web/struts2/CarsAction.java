@@ -42,6 +42,7 @@ import cn.bc.web.ui.html.grid.IdColumn4MapKey;
 import cn.bc.web.ui.html.grid.TextColumn4MapKey;
 import cn.bc.web.ui.html.page.PageOption;
 import cn.bc.web.ui.html.toolbar.Toolbar;
+import cn.bc.web.ui.html.toolbar.ToolbarButton;
 import cn.bc.web.ui.html.toolbar.ToolbarMenuButton;
 import cn.bc.web.ui.json.Json;
 
@@ -387,8 +388,10 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 
 			// 编辑按钮
 			tb.addButton(this.getDefaultEditToolbarButton());
-
-			// 取消删除按钮
+			// 删除按钮
+			tb.addButton(new ToolbarButton().setIcon("ui-icon-trash")
+					.setText("删除草稿").setAction("delete"));
+			//
 		}
 
 		// 搜索按钮

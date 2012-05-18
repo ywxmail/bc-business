@@ -30,6 +30,7 @@ import cn.bc.business.carmodel.service.CarModelService;
 import cn.bc.business.motorcade.domain.Motorcade;
 import cn.bc.business.motorcade.service.MotorcadeService;
 import cn.bc.business.web.struts2.FileEntityAction;
+import cn.bc.core.exception.PermissionDeniedException;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.option.domain.OptionItem;
 import cn.bc.option.service.OptionService;
@@ -142,7 +143,7 @@ public class CarAction extends FileEntityAction<Long, Car> {
 						"bc.carForm.saveAndClose"));
 
 			} else {
-				pageOption.addButton(new ButtonOption(getText("label.save"),
+				pageOption.addButton(new ButtonOption(getText("labe.save4Draft"),
 						null, "bc.carForm.save"));
 				pageOption.addButton(new ButtonOption(
 						getText("label.warehousing"), null,
@@ -153,7 +154,7 @@ public class CarAction extends FileEntityAction<Long, Car> {
 		// 如果有录入权限的就有保存按钮
 		if (!this.isEntering()
 				&& this.getE().getStatus() == BCConstants.STATUS_DRAFT) {
-			pageOption.addButton(new ButtonOption(getText("label.save"), null,
+			pageOption.addButton(new ButtonOption(getText("labe.save4Draft"), null,
 					"bc.carForm.save"));
 		}
 	}
@@ -548,5 +549,17 @@ public class CarAction extends FileEntityAction<Long, Car> {
 		this.json = json.toString();
 		return "json";
 	}
+
 	// ========判断车牌号唯一性代码结束========
+
+	// 提示只能删除草稿状态的车辆
+	@Override
+	protected String getDeleteExceptionMsg(Exception e) {
+		//
+		if (e instanceof PermissionDeniedException) {
+			return "只能删除草稿状态的车辆";
+		}
+		return super.getDeleteExceptionMsg(e);
+	}
+
 }

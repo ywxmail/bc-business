@@ -13,7 +13,6 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
-import org.springframework.util.StringUtils;
 
 import cn.bc.BCConstants;
 import cn.bc.business.car.dao.CarDao;
@@ -21,6 +20,7 @@ import cn.bc.business.car.domain.Car;
 import cn.bc.business.car.event.BeforeSave4CarEvent;
 import cn.bc.business.motorcade.domain.Motorcade;
 import cn.bc.core.Page;
+import cn.bc.core.exception.PermissionDeniedException;
 import cn.bc.core.query.condition.Condition;
 import cn.bc.core.service.DefaultCrudService;
 import cn.bc.log.domain.OperateLog;
@@ -55,23 +55,36 @@ public class CarServiceImpl extends DefaultCrudService<Car> implements
 
 	@Override
 	public void delete(Serializable id) {
-		// 删除车辆
-		this.carDao.delete(id);
-
-		// 记录删除日志
-		this.operateLogService.saveWorkLog(Car.class.getSimpleName(),
-				String.valueOf(id), "删除车辆", null, OperateLog.OPERATE_DELETE);
+		Car car = this.load(id);
+		// 如果车辆状态为草稿的，可以删除
+		if (BCConstants.STATUS_DRAFT == car.getStatus()) {
+			// 删除车辆
+			this.carDao.delete(id);
+			// 记录删除日志
+			this.operateLogService.saveWorkLog(Car.class.getSimpleName(),
+					String.valueOf(id), "删除草稿状态的车辆" + car.getPlate(), null,
+					OperateLog.OPERATE_DELETE);
+		} else {
+			// 抛出不能删除非草稿状态车辆的异常
+			throw new PermissionDeniedException();
+		}
 	}
 
 	@Override
 	public void delete(Serializable[] ids) {
-		// 批量删除车辆
-		this.carDao.delete(ids);
 
-		// 记录删除日志
-		this.operateLogService.saveWorkLog(Car.class.getSimpleName(),
-				StringUtils.arrayToCommaDelimitedString(ids), "删除车辆", null,
-				OperateLog.OPERATE_DELETE);
+		for (Serializable id : ids) {
+			this.delete(id);
+			//
+		}
+
+		// // 批量删除车辆
+		// this.carDao.delete(ids);
+		//
+		// // 记录删除日志
+		// this.operateLogService.saveWorkLog(Car.class.getSimpleName(),
+		// StringUtils.arrayToCommaDelimitedString(ids), "删除车辆", null,
+		// OperateLog.OPERATE_DELETE);
 	}
 
 	/**
@@ -221,10 +234,12 @@ public class CarServiceImpl extends DefaultCrudService<Car> implements
 
 	/**
 	 * 根据状态查找车辆列表
+	 * 
 	 * @param status
 	 * @return
 	 */
 	public List<Car> selectCarByStatus(Integer status) {
 		return this.carDao.selectCarByStatus(status);
 	}
+
 }
