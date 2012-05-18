@@ -4,10 +4,12 @@
 package cn.bc.business.fee.web.struts2;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.tools.ant.util.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
@@ -150,8 +152,13 @@ public class BatchInitAction extends FileEntityAction<Long, Fee> {
 		Map<String, List<Map<String, String>>> optionItems = this.optionService
 				.findOptionItemByGroupKeys(new String[] {
 						OptionConstants.FEE_MONTH });
+		//设置当前年月
+		feeYear = Integer.valueOf(DateUtils.format(new Date(), "yyyy").toString());
+		feeMonth = Integer.valueOf(DateUtils.format(new Date(), "MM").toString());
+		
 		// 经营权性质
 		feeMonths = optionItems.get(OptionConstants.FEE_MONTH);
+		
 
 	}	
 	
@@ -160,7 +167,7 @@ public class BatchInitAction extends FileEntityAction<Long, Fee> {
 		boolean readonly = this.isReadonly();
 		if (editable && !readonly) {
 			// 添加默认的保存按钮
-			pageOption.addButton(new ButtonOption("保存并关闭", null,
+			pageOption.addButton(new ButtonOption("确认", null,
 					"bs.batchInitForm.saveAndClose"));
 		}
 	}

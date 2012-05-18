@@ -11,4 +11,9 @@
 		</action>
 		<action name="selectAllCar" class="batchInitAction" method="selectAllCar" />
 	</package>
+	
+	<package name="fee" extends="bc-default" namespace="/bc-business">
+		<action name="fee/selectFeeb4OweDetail" class="feeAction" method="selectFeeb4OweDetail">
+		</action>
+	</package>
 </struts>

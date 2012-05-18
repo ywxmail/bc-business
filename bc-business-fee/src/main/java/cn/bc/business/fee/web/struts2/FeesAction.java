@@ -36,7 +36,6 @@ import cn.bc.identity.web.SystemContext;
 import cn.bc.option.domain.OptionItem;
 import cn.bc.option.service.OptionService;
 import cn.bc.web.formater.CalendarFormater;
-import cn.bc.web.formater.EntityStatusFormater;
 import cn.bc.web.formater.LinkFormater4Id;
 import cn.bc.web.formater.NubmerFormater;
 import cn.bc.web.ui.html.grid.Column;
@@ -154,9 +153,9 @@ public class FeesAction extends ViewAction<Map<String, Object>> {
 	protected List<Column> getGridColumns() {
 		List<Column> columns = new ArrayList<Column>();
 		columns.add(new IdColumn4MapKey("f.id", "id"));
-		columns.add(new TextColumn4MapKey("f.status_", "status_",
-				getText("fee.status"), 40).setSortable(true)
-				.setValueFormater(new EntityStatusFormater(getFeeStatuses())));
+//		columns.add(new TextColumn4MapKey("f.status_", "status_",
+//				getText("fee.status"), 40).setSortable(true)
+//				.setValueFormater(new EntityStatusFormater(getFeeStatuses())));
 		//年份
 		columns.add(new TextColumn4MapKey("f.fee_year", "fee_year",
 				getText("fee.feeYear"), 50).setSortable(true));
@@ -232,41 +231,41 @@ public class FeesAction extends ViewAction<Map<String, Object>> {
 		//本期应收合计
 		columns.add(new TextColumn4MapKey("f.s_total", "s_total",
 				getText("fee.benqiyingshou"), 80).setSortable(true)
-				.setValueFormater(new NubmerFormater("###,###.00")));
+				.setValueFormater(new NubmerFormater("###,###.##")));
 		//本期调整合计
 		columns.add(new TextColumn4MapKey("f.a_total", "a_total",
 				getText("fee.benqitiaozheng"), 80).setSortable(true)
-				.setValueFormater(new NubmerFormater("###,###.00")));
+				.setValueFormater(new NubmerFormater("###,###.##")));
 		//本期应收款合计
 		columns.add(new TextColumn4MapKey("f.sa_total1", "sa_total1",
 				getText("fee.benqiyingshouheji"), 95).setSortable(true)
-				.setValueFormater(new NubmerFormater("###,###.00")));
+				.setValueFormater(new NubmerFormater("###,###.##")));
 		
 		//前期加本期应收合计
 		columns.add(new TextColumn4MapKey("f.sa_total2", "sa_total2",
 				getText("fee.qianqibenqiyingshouheji"), 110).setSortable(true)
-				.setValueFormater(new NubmerFormater("###,###.00")));
+				.setValueFormater(new NubmerFormater("###,###.##")));
 		
 		//本期实收
 		columns.add(new TextColumn4MapKey("f.r_total", "r_total",
 				getText("fee.benqishishou"), 80).setSortable(true)
-				.setValueFormater(new NubmerFormater("###,###.00")));
+				.setValueFormater(new NubmerFormater("###,###.##")));
 		//本期实收明细
 		columns.add(new TextColumn4MapKey("f.r_total", "r_fee_detail",
 				getText("fee.benqishishou.detail"), 120).setUseTitleFromLabel(true)
-				.setValueFormater(new NubmerFormater("###,###.00")));
+				.setValueFormater(new NubmerFormater("###,###.##")));
 		//本期欠费
 		columns.add(new TextColumn4MapKey("f.o_total", "o_total",
 				getText("fee.benqiqianfei"), 80).setSortable(true)
-				.setValueFormater(new NubmerFormater("###,###.00")));
+				.setValueFormater(new NubmerFormater("###,###.##")));
 		//本期欠费明细
 		columns.add(new TextColumn4MapKey("f.o_total", "o_fee_detail",
 				getText("fee.benqiqianfei.detail"), 120).setUseTitleFromLabel(true)
-				.setValueFormater(new NubmerFormater("###,###.00")));
+				.setValueFormater(new NubmerFormater("###,###.##")));
 		//前期欠费明细
 		columns.add(new TextColumn4MapKey("f.o_total", "b4_o_fee_detail",
 				getText("fee.qianqiqianfei.detail"), 120).setUseTitleFromLabel(true)
-				.setValueFormater(new NubmerFormater("###,###.00")));
+				.setValueFormater(new NubmerFormater("###,###.##")));
 		//备注
 		columns.add(new TextColumn4MapKey("f.desc_", "desc_",
 				getText("fee.description"), 80)

@@ -4,12 +4,14 @@
 package cn.bc.business.fee.web.struts2;
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.tools.ant.util.DateUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -34,6 +36,7 @@ import cn.bc.option.service.OptionService;
 import cn.bc.web.ui.html.page.ButtonOption;
 import cn.bc.web.ui.html.page.PageOption;
 import cn.bc.web.ui.json.Json;
+import cn.bc.web.ui.json.JsonArray;
 
 /**
  * 承包费Action
@@ -56,7 +59,7 @@ public class FeeAction extends FileEntityAction<Long, Fee> {
 	public JSONArray feeNames; // 承包费明细名称列表
 	public String feeDetails;// 承包费本期实收明细的json字符串
 	public Set<FeeDetail> b4feeOweDetail;// 前期欠费明细
-	public Json json;
+	public String json;
 	
 	public FeeService feeService;
 	public CarManService carManService;
@@ -104,6 +107,8 @@ public class FeeAction extends FileEntityAction<Long, Fee> {
 		entity.setUid(this.getIdGeneratorService().next(Fee.ATTACH_TYPE));
 		entity.setStatus(BCConstants.STATUS_ENABLED);
 		entity.setCompany("宝城");
+		entity.setFeeYear(Integer.valueOf(DateUtils.format(new Date(), "yyyy").toString()));
+		entity.setFeeMonth(Integer.valueOf(DateUtils.format(new Date(), "MM").toString()));
 		//SystemContext context = this.getSystyemContext();
 
 	}
@@ -205,7 +210,7 @@ public class FeeAction extends FileEntityAction<Long, Fee> {
 					resource.setCharge(Float.parseFloat(json.getString("charge")));
 					resource.setFeeDescription(json.getString("feeDescription"));
 					resource.setFeeType(Integer.parseInt(json.getString("feeType")));
-
+					
 					fees.add(resource);
 
 				}
@@ -228,15 +233,15 @@ public class FeeAction extends FileEntityAction<Long, Fee> {
 	
 	@Override
 	public String save() throws Exception {
-		json = new Json();
+		Json info = new Json();
 		Fee e = this.getE();
 		Long excludeId = null;
 		//保存之前检测此车辆是否存在本年本月的承包费用
 		excludeId = this.feeService.checkFeeIsExist(e.getId(), e.getCarId(),
 				e.getFeeYear(), e.getFeeMonth());
 		if(excludeId != null){
-			json.put("success", false);
-			json.put("msg", getText("此车辆已存在"+e.getFeeYear()+"年"+e.getFeeMonth()+"月的承包费用"));
+			info.put("success", false);
+			info.put("msg", getText("此车辆已存在"+e.getFeeYear()+"年"+e.getFeeMonth()+"月的承包费用"));
 		} else {
 			// 执行基类的保存
 			this.beforeSave(e);
@@ -250,10 +255,11 @@ public class FeeAction extends FileEntityAction<Long, Fee> {
 			
 			this.afterSave(e);
 			
-			json.put("id", e.getId());
-			json.put("success", true);
-			json.put("msg", getText("form.save.success"));
+			info.put("id", e.getId());
+			info.put("success", true);
+			info.put("msg", getText("form.save.success"));
 		}
+		json = info.toString();
 		return "json";
 	}
 
@@ -277,9 +283,78 @@ public class FeeAction extends FileEntityAction<Long, Fee> {
 		Map<String, List<Map<String, String>>> optionItems = this.optionService
 				.findOptionItemByGroupKeys(new String[] { OptionConstants.FEE_MONTH });
 
+		// 缴费月
 		feeMonths = optionItems.get(OptionConstants.FEE_MONTH);
+		
+		// 证件名称列表
+		this.feeNames = OptionItem.toLabelValues(optionItems
+				.get(OptionConstants.FEE_NAME));
 	}
 
+	//根据车辆,收费年,月查找上期承包费欠费明细
+	private Long searchCarId;
+	private Integer feeYear;
+	private Integer feeMonth;
+	
+	public Long getSearchCarId() {
+		return searchCarId;
+	}
+
+	public void setSearchCarId(Long searchCarId) {
+		this.searchCarId = searchCarId;
+	}
+
+	public Integer getFeeYear() {
+		return feeYear;
+	}
+
+	public void setFeeYear(Integer feeYear) {
+		this.feeYear = feeYear;
+	}
+
+	public Integer getFeeMonth() {
+		return feeMonth;
+	}
+
+	public void setFeeMonth(Integer feeMonth) {
+		this.feeMonth = feeMonth;
+	}
+
+	public String selectFeeb4OweDetail(){
+		
+		Long excludeId = null;
+		//保存之前检测此车辆是否存在本年本月的承包费用
+		excludeId = this.feeService.checkFeeIsExist(null, this.searchCarId,
+				this.feeYear, this.feeMonth);
+		if(excludeId != null){
+			Json info = new Json();
+			info.put("success", true);
+			info.put("msg", getText("此车辆已存在"+this.feeYear+"年"+this.feeMonth+"月的承包费用"));
+			json = info.toString();
+		}else{
+			Fee b4Fee = this.feeService.findb4FeeByCarIdANDYearAndMonth(
+					this.searchCarId, this.feeYear,this.feeMonth);
+			JsonArray jsons = new JsonArray();
+			Json o;
+			if(null != b4Fee){
+				Set<FeeDetail> b4feeDetails = b4Fee.getFeeOweDetail();	
+
+				for(FeeDetail detail : b4feeDetails){
+					o = new Json();
+					o.put("id", detail.getId());
+					o.put("feeName", detail.getFeeName());
+					o.put("charge", detail.getCharge());
+					o.put("feeDescription", detail.getFeeDescription());
+					o.put("feeType", detail.getFeeType());
+					jsons.add(o);
+				}
+			}
+			json = jsons.toString();
+		}
+		return "json";
+	}
+	
+	
 	/**
 	 * 状态值转换列表：在案|注销|全部
 	 * 
