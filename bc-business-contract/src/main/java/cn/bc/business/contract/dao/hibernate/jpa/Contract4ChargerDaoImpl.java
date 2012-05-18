@@ -32,6 +32,7 @@ import cn.bc.business.contract.domain.Contract4Charger;
 import cn.bc.core.Page;
 import cn.bc.core.query.condition.Condition;
 import cn.bc.orm.hibernate.jpa.HibernateCrudJpaDao;
+import cn.bc.orm.hibernate.jpa.HibernateJpaNativeQuery;
 
 
 /**
@@ -638,6 +639,51 @@ public class Contract4ChargerDaoImpl extends HibernateCrudJpaDao<Contract4Charge
 			return new Long(list.get(0).get("id").toString());
 		else
 			return null;
+	}
+
+	public List<Map<String, String>> findCarByContractId(Long contractId) {
+		String hql="SELECT  b.plate_type,b.plate_no,b.factory_type,b.factory_model,b.vin,b.engine_no,b.color,b.register_date";
+			hql+=" FROM bs_car_contract a";
+			hql+=" inner join bs_car b on b.id=a.car_id";
+			hql+=" where a.contract_id=?";
+		return	HibernateJpaNativeQuery.executeNativeSql(getJpaTemplate(), hql,new Object[]{contractId}
+			 	,new cn.bc.db.jdbc.RowMapper<Map<String, String>>() {
+					public Map<String, String> mapRow(Object[] rs, int rowNum) {
+						Map<String, String> oi = new HashMap<String, String>();
+						int i = 0;
+						oi.put("plateType", rs[i++].toString());
+						oi.put("plateNo", rs[i++].toString());
+						oi.put("factoryType", rs[i++].toString());
+						oi.put("factoryMode", rs[i++].toString());
+						oi.put("vin", rs[i++].toString());
+						oi.put("engineNo", rs[i++].toString());
+						oi.put("color", rs[i++].toString());
+						oi.put("registerDate", rs[i++].toString());
+						return oi;
+					}
+				});
+	}
+	
+	public List<Map<String, String>> findChargerByContractId(Long contractId) {
+		String hql="SELECT b.name,b.address,b.address1,b.cert_identity,b.phone,b.phone1,b.cert_fwzg";
+			hql+=" FROM bs_carman_contract a";
+			hql+=" inner join bs_carman b on b.id=a.man_id";
+			hql+=" where a.contract_id=?";
+		return	HibernateJpaNativeQuery.executeNativeSql(getJpaTemplate(), hql,new Object[]{contractId}
+			 	,new cn.bc.db.jdbc.RowMapper<Map<String, String>>() {
+					public Map<String, String> mapRow(Object[] rs, int rowNum) {
+						Map<String, String> oi = new HashMap<String, String>();
+						int i = 0;
+						oi.put("name", rs[i++].toString());
+						oi.put("address", rs[i++].toString());
+						oi.put("address1", rs[i++].toString());
+						oi.put("certIdentity", rs[i++].toString());
+						oi.put("phone", rs[i++].toString());
+						oi.put("phone1", rs[i++].toString());
+						oi.put("certFWZG", rs[i++].toString());
+						return oi;
+					}
+				});
 	}
 
 }
