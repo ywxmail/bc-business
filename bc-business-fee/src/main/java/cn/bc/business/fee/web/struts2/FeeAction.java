@@ -59,7 +59,6 @@ public class FeeAction extends FileEntityAction<Long, Fee> {
 	public JSONArray feeNames; // 承包费明细名称列表
 	public String feeDetails;// 承包费本期实收明细的json字符串
 	public Set<FeeDetail> b4feeOweDetail;// 前期欠费明细
-	public String json;
 	
 	public FeeService feeService;
 	public CarManService carManService;
