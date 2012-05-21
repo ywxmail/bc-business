@@ -800,30 +800,31 @@ public class Contract4ChargerServiceImpl extends
 	
 		//责任人信息
 		List<Map<String,String>> chargerList=this.contract4ChargerDao.findChargerByContractId(c.getId());
-		params.put("carMan4A",chargerList.get(0).get("name"));
-		params.put("ZGZ4A",chargerList.get(0).get("certFWZG"));
-		params.put("cert4Indentity4A", chargerList.get(0).get("certIdentity"));
-		params.put("phone4A",chargerList.get(0).get("phone")!=null||chargerList.get(0).get("phone").length()>0?
+		params.put("carMan",chargerList.get(0).get("name"));
+		params.put("FWZGZ",chargerList.get(0).get("certFWZG"));
+		params.put("cert4Indentity", chargerList.get(0).get("certIdentity"));
+		params.put("phone",chargerList.get(0).get("phone")!=null||chargerList.get(0).get("phone").length()>0?
 							chargerList.get(0).get("phone"):chargerList.get(0).get("phone1"));
-		params.put("address4A",chargerList.get(0).get("address"));
+		params.put("address",chargerList.get(0).get("address"));
 		
 		if(chargerList.size()>1&&chargerList.get(1)!=null){
-			params.put("carMan4B", chargerList.get(1).get("name"));
-			params.put("ZGZ4B",chargerList.get(1).get("certFWZG"));
-			params.put("cert4Indentity4B", chargerList.get(1).get("certIdentity"));
-			params.put("phone4B",chargerList.get(1).get("phone")!=null||chargerList.get(1).get("phone").length()>0?
+			params.put("carMan2", chargerList.get(1).get("name"));
+			params.put("FWZGZ2",chargerList.get(1).get("certFWZG"));
+			params.put("cert4Indentity2", chargerList.get(1).get("certIdentity"));
+			params.put("phone2",chargerList.get(1).get("phone")!=null||chargerList.get(1).get("phone").length()>0?
 					chargerList.get(1).get("phone"):chargerList.get(1).get("phone1"));
-			params.put("address4B",chargerList.get(1).get("address"));
+			params.put("address2",chargerList.get(1).get("address"));
 		}else{
-			params.put("carMan4B", null);
-			params.put("ZGZ4B", null);
-			params.put("cert4Indentity4B", null);
-			params.put("phone4B", null);
-			params.put("address4B", null);
+			params.put("carMan2", null);
+			params.put("FWZGZ2", null);
+			params.put("cert4Indentity2", null);
+			params.put("phone2", null);
+			params.put("address2", null);
 		}
 		
 		//车辆信息
 		List<Map<String,String>> carList=this.contract4ChargerDao.findCarByContractId(c.getId());
+		params.put("carCode", carList.get(0).get("code"));
 		params.put("plate", carList.get(0).get("plateType")+"."+carList.get(0).get("plateNo"));
 		params.put("factoryTypeModel", carList.get(0).get("factoryType")+carList.get(0).get("factoryMode"));
 		params.put("vin", carList.get(0).get("vin"));
@@ -838,7 +839,7 @@ public class Contract4ChargerServiceImpl extends
 		//合同开始日期
 		Calendar startDate=c.getStartDate();
 		Calendar endDate=c.getEndDate();
-		int sumMonth=(endDate.get(Calendar.YEAR)-startDate.get(Calendar.YEAR))*12-(endDate.get(Calendar.MONTH)-startDate.get(Calendar.MONTH))+1;
+		int sumMonth=(endDate.get(Calendar.YEAR)-startDate.get(Calendar.YEAR))*12+(endDate.get(Calendar.MONTH)-startDate.get(Calendar.MONTH))+1;
 		params.put("sumMonth", sumMonth);
 		params.put("sumStartYear",new CalendarFormater("yyyy").format(startDate));
 		params.put("sumStartMonth",new CalendarFormater("MM").format(startDate));
@@ -858,7 +859,8 @@ public class Contract4ChargerServiceImpl extends
 					params.put("htbzj",cfd.getPrice()!=0?multiDigit2Chinese(String.valueOf(cfd.getPrice())):siginDigit2Chinese(0));
 				}else if(cfd.getName()!=null&&cfd.getName().equals("安全互助金")){
 					//安全互助金
-					params.put("aqhzj",cfd.getPrice()!=0?multiDigit2Chinese(String.valueOf(cfd.getPrice()/2)):siginDigit2Chinese(0));
+					params.put("aqhzj",cfd.getPrice()!=0?
+							multiDigit2Chinese(String.valueOf(cfd.getPrice()/cfd.getCount())):siginDigit2Chinese(0));
 				}else if(cfd.getName()!=null&&cfd.getName().equals("每月承包款")){
 					cfdList.add(cfd);
 				}	
