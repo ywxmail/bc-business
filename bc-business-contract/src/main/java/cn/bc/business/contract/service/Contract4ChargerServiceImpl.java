@@ -795,44 +795,44 @@ public class Contract4ChargerServiceImpl extends
 		Map<String, Object> params = new HashMap<String, Object>();
 
 		//合同信息
-		params.put("code===========", c.getCode());
-		params.put("signDate=======",new CalendarFormater("dd/MM/yyyy").format(c.getSignDate()));
+		params.put("code", c.getCode());
+		params.put("signDate",new CalendarFormater("dd/MM/yyyy").format(c.getSignDate()));
 	
 		//责任人信息
 		List<Map<String,String>> chargerList=this.contract4ChargerDao.findChargerByContractId(c.getId());
-		params.put("carMan4A===================",chargerList.get(0).get("name"));
-		params.put("ZGZ4A===",chargerList.get(0).get("certFWZG"));
-		params.put("cert4Indentity4A===================", chargerList.get(0).get("certIdentity"));
-		params.put("phone4A=",chargerList.get(0).get("phone")!=null||chargerList.get(0).get("phone").length()>0?
+		params.put("carMan4A",chargerList.get(0).get("name"));
+		params.put("ZGZ4A",chargerList.get(0).get("certFWZG"));
+		params.put("cert4Indentity4A", chargerList.get(0).get("certIdentity"));
+		params.put("phone4A",chargerList.get(0).get("phone")!=null||chargerList.get(0).get("phone").length()>0?
 							chargerList.get(0).get("phone"):chargerList.get(0).get("phone1"));
-		params.put("address4A===============================",chargerList.get(0).get("address"));
+		params.put("address4A",chargerList.get(0).get("address"));
 		
 		if(chargerList.size()>1&&chargerList.get(1)!=null){
-			params.put("carMan4B===================", chargerList.get(1).get("name"));
-			params.put("ZGZ4B===",chargerList.get(1).get("certFWZG"));
-			params.put("cert4Indentity4B===================", chargerList.get(1).get("certIdentity"));
-			params.put("phone4B=",chargerList.get(1).get("phone")!=null||chargerList.get(1).get("phone").length()>0?
+			params.put("carMan4B", chargerList.get(1).get("name"));
+			params.put("ZGZ4B",chargerList.get(1).get("certFWZG"));
+			params.put("cert4Indentity4B", chargerList.get(1).get("certIdentity"));
+			params.put("phone4B",chargerList.get(1).get("phone")!=null||chargerList.get(1).get("phone").length()>0?
 					chargerList.get(1).get("phone"):chargerList.get(1).get("phone1"));
-			params.put("address4B===============================",chargerList.get(1).get("address"));
+			params.put("address4B",chargerList.get(1).get("address"));
 		}else{
-			params.put("carMan4B===================", null);
-			params.put("ZGZ4B===", null);
-			params.put("cert4Indentity4B===================", null);
-			params.put("phone4B=", null);
-			params.put("address4B===============================", null);
+			params.put("carMan4B", null);
+			params.put("ZGZ4B", null);
+			params.put("cert4Indentity4B", null);
+			params.put("phone4B", null);
+			params.put("address4B", null);
 		}
 		
 		//车辆信息
 		List<Map<String,String>> carList=this.contract4ChargerDao.findCarByContractId(c.getId());
-		params.put("plate==========", carList.get(0).get("plateType")+"."+carList.get(0).get("plateNo"));
-		params.put("factoryTypeModel======", carList.get(0).get("factoryType")+carList.get(0).get("factoryModel"));
-		params.put("vin===========", carList.get(0).get("vin"));
-		params.put("engineNo============", carList.get(0).get("engineNo"));
-		params.put("color========", carList.get(0).get("color"));
+		params.put("plate", carList.get(0).get("plateType")+"."+carList.get(0).get("plateNo"));
+		params.put("factoryTypeModel", carList.get(0).get("factoryType")+carList.get(0).get("factoryMode"));
+		params.put("vin", carList.get(0).get("vin"));
+		params.put("engineNo", carList.get(0).get("engineNo"));
+		params.put("color", carList.get(0).get("color"));
 		//格式化处理行驶证登记日期
 		String rDate=carList.get(0).get("registerDate").substring(0,carList.get(0).get("registerDate").indexOf(" "));
 		String[] tempArrDate=rDate.split("-");
-		params.put("registerDate======================================",
+		params.put("registerDate",
 				tempArrDate.length<3?null:tempArrDate[2]+"/"+tempArrDate[1]+"/"+tempArrDate[0]);
 		
 		//合同开始日期
@@ -855,19 +855,24 @@ public class Contract4ChargerServiceImpl extends
 			for(ContractFeeDetail cfd:c.getContractFeeDetail()){
 				//合同保证金
 				if(cfd.getName()!=null&&cfd.getName().equals("合同保证金")){
-					params.put("htbzj",cfd.getPrice()!=0?multiDigit2Chinese(String.valueOf(cfd.getPrice())):"    ");
+					params.put("htbzj",cfd.getPrice()!=0?multiDigit2Chinese(String.valueOf(cfd.getPrice())):siginDigit2Chinese(0));
 				}else if(cfd.getName()!=null&&cfd.getName().equals("安全互助金")){
 					//安全互助金
-					params.put("aqhzj",cfd.getPrice()!=0?multiDigit2Chinese(String.valueOf(cfd.getPrice()/2)):"    ");
+					params.put("aqhzj",cfd.getPrice()!=0?multiDigit2Chinese(String.valueOf(cfd.getPrice()/2)):siginDigit2Chinese(0));
 				}else if(cfd.getName()!=null&&cfd.getName().equals("每月承包款")){
 					cfdList.add(cfd);
 				}	
 			}
-		}else{
+		}
+		
+		if(params.get("htbzj")==null){
 			//合同保证金
-			params.put("htbzj", "    ");
+			params.put("htbzj", "　　");
+		}
+		
+		if(params.get("aqhzj")==null){
 			//安全互助金
-			params.put("aqhzj", "    ");
+			params.put("aqhzj", "　　");
 		}
 		
 		//处理每月承包费的生成
@@ -888,58 +893,58 @@ public class Contract4ChargerServiceImpl extends
 					params.put("cfdmshi"+i, siginDigit2Chinese(Integer.valueOf(price.substring(index-2, index-1))));
 					params.put("cfdmyuan"+i, siginDigit2Chinese(Integer.valueOf(price.substring(index-1, index-0))));
 				}else if(index==3){
-					params.put("cfdmqian"+i, "/");
+					params.put("cfdmqian"+i, "／");
 					params.put("cfdmbai"+i, siginDigit2Chinese(Integer.valueOf(price.substring(index-3, index-2))));
 					params.put("cfdmshi"+i, siginDigit2Chinese(Integer.valueOf(price.substring(index-2, index-1))));
 					params.put("cfdmyuan"+i, siginDigit2Chinese(Integer.valueOf(price.substring(index-1, index-0))));
 				}else if(index==2){
-					params.put("cfdmqian"+i, "/");
-					params.put("cfdmbai"+i, "/");
+					params.put("cfdmqian"+i, "／");
+					params.put("cfdmbai"+i, "／");
 					params.put("cfdmshi"+i, siginDigit2Chinese(Integer.valueOf(price.substring(index-2, index-1))));
 					params.put("cfdmyuan"+i, siginDigit2Chinese(Integer.valueOf(price.substring(index-1, index-0))));
 				}else if(index==1){
-					params.put("cfdmqian"+i, "/");
-					params.put("cfdmbai"+i, "/");
-					params.put("cfdmshi"+i, "/");
+					params.put("cfdmqian"+i, "／");
+					params.put("cfdmbai"+i, "／");
+					params.put("cfdmshi"+i, "／");
 					params.put("cfdmyuan"+i, siginDigit2Chinese(Integer.valueOf(price.substring(index-1, index-0))));
 				}else{
-					params.put("cfdmqian"+i, "  ");
-					params.put("cfdmbai"+i, "  ");
-					params.put("cfdmshi"+i, "  ");
-					params.put("cfdmyuan"+i, "  ");
+					params.put("cfdmqian"+i, "　");
+					params.put("cfdmbai"+i, "　");
+					params.put("cfdmshi"+i, "　");
+					params.put("cfdmyuan"+i, "　");
 				}
 			}
 			
 			
-			//每月承包费不是6年时
+			//每月承包费不足6年时
 			if(cfdList.size()<6){
 				for(int i=1;i<6-cfdList.size()+1;i++){
-					params.put("cfdsy"+(cfdList.size()+i),"/");
-					params.put("cfdsm"+(cfdList.size()+i),"/");
-					params.put("cfdsd"+(cfdList.size()+i),"/");
-					params.put("cfdey"+(cfdList.size()+i), "/");
-					params.put("cfdem"+(cfdList.size()+i), "/");
-					params.put("cfded"+(cfdList.size()+i), "/");
-					params.put("cfdmqian"+(cfdList.size()+i), "/");
-					params.put("cfdmbai"+(cfdList.size()+i), "/");
-					params.put("cfdmshi"+(cfdList.size()+i), "/");
-					params.put("cfdmyuan"+(cfdList.size()+i), "/");
+					params.put("cfdsy"+(cfdList.size()+i),"　／");
+					params.put("cfdsm"+(cfdList.size()+i),"／");
+					params.put("cfdsd"+(cfdList.size()+i),"／");
+					params.put("cfdey"+(cfdList.size()+i), "　／");
+					params.put("cfdem"+(cfdList.size()+i), "／");
+					params.put("cfded"+(cfdList.size()+i), "／");
+					params.put("cfdmqian"+(cfdList.size()+i), "／");
+					params.put("cfdmbai"+(cfdList.size()+i), "／");
+					params.put("cfdmshi"+(cfdList.size()+i), "／");
+					params.put("cfdmyuan"+(cfdList.size()+i), "／");
 				}
 			}
 			
 		}else{
-			//承包费6行
+			//承包费
 			for(int i=1;i<7;i++){
-				params.put("cfdsy"+i,"    ");
-				params.put("cfdsm"+i,"  ");
-				params.put("cfdsd"+i,"  ");
-				params.put("cfdey"+i, "    ");
-				params.put("cfdem"+i, "  ");
-				params.put("cfded"+i, "  ");
-				params.put("cfdmqian"+i, "  ");
-				params.put("cfdmbai"+i, "  ");
-				params.put("cfdmshi"+i, "  ");
-				params.put("cfdmyuan"+i, "  ");
+				params.put("cfdsy"+i,"　　");
+				params.put("cfdsm"+i,"　");
+				params.put("cfdsd"+i,"　");
+				params.put("cfdey"+i, "　");
+				params.put("cfdem"+i, "　");
+				params.put("cfded"+i, "　");
+				params.put("cfdmqian"+i, "　");
+				params.put("cfdmbai"+i, "　");
+				params.put("cfdmshi"+i, "　");
+				params.put("cfdmyuan"+i, "　");
 			}
 			
 		}
