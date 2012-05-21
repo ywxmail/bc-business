@@ -839,7 +839,7 @@ public class Contract4ChargerServiceImpl extends
 		//合同开始日期
 		Calendar startDate=c.getStartDate();
 		Calendar endDate=c.getEndDate();
-		int sumMonth=(endDate.get(Calendar.YEAR)-startDate.get(Calendar.YEAR))*12+(endDate.get(Calendar.MONTH)-startDate.get(Calendar.MONTH))+1;
+		int sumMonth=(endDate.get(Calendar.YEAR)-startDate.get(Calendar.YEAR))*12+(endDate.get(Calendar.MONTH)-startDate.get(Calendar.MONTH));
 		params.put("sumMonth", sumMonth);
 		params.put("sumStartYear",new CalendarFormater("yyyy").format(startDate));
 		params.put("sumStartMonth",new CalendarFormater("MM").format(startDate));
