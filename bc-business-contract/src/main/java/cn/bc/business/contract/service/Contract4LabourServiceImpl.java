@@ -3,13 +3,17 @@
  */
 package cn.bc.business.contract.service;
 
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
@@ -25,10 +29,14 @@ import cn.bc.core.Page;
 import cn.bc.core.exception.CoreException;
 import cn.bc.core.query.condition.Condition;
 import cn.bc.core.service.DefaultCrudService;
+import cn.bc.core.util.DateUtils;
+import cn.bc.docs.domain.Attach;
 import cn.bc.docs.service.AttachService;
 import cn.bc.identity.service.IdGeneratorService;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.identity.web.SystemContextHolder;
+import cn.bc.template.domain.Template;
+import cn.bc.template.service.TemplateService;
 
 /**
  * 司机劳动合同Service的实现
@@ -37,10 +45,18 @@ import cn.bc.identity.web.SystemContextHolder;
  */
 public class Contract4LabourServiceImpl extends
 		DefaultCrudService<Contract4Labour> implements Contract4LabourService {
+	private static Log logger = LogFactory
+			.getLog(Contract4LabourServiceImpl.class);
 	private Contract4LabourDao contract4LabourDao;
 	private ContractDao contractDao;
 	private IdGeneratorService idGeneratorService;// 用于生成uid的服务
 	private AttachService attachService;// 附件服务
+	private TemplateService templateService;// 模板服务
+
+	@Autowired
+	public void setTemplateService(TemplateService templateService) {
+		this.templateService = templateService;
+	}
 
 	@Autowired
 	public void setContractDao(ContractDao contractDao) {
@@ -568,4 +584,28 @@ public class Contract4LabourServiceImpl extends
 
 	}
 
+	public Attach doAddAttachFromTemplate(Long id, String templateCode)
+			throws IOException {
+		// 加载合同
+		Contract4Labour c = this.load(id);
+
+		// TODO: 生成格式化参数
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("plate", c.getExt_str1());
+		params.put("startDate", DateUtils.formatCalendar2Day(c.getStartDate()));
+		params.put("endDate", DateUtils.formatCalendar2Day(c.getEndDate()));
+
+		// 生成附件
+		String ptype = Contract4Labour.ATTACH_TYPE;
+		String puid = c.getUid();
+		Template template = this.templateService.loadByCode(templateCode);
+		if (template == null) {
+			logger.warn("模板不存在,返回null:code=" + templateCode);
+			return null;
+		} else {
+			Attach attach = template.format2Attach(params, ptype, puid);
+			this.attachService.save(attach);
+			return attach;
+		}
+	}
 }
