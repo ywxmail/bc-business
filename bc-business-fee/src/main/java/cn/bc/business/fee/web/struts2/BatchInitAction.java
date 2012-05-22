@@ -131,7 +131,7 @@ public class BatchInitAction extends FileEntityAction<Long, Fee> {
 			this.afterSave(e);
 			
 			json.put("success", true);
-			json.put("msg", getText("form.save.success"));
+			json.put("msg", "初始化成功!");
 		}
 		this.json = json.toString();
 		return "json";
@@ -139,7 +139,7 @@ public class BatchInitAction extends FileEntityAction<Long, Fee> {
 
 	@Override
 	protected PageOption buildFormPageOption(boolean editable) {
-		return super.buildFormPageOption(editable).setWidth(420)
+		return super.buildFormPageOption(editable).setWidth(380)
 				.setMinWidth(320).setModal(true);
 
 	}
