@@ -36,4 +36,13 @@ public interface CarByDriverService extends CrudService<CarByDriver> {
 	 * @return
 	 */
 	List<CarByDriver> findCarByDriverInfo4DriverId(Long driverId);
+
+	/**
+	 * 通过迁移记录的id查找相关的营运班次记录
+	 * 
+	 * @param pid
+	 *            迁移记录的Id
+	 * @return
+	 */
+	List<CarByDriver> findCarByDriverInfoByPid(Long pid);
 }

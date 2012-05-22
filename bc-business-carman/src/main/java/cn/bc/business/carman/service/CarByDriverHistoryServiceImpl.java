@@ -102,6 +102,15 @@ public class CarByDriverHistoryServiceImpl extends
 	public void delete(Serializable id) {
 		CarByDriverHistory cbh = this.load(id);
 		CarMan cm = cbh.getDriver();
+		// 查找出相关联的营运班次记录
+		List<CarByDriver> carByDriver4Pid = this.carByDriverDao
+				.findCarByDriverInfoByPid((Long) id);
+		// 如果营运班次记录不为空，先删除营运班次记录
+		if (carByDriver4Pid != null) {
+			for (CarByDriver cbd : carByDriver4Pid) {
+				this.carByDriverDao.delete(cbd.getId());
+			}
+		}
 		if (cm != null) {
 			if (cm.getStatus() == BCConstants.STATUS_DRAFT) {
 				super.delete(id);
@@ -325,7 +334,7 @@ public class CarByDriverHistoryServiceImpl extends
 		// 保存迁移历史记录
 		entity = super.save(entity);
 		// 保存营运班次信息
-		CarMan driver = entity.getDriver();
+		CarMan driver = this.carManDao.load(entity.getDriver().getId());
 		List<CarByDriver> carByDrivers = new ArrayList<CarByDriver>();
 		CarByDriver carByDriver;
 		// 顶班车辆

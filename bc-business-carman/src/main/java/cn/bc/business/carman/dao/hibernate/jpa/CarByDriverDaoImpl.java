@@ -166,4 +166,20 @@ public class CarByDriverDaoImpl extends HibernateCrudJpaDao<CarByDriver>
 			return list;
 		}
 	}
+
+	public List<CarByDriver> findCarByDriverInfoByPid(Long pid) {
+		String hql = "select c from CarByDriver c where c.pid=? ";
+		@SuppressWarnings("unchecked")
+		List<CarByDriver> list = this.getJpaTemplate().find(hql, pid);
+		if (list.size() == 0) {
+			if (logger.isDebugEnabled()) {
+				logger.debug("没有找到相应的营运班次信息！");
+
+			}
+			return null;
+		} else {
+
+			return list;
+		}
+	}
 }

@@ -40,4 +40,8 @@ public class CarByDriverServiceImpl extends DefaultCrudService<CarByDriver>
 	public List<CarByDriver> findCarByDriverInfo4DriverId(Long driverId) {
 		return (this.carByDriverDao.findCarByDrivers4DriverId(driverId));
 	}
+
+	public List<CarByDriver> findCarByDriverInfoByPid(Long pid) {
+		return this.carByDriverDao.findCarByDriverInfoByPid(pid);
+	}
 }
