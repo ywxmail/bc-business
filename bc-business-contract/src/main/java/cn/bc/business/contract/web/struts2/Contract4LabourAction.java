@@ -25,7 +25,6 @@ import cn.bc.business.contract.domain.Contract4Labour;
 import cn.bc.business.contract.domain.ContractFeeDetail;
 import cn.bc.business.contract.service.Contract4LabourService;
 import cn.bc.business.web.struts2.FileEntityAction;
-import cn.bc.core.util.DateUtils;
 import cn.bc.docs.service.AttachService;
 import cn.bc.docs.web.ui.html.AttachWidget;
 import cn.bc.identity.web.SystemContext;
@@ -524,11 +523,10 @@ public class Contract4LabourAction extends
 			Contract newContract = null;
 			String msg = "";
 			Json json = new Json();
-			// 合同实际结束日期
-			Calendar stopDate4Charger = DateUtils.getCalendar(this.stopDate);
-
+			// // 合同实际结束日期
+			// Calendar stopDate4Charger = DateUtils.getCalendar(this.stopDate);
 			newContract = this.contract4LabourService.doOperate(carId,
-					this.getE(), fromContractId, stopDate4Charger);
+					this.getE(), fromContractId, this.stopDate);
 			if (e.getOpType() == Contract.OPTYPE_RENEW) {// 续约
 				msg = getText("contract4Labour.renew.success");
 			} else if (e.getOpType() == Contract.OPTYPE_CHANGECAR) {// 转车
@@ -767,40 +765,27 @@ public class Contract4LabourAction extends
 		return "json";
 	}
 
-	// /**
-	// * 获取合同的状态列表
-	// *
-	// * @return
-	// */
-	// private Map<String, String> getContractStatuses() {
-	// Map<String, String> types = new HashMap<String, String>();
-	// types.put(String.valueOf(Contract.STATUS_NORMAL),
-	// getText("contract.status.normal"));
-	// types.put(String.valueOf(Contract.STATUS_LOGOUT),
-	// getText("contract.status.logout"));
-	// types.put(String.valueOf(Contract.STATUS_RESGIN),
-	// getText("contract.status.resign"));
-	// return types;
-	// }
-
-	// /**
-	// * 获取合同的状态列表
-	// *
-	// * @return
-	// */
-	// private Map<String, String> getContractOpType() {
-	// Map<String, String> types = new HashMap<String, String>();
-	// types.put(String.valueOf(Contract.OPTYPE_MAINTENANCE),
-	// getText("contract4Labour.optype.maintenance"));
-	// types.put(String.valueOf(Contract.OPTYPE_CHANGECAR),
-	// getText("contract4Labour.optype.changeCar"));
-	// types.put(String.valueOf(Contract.OPTYPE_RENEW),
-	// getText("contract4Labour.optype.renew"));
-	// types.put(String.valueOf(Contract.OPTYPE_RESIGN),
-	// getText("contract4Labour.optype.resign"));
-	//
-	// return types;
-	// }
+	/**
+	 * 入库
+	 * 
+	 * @return
+	 */
+	public String warehousing() {
+		// 将收费明细设置为空
+		this.getE()
+				.setContractFeeDetail(new LinkedHashSet<ContractFeeDetail>());
+		SystemContext context = this.getSystyemContext();
+		// 设置创建人
+		this.getE().setAuthor(context.getUserHistory());
+		this.getE().setFileDate(Calendar.getInstance());
+		// 如果是新建将实际停保日期设置到冗余字段
+		if (this.getE().isNew()) {
+			this.getE().setExt_str3(this.stopDate);
+		}
+		this.json = this.contract4LabourService.doWarehousing(carId, driverId,
+				this.getE());
+		return "json";
+	}
 
 	private String isNullObject(Object obj) {
 		if (null != obj) {

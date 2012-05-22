@@ -260,7 +260,7 @@ public interface Contract4ChargerService extends CrudService<Contract4Charger> {
 	 * @return
 	 */
 	Contract4Charger doOperate(Long carId, Contract4Charger e,
-			String assignChargerIds, Long fromContractId, Calendar stopDate);
+			String assignChargerIds, Long fromContractId, String stopDate);
 
 	/**
 	 * 从模版添加附件
@@ -271,5 +271,18 @@ public interface Contract4ChargerService extends CrudService<Contract4Charger> {
 	 *            模板编码
 	 * @return 返回生成的附件信息
 	 */
-	Attach doAddAttachFromTemplate(Long id, String templateCode) throws IOException;
+	Attach doAddAttachFromTemplate(Long id, String templateCode)
+			throws IOException;
+
+	/**
+	 * 入库
+	 * 
+	 * @param contract4Charger合同
+	 * 
+	 * @param contractCarId车辆ID
+	 * @param carMansId司机Id
+	 * @return
+	 */
+	String doWarehousing(Long contractCarId, String carMansId,
+			Contract4Charger contract4Charger);
 }

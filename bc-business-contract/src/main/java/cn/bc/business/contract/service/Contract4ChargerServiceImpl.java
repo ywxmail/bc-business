@@ -38,6 +38,7 @@ import cn.bc.identity.web.SystemContext;
 import cn.bc.identity.web.SystemContextHolder;
 import cn.bc.template.domain.Template;
 import cn.bc.template.service.TemplateService;
+import cn.bc.web.ui.json.Json;
 
 /**
  * 责任人合同Service的实现
@@ -535,8 +536,8 @@ public class Contract4ChargerServiceImpl extends
 	 * 操作
 	 */
 	public Contract4Charger doOperate(Long carId, Contract4Charger e,
-			String assignChargerIds, Long contractId, Calendar stopDate) {
-
+			String assignChargerIds, Long contractId, String stopDate) {
+		boolean isNew=e.isNew();
 		// 获取原来的合同信息
 		Contract4Charger oldContract = this.contract4ChargerDao
 				.load(contractId);
@@ -546,38 +547,52 @@ public class Contract4ChargerServiceImpl extends
 		// 保存旧合同信息
 		// 更新旧合同的相关信息
 		SystemContext context = SystemContextHolder.get();
-		oldContract.setStatus(Contract.STATUS_LOGOUT);// 失效
-		oldContract.setMain(Contract.MAIN_HISTORY);// 历史
-		oldContract.setLogoutId(context.getUserHistory());// 注销人
-		oldContract.setLogoutDate(Calendar.getInstance());// 注销时间
-		oldContract.setStopDate(stopDate);// 合同实际结束日期
+		// 如果是保存为草稿的，不对原合同作任何操作
+		if (e.getStatus() != BCConstants.STATUS_DRAFT) {
+			oldContract.setStatus(Contract.STATUS_LOGOUT);// 失效
+			oldContract.setMain(Contract.MAIN_HISTORY);// 历史
+			oldContract.setLogoutId(context.getUserHistory());// 注销人
+			oldContract.setLogoutDate(Calendar.getInstance());// 注销时间
+			// 合同实际结束日期
+			Calendar stopDate4Charger = DateUtils.getCalendar(stopDate);
+
+			oldContract.setStopDate(stopDate4Charger);// 合同实际结束日期
+		}
 		this.contract4ChargerDao.save(oldContract);
 
 		// 保存新合同信息
 		Contract4Charger newContract = e;
+		// 如果是保存为草稿的，先将实际结束日期保存在新合同的冗余字段中
+		if (e.getStatus() == BCConstants.STATUS_DRAFT) {
+			e.setExt_str3(stopDate);
+		} else {
+			e.setExt_str3(null);
+		}
 		newContract = this.contract4ChargerDao.save(newContract);
 		Long newId = newContract.getId();
 
 		// 参数有效性验证
 		Assert.notNull(carId);
+		// 如果是新建
+		if (isNew) {
+			// 处理责任人id列表
+			Long[] chargerIdAry = StringUtils
+					.stringArray2LongArray(assignChargerIds.split(","));
 
-		// 处理责任人id列表
-		Long[] chargerIdAry = StringUtils
-				.stringArray2LongArray(assignChargerIds.split(","));
+			// 处理与车辆的关联关系
+			ContractCarRelation carRelation = new ContractCarRelation(newId,
+					carId);
+			this.contractDao.saveContractCarRelation(carRelation);
 
-		// 处理与车辆的关联关系
-		ContractCarRelation carRelation = new ContractCarRelation(newId, carId);
-		this.contractDao.saveContractCarRelation(carRelation);
-
-		// 处理与责任人的关联关系
-		List<ContractCarManRelation> chargerRelationList = new ArrayList<ContractCarManRelation>();
-		ContractCarManRelation driverRelation = null;
-		for (Long chargerId : chargerIdAry) {
-			driverRelation = new ContractCarManRelation(newId, chargerId);
-			chargerRelationList.add(driverRelation);
+			// 处理与责任人的关联关系
+			List<ContractCarManRelation> chargerRelationList = new ArrayList<ContractCarManRelation>();
+			ContractCarManRelation driverRelation = null;
+			for (Long chargerId : chargerIdAry) {
+				driverRelation = new ContractCarManRelation(newId, chargerId);
+				chargerRelationList.add(driverRelation);
+			}
+			this.contractDao.saveContractCarManRelation(chargerRelationList);
 		}
-		this.contractDao.saveContractCarManRelation(chargerRelationList);
-
 		// 更新车辆视图的charger列显示责任人姓名
 		this.contract4ChargerDao.updateCar4ChargerName(carId);
 		// 更新司机视图的charger列显示责任人姓名
@@ -811,4 +826,90 @@ public class Contract4ChargerServiceImpl extends
 			return attach;
 		}
 	}
+
+	public String json;
+
+	public String doWarehousing(Long contractCarId, String carMansId,
+			Contract4Charger contract4Charger) {
+		Map<String, Object> carInfoMap; // 车辆Map
+		Map<String, Object> carManInfoMap; // 车辆Map
+		Json json = new Json();
+		boolean success4car = true;
+		boolean success4carMan = true;
+		String msg = "";
+		// 查找车辆的状态和车牌号
+		carInfoMap = this.contract4ChargerDao.findCarByCarId(contractCarId);
+		if (carInfoMap != null) {
+			// 如果车辆状态不为草稿时，不能入库
+			if (Long.valueOf(String.valueOf(carInfoMap.get("status_"))) == BCConstants.STATUS_DRAFT) {
+				success4car = false;
+				msg = carInfoMap.get("plate_type") + "."
+						+ carInfoMap.get("plate_no");
+
+			}
+		}
+		String[] carManIds = carMansId.split(",");
+		for (String carManId : carManIds) {
+			// 查找责任人的状态和姓名
+			carManInfoMap = this.contract4ChargerDao
+					.getCarManInfoByCarManId(Long.valueOf(carManId));
+			if (carManInfoMap != null) {
+				// 如果责任人状态不为草稿时，不能入库
+				if (Long.valueOf(String.valueOf(carManInfoMap.get("status_"))) == BCConstants.STATUS_DRAFT) {
+					success4carMan = false;
+					msg = (String) (msg.length() > 0 || msg != "" ? msg + " 、"
+							+ carManInfoMap.get("name") : carManInfoMap
+							.get("name"));
+
+				}
+			}
+
+		}
+		// 如果都为入库状态，则该经济合同可以入库
+		if (success4car == true && success4carMan == true) {
+			contract4Charger.setStatus(BCConstants.STATUS_ENABLED);
+			// 如果pid不为空，则为变更操作新建入库
+			if (contract4Charger.getPid() != null) {
+				this.doOperate(contractCarId, contract4Charger,
+						getChargerIds(contract4Charger.getExt_str2()),
+						contract4Charger.getPid(),
+						contract4Charger.getExt_str3());
+			} else {
+				// 无变更操作下新建
+				this.save(contract4Charger, contractCarId,
+						getChargerIds(contract4Charger.getExt_str2()), null);
+
+			}
+			json.put("success", true);
+		} else {
+			json.put("success", false);
+			json.put("msg", "入库失败！请先将  " + msg + " 入库！");
+		}
+		this.json = json.toString();
+		return this.json;
+	}
+
+	/**
+	 * 获取责任人的id
+	 * 
+	 * @param chargersStr
+	 * @return
+	 */
+	public String getChargerIds(String chargersStr) {
+		String ids = "";
+		if (null != chargersStr && chargersStr.trim().length() > 0) {
+			String[] chargerAry = chargersStr.split(";");
+			for (int i = 0; i < chargerAry.length; i++) {
+				if (i > 0) {
+					ids = ids + ",";
+				}
+				ids = ids + chargerAry[i].split(",")[1];
+
+			}
+
+		}
+
+		return ids;
+	}
+
 }

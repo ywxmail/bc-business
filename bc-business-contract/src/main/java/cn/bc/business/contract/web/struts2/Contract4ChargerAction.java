@@ -304,9 +304,6 @@ public class Contract4ChargerAction extends
 		} else {
 			// 如果Pid不为空，且为新建的则该合同执行的是过户或生发包或续约操作
 			if (this.getE().isNew() && this.getE().getPid() != null) {
-				// 合同实际结束日期
-				Calendar stopDate4Charger = DateUtils
-						.getCalendar(this.stopDate);
 				// 设置最后更新人的信息
 				SystemContext context = this.getSystyemContext();
 				// 设置创建人
@@ -323,7 +320,7 @@ public class Contract4ChargerAction extends
 
 				newContract = this.contract4ChargerService.doOperate(carId,
 						this.getE(), assignChargerIds, fromContractId,
-						stopDate4Charger);
+						this.stopDate);
 
 				if (e.getOpType() == Contract.OPTYPE_RENEW) {// 续约
 					msg = getText("contract4Charger.renew.success");
@@ -366,6 +363,31 @@ public class Contract4ChargerAction extends
 
 	}
 
+	// ---------------------入库开始--------------------------
+	public String carMansId;// 入库时要查验是否为入库状态的责任人ID
+
+	/**
+	 * 入库
+	 * 
+	 * @return
+	 */
+	public String warehousing() {
+		this.beforeSave(this.getE());
+		SystemContext context = this.getSystyemContext();
+		// 设置创建人
+		this.getE().setAuthor(context.getUserHistory());
+		this.getE().setFileDate(Calendar.getInstance());
+		// 如果是新建将实际停保日期设置到冗余字段
+		if (this.getE().isNew()) {
+			this.getE().setExt_str3(this.stopDate);
+		}
+		carMansId = this.getChargerIds(this.getE().getExt_str2());
+		this.json = this.contract4ChargerService.doWarehousing(carId,
+				carMansId, this.getE());
+		return "json";
+	}
+
+	// ---------------------入库结束---------------------
 	@Override
 	protected void afterEdit(Contract4Charger e) {
 		// == 合同维护处理
@@ -602,9 +624,8 @@ public class Contract4ChargerAction extends
 			}
 			// 维护操作
 			if (isDoMaintenance) {
-				pageOption.addButton(new ButtonOption(
-						getText("labe.save4Draft"), null,
-						"bc.contract4ChargerForm.save"));
+				pageOption.addButton(new ButtonOption(getText("label.save"),
+						null, "bc.contract4ChargerForm.save"));
 				pageOption.addButton(new ButtonOption(
 						getText("label.saveAndClose"), null,
 						"bc.contract4ChargerForm.saveAndClose"));

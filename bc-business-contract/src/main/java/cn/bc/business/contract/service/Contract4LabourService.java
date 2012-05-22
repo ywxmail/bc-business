@@ -193,6 +193,16 @@ public interface Contract4LabourService extends CrudService<Contract4Labour> {
 	 * @return
 	 */
 	Contract4Labour doOperate(Long carId, Contract4Labour e,
-			Long fromContractId, Calendar stopDate);
+			Long fromContractId, String stopDate);
+
+	/**
+	 * 劳动合同入库
+	 * 
+	 * @param carId车辆Id
+	 * @param driverId司机Id
+	 * @param e
+	 * @return
+	 */
+	String doWarehousing(Long carId, Long driverId, Contract4Labour e);
 
 }

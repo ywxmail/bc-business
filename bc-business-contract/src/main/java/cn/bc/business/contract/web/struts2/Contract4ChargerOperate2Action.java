@@ -206,8 +206,8 @@ public class Contract4ChargerOperate2Action extends
 	@Override
 	public String save() throws Exception {
 
-		// 合同实际结束日期
-		Calendar stopDate4Charger = DateUtils.getCalendar(this.stopDate);
+//		// 合同实际结束日期
+//		Calendar stopDate4Charger = DateUtils.getCalendar(this.stopDate);
 		Json json = new Json();
 		Contract4Charger e = this.getE();
 		Long excludeId = null;
@@ -256,7 +256,7 @@ public class Contract4ChargerOperate2Action extends
 
 			newContract = this.contract4ChargerService.doOperate(carId,
 					this.getE(), assignChargerIds, fromContractId,
-					stopDate4Charger);
+					this.stopDate);
 			if (e.getOpType() == Contract.OPTYPE_RENEW) {// 续约
 				msg = getText("contract4Charger.renew.success");
 			} else if (e.getOpType() == Contract.OPTYPE_CHANGECHARGER) {// 过户
