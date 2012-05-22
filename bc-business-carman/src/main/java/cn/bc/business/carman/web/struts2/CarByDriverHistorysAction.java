@@ -301,15 +301,29 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 		Condition status4CarManCondition = null;
 		// 迁移类型条件
 		Condition status4NullCondition = null;
+		// 迁出车辆状态
+		Condition status4ToCarCondition = null;
+		// 迁入车辆状态
+		Condition status4FormCarCondition = null;
 		if (status != null && status.length() > 0) {
 			String[] ss = status.split(",");
+			//
 			if (ss.length == 1) {
 				status4CarManCondition = new EqualsCondition("m.status_",
+						new Integer(ss[0]));
+				status4ToCarCondition = new EqualsCondition("oc.status_",
+						new Integer(ss[0]));
+				status4FormCarCondition = new EqualsCondition("nc.status_",
 						new Integer(ss[0]));
 			} else {
 				status4CarManCondition = new InCondition("m.status_",
 						StringUtils.stringArray2IntegerArray(ss));
+				status4ToCarCondition = new InCondition("oc.status_",
+						StringUtils.stringArray2IntegerArray(ss));
+				status4FormCarCondition = new InCondition("nc.status_",
+						StringUtils.stringArray2IntegerArray(ss));
 			}
+
 			for (String s : ss) {
 				// 如果是草稿状态下的，不添加转车队的查询条件[状态为null]
 				if (!s.endsWith(String.valueOf(BCConstants.STATUS_DRAFT)))
@@ -340,16 +354,32 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 			carId2ShiftworkCarIdCondition = new LikeCondition("d.shiftwork",
 					shiftworkCarId);
 		}
+		// 入库的sql条件：where (f.status_ in (1,0) or t.status_ in (0,1) ) and
+		// (m.status_ in(0,1) or m.status_ is null)
+		// 草稿sql条件：where (f.status_ = -1 or t.status_ =-1 or m.status_ = -1)
+		return ConditionUtils
+				.mix2AndCondition(
+						carManIdCondition,
+						(status != null && status.length() > 0 ? (status != null
+								&& status.endsWith(String
+										.valueOf(BCConstants.STATUS_DRAFT)) ? ConditionUtils
+								.mix2OrCondition(status4CarManCondition,
+										status4ToCarCondition,
+										status4FormCarCondition).setAddBracket(
+										true) : ConditionUtils
+								.mix2AndCondition(
+										ConditionUtils.mix2OrCondition(
+												status4ToCarCondition,
+												status4FormCarCondition)
+												.setAddBracket(true),
+										ConditionUtils.mix2OrCondition(
+												status4CarManCondition,
+												status4NullCondition)
+												.setAddBracket(true)))
+								: null), ConditionUtils.mix2OrCondition(
+								carId2ToCarIdCondition, oldCarIdCondition,
+								carId2ShiftworkCarIdCondition));
 
-		// 合并条件
-		return ConditionUtils.mix2AndCondition(
-				carManIdCondition,
-				(status4CarManCondition != null ? ConditionUtils
-						.mix2OrCondition(status4CarManCondition,
-								status4NullCondition).setAddBracket(true)
-						: null), ConditionUtils.mix2OrCondition(
-						carId2ToCarIdCondition, oldCarIdCondition,
-						carId2ShiftworkCarIdCondition));
 	}
 
 	@Override
@@ -455,6 +485,10 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 											.setIcon("ui-icon-pencil")
 											.setText("编辑").setAction("edit"));
 				}
+				// 删除按钮
+				tb.addButton(new ToolbarButton().setIcon("ui-icon-trash")
+						.setText("删除草稿").setAction("delete"));
+
 				// 搜索按钮
 				tb.addButton(this.getDefaultSearchToolbarButton());
 			} else {
@@ -479,13 +513,13 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 										.setClick(
 												"bc.business.chuLiDingBan.create"));
 
-				// 如果有权限的用户可以看到草稿状态的车
-				if (!isReadonly()) {
-					tb.addButton(Toolbar.getDefaultToolbarRadioGroup(
-							this.getBSStatuses(), "status", 0,
-							getText("title.click2changeSearchStatus")));
+			}
+			// 如果有权限的用户可以看到草稿状态的车
+			if (!isReadonly()) {
+				tb.addButton(Toolbar.getDefaultToolbarRadioGroup(
+						this.getBSStatuses(), "status", 0,
+						getText("title.click2changeSearchStatus")));
 
-				}
 			}
 
 		}
