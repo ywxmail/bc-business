@@ -675,6 +675,7 @@ public class Contract4ChargerDaoImpl extends
 
 	public List<Map<String, String>> findCarByContractId(Long contractId) {
 		String hql="SELECT  b.plate_type,b.plate_no,b.factory_type,b.factory_model,b.vin,b.engine_no,b.color,b.register_date,b.code";
+			hql+=",b.company,b.cert_no2";
 			hql+=" FROM bs_car_contract a";
 			hql+=" inner join bs_car b on b.id=a.car_id";
 			hql+=" where a.contract_id=?";
@@ -692,6 +693,8 @@ public class Contract4ChargerDaoImpl extends
 						oi.put("color", rs[i++].toString());
 						oi.put("registerDate", rs[i++].toString());
 						oi.put("code", rs[i++].toString());
+						oi.put("company", rs[i++].toString());
+						oi.put("certNo2", rs[i++].toString());
 						return oi;
 					}
 				});

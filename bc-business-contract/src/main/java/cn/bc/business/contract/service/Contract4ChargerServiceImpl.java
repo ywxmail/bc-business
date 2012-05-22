@@ -839,12 +839,23 @@ public class Contract4ChargerServiceImpl extends
 		
 		//车辆信息
 		List<Map<String,String>> carList=this.contract4ChargerDao.findCarByContractId(c.getId());
+		//公司
+		String company=null;
+		if(carList.get(0).get("company").equals("宝城")){
+			company="广州市宝城汽车出租有限公司";
+		}else if(carList.get(0).get("company").equals("广发")){
+			company="广州市广发出租汽车有限公司";
+		}
+		params.put("company", company);
 		params.put("carCode", carList.get(0).get("code"));
 		params.put("plate", carList.get(0).get("plateType")+"."+carList.get(0).get("plateNo"));
 		params.put("factoryTypeModel", carList.get(0).get("factoryType")+carList.get(0).get("factoryMode"));
 		params.put("vin", carList.get(0).get("vin"));
 		params.put("engineNo", carList.get(0).get("engineNo"));
 		params.put("color", carList.get(0).get("color"));
+		//经营权证
+		params.put("certNo2", carList.get(0).get("certNo2"));
+		
 		//格式化处理行驶证登记日期
 		String rDate=carList.get(0).get("registerDate").substring(0,carList.get(0).get("registerDate").indexOf(" "));
 		String[] tempArrDate=rDate.split("-");
@@ -904,27 +915,38 @@ public class Contract4ChargerServiceImpl extends
 				//金额
 				String price=String.valueOf(cfdList.get(i-1).getPrice());
 				int index=price.indexOf(".");
-				if(index>4||index==4){
+				if(index>5||index==5){
+					params.put("cfdmwan"+i,siginDigit2Chinese(Integer.valueOf(price.substring(index-5, index-4))));
+					params.put("cfdmqian"+i,siginDigit2Chinese(Integer.valueOf(price.substring(index-4, index-3))));
+					params.put("cfdmbai"+i, siginDigit2Chinese(Integer.valueOf(price.substring(index-3, index-2))));
+					params.put("cfdmshi"+i, siginDigit2Chinese(Integer.valueOf(price.substring(index-2, index-1))));
+					params.put("cfdmyuan"+i, siginDigit2Chinese(Integer.valueOf(price.substring(index-1, index-0))));
+				}else if(index==4){
+					params.put("cfdmwan"+i,"／");
 					params.put("cfdmqian"+i,siginDigit2Chinese(Integer.valueOf(price.substring(index-4, index-3))));
 					params.put("cfdmbai"+i, siginDigit2Chinese(Integer.valueOf(price.substring(index-3, index-2))));
 					params.put("cfdmshi"+i, siginDigit2Chinese(Integer.valueOf(price.substring(index-2, index-1))));
 					params.put("cfdmyuan"+i, siginDigit2Chinese(Integer.valueOf(price.substring(index-1, index-0))));
 				}else if(index==3){
+					params.put("cfdmwan"+i,"／");
 					params.put("cfdmqian"+i, "／");
 					params.put("cfdmbai"+i, siginDigit2Chinese(Integer.valueOf(price.substring(index-3, index-2))));
 					params.put("cfdmshi"+i, siginDigit2Chinese(Integer.valueOf(price.substring(index-2, index-1))));
 					params.put("cfdmyuan"+i, siginDigit2Chinese(Integer.valueOf(price.substring(index-1, index-0))));
 				}else if(index==2){
+					params.put("cfdmwan"+i,"／");
 					params.put("cfdmqian"+i, "／");
 					params.put("cfdmbai"+i, "／");
 					params.put("cfdmshi"+i, siginDigit2Chinese(Integer.valueOf(price.substring(index-2, index-1))));
 					params.put("cfdmyuan"+i, siginDigit2Chinese(Integer.valueOf(price.substring(index-1, index-0))));
 				}else if(index==1){
+					params.put("cfdmwan"+i,"／");
 					params.put("cfdmqian"+i, "／");
 					params.put("cfdmbai"+i, "／");
 					params.put("cfdmshi"+i, "／");
 					params.put("cfdmyuan"+i, siginDigit2Chinese(Integer.valueOf(price.substring(index-1, index-0))));
 				}else{
+					params.put("cfdmwan"+i,"　");
 					params.put("cfdmqian"+i, "　");
 					params.put("cfdmbai"+i, "　");
 					params.put("cfdmshi"+i, "　");
@@ -942,6 +964,7 @@ public class Contract4ChargerServiceImpl extends
 					params.put("cfdey"+(cfdList.size()+i), "　／");
 					params.put("cfdem"+(cfdList.size()+i), "／");
 					params.put("cfded"+(cfdList.size()+i), "／");
+					params.put("cfdmwan"+(cfdList.size()+i),"／");
 					params.put("cfdmqian"+(cfdList.size()+i), "／");
 					params.put("cfdmbai"+(cfdList.size()+i), "／");
 					params.put("cfdmshi"+(cfdList.size()+i), "／");
@@ -958,6 +981,7 @@ public class Contract4ChargerServiceImpl extends
 				params.put("cfdey"+i, "　");
 				params.put("cfdem"+i, "　");
 				params.put("cfded"+i, "　");
+				params.put("cfdmwan"+i,"　");
 				params.put("cfdmqian"+i, "　");
 				params.put("cfdmbai"+i, "　");
 				params.put("cfdmshi"+i, "　");
