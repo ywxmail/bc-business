@@ -11,6 +11,7 @@ import cn.bc.business.contract.domain.Contract4Labour;
 import cn.bc.core.Page;
 import cn.bc.core.query.condition.Condition;
 import cn.bc.core.service.CrudService;
+import cn.bc.template.service.AddAttachFromTemplateService;
 
 /**
  * 司机劳动合同Service
@@ -18,7 +19,8 @@ import cn.bc.core.service.CrudService;
  * @author wis
  * 
  */
-public interface Contract4LabourService extends CrudService<Contract4Labour> {
+public interface Contract4LabourService extends CrudService<Contract4Labour>,
+		AddAttachFromTemplateService {
 	/**
 	 * 保存劳动合同并处理车辆和司机的关联关系
 	 * 
@@ -194,7 +196,6 @@ public interface Contract4LabourService extends CrudService<Contract4Labour> {
 	 */
 	Contract4Labour doOperate(Long carId, Contract4Labour e,
 			Long fromContractId, String stopDate);
-
 	/**
 	 * 劳动合同入库
 	 * 

@@ -115,4 +115,7 @@ public class OptionConstants extends cn.bc.option.OptionConstants {
 	
 	/** 社保收费规则明细险种名称 */
 	public final static String SOCIALSECURTYRULEDETAIL_NAME = "socialSecurtyRuleDetail.name";
+	
+	/** 承包费名称 */
+	public final static String FEE_NAME = "fee.name";
 }

@@ -20,7 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.Assert;
 
 import cn.bc.BCConstants;
 import cn.bc.business.OptionConstants;
@@ -530,7 +529,7 @@ public class Contract4ChargerAction extends
 
 	private AttachWidget buildAttachsUI(boolean isNew, boolean forceReadonly) {
 		// 构建附件控件
-		String ptype = Contract4Charger.KEY_UID;
+		String ptype = Contract4Charger.ATTACH_TYPE;
 		String puid = this.getE().getUid();
 		boolean readonly = forceReadonly ? true : this.isReadonly();
 		AttachWidget attachsUI = this.buildAttachsUI(isNew, readonly, ptype,
@@ -729,44 +728,10 @@ public class Contract4ChargerAction extends
 		return map;
 	}
 
-	// ==== 从模板添加附件 开始 ====
-	public String tpl;
-
-	/**
-	 * 从模板添加附件
-	 * 
-	 * @throws Exception
-	 */
-	public String addAttachFromTemplate() throws Exception {
-		Assert.notNull(this.getId());
-		Assert.hasText(tpl);
-
-		// 返回附件信息
-		JSONObject result = new JSONObject();
-		try {
-			// 根据模板生成附件
-			Attach attach = this.contract4ChargerService
-					.doAddAttachFromTemplate(this.getId(), tpl);
-
-			// 附件参数
-			result.put("id", attach.getId());
-			result.put("subject", attach.getSubject());
-			result.put("size", attach.getSize());
-			result.put("extension", attach.getExtension());
-			result.put("path", attach.getPath());
-
-			// {"err":"","msg":{"url":"/bs/bc/attach/download?id=10040140","localfile":"chart_fixedSize.xls","id":"10040140"}}
-			// 成功信息
-			result.put("success", true);
-			result.put("msg", "添加模板成功！");
-		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
-			// 失败信息
-			result.put("success", false);
-			result.put("msg", e.getMessage());
-		}
-		this.json = result.toString();
-		return "json";
+	// 从模板添加附件
+	@Override
+	protected Attach buildAttachFromTemplate() throws Exception {
+		return this.contract4ChargerService.doAddAttachFromTemplate(
+				this.getId(), this.tpl);
 	}
-	// ==== 从模板添加附件结束始 ====
 }
