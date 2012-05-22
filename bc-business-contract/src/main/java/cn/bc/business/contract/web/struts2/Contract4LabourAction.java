@@ -398,11 +398,14 @@ public class Contract4LabourAction extends
 		// 组装车辆和司机信息
 		setupCarAndDriverInfo();
 
-		// 将次版本号加1
-		entity.setVerMinor(entity.getVerMinor() + 1);
-
 		// 操作类型设置为维护
-		entity.setOpType(Contract.OPTYPE_MAINTENANCE);
+		// 如果是草稿状态下打开，操作类型保持为原来的操作类型
+		if (entity.getStatus() != BCConstants.STATUS_DRAFT) {
+			// 将次版本号加1
+			entity.setVerMinor(entity.getVerMinor() + 1);
+			// 操作类型设置为维护
+			entity.setOpType(Contract.OPTYPE_MAINTENANCE);
+		}
 	}
 
 	@Override

@@ -405,7 +405,10 @@ public class Contract4ChargerAction extends
 		}
 
 		// 操作类型设置为维护
-		e.setOpType(Contract.OPTYPE_MAINTENANCE);
+		// 如果是草稿状态下打开，操作类型保持为原来的操作类型
+		if (e.getStatus() != BCConstants.STATUS_DRAFT) {
+			e.setOpType(Contract.OPTYPE_MAINTENANCE);
+		}
 	}
 
 	@Override

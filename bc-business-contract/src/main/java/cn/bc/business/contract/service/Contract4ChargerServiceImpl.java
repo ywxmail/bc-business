@@ -559,9 +559,9 @@ public class Contract4ChargerServiceImpl extends
 			Calendar stopDate4Charger = DateUtils.getCalendar(stopDate);
 
 			oldContract.setStopDate(stopDate4Charger);// 合同实际结束日期
+			this.contract4ChargerDao.save(oldContract);
 		}
-		this.contract4ChargerDao.save(oldContract);
-
+	
 		// 保存新合同信息
 		Contract4Charger newContract = e;
 		// 如果是保存为草稿的，先将实际结束日期保存在新合同的冗余字段中
