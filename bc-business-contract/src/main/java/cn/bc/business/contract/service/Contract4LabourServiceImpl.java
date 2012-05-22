@@ -32,7 +32,6 @@ import cn.bc.core.query.condition.Condition;
 import cn.bc.core.service.DefaultCrudService;
 import cn.bc.core.util.DateUtils;
 import cn.bc.docs.domain.Attach;
-import cn.bc.core.util.DateUtils;
 import cn.bc.docs.service.AttachService;
 import cn.bc.identity.service.IdGeneratorService;
 import cn.bc.identity.web.SystemContext;
@@ -547,7 +546,7 @@ public class Contract4LabourServiceImpl extends
 			// 合同实际结束日期
 			Calendar stopDate4Charger = DateUtils.getCalendar(stopDate);
 			oldContract.setStopDate(stopDate4Charger);// 合同实际结束日期
-			
+
 		}
 		this.contract4LabourDao.save(oldContract);
 		// 保存新合同信息
@@ -619,7 +618,7 @@ public class Contract4LabourServiceImpl extends
 			return attach;
 		}
 	}
-}
+
 	public String json;
 
 	public String doWarehousing(Long carId, Long driverId, Contract4Labour e) {

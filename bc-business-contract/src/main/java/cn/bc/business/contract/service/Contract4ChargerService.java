@@ -263,18 +263,6 @@ public interface Contract4ChargerService extends CrudService<Contract4Charger>,
 			String assignChargerIds, Long fromContractId, String stopDate);
 
 	/**
-	 * 从模版添加附件
-	 * 
-	 * @param id
-	 *            经济合同的id
-	 * @param templateCode
-	 *            模板编码
-	 * @return 返回生成的附件信息
-	 */
-	Attach doAddAttachFromTemplate(Long id, String templateCode)
-			throws IOException;
-
-	/**
 	 * 入库
 	 * 
 	 * @param contract4Charger合同
