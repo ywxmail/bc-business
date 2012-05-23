@@ -194,8 +194,12 @@ public class SelectFeeTemplateAction extends
 
 	@Override
 	protected Condition getGridSpecalCondition() {
-		AndCondition andCondition = new AndCondition(new EqualsCondition(
-				"a.status_", BCConstants.STATUS_ENABLED));
+		AndCondition andCondition = new AndCondition();
+		if (status != null && status.length() > 0) {
+			andCondition.add(new EqualsCondition(
+						"a.status_", Integer.valueOf(status)));
+		}
+		
 		if (module != null && module.length() > 0) {
 			if (module.indexOf(",") == -1) {
 				andCondition.add(new EqualsCondition("a.module_", module));

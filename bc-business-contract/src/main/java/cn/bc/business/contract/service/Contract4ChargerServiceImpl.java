@@ -897,13 +897,13 @@ public class Contract4ChargerServiceImpl extends
 			//遍历合同费用明细
 			for(ContractFeeDetail cfd:c.getContractFeeDetail()){
 				//合同保证金
-				if(cfd.getName()!=null&&cfd.getName().equals("合同保证金")){
+				if(cfd.getName()!=null&&cfd.getCode().equals("contract4Charger.HTBZJ")){
 					params.put("htbzj",cfd.getPrice()!=0?multiDigit2Chinese(String.valueOf(cfd.getPrice())):siginDigit2Chinese(0));
-				}else if(cfd.getName()!=null&&cfd.getName().equals("安全互助金")){
+				}else if(cfd.getName()!=null&&cfd.getCode().equals("contract4Charger.AQHZJ")){
 					//安全互助金
 					params.put("aqhzj",cfd.getPrice()!=0?
 							multiDigit2Chinese(String.valueOf(cfd.getPrice()/cfd.getCount())):siginDigit2Chinese(0));
-				}else if(cfd.getName()!=null&&cfd.getName().equals("每月承包款")){
+				}else if(cfd.getName()!=null&&cfd.getCode().equals("contract4Charger.MYCBK")){
 					cfdList.add(cfd);
 				}	
 			}
