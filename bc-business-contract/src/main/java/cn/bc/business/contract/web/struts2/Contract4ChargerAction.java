@@ -241,6 +241,7 @@ public class Contract4ChargerAction extends
 						resource.setId(json.getLong("id"));
 					resource.setOrderNo(i);
 					resource.setContract(this.getE());
+					resource.setCode(json.getString("code"));
 					resource.setName(json.getString("name"));
 					resource.setCount(Integer.parseInt(json.getString("count")));
 					resource.setPayType(Integer.parseInt(json

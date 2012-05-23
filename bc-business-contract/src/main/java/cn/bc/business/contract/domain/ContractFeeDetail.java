@@ -38,6 +38,7 @@ public class ContractFeeDetail extends EntityImpl {
 	private Calendar startDate;// 开始时间
 	private Calendar endDate;// 结束时间
 	private String description;// 备注
+	private String code;// 编码
 	private int orderNo;// 排序号
 	private Contract contract;// 合同ID
 
@@ -120,6 +121,14 @@ public class ContractFeeDetail extends EntityImpl {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	public String getCode() {
+		return code;
+	}
+
+	public void setCode(String code) {
+		this.code = code;
 	}
 
 }

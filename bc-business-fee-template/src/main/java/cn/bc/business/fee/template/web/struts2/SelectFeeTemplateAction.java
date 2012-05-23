@@ -87,8 +87,6 @@ public class SelectFeeTemplateAction extends
 				map.put("count", rs[i++]);
 				map.put("pay_type", rs[i++]);
 				map.put("desc", rs[i++]);
-				map.put("spec", rs[i++]);
-				map.put("code", rs[i++]);
 				String spec = (String) rs[i++];
 				try {
 					map.put("spec",
@@ -98,7 +96,7 @@ public class SelectFeeTemplateAction extends
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-
+				map.put("code", rs[i++]);
 				return map;
 			}
 		});
@@ -117,7 +115,7 @@ public class SelectFeeTemplateAction extends
 		columns.add(new TextColumn4MapKey("b.name", "pname",
 				getText("feeTemplate.ptempalte"), 100)
 				.setUseTitleFromLabel(true));
-		//编码
+		// 编码
 		columns.add(new TextColumn4MapKey("a.code", "code",
 				getText("feeTemplate.code"), 160).setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("a.name", "name",
@@ -165,7 +163,7 @@ public class SelectFeeTemplateAction extends
 
 	@Override
 	protected String[] getGridSearchFields() {
-		return new String[]{"b.name","a.name","a.code"};
+		return new String[] { "b.name", "a.name", "a.code" };
 	}
 
 	@Override
@@ -196,22 +194,24 @@ public class SelectFeeTemplateAction extends
 
 	@Override
 	protected Condition getGridSpecalCondition() {
-		AndCondition andCondition=new AndCondition(new EqualsCondition("a.status_", BCConstants.STATUS_ENABLED));
-		if(module!=null&&module.length()>0){
-			if(module.indexOf(",")==-1){
+		AndCondition andCondition = new AndCondition(new EqualsCondition(
+				"a.status_", BCConstants.STATUS_ENABLED));
+		if (module != null && module.length() > 0) {
+			if (module.indexOf(",") == -1) {
 				andCondition.add(new EqualsCondition("a.module_", module));
-			}else{
-				andCondition.add(new InCondition("a.module_", module.split(",")));
+			} else {
+				andCondition
+						.add(new InCondition("a.module_", module.split(",")));
 			}
 		}
-		
+
 		return andCondition;
 	}
 
 	@Override
 	protected Json getGridExtrasData() {
 		Json json = new Json();
-		if(status!=null&&status.length()>0){
+		if (status != null && status.length() > 0) {
 			json.put("status", status);
 		}
 		if (module != null && module.length() > 0) {
