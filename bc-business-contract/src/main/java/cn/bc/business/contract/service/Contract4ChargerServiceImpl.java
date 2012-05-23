@@ -796,11 +796,12 @@ public class Contract4ChargerServiceImpl extends
 
 		//合同信息
 		params.put("code", c.getCode());
-		params.put("signDate",new CalendarFormater("dd/MM/yyyy").format(c.getSignDate()));
+		params.put("signDate",new CalendarFormater("yyyy-MM-dd").format(c.getSignDate()));
 	
 		//责任人信息
 		List<Map<String,String>> chargerList=this.contract4ChargerDao.findChargerByContractId(c.getId());
-		params.put("carMan",chargerList.get(0).get("name"));
+		String chargers=chargerList.get(0).get("name");
+		params.put("charger",chargerList.get(0).get("name"));
 		params.put("FWZGZ",chargerList.get(0).get("certFWZG"));
 		params.put("cert4Indentity", chargerList.get(0).get("certIdentity"));
 		params.put("phone",chargerList.get(0).get("phone")!=null||chargerList.get(0).get("phone").length()>0?
@@ -808,19 +809,21 @@ public class Contract4ChargerServiceImpl extends
 		params.put("address",chargerList.get(0).get("address"));
 		
 		if(chargerList.size()>1&&chargerList.get(1)!=null){
-			params.put("carMan2", chargerList.get(1).get("name"));
+			chargers+=","+chargerList.get(1).get("name");
+			params.put("charger2", chargerList.get(1).get("name"));
 			params.put("FWZGZ2",chargerList.get(1).get("certFWZG"));
 			params.put("cert4Indentity2", chargerList.get(1).get("certIdentity"));
 			params.put("phone2",chargerList.get(1).get("phone")!=null||chargerList.get(1).get("phone").length()>0?
 					chargerList.get(1).get("phone"):chargerList.get(1).get("phone1"));
 			params.put("address2",chargerList.get(1).get("address"));
 		}else{
-			params.put("carMan2", null);
+			params.put("charger2", null);
 			params.put("FWZGZ2", null);
 			params.put("cert4Indentity2", null);
 			params.put("phone2", null);
 			params.put("address2", null);
 		}
+		params.put("chargers", chargers);
 		
 		//车辆信息
 		List<Map<String,String>> carList=this.contract4ChargerDao.findCarByContractId(c.getId());
@@ -833,6 +836,8 @@ public class Contract4ChargerServiceImpl extends
 		}
 		params.put("company", company);
 		params.put("carCode", carList.get(0).get("code"));
+		params.put("plateType", carList.get(0).get("plateType"));
+		params.put("plateNo", carList.get(0).get("plateNo"));
 		params.put("plate", carList.get(0).get("plateType")+"."+carList.get(0).get("plateNo"));
 		params.put("factoryTypeModel", carList.get(0).get("factoryType")+carList.get(0).get("factoryMode"));
 		params.put("vin", carList.get(0).get("vin"));
@@ -842,16 +847,27 @@ public class Contract4ChargerServiceImpl extends
 		params.put("certNo2", carList.get(0).get("certNo2"));
 		
 		//格式化处理行驶证登记日期
-		String rDate=carList.get(0).get("registerDate").substring(0,carList.get(0).get("registerDate").indexOf(" "));
-		String[] tempArrDate=rDate.split("-");
-		params.put("registerDate",
-				tempArrDate.length<3?null:tempArrDate[2]+"/"+tempArrDate[1]+"/"+tempArrDate[0]);
+		params.put("registerDate",carList.get(0).get("registerDate"));
 		
 		//合同开始日期
 		Calendar startDate=c.getStartDate();
 		Calendar endDate=c.getEndDate();
-		int sumMonth=(endDate.get(Calendar.YEAR)-startDate.get(Calendar.YEAR))*12+(endDate.get(Calendar.MONTH)-startDate.get(Calendar.MONTH));
-		params.put("sumMonth", sumMonth);
+		
+		int countMonth=(endDate.get(Calendar.YEAR)-startDate.get(Calendar.YEAR))*12+(endDate.get(Calendar.MONTH)-startDate.get(Calendar.MONTH));
+		params.put("countMonth",multiDigit2Chinese(countMonth+""));
+		int sumYear=countMonth/12;
+		if(sumYear>0){
+			params.put("sumYear", siginDigit2Chinese(sumYear));
+		}else{
+			params.put("sumYear", "　／");
+		}
+		int sumMonth=countMonth%12;
+		if(sumMonth>9){
+			params.put("sumMonth", multiDigit2Chinese(sumMonth+""));
+		}else{
+			params.put("sumMonth", siginDigit2Chinese(sumMonth));
+		}
+		
 		params.put("sumStartYear",new CalendarFormater("yyyy").format(startDate));
 		params.put("sumStartMonth",new CalendarFormater("MM").format(startDate));
 		params.put("sumStartDay", new CalendarFormater("dd").format(startDate));
@@ -890,7 +906,7 @@ public class Contract4ChargerServiceImpl extends
 		
 		//处理每月承包费的生成
 		if(cfdList.size()>0){
-			for(int i=1;i<7&&i<cfdList.size()+1;i++){
+			for(int i=1;i<cfdList.size()+1;i++){
 				params.put("cfdsy"+i,new CalendarFormater("yyyy").format(cfdList.get(i-1).getStartDate()));
 				params.put("cfdsm"+i,new CalendarFormater("MM").format(cfdList.get(i-1).getStartDate()));
 				params.put("cfdsd"+i,new CalendarFormater("dd").format(cfdList.get(i-1).getStartDate()));
@@ -938,7 +954,6 @@ public class Contract4ChargerServiceImpl extends
 					params.put("cfdmyuan"+i, "　");
 				}
 			}
-			
 			
 			//每月承包费不足6年时
 			if(cfdList.size()<6){
