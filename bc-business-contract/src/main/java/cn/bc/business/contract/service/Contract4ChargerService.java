@@ -260,5 +260,17 @@ public interface Contract4ChargerService extends CrudService<Contract4Charger>,
 	 * @return
 	 */
 	Contract4Charger doOperate(Long carId, Contract4Charger e,
-			String assignChargerIds, Long fromContractId, Calendar stopDate);
+			String assignChargerIds, Long fromContractId, String stopDate);
+
+	/**
+	 * 入库
+	 * 
+	 * @param contract4Charger合同
+	 * 
+	 * @param contractCarId车辆ID
+	 * @param carMansId司机Id
+	 * @return
+	 */
+	String doWarehousing(Long contractCarId, String carMansId,
+			Contract4Charger contract4Charger);
 }

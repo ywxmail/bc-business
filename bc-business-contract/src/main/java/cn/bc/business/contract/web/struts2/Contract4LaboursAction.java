@@ -503,17 +503,10 @@ public class Contract4LaboursAction extends ViewAction<Map<String, Object>> {
 			statusCondition = ConditionUtils.toConditionByComma4IntegerValue(
 					this.status, "c.status_");
 			// if (this.status.length() <= 0) { // 显示全部状态的时候只显示最新版本的记录
-			mainsCondition = ConditionUtils.toConditionByComma4IntegerValue(
-					this.mains, "c.main");
+//			mainsCondition = ConditionUtils.toConditionByComma4IntegerValue(
+//					this.mains, "c.main");
 			// }
 		}
-		// else {
-		// // 查看历史版本
-		// patchCondtion = new EqualsCondition("c.patch_no", patchNo);
-		// mainsCondition = new EqualsCondition("c.main",
-		// Contract.MAIN_HISTORY);
-		// }
-		//
 		if (carId != null) {
 			carCondition = new EqualsCondition("carc.car_id", carId);
 		}
@@ -521,8 +514,6 @@ public class Contract4LaboursAction extends ViewAction<Map<String, Object>> {
 		if (driverId != null) {
 			driverCondition = new EqualsCondition("manc.man_id", driverId);
 		}
-		// return ConditionUtils.mix2AndCondition(typeCondtion, statusCondition,
-		// mainsCondition, patchCondtion,carCondition,driverCondition);
 		return ConditionUtils.mix2AndCondition(statusCondition, mainsCondition,
 				driverCondition, carCondition);
 	}

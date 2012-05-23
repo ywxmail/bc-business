@@ -151,6 +151,7 @@ public interface Contract4LabourDao extends CrudDao<Contract4Labour> {
 
 	/**
 	 * 更新指定司机的户口性质,区域,籍贯,出生日期
+	 * 
 	 * @param driverId
 	 * @param houseType
 	 * @param region
@@ -159,14 +160,14 @@ public interface Contract4LabourDao extends CrudDao<Contract4Labour> {
 	void updateCarMan4CarManInfo(Long driverId, String houseType,
 			Integer region, String origin);
 
-	
-//	/**
-//	 * 更新司机的备注列
-//	 * @param driverId 
-//	 * @param description
-//	 */
-//	void updateCarMan4Description(Long driverId, String description);
-	/**
+	// /**
+	// * 更新司机的备注列
+	// * @param driverId
+	// * @param description
+	// */
+	// void updateCarMan4Description(Long driverId, String description);
+
+	/**
 	 * 判断经济合同自编号唯一
 	 * 
 	 * @param excludeId
@@ -174,5 +175,14 @@ public interface Contract4LabourDao extends CrudDao<Contract4Labour> {
 	 * @return
 	 */
 	Long checkInsurCodeIsExist(Long excludeId, String insurCode);
+
+	/**
+	 * 根据车辆Id查找车辆信息
+	 * 
+	 * @param carId
+	 *            车辆Id
+	 * @return
+	 */
+	Map<String, Object> findCarByCarId(Long carId);
 
 }

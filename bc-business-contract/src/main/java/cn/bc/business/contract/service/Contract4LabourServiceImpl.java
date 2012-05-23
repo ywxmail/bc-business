@@ -18,6 +18,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 
+import cn.bc.BCConstants;
 import cn.bc.business.contract.dao.Contract4LabourDao;
 import cn.bc.business.contract.dao.ContractDao;
 import cn.bc.business.contract.domain.Contract;
@@ -37,6 +38,7 @@ import cn.bc.identity.web.SystemContext;
 import cn.bc.identity.web.SystemContextHolder;
 import cn.bc.template.domain.Template;
 import cn.bc.template.service.TemplateService;
+import cn.bc.web.ui.json.Json;
 
 /**
  * 司机劳动合同Service的实现
@@ -106,14 +108,6 @@ public class Contract4LabourServiceImpl extends
 			this.contractDao.saveContractCarManRelation(driverRelation);
 
 		}
-		// //更新司机的备注列
-		// String description =
-		// "劳动合同期限: 从 "+calendarToString(contract4Labour.getStartDate())+" 到 "+
-		// calendarToString(contract4Labour.getEndDate())+"\n"
-		// +"社保参保日期: "+calendarToString(contract4Labour.getJoinDate())+"\n"
-		// +"个人社保编号: "+contract4Labour.getInsurCode()+"\n"
-		// +"社保参保险种: "+contract4Labour.getInsuranceType();
-		//
 		// 更新司机的户口性质,区域,籍贯备注
 		this.contract4LabourDao.updateCarMan4CarManInfo(driverId,
 				contract4Labour.getHouseType(), contract4Labour.getRegion(),
@@ -532,8 +526,9 @@ public class Contract4LabourServiceImpl extends
 	 * 操作
 	 */
 	public Contract4Labour doOperate(Long carId, Contract4Labour e,
-			Long contractId, Calendar stopDate) {
-
+			Long contractId, String stopDate) {
+		// 是否新建
+		boolean isNew = e.isNew();
 		// 获取原来的合同信息
 		Contract4Labour oldContract = this.contract4LabourDao.load(contractId);
 		if (oldContract == null)
@@ -542,41 +537,56 @@ public class Contract4LabourServiceImpl extends
 		// 保存旧合同信息
 		// 更新旧合同的相关信息
 		SystemContext context = SystemContextHolder.get();
-		oldContract.setStatus(Contract.STATUS_LOGOUT);// 失效
-		oldContract.setMain(Contract.MAIN_HISTORY);// 历史
-		oldContract.setLogoutId(context.getUserHistory());// 注销人
-		oldContract.setLogoutDate(Calendar.getInstance());// 注销时间
-		oldContract.setStopDate(stopDate);// 合同实际结束日期
-		this.contract4LabourDao.save(oldContract);
+		// 如果是保存为草稿的，不对原合同作任何操作
+		if (e.getStatus() != BCConstants.STATUS_DRAFT) {
+			oldContract.setStatus(Contract.STATUS_LOGOUT);// 失效
+			oldContract.setMain(Contract.MAIN_HISTORY);// 历史
+			oldContract.setLogoutId(context.getUserHistory());// 注销人
+			oldContract.setLogoutDate(Calendar.getInstance());// 注销时间
+			// 合同实际结束日期
+			Calendar stopDate4Charger = DateUtils.getCalendar(stopDate);
+			oldContract.setStopDate(stopDate4Charger);// 合同实际结束日期
+			this.contract4LabourDao.save(oldContract);
+		}
 
 		// 保存新合同信息
 		Contract4Labour newContract = e;
-		newContract = this.contract4LabourDao.save(newContract);
-		Long newId = newContract.getId();
-
-		// 复制合同与车辆的关系
-		List<ContractCarRelation> oldCCRelations = this.contractDao
-				.findContractCarRelation(contractId);
-		if (!oldCCRelations.isEmpty()) {
-			List<ContractCarRelation> copyCCRelations = new ArrayList<ContractCarRelation>();
-			for (ContractCarRelation old : oldCCRelations) {
-				copyCCRelations.add(new ContractCarRelation(newId, old
-						.getCarId()));
-			}
-			this.contractDao.saveContractCarRelation(copyCCRelations);
+		// 如果是保存为草稿的，先将实际结束日期保存在新合同的冗余字段中
+		if (e.getStatus() == BCConstants.STATUS_DRAFT) {
+			e.setExt_str3(stopDate);
+		} else {
+			e.setExt_str3(null);
 		}
 
-		// 复制合同与司机的关系：劳动合同
-		// 复制合同与责任人的关系：经济合同
-		List<ContractCarManRelation> oldCMRelations = this.contractDao
-				.findContractCarManRelation(contractId);
-		if (!oldCMRelations.isEmpty()) {
-			List<ContractCarManRelation> copyCMRelations = new ArrayList<ContractCarManRelation>();
-			for (ContractCarManRelation old : oldCMRelations) {
-				copyCMRelations.add(new ContractCarManRelation(newId, old
-						.getCarManId()));
+		newContract = this.contract4LabourDao.save(newContract);
+		Long newId = newContract.getId();
+		// 如果是新建
+		if (isNew) {
+
+			// 复制合同与车辆的关系
+			List<ContractCarRelation> oldCCRelations = this.contractDao
+					.findContractCarRelation(contractId);
+			if (!oldCCRelations.isEmpty()) {
+				List<ContractCarRelation> copyCCRelations = new ArrayList<ContractCarRelation>();
+				for (ContractCarRelation old : oldCCRelations) {
+					copyCCRelations.add(new ContractCarRelation(newId, old
+							.getCarId()));
+				}
+				this.contractDao.saveContractCarRelation(copyCCRelations);
 			}
-			this.contractDao.saveContractCarManRelation(copyCMRelations);
+
+			// 复制合同与司机的关系：劳动合同
+			// 复制合同与责任人的关系：经济合同
+			List<ContractCarManRelation> oldCMRelations = this.contractDao
+					.findContractCarManRelation(contractId);
+			if (!oldCMRelations.isEmpty()) {
+				List<ContractCarManRelation> copyCMRelations = new ArrayList<ContractCarManRelation>();
+				for (ContractCarManRelation old : oldCMRelations) {
+					copyCMRelations.add(new ContractCarManRelation(newId, old
+							.getCarManId()));
+				}
+				this.contractDao.saveContractCarManRelation(copyCMRelations);
+			}
 		}
 
 		// 返回续签的合同
@@ -607,5 +617,61 @@ public class Contract4LabourServiceImpl extends
 			this.attachService.save(attach);
 			return attach;
 		}
+	}
+
+	public String json;
+
+	public String doWarehousing(Long carId, Long driverId, Contract4Labour e) {
+		Map<String, Object> carInfoMap; // 车辆Map
+		Map<String, Object> carManInfoMap; // 车辆Map
+		Json json = new Json();
+		boolean success4car = true;
+		boolean success4carMan = true;
+		String msg = "";
+		// 查找车辆的状态和车牌号
+		carInfoMap = this.contract4LabourDao.findCarByCarId(carId);
+		if (carInfoMap != null) {
+			// 如果车辆状态不为草稿时，不能入库
+			if (Long.valueOf(String.valueOf(carInfoMap.get("status_"))) == BCConstants.STATUS_DRAFT) {
+				success4car = false;
+				msg = carInfoMap.get("plate_type") + "."
+						+ carInfoMap.get("plate_no");
+
+			}
+		}
+		// 查找责任人的状态和姓名
+		carManInfoMap = this.findCarManByCarManId(driverId);
+		if (carManInfoMap != null) {
+			// 如果责任人状态不为草稿时，不能入库
+			if (Long.valueOf(String.valueOf(carManInfoMap.get("status_"))) == BCConstants.STATUS_DRAFT) {
+				success4carMan = false;
+				msg = (String) (msg.length() > 0 || msg != "" ? msg + " 、"
+						+ carManInfoMap.get("name") : carManInfoMap.get("name"));
+
+			}
+		}
+
+		// 如果都为入库状态，则该经济合同可以入库
+		if (success4car == true && success4carMan == true) {
+
+			e.setStatus(BCConstants.STATUS_ENABLED);
+			// 如果pid不为空，则为变更操作新建入库
+			if (e.getPid() != null) {
+				this.doOperate(carId, e, e.getPid(), e.getExt_str3());
+			} else {
+				// 无变更操作下新建
+				this.save(e, carId, driverId);
+			}
+			json.put("success", true);
+
+			e.setStatus(BCConstants.STATUS_ENABLED);
+			this.save(e);
+			json.put("success", true);
+		} else {
+			json.put("success", false);
+			json.put("msg", "入库失败！请先将  " + msg + " 入库！");
+		}
+		this.json = json.toString();
+		return this.json;
 	}
 }

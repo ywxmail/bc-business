@@ -84,8 +84,8 @@ public class Contract4LabourDaoImpl extends
 		Contract4Labour c = this.load(contractId);
 		Long pid = c.getPid();
 		this.getJpaTemplate().remove(c);
-//		this.executeUpdate("delete Contract4Labour where id=?",
-//				new Object[] { contractId });
+		// this.executeUpdate("delete Contract4Labour where id=?",
+		// new Object[] { contractId });
 
 		// 如有父级ID,递归删除父级记录
 		if (pid != null) {
@@ -471,7 +471,7 @@ public class Contract4LabourDaoImpl extends
 	}
 
 	/**
-	 * 根据车辆Id查找车辆
+	 * 根据车辆Id查找司机
 	 * 
 	 * @param carId
 	 * @return
@@ -502,7 +502,9 @@ public class Contract4LabourDaoImpl extends
 		List<Map<String, Object>> list = null;
 		String sql = "SELECT car.id,car.plate_type,car.plate_no,car.bs_type,car.factory_type,car.factory_model,car.register_date,car.scrap_date,car.level_,car.vin,car.engine_no"
 				+ ",car.total_weight,car.dim_len,car.dim_width,car.dim_height,car.access_weight,car.access_count,cd.car_id FROM BS_CAR_DRIVER cd left join BS_CAR car on cd.car_id = car.id"
-				+ " where cd.driver_id=" + carManId + " and cd.status_=0 order by cd.file_date DESC";
+				+ " where cd.driver_id="
+				+ carManId
+				+ " and cd.status_=0 order by cd.file_date DESC";
 
 		list = this.jdbcTemplate.queryForList(sql);
 
@@ -518,9 +520,8 @@ public class Contract4LabourDaoImpl extends
 	public Map<String, Object> findCarManByCarManId(Long carManId) {
 		Map<String, Object> queryMap = null;
 		String sql = "SELECT man.id,man.name,man.sex,man.cert_fwzg,man.cert_identity,man.origin,man.house_type"
-				+ ",man.birthdate FROM BS_CARMAN man"
-				+ " where man.id="
-				+ carManId;
+				+ ",man.birthdate,man.status_ FROM BS_CARMAN man"
+				+ " where man.id=" + carManId;
 
 		// jdbc查询BS_CARMAN记录
 		try {
@@ -547,8 +548,9 @@ public class Contract4LabourDaoImpl extends
 
 		// jdbc查询BS_CAR记录
 		try {
-			List<Map<String,Object>> list = this.jdbcTemplate.queryForList(sql);
-			if(list.size()>0){
+			List<Map<String, Object>> list = this.jdbcTemplate
+					.queryForList(sql);
+			if (list.size() > 0) {
 				queryMap = list.get(0);
 			}
 		} catch (EmptyResultDataAccessException e) {
@@ -578,16 +580,17 @@ public class Contract4LabourDaoImpl extends
 
 	public boolean isExistContractByDriverId(Long driverId) {
 		String sql = "select c.* from BS_CONTRACT c"
-				+ " inner join BS_CARMAN_CONTRACT cc ON c.id = cc.contract_id where c.type_="+Contract.TYPE_LABOUR+" and cc.man_id="
-				+ driverId + " and c.status_="+ BCConstants.STATUS_ENABLED;
+				+ " inner join BS_CARMAN_CONTRACT cc ON c.id = cc.contract_id where c.type_="
+				+ Contract.TYPE_LABOUR + " and cc.man_id=" + driverId
+				+ " and c.status_=" + BCConstants.STATUS_ENABLED;
 
 		List<Map<String, Object>> list = this.jdbcTemplate.queryForList(sql);
 		return list != null && list.size() > 0;
 	}
 
-
 	/**
 	 * 更新指定司机的户口性质
+	 * 
 	 * @param driverId
 	 * @param houseType
 	 */
@@ -602,6 +605,7 @@ public class Contract4LabourDaoImpl extends
 
 	/**
 	 * 更新指定司机的户口性质,区域,籍贯,出生日期,备注
+	 * 
 	 * @param driverId
 	 * @param houseType
 	 * @param region
@@ -621,9 +625,9 @@ public class Contract4LabourDaoImpl extends
 		args.add(origin);
 		args.add(driverId);
 		this.executeUpdate(hql.toString(), args);
-		
+
 	}
-	
+
 	/**
 	 * 判断经济合同自编号唯一
 	 * 
@@ -632,17 +636,18 @@ public class Contract4LabourDaoImpl extends
 	 * @return
 	 */
 	public Long checkInsurCodeIsExist(Long excludeId, String insurCode) {
-		String sql = "select c.id as id,manc.man_id as carManId from BS_CONTRACT c"+ 
-				" inner join BS_CONTRACT_LABOUR cl ON c.id = cl.id"+
-				" left join BS_CARMAN_CONTRACT manc ON c.id = manc.contract_id"+
-				" where c.status_=? and cl.insurcode=? ";
+		String sql = "select c.id as id,manc.man_id as carManId from BS_CONTRACT c"
+				+ " inner join BS_CONTRACT_LABOUR cl ON c.id = cl.id"
+				+ " left join BS_CARMAN_CONTRACT manc ON c.id = manc.contract_id"
+				+ " where c.status_=? and cl.insurcode=? ";
 		Object[] args;
 		if (excludeId != null) {
 			sql += " and c.id!=?";
-			args = new Object[] { new Integer(Contract.STATUS_NORMAL), insurCode,
-					excludeId };
+			args = new Object[] { new Integer(Contract.STATUS_NORMAL),
+					insurCode, excludeId };
 		} else {
-			args = new Object[] { new Integer(Contract.STATUS_NORMAL), insurCode };
+			args = new Object[] { new Integer(Contract.STATUS_NORMAL),
+					insurCode };
 		}
 		List<Map<String, Object>> list = this.jdbcTemplate.queryForList(sql,
 				args);
@@ -652,17 +657,33 @@ public class Contract4LabourDaoImpl extends
 			return null;
 	}
 
-//	/**
-//	 * 更新司机的备注列
-//	 * @param driverId 
-//	 * @param description
-//	 */
-//	public void updateCarMan4Description(Long driverId,String description) {
-//		ArrayList<Object> args = new ArrayList<Object>();
-//		StringBuffer hql = new StringBuffer();
-//		hql.append("UPDATE CarMan c SET c.description=? WHERE c.id =?");
-//		args.add(description);
-//		args.add(driverId);
-//		this.executeUpdate(hql.toString(), args);
-//	}
+	public Map<String, Object> findCarByCarId(Long carId) {
+		Map<String, Object> queryMap = null;
+		String sql = "SELECT car.id,car.plate_type,car.plate_no,car.status_ FROM BS_CAR car "
+				+ " WHERE car.id =" + carId;
+
+		// jdbc查询BS_CAR记录
+		try {
+			queryMap = this.jdbcTemplate.queryForMap(sql);
+		} catch (EmptyResultDataAccessException e) {
+			e.getStackTrace();
+			// logger.error(e.getMessage(), e);
+		}
+
+		return queryMap;
+	}
+
+	// /**
+	// * 更新司机的备注列
+	// * @param driverId
+	// * @param description
+	// */
+	// public void updateCarMan4Description(Long driverId,String description) {
+	// ArrayList<Object> args = new ArrayList<Object>();
+	// StringBuffer hql = new StringBuffer();
+	// hql.append("UPDATE CarMan c SET c.description=? WHERE c.id =?");
+	// args.add(description);
+	// args.add(driverId);
+	// this.executeUpdate(hql.toString(), args);
+	// }
 }

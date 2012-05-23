@@ -168,15 +168,15 @@ public class FeesAction extends ViewAction<Map<String, Object>> {
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
 		// 公司
 		columns.add(new TextColumn4MapKey("c.company", "company",
-				getText("fee.company"), 40).setSortable(true)
+				getText("fee.company"), 50).setSortable(true)
 				.setUseTitleFromLabel(true));
 		// 分公司
 		columns.add(new TextColumn4MapKey("unit.name", "unit_name",
-				getText("fee.unitname"), 65).setSortable(true)
+				getText("fee.unitname"), 70).setSortable(true)
 				.setUseTitleFromLabel(true));
 		// 车队
 		columns.add(new TextColumn4MapKey("f.motorcade_name", "motorcade_name",
-				getText("fee.motorcade"), 65)
+				getText("fee.motorcade"), 70)
 				.setSortable(true)
 				.setUseTitleFromLabel(true)
 				.setValueFormater(
@@ -194,7 +194,7 @@ public class FeesAction extends ViewAction<Map<String, Object>> {
 						}));
 		//车牌
 		columns.add(new TextColumn4MapKey("f.car_plate", "car_plate",
-				getText("fee.plate"), 80).setUseTitleFromLabel(true)
+				getText("fee.plate"), 85).setUseTitleFromLabel(true)
 				.setValueFormater(
 						new LinkFormater4Id(this.getContextPath()
 								+ "/bc-business/car/edit?id={0}", "car") {
@@ -213,7 +213,7 @@ public class FeesAction extends ViewAction<Map<String, Object>> {
 				.setUseTitleFromLabel(true));
 		//缴费人
 		columns.add(new TextColumn4MapKey("f.payer_name", "payer_name",
-				getText("fee.payerName"), 80)
+				getText("fee.payerName"), 65)
 				.setValueFormater(
 					new LinkFormater4Id(this.getContextPath()
 							+ "/bc-business/carMan/edit?id={0}",
@@ -230,20 +230,20 @@ public class FeesAction extends ViewAction<Map<String, Object>> {
 		
 		//本期应收合计
 		columns.add(new TextColumn4MapKey("f.s_total", "s_total",
-				getText("fee.benqiyingshou"), 80).setSortable(true)
+				getText("fee.benqiyingshou"), 100).setSortable(true)
 				.setValueFormater(new NubmerFormater("###,###.##")));
 		//本期调整合计
 		columns.add(new TextColumn4MapKey("f.a_total", "a_total",
-				getText("fee.benqitiaozheng"), 80).setSortable(true)
+				getText("fee.benqitiaozheng"), 100).setSortable(true)
 				.setValueFormater(new NubmerFormater("###,###.##")));
 		//本期应收款合计
 		columns.add(new TextColumn4MapKey("f.sa_total1", "sa_total1",
-				getText("fee.benqiyingshouheji"), 95).setSortable(true)
+				getText("fee.benqiyingshouheji"), 120).setSortable(true)
 				.setValueFormater(new NubmerFormater("###,###.##")));
 		
 		//前期加本期应收合计
 		columns.add(new TextColumn4MapKey("f.sa_total2", "sa_total2",
-				getText("fee.qianqibenqiyingshouheji"), 110).setSortable(true)
+				getText("fee.qianqibenqiyingshouheji"), 135).setSortable(true)
 				.setValueFormater(new NubmerFormater("###,###.##")));
 		
 		//本期实收
@@ -252,7 +252,7 @@ public class FeesAction extends ViewAction<Map<String, Object>> {
 				.setValueFormater(new NubmerFormater("###,###.##")));
 		//本期实收明细
 		columns.add(new TextColumn4MapKey("f.r_total", "r_fee_detail",
-				getText("fee.benqishishou.detail"), 120).setUseTitleFromLabel(true)
+				getText("fee.benqishishou.detail"), 200).setUseTitleFromLabel(true)
 				.setValueFormater(new NubmerFormater("###,###.##")));
 		//本期欠费
 		columns.add(new TextColumn4MapKey("f.o_total", "o_total",
@@ -260,11 +260,11 @@ public class FeesAction extends ViewAction<Map<String, Object>> {
 				.setValueFormater(new NubmerFormater("###,###.##")));
 		//本期欠费明细
 		columns.add(new TextColumn4MapKey("f.o_total", "o_fee_detail",
-				getText("fee.benqiqianfei.detail"), 120).setUseTitleFromLabel(true)
+				getText("fee.benqiqianfei.detail"), 200).setUseTitleFromLabel(true)
 				.setValueFormater(new NubmerFormater("###,###.##")));
 		//前期欠费明细
 		columns.add(new TextColumn4MapKey("f.o_total", "b4_o_fee_detail",
-				getText("fee.qianqiqianfei.detail"), 120).setUseTitleFromLabel(true)
+				getText("fee.qianqiqianfei.detail"), 200).setUseTitleFromLabel(true)
 				.setValueFormater(new NubmerFormater("###,###.##")));
 		//备注
 		columns.add(new TextColumn4MapKey("f.desc_", "desc_",
@@ -364,7 +364,7 @@ public class FeesAction extends ViewAction<Map<String, Object>> {
 		}
 		// 搜索按钮
 		tb.addButton(getDefaultSearchToolbarButton());
-
+		
 		return tb;
 	}
 
