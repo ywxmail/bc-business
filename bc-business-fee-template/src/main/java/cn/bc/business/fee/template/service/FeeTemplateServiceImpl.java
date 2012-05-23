@@ -43,6 +43,10 @@ public class FeeTemplateServiceImpl extends DefaultCrudService<FeeTemplate> impl
 		return this.feeTemplateDao.getFeeBelong2Template(pid);
 	}
 
+	public boolean isUniqueCode(Long currentId, String code) {
+		return this.feeTemplateDao.isUniqueCode(currentId, code);
+	}
+
 	
 	
 }

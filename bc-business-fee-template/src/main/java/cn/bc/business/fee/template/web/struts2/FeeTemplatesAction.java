@@ -65,7 +65,7 @@ public class FeeTemplatesAction extends ViewAction<Map<String, Object>> {
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer sql = new StringBuffer();
 		sql.append("select a.id,a.status_ as status,a.module_ as module,a.type_ as type,b.name as pname,a.order_ as order");
-		sql.append(",a.name,a.price,a.count_ as count,a.pay_type,a.desc_ as desc");
+		sql.append(",a.name,a.price,a.count_ as count,a.pay_type,a.desc_ as desc,a.code");
 		sql.append(" from bs_fee_template a");
 		sql.append(" left join bs_fee_template b on b.id=a.pid ");
 		sqlObject.setSql(sql.toString());
@@ -89,6 +89,7 @@ public class FeeTemplatesAction extends ViewAction<Map<String, Object>> {
 				map.put("count", rs[i++]);
 				map.put("pay_type", rs[i++]);
 				map.put("desc", rs[i++]);
+				map.put("code", rs[i++]);
 				return map;
 			}
 		});
@@ -102,7 +103,7 @@ public class FeeTemplatesAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected String[] getGridSearchFields() {
-		return new String[]{"a.module_","b.name","a.name"};
+		return new String[]{"a.module_","b.name","a.name","a.code"};
 	}
 
 	@Override
@@ -121,6 +122,10 @@ public class FeeTemplatesAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("a.type_", "type",
 				getText("feeTemplate.type"), 40)
 				.setValueFormater(new KeyValueFormater(this.getTypes())));
+		//编码
+		columns.add(new TextColumn4MapKey("a.code", "code",
+				getText("feeTemplate.code"), 150).setSortable(true)
+				.setUseTitleFromLabel(true));
 		//所属模板
 		columns.add(new TextColumn4MapKey("b.name", "pname",
 				getText("feeTemplate.ptempalte"), 100).setUseTitleFromLabel(true));

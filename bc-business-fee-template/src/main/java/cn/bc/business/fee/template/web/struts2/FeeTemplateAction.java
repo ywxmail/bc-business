@@ -21,6 +21,7 @@ import cn.bc.business.web.struts2.FileEntityAction;
 import cn.bc.core.exception.CoreException;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.option.domain.OptionItem;
+import cn.bc.web.ui.html.page.ButtonOption;
 import cn.bc.web.ui.html.page.PageOption;
 import cn.bc.web.ui.json.Json;
 
@@ -83,6 +84,16 @@ public class FeeTemplateAction extends FileEntityAction<Long, FeeTemplate> {
 					.toString(), template.getName());
 		}
 		super.afterOpen(entity);
+	}
+	
+	@Override
+	protected void buildFormPageButtons(PageOption pageOption, boolean editable) {
+		boolean readonly = this.isReadonly();
+		if (editable && !readonly) {
+			// 添加保存按钮
+			pageOption.addButton(new ButtonOption(getText("label.save"), null,
+					"bs.feeTemplateForm.save"));
+		}
 	}
 
 	@Override
@@ -181,6 +192,18 @@ public class FeeTemplateAction extends FileEntityAction<Long, FeeTemplate> {
 		}
 		this.json=json.toString();
 		return "json";	
+	}
+	
+	public Long fid;
+	public String code;
+	
+	//检测编码唯一
+	public String isUniqueCode(){
+		Json json = new Json();
+		boolean flag=this.feeTemplateService.isUniqueCode(fid, code);
+		json.put("result",!flag);
+		this.json = json.toString();
+		return "json";
 	}
 
 }

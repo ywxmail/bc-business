@@ -21,6 +21,7 @@ import cn.bc.core.query.condition.Condition;
 import cn.bc.core.query.condition.Direction;
 import cn.bc.core.query.condition.impl.AndCondition;
 import cn.bc.core.query.condition.impl.EqualsCondition;
+import cn.bc.core.query.condition.impl.InCondition;
 import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.db.jdbc.RowMapper;
 import cn.bc.db.jdbc.SqlObject;
@@ -62,7 +63,7 @@ public class SelectFeeTemplateAction extends
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer sql = new StringBuffer();
 		sql.append("select a.id,a.status_ as status,a.module_ as module,a.type_ as type,b.name as pname,a.order_ as order");
-		sql.append(",a.name,a.price,a.count_ as count,a.pay_type,a.desc_ as desc,a.spec");
+		sql.append(",a.name,a.price,a.count_ as count,a.pay_type,a.desc_ as desc,a.spec,a.code");
 		sql.append(" from bs_fee_template a");
 		sql.append(" left join bs_fee_template b on b.id=a.pid ");
 		sqlObject.setSql(sql.toString());
@@ -86,6 +87,8 @@ public class SelectFeeTemplateAction extends
 				map.put("count", rs[i++]);
 				map.put("pay_type", rs[i++]);
 				map.put("desc", rs[i++]);
+				map.put("spec", rs[i++]);
+				map.put("code", rs[i++]);
 				String spec = (String) rs[i++];
 				try {
 					map.put("spec",
@@ -114,8 +117,9 @@ public class SelectFeeTemplateAction extends
 		columns.add(new TextColumn4MapKey("b.name", "pname",
 				getText("feeTemplate.ptempalte"), 100)
 				.setUseTitleFromLabel(true));
-		columns.add(new TextColumn4MapKey("a.order_", "order",
-				getText("feeTemplate.order"), 60).setSortable(true));
+		//编码
+		columns.add(new TextColumn4MapKey("a.code", "code",
+				getText("feeTemplate.code"), 160).setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("a.name", "name",
 				getText("feeTemplate.name"), 100).setSortable(true));
 		columns.add(new TextColumn4MapKey("a.price", "price",
@@ -161,7 +165,7 @@ public class SelectFeeTemplateAction extends
 
 	@Override
 	protected String[] getGridSearchFields() {
-		return new String[] { "b.name", "a.name" };
+		return new String[]{"b.name","a.name","a.code"};
 	}
 
 	@Override
@@ -192,18 +196,24 @@ public class SelectFeeTemplateAction extends
 
 	@Override
 	protected Condition getGridSpecalCondition() {
-		AndCondition andCondition = new AndCondition(new EqualsCondition(
-				"a.status_", BCConstants.STATUS_ENABLED));
-		if (module != null || module.length() > 0) {
-			andCondition.add(new EqualsCondition("a.module_", module.trim()));
+		AndCondition andCondition=new AndCondition(new EqualsCondition("a.status_", BCConstants.STATUS_ENABLED));
+		if(module!=null&&module.length()>0){
+			if(module.indexOf(",")==-1){
+				andCondition.add(new EqualsCondition("a.module_", module));
+			}else{
+				andCondition.add(new InCondition("a.module_", module.split(",")));
+			}
 		}
+		
 		return andCondition;
 	}
 
 	@Override
 	protected Json getGridExtrasData() {
 		Json json = new Json();
-		json.put("status", status);
+		if(status!=null&&status.length()>0){
+			json.put("status", status);
+		}
 		if (module != null && module.length() > 0) {
 			json.put("module", module);
 		}

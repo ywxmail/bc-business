@@ -10,6 +10,7 @@ import cn.bc.business.fee.template.domain.FeeTemplate;
 import cn.bc.core.query.condition.Condition;
 import cn.bc.core.query.condition.impl.AndCondition;
 import cn.bc.core.query.condition.impl.EqualsCondition;
+import cn.bc.core.query.condition.impl.NotEqualsCondition;
 import cn.bc.db.jdbc.RowMapper;
 import cn.bc.orm.hibernate.jpa.HibernateCrudJpaDao;
 import cn.bc.orm.hibernate.jpa.HibernateJpaNativeQuery;
@@ -51,7 +52,7 @@ public class FeeTemplateDaoImpl extends HibernateCrudJpaDao<FeeTemplate>
 
 	// 返回属于此模板的费用集合
 	public List<Map<String, String>> getFeeBelong2Template(Long pid) {
-		String hql = "SELECT a.id,a.name,a.price,a.count_,a.pay_type,a.desc_,a.spec";
+		String hql = "SELECT a.id,a.name,a.price,a.count_,a.pay_type,a.desc_,a.spec,a.code";
 		hql += " FROM bs_fee_template a";
 		hql += " WHERE a.status_=";
 		hql += BCConstants.STATUS_ENABLED;
@@ -69,8 +70,21 @@ public class FeeTemplateDaoImpl extends HibernateCrudJpaDao<FeeTemplate>
 						oi.put("desc", rs[i++].toString());
 						Object spec = rs[i++];
 						oi.put("spec", spec != null ? spec.toString() : "");
+						oi.put("code", rs[i++].toString());
 						return oi;
 					}
 				});
+	}
+	
+	public boolean isUniqueCode(Long currentId,String code){
+		Condition c;
+		if (currentId == null) {
+			c =new EqualsCondition("code", code);
+			
+		} else {
+			c = new AndCondition().add(new EqualsCondition("code", code)).add(
+					new NotEqualsCondition("id", currentId));
+		}
+		return this.createQuery().condition(c).count() > 0;
 	}
 }
