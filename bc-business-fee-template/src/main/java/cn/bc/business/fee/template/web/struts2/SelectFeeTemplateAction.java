@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
@@ -45,14 +47,14 @@ public class SelectFeeTemplateAction extends
 		AbstractSelectPageAction<Map<String, Object>> {
 	private static final long serialVersionUID = 1L;
 	public String status = String.valueOf(BCConstants.STATUS_ENABLED); // 车辆保单险种的状态，多个用逗号连接
-	public String module;//所属模板
+	public String module;// 所属模板
 
 	@Override
 	protected OrderCondition getGridDefaultOrderCondition() {
 		// 默认排序方向：排序号
 		return new OrderCondition("a.order_", Direction.Asc);
 	}
-	
+
 	@Override
 	protected SqlObject<Map<String, Object>> getSqlObject() {
 		SqlObject<Map<String, Object>> sqlObject = new SqlObject<Map<String, Object>>();
@@ -84,25 +86,34 @@ public class SelectFeeTemplateAction extends
 				map.put("count", rs[i++]);
 				map.put("pay_type", rs[i++]);
 				map.put("desc", rs[i++]);
-				map.put("spec", rs[i++]);
-				
+				String spec = (String) rs[i++];
+				try {
+					map.put("spec",
+							spec != null && spec.length() > 0 ? new JSONObject(
+									spec) : new JSONObject());
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
 				return map;
 			}
 		});
 		return sqlObject;
-	}       
+	}
 
 	@Override
 	protected List<Column> getGridColumns() {
 		List<Column> columns = new ArrayList<Column>();
 		columns.add(new IdColumn4MapKey("a.id", "id"));
-		//类型
+		// 类型
 		columns.add(new TextColumn4MapKey("a.type_", "type",
 				getText("feeTemplate.type"), 40)
 				.setValueFormater(new KeyValueFormater(this.getTypes())));
-		//所属模板
+		// 所属模板
 		columns.add(new TextColumn4MapKey("b.name", "pname",
-				getText("feeTemplate.ptempalte"), 100).setUseTitleFromLabel(true));
+				getText("feeTemplate.ptempalte"), 100)
+				.setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("a.order_", "order",
 				getText("feeTemplate.order"), 60).setSortable(true));
 		columns.add(new TextColumn4MapKey("a.name", "name",
@@ -112,45 +123,45 @@ public class SelectFeeTemplateAction extends
 				.setValueFormater(new NubmerFormater("###,##0.00")));
 		columns.add(new TextColumn4MapKey("a.count_", "count",
 				getText("feeTemplate.count"), 80).setSortable(true));
-		//收费方式
+		// 收费方式
 		columns.add(new TextColumn4MapKey("t.pay_type", "pay_type",
 				getText("feeTemplate.payType"), 65).setSortable(true)
-				.setValueFormater(new KeyValueFormater(this.getPayTypes())));	
+				.setValueFormater(new KeyValueFormater(this.getPayTypes())));
 		columns.add(new TextColumn4MapKey("a.desc_", "desc",
 				getText("feeTemplate.desc")).setUseTitleFromLabel(true));
-		//特殊配置
+		// 特殊配置
 		columns.add(new HiddenColumn4MapKey("spec", "spec"));
 		return columns;
 	}
 
-	//收费方式值转换
+	// 收费方式值转换
 	private Map<String, String> getPayTypes() {
-		Map<String,String> paytypes=new HashMap<String, String>();
+		Map<String, String> paytypes = new HashMap<String, String>();
 		paytypes.put(null, "");
-		paytypes.put(String.valueOf(FeeTemplate.PAY_TYPE_MONTH), 
+		paytypes.put(String.valueOf(FeeTemplate.PAY_TYPE_MONTH),
 				getText("feeTemplate.payType.month"));
-		paytypes.put(String.valueOf(FeeTemplate.PAY_TYPE_SEASON), 
+		paytypes.put(String.valueOf(FeeTemplate.PAY_TYPE_SEASON),
 				getText("feeTemplate.payType.season"));
-		paytypes.put(String.valueOf(FeeTemplate.PAY_TYPE_YEAR), 
+		paytypes.put(String.valueOf(FeeTemplate.PAY_TYPE_YEAR),
 				getText("feeTemplate.payType.year"));
-		paytypes.put(String.valueOf(FeeTemplate.PAY_TYPE_ALL), 
+		paytypes.put(String.valueOf(FeeTemplate.PAY_TYPE_ALL),
 				getText("feeTemplate.payType.all"));
 		return paytypes;
 	}
-	
-	//类型值转换
+
+	// 类型值转换
 	private Map<String, String> getTypes() {
-		Map<String,String> types=new HashMap<String, String>();
-		types.put(String.valueOf(FeeTemplate.TYPE_FEE), 
+		Map<String, String> types = new HashMap<String, String>();
+		types.put(String.valueOf(FeeTemplate.TYPE_FEE),
 				getText("feeTemplate.type.fee"));
-		types.put(String.valueOf(FeeTemplate.TYPE_TEMPLATE), 
+		types.put(String.valueOf(FeeTemplate.TYPE_TEMPLATE),
 				getText("feeTemplate.type.template"));
 		return types;
 	}
-	
+
 	@Override
 	protected String[] getGridSearchFields() {
-		return new String[]{"b.name","a.name"};
+		return new String[] { "b.name", "a.name" };
 	}
 
 	@Override
@@ -181,9 +192,10 @@ public class SelectFeeTemplateAction extends
 
 	@Override
 	protected Condition getGridSpecalCondition() {
-		AndCondition andCondition=new AndCondition(new EqualsCondition("a.status_", BCConstants.STATUS_ENABLED));
-		if(module!=null||module.length()>0){
-			 andCondition.add(new EqualsCondition("a.module_", module.trim()));
+		AndCondition andCondition = new AndCondition(new EqualsCondition(
+				"a.status_", BCConstants.STATUS_ENABLED));
+		if (module != null || module.length() > 0) {
+			andCondition.add(new EqualsCondition("a.module_", module.trim()));
 		}
 		return andCondition;
 	}
@@ -192,7 +204,7 @@ public class SelectFeeTemplateAction extends
 	protected Json getGridExtrasData() {
 		Json json = new Json();
 		json.put("status", status);
-		if(module!=null&&module.length()>0){
+		if (module != null && module.length() > 0) {
 			json.put("module", module);
 		}
 		return json;
@@ -207,7 +219,5 @@ public class SelectFeeTemplateAction extends
 	protected String getHtmlPageNamespace() {
 		return this.getContextPath() + BSConstants.NAMESPACE;
 	}
-	
-	
-	
+
 }
