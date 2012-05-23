@@ -19,6 +19,7 @@
 		<action name="isTemplateExistFee" class="feeTemplateAction" method="isTemplateExistFee" />
 		<action name="isFeeBelong2Template" class="feeTemplateAction" method="isFeeBelong2Template" />
 		<action name="getTemplateModule" class="feeTemplateAction" method="getTemplateModule" />
+		<action name="isUniqueCode" class="feeTemplateAction" method="isUniqueCode" />
 	</package>
 	
 	<package name="selectTemplateWithFeeTemplate" extends="bc-default" namespace="/bc-business/selectTemplateWithFeeTemplate">

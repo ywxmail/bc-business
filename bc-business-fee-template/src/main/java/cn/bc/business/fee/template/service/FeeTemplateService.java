@@ -47,4 +47,13 @@ public interface FeeTemplateService extends CrudService<FeeTemplate> {
 	 * @return
 	 */
 	public List<Map<String, String>> findFee(Long pid);
+	
+	/**
+	 * 检测编码是否唯一
+	 * 
+	 * @param currentId
+	 * @param code
+	 * @return
+	 */
+	public boolean isUniqueCode(Long currentId,String code);
 }

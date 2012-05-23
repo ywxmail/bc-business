@@ -44,6 +44,7 @@ public class FeeTemplate extends FileEntityImpl {
 	private Integer payType;// 收费方式
 	private String desc;// 描述
 	private String spec;// 特殊配置
+	private String code;// 编码 全局唯一
 
 	public String getSpec() {
 		return spec;
@@ -140,4 +141,13 @@ public class FeeTemplate extends FileEntityImpl {
 		this.desc = desc;
 	}
 
+	public String getCode() {
+		return code;
+	}
+
+	public void setCode(String code) {
+		this.code = code;
+	}
+
+	
 }

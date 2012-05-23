@@ -64,6 +64,7 @@ public class SelectTemplateWithFeeTemplateAction extends
 						o.put("spec",
 								spec != null && spec.length() > 0 ? new JSONObject(
 										spec) : new JSONObject());
+						o.put("code", it.get("code"));
 						jsons.put(o);
 					}
 				}

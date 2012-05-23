@@ -39,4 +39,13 @@ public interface FeeTemplateDao extends CrudDao<FeeTemplate> {
 	 * @return
 	 */
 	public List<Map<String, String>> getFeeBelong2Template(Long pid);
+	
+	/**
+	 * 检测编码是否唯一
+	 * 
+	 * @param currentId
+	 * @param code
+	 * @return
+	 */
+	public boolean isUniqueCode(Long currentId,String code);
 }
