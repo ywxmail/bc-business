@@ -351,7 +351,7 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 		if (isScrapTo()) {
 			columns.add(new TextColumn4MapKey("cc.scrapto", "scrapto",
 					getText("contract4Charger.scrapTo"), 60)
-					.setUseTitleFromLabel(true));
+					.setUseTitleFromLabel(true).setSortable(true));
 		}
 		columns.add(new TextColumn4MapKey("c.ver_major", "ver_major",
 				getText("contract4Labour.ver"), 40)
