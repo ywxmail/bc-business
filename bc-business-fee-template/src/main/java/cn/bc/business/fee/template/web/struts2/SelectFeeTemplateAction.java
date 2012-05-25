@@ -115,9 +115,6 @@ public class SelectFeeTemplateAction extends
 		columns.add(new TextColumn4MapKey("b.name", "pname",
 				getText("feeTemplate.ptempalte"), 100)
 				.setUseTitleFromLabel(true));
-		// 编码
-		columns.add(new TextColumn4MapKey("a.code", "code",
-				getText("feeTemplate.code"), 160).setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("a.name", "name",
 				getText("feeTemplate.name"), 100).setSortable(true));
 		columns.add(new TextColumn4MapKey("a.price", "price",
@@ -131,6 +128,9 @@ public class SelectFeeTemplateAction extends
 				.setValueFormater(new KeyValueFormater(this.getPayTypes())));
 		columns.add(new TextColumn4MapKey("a.desc_", "desc",
 				getText("feeTemplate.desc")).setUseTitleFromLabel(true));
+		// 编码
+		columns.add(new TextColumn4MapKey("a.code", "code",
+				getText("feeTemplate.code"), 160).setUseTitleFromLabel(true));
 		// 特殊配置
 		columns.add(new HiddenColumn4MapKey("spec", "spec"));
 		return columns;

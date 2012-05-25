@@ -26,6 +26,7 @@ import cn.bc.business.contract.domain.Contract4Charger;
 import cn.bc.business.contract.domain.ContractCarManRelation;
 import cn.bc.business.contract.domain.ContractCarRelation;
 import cn.bc.business.contract.domain.ContractFeeDetail;
+import cn.bc.business.socialSecurityRule.service.SocialSecurityRuleService;
 import cn.bc.core.Page;
 import cn.bc.core.exception.CoreException;
 import cn.bc.core.query.condition.Condition;
@@ -39,7 +40,9 @@ import cn.bc.identity.web.SystemContext;
 import cn.bc.identity.web.SystemContextHolder;
 import cn.bc.template.domain.Template;
 import cn.bc.template.service.TemplateService;
+import cn.bc.template.util.DocxUtils;
 import cn.bc.web.formater.CalendarFormater;
+import cn.bc.web.formater.NubmerFormater;
 import cn.bc.web.ui.json.Json;
 
 /**
@@ -539,7 +542,7 @@ public class Contract4ChargerServiceImpl extends
 	 */
 	public Contract4Charger doOperate(Long carId, Contract4Charger e,
 			String assignChargerIds, Long contractId, String stopDate) {
-		boolean isNew=e.isNew();
+		boolean isNew = e.isNew();
 		// 获取原来的合同信息
 		Contract4Charger oldContract = this.contract4ChargerDao
 				.load(contractId);
@@ -561,7 +564,7 @@ public class Contract4ChargerServiceImpl extends
 			oldContract.setStopDate(stopDate4Charger);// 合同实际结束日期
 			this.contract4ChargerDao.save(oldContract);
 		}
-	
+
 		// 保存新合同信息
 		Contract4Charger newContract = e;
 		// 如果是保存为草稿的，先将实际结束日期保存在新合同的冗余字段中
@@ -801,210 +804,318 @@ public class Contract4ChargerServiceImpl extends
 		return this.contract4ChargerDao.checkCodeIsExist(excludeId, code);
 	}
 
+	// 社保
+	private SocialSecurityRuleService SocialSecurityRuleService;
+
+	@Autowired
+	public void setSocialSecurityRuleService(
+			SocialSecurityRuleService socialSecurityRuleService) {
+		SocialSecurityRuleService = socialSecurityRuleService;
+	}
+
 	public Attach doAddAttachFromTemplate(Long id, String templateCode)
 			throws IOException {
 		// 加载合同
-		Contract4Charger c = this.load(id);		
+		Contract4Charger c = this.load(id);
 
 		// 生成格式化参数
 		Map<String, Object> params = new HashMap<String, Object>();
 
-		//合同信息
+		// --加载社保信息--开始--
+		// 公司unit
+		params.put("unitSSRuleBZ", new NubmerFormater("0.##").format(this.SocialSecurityRuleService.countUnit(
+				null, "本地城镇", Calendar.getInstance().get(Calendar.YEAR),
+				Calendar.getInstance().get(Calendar.MONTH) + 1)));
+		params.put("unitSSRuleWZ", new NubmerFormater("0.##").format(this.SocialSecurityRuleService.countUnit(
+				null, "外地城镇", Calendar.getInstance().get(Calendar.YEAR),
+				Calendar.getInstance().get(Calendar.MONTH) + 1)));
+		params.put("unitSSRuleBC", new NubmerFormater("0.##").format(this.SocialSecurityRuleService.countUnit(
+				null, "本地农村", Calendar.getInstance().get(Calendar.YEAR),
+				Calendar.getInstance().get(Calendar.MONTH) + 1)));
+		params.put("unitSSRuleWC", new NubmerFormater("0.##").format(this.SocialSecurityRuleService.countUnit(
+				null, "外地农村", Calendar.getInstance().get(Calendar.YEAR),
+				Calendar.getInstance().get(Calendar.MONTH) + 1)));
+
+		// 个人persional
+		params.put("psnlSSRuleBZ", new NubmerFormater("0.##").format(this.SocialSecurityRuleService.countPersonal(
+				null, "本地城镇", Calendar.getInstance().get(Calendar.YEAR),
+				Calendar.getInstance().get(Calendar.MONTH) + 1)));
+		params.put("psnlSSRuleWZ", new NubmerFormater("0.##").format(this.SocialSecurityRuleService.countPersonal(
+				null, "外地城镇", Calendar.getInstance().get(Calendar.YEAR),
+				Calendar.getInstance().get(Calendar.MONTH) + 1)));
+		params.put("psnlSSRuleBC", new NubmerFormater("0.##").format(this.SocialSecurityRuleService.countPersonal(
+				null, "本地农村", Calendar.getInstance().get(Calendar.YEAR),
+				Calendar.getInstance().get(Calendar.MONTH) + 1)));
+		params.put("psnlSSRuleWC", new NubmerFormater("0.##").format(this.SocialSecurityRuleService.countPersonal(
+				null, "外地农村", Calendar.getInstance().get(Calendar.YEAR),
+				Calendar.getInstance().get(Calendar.MONTH) + 1)));
+		// --加载社保信息--结束--
+
+		// -----合同信息----开始--
 		params.put("code", c.getCode());
-		params.put("signDate",new CalendarFormater("yyyy-MM-dd").format(c.getSignDate()));
-	
-		//责任人信息
-		List<Map<String,String>> chargerList=this.contract4ChargerDao.findChargerByContractId(c.getId());
-		String chargers=chargerList.get(0).get("name");
-		params.put("charger",chargerList.get(0).get("name"));
-		params.put("FWZGZ",chargerList.get(0).get("certFWZG"));
-		params.put("cert4Indentity", chargerList.get(0).get("certIdentity"));
-		params.put("phone",chargerList.get(0).get("phone")!=null||chargerList.get(0).get("phone").length()>0?
-							chargerList.get(0).get("phone"):chargerList.get(0).get("phone1"));
-		params.put("address",chargerList.get(0).get("address"));
-		
-		if(chargerList.size()>1&&chargerList.get(1)!=null){
-			chargers+=","+chargerList.get(1).get("name");
-			params.put("charger2", chargerList.get(1).get("name"));
-			params.put("FWZGZ2",chargerList.get(1).get("certFWZG"));
-			params.put("cert4Indentity2", chargerList.get(1).get("certIdentity"));
-			params.put("phone2",chargerList.get(1).get("phone")!=null||chargerList.get(1).get("phone").length()>0?
-					chargerList.get(1).get("phone"):chargerList.get(1).get("phone1"));
-			params.put("address2",chargerList.get(1).get("address"));
-		}else{
-			params.put("charger2", null);
-			params.put("FWZGZ2", null);
-			params.put("cert4Indentity2", null);
-			params.put("phone2", null);
-			params.put("address2", null);
+		params.put("signDate",
+				new CalendarFormater("yyyy-MM-dd").format(c.getSignDate()));
+
+		// 缴费日
+		params.put("paymentDate", c.getPaymentDate() != null
+				&& c.getPaymentDate().length() > 0 ? c.getPaymentDate() : " ");
+
+		// 合同开始日期
+		Calendar startDate = c.getStartDate();
+		Calendar endDate = c.getEndDate();
+
+		int countMonth = (endDate.get(Calendar.YEAR) - startDate
+				.get(Calendar.YEAR))
+				* 12
+				+ (endDate.get(Calendar.MONTH) - startDate.get(Calendar.MONTH));
+		params.put("countMonth", multiDigit2Chinese(countMonth + ""));
+		int sumYear = countMonth / 12;
+		if (sumYear > 0) {
+			params.put("sumYear", siginDigit2Chinese(sumYear));
+		} else {
+			params.put("sumYear", "　／");
+		}
+		int sumMonth = countMonth % 12;
+		if (sumMonth > 9) {
+			params.put("sumMonth", multiDigit2Chinese(sumMonth + ""));
+		} else {
+			params.put("sumMonth", siginDigit2Chinese(sumMonth));
+		}
+		params.put("sumStartYear",
+				new CalendarFormater("yyyy").format(startDate));
+		params.put("sumStartMonth",
+				new CalendarFormater("MM").format(startDate));
+		params.put("sumStartDay", new CalendarFormater("dd").format(startDate));
+		params.put("sumEndYear", new CalendarFormater("yyyy").format(endDate));
+		params.put("sumEndMonth", new CalendarFormater("MM").format(endDate));
+		params.put("sumEndDay", new CalendarFormater("dd").format(endDate));
+		// -----合同信息----结束--
+
+		// -----责任人信息---开始--
+		List<Map<String, String>> chargerList = this.contract4ChargerDao
+				.findChargerByContractId(c.getId());
+		// 循环变量
+		int chargerI = 1;
+		String chargers = "  ";
+		for (Map<String, String> chargerMap : chargerList) {
+			if (chargerI == 1) {
+				chargers = chargerMap.get("name");
+				params.put("charger", chargerMap.get("name"));
+				params.put("FWZGZ", chargerMap.get("certFWZG"));
+				params.put("cert4Indentity", chargerMap.get("certIdentity"));
+				params.put(
+						"phone",
+						chargerMap.get("phone") != null
+								|| chargerMap.get("phone").length() > 0 ? chargerMap
+								.get("phone") : chargerMap.get("phone1"));
+				params.put("address", chargerList.get(0).get("address"));
+			} else {
+				chargers += "," + chargerMap.get("name");
+				params.put("charger" + chargerI, chargerMap.get("name"));
+				params.put("FWZGZ" + chargerI, chargerMap.get("certFWZG"));
+				params.put("cert4Indentity" + chargerI,
+						chargerMap.get("certIdentity"));
+				params.put(
+						"phone" + chargerI,
+						chargerList.get(1).get("phone") != null
+								|| chargerList.get(1).get("phone").length() > 0 ? chargerList
+								.get(1).get("phone") : chargerList.get(1).get(
+								"phone1"));
+				params.put("address2", chargerList.get(1).get("address"));
+			}
+			chargerI++;
 		}
 		params.put("chargers", chargers);
-		
-		//车辆信息
-		List<Map<String,String>> carList=this.contract4ChargerDao.findCarByContractId(c.getId());
-		//公司
-		String company=null;
-		if(carList.get(0).get("company").equals("宝城")){
-			company="广州市宝城汽车出租有限公司";
-		}else if(carList.get(0).get("company").equals("广发")){
-			company="广州市广发出租汽车有限公司";
+		// -----责任人信息---结束--
+
+		// ------车辆信息-----开始--
+		List<Map<String, String>> carList = this.contract4ChargerDao
+				.findCarByContractId(c.getId());
+		// 公司
+		String company = null;
+		if (carList.get(0).get("company").equals("宝城")) {
+			company = "广州市宝城汽车出租有限公司";
+		} else if (carList.get(0).get("company").equals("广发")) {
+			company = "广州市广发出租汽车有限公司";
 		}
 		params.put("company", company);
 		params.put("carCode", carList.get(0).get("code"));
 		params.put("plateType", carList.get(0).get("plateType"));
 		params.put("plateNo", carList.get(0).get("plateNo"));
-		params.put("plate", carList.get(0).get("plateType")+"."+carList.get(0).get("plateNo"));
-		params.put("factoryTypeModel", carList.get(0).get("factoryType")+carList.get(0).get("factoryMode"));
+		params.put("plate", carList.get(0).get("plateType") + "."
+				+ carList.get(0).get("plateNo"));
+		params.put("factoryTypeModel", carList.get(0).get("factoryType")
+				+ carList.get(0).get("factoryMode"));
 		params.put("vin", carList.get(0).get("vin"));
 		params.put("engineNo", carList.get(0).get("engineNo"));
 		params.put("color", carList.get(0).get("color"));
-		//经营权证
+		// 经营权证
 		params.put("certNo2", carList.get(0).get("certNo2"));
-		
-		//格式化处理行驶证登记日期
-		params.put("registerDate",carList.get(0).get("registerDate"));
-		
-		//合同开始日期
-		Calendar startDate=c.getStartDate();
-		Calendar endDate=c.getEndDate();
-		
-		int countMonth=(endDate.get(Calendar.YEAR)-startDate.get(Calendar.YEAR))*12+(endDate.get(Calendar.MONTH)-startDate.get(Calendar.MONTH));
-		params.put("countMonth",multiDigit2Chinese(countMonth+""));
-		int sumYear=countMonth/12;
-		if(sumYear>0){
-			params.put("sumYear", siginDigit2Chinese(sumYear));
-		}else{
-			params.put("sumYear", "　／");
+		// 行驶证登记日期
+		params.put("registerDate", carList.get(0).get("registerDate"));
+		// 营运证号：道路运输证号
+		params.put("certNo4", carList.get(0).get("certNo4"));
+
+		// ------车辆信息-----结束--
+
+		// ------正班司机信息-----开始--
+		List<Map<String, String>> driverList = this.contract4ChargerDao
+				.findDriverByContractId(c.getId());
+		// 循环变量
+		int driverI = 1;
+		String drivers = "  ";
+		for (Map<String, String> driverMap : driverList) {
+			if (driverI == 1) {
+				drivers = driverMap.get("name");
+				params.put("driver", driverMap.get("name"));
+				params.put("dFWZGZ", driverMap.get("certFWZG"));
+				params.put("dCert4Indentity", driverMap.get("certIdentity"));
+				params.put(
+						"dPhone",
+						driverMap.get("phone") != null
+								|| driverMap.get("phone").length() > 0 ? driverMap
+								.get("phone") : driverMap.get("phone1"));
+				params.put("dAddress", driverMap.get("address"));
+			} else {
+				drivers += "," + driverMap.get("name");
+				params.put("driver" + driverI, driverMap.get("name"));
+				params.put("dFWZGZ" + driverI, driverMap.get("certFWZG"));
+				params.put("dCert4Indentity" + driverI,
+						driverMap.get("certIdentity"));
+				params.put(
+						"dPhone" + driverI,
+						driverMap.get("phone") != null
+								|| driverMap.get("phone").length() > 0 ? driverMap
+								.get("phone") : driverMap.get("phone1"));
+				params.put("dAddress" + driverI, driverMap.get("address"));
+			}
+			driverI++;
 		}
-		int sumMonth=countMonth%12;
-		if(sumMonth>9){
-			params.put("sumMonth", multiDigit2Chinese(sumMonth+""));
-		}else{
-			params.put("sumMonth", siginDigit2Chinese(sumMonth));
-		}
-		
-		params.put("sumStartYear",new CalendarFormater("yyyy").format(startDate));
-		params.put("sumStartMonth",new CalendarFormater("MM").format(startDate));
-		params.put("sumStartDay", new CalendarFormater("dd").format(startDate));
-		params.put("sumEndYear", new CalendarFormater("yyyy").format(endDate));
-		params.put("sumEndMonth", new CalendarFormater("MM").format(endDate));
-		params.put("sumEndDay", new CalendarFormater("dd").format(endDate));
-		
-		//合同费用明细
-		//声明保存每月承包款的集合
-		List<ContractFeeDetail> cfdList=new ArrayList<ContractFeeDetail>();
-		if(c.getContractFeeDetail()!=null&&c.getContractFeeDetail().size()>0){
-			//遍历合同费用明细
-			for(ContractFeeDetail cfd:c.getContractFeeDetail()){
-				//合同保证金
-				if(cfd.getName()!=null&&cfd.getCode().equals("contract4Charger.HTBZJ")){
-					params.put("htbzj",cfd.getPrice()!=0?multiDigit2Chinese(String.valueOf(cfd.getPrice())):siginDigit2Chinese(0));
-				}else if(cfd.getName()!=null&&cfd.getCode().equals("contract4Charger.AQHZJ")){
-					//安全互助金
-					params.put("aqhzj",cfd.getPrice()!=0?
-							multiDigit2Chinese(String.valueOf(cfd.getPrice()/cfd.getCount())):siginDigit2Chinese(0));
-				}else if(cfd.getName()!=null&&cfd.getCode().equals("contract4Charger.MYCBK")){
+		params.put("drivers", drivers);
+		// ------正班司机信息-----结束--
+
+		// ---合同费用明细----开始---
+		// 声明保存每月承包款的集合
+		List<ContractFeeDetail> cfdList = new ArrayList<ContractFeeDetail>();
+		if (c.getContractFeeDetail() != null
+				&& c.getContractFeeDetail().size() > 0) {
+			// 遍历合同费用明细
+			for (ContractFeeDetail cfd : c.getContractFeeDetail()) {
+				params.put(
+						cfd.getCode().substring(cfd.getCode().indexOf(".") + 1),
+						new NubmerFormater("0.##").format(cfd.getPrice()));
+
+				if (cfd.getCode().equals("contract4Charger.HTBZJ")) {// 合同保证金
+					params.put(
+							"htbzj",
+							cfd.getPrice() != 0 ? multiDigit2Chinese(String
+									.valueOf(cfd.getPrice()))
+									: siginDigit2Chinese(0));
+				} else if (cfd.getCode().equals("contract4Charger.AQHZJ")) {// 安全互助金
+					params.put(
+							"aqhzj",
+							cfd.getPrice() != 0 ? multiDigit2Chinese(String
+									.valueOf(cfd.getPrice() / cfd.getCount()))
+									: siginDigit2Chinese(0));
+				} else if (cfd.getCode() != null
+						&& cfd.getCode().equals("contract4Charger.MYCBK")) {
 					cfdList.add(cfd);
-				}	
-			}
-		}
-		
-		if(params.get("htbzj")==null){
-			//合同保证金
-			params.put("htbzj", "　　");
-		}
-		
-		if(params.get("aqhzj")==null){
-			//安全互助金
-			params.put("aqhzj", "　　");
-		}
-		
-		//处理每月承包费的生成
-		if(cfdList.size()>0){
-			for(int i=1;i<cfdList.size()+1;i++){
-				params.put("cfdsy"+i,new CalendarFormater("yyyy").format(cfdList.get(i-1).getStartDate()));
-				params.put("cfdsm"+i,new CalendarFormater("MM").format(cfdList.get(i-1).getStartDate()));
-				params.put("cfdsd"+i,new CalendarFormater("dd").format(cfdList.get(i-1).getStartDate()));
-				params.put("cfdey"+i,new CalendarFormater("yyyy").format(cfdList.get(i-1).getEndDate()));
-				params.put("cfdem"+i,new CalendarFormater("MM").format(cfdList.get(i-1).getEndDate()));
-				params.put("cfded"+i,new CalendarFormater("dd").format(cfdList.get(i-1).getEndDate()));
-				//金额
-				String price=String.valueOf(cfdList.get(i-1).getPrice());
-				int index=price.indexOf(".");
-				if(index>5||index==5){
-					params.put("cfdmwan"+i,siginDigit2Chinese(Integer.valueOf(price.substring(index-5, index-4))));
-					params.put("cfdmqian"+i,siginDigit2Chinese(Integer.valueOf(price.substring(index-4, index-3))));
-					params.put("cfdmbai"+i, siginDigit2Chinese(Integer.valueOf(price.substring(index-3, index-2))));
-					params.put("cfdmshi"+i, siginDigit2Chinese(Integer.valueOf(price.substring(index-2, index-1))));
-					params.put("cfdmyuan"+i, siginDigit2Chinese(Integer.valueOf(price.substring(index-1, index-0))));
-				}else if(index==4){
-					params.put("cfdmwan"+i,"／");
-					params.put("cfdmqian"+i,siginDigit2Chinese(Integer.valueOf(price.substring(index-4, index-3))));
-					params.put("cfdmbai"+i, siginDigit2Chinese(Integer.valueOf(price.substring(index-3, index-2))));
-					params.put("cfdmshi"+i, siginDigit2Chinese(Integer.valueOf(price.substring(index-2, index-1))));
-					params.put("cfdmyuan"+i, siginDigit2Chinese(Integer.valueOf(price.substring(index-1, index-0))));
-				}else if(index==3){
-					params.put("cfdmwan"+i,"／");
-					params.put("cfdmqian"+i, "／");
-					params.put("cfdmbai"+i, siginDigit2Chinese(Integer.valueOf(price.substring(index-3, index-2))));
-					params.put("cfdmshi"+i, siginDigit2Chinese(Integer.valueOf(price.substring(index-2, index-1))));
-					params.put("cfdmyuan"+i, siginDigit2Chinese(Integer.valueOf(price.substring(index-1, index-0))));
-				}else if(index==2){
-					params.put("cfdmwan"+i,"／");
-					params.put("cfdmqian"+i, "／");
-					params.put("cfdmbai"+i, "／");
-					params.put("cfdmshi"+i, siginDigit2Chinese(Integer.valueOf(price.substring(index-2, index-1))));
-					params.put("cfdmyuan"+i, siginDigit2Chinese(Integer.valueOf(price.substring(index-1, index-0))));
-				}else if(index==1){
-					params.put("cfdmwan"+i,"／");
-					params.put("cfdmqian"+i, "／");
-					params.put("cfdmbai"+i, "／");
-					params.put("cfdmshi"+i, "／");
-					params.put("cfdmyuan"+i, siginDigit2Chinese(Integer.valueOf(price.substring(index-1, index-0))));
-				}else{
-					params.put("cfdmwan"+i,"　");
-					params.put("cfdmqian"+i, "　");
-					params.put("cfdmbai"+i, "　");
-					params.put("cfdmshi"+i, "　");
-					params.put("cfdmyuan"+i, "　");
 				}
 			}
-			
-			//每月承包费不足6年时
-			if(cfdList.size()<6){
-				for(int i=1;i<6-cfdList.size()+1;i++){
-					params.put("cfdsy"+(cfdList.size()+i),"　／");
-					params.put("cfdsm"+(cfdList.size()+i),"／");
-					params.put("cfdsd"+(cfdList.size()+i),"／");
-					params.put("cfdey"+(cfdList.size()+i), "　／");
-					params.put("cfdem"+(cfdList.size()+i), "／");
-					params.put("cfded"+(cfdList.size()+i), "／");
-					params.put("cfdmwan"+(cfdList.size()+i),"／");
-					params.put("cfdmqian"+(cfdList.size()+i), "／");
-					params.put("cfdmbai"+(cfdList.size()+i), "／");
-					params.put("cfdmshi"+(cfdList.size()+i), "／");
-					params.put("cfdmyuan"+(cfdList.size()+i), "／");
+		}
+
+		// 处理每月承包费的生成
+		if (cfdList.size() > 0) {
+			for (int i = 1; i < cfdList.size() + 1; i++) {
+				params.put("cfdsy" + i, new CalendarFormater("yyyy")
+						.format(cfdList.get(i - 1).getStartDate()));
+				params.put("cfdsm" + i, new CalendarFormater("MM")
+						.format(cfdList.get(i - 1).getStartDate()));
+				params.put("cfdsd" + i, new CalendarFormater("dd")
+						.format(cfdList.get(i - 1).getStartDate()));
+				params.put("cfdey" + i, new CalendarFormater("yyyy")
+						.format(cfdList.get(i - 1).getEndDate()));
+				params.put("cfdem" + i, new CalendarFormater("MM")
+						.format(cfdList.get(i - 1).getEndDate()));
+				params.put("cfded" + i, new CalendarFormater("dd")
+						.format(cfdList.get(i - 1).getEndDate()));
+				// 金额
+				String price = String.valueOf(cfdList.get(i - 1).getPrice());
+				int index = price.indexOf(".");
+				if (index > 5 || index == 5) {
+					params.put("cfdmwan" + i, siginDigit2Chinese(Integer
+							.valueOf(price.substring(index - 5, index - 4))));
+					params.put("cfdmqian" + i, siginDigit2Chinese(Integer
+							.valueOf(price.substring(index - 4, index - 3))));
+					params.put("cfdmbai" + i, siginDigit2Chinese(Integer
+							.valueOf(price.substring(index - 3, index - 2))));
+					params.put("cfdmshi" + i, siginDigit2Chinese(Integer
+							.valueOf(price.substring(index - 2, index - 1))));
+					params.put("cfdmyuan" + i, siginDigit2Chinese(Integer
+							.valueOf(price.substring(index - 1, index - 0))));
+				} else if (index == 4) {
+					params.put("cfdmwan" + i, "／");
+					params.put("cfdmqian" + i, siginDigit2Chinese(Integer
+							.valueOf(price.substring(index - 4, index - 3))));
+					params.put("cfdmbai" + i, siginDigit2Chinese(Integer
+							.valueOf(price.substring(index - 3, index - 2))));
+					params.put("cfdmshi" + i, siginDigit2Chinese(Integer
+							.valueOf(price.substring(index - 2, index - 1))));
+					params.put("cfdmyuan" + i, siginDigit2Chinese(Integer
+							.valueOf(price.substring(index - 1, index - 0))));
+				} else if (index == 3) {
+					params.put("cfdmwan" + i, "／");
+					params.put("cfdmqian" + i, "／");
+					params.put("cfdmbai" + i, siginDigit2Chinese(Integer
+							.valueOf(price.substring(index - 3, index - 2))));
+					params.put("cfdmshi" + i, siginDigit2Chinese(Integer
+							.valueOf(price.substring(index - 2, index - 1))));
+					params.put("cfdmyuan" + i, siginDigit2Chinese(Integer
+							.valueOf(price.substring(index - 1, index - 0))));
+				} else if (index == 2) {
+					params.put("cfdmwan" + i, "／");
+					params.put("cfdmqian" + i, "／");
+					params.put("cfdmbai" + i, "／");
+					params.put("cfdmshi" + i, siginDigit2Chinese(Integer
+							.valueOf(price.substring(index - 2, index - 1))));
+					params.put("cfdmyuan" + i, siginDigit2Chinese(Integer
+							.valueOf(price.substring(index - 1, index - 0))));
+				} else if (index == 1) {
+					params.put("cfdmwan" + i, "／");
+					params.put("cfdmqian" + i, "／");
+					params.put("cfdmbai" + i, "／");
+					params.put("cfdmshi" + i, "／");
+					params.put("cfdmyuan" + i, siginDigit2Chinese(Integer
+							.valueOf(price.substring(index - 1, index - 0))));
+				} else {
+					params.put("cfdmwan" + i, "　");
+					params.put("cfdmqian" + i, "　");
+					params.put("cfdmbai" + i, "　");
+					params.put("cfdmshi" + i, "　");
+					params.put("cfdmyuan" + i, "　");
 				}
 			}
-			
-		}else{
-			//承包费
-			for(int i=1;i<7;i++){
-				params.put("cfdsy"+i,"　　");
-				params.put("cfdsm"+i,"　");
-				params.put("cfdsd"+i,"　");
-				params.put("cfdey"+i, "　");
-				params.put("cfdem"+i, "　");
-				params.put("cfded"+i, "　");
-				params.put("cfdmwan"+i,"　");
-				params.put("cfdmqian"+i, "　");
-				params.put("cfdmbai"+i, "　");
-				params.put("cfdmshi"+i, "　");
-				params.put("cfdmyuan"+i, "　");
+
+			// 每月承包费不足6年时
+			if (cfdList.size() < 6) {
+				for (int i = 1; i < 6 - cfdList.size() + 1; i++) {
+					params.put("cfdsy" + (cfdList.size() + i), "　／");
+					params.put("cfdsm" + (cfdList.size() + i), "／");
+					params.put("cfdsd" + (cfdList.size() + i), "／");
+					params.put("cfdey" + (cfdList.size() + i), "　／");
+					params.put("cfdem" + (cfdList.size() + i), "／");
+					params.put("cfded" + (cfdList.size() + i), "／");
+					params.put("cfdmwan" + (cfdList.size() + i), "／");
+					params.put("cfdmqian" + (cfdList.size() + i), "／");
+					params.put("cfdmbai" + (cfdList.size() + i), "／");
+					params.put("cfdmshi" + (cfdList.size() + i), "／");
+					params.put("cfdmyuan" + (cfdList.size() + i), "／");
+				}
 			}
-			
+
 		}
-		
+		// ---合同费用明细----结束---
+
 		// 生成附件
 		String ptype = Contract4Charger.ATTACH_TYPE;
 		String puid = c.getUid();
@@ -1013,58 +1124,82 @@ public class Contract4ChargerServiceImpl extends
 			logger.warn("模板不存在,返回null:code=" + templateCode);
 			return null;
 		} else {
+			// 获取文件中的${XXXX}占位标记的键名列表
+			List<String> markers = DocxUtils.findMarkers(template
+					.getInputStream());
+			// 占位符列表与参数列表匹配,当占位符列表值没出现在参数列表key值时，增加此key值
+			for (String key : markers) {
+				if (!params.containsKey(key)) {
+					params.put(
+							key,
+							key.length() > 3 ? concatSting(key.length() / 3,
+									"　") : "　　");
+				}
+			}
 			Attach attach = template.format2Attach(params, ptype, puid);
 			this.attachService.save(attach);
 			return attach;
 		}
 	}
-	
-	//多位数字转换为中文繁体
+
+	// 根据数量拼接这个字符串n次
+	private String concatSting(int n, String module) {
+		String value = "";
+		for (int i = 0; i < n; i++) {
+			value += module;
+		}
+		return value;
+	}
+
+	// 多位数字转换为中文繁体
 	private String multiDigit2Chinese(String n) {
-	        String num1[] = {"零", "壹", "贰", "叁", "肆", "伍", "陆","柒","捌","玖",};
-	        String num2[] = {"", "拾", "佰", "仟", "万", "亿", "兆", "吉", "太", "拍", "艾"};
-	        n=n.indexOf(".")>0?n.substring(0,n.indexOf(".")):n;
-	        
-	        int len = n.length();
-	        
-	        if (len <= 5) {
-	            String ret = "";
-	            for (int i = 0; i < len; ++i) {
-	                if (n.charAt(i) == '0') {
-	                    int j = i + 1;
-	                    while (j < len && n.charAt(j) == '0') ++j;
-	                    if (j < len)
-	                        ret += "零";
-	                    i = j - 1;
-	                } else
-	                    ret = ret + num1[n.substring(i, i + 1).charAt(0) - '0'] + num2[len - i - 1];
-	            }
-	            return ret;
-	        } else if (len <= 8) {
-	            String ret = multiDigit2Chinese(n.substring(0, len - 4));
-	            if (ret.length() != 0)
-	                ret += num2[4];
-	            return ret + multiDigit2Chinese(n.substring(len - 4));
-	        } else {
-	            String ret = multiDigit2Chinese(n.substring(0, len - 8));
-	            if (ret.length() != 0)
-	                ret += num2[5];
-	            return ret + multiDigit2Chinese(n.substring(len - 8));
-	        }
-	 }
-	
-	 //个位数字转换为中文繁体
-	 private String siginDigit2Chinese(Object n) {
-		 	String num[] = {"零", "壹", "贰", "叁", "肆", "伍", "陆","柒","捌","玖",};
-	        if(n==null)return null;
-	        if(n instanceof Integer&&Integer.parseInt(n.toString())<10){
-	        	return num[(Integer) n];
-	        }else if(n instanceof Long&&Long.parseLong(n.toString())<10){
-	        	return num[Integer.parseInt(n.toString())];
-	        }else{
-	        	return n.toString();
-	        }
-	 }
+		String num1[] = { "零", "壹", "贰", "叁", "肆", "伍", "陆", "柒", "捌", "玖", };
+		String num2[] = { "", "拾", "佰", "仟", "万", "亿", "兆", "吉", "太", "拍", "艾" };
+		n = n.indexOf(".") > 0 ? n.substring(0, n.indexOf(".")) : n;
+
+		int len = n.length();
+
+		if (len <= 5) {
+			String ret = "";
+			for (int i = 0; i < len; ++i) {
+				if (n.charAt(i) == '0') {
+					int j = i + 1;
+					while (j < len && n.charAt(j) == '0')
+						++j;
+					if (j < len)
+						ret += "零";
+					i = j - 1;
+				} else
+					ret = ret + num1[n.substring(i, i + 1).charAt(0) - '0']
+							+ num2[len - i - 1];
+			}
+			return ret;
+		} else if (len <= 8) {
+			String ret = multiDigit2Chinese(n.substring(0, len - 4));
+			if (ret.length() != 0)
+				ret += num2[4];
+			return ret + multiDigit2Chinese(n.substring(len - 4));
+		} else {
+			String ret = multiDigit2Chinese(n.substring(0, len - 8));
+			if (ret.length() != 0)
+				ret += num2[5];
+			return ret + multiDigit2Chinese(n.substring(len - 8));
+		}
+	}
+
+	// 个位数字转换为中文繁体
+	private String siginDigit2Chinese(Object n) {
+		String num[] = { "零", "壹", "贰", "叁", "肆", "伍", "陆", "柒", "捌", "玖", };
+		if (n == null)
+			return null;
+		if (n instanceof Integer && Integer.parseInt(n.toString()) < 10) {
+			return num[(Integer) n];
+		} else if (n instanceof Long && Long.parseLong(n.toString()) < 10) {
+			return num[Integer.parseInt(n.toString())];
+		} else {
+			return n.toString();
+		}
+	}
 
 	public String json;
 

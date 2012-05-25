@@ -32,22 +32,22 @@ public interface SocialSecurityRuleService extends CrudService<SocialSecurityRul
 	
 	/**
 	 * 计算个人社保费用接口
-	 * @param areaName 使用区域
+	 * @param areaName 使用区域  null时自动设置默认值，'广东省广州市'
 	 * @param houseType 户口类型
 	 * @param year 年
 	 * @param month 月
 	 * @return 返回根据年月计算个人需要缴纳的社保费用
 	 */
-	public String countPersonal(String areaName,String houseType,int year,int month);
+	public Float countPersonal(String areaName,String houseType,int year,int month);
 	
 	/**
 	 * 计算单位社保费用接口
-	 * @param areaName 使用区域
+	 * @param areaName 使用区域  null时自动设置默认值，'广东省广州市'
 	 * @param houseType 户口类型
 	 * @param year 年
 	 * @param month 月
 	 * @return 返回根据年月计算单位每月需要为个人缴纳的社保费用
 	 */
-	public String countUnit(String areaName,String houseType,int year,int month);
+	public Float countUnit(String areaName,String houseType,int year,int month);
 
 }
