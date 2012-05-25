@@ -1129,12 +1129,8 @@ public class Contract4ChargerServiceImpl extends
 					.getInputStream());
 			// 占位符列表与参数列表匹配,当占位符列表值没出现在参数列表key值时，增加此key值
 			for (String key : markers) {
-				if (!params.containsKey(key)) {
-					params.put(
-							key,
-							key.length() > 3 ? concatSting(key.length() / 3,
-									"　") : "　　");
-				}
+				if (!params.containsKey(key)) 
+					params.put(key,"　　");
 			}
 			Attach attach = template.format2Attach(params, ptype, puid);
 			this.attachService.save(attach);
@@ -1142,14 +1138,6 @@ public class Contract4ChargerServiceImpl extends
 		}
 	}
 
-	// 根据数量拼接这个字符串n次
-	private String concatSting(int n, String module) {
-		String value = "";
-		for (int i = 0; i < n; i++) {
-			value += module;
-		}
-		return value;
-	}
 
 	// 多位数字转换为中文繁体
 	private String multiDigit2Chinese(String n) {
@@ -1189,7 +1177,7 @@ public class Contract4ChargerServiceImpl extends
 
 	// 个位数字转换为中文繁体
 	private String siginDigit2Chinese(Object n) {
-		String num[] = { "零", "壹", "贰", "叁", "肆", "伍", "陆", "柒", "捌", "玖", };
+		String num[] = { "零", "壹", "贰", "叁", "肆", " 伍", "陆", "柒", "捌", "玖", };
 		if (n == null)
 			return null;
 		if (n instanceof Integer && Integer.parseInt(n.toString()) < 10) {
