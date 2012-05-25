@@ -301,7 +301,8 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 		if (isScrapTo()) {
 			// 残值归属
 			columns.add(new TextColumn4MapKey("c.fuel_type", "scrapto",
-					getText("car.scrapto"), 60).setUseTitleFromLabel(true));
+					getText("car.scrapto"), 60).setUseTitleFromLabel(true)
+					.setSortable(true));
 		}
 		columns.add(new TextColumn4MapKey("ad.actor_name", "author",
 				getText("car.author"), 80).setSortable(true));
