@@ -69,10 +69,11 @@ public interface Contract4ChargerDao extends CrudDao<Contract4Charger> {
 	 * @return
 	 */
 	Map<String, Object> findCarInfoByContractId(Long contractId);
-	
+
 	/**
 	 * 根据contractId查找car信息
-	 * @parma contractId 
+	 * 
+	 * @parma contractId
 	 * @return
 	 */
 	List<Map<String, String>> findCarByContractId(Long contractId);
@@ -186,10 +187,12 @@ public interface Contract4ChargerDao extends CrudDao<Contract4Charger> {
 	/**
 	 * 获取去责任人信息
 	 * 
-	 * @param contractId 合同id
+	 * @param contractId
+	 *            合同id
 	 * @return
 	 */
 	List<Map<String, String>> findChargerByContractId(Long contractId);
+
 	/**
 	 * 根据司机ID获取司机的状态和姓名
 	 * 
@@ -200,8 +203,19 @@ public interface Contract4ChargerDao extends CrudDao<Contract4Charger> {
 	/**
 	 * 获取去正班司机信息
 	 * 
-	 * @param contractId 合同id
+	 * @param contractId
+	 *            合同id
 	 * @return
 	 */
 	List<Map<String, String>> findDriverByContractId(Long contractId);
+
+	/**
+	 * 更新车辆的合同性质
+	 * 
+	 * @param businessType
+	 *            经济合同的合同性质值
+	 * @param contractId
+	 *            合同Id
+	 */
+	void updateCarWithbusinessType(String businessType, Long contractId);
 }
