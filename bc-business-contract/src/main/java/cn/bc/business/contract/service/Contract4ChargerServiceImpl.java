@@ -99,12 +99,6 @@ public class Contract4ChargerServiceImpl extends
 			// 处理与责任人的关联关系
 			this.contractDao.updateContractCarManRelation(
 					contract4Charger.getId(), chargerIdAry);
-			// 如果是在案状态就更新车辆的合同性质
-			if (contract4Charger.getStatus() == BCConstants.STATUS_ENABLED) {
-				this.contract4ChargerDao.updateCarWithbusinessType(
-						contract4Charger.getBusinessType(),
-						contract4Charger.getId());
-			}
 		} else { // 在新建时需保存与车辆、责任人的关联关系
 			// 参数有效性验证
 			Assert.notNull(carId);
@@ -126,9 +120,6 @@ public class Contract4ChargerServiceImpl extends
 				chargerRelationList.add(driverRelation);
 			}
 			this.contractDao.saveContractCarManRelation(chargerRelationList);
-			// ContractCarManRelation driverRelation = new
-			// ContractCarManRelation(
-			// contract4Charger.getId(), null);
 		}
 		// 更新车辆视图的charger列显示责任人姓名
 		this.contract4ChargerDao.updateCar4ChargerName(carId);
@@ -136,6 +127,13 @@ public class Contract4ChargerServiceImpl extends
 		// 更新司机视图的charger列显示责任人姓名
 		this.contract4ChargerDao.updateCarMan4ChargerName(carId);
 		// this.contract4ChargerDao.updateCarMan4ChargerName(assignChargerNames,carId);
+
+		// 如果是在案状态就更新车辆的合同性质
+		if (contract4Charger.getStatus() == BCConstants.STATUS_ENABLED) {
+			this.contract4ChargerDao.updateCarWithbusinessType(
+					contract4Charger.getBusinessType(), carId);
+		}
+
 		return contract4Charger;
 	}
 
@@ -608,6 +606,12 @@ public class Contract4ChargerServiceImpl extends
 		this.contract4ChargerDao.updateCar4ChargerName(carId);
 		// 更新司机视图的charger列显示责任人姓名
 		this.contract4ChargerDao.updateCarMan4ChargerName(carId);
+		// 如果是在案状态就更新车辆的合同性质
+		if (newContract.getStatus() == BCConstants.STATUS_ENABLED) {
+			this.contract4ChargerDao.updateCarWithbusinessType(
+					e.getBusinessType(), carId);
+
+		}
 
 		// 返回续签的合同
 		return newContract;
@@ -1262,17 +1266,12 @@ public class Contract4ChargerServiceImpl extends
 						getChargerIds(contract4Charger.getExt_str2()),
 						contract4Charger.getPid(),
 						contract4Charger.getExt_str3());
+
 			} else {
 				// 无变更操作下新建
 				this.save(contract4Charger, contractCarId,
 						getChargerIds(contract4Charger.getExt_str2()), null);
 
-			}
-			// 如果是在案状态就更新车辆的合同性质
-			if (contract4Charger.getStatus() == BCConstants.STATUS_ENABLED) {
-				this.contract4ChargerDao.updateCarWithbusinessType(
-						contract4Charger.getBusinessType(),
-						contract4Charger.getId());
 			}
 
 			json.put("success", true);

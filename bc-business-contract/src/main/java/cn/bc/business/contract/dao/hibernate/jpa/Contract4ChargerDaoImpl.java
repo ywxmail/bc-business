@@ -776,11 +776,9 @@ public class Contract4ChargerDaoImpl extends
 		return queryMap;
 	}
 
-	public void updateCarWithbusinessType(String businessType, Long contractId) {
-		String sql = "update bs_car set bs_type = ? where id = (select bcc.car_id from bs_car_contract bcc"
-				+ " inner join bs_contract bc on bc.id=bcc.contract_id where bc.type_ = 2 and bc.id = ?)";
-		this.jdbcTemplate
-				.update(sql, new Object[] { businessType, contractId });
-
+	public void updateCarWithbusinessType(String businessType, Long carId) {
+		String hql = "update Car c set c.businessType = ? where c.id = ?";
+		this.executeUpdate(hql, new Object[] { businessType, carId });
 	}
+
 }
