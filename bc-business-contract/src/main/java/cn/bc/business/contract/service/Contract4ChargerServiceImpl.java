@@ -120,9 +120,6 @@ public class Contract4ChargerServiceImpl extends
 				chargerRelationList.add(driverRelation);
 			}
 			this.contractDao.saveContractCarManRelation(chargerRelationList);
-			// ContractCarManRelation driverRelation = new
-			// ContractCarManRelation(
-			// contract4Charger.getId(), null);
 		}
 		// 更新车辆视图的charger列显示责任人姓名
 		this.contract4ChargerDao.updateCar4ChargerName(carId);
@@ -130,6 +127,13 @@ public class Contract4ChargerServiceImpl extends
 		// 更新司机视图的charger列显示责任人姓名
 		this.contract4ChargerDao.updateCarMan4ChargerName(carId);
 		// this.contract4ChargerDao.updateCarMan4ChargerName(assignChargerNames,carId);
+
+		// 如果是在案状态就更新车辆的合同性质
+		if (contract4Charger.getStatus() == BCConstants.STATUS_ENABLED) {
+			this.contract4ChargerDao.updateCarWithbusinessType(
+					contract4Charger.getBusinessType(), carId);
+		}
+
 		return contract4Charger;
 	}
 
@@ -602,6 +606,12 @@ public class Contract4ChargerServiceImpl extends
 		this.contract4ChargerDao.updateCar4ChargerName(carId);
 		// 更新司机视图的charger列显示责任人姓名
 		this.contract4ChargerDao.updateCarMan4ChargerName(carId);
+		// 如果是在案状态就更新车辆的合同性质
+		if (newContract.getStatus() == BCConstants.STATUS_ENABLED) {
+			this.contract4ChargerDao.updateCarWithbusinessType(
+					e.getBusinessType(), carId);
+
+		}
 
 		// 返回续签的合同
 		return newContract;
@@ -823,32 +833,40 @@ public class Contract4ChargerServiceImpl extends
 
 		// --加载社保信息--开始--
 		// 公司unit
-		params.put("unitSSRuleBZ", new NubmerFormater("0.##").format(this.SocialSecurityRuleService.countUnit(
-				null, "本地城镇", Calendar.getInstance().get(Calendar.YEAR),
-				Calendar.getInstance().get(Calendar.MONTH) + 1)));
-		params.put("unitSSRuleWZ", new NubmerFormater("0.##").format(this.SocialSecurityRuleService.countUnit(
-				null, "外地城镇", Calendar.getInstance().get(Calendar.YEAR),
-				Calendar.getInstance().get(Calendar.MONTH) + 1)));
-		params.put("unitSSRuleBC", new NubmerFormater("0.##").format(this.SocialSecurityRuleService.countUnit(
-				null, "本地农村", Calendar.getInstance().get(Calendar.YEAR),
-				Calendar.getInstance().get(Calendar.MONTH) + 1)));
-		params.put("unitSSRuleWC", new NubmerFormater("0.##").format(this.SocialSecurityRuleService.countUnit(
-				null, "外地农村", Calendar.getInstance().get(Calendar.YEAR),
-				Calendar.getInstance().get(Calendar.MONTH) + 1)));
+		params.put("unitSSRuleBZ", new NubmerFormater("0.##")
+				.format(this.SocialSecurityRuleService.countUnit(null, "本地城镇",
+						Calendar.getInstance().get(Calendar.YEAR), Calendar
+								.getInstance().get(Calendar.MONTH) + 1)));
+		params.put("unitSSRuleWZ", new NubmerFormater("0.##")
+				.format(this.SocialSecurityRuleService.countUnit(null, "外地城镇",
+						Calendar.getInstance().get(Calendar.YEAR), Calendar
+								.getInstance().get(Calendar.MONTH) + 1)));
+		params.put("unitSSRuleBC", new NubmerFormater("0.##")
+				.format(this.SocialSecurityRuleService.countUnit(null, "本地农村",
+						Calendar.getInstance().get(Calendar.YEAR), Calendar
+								.getInstance().get(Calendar.MONTH) + 1)));
+		params.put("unitSSRuleWC", new NubmerFormater("0.##")
+				.format(this.SocialSecurityRuleService.countUnit(null, "外地农村",
+						Calendar.getInstance().get(Calendar.YEAR), Calendar
+								.getInstance().get(Calendar.MONTH) + 1)));
 
 		// 个人persional
-		params.put("psnlSSRuleBZ", new NubmerFormater("0.##").format(this.SocialSecurityRuleService.countPersonal(
-				null, "本地城镇", Calendar.getInstance().get(Calendar.YEAR),
-				Calendar.getInstance().get(Calendar.MONTH) + 1)));
-		params.put("psnlSSRuleWZ", new NubmerFormater("0.##").format(this.SocialSecurityRuleService.countPersonal(
-				null, "外地城镇", Calendar.getInstance().get(Calendar.YEAR),
-				Calendar.getInstance().get(Calendar.MONTH) + 1)));
-		params.put("psnlSSRuleBC", new NubmerFormater("0.##").format(this.SocialSecurityRuleService.countPersonal(
-				null, "本地农村", Calendar.getInstance().get(Calendar.YEAR),
-				Calendar.getInstance().get(Calendar.MONTH) + 1)));
-		params.put("psnlSSRuleWC", new NubmerFormater("0.##").format(this.SocialSecurityRuleService.countPersonal(
-				null, "外地农村", Calendar.getInstance().get(Calendar.YEAR),
-				Calendar.getInstance().get(Calendar.MONTH) + 1)));
+		params.put("psnlSSRuleBZ", new NubmerFormater("0.##")
+				.format(this.SocialSecurityRuleService.countPersonal(null,
+						"本地城镇", Calendar.getInstance().get(Calendar.YEAR),
+						Calendar.getInstance().get(Calendar.MONTH) + 1)));
+		params.put("psnlSSRuleWZ", new NubmerFormater("0.##")
+				.format(this.SocialSecurityRuleService.countPersonal(null,
+						"外地城镇", Calendar.getInstance().get(Calendar.YEAR),
+						Calendar.getInstance().get(Calendar.MONTH) + 1)));
+		params.put("psnlSSRuleBC", new NubmerFormater("0.##")
+				.format(this.SocialSecurityRuleService.countPersonal(null,
+						"本地农村", Calendar.getInstance().get(Calendar.YEAR),
+						Calendar.getInstance().get(Calendar.MONTH) + 1)));
+		params.put("psnlSSRuleWC", new NubmerFormater("0.##")
+				.format(this.SocialSecurityRuleService.countPersonal(null,
+						"外地农村", Calendar.getInstance().get(Calendar.YEAR),
+						Calendar.getInstance().get(Calendar.MONTH) + 1)));
 		// --加载社保信息--结束--
 
 		// -----合同信息----开始--
@@ -1236,12 +1254,14 @@ public class Contract4ChargerServiceImpl extends
 						getChargerIds(contract4Charger.getExt_str2()),
 						contract4Charger.getPid(),
 						contract4Charger.getExt_str3());
+
 			} else {
 				// 无变更操作下新建
 				this.save(contract4Charger, contractCarId,
 						getChargerIds(contract4Charger.getExt_str2()), null);
 
 			}
+
 			json.put("success", true);
 		} else {
 			json.put("success", false);
