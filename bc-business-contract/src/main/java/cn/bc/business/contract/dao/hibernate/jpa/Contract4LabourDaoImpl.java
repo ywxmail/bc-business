@@ -29,6 +29,7 @@ import cn.bc.business.contract.domain.Contract4Labour;
 import cn.bc.core.Page;
 import cn.bc.core.query.condition.Condition;
 import cn.bc.orm.hibernate.jpa.HibernateCrudJpaDao;
+import cn.bc.orm.hibernate.jpa.HibernateJpaNativeQuery;
 
 /**
  * 司机劳动合同Dao的hibernate jpa实现
@@ -659,7 +660,7 @@ public class Contract4LabourDaoImpl extends
 
 	public Map<String, Object> findCarByCarId(Long carId) {
 		Map<String, Object> queryMap = null;
-		String sql = "SELECT car.id,car.plate_type,car.plate_no,car.status_ FROM BS_CAR car "
+		String sql = "SELECT car.id,car.plate_type,car.plate_no,car.status_,car.company FROM BS_CAR car "
 				+ " WHERE car.id =" + carId;
 
 		// jdbc查询BS_CAR记录
@@ -686,4 +687,25 @@ public class Contract4LabourDaoImpl extends
 	// args.add(driverId);
 	// this.executeUpdate(hql.toString(), args);
 	// }
+	
+	
+	public List<Map<String,String>> findContract4ChargerByContarct4LabourId(Long contractId){
+		String hql="SELECT  to_char(b.sign_date,'YYYY-MM-DD'),1";
+			hql+=" from BS_CONTRACT_CHARGER a";
+			hql+=" inner join BS_CONTRACT b on b.id = a.id";
+			hql+=" left join BS_CAR_CONTRACT c on c.contract_id = b.id";
+			hql+=" left join BS_CAR_CONTRACT d on d.car_id = c.car_id";
+			hql+=" left join BS_CONTRACT_LABOUR e on e.id=d.contract_id";
+			hql+=" where e.id=? and b.type_=?";
+			hql+=" Order by b.status_ asc,b.file_date desc";
+		return	HibernateJpaNativeQuery.executeNativeSql(getJpaTemplate(), hql,new Object[]{contractId,Contract.TYPE_CHARGER}
+			 	,new cn.bc.db.jdbc.RowMapper<Map<String, String>>() {
+					public Map<String, String> mapRow(Object[] rs, int rowNum) {
+						Map<String, String> oi = new HashMap<String, String>();
+						int i = 0;
+						oi.put("signDate", rs[i++].toString());
+						return oi;
+					}
+				});
+	};
 }

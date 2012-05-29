@@ -853,8 +853,7 @@ public class Contract4ChargerServiceImpl extends
 
 		// -----合同信息----开始--
 		params.put("code", c.getCode());
-		params.put("signDate",
-				new CalendarFormater("yyyy-MM-dd").format(c.getSignDate()));
+		params.put("signDate",DateUtils.formatCalendar(c.getSignDate(),"yyyy-MM-dd"));
 
 		// 缴费日
 		params.put("paymentDate", c.getPaymentDate() != null
@@ -881,14 +880,12 @@ public class Contract4ChargerServiceImpl extends
 		} else {
 			params.put("sumMonth", siginDigit2Chinese(sumMonth));
 		}
-		params.put("sumStartYear",
-				new CalendarFormater("yyyy").format(startDate));
-		params.put("sumStartMonth",
-				new CalendarFormater("MM").format(startDate));
-		params.put("sumStartDay", new CalendarFormater("dd").format(startDate));
-		params.put("sumEndYear", new CalendarFormater("yyyy").format(endDate));
-		params.put("sumEndMonth", new CalendarFormater("MM").format(endDate));
-		params.put("sumEndDay", new CalendarFormater("dd").format(endDate));
+		params.put("sumStartYear",DateUtils.formatCalendar(startDate, "yyyy"));
+		params.put("sumStartMonth",DateUtils.formatCalendar(startDate, "MM"));
+		params.put("sumStartDay", DateUtils.formatCalendar(startDate, "dd"));
+		params.put("sumEndYear", DateUtils.formatCalendar(endDate, "yyyy"));
+		params.put("sumEndMonth", DateUtils.formatCalendar(endDate, "MM"));
+		params.put("sumEndDay", DateUtils.formatCalendar(endDate, "dd"));
 		// -----合同信息----结束--
 
 		// -----责任人信息---开始--
@@ -1005,19 +1002,7 @@ public class Contract4ChargerServiceImpl extends
 						cfd.getCode().substring(cfd.getCode().indexOf(".") + 1),
 						new NubmerFormater("0.##").format(cfd.getPrice()));
 
-				if (cfd.getCode().equals("contract4Charger.HTBZJ")) {// 合同保证金
-					params.put(
-							"htbzj",
-							cfd.getPrice() != 0 ? multiDigit2Chinese(String
-									.valueOf(cfd.getPrice()))
-									: siginDigit2Chinese(0));
-				} else if (cfd.getCode().equals("contract4Charger.AQHZJ")) {// 安全互助金
-					params.put(
-							"aqhzj",
-							cfd.getPrice() != 0 ? multiDigit2Chinese(String
-									.valueOf(cfd.getPrice() / cfd.getCount()))
-									: siginDigit2Chinese(0));
-				} else if (cfd.getCode() != null
+				if (cfd.getCode() != null
 						&& cfd.getCode().equals("contract4Charger.MYCBK")) {
 					cfdList.add(cfd);
 				}
@@ -1027,73 +1012,14 @@ public class Contract4ChargerServiceImpl extends
 		// 处理每月承包费的生成
 		if (cfdList.size() > 0) {
 			for (int i = 1; i < cfdList.size() + 1; i++) {
-				params.put("cfdsy" + i, new CalendarFormater("yyyy")
-						.format(cfdList.get(i - 1).getStartDate()));
-				params.put("cfdsm" + i, new CalendarFormater("MM")
-						.format(cfdList.get(i - 1).getStartDate()));
-				params.put("cfdsd" + i, new CalendarFormater("dd")
-						.format(cfdList.get(i - 1).getStartDate()));
-				params.put("cfdey" + i, new CalendarFormater("yyyy")
-						.format(cfdList.get(i - 1).getEndDate()));
-				params.put("cfdem" + i, new CalendarFormater("MM")
-						.format(cfdList.get(i - 1).getEndDate()));
-				params.put("cfded" + i, new CalendarFormater("dd")
-						.format(cfdList.get(i - 1).getEndDate()));
-				// 金额
-				String price = String.valueOf(cfdList.get(i - 1).getPrice());
-				int index = price.indexOf(".");
-				if (index > 5 || index == 5) {
-					params.put("cfdmwan" + i, siginDigit2Chinese(Integer
-							.valueOf(price.substring(index - 5, index - 4))));
-					params.put("cfdmqian" + i, siginDigit2Chinese(Integer
-							.valueOf(price.substring(index - 4, index - 3))));
-					params.put("cfdmbai" + i, siginDigit2Chinese(Integer
-							.valueOf(price.substring(index - 3, index - 2))));
-					params.put("cfdmshi" + i, siginDigit2Chinese(Integer
-							.valueOf(price.substring(index - 2, index - 1))));
-					params.put("cfdmyuan" + i, siginDigit2Chinese(Integer
-							.valueOf(price.substring(index - 1, index - 0))));
-				} else if (index == 4) {
-					params.put("cfdmwan" + i, "／");
-					params.put("cfdmqian" + i, siginDigit2Chinese(Integer
-							.valueOf(price.substring(index - 4, index - 3))));
-					params.put("cfdmbai" + i, siginDigit2Chinese(Integer
-							.valueOf(price.substring(index - 3, index - 2))));
-					params.put("cfdmshi" + i, siginDigit2Chinese(Integer
-							.valueOf(price.substring(index - 2, index - 1))));
-					params.put("cfdmyuan" + i, siginDigit2Chinese(Integer
-							.valueOf(price.substring(index - 1, index - 0))));
-				} else if (index == 3) {
-					params.put("cfdmwan" + i, "／");
-					params.put("cfdmqian" + i, "／");
-					params.put("cfdmbai" + i, siginDigit2Chinese(Integer
-							.valueOf(price.substring(index - 3, index - 2))));
-					params.put("cfdmshi" + i, siginDigit2Chinese(Integer
-							.valueOf(price.substring(index - 2, index - 1))));
-					params.put("cfdmyuan" + i, siginDigit2Chinese(Integer
-							.valueOf(price.substring(index - 1, index - 0))));
-				} else if (index == 2) {
-					params.put("cfdmwan" + i, "／");
-					params.put("cfdmqian" + i, "／");
-					params.put("cfdmbai" + i, "／");
-					params.put("cfdmshi" + i, siginDigit2Chinese(Integer
-							.valueOf(price.substring(index - 2, index - 1))));
-					params.put("cfdmyuan" + i, siginDigit2Chinese(Integer
-							.valueOf(price.substring(index - 1, index - 0))));
-				} else if (index == 1) {
-					params.put("cfdmwan" + i, "／");
-					params.put("cfdmqian" + i, "／");
-					params.put("cfdmbai" + i, "／");
-					params.put("cfdmshi" + i, "／");
-					params.put("cfdmyuan" + i, siginDigit2Chinese(Integer
-							.valueOf(price.substring(index - 1, index - 0))));
-				} else {
-					params.put("cfdmwan" + i, "　");
-					params.put("cfdmqian" + i, "　");
-					params.put("cfdmbai" + i, "　");
-					params.put("cfdmshi" + i, "　");
-					params.put("cfdmyuan" + i, "　");
-				}
+				params.put("cfdsy" + i, DateUtils.formatCalendar(cfdList.get(i - 1).getStartDate(),"yyyy"));
+				params.put("cfdsm" + i, DateUtils.formatCalendar(cfdList.get(i - 1).getStartDate(),"MM"));
+				params.put("cfdsd" + i, DateUtils.formatCalendar(cfdList.get(i - 1).getStartDate(),"dd"));
+				params.put("cfdey" + i, DateUtils.formatCalendar(cfdList.get(i - 1).getEndDate(),"yyyy"));
+				params.put("cfdem" + i, DateUtils.formatCalendar(cfdList.get(i - 1).getEndDate(),"MM"));
+				params.put("cfded" + i, DateUtils.formatCalendar(cfdList.get(i - 1).getEndDate(),"dd"));
+				// 金额	
+				params.put("mycbf"+ i, multiDigit2Chinese(String.valueOf(cfdList.get(i - 1).getPrice())));
 			}
 
 			// 每月承包费不足6年时
@@ -1105,11 +1031,7 @@ public class Contract4ChargerServiceImpl extends
 					params.put("cfdey" + (cfdList.size() + i), "　／");
 					params.put("cfdem" + (cfdList.size() + i), "／");
 					params.put("cfded" + (cfdList.size() + i), "／");
-					params.put("cfdmwan" + (cfdList.size() + i), "／");
-					params.put("cfdmqian" + (cfdList.size() + i), "／");
-					params.put("cfdmbai" + (cfdList.size() + i), "／");
-					params.put("cfdmshi" + (cfdList.size() + i), "／");
-					params.put("cfdmyuan" + (cfdList.size() + i), "／");
+					params.put("mycbf"+ (cfdList.size() + i), "／");
 				}
 			}
 
@@ -1129,12 +1051,8 @@ public class Contract4ChargerServiceImpl extends
 					.getInputStream());
 			// 占位符列表与参数列表匹配,当占位符列表值没出现在参数列表key值时，增加此key值
 			for (String key : markers) {
-				if (!params.containsKey(key)) {
-					params.put(
-							key,
-							key.length() > 3 ? concatSting(key.length() / 3,
-									"　") : "　　");
-				}
+				if (!params.containsKey(key)) 
+					params.put(key,"　　");
 			}
 			Attach attach = template.format2Attach(params, ptype, puid);
 			this.attachService.save(attach);
@@ -1142,14 +1060,6 @@ public class Contract4ChargerServiceImpl extends
 		}
 	}
 
-	// 根据数量拼接这个字符串n次
-	private String concatSting(int n, String module) {
-		String value = "";
-		for (int i = 0; i < n; i++) {
-			value += module;
-		}
-		return value;
-	}
 
 	// 多位数字转换为中文繁体
 	private String multiDigit2Chinese(String n) {
@@ -1189,7 +1099,8 @@ public class Contract4ChargerServiceImpl extends
 
 	// 个位数字转换为中文繁体
 	private String siginDigit2Chinese(Object n) {
-		String num[] = { "零", "壹", "贰", "叁", "肆", "伍", "陆", "柒", "捌", "玖", };
+		
+		String num[] = { "零", "壹", "贰", "叁", "肆", "　伍", "陆", "柒", "捌", "玖", };
 		if (n == null)
 			return null;
 		if (n instanceof Integer && Integer.parseInt(n.toString()) < 10) {
