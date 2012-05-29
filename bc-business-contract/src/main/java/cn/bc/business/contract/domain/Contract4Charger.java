@@ -3,6 +3,8 @@
  */
 package cn.bc.business.contract.domain;
 
+import java.util.Calendar;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Inheritance;
@@ -19,7 +21,8 @@ import javax.persistence.Table;
 @Inheritance(strategy = InheritanceType.JOINED)
 public class Contract4Charger extends Contract {
 	private static final long serialVersionUID = 1L;
-	public static final String ATTACH_TYPE = Contract4Charger.class.getSimpleName();
+	public static final String ATTACH_TYPE = Contract4Charger.class
+			.getSimpleName();
 	public static final String KEY_UID = Contract4Charger.class.getSimpleName();
 	public static final String KEY_CODE = "contract.code";
 	private String signType;// 签约类型:如新户
@@ -30,6 +33,9 @@ public class Contract4Charger extends Contract {
 	private String contractVersionNo;// 合同版本号
 	private String paymentDate;// 缴费日
 	private String scrapTo;// 残值归属
+	private Long quitterId;// 提前终止方
+	private Calendar agreementStartDate;// 协议期限开始日期
+	private Calendar agreementEndDate;// 协议期限开始日期
 
 	public Contract4Charger() {
 		this.setCode("[经济合同]");
@@ -104,6 +110,33 @@ public class Contract4Charger extends Contract {
 
 	public void setScrapTo(String scrapTo) {
 		this.scrapTo = scrapTo;
+	}
+
+	@Column(name = "QUITTER_ID")
+	public Long getQuitterId() {
+		return quitterId;
+	}
+
+	public void setQuitterId(Long quitterId) {
+		this.quitterId = quitterId;
+	}
+
+	@Column(name = "AGREEMENT_START_DATE")
+	public Calendar getAgreementStartDate() {
+		return agreementStartDate;
+	}
+
+	public void setAgreementStartDate(Calendar agreementStartDate) {
+		this.agreementStartDate = agreementStartDate;
+	}
+
+	@Column(name = "AGREEMENT_END_DATE")
+	public Calendar getAgreementEndDate() {
+		return agreementEndDate;
+	}
+
+	public void setAgreementEndDate(Calendar agreementEndDate) {
+		this.agreementEndDate = agreementEndDate;
 	}
 
 }
