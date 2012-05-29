@@ -38,6 +38,7 @@ import cn.bc.identity.web.SystemContext;
 import cn.bc.identity.web.SystemContextHolder;
 import cn.bc.template.domain.Template;
 import cn.bc.template.service.TemplateService;
+import cn.bc.template.util.DocxUtils;
 import cn.bc.web.ui.json.Json;
 
 /**
@@ -599,12 +600,46 @@ public class Contract4LabourServiceImpl extends
 		// 加载合同
 		Contract4Labour c = this.load(id);
 
-		// TODO: 生成格式化参数
+		//生成格式化参数
 		Map<String, Object> params = new HashMap<String, Object>();
-		params.put("plate", c.getExt_str1());
-		params.put("startDate", DateUtils.formatCalendar2Day(c.getStartDate()));
-		params.put("endDate", DateUtils.formatCalendar2Day(c.getEndDate()));
+		
+		//合同信息
+		params.put("code", c.getCode());
+		Calendar startDate = c.getStartDate();
+		Calendar endDate = c.getEndDate();
+		params.put("startYear",DateUtils.formatCalendar(startDate, "yyyy"));
+		params.put("startMonth",DateUtils.formatCalendar(startDate, "MM"));
+		params.put("startDay", DateUtils.formatCalendar(startDate, "dd"));
+		params.put("endYear", DateUtils.formatCalendar(endDate, "yyyy"));
+		params.put("endMonth", DateUtils.formatCalendar(endDate, "MM"));
+		params.put("endDay", DateUtils.formatCalendar(endDate, "dd"));
 
+		//车辆信息
+		Map<String, Object> carMap=this.contract4LabourDao.findCarByCarId(this.contract4LabourDao.findCarIdByContractId(id));
+		// 公司
+		String company = null;
+		if (carMap.get("company").equals("宝城")) {
+			company = "广州市宝城汽车出租有限公司";
+		} else if (carMap.get("company").equals("广发")) {
+			company = "广州市广发出租汽车有限公司";
+		}
+		params.put("company", company);
+		
+		//司机信息
+		Map<String, Object> carManMap=this.contract4LabourDao.findCarManByCarManId(this.contract4LabourDao.findCarManIdByContractId(id));
+		params.put("carMan", carManMap.get("name").toString());
+		params.put("certIdentity", carManMap.get("cert_Identity").toString());
+		
+		//经济合同信息
+		List<Map<String,String>> chargerList=this.contract4LabourDao.findContract4ChargerByContarct4LabourId(id);
+		String signDate=chargerList.get(0).get("signDate");
+		if(signDate!=null&&signDate!=""){
+			params.put("chargerSignYear", signDate.substring(0, signDate.indexOf("-")));
+			params.put("chargerSignMonth",signDate.substring(signDate.indexOf("-")+1, signDate.lastIndexOf("-")));
+			params.put("chargerSignDay", signDate.substring(signDate.lastIndexOf("-")+1));
+		}
+		
+		
 		// 生成附件
 		String ptype = Contract4Labour.ATTACH_TYPE;
 		String puid = c.getUid();
@@ -613,6 +648,14 @@ public class Contract4LabourServiceImpl extends
 			logger.warn("模板不存在,返回null:code=" + templateCode);
 			return null;
 		} else {
+			// 获取文件中的${XXXX}占位标记的键名列表
+			List<String> markers = DocxUtils.findMarkers(template
+					.getInputStream());
+			// 占位符列表与参数列表匹配,当占位符列表值没出现在参数列表key值时，增加此key值
+			for (String key : markers) {
+				if (!params.containsKey(key)) 
+					params.put(key,"　　");
+			}
 			Attach attach = template.format2Attach(params, ptype, puid);
 			this.attachService.save(attach);
 			return attach;
