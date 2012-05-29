@@ -184,5 +184,14 @@ public interface Contract4LabourDao extends CrudDao<Contract4Labour> {
 	 * @return
 	 */
 	Map<String, Object> findCarByCarId(Long carId);
+	
+	/**
+	 * 根据劳动合同Id查找此车最新的经济合同签订时间
+	 * 
+	 * @param contractId
+	 *           劳动合同Id
+	 * @return
+	 */
+	List<Map<String,String>> findContract4ChargerByContarct4LabourId(Long contractId);
 
 }
