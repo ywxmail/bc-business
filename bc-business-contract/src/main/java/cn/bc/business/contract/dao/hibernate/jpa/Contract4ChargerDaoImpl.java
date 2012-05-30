@@ -674,13 +674,14 @@ public class Contract4ChargerDaoImpl extends
 	}
 
 	public List<Map<String, String>> findCarByContractId(Long contractId) {
-		String hql="SELECT  b.plate_type,b.plate_no,b.factory_type,b.factory_model,b.vin,b.engine_no,b.color";
-			hql+=",to_char(b.register_date,'YYYY-MM-DD'),b.code,b.company,b.cert_no2,b.cert_no4";
-			hql+=" FROM bs_car_contract a";
-			hql+=" inner join bs_car b on b.id=a.car_id";
-			hql+=" where a.contract_id=?";
-		return	HibernateJpaNativeQuery.executeNativeSql(getJpaTemplate(), hql,new Object[]{contractId}
-			 	,new cn.bc.db.jdbc.RowMapper<Map<String, String>>() {
+		String hql = "SELECT  b.plate_type,b.plate_no,b.factory_type,b.factory_model,b.vin,b.engine_no,b.color";
+		hql += ",to_char(b.register_date,'YYYY-MM-DD'),b.code,b.company,b.cert_no2,b.cert_no4";
+		hql += " FROM bs_car_contract a";
+		hql += " inner join bs_car b on b.id=a.car_id";
+		hql += " where a.contract_id=?";
+		return HibernateJpaNativeQuery.executeNativeSql(getJpaTemplate(), hql,
+				new Object[] { contractId },
+				new cn.bc.db.jdbc.RowMapper<Map<String, String>>() {
 					public Map<String, String> mapRow(Object[] rs, int rowNum) {
 						Map<String, String> oi = new HashMap<String, String>();
 						int i = 0;
@@ -700,37 +701,15 @@ public class Contract4ChargerDaoImpl extends
 					}
 				});
 	}
-	
+
 	public List<Map<String, String>> findChargerByContractId(Long contractId) {
-		String hql="SELECT b.name,b.address,b.address1,b.cert_identity,b.phone,b.phone1,b.cert_fwzg";
-			hql+=" FROM bs_carman_contract a";
-			hql+=" inner join bs_carman b on b.id=a.man_id";
-			hql+=" where a.contract_id=?";
-		return	HibernateJpaNativeQuery.executeNativeSql(getJpaTemplate(), hql,new Object[]{contractId}
-			 	,new cn.bc.db.jdbc.RowMapper<Map<String, String>>() {
-					public Map<String, String> mapRow(Object[] rs, int rowNum) {
-						Map<String, String> oi = new HashMap<String, String>();
-						int i = 0;
-						oi.put("name", rs[i++].toString());
-						oi.put("address", rs[i++].toString());
-						oi.put("address1", rs[i++].toString());
-						oi.put("certIdentity", rs[i++].toString());
-						oi.put("phone", rs[i++].toString());
-						oi.put("phone1", rs[i++].toString());
-						oi.put("certFWZG", rs[i++].toString());
-						return oi;
-					}
-				});
-	}
-	
-	public List<Map<String, String>> findDriverByContractId(Long contractId) {
-		String hql="SELECT  b.name,b.address,b.address1,b.cert_identity,b.phone,b.phone1,b.cert_fwzg";
-			hql+=" FROM bs_car_contract a";
-			hql+=" inner join bs_car_driver c on c.car_id=a.car_id";
-			hql+=" inner join bs_carman b on b.id=c.driver_id";
-			hql+=" where b.classes=? and a.contract_id=?";
-		return	HibernateJpaNativeQuery.executeNativeSql(getJpaTemplate(), hql,new Object[]{1,contractId}
-			 	,new cn.bc.db.jdbc.RowMapper<Map<String, String>>() {
+		String hql = "SELECT b.name,b.address,b.address1,b.cert_identity,b.phone,b.phone1,b.cert_fwzg";
+		hql += " FROM bs_carman_contract a";
+		hql += " inner join bs_carman b on b.id=a.man_id";
+		hql += " where a.contract_id=?";
+		return HibernateJpaNativeQuery.executeNativeSql(getJpaTemplate(), hql,
+				new Object[] { contractId },
+				new cn.bc.db.jdbc.RowMapper<Map<String, String>>() {
 					public Map<String, String> mapRow(Object[] rs, int rowNum) {
 						Map<String, String> oi = new HashMap<String, String>();
 						int i = 0;
@@ -746,9 +725,28 @@ public class Contract4ChargerDaoImpl extends
 				});
 	}
 
-	public String getCarStatusAndPlate(Long contractCarId) {
-		// TODO Auto-generated method stub
-		return null;
+	public List<Map<String, String>> findDriverByContractId(Long contractId) {
+		String hql = "SELECT  b.name,b.address,b.address1,b.cert_identity,b.phone,b.phone1,b.cert_fwzg";
+		hql += " FROM bs_car_contract a";
+		hql += " inner join bs_car_driver c on c.car_id=a.car_id";
+		hql += " inner join bs_carman b on b.id=c.driver_id";
+		hql += " where b.classes=? and a.contract_id=?";
+		return HibernateJpaNativeQuery.executeNativeSql(getJpaTemplate(), hql,
+				new Object[] { 1, contractId },
+				new cn.bc.db.jdbc.RowMapper<Map<String, String>>() {
+					public Map<String, String> mapRow(Object[] rs, int rowNum) {
+						Map<String, String> oi = new HashMap<String, String>();
+						int i = 0;
+						oi.put("name", rs[i++].toString());
+						oi.put("address", rs[i++].toString());
+						oi.put("address1", rs[i++].toString());
+						oi.put("certIdentity", rs[i++].toString());
+						oi.put("phone", rs[i++].toString());
+						oi.put("phone1", rs[i++].toString());
+						oi.put("certFWZG", rs[i++].toString());
+						return oi;
+					}
+				});
 	}
 
 	/**
@@ -777,4 +775,10 @@ public class Contract4ChargerDaoImpl extends
 
 		return queryMap;
 	}
+
+	public void updateCarWithbusinessType(String businessType, Long carId) {
+		String hql = "update Car c set c.businessType = ? where c.id = ?";
+		this.executeUpdate(hql, new Object[] { businessType, carId });
+	}
+
 }
