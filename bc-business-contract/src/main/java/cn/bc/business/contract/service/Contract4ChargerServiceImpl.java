@@ -41,7 +41,6 @@ import cn.bc.identity.web.SystemContextHolder;
 import cn.bc.template.domain.Template;
 import cn.bc.template.service.TemplateService;
 import cn.bc.template.util.DocxUtils;
-import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.formater.NubmerFormater;
 import cn.bc.web.ui.json.Json;
 
@@ -869,17 +868,21 @@ public class Contract4ChargerServiceImpl extends
 				+ (endDate.get(Calendar.MONTH) - startDate.get(Calendar.MONTH));
 		params.put("countMonth", multiDigit2Chinese(countMonth + ""));
 		int sumYear = countMonth / 12;
+		String sumDate="　　";
 		if (sumYear > 0) {
-			params.put("sumYear", siginDigit2Chinese(sumYear));
+			sumDate=multiDigit2Chinese(sumYear + "")+"年";
 		} else {
-			params.put("sumYear", "　／");
+			sumDate="　／年";
 		}
 		int sumMonth = countMonth % 12;
-		if (sumMonth > 9) {
+		if (sumMonth > 0) {
+			sumDate+= multiDigit2Chinese(sumMonth + "");
 			params.put("sumMonth", multiDigit2Chinese(sumMonth + ""));
 		} else {
+			sumDate+= siginDigit2Chinese(sumMonth);
 			params.put("sumMonth", siginDigit2Chinese(sumMonth));
 		}
+		params.put("sumDate", sumDate);
 		params.put("sumStartYear",DateUtils.formatCalendar(startDate, "yyyy"));
 		params.put("sumStartMonth",DateUtils.formatCalendar(startDate, "MM"));
 		params.put("sumStartDay", DateUtils.formatCalendar(startDate, "dd"));
