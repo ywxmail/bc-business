@@ -153,22 +153,15 @@ public class FeesAction extends ViewAction<Map<String, Object>> {
 	protected List<Column> getGridColumns() {
 		List<Column> columns = new ArrayList<Column>();
 		columns.add(new IdColumn4MapKey("f.id", "id"));
-//		columns.add(new TextColumn4MapKey("f.status_", "status_",
-//				getText("fee.status"), 40).setSortable(true)
-//				.setValueFormater(new EntityStatusFormater(getFeeStatuses())));
 		//年份
 		columns.add(new TextColumn4MapKey("f.fee_year", "fee_year",
-				getText("fee.feeYear"), 50).setSortable(true));
+				getText("fee.feeYear"), 40).setSortable(true));
 		//月份
 		columns.add(new TextColumn4MapKey("f.fee_month", "fee_month",
-				getText("fee.feeMonth"), 50).setSortable(true));
-		//收款日期
-		columns.add(new TextColumn4MapKey("f.fee_date", "fee_date",
-				getText("fee.feeDate"), 100).setSortable(true)
-				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+				getText("fee.feeMonth"), 40).setSortable(true));
 		// 公司
 		columns.add(new TextColumn4MapKey("c.company", "company",
-				getText("fee.company"), 50).setSortable(true)
+				getText("fee.company"), 40).setSortable(true)
 				.setUseTitleFromLabel(true));
 		// 分公司
 		columns.add(new TextColumn4MapKey("unit.name", "unit_name",
@@ -227,6 +220,10 @@ public class FeesAction extends ViewAction<Map<String, Object>> {
 											.get("payer_id"));
 						}
 				}));
+		//缴费日期
+		columns.add(new TextColumn4MapKey("f.fee_date", "fee_date",
+				getText("fee.feeDate"), 90).setSortable(true)
+				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
 		
 		//本期应收合计
 		columns.add(new TextColumn4MapKey("f.s_total", "s_total",
