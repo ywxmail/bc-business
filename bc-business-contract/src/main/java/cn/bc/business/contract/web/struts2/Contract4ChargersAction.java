@@ -4,6 +4,7 @@
 package cn.bc.business.contract.web.struts2;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -38,6 +39,7 @@ import cn.bc.option.domain.OptionItem;
 import cn.bc.option.service.OptionService;
 import cn.bc.web.formater.AbstractFormater;
 import cn.bc.web.formater.CalendarFormater;
+import cn.bc.web.formater.DateRangeFormater;
 import cn.bc.web.formater.EntityStatusFormater;
 import cn.bc.web.formater.LinkFormater4Id;
 import cn.bc.web.ui.html.grid.Column;
@@ -182,10 +184,12 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 		sql.append(",bia.id batch_company_id,bia.name batch_company");
 		sql.append(",m.id motorcade_id,m.name motorcade_name,c.stop_date,cc.scrapto");
 		sql.append(",c.modified_date,md.actor_name modifier,c.file_date,ad.actor_name author");
+		sql.append(",qu.name qutter,cc.agreement_start_date,cc.agreement_end_date");
 		sql.append(" from BS_CONTRACT_CHARGER cc");
 		sql.append(" inner join BS_CONTRACT c on cc.id = c.id");
 		sql.append(" inner join BS_CAR_CONTRACT carc on c.id = carc.contract_id");
 		sql.append(" inner join BS_Car car on carc.car_id = car.id");
+		sql.append(" left join BS_CARMAN qu on cc.quitter_id = qu.id");
 		if (driverId != null) {
 			sql.append(" left join BS_CARMAN_CONTRACT manc on c.id = manc.contract_id");
 			sql.append(" left join BS_CARMAN man on manc.man_id = man.id");
@@ -239,6 +243,9 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 				map.put("modifier", rs[i++]);
 				map.put("file_date", rs[i++]);
 				map.put("author", rs[i++]);
+				map.put("qutter", rs[i++]);
+				map.put("agreement_start_date", rs[i++]);
+				map.put("agreement_end_date", rs[i++]);
 
 				return map;
 			}
@@ -292,7 +299,7 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 				getText("contract4Charger.wordNo"), 70)
 				.setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("c.ext_str2", "ext_str2",
-				getText("contract4Charger.charger"), 140).setUseTitleFromLabel(
+				getText("contract4Charger.charger"), 240).setUseTitleFromLabel(
 				true).setValueFormater(
 				new LinkFormater4ChargerInfo(this.getContextPath())));
 		columns.add(new TextColumn4MapKey("cc.sign_type", "sign_type",
@@ -324,30 +331,38 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 				getText("contract.signDate"), 90).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
 		columns.add(new TextColumn4MapKey("c.stop_date", "stop_date",
-				getText("contract.stopDate"), 120).setSortable(true)
-				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+				getText("contract.stopDate"), 180)
+				.setValueFormater(new DateRangeFormater("yyyy-MM-dd") {
+					@Override
+					public Date getToDate(Object context, Object value) {
+						@SuppressWarnings("rawtypes")
+						Map contract = (Map) context;
+						return (Date) contract.get("agreement_end_date");
+					}
+				}.setConnector(",").setUseEmptySymbol(true)));
+
+		columns.add(new TextColumn4MapKey("cc.agreement_start_date",
+				"agreement_start_date", getText("contract4Charger.agreement"),
+				180).setValueFormater(new DateRangeFormater("yyyy-MM-dd") {
+			@Override
+			public Date getToDate(Object context, Object value) {
+				@SuppressWarnings("rawtypes")
+				Map contract = (Map) context;
+				return (Date) contract.get("agreement_end_date");
+			}
+		}));
 		columns.add(new TextColumn4MapKey("cc.contract_version_no",
 				"contract_version_no",
 				getText("contract4Charger.contractVersionNo"), 180)
 				.setUseTitleFromLabel(true));
-		// columns.add(new TextColumn4MapKey("c.transactor_name",
-		// "transactor_name", getText("contract.transactor"), 50)
-		// .setUseTitleFromLabel(true));
-		// if(status.equals(String.valueOf(Contract.STATUS_LOGOUT)) ||
-		// status.length() == 0){ //控制视图在在案注销下不显示注销人,注销时间
 		columns.add(new TextColumn4MapKey("c.logout_date", "logout_date",
 				getText("contract4Charger.logoutDate"), 90).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
 		columns.add(new TextColumn4MapKey("iah.actor_name", "actor_name",
 				getText("contract4Charger.logoutId"), 50)
 				.setUseTitleFromLabel(true));
-		// }
 		columns.add(new TextColumn4MapKey("c.code", "code",
 				getText("contract.code"), 130).setUseTitleFromLabel(true));
-		// columns.add(new TextColumn4MapKey("c.op_type", "op_type",
-		// getText("contract4Labour.op"),
-		// 35).setSortable(true).setUseTitleFromLabel(true)
-		// .setValueFormater(new EntityStatusFormater(getEntityOpTypes())));
 		if (isScrapTo()) {
 			columns.add(new TextColumn4MapKey("cc.scrapto", "scrapto",
 					getText("contract4Charger.scrapTo"), 60)

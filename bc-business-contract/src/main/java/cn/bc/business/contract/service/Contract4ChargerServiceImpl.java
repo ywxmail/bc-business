@@ -530,6 +530,11 @@ public class Contract4ChargerServiceImpl extends
 		newContract.setStartDate(null);
 		newContract.setContractFeeDetail(null);
 		newContract.setStatus(BCConstants.STATUS_DRAFT);
+		// 设置提前终止方，协议期限为空
+		newContract.setQuitterId(null);
+		newContract.setAgreementEndDate(null);
+		newContract.setAgreementStartDate(null);
+
 		newContract.setVerMajor(newContract.getVerMajor() + 1);// 版本号+1
 		if (newContract.getOpType() == Contract.OPTYPE_CHANGECHARGER
 				|| newContract.getOpType() == Contract.OPTYPE_CHANGECHARGER2) {

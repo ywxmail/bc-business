@@ -4,11 +4,14 @@
 package cn.bc.business.web.struts2;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.util.StringUtils;
 
 import cn.bc.business.BSConstants;
+import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.formater.LinkFormater;
 
 /**
@@ -41,7 +44,17 @@ public class LinkFormater4ChargerInfo extends LinkFormater {
 		this.showTip = showTip;
 	}
 
+	@SuppressWarnings("null")
 	public String format(Object context, Object value) {
+		@SuppressWarnings("rawtypes")
+		Map contract = (Map) context;
+		// 提前终止方
+		String qutter = "";
+		// 如果提前终止方不为空
+		if (contract.get("qutter") != null) {
+			qutter = (String) contract.get("qutter");
+		}
+
 		String _value = (String) value;
 		if (value == null || _value.trim().length() == 0) {
 			return "&nbsp;";
@@ -63,7 +76,6 @@ public class LinkFormater4ChargerInfo extends LinkFormater {
 			vs = vv.split(",");// [0]-责任人姓名,[1]-责任人id
 
 			if (vs.length == 2) {
-				labels.add(vs[0]);
 				// 链接地址、模块类型、样式控制
 				tpl.append("<a class=\"bc-link\" data-mtype=\""
 						+ this.moduleKey + "\" href=\"" + this.contextPath
@@ -76,7 +88,29 @@ public class LinkFormater4ChargerInfo extends LinkFormater {
 				tpl.append(" data-mid=\"" + this.moduleKey + vs[1] + "\"");
 
 				// 链接显示的文字：张三
-				tpl.append(">" + vs[0] + "</a>");
+				// 经济合同视图:责任人列特殊处理，如"张三,李四(~[补充协议的结束日期])"
+				if (qutter != null || qutter.length() > 0) {
+					if (qutter.endsWith(vs[0])) {
+						Date endDate = (Date) contract
+								.get("agreement_end_date");
+						CalendarFormater cf = new CalendarFormater();
+						String date = cf.format(context, endDate);
+						if (date != null) {
+							labels.add(vs[0] + "(~" + date + ")");
+							tpl.append(">" + vs[0] + "(~" + date + ")" + "</a>");
+						} else {
+							labels.add(vs[0]);
+							tpl.append(">" + vs[0] + "</a>");
+						}
+					} else {
+						labels.add(vs[0]);
+						tpl.append(">" + vs[0] + "</a>");
+					}
+				} else {
+					labels.add(vs[0]);
+					tpl.append(">" + vs[0] + "</a>");
+
+				}
 			} else {
 				tpl.append(vv);
 				labels.add(vv);
@@ -94,8 +128,18 @@ public class LinkFormater4ChargerInfo extends LinkFormater {
 		}
 	}
 
+	@SuppressWarnings("null")
 	@Override
 	public String getLinkText(Object context, Object value) {
+		@SuppressWarnings("rawtypes")
+		Map contract = (Map) context;
+		// 提前终止方
+		String qutter = "";
+		// 如果提前终止方不为空
+		if (contract.get("qutter") != null) {
+			qutter = (String) contract.get("qutter");
+		}
+
 		String _value = (String) value;
 		if (value == null || _value.trim().length() == 0) {
 			return "";
@@ -115,7 +159,25 @@ public class LinkFormater4ChargerInfo extends LinkFormater {
 
 			vs = vv.split(",");// [0]-责任人姓名,[1]-责任人id
 			if (vs.length == 2) {
-				labels += vs[0];
+				// 经济合同视图:责任人列特殊处理，如"张三,李四(~[补充协议的结束日期])"
+				if (qutter != null || qutter.length() > 0) {
+					if (qutter.endsWith(vs[0])) {
+						Date endDate = (Date) contract
+								.get("agreement_end_date");
+						CalendarFormater cf = new CalendarFormater();
+						String date = cf.format(context, endDate);
+						if (date != null) {
+							labels += vs[0] + "(~" + date + ")";
+						} else {
+							labels += vs[0];
+						}
+					} else {
+						labels += vs[0];
+					}
+				} else {
+					labels += vs[0];
+				}
+
 			} else {
 				labels += vv;
 			}

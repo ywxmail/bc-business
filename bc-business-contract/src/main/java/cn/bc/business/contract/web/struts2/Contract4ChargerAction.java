@@ -59,7 +59,7 @@ public class Contract4ChargerAction extends
 
 	public Map<String, String> statusesValue;
 	// public Map<String, String> chargerInfoMap; // 责任人Map
-
+	public List<Map<String, String>> quittersList; // 可选提前终止方列表
 	public List<Map<String, String>> signTypeList; // 可选签约类型
 	public List<Map<String, String>> businessTypeList; // 可选营运性质列表
 	public List<Map<String, String>> contractVersionNoList; // 可选合同版本号列表
@@ -198,6 +198,9 @@ public class Contract4ChargerAction extends
 		if (opType == Contract.OPTYPE_CHANGECHARGER
 				|| opType == Contract.OPTYPE_RENEW
 				|| opType == Contract.OPTYPE_CHANGECHARGER2) {
+			// 提前终止合同方
+			this.quittersList = quitterOptionItem(this.getE().getExt_str2());
+
 			// 构建附件控件
 			attachsUI = buildAttachsUI(false, false);
 
@@ -217,10 +220,12 @@ public class Contract4ChargerAction extends
 			// entity.setStatus(Contract.STATUS_NORMAL);
 			entity.setSignType(getText("contract4Charger.optype.create"));
 			entity.setIncludeCost(true);
-
+			// 提前终止方列表
+			this.quittersList = new ArrayList<Map<String, String>>();
 			// 构建附件控件
 			attachsUI = buildAttachsUI(true, false);
 		}
+
 	}
 
 	@Override
@@ -395,6 +400,8 @@ public class Contract4ChargerAction extends
 		// this.price=format.format(this.getE().getContractFeeDetail().);
 		// 初始化责任人
 		this.chargersInfoList = formatChargers(e.getExt_str2());
+		// 提前终止合同方
+		this.quittersList = quitterOptionItem(e.getExt_str2());
 		// 根据合同获取车辆Id
 		carId = this.contract4ChargerService.findCarIdByContractId(e.getId());
 		// 构建附件控件
@@ -417,6 +424,7 @@ public class Contract4ChargerAction extends
 		// == 合同维护处理
 		// 初始化责任人
 		this.chargersInfoList = formatChargers(e.getExt_str2());
+		this.quittersList = quitterOptionItem(e.getExt_str2());
 		// 根据合同获取车辆Id
 		carId = this.contract4ChargerService.findCarIdByContractId(e.getId());
 		// setChargerList(e);
@@ -455,6 +463,32 @@ public class Contract4ChargerAction extends
 				id = chargerAry[i].split(",")[1];
 				charger.put("id", id);
 				charger.put("name", name);
+				chargersInfo.add(charger);
+			}
+
+		}
+		return chargersInfo;
+	}
+
+	/**
+	 * 组装责任人下拉列表
+	 * 
+	 * @param drivers
+	 * @return
+	 */
+	public List<Map<String, String>> quitterOptionItem(String chargersStr) {
+		String name = "";
+		String id = "";
+		List<Map<String, String>> chargersInfo = new ArrayList<Map<String, String>>();
+		Map<String, String> charger;
+		if (null != chargersStr && chargersStr.trim().length() > 0) {
+			String[] chargerAry = chargersStr.split(";");
+			for (int i = 0; i < chargerAry.length; i++) {
+				charger = new HashMap<String, String>();
+				name = chargerAry[i].split(",")[0];
+				id = chargerAry[i].split(",")[1];
+				charger.put("key", id);
+				charger.put("value", name);
 				chargersInfo.add(charger);
 			}
 
