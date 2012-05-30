@@ -198,6 +198,9 @@ public class Contract4ChargerAction extends
 		if (opType == Contract.OPTYPE_CHANGECHARGER
 				|| opType == Contract.OPTYPE_RENEW
 				|| opType == Contract.OPTYPE_CHANGECHARGER2) {
+			// 提前终止合同方
+			this.quittersList = quitterOptionItem(this.getE().getExt_str2());
+
 			// 构建附件控件
 			attachsUI = buildAttachsUI(false, false);
 
@@ -397,6 +400,7 @@ public class Contract4ChargerAction extends
 		// this.price=format.format(this.getE().getContractFeeDetail().);
 		// 初始化责任人
 		this.chargersInfoList = formatChargers(e.getExt_str2());
+		// 提前终止合同方
 		this.quittersList = quitterOptionItem(e.getExt_str2());
 		// 根据合同获取车辆Id
 		carId = this.contract4ChargerService.findCarIdByContractId(e.getId());
