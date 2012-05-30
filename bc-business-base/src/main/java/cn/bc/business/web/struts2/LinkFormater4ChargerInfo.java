@@ -97,7 +97,7 @@ public class LinkFormater4ChargerInfo extends LinkFormater {
 						String date = cf.format(context, endDate);
 						if (date != null) {
 							labels.add(vs[0] + "(~" + date + ")");
-							tpl.append(">" + vs[0] + "(~" + date + ")" + "</a>");
+							tpl.append(">" + vs[0] + "(～" + date + ")" + "</a>");
 						} else {
 							labels.add(vs[0]);
 							tpl.append(">" + vs[0] + "</a>");
@@ -167,7 +167,7 @@ public class LinkFormater4ChargerInfo extends LinkFormater {
 						CalendarFormater cf = new CalendarFormater();
 						String date = cf.format(context, endDate);
 						if (date != null) {
-							labels += vs[0] + "(~" + date + ")";
+							labels += vs[0] + "(～" + date + ")";
 						} else {
 							labels += vs[0];
 						}
