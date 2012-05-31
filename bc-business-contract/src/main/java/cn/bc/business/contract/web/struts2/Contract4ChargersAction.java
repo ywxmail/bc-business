@@ -39,7 +39,6 @@ import cn.bc.option.domain.OptionItem;
 import cn.bc.option.service.OptionService;
 import cn.bc.web.formater.AbstractFormater;
 import cn.bc.web.formater.CalendarFormater;
-import cn.bc.web.formater.DateRangeFormater;
 import cn.bc.web.formater.EntityStatusFormater;
 import cn.bc.web.formater.LinkFormater4Id;
 import cn.bc.web.ui.html.grid.Column;
@@ -331,26 +330,18 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 				getText("contract.signDate"), 90).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
 		columns.add(new TextColumn4MapKey("c.stop_date", "stop_date",
-				getText("contract.stopDate"), 180)
-				.setValueFormater(new DateRangeFormater("yyyy-MM-dd") {
-					@Override
-					public Date getToDate(Object context, Object value) {
-						@SuppressWarnings("rawtypes")
-						Map contract = (Map) context;
-						return (Date) contract.get("agreement_end_date");
-					}
-				}.setConnector(",").setUseEmptySymbol(true)));
-
+				getText("contract.stopDate"), 110).setSortable(true)
+				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
 		columns.add(new TextColumn4MapKey("cc.agreement_start_date",
 				"agreement_start_date", getText("contract4Charger.agreement"),
-				180).setValueFormater(new DateRangeFormater("yyyy-MM-dd") {
+				210).setValueFormater(new AgreementFormater() {
 			@Override
 			public Date getToDate(Object context, Object value) {
 				@SuppressWarnings("rawtypes")
 				Map contract = (Map) context;
 				return (Date) contract.get("agreement_end_date");
 			}
-		}));
+		}.setBeforeDateStr("qutter")));
 		columns.add(new TextColumn4MapKey("cc.contract_version_no",
 				"contract_version_no",
 				getText("contract4Charger.contractVersionNo"), 180)

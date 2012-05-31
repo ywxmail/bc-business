@@ -92,12 +92,13 @@ public class LinkFormater4ChargerInfo extends LinkFormater {
 				if (qutter != null || qutter.length() > 0) {
 					if (qutter.endsWith(vs[0])) {
 						Date endDate = (Date) contract
-								.get("agreement_end_date");
+								.get("agreement_start_date");
 						CalendarFormater cf = new CalendarFormater();
 						String date = cf.format(context, endDate);
 						if (date != null) {
 							labels.add(vs[0] + "(~" + date + ")");
-							tpl.append(">" + vs[0] + "(～" + date + ")" + "</a>");
+							tpl.append(">" + vs[0] + "(" + date + "终止)"
+									+ "</a>");
 						} else {
 							labels.add(vs[0]);
 							tpl.append(">" + vs[0] + "</a>");
@@ -159,15 +160,15 @@ public class LinkFormater4ChargerInfo extends LinkFormater {
 
 			vs = vv.split(",");// [0]-责任人姓名,[1]-责任人id
 			if (vs.length == 2) {
-				// 经济合同视图:责任人列特殊处理，如"张三,李四(~[补充协议的结束日期])"
+				// 经济合同视图:责任人列特殊处理，如"张三,李四([补充协议的开始日期]终止)"
 				if (qutter != null || qutter.length() > 0) {
 					if (qutter.endsWith(vs[0])) {
 						Date endDate = (Date) contract
-								.get("agreement_end_date");
+								.get("agreement_start_date");
 						CalendarFormater cf = new CalendarFormater();
 						String date = cf.format(context, endDate);
 						if (date != null) {
-							labels += vs[0] + "(～" + date + ")";
+							labels += vs[0] + "(" + date + "终止)";
 						} else {
 							labels += vs[0];
 						}
