@@ -25,10 +25,6 @@ import cn.bc.web.formater.DateRangeFormaterEx;
  */
 public abstract class AgreementFormater extends DateRangeFormaterEx {
 	private SimpleDateFormat dateFormat;
-	@SuppressWarnings("unused")
-	private SimpleDateFormat yearFormat;
-	private SimpleDateFormat monthFormat;
-	private SimpleDateFormat dayFormat;
 	private String connector = " ";// 日期和时间间的连接字符串
 	private String beforeDateStr;// 视图中mapRow的key值
 
@@ -56,9 +52,6 @@ public abstract class AgreementFormater extends DateRangeFormaterEx {
 	public AgreementFormater() {
 		// 默认日期格式
 		dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-		yearFormat = new SimpleDateFormat("yyyy");
-		monthFormat = new SimpleDateFormat("MM");
-		dayFormat = new SimpleDateFormat("dd");
 	}
 
 	/**
@@ -116,7 +109,7 @@ public abstract class AgreementFormater extends DateRangeFormaterEx {
 					// 如果存在提前终止方
 					if (!vs[0].endsWith(strValue)) {
 
-						// 添加继续合同方
+						// 添加履约方
 						if (_fromDate != null) {
 							fromDate = Calendar.getInstance();
 							fromDate.setTime(_fromDate);
@@ -139,57 +132,16 @@ public abstract class AgreementFormater extends DateRangeFormaterEx {
 										+ dateFormat.format(fromDate.getTime())
 										+ "～";
 							} else {
-								// 如果年相等，但月日不相等
-								if (fromDate.get(Calendar.YEAR) == toDate
-										.get(Calendar.YEAR)
-										&& fromDate.get(Calendar.MONTH) != toDate
-												.get(Calendar.MONTH)
-										&& fromDate.get(Calendar.DATE) != toDate
-												.get(Calendar.DATE)) {
-									returnValue = "("
-											+ vs[0]
-											+ ")"
-											+ dateFormat.format(fromDate
-													.getTime())
-											+ "～"
-											+ monthFormat.format(toDate
-													.getTime())
-											+ "-"
-											+ dayFormat
-													.format(toDate.getTime());
-									// 同年同月，不同日
-								} else if (fromDate.get(Calendar.YEAR) == toDate
-										.get(Calendar.YEAR)
-										&& fromDate.get(Calendar.MONTH) == toDate
-												.get(Calendar.MONTH)
-										&& fromDate.get(Calendar.DATE) != toDate
-												.get(Calendar.DATE)) {
-									returnValue = "("
-											+ vs[0]
-											+ ")"
-											+ dateFormat.format(fromDate
-													.getTime())
-											+ "～"
-											+ dayFormat
-													.format(toDate.getTime());
-								} else {
-									returnValue = "("
-											+ vs[0]
-											+ ")"
-											+ dateFormat.format(fromDate
-													.getTime())
-											+ "～"
-											+ dateFormat.format(toDate
-													.getTime());
-
-								}
-
+								returnValue = "(" + vs[0] + ")"
+										+ dateFormat.format(fromDate.getTime())
+										+ "～"
+										+ dateFormat.format(toDate.getTime());
 							}
 						}
 					}
 				} else {
 
-					// 添加继续合同方
+					// 添加履约方
 					if (_fromDate != null) {
 						fromDate = Calendar.getInstance();
 						fromDate.setTime(_fromDate);
@@ -211,45 +163,16 @@ public abstract class AgreementFormater extends DateRangeFormaterEx {
 							returnValue = dateFormat.format(fromDate.getTime())
 									+ "～";
 						} else {
-							// 如果年相等，但月日不相等
-							if (fromDate.get(Calendar.YEAR) == toDate
-									.get(Calendar.YEAR)
-									&& fromDate.get(Calendar.MONTH) != toDate
-											.get(Calendar.MONTH)
-									&& fromDate.get(Calendar.DATE) != toDate
-											.get(Calendar.DATE)) {
-								returnValue = dateFormat.format(fromDate
-										.getTime())
-										+ "～"
-										+ monthFormat.format(toDate.getTime())
-										+ "-"
-										+ dayFormat.format(toDate.getTime());
-								// 同年同月，不同日
-							} else if (fromDate.get(Calendar.YEAR) == toDate
-									.get(Calendar.YEAR)
-									&& fromDate.get(Calendar.MONTH) == toDate
-											.get(Calendar.MONTH)
-									&& fromDate.get(Calendar.DATE) != toDate
-											.get(Calendar.DATE)) {
-								returnValue = dateFormat.format(fromDate
-										.getTime())
-										+ "～"
-										+ dayFormat.format(toDate.getTime());
-							} else {
-								returnValue = dateFormat.format(fromDate
-										.getTime())
-										+ "～"
-										+ dateFormat.format(toDate.getTime());
-
-							}
-
+							returnValue = "(" + vs[0] + ")"
+									+ dateFormat.format(fromDate.getTime())
+									+ "～" + dateFormat.format(toDate.getTime());
 						}
 					}
 				}
 			} else {
 				// 张三,1220;李四
 				// 一个值时
-				// 添加继续合同方
+				// 添加履约方
 				if (_fromDate != null) {
 					fromDate = Calendar.getInstance();
 					fromDate.setTime(_fromDate);
@@ -271,35 +194,9 @@ public abstract class AgreementFormater extends DateRangeFormaterEx {
 						returnValue = "(" + vs[0] + ")"
 								+ dateFormat.format(fromDate.getTime()) + "～";
 					} else {
-						// 如果年相等，但月日不相等
-						if (fromDate.get(Calendar.YEAR) == toDate
-								.get(Calendar.YEAR)
-								&& fromDate.get(Calendar.MONTH) != toDate
-										.get(Calendar.MONTH)
-								&& fromDate.get(Calendar.DATE) != toDate
-										.get(Calendar.DATE)) {
-							returnValue = "(" + vs[0] + ")"
-									+ dateFormat.format(fromDate.getTime())
-									+ "～"
-									+ monthFormat.format(toDate.getTime())
-									+ "-" + dayFormat.format(toDate.getTime());
-							// 同年同月，不同日
-						} else if (fromDate.get(Calendar.YEAR) == toDate
-								.get(Calendar.YEAR)
-								&& fromDate.get(Calendar.MONTH) == toDate
-										.get(Calendar.MONTH)
-								&& fromDate.get(Calendar.DATE) != toDate
-										.get(Calendar.DATE)) {
-							returnValue = "(" + vs[0] + ")"
-									+ dateFormat.format(fromDate.getTime())
-									+ "～" + dayFormat.format(toDate.getTime());
-						} else {
-							returnValue = "(" + vs[0] + ")"
-									+ dateFormat.format(fromDate.getTime())
-									+ "～" + dateFormat.format(toDate.getTime());
-
-						}
-
+						returnValue = "(" + vs[0] + ")"
+								+ dateFormat.format(fromDate.getTime()) + "～"
+								+ dateFormat.format(toDate.getTime());
 					}
 				}
 			}

@@ -120,15 +120,15 @@ public class Contract4ChargerServiceImpl extends
 			}
 			this.contractDao.saveContractCarManRelation(chargerRelationList);
 		}
-		// 更新车辆视图的charger列显示责任人姓名
-		this.contract4ChargerDao.updateCar4ChargerName(carId);
-		// this.contract4ChargerDao.updateCar4ChargerName(assignChargerNames,carId);
-		// 更新司机视图的charger列显示责任人姓名
-		this.contract4ChargerDao.updateCarMan4ChargerName(carId);
-		// this.contract4ChargerDao.updateCarMan4ChargerName(assignChargerNames,carId);
-
-		// 如果是在案状态就更新车辆的合同性质
+		// 如果是在案状态
 		if (contract4Charger.getStatus() == BCConstants.STATUS_ENABLED) {
+			// 更新车辆视图的charger列显示责任人姓名
+			this.contract4ChargerDao.updateCar4ChargerName(carId);
+			// this.contract4ChargerDao.updateCar4ChargerName(assignChargerNames,carId);
+			// 更新司机视图的charger列显示责任人姓名
+			this.contract4ChargerDao.updateCarMan4ChargerName(carId);
+			// this.contract4ChargerDao.updateCarMan4ChargerName(assignChargerNames,carId);
+			// 如果是在案状态就更新车辆的合同性质
 			this.contract4ChargerDao.updateCarWithbusinessType(
 					contract4Charger.getBusinessType(), carId);
 		}
@@ -606,12 +606,13 @@ public class Contract4ChargerServiceImpl extends
 			}
 			this.contractDao.saveContractCarManRelation(chargerRelationList);
 		}
-		// 更新车辆视图的charger列显示责任人姓名
-		this.contract4ChargerDao.updateCar4ChargerName(carId);
-		// 更新司机视图的charger列显示责任人姓名
-		this.contract4ChargerDao.updateCarMan4ChargerName(carId);
-		// 如果是在案状态就更新车辆的合同性质
+		// 如果是在案状态就
 		if (newContract.getStatus() == BCConstants.STATUS_ENABLED) {
+			// 更新车辆视图的charger列显示责任人姓名
+			this.contract4ChargerDao.updateCar4ChargerName(carId);
+			// 更新司机视图的charger列显示责任人姓名
+			this.contract4ChargerDao.updateCarMan4ChargerName(carId);
+			// 更新车辆的合同性质
 			this.contract4ChargerDao.updateCarWithbusinessType(
 					e.getBusinessType(), carId);
 
@@ -875,7 +876,8 @@ public class Contract4ChargerServiceImpl extends
 
 		// -----合同信息----开始--
 		params.put("code", c.getCode());
-		params.put("signDate",DateUtils.formatCalendar(c.getSignDate(),"yyyy-MM-dd"));
+		params.put("signDate",
+				DateUtils.formatCalendar(c.getSignDate(), "yyyy-MM-dd"));
 
 		// 缴费日
 		params.put("paymentDate", c.getPaymentDate() != null
@@ -891,23 +893,23 @@ public class Contract4ChargerServiceImpl extends
 				+ (endDate.get(Calendar.MONTH) - startDate.get(Calendar.MONTH));
 		params.put("countMonth", multiDigit2Chinese(countMonth + ""));
 		int sumYear = countMonth / 12;
-		String sumDate="　　";
+		String sumDate = "　　";
 		if (sumYear > 0) {
-			sumDate=multiDigit2Chinese(sumYear + "")+"年";
+			sumDate = multiDigit2Chinese(sumYear + "") + "年";
 		} else {
-			sumDate="　／年";
+			sumDate = "　／年";
 		}
 		int sumMonth = countMonth % 12;
 		if (sumMonth > 0) {
-			sumDate+= multiDigit2Chinese(sumMonth + "");
+			sumDate += multiDigit2Chinese(sumMonth + "");
 			params.put("sumMonth", multiDigit2Chinese(sumMonth + ""));
 		} else {
-			sumDate+= siginDigit2Chinese(sumMonth);
+			sumDate += siginDigit2Chinese(sumMonth);
 			params.put("sumMonth", siginDigit2Chinese(sumMonth));
 		}
 		params.put("sumDate", sumDate);
-		params.put("sumStartYear",DateUtils.formatCalendar(startDate, "yyyy"));
-		params.put("sumStartMonth",DateUtils.formatCalendar(startDate, "MM"));
+		params.put("sumStartYear", DateUtils.formatCalendar(startDate, "yyyy"));
+		params.put("sumStartMonth", DateUtils.formatCalendar(startDate, "MM"));
 		params.put("sumStartDay", DateUtils.formatCalendar(startDate, "dd"));
 		params.put("sumEndYear", DateUtils.formatCalendar(endDate, "yyyy"));
 		params.put("sumEndMonth", DateUtils.formatCalendar(endDate, "MM"));
@@ -1038,14 +1040,21 @@ public class Contract4ChargerServiceImpl extends
 		// 处理每月承包费的生成
 		if (cfdList.size() > 0) {
 			for (int i = 1; i < cfdList.size() + 1; i++) {
-				params.put("cfdsy" + i, DateUtils.formatCalendar(cfdList.get(i - 1).getStartDate(),"yyyy"));
-				params.put("cfdsm" + i, DateUtils.formatCalendar(cfdList.get(i - 1).getStartDate(),"MM"));
-				params.put("cfdsd" + i, DateUtils.formatCalendar(cfdList.get(i - 1).getStartDate(),"dd"));
-				params.put("cfdey" + i, DateUtils.formatCalendar(cfdList.get(i - 1).getEndDate(),"yyyy"));
-				params.put("cfdem" + i, DateUtils.formatCalendar(cfdList.get(i - 1).getEndDate(),"MM"));
-				params.put("cfded" + i, DateUtils.formatCalendar(cfdList.get(i - 1).getEndDate(),"dd"));
-				// 金额	
-				params.put("mycbf"+ i, multiDigit2Chinese(String.valueOf(cfdList.get(i - 1).getPrice())));
+				params.put("cfdsy" + i, DateUtils.formatCalendar(
+						cfdList.get(i - 1).getStartDate(), "yyyy"));
+				params.put("cfdsm" + i, DateUtils.formatCalendar(
+						cfdList.get(i - 1).getStartDate(), "MM"));
+				params.put("cfdsd" + i, DateUtils.formatCalendar(
+						cfdList.get(i - 1).getStartDate(), "dd"));
+				params.put("cfdey" + i, DateUtils.formatCalendar(
+						cfdList.get(i - 1).getEndDate(), "yyyy"));
+				params.put("cfdem" + i, DateUtils.formatCalendar(
+						cfdList.get(i - 1).getEndDate(), "MM"));
+				params.put("cfded" + i, DateUtils.formatCalendar(
+						cfdList.get(i - 1).getEndDate(), "dd"));
+				// 金额
+				params.put("mycbf" + i, multiDigit2Chinese(String
+						.valueOf(cfdList.get(i - 1).getPrice())));
 			}
 
 			// 每月承包费不足6年时
@@ -1057,7 +1066,7 @@ public class Contract4ChargerServiceImpl extends
 					params.put("cfdey" + (cfdList.size() + i), "　／");
 					params.put("cfdem" + (cfdList.size() + i), "／");
 					params.put("cfded" + (cfdList.size() + i), "／");
-					params.put("mycbf"+ (cfdList.size() + i), "／");
+					params.put("mycbf" + (cfdList.size() + i), "／");
 				}
 			}
 
@@ -1077,15 +1086,14 @@ public class Contract4ChargerServiceImpl extends
 					.getInputStream());
 			// 占位符列表与参数列表匹配,当占位符列表值没出现在参数列表key值时，增加此key值
 			for (String key : markers) {
-				if (!params.containsKey(key)) 
-					params.put(key,"　　");
+				if (!params.containsKey(key))
+					params.put(key, "　　");
 			}
 			Attach attach = template.format2Attach(params, ptype, puid);
 			this.attachService.save(attach);
 			return attach;
 		}
 	}
-
 
 	// 多位数字转换为中文繁体
 	private String multiDigit2Chinese(String n) {
@@ -1125,7 +1133,7 @@ public class Contract4ChargerServiceImpl extends
 
 	// 个位数字转换为中文繁体
 	private String siginDigit2Chinese(Object n) {
-		
+
 		String num[] = { "零", "壹", "贰", "叁", "肆", "　伍", "陆", "柒", "捌", "玖", };
 		if (n == null)
 			return null;
