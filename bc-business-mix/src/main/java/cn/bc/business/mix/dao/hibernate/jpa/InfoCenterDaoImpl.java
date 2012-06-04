@@ -748,7 +748,7 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 							String conversionType = null2Empty(obj[i++]);
 							// 现在的时间
 							Date now = new Date();
-							//如果有指定时间
+							// 如果有指定时间
 							if (appointDate != null) {
 								// 到了指定日期或指定日期后就将限制项目更变为指定日期后变换的限制项目
 								if (now.after(appointDate)
@@ -757,7 +757,7 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 								} else {
 									json.put("limit", type);
 								}
-							}else{
+							} else {
 								json.put("limit", type);
 							}
 							jsons.put(json);
@@ -1272,7 +1272,8 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 		sql.append(" 	inner join bs_contract ci on ci.id = mci.contract_id");
 		sql.append("	inner join bs_contract_charger cci on cci.id=ci.id");
 		sql.append("	inner join bs_car_contract carci on carci.contract_id=ci.id");
-		sql.append("	where carci.car_id = carc.car_id and mci.man_id=mc.man_id and ci.start_date > c.start_date)");
+		sql.append("	where carci.car_id = carc.car_id and mci.man_id=mc.man_id and ci.start_date > c.start_date ");
+		sql.append("    or( cc.agreement_start_date < current_date and cc.quitter_id =mc.man_id))");
 		sql.append(" order by c.start_date desc");
 		if (logger.isDebugEnabled()) {
 			logger.debug("getMansFromContract4Charger:carId=" + carId + ";sql="

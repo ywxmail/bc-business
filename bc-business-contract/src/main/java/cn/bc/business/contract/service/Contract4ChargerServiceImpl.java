@@ -120,15 +120,15 @@ public class Contract4ChargerServiceImpl extends
 			}
 			this.contractDao.saveContractCarManRelation(chargerRelationList);
 		}
-		// 更新车辆视图的charger列显示责任人姓名
-		this.contract4ChargerDao.updateCar4ChargerName(carId);
-		// this.contract4ChargerDao.updateCar4ChargerName(assignChargerNames,carId);
-		// 更新司机视图的charger列显示责任人姓名
-		this.contract4ChargerDao.updateCarMan4ChargerName(carId);
-		// this.contract4ChargerDao.updateCarMan4ChargerName(assignChargerNames,carId);
-
-		// 如果是在案状态就更新车辆的合同性质
+		// 如果是在案状态
 		if (contract4Charger.getStatus() == BCConstants.STATUS_ENABLED) {
+			// 更新车辆视图的charger列显示责任人姓名
+			this.contract4ChargerDao.updateCar4ChargerName(carId);
+			// this.contract4ChargerDao.updateCar4ChargerName(assignChargerNames,carId);
+			// 更新司机视图的charger列显示责任人姓名
+			this.contract4ChargerDao.updateCarMan4ChargerName(carId);
+			// this.contract4ChargerDao.updateCarMan4ChargerName(assignChargerNames,carId);
+			// 如果是在案状态就更新车辆的合同性质
 			this.contract4ChargerDao.updateCarWithbusinessType(
 					contract4Charger.getBusinessType(), carId);
 		}
@@ -606,12 +606,13 @@ public class Contract4ChargerServiceImpl extends
 			}
 			this.contractDao.saveContractCarManRelation(chargerRelationList);
 		}
-		// 更新车辆视图的charger列显示责任人姓名
-		this.contract4ChargerDao.updateCar4ChargerName(carId);
-		// 更新司机视图的charger列显示责任人姓名
-		this.contract4ChargerDao.updateCarMan4ChargerName(carId);
-		// 如果是在案状态就更新车辆的合同性质
+		// 如果是在案状态就
 		if (newContract.getStatus() == BCConstants.STATUS_ENABLED) {
+			// 更新车辆视图的charger列显示责任人姓名
+			this.contract4ChargerDao.updateCar4ChargerName(carId);
+			// 更新司机视图的charger列显示责任人姓名
+			this.contract4ChargerDao.updateCarMan4ChargerName(carId);
+			// 更新车辆的合同性质
 			this.contract4ChargerDao.updateCarWithbusinessType(
 					e.getBusinessType(), carId);
 
@@ -832,14 +833,13 @@ public class Contract4ChargerServiceImpl extends
 		// 加载合同
 		Contract4Charger c = this.load(id);
 		
-		// 生成附件
-		String ptype = Contract4Charger.ATTACH_TYPE;
-		String puid = c.getUid();
+		//获取模板
 		Template template = this.templateService.loadByCode(templateCode);
 		if (template == null) {
 			logger.warn("模板不存在,返回null:code=" + templateCode);
 			return null;
 		}
+		
 		// 生成格式化参数
 		Map<String, Object> params = new HashMap<String, Object>();
 		// 保存合同费用明细的集合，用于填写收费通知单上的值
@@ -849,7 +849,8 @@ public class Contract4ChargerServiceImpl extends
 		
 		// -----合同信息----开始--
 		params.put("code", c.getCode());
-		params.put("signDate",DateUtils.formatCalendar(c.getSignDate(),"yyyy-MM-dd"));
+		params.put("signDate",
+				DateUtils.formatCalendar(c.getSignDate(), "yyyy-MM-dd"));
 		// 缴费日
 		params.put("paymentDate", c.getPaymentDate() != null
 				&& c.getPaymentDate().length() > 0 ? c.getPaymentDate() : " ");
@@ -867,7 +868,7 @@ public class Contract4ChargerServiceImpl extends
 		//word-docx文档上的特殊处理 合同期限数量中文表达，例如 伍年零伍个月
 		String sumDate="　　";
 		if (sumYear > 0) {
-			sumDate=multiDigit2Chinese(sumYear + "")+"年";
+			sumDate = multiDigit2Chinese(sumYear + "") + "年";
 		} else {
 			sumDate="／年";
 		}
@@ -880,8 +881,8 @@ public class Contract4ChargerServiceImpl extends
 			params.put("sumMonth", siginDigit2Chinese(sumMonth));
 		}
 		params.put("sumDate", sumDate);
-		params.put("sumStartYear",DateUtils.formatCalendar(startDate, "yyyy"));
-		params.put("sumStartMonth",DateUtils.formatCalendar(startDate, "MM"));
+		params.put("sumStartYear", DateUtils.formatCalendar(startDate, "yyyy"));
+		params.put("sumStartMonth", DateUtils.formatCalendar(startDate, "MM"));
 		params.put("sumStartDay", DateUtils.formatCalendar(startDate, "dd"));
 		params.put("sumEndYear", DateUtils.formatCalendar(endDate, "yyyy"));
 		params.put("sumEndMonth", DateUtils.formatCalendar(endDate, "MM"));
@@ -931,9 +932,6 @@ public class Contract4ChargerServiceImpl extends
 		}else{
 			params.put("businessType",c.getBusinessType());
 		}
-		
-		
-		
 		// -----合同信息----结束--
 		
 		// ---合同费用明细----开始---
@@ -1136,16 +1134,17 @@ public class Contract4ChargerServiceImpl extends
 		params.put("drivers", drivers);
 		// ------正班司机信息-----结束--
 
-		//Word 2007+ 文档处理
+		//word 2007 文档处理
 		if(template.getTemplateType().getCode().equals("word-docx")){
 			// 获取文件中的${XXXX}占位标记的键名列表
 			List<String> markers = DocxUtils.findMarkers(template
 					.getInputStream());
 			// 占位符列表与参数列表匹配,当占位符列表值没出现在参数列表key值时，增加此key值
 			for (String key : markers) {
-				if (!params.containsKey(key)) 
-					params.put(key,"　　");
+				if (!params.containsKey(key))
+					params.put(key, "　　");
 			}
+			
 		}
 		
 		//Excel 97-2003 工作薄文档处理
@@ -1153,12 +1152,14 @@ public class Contract4ChargerServiceImpl extends
 			params.put("cfdetails", cDetailList);
 		}
 		
+		// 生成附件
+		String ptype = Contract4Charger.ATTACH_TYPE;
+		String puid = c.getUid();
 		Attach attach = template.format2Attach(params, ptype, puid);
 		this.attachService.save(attach);
 		return attach;
 		
 	}
-
 
 	// 多位数字转换为中文繁体
 	private String multiDigit2Chinese(String n) {
@@ -1197,8 +1198,8 @@ public class Contract4ChargerServiceImpl extends
 	}
 
 	// 个位数字转换为中文繁体
-	private String siginDigit2Chinese(Object n) {
-		
+	private String siginDigit2Chinese(Object n) {		
+
 		String num[] = { "零", "壹", "贰", "叁", "肆", "　伍", "陆", "柒", "捌", "玖", };
 		if (n == null)
 			return null;

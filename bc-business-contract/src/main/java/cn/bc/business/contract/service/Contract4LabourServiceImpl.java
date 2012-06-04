@@ -109,11 +109,13 @@ public class Contract4LabourServiceImpl extends
 			this.contractDao.saveContractCarManRelation(driverRelation);
 
 		}
-		// 更新司机的户口性质,区域,籍贯备注
-		this.contract4LabourDao.updateCarMan4CarManInfo(driverId,
-				contract4Labour.getHouseType(), contract4Labour.getRegion(),
-				contract4Labour.getOrigin());
-
+		if (contract4Labour.getStatus() == BCConstants.STATUS_ENABLED) {
+			// 在案时才更新
+			// 更新司机的户口性质,区域,籍贯备注
+			this.contract4LabourDao.updateCarMan4CarManInfo(driverId,
+					contract4Labour.getHouseType(),
+					contract4Labour.getRegion(), contract4Labour.getOrigin());
+		}
 		// this.contract4LabourDao.updateCarMan4Description(driverId,description);
 
 		return contract4Labour;
@@ -599,23 +601,22 @@ public class Contract4LabourServiceImpl extends
 			throws IOException {
 		// 加载合同
 		Contract4Labour c = this.load(id);
-
-		//生成格式化参数
+		// 生成格式化参数
 		Map<String, Object> params = new HashMap<String, Object>();
-		
-		//合同信息
+		// 合同信息
 		params.put("code", c.getCode());
 		Calendar startDate = c.getStartDate();
 		Calendar endDate = c.getEndDate();
-		params.put("startYear",DateUtils.formatCalendar(startDate, "yyyy"));
-		params.put("startMonth",DateUtils.formatCalendar(startDate, "MM"));
+		params.put("startYear", DateUtils.formatCalendar(startDate, "yyyy"));
+		params.put("startMonth", DateUtils.formatCalendar(startDate, "MM"));
 		params.put("startDay", DateUtils.formatCalendar(startDate, "dd"));
 		params.put("endYear", DateUtils.formatCalendar(endDate, "yyyy"));
 		params.put("endMonth", DateUtils.formatCalendar(endDate, "MM"));
 		params.put("endDay", DateUtils.formatCalendar(endDate, "dd"));
-
-		//车辆信息
-		Map<String, Object> carMap=this.contract4LabourDao.findCarByCarId(this.contract4LabourDao.findCarIdByContractId(id));
+		// 车辆信息
+		Map<String, Object> carMap = this.contract4LabourDao
+				.findCarByCarId(this.contract4LabourDao
+						.findCarIdByContractId(id));
 		// 公司
 		String company = null;
 		if (carMap.get("company").equals("宝城")) {
@@ -624,22 +625,29 @@ public class Contract4LabourServiceImpl extends
 			company = "广州市广发出租汽车有限公司";
 		}
 		params.put("company", company);
-		
-		//司机信息
-		Map<String, Object> carManMap=this.contract4LabourDao.findCarManByCarManId(this.contract4LabourDao.findCarManIdByContractId(id));
+
+		// 司机信息
+		Map<String, Object> carManMap = this.contract4LabourDao
+				.findCarManByCarManId(this.contract4LabourDao
+						.findCarManIdByContractId(id));
 		params.put("carMan", carManMap.get("name").toString());
 		params.put("certIdentity", carManMap.get("cert_Identity").toString());
-		
-		//经济合同信息
-		List<Map<String,String>> chargerList=this.contract4LabourDao.findContract4ChargerByContarct4LabourId(id);
-		String signDate=chargerList.get(0).get("signDate");
-		if(signDate!=null&&signDate!=""){
-			params.put("chargerSignYear", signDate.substring(0, signDate.indexOf("-")));
-			params.put("chargerSignMonth",signDate.substring(signDate.indexOf("-")+1, signDate.lastIndexOf("-")));
-			params.put("chargerSignDay", signDate.substring(signDate.lastIndexOf("-")+1));
+
+		// 经济合同信息
+		List<Map<String, String>> chargerList = this.contract4LabourDao
+				.findContract4ChargerByContarct4LabourId(id);
+		String signDate = chargerList.get(0).get("signDate");
+		if (signDate != null && signDate != "") {
+			params.put("chargerSignYear",
+					signDate.substring(0, signDate.indexOf("-")));
+			params.put(
+					"chargerSignMonth",
+					signDate.substring(signDate.indexOf("-") + 1,
+							signDate.lastIndexOf("-")));
+			params.put("chargerSignDay",
+					signDate.substring(signDate.lastIndexOf("-") + 1));
 		}
-		
-		
+
 		// 生成附件
 		String ptype = Contract4Labour.ATTACH_TYPE;
 		String puid = c.getUid();

@@ -799,4 +799,16 @@ public class Contract4ChargerDaoImpl extends
 		this.executeUpdate(hql, new Object[] { businessType, carId });
 	}
 
+	@Override
+	public Contract4Charger save(Contract4Charger entity) {
+		// 保存信息
+		entity = super.save(entity);
+
+		// 这句很关键，保证信息先保存，然后再执行下面的更新
+		// 如果不执行这句，实测结果是hibernate先执行了下面的更新语句再执行上面的保存语句而导致司机信息没有更新，比较奇怪
+		this.getJpaTemplate().flush();
+
+		return entity;
+	}
+
 }

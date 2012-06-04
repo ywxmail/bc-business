@@ -39,7 +39,6 @@ import cn.bc.option.domain.OptionItem;
 import cn.bc.option.service.OptionService;
 import cn.bc.web.formater.AbstractFormater;
 import cn.bc.web.formater.CalendarFormater;
-import cn.bc.web.formater.DateRangeFormater;
 import cn.bc.web.formater.EntityStatusFormater;
 import cn.bc.web.formater.LinkFormater4Id;
 import cn.bc.web.ui.html.grid.Column;
@@ -299,7 +298,7 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 				getText("contract4Charger.wordNo"), 70)
 				.setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("c.ext_str2", "ext_str2",
-				getText("contract4Charger.charger"), 240).setUseTitleFromLabel(
+				getText("contract4Charger.charger"), 210).setUseTitleFromLabel(
 				true).setValueFormater(
 				new LinkFormater4ChargerInfo(this.getContextPath())));
 		columns.add(new TextColumn4MapKey("cc.sign_type", "sign_type",
@@ -331,26 +330,18 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 				getText("contract.signDate"), 90).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
 		columns.add(new TextColumn4MapKey("c.stop_date", "stop_date",
-				getText("contract.stopDate"), 180)
-				.setValueFormater(new DateRangeFormater("yyyy-MM-dd") {
-					@Override
-					public Date getToDate(Object context, Object value) {
-						@SuppressWarnings("rawtypes")
-						Map contract = (Map) context;
-						return (Date) contract.get("agreement_end_date");
-					}
-				}.setConnector(",").setUseEmptySymbol(true)));
-
+				getText("contract.stopDate"), 110).setSortable(true)
+				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
 		columns.add(new TextColumn4MapKey("cc.agreement_start_date",
 				"agreement_start_date", getText("contract4Charger.agreement"),
-				180).setValueFormater(new DateRangeFormater("yyyy-MM-dd") {
+				230).setValueFormater(new AgreementFormater() {
 			@Override
 			public Date getToDate(Object context, Object value) {
 				@SuppressWarnings("rawtypes")
 				Map contract = (Map) context;
 				return (Date) contract.get("agreement_end_date");
 			}
-		}));
+		}.setBeforeDateStr("qutter")));
 		columns.add(new TextColumn4MapKey("cc.contract_version_no",
 				"contract_version_no",
 				getText("contract4Charger.contractVersionNo"), 180)
@@ -458,25 +449,7 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 			// 查看最新合同列表
 			statusCondition = ConditionUtils.toConditionByComma4IntegerValue(
 					this.status, "c.status_");
-			// if (this.status.length() <= 0) { // 显示全部状态的时候只显示最新版本的记录
-			// mainsCondition = ConditionUtils // 控制显示最新版本main为0的经济合同
-			// .toConditionByComma4IntegerValue(this.mains, "c.main");
-			// }
 		}
-		// else {
-		// // 查看历史版本
-		// if (this.contractId != 0) {
-		// // 显示实例本身
-		// patchCondtion = new EqualsCondition("c.patch_no", patchNo);
-		// } else {
-		// // 不显示实例本身
-		// patchCondtion = new EqualsCondition("c.patch_no", patchNo);
-		// mainsCondition = new EqualsCondition("c.main",
-		// Contract.MAIN_HISTORY);
-		//
-		// }
-		// }
-
 		if (carId != null) {
 			carCondition = new EqualsCondition("carc.car_id", carId);
 		}
@@ -513,18 +486,6 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 			json.put("driverId", driverId);
 		}
 	}
-
-	// @Override
-	// protected Toolbar getHtmlPageToolbar() {
-	// if (contractId == null) {
-	// return super.getHtmlPageToolbar().addButton(
-	// Toolbar.getDefaultToolbarRadioGroup(
-	// this.getEntityStatuses(), "status", 0,
-	// getText("title.click2changeSearchStatus")));
-	// } else {
-	// return super.getHtmlPageToolbar();
-	// }
-	// }
 
 	/**
 	 * 状态值转换列表：正常|注销|离职|全部
