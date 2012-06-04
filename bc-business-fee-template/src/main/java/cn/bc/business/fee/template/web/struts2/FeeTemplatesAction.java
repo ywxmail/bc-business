@@ -118,6 +118,8 @@ public class FeeTemplatesAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("a.module_", "module",
 				getText("feeTemplate.module"), 80).setSortable(true)
 				.setUseTitleFromLabel(true));
+		columns.add(new TextColumn4MapKey("a.order_", "order",
+				getText("feeTemplate.order"), 60).setSortable(true));
 		//类型
 		columns.add(new TextColumn4MapKey("a.type_", "type",
 				getText("feeTemplate.type"), 40)
@@ -126,16 +128,14 @@ public class FeeTemplatesAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("a.code", "code",
 				getText("feeTemplate.code"), 150).setSortable(true)
 				.setUseTitleFromLabel(true));
+		columns.add(new TextColumn4MapKey("a.name", "name",
+				getText("feeTemplate.name"), 180).setSortable(true).setUseTitleFromLabel(true));
 		//所属模板
 		columns.add(new TextColumn4MapKey("b.name", "pname",
 				getText("feeTemplate.ptempalte"), 100).setUseTitleFromLabel(true));
-		columns.add(new TextColumn4MapKey("a.order_", "order",
-				getText("feeTemplate.order"), 60).setSortable(true));
-		columns.add(new TextColumn4MapKey("a.name", "name",
-				getText("feeTemplate.name"), 100).setSortable(true));
 		columns.add(new TextColumn4MapKey("a.price", "price",
 				getText("feeTemplate.price"), 80).setSortable(true)
-				.setValueFormater(new NubmerFormater("###,##0.00")));
+				.setValueFormater(new NubmerFormater("###,##0.##")));
 		columns.add(new TextColumn4MapKey("a.count_", "count",
 				getText("feeTemplate.count"), 80).setSortable(true));
 		//收费方式

@@ -53,7 +53,7 @@ public class SelectFeeTemplateAction extends
 	@Override
 	protected OrderCondition getGridDefaultOrderCondition() {
 		// 默认排序方向：排序号
-		return new OrderCondition("a.order_", Direction.Asc);
+		return new OrderCondition("a.type_", Direction.Asc).add("a.order_", Direction.Asc);
 	}
 
 	@Override
@@ -116,12 +116,12 @@ public class SelectFeeTemplateAction extends
 				getText("feeTemplate.ptempalte"), 100)
 				.setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("a.name", "name",
-				getText("feeTemplate.name"), 100).setSortable(true));
+				getText("feeTemplate.name"), 150).setSortable(true).setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("a.price", "price",
-				getText("feeTemplate.price"), 80).setSortable(true)
-				.setValueFormater(new NubmerFormater("###,##0.00")));
+				getText("feeTemplate.price"), 60).setSortable(true)
+				.setValueFormater(new NubmerFormater("###,##0.##")));
 		columns.add(new TextColumn4MapKey("a.count_", "count",
-				getText("feeTemplate.count"), 80).setSortable(true));
+				getText("feeTemplate.count"), 40).setSortable(true));
 		// 收费方式
 		columns.add(new TextColumn4MapKey("t.pay_type", "pay_type",
 				getText("feeTemplate.payType"), 65).setSortable(true)
