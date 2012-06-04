@@ -831,78 +831,52 @@ public class Contract4ChargerServiceImpl extends
 			throws IOException {
 		// 加载合同
 		Contract4Charger c = this.load(id);
-
+		
+		// 生成附件
+		String ptype = Contract4Charger.ATTACH_TYPE;
+		String puid = c.getUid();
+		Template template = this.templateService.loadByCode(templateCode);
+		if (template == null) {
+			logger.warn("模板不存在,返回null:code=" + templateCode);
+			return null;
+		}
 		// 生成格式化参数
 		Map<String, Object> params = new HashMap<String, Object>();
-
-		// --加载社保信息--开始--
-		// 公司unit
-		params.put("unitSSRuleBZ", new NubmerFormater("0.##")
-				.format(this.SocialSecurityRuleService.countUnit(null, "本地城镇",
-						Calendar.getInstance().get(Calendar.YEAR), Calendar
-								.getInstance().get(Calendar.MONTH) + 1)));
-		params.put("unitSSRuleWZ", new NubmerFormater("0.##")
-				.format(this.SocialSecurityRuleService.countUnit(null, "外地城镇",
-						Calendar.getInstance().get(Calendar.YEAR), Calendar
-								.getInstance().get(Calendar.MONTH) + 1)));
-		params.put("unitSSRuleBC", new NubmerFormater("0.##")
-				.format(this.SocialSecurityRuleService.countUnit(null, "本地农村",
-						Calendar.getInstance().get(Calendar.YEAR), Calendar
-								.getInstance().get(Calendar.MONTH) + 1)));
-		params.put("unitSSRuleWC", new NubmerFormater("0.##")
-				.format(this.SocialSecurityRuleService.countUnit(null, "外地农村",
-						Calendar.getInstance().get(Calendar.YEAR), Calendar
-								.getInstance().get(Calendar.MONTH) + 1)));
-
-		// 个人persional
-		params.put("psnlSSRuleBZ", new NubmerFormater("0.##")
-				.format(this.SocialSecurityRuleService.countPersonal(null,
-						"本地城镇", Calendar.getInstance().get(Calendar.YEAR),
-						Calendar.getInstance().get(Calendar.MONTH) + 1)));
-		params.put("psnlSSRuleWZ", new NubmerFormater("0.##")
-				.format(this.SocialSecurityRuleService.countPersonal(null,
-						"外地城镇", Calendar.getInstance().get(Calendar.YEAR),
-						Calendar.getInstance().get(Calendar.MONTH) + 1)));
-		params.put("psnlSSRuleBC", new NubmerFormater("0.##")
-				.format(this.SocialSecurityRuleService.countPersonal(null,
-						"本地农村", Calendar.getInstance().get(Calendar.YEAR),
-						Calendar.getInstance().get(Calendar.MONTH) + 1)));
-		params.put("psnlSSRuleWC", new NubmerFormater("0.##")
-				.format(this.SocialSecurityRuleService.countPersonal(null,
-						"外地农村", Calendar.getInstance().get(Calendar.YEAR),
-						Calendar.getInstance().get(Calendar.MONTH) + 1)));
-		// --加载社保信息--结束--
-
+		// 保存合同费用明细的集合，用于填写收费通知单上的值
+		List<Map<String,String>> cDetailList=new ArrayList<Map<String,String>>();
+		//保存收费通知单上每一条项目的集合
+		Map<String,String> cDetailMap=null;
+		
 		// -----合同信息----开始--
 		params.put("code", c.getCode());
 		params.put("signDate",DateUtils.formatCalendar(c.getSignDate(),"yyyy-MM-dd"));
-
 		// 缴费日
 		params.put("paymentDate", c.getPaymentDate() != null
 				&& c.getPaymentDate().length() > 0 ? c.getPaymentDate() : " ");
-
 		// 合同开始日期
 		Calendar startDate = c.getStartDate();
+		//合同结束日期
 		Calendar endDate = c.getEndDate();
-
+		//合同期限内的总月份的数量
 		int countMonth = (endDate.get(Calendar.YEAR) - startDate
 				.get(Calendar.YEAR))
 				* 12
 				+ (endDate.get(Calendar.MONTH) - startDate.get(Calendar.MONTH));
-		params.put("countMonth", multiDigit2Chinese(countMonth + ""));
+		params.put("countMonth",countMonth +"个月");
 		int sumYear = countMonth / 12;
+		//word-docx文档上的特殊处理 合同期限数量中文表达，例如 伍年零伍个月
 		String sumDate="　　";
 		if (sumYear > 0) {
 			sumDate=multiDigit2Chinese(sumYear + "")+"年";
 		} else {
-			sumDate="　／年";
+			sumDate="／年";
 		}
 		int sumMonth = countMonth % 12;
 		if (sumMonth > 0) {
-			sumDate+= multiDigit2Chinese(sumMonth + "");
+			sumDate+= multiDigit2Chinese(sumMonth + "")+"个月";
 			params.put("sumMonth", multiDigit2Chinese(sumMonth + ""));
 		} else {
-			sumDate+= siginDigit2Chinese(sumMonth);
+			sumDate+= siginDigit2Chinese(sumMonth)+"个月";
 			params.put("sumMonth", siginDigit2Chinese(sumMonth));
 		}
 		params.put("sumDate", sumDate);
@@ -912,7 +886,133 @@ public class Contract4ChargerServiceImpl extends
 		params.put("sumEndYear", DateUtils.formatCalendar(endDate, "yyyy"));
 		params.put("sumEndMonth", DateUtils.formatCalendar(endDate, "MM"));
 		params.put("sumEndDay", DateUtils.formatCalendar(endDate, "dd"));
+		// 挂靠合同加载社保信息
+		NubmerFormater nf=new NubmerFormater("0.##");
+		// 公司unit
+		params.put("unitSSRuleBZ",nf.format(SocialSecurityRuleService.countNowUnit4GZ("本地城镇")));
+		params.put("unitSSRuleWZ",nf.format(SocialSecurityRuleService.countNowUnit4GZ("外地城镇")));
+		params.put("unitSSRuleBC",nf.format(SocialSecurityRuleService.countNowUnit4GZ("本地农村")));
+		params.put("unitSSRuleWC",nf.format(SocialSecurityRuleService.countNowUnit4GZ("外地农村")));
+		// 个人persional
+		params.put("psnlSSRuleBZ",nf.format(SocialSecurityRuleService.countNowPersonal4GZ("本地城镇")));
+		params.put("psnlSSRuleWZ",nf.format(SocialSecurityRuleService.countNowPersonal4GZ("外地城镇")));
+		params.put("psnlSSRuleBC",nf.format(SocialSecurityRuleService.countNowPersonal4GZ("本地农村")));
+		params.put("psnlSSRuleWC",nf.format(SocialSecurityRuleService.countNowPersonal4GZ("外地农村")));
+		//签约类型
+		params.put("signType", c.getSignType());
+		//收费通知单 签约类型对应的手续
+		switch (c.getOpType()) {
+			//新户 
+			case Contract4Charger.OPTYPE_CREATE:
+				params.put("signProcedure", "出车");
+				break;
+			//过户
+			case Contract4Charger.OPTYPE_CHANGECHARGER:
+				params.put("signProcedure", "过户");			
+				break;
+			//续约
+			case Contract4Charger.OPTYPE_RENEW:
+				params.put("signProcedure", "续期");
+				break;
+			//重发包
+			case Contract4Charger.OPTYPE_CHANGECHARGER2:
+				params.put("signProcedure", "重发包");
+				break;
+		}
+		//合同性质
+		if(c.getBusinessType().equals("承包合同")){
+			params.put("businessType", "承包车");
+		}else if(c.getBusinessType().equals("合作合同")||c.getBusinessType().equals("合作合同SS")){
+			params.put("businessType","买断车");
+		}else if(c.getBusinessType().equals("挂靠合同")){
+			params.put("businessType","挂靠车");
+		}else if(c.getBusinessType().equals("中标车")){
+			params.put("businessType","中标车");
+		}else{
+			params.put("businessType",c.getBusinessType());
+		}
+		
+		
+		
 		// -----合同信息----结束--
+		
+		// ---合同费用明细----开始---
+		// 声明保存每月承包款的集合
+		List<ContractFeeDetail> cfdList = new ArrayList<ContractFeeDetail>();
+		if (c.getContractFeeDetail() != null
+				&& c.getContractFeeDetail().size() > 0) {
+			// 遍历合同费用明细
+			for (ContractFeeDetail cfd : c.getContractFeeDetail()) {
+				//收费通知单合同费用项目
+				cDetailMap=new HashMap<String, String>();
+				cDetailMap.put("pg", cfd.getName());
+				cDetailMap.put("desc", cfd.getDescription());
+				//声明金额栏
+				String price="";
+				//每月承包款
+				if (cfd.getCode().substring(cfd.getCode().lastIndexOf(".") + 1).equals("MYCBK")) {
+					cfdList.add(cfd);				
+				}
+				//拼装日期
+				if(cfd.getStartDate()!=null&&cfd.getEndDate()!=null){
+					price+=DateUtils.formatCalendar(cfd.getStartDate(),"yyyy年MM月dd日");
+					price+="至";
+					price+=DateUtils.formatCalendar(cfd.getEndDate(),"yyyy年MM月dd日");
+				}
+				price+=nf.format(cfd.getPrice())+"元";
+				if(cfd.getCount()>1){
+					price+="/人";
+				}
+				switch (cfd.getPayType()) {
+					case ContractFeeDetail.PAY_TYPE_MONTH:
+						price+="/月";
+						break;
+					case ContractFeeDetail.PAY_TYPE_SEASON:
+						price+="/季";					
+						break;
+					case ContractFeeDetail.PAY_TYPE_YEAR:
+						price+="/年";
+						break;
+				}
+				cDetailMap.put("price", price);
+				cDetailList.add(cDetailMap);
+				//将编码的后半部分作为占位符key，并加入相应的值
+				params.put(
+						cfd.getCode().substring(cfd.getCode().lastIndexOf(".") + 1),
+						nf.format(cfd.getPrice()));
+				//将编码的后半部分作为占位符key+4cn，并加入相应的中文值
+				params.put(
+						cfd.getCode().substring(cfd.getCode().lastIndexOf(".") + 1)+"4cn",
+						cfd.getPrice()<1?"零":multiDigit2Chinese(cfd.getPrice()+""));
+			}
+		}
+
+		// word-docx文档上的特殊处理，处理每月承包费的生成
+		if (cfdList.size() > 0) {
+			for (int i = 1; i < cfdList.size() + 1; i++) {
+				params.put("cfdsy" + i, DateUtils.formatCalendar(cfdList.get(i - 1).getStartDate(),"yyyy"));
+				params.put("cfdsm" + i, DateUtils.formatCalendar(cfdList.get(i - 1).getStartDate(),"MM"));
+				params.put("cfdsd" + i, DateUtils.formatCalendar(cfdList.get(i - 1).getStartDate(),"dd"));
+				params.put("cfdey" + i, DateUtils.formatCalendar(cfdList.get(i - 1).getEndDate(),"yyyy"));
+				params.put("cfdem" + i, DateUtils.formatCalendar(cfdList.get(i - 1).getEndDate(),"MM"));
+				params.put("cfded" + i, DateUtils.formatCalendar(cfdList.get(i - 1).getEndDate(),"dd"));
+				// word文档 金额	
+				params.put("mycbf"+ i, multiDigit2Chinese(String.valueOf(cfdList.get(i - 1).getPrice())));
+			}
+			// 每月承包费不足6年时
+			if (cfdList.size() < 6) {
+				for (int i = 1; i < 6 - cfdList.size() + 1; i++) {
+					params.put("cfdsy" + (cfdList.size() + i), "　／");
+					params.put("cfdsm" + (cfdList.size() + i), "／");
+					params.put("cfdsd" + (cfdList.size() + i), "／");
+					params.put("cfdey" + (cfdList.size() + i), "　／");
+					params.put("cfdem" + (cfdList.size() + i), "／");
+					params.put("cfded" + (cfdList.size() + i), "／");
+					params.put("mycbf"+ (cfdList.size() + i), "／");
+				}
+			}
+		}
+		// ---合同费用明细----结束---
 
 		// -----责任人信息---开始--
 		List<Map<String, String>> chargerList = this.contract4ChargerDao
@@ -933,7 +1033,7 @@ public class Contract4ChargerServiceImpl extends
 								.get("phone") : chargerMap.get("phone1"));
 				params.put("address", chargerList.get(0).get("address"));
 			} else {
-				chargers += "," + chargerMap.get("name");
+				chargers += "、" + chargerMap.get("name");
 				params.put("charger" + chargerI, chargerMap.get("name"));
 				params.put("FWZGZ" + chargerI, chargerMap.get("certFWZG"));
 				params.put("cert4Indentity" + chargerI,
@@ -962,6 +1062,7 @@ public class Contract4ChargerServiceImpl extends
 			company = "广州市广发出租汽车有限公司";
 		}
 		params.put("company", company);
+		params.put("company4Short", carList.get(0).get("company"));
 		params.put("carCode", carList.get(0).get("code"));
 		params.put("plateType", carList.get(0).get("plateType"));
 		params.put("plateNo", carList.get(0).get("plateNo"));
@@ -969,6 +1070,8 @@ public class Contract4ChargerServiceImpl extends
 				+ carList.get(0).get("plateNo"));
 		params.put("factoryTypeModel", carList.get(0).get("factoryType")
 				+ carList.get(0).get("factoryMode"));
+		params.put("factoryType", carList.get(0).get("factoryType"));
+		params.put("factoryModel", carList.get(0).get("factoryMode"));
 		params.put("vin", carList.get(0).get("vin"));
 		params.put("engineNo", carList.get(0).get("engineNo"));
 		params.put("color", carList.get(0).get("color"));
@@ -978,7 +1081,8 @@ public class Contract4ChargerServiceImpl extends
 		params.put("registerDate", carList.get(0).get("registerDate"));
 		// 营运证号：道路运输证号
 		params.put("certNo4", carList.get(0).get("certNo4"));
-
+		// 车队
+		params.put("motorcade", carList.get(0).get("motorcade"));
 		// ------车辆信息-----结束--
 
 		// ------正班司机信息-----开始--
@@ -1000,7 +1104,7 @@ public class Contract4ChargerServiceImpl extends
 								.get("phone") : driverMap.get("phone1"));
 				params.put("dAddress", driverMap.get("address"));
 			} else {
-				drivers += "," + driverMap.get("name");
+				drivers += "、" + driverMap.get("name");
 				params.put("driver" + driverI, driverMap.get("name"));
 				params.put("dFWZGZ" + driverI, driverMap.get("certFWZG"));
 				params.put("dCert4Indentity" + driverI,
@@ -1013,65 +1117,27 @@ public class Contract4ChargerServiceImpl extends
 				params.put("dAddress" + driverI, driverMap.get("address"));
 			}
 			driverI++;
+			
+			if(driverMap.get("houseType")!=null&&driverMap.get("houseType").length()>0){
+				//收费通知单社保项目
+				Float unit=this.SocialSecurityRuleService.countNowUnit4GZ(driverMap.get("houseType"));
+				Float personal=this.SocialSecurityRuleService.countNowPersonal4GZ(driverMap.get("houseType"));	
+				cDetailMap=new HashMap<String, String>();
+				/*cDetailMap.put("pg", "社保");
+				cDetailMap.put("price", driverMap.get("name")+"("+driverMap.get("certIdentity")+"),"+"\n"
+							+"按实际社保数实收："+unit+"+"+personal+"="+(unit+personal)+"元");
+				cDetailMap.put("desc","");*/
+				cDetailMap.put("pg", "社保："+driverMap.get("name"));
+				cDetailMap.put("price","按实际社保数实收："+unit+"+"+personal+"="+(unit+personal)+"元");
+				cDetailMap.put("desc",""+driverMap.get("certIdentity"));
+				cDetailList.add(cDetailMap);
+			}
 		}
 		params.put("drivers", drivers);
 		// ------正班司机信息-----结束--
 
-		// ---合同费用明细----开始---
-		// 声明保存每月承包款的集合
-		List<ContractFeeDetail> cfdList = new ArrayList<ContractFeeDetail>();
-		if (c.getContractFeeDetail() != null
-				&& c.getContractFeeDetail().size() > 0) {
-			// 遍历合同费用明细
-			for (ContractFeeDetail cfd : c.getContractFeeDetail()) {
-				params.put(
-						cfd.getCode().substring(cfd.getCode().indexOf(".") + 1),
-						new NubmerFormater("0.##").format(cfd.getPrice()));
-
-				if (cfd.getCode() != null
-						&& cfd.getCode().equals("contract4Charger.MYCBK")) {
-					cfdList.add(cfd);
-				}
-			}
-		}
-
-		// 处理每月承包费的生成
-		if (cfdList.size() > 0) {
-			for (int i = 1; i < cfdList.size() + 1; i++) {
-				params.put("cfdsy" + i, DateUtils.formatCalendar(cfdList.get(i - 1).getStartDate(),"yyyy"));
-				params.put("cfdsm" + i, DateUtils.formatCalendar(cfdList.get(i - 1).getStartDate(),"MM"));
-				params.put("cfdsd" + i, DateUtils.formatCalendar(cfdList.get(i - 1).getStartDate(),"dd"));
-				params.put("cfdey" + i, DateUtils.formatCalendar(cfdList.get(i - 1).getEndDate(),"yyyy"));
-				params.put("cfdem" + i, DateUtils.formatCalendar(cfdList.get(i - 1).getEndDate(),"MM"));
-				params.put("cfded" + i, DateUtils.formatCalendar(cfdList.get(i - 1).getEndDate(),"dd"));
-				// 金额	
-				params.put("mycbf"+ i, multiDigit2Chinese(String.valueOf(cfdList.get(i - 1).getPrice())));
-			}
-
-			// 每月承包费不足6年时
-			if (cfdList.size() < 6) {
-				for (int i = 1; i < 6 - cfdList.size() + 1; i++) {
-					params.put("cfdsy" + (cfdList.size() + i), "　／");
-					params.put("cfdsm" + (cfdList.size() + i), "／");
-					params.put("cfdsd" + (cfdList.size() + i), "／");
-					params.put("cfdey" + (cfdList.size() + i), "　／");
-					params.put("cfdem" + (cfdList.size() + i), "／");
-					params.put("cfded" + (cfdList.size() + i), "／");
-					params.put("mycbf"+ (cfdList.size() + i), "／");
-				}
-			}
-
-		}
-		// ---合同费用明细----结束---
-
-		// 生成附件
-		String ptype = Contract4Charger.ATTACH_TYPE;
-		String puid = c.getUid();
-		Template template = this.templateService.loadByCode(templateCode);
-		if (template == null) {
-			logger.warn("模板不存在,返回null:code=" + templateCode);
-			return null;
-		} else {
+		//Word 2007+ 文档处理
+		if(template.getTemplateType().getCode().equals("word-docx")){
 			// 获取文件中的${XXXX}占位标记的键名列表
 			List<String> markers = DocxUtils.findMarkers(template
 					.getInputStream());
@@ -1080,10 +1146,17 @@ public class Contract4ChargerServiceImpl extends
 				if (!params.containsKey(key)) 
 					params.put(key,"　　");
 			}
-			Attach attach = template.format2Attach(params, ptype, puid);
-			this.attachService.save(attach);
-			return attach;
 		}
+		
+		//Excel 97-2003 工作薄文档处理
+		if(template.getTemplateType().getCode().equals("xls")){
+			params.put("cfdetails", cDetailList);
+		}
+		
+		Attach attach = template.format2Attach(params, ptype, puid);
+		this.attachService.save(attach);
+		return attach;
+		
 	}
 
 

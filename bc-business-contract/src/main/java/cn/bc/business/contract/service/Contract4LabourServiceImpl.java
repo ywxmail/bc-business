@@ -648,13 +648,16 @@ public class Contract4LabourServiceImpl extends
 			logger.warn("模板不存在,返回null:code=" + templateCode);
 			return null;
 		} else {
-			// 获取文件中的${XXXX}占位标记的键名列表
-			List<String> markers = DocxUtils.findMarkers(template
-					.getInputStream());
-			// 占位符列表与参数列表匹配,当占位符列表值没出现在参数列表key值时，增加此key值
-			for (String key : markers) {
-				if (!params.containsKey(key)) 
-					params.put(key,"　　");
+			if(template.getTemplateType().getCode().equals("word-docx")&&
+					template.isFormatted()){
+				// 获取文件中的${XXXX}占位标记的键名列表
+				List<String> markers = DocxUtils.findMarkers(template
+						.getInputStream());
+				// 占位符列表与参数列表匹配,当占位符列表值没出现在参数列表key值时，增加此key值
+				for (String key : markers) {
+					if (!params.containsKey(key)) 
+						params.put(key,"　　");
+				}
 			}
 			Attach attach = template.format2Attach(params, ptype, puid);
 			this.attachService.save(attach);

@@ -25,6 +25,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.orm.jpa.JpaCallback;
 import org.springframework.util.StringUtils;
 
+import cn.bc.BCConstants;
 import cn.bc.business.contract.dao.Contract4ChargerDao;
 import cn.bc.business.contract.domain.Contract;
 import cn.bc.business.contract.domain.Contract4Charger;
@@ -675,9 +676,10 @@ public class Contract4ChargerDaoImpl extends
 
 	public List<Map<String, String>> findCarByContractId(Long contractId) {
 		String hql = "SELECT  b.plate_type,b.plate_no,b.factory_type,b.factory_model,b.vin,b.engine_no,b.color";
-		hql += ",to_char(b.register_date,'YYYY-MM-DD'),b.code,b.company,b.cert_no2,b.cert_no4";
+		hql += ",to_char(b.register_date,'YYYY-MM-DD'),b.code,b.company,b.cert_no2,b.cert_no4,m.name";
 		hql += " FROM bs_car_contract a";
 		hql += " inner join bs_car b on b.id=a.car_id";
+		hql += " inner join bs_motorcade m on m.id=b.motorcade_id";
 		hql += " where a.contract_id=?";
 		return HibernateJpaNativeQuery.executeNativeSql(getJpaTemplate(), hql,
 				new Object[] { contractId },
@@ -697,6 +699,7 @@ public class Contract4ChargerDaoImpl extends
 						oi.put("company", rs[i++].toString());
 						oi.put("certNo2", rs[i++].toString());
 						oi.put("certNo4", rs[i++].toString());
+						oi.put("motorcade", rs[i++].toString());
 						return oi;
 					}
 				});
@@ -726,7 +729,16 @@ public class Contract4ChargerDaoImpl extends
 	}
 
 	public List<Map<String, String>> findDriverByContractId(Long contractId) {
-		String hql = "SELECT  b.name,b.address,b.address1,b.cert_identity,b.phone,b.phone1,b.cert_fwzg";
+		String hql = "SELECT  b.name,b.address,b.address1,b.cert_identity,b.phone,b.phone1,b.cert_fwzg,";
+		//查找此司机最新劳动合同的户口性质
+		hql += "(select l.house_type from bs_contract_labour l";
+		hql += "  INNER JOIN bs_contract d on d.id =l.id";
+		hql += "  inner join bs_carman_contract e on e.contract_id = d.id"; 
+		hql += "  where d.type_="+Contract.TYPE_LABOUR;
+		hql += "  and d.status_ in ("+BCConstants.STATUS_ENABLED+","+BCConstants.STATUS_DRAFT+")";
+		hql += "  and e.man_id=b.id";
+		hql += "  ORDER BY d.file_date DESC";
+		hql += "  LIMIT 1)";
 		hql += " FROM bs_car_contract a";
 		hql += " inner join bs_car_driver c on c.car_id=a.car_id";
 		hql += " inner join bs_carman b on b.id=c.driver_id";
@@ -744,6 +756,12 @@ public class Contract4ChargerDaoImpl extends
 						oi.put("phone", rs[i++].toString());
 						oi.put("phone1", rs[i++].toString());
 						oi.put("certFWZG", rs[i++].toString());
+						Object o=rs[i++];
+						if(o==null){
+							oi.put("houseType", null);
+						}else{
+							oi.put("houseType", o.toString());
+						}
 						return oi;
 					}
 				});

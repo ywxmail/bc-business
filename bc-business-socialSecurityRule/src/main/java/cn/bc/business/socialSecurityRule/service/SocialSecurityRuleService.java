@@ -49,5 +49,19 @@ public interface SocialSecurityRuleService extends CrudService<SocialSecurityRul
 	 * @return 返回根据年月计算单位每月需要为个人缴纳的社保费用
 	 */
 	public Float countUnit(String areaName,String houseType,int year,int month);
+	
+	/**
+	 * 根据户口类型计算现时广东省广州市个人社保费用接口
+	 * @param houseType 户口类型
+	 * @return 返回单位每月个人缴纳的社保费用
+	 */
+	public Float countNowPersonal4GZ(String houseType);
+	
+	/**
+	 * 根据户口类型计算现时广东省广州市单位社保费用接口
+	 * @param houseType 户口类型
+	 * @return 返回单位每月单位需要为个人缴纳的社保费用
+	 */
+	public Float countNowUnit4GZ(String houseType);
 
 }

@@ -4,6 +4,7 @@
 package cn.bc.business.socialSecurityRule.service;
 
 import java.math.BigDecimal;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -131,6 +132,14 @@ public class SocialSecurityRuleServiceImpl extends
 		BigDecimal b = new BigDecimal(fee);
 		fee = b.setScale(2, BigDecimal.ROUND_HALF_UP).floatValue();
 		return fee;
+	}
+
+	public Float countNowPersonal4GZ(String houseType) {
+		return this.count(null, houseType, Calendar.getInstance().get(Calendar.YEAR), Calendar.getInstance().get(Calendar.MONTH) + 1, "personal");
+	}
+
+	public Float countNowUnit4GZ(String houseType) {
+		return this.count(null, houseType, Calendar.getInstance().get(Calendar.YEAR), Calendar.getInstance().get(Calendar.MONTH) + 1, "unit");
 	}
 
 }
