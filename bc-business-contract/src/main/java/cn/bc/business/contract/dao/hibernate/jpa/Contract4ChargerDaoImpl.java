@@ -730,12 +730,13 @@ public class Contract4ChargerDaoImpl extends
 
 	public List<Map<String, String>> findDriverByContractId(Long contractId) {
 		String hql = "SELECT  b.name,b.address,b.address1,b.cert_identity,b.phone,b.phone1,b.cert_fwzg,";
-		//查找此司机最新劳动合同的户口性质
+		// 查找此司机最新劳动合同的户口性质
 		hql += "(select l.house_type from bs_contract_labour l";
 		hql += "  INNER JOIN bs_contract d on d.id =l.id";
-		hql += "  inner join bs_carman_contract e on e.contract_id = d.id"; 
-		hql += "  where d.type_="+Contract.TYPE_LABOUR;
-		hql += "  and d.status_ in ("+BCConstants.STATUS_ENABLED+","+BCConstants.STATUS_DRAFT+")";
+		hql += "  inner join bs_carman_contract e on e.contract_id = d.id";
+		hql += "  where d.type_=" + Contract.TYPE_LABOUR;
+		hql += "  and d.status_ in (" + BCConstants.STATUS_ENABLED + ","
+				+ BCConstants.STATUS_DRAFT + ")";
 		hql += "  and e.man_id=b.id";
 		hql += "  ORDER BY d.file_date DESC";
 		hql += "  LIMIT 1)";
@@ -756,10 +757,10 @@ public class Contract4ChargerDaoImpl extends
 						oi.put("phone", rs[i++].toString());
 						oi.put("phone1", rs[i++].toString());
 						oi.put("certFWZG", rs[i++].toString());
-						Object o=rs[i++];
-						if(o==null){
+						Object o = rs[i++];
+						if (o == null) {
 							oi.put("houseType", null);
-						}else{
+						} else {
 							oi.put("houseType", o.toString());
 						}
 						return oi;
@@ -811,4 +812,9 @@ public class Contract4ChargerDaoImpl extends
 		return entity;
 	}
 
+	public int getDriverAmount(Long carId) {
+		String hql = "select c.driver from CarByDriver c where c.car.id=? and c.classes in (1,2) and c.status =0";
+		List<?> list = this.getJpaTemplate().find(hql, new Object[] { carId });
+		return list.size();
+	}
 }

@@ -60,6 +60,7 @@
 		<action name="save" class="contract4ChargerAction" method="save"/>
 		<action name="isExistContract" class="contract4ChargerAction" method="isExistContract" />
 		<action name="warehousing" class="contract4ChargerAction" method="warehousing" />
+		<action name="getDriverAmount" class="contract4ChargerAction" method="getDriverAmount" />
 		<action name="checkCodeIsExist" class="contract4ChargerAction" method="checkCodeIsExist" />
 		<action name="addAttachFromTemplate" class="contract4ChargerAction" method="addAttachFromTemplate" />
 	</package>

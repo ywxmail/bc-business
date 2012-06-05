@@ -273,4 +273,10 @@ public interface Contract4ChargerService extends CrudService<Contract4Charger>,
 	 */
 	String doWarehousing(Long contractCarId, String carMansId,
 			Contract4Charger contract4Charger);
+
+	/**根据车辆Id获取在案的正副班司机数量
+	 * @param carId 车辆Id
+	 * @return
+	 */
+	int getDriverAmount(Long carId);
 }

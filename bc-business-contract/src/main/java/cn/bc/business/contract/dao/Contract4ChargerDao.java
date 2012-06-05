@@ -218,4 +218,13 @@ public interface Contract4ChargerDao extends CrudDao<Contract4Charger> {
 	 *            车辆Id
 	 */
 	void updateCarWithbusinessType(String businessType, Long carId);
+
+	/**
+	 * 根据车辆Id获取在案的正副班司机数量
+	 * 
+	 * @param carId
+	 *            车辆Id
+	 * @return
+	 */
+	int getDriverAmount(Long carId);
 }
