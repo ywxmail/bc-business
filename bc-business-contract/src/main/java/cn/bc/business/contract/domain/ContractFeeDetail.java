@@ -41,6 +41,15 @@ public class ContractFeeDetail extends EntityImpl {
 	private String code;// 编码
 	private int orderNo;// 排序号
 	private Contract contract;// 合同ID
+	private String spec;// 特殊配置
+
+	public String getSpec() {
+		return spec;
+	}
+
+	public void setSpec(String spec) {
+		this.spec = spec;
+	}
 
 	public float getPrice() {
 		return price;
