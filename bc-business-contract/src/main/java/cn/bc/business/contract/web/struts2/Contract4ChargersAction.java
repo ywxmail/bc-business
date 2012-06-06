@@ -75,10 +75,10 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 				getText("key.role.bc.admin"));
 	}
 
-	private boolean isEntering() {
+	public boolean isEntering() {
 		// 经济合同录入管理员
 		SystemContext context = (SystemContext) this.getContext();
-		return !context
+		return context
 				.hasAnyRole(getText("key.role.bs.contract4charger.entering"));
 	}
 
@@ -104,7 +104,7 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 		if (this.isReadonly()) {
 			// 查看按钮
 			tb.addButton(this.getDefaultOpenToolbarButton());
-			if (!this.isEntering()) {
+			if (this.isEntering()) {
 				// 新建按钮
 				tb.addButton(this.getDefaultCreateToolbarButton());
 
@@ -131,7 +131,7 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 		}
 		// 状态单选按钮组
 		// 如果有权限的用户可以看到草稿状态的车
-		if (!isReadonly() || !this.isEntering()) {
+		if (!isReadonly() || this.isEntering()) {
 			tb.addButton(Toolbar.getDefaultToolbarRadioGroup(
 					this.getBSStatuses3(), "status", 0,
 					getText("title.click2changeSearchStatus")));

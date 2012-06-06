@@ -78,10 +78,10 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 				getText("key.role.bc.admin"));
 	}
 
-	private boolean isEntering() {
+	public boolean isEntering() {
 		// 司机录入管理员
 		SystemContext context = (SystemContext) this.getContext();
-		return !context.hasAnyRole(getText("key.role.bs.driver.entering"));
+		return context.hasAnyRole(getText("key.role.bs.driver.entering"));
 	}
 
 	@Override
@@ -465,7 +465,7 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 			// 查看按钮
 			tb.addButton(this.getDefaultOpenToolbarButton());
 			// 如果有录入权限的有新建按钮
-			if (!this.isEntering()) {
+			if (this.isEntering()) {
 				// 新建按钮
 				tb.addButton(this.getDefaultCreateToolbarButton());
 
@@ -487,7 +487,7 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 		tb.addButton(this.getDefaultSearchToolbarButton());
 
 		// 如果有权限的用户可以看到草稿状态的车
-		if (!isReadonly() || !this.isEntering()) {
+		if (!isReadonly() || this.isEntering()) {
 			tb.addButton(Toolbar.getDefaultToolbarRadioGroup(
 					this.getBSStatuses3(), "status", 0,
 					getText("title.click2changeSearchStatus")));

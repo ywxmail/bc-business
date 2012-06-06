@@ -71,10 +71,10 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 				getText("key.role.bc.admin"));
 	}
 
-	private boolean isEntering() {
+	public boolean isEntering() {
 		// 司机录入管理员
 		SystemContext context = (SystemContext) this.getContext();
-		return !context.hasAnyRole(getText("key.role.bs.driver.entering"));
+		return context.hasAnyRole(getText("key.role.bs.driver.entering"));
 	}
 
 	@Override
@@ -149,7 +149,7 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 			pageOption.put("readonly", readonly);
 			// 如果有录入权限且状态为草稿的可以进行修改
 		} else if (this.getE().getStatus() == BCConstants.STATUS_DRAFT
-				&& !this.isEntering()) {
+				&& this.isEntering()) {
 			pageOption.put("readonly", false);
 		} else {
 			pageOption.put("readonly", true);
@@ -172,8 +172,9 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 						"bc.carManForm.saveAndClose"));
 
 			} else {
-				pageOption.addButton(new ButtonOption(getText("labe.save4Draft"),
-						null, "bc.carManForm.save"));
+				pageOption
+						.addButton(new ButtonOption(getText("labe.save4Draft"),
+								null, "bc.carManForm.save"));
 				pageOption.addButton(new ButtonOption(
 						getText("label.warehousing"), null,
 						"bc.carManForm.warehousing"));
@@ -183,10 +184,10 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 		}
 
 		// 如果有录入权限的就有保存按钮
-		if (!this.isEntering()
+		if (this.isEntering()
 				&& this.getE().getStatus() == BCConstants.STATUS_DRAFT) {
-			pageOption.addButton(new ButtonOption(getText("labe.save4Draft"), null,
-					"bc.carManForm.save"));
+			pageOption.addButton(new ButtonOption(getText("labe.save4Draft"),
+					null, "bc.carManForm.save"));
 		}
 
 	}
