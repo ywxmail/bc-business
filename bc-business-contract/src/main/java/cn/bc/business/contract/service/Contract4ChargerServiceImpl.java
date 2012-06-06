@@ -14,6 +14,8 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
@@ -852,9 +854,9 @@ public class Contract4ChargerServiceImpl extends
 
 		// 生成格式化参数
 		Map<String, Object> params = new HashMap<String, Object>();
-		// 保存合同费用明细的集合，用于填写收费通知单上的值
+		// 财务部收费通知集合，用于填写收费通知单上的值
 		List<Map<String, String>> cDetailList = new ArrayList<Map<String, String>>();
-		// 维修厂费用明细的集合，用于填写收费通知单上的值
+		// 汽车修理厂收费通知集合，用于填写收费通知单上的值
 		List<Map<String, String>> cDetailFactoryList = new ArrayList<Map<String, String>>();
 		// 保存收费通知单上每一条项目的集合
 		Map<String, String> cDetailMap = null;
@@ -864,8 +866,11 @@ public class Contract4ChargerServiceImpl extends
 		params.put("signDate",
 				DateUtils.formatCalendar(c.getSignDate(), "yyyy-MM-dd"));
 		// 缴费日
-		params.put("paymentDate", c.getPaymentDate() != null
-				&& c.getPaymentDate().length() > 0 ? c.getPaymentDate() : " ");
+		params.put(
+				"paymentDate",
+				c.getPaymentDate() != null && c.getPaymentDate().length() > 0 ? c
+						.getPaymentDate().equals("0") ? "月末" : c
+						.getPaymentDate() : " ");
 		// 合同开始日期
 		Calendar startDate = c.getStartDate();
 		// 合同结束日期
@@ -922,13 +927,13 @@ public class Contract4ChargerServiceImpl extends
 		// 签约类型
 		params.put("signType", c.getSignType());
 		// 收费通知单 签约类型对应的手续
-		if(c.getSignType().equals("新户")){
+		if (c.getSignType().equals("新户")) {
 			params.put("signProcedure", "出车");
-		}else if(c.getSignType().equals("过户")){
+		} else if (c.getSignType().equals("过户")) {
 			params.put("signProcedure", "过户");
-		}else if(c.getSignType().equals("续约")){
+		} else if (c.getSignType().equals("续约")) {
 			params.put("signProcedure", "续期");
-		}else if(c.getSignType().equals("重发包")){
+		} else if (c.getSignType().equals("重发包")) {
 			params.put("signProcedure", "重发包");
 		}
 
@@ -961,66 +966,101 @@ public class Contract4ChargerServiceImpl extends
 					c.getAgreementEndDate(), "yyyy年MM月dd日"));
 		}
 
-		// -----合同信息----结束--	
+		// -----合同信息----结束--
 
 		// ---合同费用明细----开始---
 		// 声明保存每月承包款的集合
 		List<ContractFeeDetail> cfdList = new ArrayList<ContractFeeDetail>();
 		if (c.getContractFeeDetail() != null
 				&& c.getContractFeeDetail().size() > 0) {
-			// 遍历合同费用明细
-			for (ContractFeeDetail cfd : c.getContractFeeDetail()) {
-				// 收费通知单合同费用项目
-				cDetailMap = new HashMap<String, String>();
-				cDetailMap.put("pg", cfd.getName());
-				cDetailMap.put("desc", cfd.getDescription());
-				// 声明金额栏
-				String price = "";
-				// 合同费用明细编码，后半部分,如“CC.ORDER.AQHZJ”，则code为“AQHZJ”
-				String code = cfd.getCode().substring(
-						cfd.getCode().lastIndexOf(".") + 1);
+			try {
+				// 遍历合同费用明细
+				for (ContractFeeDetail cfd : c.getContractFeeDetail()) {
+					// 合同费用明细编码，后半部分,如“CC.ORDER.AQHZJ”，则code为“AQHZJ”
+					String code = cfd.getCode().substring(
+							cfd.getCode().lastIndexOf(".") + 1);
+					// 将编码的后半部分作为占位符key，并加入相应的值
+					params.put(code, nf.format(cfd.getPrice()));
+					// 将编码的后半部分作为占位符key+4cn，并加入相应的中文值
+					params.put(code + "4CN", cfd.getPrice() < 1 ? "零"
+							: multiDigit2Chinese(cfd.getPrice() + ""));
 
-				// 每月承包款
-				if (code.equals("MYCBK")) {
-					cfdList.add(cfd);
+					// 每月承包款
+					if (code.equals("MYCBK")) {
+						cfdList.add(cfd);
+					}
+
+					// 收费通知单合同费用项目
+					cDetailMap = new HashMap<String, String>();
+					cDetailMap.put("pg", cfd.getName());
+					cDetailMap.put("desc", cfd.getDescription());
+					// 声明金额栏
+					String price = "";
+					// 拼装日期
+					if (cfd.getStartDate() != null && cfd.getEndDate() != null) {
+						price += DateUtils.formatCalendar(cfd.getStartDate(),
+								"yyyy年MM月dd日");
+						price += "至";
+						price += DateUtils.formatCalendar(cfd.getEndDate(),
+								"yyyy年MM月dd日");
+					}
+					price += nf.format(cfd.getPrice()) + "元";
+					// 付款方式
+					String strPayTypeDate = "";
+					switch (cfd.getPayType()) {
+					case ContractFeeDetail.PAY_TYPE_MONTH:
+						strPayTypeDate = "/月";
+						break;
+					case ContractFeeDetail.PAY_TYPE_SEASON:
+						strPayTypeDate = "/季";
+						break;
+					case ContractFeeDetail.PAY_TYPE_YEAR:
+						strPayTypeDate = "/年";
+						break;
+					}
+
+					// 没特殊配置的默认加入财务部收费通知集合
+					if (cfd.getSpec() == null || cfd.getSpec().length() == 0) {
+						cDetailMap.put("price", price + strPayTypeDate);
+						cDetailList.add(cDetailMap);
+						continue;
+					}
+
+					// 特殊配置
+					JSONObject jo = new JSONObject(cfd.getSpec());
+					if (jo.length() == 0) {
+						cDetailMap.put("price", price + strPayTypeDate);
+						cDetailList.add(cDetailMap);
+						continue;
+					}
+
+					// 是否加入每人
+					String strTemp = "";
+					if (!jo.isNull("isByDriver") && jo.getBoolean("isByDriver"))
+						strTemp = "/人";
+
+					cDetailMap.put("price", price + strTemp + strPayTypeDate);
+
+					// 财务部收费通知集合
+					if (jo.isNull("isByFinancial")
+							|| jo.getBoolean("isByFinancial")) {
+						cDetailList.add(cDetailMap);
+					}
+
+					// 维修厂收费通知集合
+					if (!jo.isNull("isByGarage") && jo.getBoolean("isByGarage")) {
+						cDetailFactoryList.add(cDetailMap);
+					}
 				}
-				// 拼装日期
-				if (cfd.getStartDate() != null && cfd.getEndDate() != null) {
-					price += DateUtils.formatCalendar(cfd.getStartDate(),
-							"yyyy年MM月dd日");
-					price += "至";
-					price += DateUtils.formatCalendar(cfd.getEndDate(),
-							"yyyy年MM月dd日");
+
+			} catch (JSONException e) {
+				logger.error(e.getMessage(), e);
+				try {
+					throw e;
+				} catch (JSONException e1) {
+					e1.printStackTrace();
 				}
-				price += nf.format(cfd.getPrice()) + "元";
-				if (cfd.getCount() > 1) {
-					price += "/人";
-				}
-				switch (cfd.getPayType()) {
-				case ContractFeeDetail.PAY_TYPE_MONTH:
-					price += "/月";
-					break;
-				case ContractFeeDetail.PAY_TYPE_SEASON:
-					price += "/季";
-					break;
-				case ContractFeeDetail.PAY_TYPE_YEAR:
-					price += "/年";
-					break;
-				}
-				cDetailMap.put("price", price);
-				//不加入驾驶员衣服项目
-				if (!code.equals("JSYGZF")) {
-					cDetailList.add(cDetailMap);
-				}
-				if (code.equals("JSYGZF") || code.equals("ZYT")
-						|| code.equals("WXF")) {
-					cDetailFactoryList.add(cDetailMap);
-				}
-				// 将编码的后半部分作为占位符key，并加入相应的值
-				params.put(code, nf.format(cfd.getPrice()));
-				// 将编码的后半部分作为占位符key+4cn，并加入相应的中文值
-				params.put(code + "4CN", cfd.getPrice() < 1 ? "零"
-						: multiDigit2Chinese(cfd.getPrice() + ""));
+				;
 			}
 		}
 
@@ -1170,10 +1210,16 @@ public class Contract4ChargerServiceImpl extends
 						.countNowPersonal4GZ(driverMap.get("houseType"));
 				cDetailMap = new HashMap<String, String>();
 				cDetailMap.put("pg", "社保：" + driverMap.get("name"));
-				cDetailMap.put("price", "身份证：" + driverMap.get("certIdentity")
-						+ "," + "按实际社保数实收：" + unit + "+" + personal + "="
-						+ (unit + personal) + "元");
-				cDetailMap.put("desc", "");
+				if(driverMap.get("joinDate") != null
+						&& driverMap.get("joinDate").length() > 0){
+					String[] dateArr=driverMap.get("joinDate").split("-");
+					cDetailMap.put("price","按实际社保数实收：" + unit + "+" + personal + "="
+							+ (unit + personal) + "元,"+dateArr[0]+"年"+dateArr[1]+"月起保");
+				}else{
+					cDetailMap.put("price","按实际社保数实收：" + unit + "+" + personal + "="
+							+ (unit + personal) + "元");
+				}
+				cDetailMap.put("desc","身份证：" + driverMap.get("certIdentity"));
 				cDetailList.add(cDetailMap);
 			}
 		}
@@ -1194,8 +1240,8 @@ public class Contract4ChargerServiceImpl extends
 
 		// Excel 97-2003 工作薄文档处理
 		if (template.getTemplateType().getCode().equals("xls")) {
-			params.put("cfdetails", cDetailList);
-			params.put("cfdetails4factory", cDetailFactoryList);
+			params.put("FinancialFeeMsg", cDetailList);
+			params.put("GarageFeeMsg", cDetailFactoryList);
 		}
 
 		// 生成附件

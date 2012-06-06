@@ -739,7 +739,17 @@ public class Contract4ChargerDaoImpl extends
 				+ BCConstants.STATUS_DRAFT + ")";
 		hql += "  and e.man_id=b.id";
 		hql += "  ORDER BY d.file_date DESC";
-		hql += "  LIMIT 1)";
+		hql += "  LIMIT 1) as houseType,";
+		// 查找此司机最新劳动合同的参保日期
+		hql += "(select to_char(ll.joindate,'YYYY-MM-DD') from bs_contract_labour ll";
+		hql += "  INNER JOIN bs_contract dd on dd.id =ll.id";
+		hql += "  inner join bs_carman_contract ee on ee.contract_id = dd.id";
+		hql += "  where dd.type_=" + Contract.TYPE_LABOUR;
+		hql += "  and dd.status_ in (" + BCConstants.STATUS_ENABLED + ","
+				+ BCConstants.STATUS_DRAFT + ")";
+		hql += "  and ee.man_id=b.id";
+		hql += "  ORDER BY dd.file_date DESC";
+		hql += "  LIMIT 1) as joindate";
 		hql += " FROM bs_car_contract a";
 		hql += " inner join bs_car_driver c on c.car_id=a.car_id";
 		hql += " inner join bs_carman b on b.id=c.driver_id";
@@ -762,6 +772,12 @@ public class Contract4ChargerDaoImpl extends
 							oi.put("houseType", null);
 						} else {
 							oi.put("houseType", o.toString());
+						}
+						Object o2 = rs[i++];
+						if (o2 == null) {
+							oi.put("joinDate", null);
+						} else {
+							oi.put("joinDate", o2.toString());
 						}
 						return oi;
 					}
