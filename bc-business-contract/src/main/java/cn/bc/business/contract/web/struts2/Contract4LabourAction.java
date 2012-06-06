@@ -482,7 +482,7 @@ public class Contract4LabourAction extends
 						OptionConstants.CARMAN_HOUSETYPE,
 						OptionConstants.LB_BUYUNIT,
 						OptionConstants.CULTURAL_DEGREE,
-						OptionConstants.MARITAL_STATUS});
+						OptionConstants.MARITAL_STATUS });
 
 		// 加载可选营运性质列表
 		// this.businessTypeList = optionItems
@@ -501,12 +501,12 @@ public class Contract4LabourAction extends
 		this.buyUnitList = optionItems.get(OptionConstants.LB_BUYUNIT);
 		OptionItem.insertIfNotExist(this.buyUnitList, this.getE().getBuyUnit(),
 				null);
-		// 加载可选文化程度列表 
+		// 加载可选文化程度列表
 		this.culturalDegreeList = optionItems
-				.get(OptionConstants.CULTURAL_DEGREE); 
-		// 加载可选婚姻状况列表  
+				.get(OptionConstants.CULTURAL_DEGREE);
+		// 加载可选婚姻状况列表
 		this.maritalStatusList = optionItems
-				.get(OptionConstants.MARITAL_STATUS); 
+				.get(OptionConstants.MARITAL_STATUS);
 	}
 
 	@Override
@@ -621,7 +621,9 @@ public class Contract4LabourAction extends
 		// 构建附件控件
 		String ptype = Contract4Labour.ATTACH_TYPE;
 		String puid = this.getE().getUid();
-		boolean readonly = forceReadonly ? true : this.isReadonly();
+		boolean readonly = forceReadonly ? true : (this.isEntering()
+				&& this.getE().getStatus() == BCConstants.STATUS_DRAFT ? false
+				: this.isReadonly());
 		AttachWidget attachsUI = this.buildAttachsUI(isNew, readonly, ptype,
 				puid);
 
