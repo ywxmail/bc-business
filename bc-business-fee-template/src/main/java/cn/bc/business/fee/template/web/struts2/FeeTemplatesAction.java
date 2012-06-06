@@ -124,15 +124,16 @@ public class FeeTemplatesAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("a.type_", "type",
 				getText("feeTemplate.type"), 40)
 				.setValueFormater(new KeyValueFormater(this.getTypes())));
+		//所属模板
+		columns.add(new TextColumn4MapKey("b.name", "pname",
+				getText("feeTemplate.ptempalte"), 100).setUseTitleFromLabel(true));
+		//名称
+		columns.add(new TextColumn4MapKey("a.name", "name",
+				getText("feeTemplate.name"), 180).setSortable(true).setUseTitleFromLabel(true));
 		//编码
 		columns.add(new TextColumn4MapKey("a.code", "code",
 				getText("feeTemplate.code"), 150).setSortable(true)
 				.setUseTitleFromLabel(true));
-		columns.add(new TextColumn4MapKey("a.name", "name",
-				getText("feeTemplate.name"), 180).setSortable(true).setUseTitleFromLabel(true));
-		//所属模板
-		columns.add(new TextColumn4MapKey("b.name", "pname",
-				getText("feeTemplate.ptempalte"), 100).setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("a.price", "price",
 				getText("feeTemplate.price"), 80).setSortable(true)
 				.setValueFormater(new NubmerFormater("###,##0.##")));

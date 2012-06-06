@@ -97,10 +97,11 @@ public class CarByDriverHistoryAction extends
 
 	@Override
 	public boolean isReadonly() {
-		// 车辆管理/司机管理或系统管理员
+		// 迁移记录管理或系统管理员
 		SystemContext context = (SystemContext) this.getContext();
-		return !context.hasAnyRole(getText("key.role.bs.car"),
-				getText("key.role.bs.driver"), getText("key.role.bc.admin"));
+		return !context.hasAnyRole(
+				getText("key.role.bs.driverByDriverHistory"),
+				getText("key.role.bc.admin"));
 	}
 
 	public String create() throws Exception {

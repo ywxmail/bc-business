@@ -77,7 +77,7 @@ public class Contract4LaboursAction extends ViewAction<Map<String, Object>> {
 				getText("key.role.bc.admin"));
 	}
 
-	private boolean isEntering() {
+	public boolean isEntering() {
 		// 劳动合同录入管理员
 		SystemContext context = (SystemContext) this.getContext();
 		return !context
@@ -518,8 +518,8 @@ public class Contract4LaboursAction extends ViewAction<Map<String, Object>> {
 			statusCondition = ConditionUtils.toConditionByComma4IntegerValue(
 					this.status, "c.status_");
 			// if (this.status.length() <= 0) { // 显示全部状态的时候只显示最新版本的记录
-//			mainsCondition = ConditionUtils.toConditionByComma4IntegerValue(
-//					this.mains, "c.main");
+			// mainsCondition = ConditionUtils.toConditionByComma4IntegerValue(
+			// this.mains, "c.main");
 			// }
 		}
 		if (carId != null) {

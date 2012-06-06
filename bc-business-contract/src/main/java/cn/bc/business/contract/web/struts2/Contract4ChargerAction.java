@@ -114,10 +114,10 @@ public class Contract4ChargerAction extends
 				getText("key.role.bc.admin"));
 	}
 
-	private boolean isEntering() {
+	public boolean isEntering() {
 		// 经济合同录入管理员
 		SystemContext context = (SystemContext) this.getContext();
-		return !context
+		return context
 				.hasAnyRole(getText("key.role.bs.contract4charger.entering"));
 	}
 
@@ -570,7 +570,8 @@ public class Contract4ChargerAction extends
 		// 构建附件控件
 		String ptype = Contract4Charger.ATTACH_TYPE;
 		String puid = this.getE().getUid();
-		boolean readonly = forceReadonly ? true : this.isReadonly();
+		boolean readonly = forceReadonly ? true : (this.isEntering() ? false
+				: this.isReadonly());
 		AttachWidget attachsUI = this.buildAttachsUI(isNew, readonly, ptype,
 				puid);
 
@@ -603,13 +604,13 @@ public class Contract4ChargerAction extends
 			pageOption.put("readonly", readonly);
 			// 如果有录入权限且状态为草稿的可以进行修改
 		} else if (this.getE().getStatus() == BCConstants.STATUS_DRAFT
-				&& !this.isEntering()) {
+				&& this.isEntering()) {
 			pageOption.put("readonly", false);
 		} else {
 			pageOption.put("readonly", true);
 		}
 		// 是否能复制
-		if (editable && !this.isReadonly()) {
+		if ((editable && !this.isReadonly()) || this.isEntering()) {
 			canCopy = false;
 
 		} else {
@@ -671,7 +672,7 @@ public class Contract4ChargerAction extends
 			}
 		}
 		// 如果有录入权限的就有保存按钮
-		if (!this.isEntering()
+		if (this.isEntering()
 				&& this.getE().getStatus() == BCConstants.STATUS_DRAFT) {
 			pageOption.addButton(new ButtonOption(getText("label.save"), null,
 					"bc.contract4ChargerForm.save"));
