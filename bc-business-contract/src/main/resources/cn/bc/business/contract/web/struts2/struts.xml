@@ -105,4 +105,12 @@
 			<result name="success">/bc-business/contract4Labour/selectTwoDate.jsp</result>
 		</action>
 	</package>
+	
+	<!-- 用工备案报表高级搜索 -->
+	<package name="contract4Labours" extends="bc-default" namespace="/bc-business">
+		<!-- 高级搜索条件窗口 -->
+		<action name="contract4Labours/conditions2" class="contract4LaboursAction" method="conditions">
+			<result name="success">/bc-business/contract4Labour/conditions2.jsp</result>
+		</action>
+	</package>
 </struts>
