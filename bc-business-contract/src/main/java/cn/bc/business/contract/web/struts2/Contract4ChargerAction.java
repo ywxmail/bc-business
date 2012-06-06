@@ -247,6 +247,7 @@ public class Contract4ChargerAction extends
 					resource.setOrderNo(i);
 					resource.setContract(this.getE());
 					resource.setCode(json.getString("code"));
+					resource.setSpec(json.getString("spec"));
 					resource.setName(json.getString("name"));
 					resource.setCount(Integer.parseInt(json.getString("count")));
 					resource.setPayType(Integer.parseInt(json
@@ -386,7 +387,6 @@ public class Contract4ChargerAction extends
 		if (this.getE().isNew() || this.stopDate.length() > 0) {
 			this.getE().setExt_str3(this.stopDate);
 		}
-		System.out.println("390stop: " + this.getE().getExt_str3());
 		carMansId = this.getChargerIds(this.getE().getExt_str2());
 		this.json = this.contract4ChargerService.doWarehousing(carId,
 				carMansId, this.getE());
@@ -772,5 +772,16 @@ public class Contract4ChargerAction extends
 	protected Attach buildAttachFromTemplate() throws Exception {
 		return this.contract4ChargerService.doAddAttachFromTemplate(
 				this.getId(), this.tpl);
+	}
+
+	// 根据车辆Id获取在案的正副班司机数量
+	public String getDriverAmount() {
+		if (carId != null) {
+			this.json = String.valueOf(this.contract4ChargerService
+					.getDriverAmount(carId));
+		} else {
+			this.json = String.valueOf(0);
+		}
+		return "json";
 	}
 }

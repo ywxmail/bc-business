@@ -648,6 +648,16 @@ public class Contract4ChargerServiceImpl extends
 	}
 
 	/**
+	 * 根据车辆Id获取在案的正副班司机数量
+	 * 
+	 * @parma carId
+	 * @return
+	 */
+	public int getDriverAmount(Long carId) {
+		return this.contract4ChargerDao.getDriverAmount(carId);
+	}
+
+	/**
 	 * 删除批量CarNContract
 	 * 
 	 * @parma contractId
@@ -959,7 +969,7 @@ public class Contract4ChargerServiceImpl extends
 					c.getAgreementEndDate(), "yyyy年MM月dd日"));
 		}
 
-		// -----合同信息----结束--
+		// -----合同信息----结束--	
 
 		// ---合同费用明细----开始---
 		// 声明保存每月承包款的集合
@@ -1188,7 +1198,6 @@ public class Contract4ChargerServiceImpl extends
 				if (!params.containsKey(key))
 					params.put(key, "　　");
 			}
-
 		}
 
 		// Excel 97-2003 工作薄文档处理
