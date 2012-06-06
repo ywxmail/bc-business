@@ -636,17 +636,21 @@ public class Contract4LabourServiceImpl extends
 		// 经济合同信息
 		List<Map<String, String>> chargerList = this.contract4LabourDao
 				.findContract4ChargerByContarct4LabourId(id);
-		String signDate = chargerList.get(0).get("signDate");
-		if (signDate != null && signDate != "") {
-			params.put("chargerSignYear",
-					signDate.substring(0, signDate.indexOf("-")));
-			params.put(
-					"chargerSignMonth",
-					signDate.substring(signDate.indexOf("-") + 1,
-							signDate.lastIndexOf("-")));
-			params.put("chargerSignDay",
-					signDate.substring(signDate.lastIndexOf("-") + 1));
+		if(chargerList!=null&&chargerList.size()>0){
+			String signDate = chargerList.get(0).get("signDate");
+			if (signDate != null && signDate != "") {
+				params.put("chargerSignYear",
+						signDate.substring(0, signDate.indexOf("-")));
+				params.put(
+						"chargerSignMonth",
+						signDate.substring(signDate.indexOf("-") + 1,
+								signDate.lastIndexOf("-")));
+				params.put("chargerSignDay",
+						signDate.substring(signDate.lastIndexOf("-") + 1));
+			}
 		}
+			
+		
 
 		// 生成附件
 		String ptype = Contract4Labour.ATTACH_TYPE;
