@@ -18,6 +18,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
 import cn.bc.BCConstants;
+import cn.bc.business.OptionConstants;
 import cn.bc.business.contract.domain.Contract;
 import cn.bc.business.motorcade.service.MotorcadeService;
 import cn.bc.business.web.struts2.ViewAction;
@@ -35,6 +36,7 @@ import cn.bc.identity.domain.Actor;
 import cn.bc.identity.service.ActorService;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.option.domain.OptionItem;
+import cn.bc.option.service.OptionService;
 import cn.bc.web.formater.AbstractFormater;
 import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.formater.DateRangeFormater;
@@ -184,6 +186,7 @@ public class Contract4LaboursAction extends ViewAction<Map<String, Object>> {
 		sql.append(",m.id motorcade_id,m.name motorcade_name");
 		sql.append(",car.code car_code,c.stop_date");
 		sql.append(",c.modified_date,md.actor_name modifier,c.file_date,ad.actor_name author");
+		sql.append(",cl.domicile_place,cl.cultural_degree,cl.marital_status");
 		sql.append(" from BS_CONTRACT_LABOUR cl");
 		sql.append(" inner join BS_CONTRACT c on cl.id = c.id");
 		sql.append(" left join BS_CAR_CONTRACT carc on c.id = carc.contract_id");
@@ -243,6 +246,9 @@ public class Contract4LaboursAction extends ViewAction<Map<String, Object>> {
 				map.put("modifier", rs[i++]);
 				map.put("file_date", rs[i++]);
 				map.put("author", rs[i++]);
+				map.put("domicile_place", rs[i++]);
+				map.put("cultural_degree", rs[i++]);
+				map.put("marital_status", rs[i++]);
 
 				return map;
 			}
@@ -373,6 +379,15 @@ public class Contract4LaboursAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("c.stop_date", "stop_date",
 				getText("contract.stopDate"), 120).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+		
+		columns.add(new TextColumn4MapKey("cl.domicile_place", "domicile_place",
+				getText("contract4Labour.domicilePlace"), 150)
+				.setSortable(true).setUseTitleFromLabel(true));
+		columns.add(new TextColumn4MapKey("cl.cultural_degree", "cultural_degree",
+				getText("contract4Labour.culturalDegree"), 60));
+		columns.add(new TextColumn4MapKey("cl.marital_status", "marital_status",
+				getText("contract4Labour.maritalStatus"), 60));
+		
 		columns.add(new TextColumn4MapKey("c.op_type", "op_type",
 				getText("contract4Labour.op"), 40).setSortable(true)
 				.setValueFormater(new EntityStatusFormater(getEntityOpTypes())));
@@ -555,6 +570,7 @@ public class Contract4LaboursAction extends ViewAction<Map<String, Object>> {
 
 	private MotorcadeService motorcadeService;
 	private ActorService actorService;
+	private OptionService optionService;
 
 	@Autowired
 	public void setActorService(
@@ -566,9 +582,15 @@ public class Contract4LaboursAction extends ViewAction<Map<String, Object>> {
 	public void setMotorcadeService(MotorcadeService motorcadeService) {
 		this.motorcadeService = motorcadeService;
 	}
+	
+	@Autowired
+	public void setOptionService(OptionService optionService) {
+		this.optionService = optionService;
+	}
 
 	public JSONArray motorcades;// 车队的下拉列表信息
 	public JSONArray units;// 分公司的下拉列表信息
+	public JSONArray houseTypes;// 营运性质列表
 
 	@Override
 	protected void initConditionsFrom() throws Exception {
@@ -580,6 +602,16 @@ public class Contract4LaboursAction extends ViewAction<Map<String, Object>> {
 		// 可选车队列表
 		motorcades = OptionItem.toLabelValues(this.motorcadeService
 				.find4Option(null));
+		
+		// 批量加载可选项列表
+		Map<String, List<Map<String, String>>> optionItems = this.optionService
+				.findOptionItemByGroupKeys(new String[] {
+					OptionConstants.CARMAN_HOUSETYPE
+				});
+		
+		// 户口性质列表
+		this.houseTypes = OptionItem.toLabelValues(
+				optionItems.get(OptionConstants.CARMAN_HOUSETYPE), "value");
 	}
 
 	// ==高级搜索代码结束==

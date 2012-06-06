@@ -66,6 +66,8 @@ public class Contract4LabourAction extends
 	public List<Map<String, String>> insurancetypeList; // 可选营运性质列表
 	public List<Map<String, String>> houseTypeList; // 可选户口类型列表
 	public List<Map<String, String>> buyUnitList; // 可选购买单位列表
+	public List<Map<String, String>> culturalDegreeList; // 可选文化程度列表
+	public List<Map<String, String>> maritalStatusList; // 可选婚姻状况列表
 
 	public boolean isMoreCar; // 是否存在多辆车
 	public boolean isMoreCarMan; // 是否存在多个司机
@@ -478,7 +480,9 @@ public class Contract4LabourAction extends
 						OptionConstants.CAR_BUSINESS_NATURE,
 						OptionConstants.LB_INSURANCETYPE,
 						OptionConstants.CARMAN_HOUSETYPE,
-						OptionConstants.LB_BUYUNIT });
+						OptionConstants.LB_BUYUNIT,
+						OptionConstants.CULTURAL_DEGREE,
+						OptionConstants.MARITAL_STATUS});
 
 		// 加载可选营运性质列表
 		// this.businessTypeList = optionItems
@@ -497,6 +501,12 @@ public class Contract4LabourAction extends
 		this.buyUnitList = optionItems.get(OptionConstants.LB_BUYUNIT);
 		OptionItem.insertIfNotExist(this.buyUnitList, this.getE().getBuyUnit(),
 				null);
+		// 加载可选文化程度列表 
+		this.culturalDegreeList = optionItems
+				.get(OptionConstants.CULTURAL_DEGREE); 
+		// 加载可选婚姻状况列表  
+		this.maritalStatusList = optionItems
+				.get(OptionConstants.MARITAL_STATUS); 
 	}
 
 	@Override

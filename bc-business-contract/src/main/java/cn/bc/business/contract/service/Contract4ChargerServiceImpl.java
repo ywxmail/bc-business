@@ -922,24 +922,16 @@ public class Contract4ChargerServiceImpl extends
 		// 签约类型
 		params.put("signType", c.getSignType());
 		// 收费通知单 签约类型对应的手续
-		switch (c.getOpType()) {
-		// 新户
-		case Contract4Charger.OPTYPE_CREATE:
+		if(c.getSignType().equals("新户")){
 			params.put("signProcedure", "出车");
-			break;
-		// 过户
-		case Contract4Charger.OPTYPE_CHANGECHARGER:
+		}else if(c.getSignType().equals("过户")){
 			params.put("signProcedure", "过户");
-			break;
-		// 续约
-		case Contract4Charger.OPTYPE_RENEW:
+		}else if(c.getSignType().equals("续约")){
 			params.put("signProcedure", "续期");
-			break;
-		// 重发包
-		case Contract4Charger.OPTYPE_CHANGECHARGER2:
+		}else if(c.getSignType().equals("重发包")){
 			params.put("signProcedure", "重发包");
-			break;
 		}
+
 		// 合同性质
 		if (c.getBusinessType().equals("承包合同")) {
 			params.put("businessType", "承包");
