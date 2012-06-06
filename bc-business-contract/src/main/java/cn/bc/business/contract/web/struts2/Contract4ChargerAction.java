@@ -570,7 +570,8 @@ public class Contract4ChargerAction extends
 		// 构建附件控件
 		String ptype = Contract4Charger.ATTACH_TYPE;
 		String puid = this.getE().getUid();
-		boolean readonly = forceReadonly ? true : (this.isEntering() ? false
+		boolean readonly = forceReadonly ? true : (this.isEntering()
+				&& this.getE().getStatus() == BCConstants.STATUS_DRAFT ? false
 				: this.isReadonly());
 		AttachWidget attachsUI = this.buildAttachsUI(isNew, readonly, ptype,
 				puid);
