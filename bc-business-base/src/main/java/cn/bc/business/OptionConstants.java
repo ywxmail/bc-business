@@ -118,4 +118,8 @@ public class OptionConstants extends cn.bc.option.OptionConstants {
 	
 	/** 承包费名称 */
 	public final static String FEE_NAME = "fee.name";
+	/** 文化程度*/
+	public final static String CULTURAL_DEGREE = "contract4Labour.cultural.degree";
+	/** 婚姻状况 */
+	public final static String MARITAL_STATUS = "contract4Labour.marital.status";
 }

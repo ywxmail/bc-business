@@ -60,6 +60,9 @@ public class Contract4Labour extends Contract {
 	private Calendar stopDate;//停保日期
 	private Calendar leaveDate;//离职日期
 	private Integer region;// 区域
+	private String domicilePlace; //户口所在地
+	private String culturalDegree; //文化程度
+	private String maritalStatus; //婚姻状况
 	
 	
 
@@ -313,6 +316,33 @@ public class Contract4Labour extends Contract {
 
 	public void setRegion(Integer region) {
 		this.region = region;
+	}
+	
+	@Column(name = "DOMICILE_PLACE")
+	public String getDomicilePlace() {
+		return domicilePlace;
+	}
+
+	public void setDomicilePlace(String domicilePlace) {
+		this.domicilePlace = domicilePlace;
+	}
+
+	@Column(name = "CULTURAL_DEGREE")
+	public String getCulturalDegree() {
+		return culturalDegree;
+	}
+
+	public void setCulturalDegree(String culturalDegree) {
+		this.culturalDegree = culturalDegree;
+	}
+
+	@Column(name = "MARITAL_STATUS")
+	public String getMaritalStatus() {
+		return maritalStatus;
+	}
+
+	public void setMaritalStatus(String maritalStatus) {
+		this.maritalStatus = maritalStatus;
 	}
 
 	/**
