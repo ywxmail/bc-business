@@ -742,9 +742,9 @@ public class Contract4ChargerDaoImpl extends
 		hql += " FROM bs_car_contract a";
 		hql += " inner join bs_car_driver c on c.car_id=a.car_id";
 		hql += " inner join bs_carman b on b.id=c.driver_id";
-		hql += " where b.classes=? and a.contract_id=?";
+		hql += " where b.classes in (1,2) and a.contract_id=?";
 		return HibernateJpaNativeQuery.executeNativeSql(getJpaTemplate(), hql,
-				new Object[] { 1, contractId },
+				new Object[] { contractId },
 				new cn.bc.db.jdbc.RowMapper<Map<String, String>>() {
 					public Map<String, String> mapRow(Object[] rs, int rowNum) {
 						Map<String, String> oi = new HashMap<String, String>();
