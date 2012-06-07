@@ -399,7 +399,10 @@ END;
 $BODY$
  LANGUAGE plpgsql
  IMMUTABLE;
- 	  
+
+-- 发票销售开始号、结束号、数量异常函数索引
+CREATE INDEX BSIDX_INVOICESELLDETAIL_CHECKI ON bs_invoice_sell_detail(checkI4SellDetailCount(count_,start_no,end_no));
+ 
 --获取金盾网的违章地址与金盾的相关信息的Id
 CREATE OR REPLACE FUNCTION findJinDunByJiaoWei(syncCode IN varchar,plateNo IN varchar,happenDate IN timestamp) RETURNS varchar AS $$
 DECLARE
@@ -429,3 +432,142 @@ BEGIN
 	return scrapToInfo;
 END;
 $$ LANGUAGE plpgsql;
+
+
+-- 视图显示本期费用明细函数
+-- 输入参数：费用id,费用类型1:本期实收明细type_,2:本期欠费明细
+CREATE OR REPLACE FUNCTION getfeedetailbyfeeid(fee_id INTEGER,type_ INTEGER)
+	RETURNS CHARACTER VARYING  AS
+$BODY$
+DECLARE
+		-- 记录费用明细字符串
+		feedetailStr CHARACTER VARYING;
+		-- 记录费用名称字符串
+		feenameStr CHARACTER VARYING;
+		-- 记录费用
+		feechargeStr CHARACTER VARYING;
+
+		-- 变量一行结果的记录	
+		rowinfo RECORD;
+BEGIN
+		-- 初始化费用明细字符串
+		feedetailStr := '';
+
+		-- 根据采购单ID查出对应的销售明细结果
+		FOR rowinfo IN SELECT f.fee_name,f.charge
+										FROM  bs_fee_detail f
+										WHERE f.fid=fee_id and f.fee_type= type_
+	  -- 循环开始
+		LOOP
+				feenameStr := rowinfo.fee_name;
+				feechargeStr := trim(to_char(rowinfo.charge, '99999999D99'));
+
+				feedetailStr := feedetailStr||'[费用名称: '||feenameStr||',费用金额: '||feechargeStr||'] ';
+
+		END LOOP;
+		-- 费用明细字符串
+		RETURN feedetailStr;
+END;
+$BODY$
+LANGUAGE plpgsql;
+
+
+-- 视图显示前期欠费明细函数
+-- 输入参数：车辆id,收费年份t_fee_year,收费月份t_fee_month
+CREATE OR REPLACE FUNCTION getb4feedetailbyfeeid(t_car_id INTEGER,t_fee_year INTEGER,t_fee_month INTEGER)
+	RETURNS CHARACTER VARYING  AS
+$BODY$
+DECLARE
+		-- 记录费用明细字符串
+		feedetailStr CHARACTER VARYING;
+		-- 记录费用名称字符串
+		feenameStr CHARACTER VARYING;
+		-- 记录费用
+		feechargeStr CHARACTER VARYING;
+		-- 前期收费年
+		b4_year INTEGER;
+		-- 前期收费月
+		b4_month INTEGER;
+		-- 前期费用id
+		b4_id INTEGER;
+
+		-- 变量一行结果的记录	
+		rowinfo RECORD;
+BEGIN
+		IF t_fee_month = 1 THEN
+			b4_year = t_fee_year - 1;
+			b4_month = 12;
+		ELSE
+			b4_year = t_fee_year;
+			b4_month = t_fee_month - 1;
+		END IF;
+
+		select f.id
+			into b4_id
+			from bs_fee f 
+			where f.car_id = t_car_id and f.fee_year = b4_year and f.fee_month = b4_month;
+
+		-- 初始化费用明细字符串
+		feedetailStr := '';
+
+		IF b4_id is not null THEN
+
+			-- 根据采购单ID查出对应的销售明细结果
+			FOR rowinfo IN SELECT f.fee_name,f.charge
+											FROM  bs_fee_detail f
+											WHERE f.fid=b4_id and f.fee_type= 2
+			-- 循环开始
+			LOOP
+					feenameStr := rowinfo.fee_name;
+					feechargeStr := trim(to_char(rowinfo.charge, '99999999D99'));
+
+					feedetailStr := feedetailStr||'[费用名称: '||feenameStr||',费用金额: '||feechargeStr||'] ';
+			END LOOP;
+
+		END IF;
+
+		-- 费用明细字符串
+		RETURN feedetailStr;
+END;
+$BODY$
+LANGUAGE plpgsql;
+
+	  
+-- 社保收费规则视图明细列函数
+CREATE OR REPLACE FUNCTION getsocialsecurityruledetail(pid INTEGER)
+	RETURNS CHARACTER VARYING  AS
+$BODY$
+DECLARE
+		-- 保存明细字符串
+		details CHARACTER VARYING;
+		-- 单位缴率
+		ur CHARACTER VARYING;
+		-- 个人缴率
+		pr CHARACTER VARYING;
+		--	基数
+		bn CHARACTER VARYING;
+		-- id临时变量用于保存函数输入的值。
+		nid INTEGER;
+		-- 一行结果的记录	
+		rowinfo RECORD;
+BEGIN
+		-- 初始化变量
+		details:='';
+		nid:=pid;
+		FOR rowinfo IN SELECT d.name,d.unit_rate,d.personal_rate,d.base_number
+										FROM bs_socialsecurityrule_detail d
+										WHERE d.pid=nid
+		-- 循环开始
+		LOOP
+			ur:=rowinfo.unit_rate;
+			pr:=rowinfo.personal_rate;
+			bn:=rowinfo.base_number;
+			details:=details||'('||rowinfo.name||',';
+			details:=details||replace(ur,'.00','')||',';
+			details:=details||replace(pr,'.00','')||',';
+			details:=details||replace(bn,'.00','')||')';
+		END LOOP;	
+		RETURN details;
+END;
+$BODY$
+LANGUAGE plpgsql;
