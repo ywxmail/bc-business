@@ -705,7 +705,7 @@ public class Contract4LabourAction extends
 	@Override
 	protected PageOption buildFormPageOption(boolean editable) {
 
-		PageOption pageOption = new PageOption().setWidth(740);
+		PageOption pageOption = new PageOption().setWidth(740).setHelp("laodonghetong");
 
 		if (this.useFormPrint())
 			pageOption.setPrint("default.form");

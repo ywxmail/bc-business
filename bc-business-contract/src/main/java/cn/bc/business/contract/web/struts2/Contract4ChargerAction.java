@@ -626,7 +626,8 @@ public class Contract4ChargerAction extends
 
 	@Override
 	protected void buildFormPageButtons(PageOption pageOption, boolean editable) {
-
+		//帮助信息
+		pageOption.setHelp("jingjihetong");
 		// 特殊处理的部分
 		if (!this.isReadonly()) {// 有权限
 			if (this.getE().getStatus() != BCConstants.STATUS_DRAFT

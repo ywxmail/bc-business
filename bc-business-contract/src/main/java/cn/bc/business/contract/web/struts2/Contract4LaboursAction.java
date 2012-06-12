@@ -428,7 +428,7 @@ public class Contract4LaboursAction extends ViewAction<Map<String, Object>> {
 	@Override
 	protected PageOption getHtmlPageOption() {
 		return super.getHtmlPageOption().setWidth(900).setMinWidth(400)
-				.setHeight(490).setMinHeight(300);
+				.setHeight(490).setMinHeight(300).setHelp("laodonghetong");
 	}
 
 	@Override
