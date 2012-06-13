@@ -16,6 +16,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
 import cn.bc.BCConstants;
+import cn.bc.business.BSConstants;
 import cn.bc.business.invoice.domain.Invoice4Buy;
 import cn.bc.business.invoice.service.Invoice4BuyService;
 import cn.bc.business.web.struts2.ViewAction;
@@ -346,5 +347,12 @@ public class Invoice4BuysAction extends ViewAction<Map<String, Object>> {
 			//公司
 			companies=OptionItem.toLabelValues(this.invoice4BuyService.findCompany4Option());
 	}
+
+	@Override
+	public String getAdvanceSearchConditionsJspPath() {
+		return  BSConstants.NAMESPACE + "/invoice/buy";
+	}
+	
+	
 	// ==高级搜索代码结束==
 }

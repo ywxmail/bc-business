@@ -6,13 +6,13 @@
 	<!-- 发票采购 -->
 	<package name="invoice4Buy" extends="bc-default" namespace="/bc-business/invoice4Buy">
 		<action name="create" class="invoice4BuyAction" method="create">
-			<result name="form">/bc-business/invoice4Buy/form.jsp</result>
+			<result name="form">/bc-business/invoice/buy/form.jsp</result>
 		</action>		
 		<action name="open" class="invoice4BuyAction" method="open">
-			<result name="formr">/bc-business/invoice4Buy/form.jsp</result>
+			<result name="formr">/bc-business/invoice/buy/form.jsp</result>
 		</action>
 		<action name="edit" class="invoice4BuyAction" method="edit">
-			<result name="form">/bc-business/invoice4Buy/form.jsp</result>
+			<result name="form">/bc-business/invoice/buy/form.jsp</result>
 		</action>
 		<action name="save" class="invoice4BuyAction" method="save"/>
 		<action name="checkSameCode4StartNoAndEndNo" class="invoice4BuyAction" method="checkSameCode4StartNoAndEndNo"/>
@@ -21,13 +21,13 @@
 	<!-- 发票销售-->
 	<package name="invoice4Sell" extends="bc-default" namespace="/bc-business/invoice4Sell">
 		<action name="create" class="invoice4SellAction" method="create">
-			<result name="form">/bc-business/invoice4Sell/form.jsp</result>
+			<result name="form">/bc-business/invoice/sell/form.jsp</result>
 		</action>		
 		<action name="open" class="invoice4SellAction" method="open">
-			<result name="formr">/bc-business/invoice4Sell/form.jsp</result>
+			<result name="formr">/bc-business/invoice/sell/form.jsp</result>
 		</action>
 		<action name="edit" class="invoice4SellAction" method="edit">
-			<result name="form">/bc-business/invoice4Sell/form.jsp</result>
+			<result name="form">/bc-business/invoice/sell/form.jsp</result>
 		</action>
 		<action name="save" class="invoice4SellAction" method="save"/>
 		<action name="autoLoadInvoice4BuyCode" class="invoice4SellAction" method="autoLoadInvoice4BuyCode"/>
@@ -38,7 +38,7 @@
 	<!-- 发票余额-->
 	<package name="invoice4Balance" extends="bc-default" namespace="/bc-business/invoice4Balance">
 		<action name="main" class="invoice4BalanceAction" method="execute">
-			<result name="success">/bc-business/invoice4Balance/form.jsp</result>
+			<result name="success">/bc-business/invoice/balance/form.jsp</result>
 		</action>
 		<!-- 返回查询结果 -->
 		<action name="select" class="invoice4BalanceAction" method="select"/>		

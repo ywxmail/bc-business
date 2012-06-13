@@ -215,7 +215,7 @@ public class Invoice4SellStatsAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected String getHtmlPageJs() {
-		return this.getHtmlPageNamespace()+"/invoice4SellStats/invoice4SellStats.js";
+		return this.getHtmlPageNamespace()+"/invoice/sellStats/invoice4SellStats.js";
 	}
 
 	@Override
