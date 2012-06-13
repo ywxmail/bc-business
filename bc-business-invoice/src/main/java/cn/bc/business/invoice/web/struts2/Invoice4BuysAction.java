@@ -82,7 +82,7 @@ public class Invoice4BuysAction extends ViewAction<Map<String, Object>> {
 		sql.append(",(select sum(count_) from bs_invoice_sell_detail where buy_id=b.id and status_=0) as balance_count");
 		//sql.append(",getbalancenumberbyinvoicebuyid(b.id,b.count_,b.start_no,b.end_no) as balance_number");
 		sql.append(",au.actor_name as author_name,b.file_date as file_date");
-		sql.append(",am.actor_name as modified_name,b.modified_date as modified_date");
+		sql.append(",am.actor_name as modified_name,b.modified_date as modified_date,b.patch_no,b.project_no");
 		sql.append(" from bs_invoice_buy b");
 		sql.append(" inner join bc_identity_actor_history au on au.id=b.author_id");
 		sql.append(" left join bc_identity_actor_history a on a.id=b.buyer_id");
@@ -131,8 +131,8 @@ public class Invoice4BuysAction extends ViewAction<Map<String, Object>> {
 				map.put("file_date", rs[i++]); // 创建时间
 				map.put("modified_name", rs[i++]); // 最后修改人
 				map.put("modified_date", rs[i++]); // 最后修改时间
-				//map.put("balance_count", rs[i++]); 
-				//map.put("balance_number", rs[i++]); // 剩余号码段
+				map.put("patchNo", rs[i++]); // 批号
+				map.put("projectNo", rs[i++]); // 批号
 				return map;
 			}
 		});
@@ -163,10 +163,13 @@ public class Invoice4BuysAction extends ViewAction<Map<String, Object>> {
 		// 剩余数量
 		columns.add(new TextColumn4MapKey("", "balance_count",
 				getText("invoice4Buy.balanceCount"), 80).setSortable(true));
-		
 		// 发票代码
 		columns.add(new TextColumn4MapKey("b.code", "code",
 				getText("invoice.code"), 120).setSortable(true)
+				.setUseTitleFromLabel(true));
+		// 批号
+		columns.add(new TextColumn4MapKey("b.patch_no", "patchNo",
+				getText("invoice4Buy.patchNo"), 40).setSortable(true)
 				.setUseTitleFromLabel(true));
 		// 发票编码开始号
 		columns.add(new TextColumn4MapKey("b.start_no", "start_no",
@@ -175,6 +178,10 @@ public class Invoice4BuysAction extends ViewAction<Map<String, Object>> {
 		// 发票编码结束号
 		columns.add(new TextColumn4MapKey("b.end_no", "end_no",
 				getText("invoice.endNo"), 80).setSortable(true)
+				.setUseTitleFromLabel(true));
+		// 工程单号
+		columns.add(new TextColumn4MapKey("b.project_no", "projectNo",
+				getText("invoice4Buy.projectNo"), 80).setSortable(true)
 				.setUseTitleFromLabel(true));
 		// 采购单价
 		columns.add(new TextColumn4MapKey("b.buy_price", "buy_price",
@@ -258,7 +265,7 @@ public class Invoice4BuysAction extends ViewAction<Map<String, Object>> {
 	@Override
 	protected String[] getGridSearchFields() {
 		return new String[] { "b.code",	"a.actor_name" 
-				,"b.start_no" ,"b.end_no","au.actor_name","am.actor_name"};
+				,"b.start_no" ,"b.end_no","au.actor_name","am.actor_name,b.patch_no"};
 	}
 
 	@Override

@@ -60,6 +60,8 @@ public class Invoice4Buy extends FileEntityImpl {
 	private Calendar buyDate; //采购日期
 	private String desc;//备注
 	private int eachCount;//每（卷/本）数量
+	private String patchNo;//批号
+	private String projectNo;//工程单号
 	
 	@Column(name = "STATUS_")
 	public int getStatus() {
@@ -158,6 +160,22 @@ public class Invoice4Buy extends FileEntityImpl {
 	public void setEachCount(int eachCount) {
 		this.eachCount = eachCount;
 	}
+	@Column(name = "PATCH_NO")
+	public String getPatchNo() {
+		return patchNo;
+	}
+	public void setPatchNo(String patchNo) {
+		this.patchNo = patchNo;
+	}
+	@Column(name = "PROJECT_NO")
+	public String getProjectNo() {
+		return projectNo;
+	}
+	public void setProjectNo(String projectNo) {
+		this.projectNo = projectNo;
+	}
+	
+	
 	
 	
 }
