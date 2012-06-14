@@ -139,7 +139,7 @@ public class FileEntityAction<K extends Serializable, E extends FileEntity<K>>
 			result.put("id", attach.getId());
 			result.put("subject", attach.getSubject());
 			result.put("size", attach.getSize());
-			result.put("extension", attach.getExtension());
+			result.put("extension", attach.getFormat());
 			result.put("path", attach.getPath());
 
 			// 成功信息
