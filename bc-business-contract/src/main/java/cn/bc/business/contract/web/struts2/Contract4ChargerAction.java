@@ -371,6 +371,8 @@ public class Contract4ChargerAction extends
 
 	// ---------------------入库开始--------------------------
 	public String carMansId;// 入库时要查验是否为入库状态的责任人ID
+	public Long draftCarId;// 未入库的车辆Id
+	public String draftCarManId;// 未入库的司机Id
 
 	/**
 	 * 入库
@@ -388,8 +390,20 @@ public class Contract4ChargerAction extends
 			this.getE().setExt_str3(this.stopDate);
 		}
 		carMansId = this.getChargerIds(this.getE().getExt_str2());
-		this.json = this.contract4ChargerService.doWarehousing(carId,
-				carMansId, this.getE());
+		if (draftCarId != null && draftCarManId != null) {
+			this.json = this.contract4ChargerService.doWarehousing(carId,
+					carMansId, this.getE(), draftCarId, draftCarManId);
+		} else if (draftCarId == null && draftCarManId != null) {
+			this.json = this.contract4ChargerService.doWarehousing(carId,
+					carMansId, this.getE(), null, draftCarManId);
+		} else if (draftCarId != null && draftCarManId == null) {
+			this.json = this.contract4ChargerService.doWarehousing(carId,
+					carMansId, this.getE(), draftCarId, null);
+		} else {
+			this.json = this.contract4ChargerService.doWarehousing(carId,
+					carMansId, this.getE(), null, null);
+		}
+
 		return "json";
 	}
 
@@ -626,7 +640,7 @@ public class Contract4ChargerAction extends
 
 	@Override
 	protected void buildFormPageButtons(PageOption pageOption, boolean editable) {
-		//帮助信息
+		// 帮助信息
 		pageOption.setHelp("jingjihetong");
 		// 特殊处理的部分
 		if (!this.isReadonly()) {// 有权限
@@ -784,6 +798,20 @@ public class Contract4ChargerAction extends
 					.getDriverAmount(carId));
 		} else {
 			this.json = String.valueOf(0);
+		}
+		return "json";
+	}
+
+	// 查看车辆或司机的状态
+	public String str2;
+
+	public String checkDriverOrCarStatus() {
+		if (carId != null && (str2 != null || str2.length() > 0)) {
+			carMansId = this.getChargerIds(str2);
+			this.json = this.contract4ChargerService.checkDriverOrCarStatus(
+					carId, carMansId);
+		} else {
+			json = "";
 		}
 		return "json";
 	}

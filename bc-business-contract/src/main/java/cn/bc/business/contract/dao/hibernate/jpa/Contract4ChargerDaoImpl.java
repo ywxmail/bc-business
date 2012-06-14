@@ -753,7 +753,8 @@ public class Contract4ChargerDaoImpl extends
 		hql += " FROM bs_car_contract a";
 		hql += " inner join bs_car_driver c on c.car_id=a.car_id";
 		hql += " inner join bs_carman b on b.id=c.driver_id";
-		hql += " where b.classes in (1,2) and a.contract_id=? and c.status_="+BCConstants.STATUS_ENABLED;
+		hql += " where b.classes in (1,2) and a.contract_id=? and c.status_="
+				+ BCConstants.STATUS_ENABLED;
 		return HibernateJpaNativeQuery.executeNativeSql(getJpaTemplate(), hql,
 				new Object[] { contractId },
 				new cn.bc.db.jdbc.RowMapper<Map<String, String>>() {
@@ -832,5 +833,15 @@ public class Contract4ChargerDaoImpl extends
 		String hql = "select c.driver from CarByDriver c where c.car.id=? and c.classes in (1,2) and c.status =0";
 		List<?> list = this.getJpaTemplate().find(hql, new Object[] { carId });
 		return list.size();
+	}
+
+	public void doWarehous4Car(Long draftCarId) {
+		String sql = "update bs_car set status_ = 0 where id =?";
+		this.jdbcTemplate.update(sql, new Object[] { draftCarId });
+	}
+
+	public void doWarehous4CarMan(Long draftCarManId) {
+		String sql = "update bs_carman set status_ = 0 where id =?";
+		this.jdbcTemplate.update(sql, new Object[] { draftCarManId });
 	}
 }
