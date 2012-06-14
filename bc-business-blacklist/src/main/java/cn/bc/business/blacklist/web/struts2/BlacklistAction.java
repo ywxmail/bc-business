@@ -240,15 +240,18 @@ public class BlacklistAction extends FileEntityAction<Long, Blacklist> {
 		this.driversInfoList = this.formatDrivers(this.getE().getDrivers());
 		// 加载可选车队列表
 		this.motorcadeList = this.motorcadeService.findEnabled4Option();
-		Long motorcadeId = this.getE().getMotorcade().getId();
-		if (motorcadeId != null) {
-			Motorcade m = this.motorcadeService.load(motorcadeId);
-			if (m != null) {
-				OptionItem.insertIfNotExist(this.motorcadeList, m.getId()
-						.toString(), m.getName());
+		if (this.getE().getMotorcade() != null) {
+			Long motorcadeId = this.getE().getMotorcade().getId();
+			if (motorcadeId != null) {
+				Motorcade m = this.motorcadeService.load(motorcadeId);
+				if (m != null) {
+					OptionItem.insertIfNotExist(this.motorcadeList, m.getId()
+							.toString(), m.getName());
+				}
 			}
+		} else {
+			this.motorcadeList = this.motorcadeService.find4Option(null);
 		}
-
 		// 编辑时设置解锁人为登录用户
 		SystemContext context = this.getSystyemContext();
 		if (this.getE().getStatus() == Blacklist.STATUS_LOCK) {
