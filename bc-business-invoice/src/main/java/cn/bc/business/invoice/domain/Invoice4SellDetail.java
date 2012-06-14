@@ -29,6 +29,7 @@ public class Invoice4SellDetail extends EntityImpl {
 	private String startNo;//开始号
 	private String endNo;//结束号
 	private int status;//状态，对应销售单
+	private int type;//类型，对应销售单
 	
 	@ManyToOne(fetch = FetchType.EAGER, optional = false)
 	@JoinColumn(name = "SELL_ID", referencedColumnName = "ID")
@@ -93,5 +94,12 @@ public class Invoice4SellDetail extends EntityImpl {
 		this.status = status;
 	}
 	
+	@Column(name = "TYPE_")
+	public int getType() {
+		return type;
+	}
+	public void setType(int type) {
+		this.type = type;
+	}
 	
 }

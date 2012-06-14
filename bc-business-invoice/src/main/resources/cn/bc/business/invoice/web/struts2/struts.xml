@@ -35,6 +35,30 @@
 		<action name="findOneInvoice4Buy" class="invoice4SellAction" method="findOneInvoice4Buy"/>
 	</package>
 	
+	<!-- 发票退票-->
+	<package name="invoice4Refunds" extends="bc-default" namespace="/bc-business/invoice4Refunds">
+		<action name="create" class="invoice4SellsAction" method="create">
+			
+		</action>		
+		<action name="open" class="invoice4SellsAction" method="open">
+			
+		</action>
+		<action name="edit" class="invoice4SellsAction" method="edit">
+			
+		</action>
+	</package>
+	<package name="invoice4Refund" extends="bc-default" namespace="/bc-business/invoice4Refund">
+		<action name="create" class="invoice4SellAction" method="create">
+			<result name="form">/bc-business/invoice/sell/form.jsp</result>
+		</action>		
+		<action name="open" class="invoice4SellAction" method="open">
+			<result name="formr">/bc-business/invoice/sell/form.jsp</result>
+		</action>
+		<action name="edit" class="invoice4SellAction" method="edit">
+			<result name="form">/bc-business/invoice/sell/form.jsp</result>
+		</action>
+	</package>
+	
 	<!-- 发票余额-->
 	<package name="invoice4Balance" extends="bc-default" namespace="/bc-business/invoice4Balance">
 		<action name="main" class="invoice4BalanceAction" method="execute">

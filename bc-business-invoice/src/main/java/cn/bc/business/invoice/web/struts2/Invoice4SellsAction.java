@@ -20,13 +20,12 @@ import cn.bc.BCConstants;
 import cn.bc.business.BSConstants;
 import cn.bc.business.invoice.domain.Invoice4Buy;
 import cn.bc.business.invoice.domain.Invoice4Sell;
-import cn.bc.business.invoice.service.Invoice4BuyService;
 import cn.bc.business.invoice.service.Invoice4SellService;
 import cn.bc.business.motorcade.service.MotorcadeService;
 import cn.bc.business.web.struts2.ViewAction;
 import cn.bc.core.query.condition.Condition;
-import cn.bc.core.query.condition.ConditionUtils;
 import cn.bc.core.query.condition.Direction;
+import cn.bc.core.query.condition.impl.AndCondition;
 import cn.bc.core.query.condition.impl.EqualsCondition;
 import cn.bc.core.query.condition.impl.InCondition;
 import cn.bc.core.query.condition.impl.LikeCondition;
@@ -64,13 +63,15 @@ public class Invoice4SellsAction extends ViewAction<Map<String, Object>> {
 	public Long buyerId;
 	public Long carId;
 	public Long buyId;//采购单ID
+	public String type;//类型
+	public String readType;//查询类型，1-发票销售，2-发票退票，3，发票查询,默认null为发票销售
 	
-	private Invoice4BuyService invoice4BuyService;
-	
-	@Autowired
-	public void setInvoice4BuyService(Invoice4BuyService invoice4BuyService) {
-		this.invoice4BuyService = invoice4BuyService;
-	}
+//	private Invoice4BuyService invoice4BuyService;
+//	
+//	@Autowired
+//	public void setInvoice4BuyService(Invoice4BuyService invoice4BuyService) {
+//		this.invoice4BuyService = invoice4BuyService;
+//	}
 
 	@Override
 	public boolean isReadonly() {
@@ -111,7 +112,7 @@ public class Invoice4SellsAction extends ViewAction<Map<String, Object>> {
 		sql.append(",d.count_ as count_,d.price as price,s.desc_ as desc,b.code as code,a.actor_name as cashier");
 		sql.append(",bia.name as unit_name,cm.cert_fwzg as fwzg");
 		sql.append(",au.actor_name as author_name,s.file_date as file_date");
-		sql.append(",am.actor_name as modified_name,s.modified_date as modified_date");
+		sql.append(",am.actor_name as modified_name,s.modified_date as modified_date,s.type_ as sellType");
 		sql.append(" from bs_invoice_sell_detail d");
 		sql.append(" inner join bs_invoice_buy b on b.id=d.buy_id");
 		sql.append(" inner join bs_invoice_sell s on s.id=d.sell_id");
@@ -165,6 +166,7 @@ public class Invoice4SellsAction extends ViewAction<Map<String, Object>> {
 				map.put("file_date", rs[i++]); // 创建时间
 				map.put("modified_name", rs[i++]); // 最后修改人
 				map.put("modified_date", rs[i++]); // 最后修改时间
+				map.put("sellType", rs[i++]); // 销售类型
 				return map;
 			}
 		});
@@ -179,13 +181,38 @@ public class Invoice4SellsAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("s.status_", "status_",
 				getText("invoice.status"), 40).setSortable(true)
 				.setValueFormater(new EntityStatusFormater(getStatus())));
-		// 销售日期
-		columns.add(new TextColumn4MapKey("s.sell_date", "sell_date",
-				getText("invoice4Sell.selldate"), 95).setSortable(true).setUseTitleFromLabel(true)
-				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
-		// 销售员
-		columns.add(new TextColumn4MapKey("a.actor_name", "cashier",
-				getText("invoice4Sell.cashier"), 60).setUseTitleFromLabel(true));
+		//查看状态为查询时
+		if(readType!=null&&readType.equals(Invoice4Sell.READ_TYPE_READ)){
+			// 类型
+			columns.add(new TextColumn4MapKey("s.type_", "sellType",
+					getText("invoice4Sell.type"), 40).setSortable(true)
+					.setValueFormater(new EntityStatusFormater(getSellTypes())));
+			// 销售/退票日期
+			columns.add(new TextColumn4MapKey("s.sell_date", "sell_date",
+					getText("invoice.select.date"), 95).setSortable(true).setUseTitleFromLabel(true)
+					.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+			// 销售/受理员
+			columns.add(new TextColumn4MapKey("a.actor_name", "cashier",
+					getText("invoice.select.seller"),90).setUseTitleFromLabel(true));
+		//类型为退票时
+		}else if(readType!=null&&readType.equals(Invoice4Sell.READ_TYPE_REFUND)){
+			// 退票日期
+			columns.add(new TextColumn4MapKey("s.sell_date", "sell_date",
+					getText("invoice4Refund.refundDate"), 95).setSortable(true).setUseTitleFromLabel(true)
+					.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+			// 退票员
+			columns.add(new TextColumn4MapKey("a.actor_name", "cashier",
+					getText("invoice4Refund.receiver"), 60).setUseTitleFromLabel(true));
+		}else{
+			// 销售日期
+			columns.add(new TextColumn4MapKey("s.sell_date", "sell_date",
+					getText("invoice4Sell.selldate"), 95).setSortable(true).setUseTitleFromLabel(true)
+					.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+			// 销售员
+			columns.add(new TextColumn4MapKey("a.actor_name", "cashier",
+					getText("invoice4Sell.cashier"), 60).setUseTitleFromLabel(true));
+		}
+		
 		// 公司
 		columns.add(new TextColumn4MapKey("s.company", "company",
 				getText("invoice.company"), 45).setSortable(true));
@@ -227,21 +254,57 @@ public class Invoice4SellsAction extends ViewAction<Map<String, Object>> {
 		}
 		// 购买人
 		if (buyerId == null) {
-			columns.add(new TextColumn4MapKey("s.buyer_name", "buyer_name",
-					getText("invoice.buyer"), 60).setSortable(true)
-					.setValueFormater(
-							new LinkFormater4Id(this.getContextPath()
-									+ "/bc-business/carMan/edit?id={0}",
-									"drivers") {
-								@SuppressWarnings("unchecked")
-								@Override
-								public String getIdValue(Object context,
-										Object value) {
-									return StringUtils
-											.toString(((Map<String, Object>) context)
-													.get("buyer_id"));
-								}
-							}));
+			//查看状态为查询时
+			if(readType!=null&&readType.equals(Invoice4Sell.READ_TYPE_READ)){
+				columns.add(new TextColumn4MapKey("s.buyer_name", "buyer_name",
+						getText("invoice.select.carman"), 90).setSortable(true)
+						.setValueFormater(
+								new LinkFormater4Id(this.getContextPath()
+										+ "/bc-business/carMan/edit?id={0}",
+										"drivers") {
+									@SuppressWarnings("unchecked")
+									@Override
+									public String getIdValue(Object context,
+											Object value) {
+										return StringUtils
+												.toString(((Map<String, Object>) context)
+														.get("buyer_id"));
+									}
+								}));
+			//类型为退票时
+			}else if(readType!=null&&readType.equals(Invoice4Sell.READ_TYPE_REFUND)){
+				columns.add(new TextColumn4MapKey("s.buyer_name", "buyer_name",
+						getText("invoice4Refund.carman"), 60).setSortable(true)
+						.setValueFormater(
+								new LinkFormater4Id(this.getContextPath()
+										+ "/bc-business/carMan/edit?id={0}",
+										"drivers") {
+									@SuppressWarnings("unchecked")
+									@Override
+									public String getIdValue(Object context,
+											Object value) {
+										return StringUtils
+												.toString(((Map<String, Object>) context)
+														.get("buyer_id"));
+									}
+								}));
+			}else{
+				columns.add(new TextColumn4MapKey("s.buyer_name", "buyer_name",
+						getText("invoice.buyer"), 60).setSortable(true)
+						.setValueFormater(
+								new LinkFormater4Id(this.getContextPath()
+										+ "/bc-business/carMan/edit?id={0}",
+										"drivers") {
+									@SuppressWarnings("unchecked")
+									@Override
+									public String getIdValue(Object context,
+											Object value) {
+										return StringUtils
+												.toString(((Map<String, Object>) context)
+														.get("buyer_id"));
+									}
+								}));
+			}
 			columns.add(new TextColumn4MapKey("cm.cert_fwzg", "fwzg",
 					getText("invoice4Sell.fwzg"), 80));
 		}
@@ -333,6 +396,19 @@ public class Invoice4SellsAction extends ViewAction<Map<String, Object>> {
 				getText("invoice.unit.ben"));
 		return map;
 	}
+	
+	/**
+	 * 发票销售类型值转换:已销|退票
+	 * 
+	 */
+	private Map<String, String> getSellTypes() {
+		Map<String, String> map = new HashMap<String, String>();
+		map.put(String.valueOf(Invoice4Sell.TYPE_SELL),
+				getText("invoice4Sell.type.sell"));
+		map.put(String.valueOf(Invoice4Sell.TYPE_REFUND),
+				getText("invoice4Sell.type.refund"));
+		return map;
+	}
 
 	@Override
 	protected String[] getGridSearchFields() {
@@ -342,7 +418,12 @@ public class Invoice4SellsAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected String getFormActionName() {
-		return "invoice4Sell";
+		//查看状态为退票时
+		if(readType!=null&&readType.equals(Invoice4Sell.READ_TYPE_REFUND)){
+			return "invoice4Refund";
+		}else{
+			return "invoice4Sell";
+		}
 	}
 
 	@Override
@@ -353,58 +434,63 @@ public class Invoice4SellsAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected String getGridRowLabelExpression() {
-		return "['car_plate']+'的发票销售单'";
+		//查看状态为查询时
+		if(readType!=null&&readType.equals(Invoice4Sell.READ_TYPE_READ)){
+			return "['car_plate']+'的发票单'";
+		//查看状态为退票时
+		}else if(readType!=null&&readType.equals(Invoice4Sell.READ_TYPE_REFUND)){
+			return "['car_plate']+'的发票退票单'";
+		}else{
+			return "['car_plate']+'的发票销售单'";
+		}
 	}
 	
 	@Override
 	protected Condition getGridSpecalCondition() {
 		// 状态条件
-		Condition statusCondition = null;
+		AndCondition ac = new AndCondition();
 		if (status != null && status.length() > 0) {
 			String[] ss = status.split(",");
 			if (ss.length == 1) {
-				statusCondition = new EqualsCondition("s.status_", new Integer(
-						ss[0]));
+				ac.add(new EqualsCondition("s.status_", new Integer(
+						ss[0])));
 			} else {
-				statusCondition = new InCondition("s.status_",
-						StringUtils.stringArray2IntegerArray(ss));
+				ac.add(new InCondition("s.status_",
+						StringUtils.stringArray2IntegerArray(ss)));
 			}
 		}
-		// carManId条件
-		Condition carManIdCondition = null;
-		if (buyerId != null) {
-			carManIdCondition = new EqualsCondition("s.buyer_id", buyerId);
-		}
-		// carId条件
-		Condition carIdCondition = null;
-		if (carId != null) {
-			carIdCondition = new EqualsCondition("s.car_id", carId);
-		}
-		// buyId采购单条件
-		Condition buyIdCondition = null;
-		if(buyId!=null){
-			buyIdCondition= new EqualsCondition("d.buy_id", buyId);
-		}
+		if (buyerId != null) 
+			ac.add(new EqualsCondition("s.buyer_id", buyerId));
 		
+		// carId条件
+		if (carId != null) 
+			ac.add(new EqualsCondition("s.car_id", carId));
+		
+		// buyId采购单条件
+		if(buyId!=null)
+			ac.add(new EqualsCondition("d.buy_id", buyId));	
+		//销售
+		if(readType==null||readType.equals(Invoice4Sell.READ_TYPE_SELL))
+			ac.add(new EqualsCondition("s.type_", Invoice4Sell.TYPE_SELL));
+		
+		//退票
+		if(readType!=null&&readType.equals(Invoice4Sell.READ_TYPE_REFUND))
+			ac.add(new EqualsCondition("s.type_", Invoice4Sell.TYPE_REFUND));
+			
 		// 合并条件
-		return ConditionUtils.mix2AndCondition(statusCondition,
-				carManIdCondition, carIdCondition,buyIdCondition);
+		return ac;
 	}
 
 	@Override
 	protected Toolbar getHtmlPageToolbar() {
 		Toolbar tb = new Toolbar();
-		if (!this.isReadonly()) {
-			if(buyId!=null){//采购单页签状态新建，若库存数量大于0则显示新建按钮
-				List<String> balanceCount = this.invoice4BuyService.findBalanceCountByInvoice4BuyId(buyId);
-				if(balanceCount!=null&&Integer.parseInt(balanceCount.get(0))>0){
-					// 新建按钮
-					tb.addButton(this.getDefaultCreateToolbarButton());
-				}
-			}else{
-				// 新建按钮
-				tb.addButton(this.getDefaultCreateToolbarButton());
-			}
+		//带权限且在查看状态为销售和退票时
+		if (!this.isReadonly()
+				&&(readType==null
+					||readType.equals(Invoice4Sell.READ_TYPE_SELL)
+						||readType.equals(Invoice4Sell.READ_TYPE_REFUND))) {
+			// 新建按钮
+			tb.addButton(this.getDefaultCreateToolbarButton());
 		}
 		// 查看按钮
 		tb.addButton(this.getDefaultOpenToolbarButton());
@@ -425,21 +511,39 @@ public class Invoice4SellsAction extends ViewAction<Map<String, Object>> {
 	protected Json getGridExtrasData() {
 		Json json = new Json();
 		// 状态条件
-		if (this.status != null || this.status.length() != 0) {
+		if (status != null && status.length() > 0) 
 			json.put("status", status);
-		}
+		
+		//类型
+		if(readType != null && readType.length() > 0)
+			json.put("readType", readType);
+		
 		// carManId条件
-		if (buyerId != null) {
+		if (buyerId != null) 
 			json.put("buyerId", buyerId);
-		}
+		
 		// carId条件
-		if (carId != null) {
+		if (carId != null) 
 			json.put("carId", carId);
-		}
-		if(buyId !=null){
+		
+		if(buyId !=null)
 			json.put("buyId", buyId);
-		}
+		
 		return json.isEmpty() ? null : json;
+	}
+	
+	//视图标题名称控制
+	@Override
+	protected String getHtmlPageTitle() {
+		//查看状态为查询时
+		if(readType!=null&&readType.equals(Invoice4Sell.READ_TYPE_READ)){
+			return getText("invoice.select");
+		//查看状态为退票时
+		}else if(readType!=null&&readType.equals(Invoice4Sell.READ_TYPE_REFUND)){
+			return getText("invoice4Refund.title");
+		}else{
+			return getText("invoice4Sell.title");
+		}
 	}
 	
 	// ==高级搜索代码开始==

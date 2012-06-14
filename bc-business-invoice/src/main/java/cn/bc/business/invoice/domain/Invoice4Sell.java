@@ -30,6 +30,13 @@ public class Invoice4Sell extends FileEntityImpl {
 	private static final long serialVersionUID = 1L;
 	public static final String KEY_UID = "Invoice4Sell.uid";
 	public static final String KEY_CODE = Invoice4Sell.class.getSimpleName();
+	
+	/** 发票销售查看状态：销售 */
+	public static final String READ_TYPE_SELL = "1";
+	/** 发票销售查看状态：退票 */
+	public static final String READ_TYPE_REFUND = "2";
+	/** 发票销售查看状态：查询 */
+	public static final String READ_TYPE_READ = "3";
 
 	/** 票务状态：正常 */
 	public static final int STATUS_NORMAL = 0;
@@ -40,6 +47,12 @@ public class Invoice4Sell extends FileEntityImpl {
 	public static final int PAY_TYPE_CASH = 0;
 	/** 收款方式：银行卡 */
 	public static final int PAY_TYPE_BANK_CARE = 1;
+	
+	/** 类型：已销 **/
+	public static final int TYPE_SELL=1;
+	
+	/** 类型：退票**/
+	public static final int TYPE_REFUND=2;
 
 	private Set<Invoice4SellDetail> invoice4SellDetail;
 	private Long buyerId;//购买人ID;
@@ -54,6 +67,7 @@ public class Invoice4Sell extends FileEntityImpl {
 	private String bankCode; //银行流水号
 	private String desc;//备注
 	private int status;//状态
+	private int type;//类型
 	
 	@OneToMany(mappedBy = "invoice4Sell", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
 	public Set<Invoice4SellDetail> getInvoice4SellDetail() {
@@ -149,4 +163,13 @@ public class Invoice4Sell extends FileEntityImpl {
 	public void setStatus(int status) {
 		this.status = status;
 	}
+	@Column(name = "TYPE_")
+	public int getType() {
+		return type;
+	}
+	public void setType(int type) {
+		this.type = type;
+	}
+	
+	
 }

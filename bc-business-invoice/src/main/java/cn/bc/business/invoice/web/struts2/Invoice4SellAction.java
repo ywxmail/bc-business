@@ -21,10 +21,6 @@ import org.springframework.stereotype.Controller;
 
 import cn.bc.BCConstants;
 import cn.bc.business.OptionConstants;
-import cn.bc.business.car.domain.Car;
-import cn.bc.business.car.service.CarService;
-import cn.bc.business.carman.domain.CarMan;
-import cn.bc.business.carman.service.CarManService;
 import cn.bc.business.invoice.domain.Invoice4Buy;
 import cn.bc.business.invoice.domain.Invoice4Sell;
 import cn.bc.business.invoice.domain.Invoice4SellDetail;
@@ -56,8 +52,7 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 	private Invoice4BuyService invoice4BuyService;
 	private OptionService optionService;
 	private MotorcadeService motorcadeService;
-	private CarService carService;
-	private CarManService carManService;
+	public String readType;//查询类型，1-发票销售，2-发票退票，3，发票查询,默认null为发票销售
 
 	public Long buyerId;
 	public Long carId;
@@ -95,16 +90,6 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 		this.motorcadeService = motorcadeService;
 	}
 
-	@Autowired
-	public void setCarService(CarService carService) {
-		this.carService = carService;
-	}
-
-	@Autowired
-	public void setCarManService(CarManService carManService) {
-		this.carManService = carManService;
-	}
-
 	@Override
 	public boolean isReadonly() {
 		// 票务管理员或系统管理员
@@ -128,46 +113,13 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 		entity.setStatus(BCConstants.STATUS_ENABLED);
 		entity.setPayType(Invoice4Sell.PAY_TYPE_CASH);
 		entity.setCashierId(entity.getAuthor());
-
-		if (carId != null) {// 车辆页签中的新建
-			Car car = this.carService.load(carId);
-			entity.setCarId(this.carId);
-			entity.setCarPlate(car.getPlate());
-			entity.setMotorcadeId(car.getMotorcade());
-			entity.setCompany(car.getCompany());
-			List<CarMan> carman = this.carManService
-					.selectAllCarManByCarId(this.carId);
-			if (carman.size() == 1) {
-				entity.setBuyerId(carman.get(0).getId());
-				entity.setBuyerName(carman.get(0).getName());
-			} else if (carman.size() > 1) {
-				isMoreBuyer = true;
-			} else {
-				isNullBuyer = true;
-			}
-			// 发票代码
+		
+		//查看状态为退票时
+		if(readType!=null&&readType.equals(Invoice4Sell.READ_TYPE_REFUND)){
+			entity.setType(Invoice4Sell.TYPE_REFUND);
 			this.codeList = this.invoice4BuyService.findEnabled4Option();
-		} else if (buyerId != null) {// 司机页签中的新建
-			CarMan carman = this.carManService.load(buyerId);
-			entity.setBuyerId(this.buyerId);
-			entity.setBuyerName(carman.getName());
-			List<Car> car = this.carService
-					.selectAllCarByCarManId(this.buyerId);
-			if (car.size() == 1) {
-				entity.setCarId(car.get(0).getId());
-				entity.setCarPlate(car.get(0).getPlate());
-				entity.setMotorcadeId(car.get(0).getMotorcade());
-				entity.setCompany(car.get(0).getCompany());
-			} else if (car.size() > 1) {
-				isMoreCar = true;
-			} else {
-				isNullCar = true;
-			}
-			// 发票代码
-			this.codeList = this.invoice4BuyService.findEnabled4Option();
-		} else if (buyId != null) {
-			this.codeList = this.invoice4BuyService.findOneInvoice4Buy(buyId);
-		} else {
+		}else{
+			entity.setType(Invoice4Sell.TYPE_SELL);
 			// 发票代码
 			this.codeList = this.invoice4BuyService.findEnabled4Option();
 		}
@@ -177,14 +129,25 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 	protected void afterEdit(Invoice4Sell entity) {
 		super.afterEdit(entity);
 		Set<Invoice4SellDetail> isd4set = entity.getInvoice4SellDetail();
-		this.codeList = this.invoice4BuyService.findEnabled4Option();
-		
-		// 遍历销售单对应的set集合，查出每个集合对应的采购
-		for (Invoice4SellDetail isd : isd4set) {
-			OptionItem.insertIfNotExist(codeList, isd.getBuyId().toString(), 
-			this.invoice4BuyService.findOneInvoice4Buy(isd.getBuyId()).get(0).get("value"));
-		}
 
+		//查看状态为退票时
+		if(readType!=null&&readType.equals(Invoice4Sell.READ_TYPE_REFUND)){
+			// 发票代码
+			this.codeList = this.invoice4BuyService.findEnabled4Option();
+			// 遍历销售单对应的set集合，查出每个集合对应的采购
+			for (Invoice4SellDetail isd : isd4set) {
+				OptionItem.insertIfNotExist(codeList, isd.getBuyId().toString(), 
+				this.invoice4BuyService.findOneInvoice4Buy(isd.getBuyId()).get(0).get("value"));
+			}
+		}else{
+			// 发票代码
+			this.codeList = this.invoice4BuyService.findEnabled4Option();
+			// 遍历销售单对应的set集合，查出每个集合对应的采购
+			for (Invoice4SellDetail isd : isd4set) {
+				OptionItem.insertIfNotExist(codeList, isd.getBuyId().toString(), 
+				this.invoice4BuyService.findOneInvoice4Buy(isd.getBuyId()).get(0).get("value"));
+			}
+		}
 	}
 
 	@Override
@@ -211,7 +174,7 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 
 		// 销售明细集合
 		Set<Invoice4SellDetail> details = this.parseSell4DetailString(
-				this.sellDetails, entity.getStatus());
+				this.sellDetails, entity.getStatus() ,entity.getType());
 
 		// 集合放进对象中
 		if (this.getE().getInvoice4SellDetail() != null
@@ -224,9 +187,17 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 
 	}
 
+	
+	
+	@Override
+	protected String getPageTitle() {
+		// TODO Auto-generated method stub
+		return super.getPageTitle();
+	}
+
 	// 解析销售明细字符串返回销售明细集合
 	private LinkedHashSet<Invoice4SellDetail> parseSell4DetailString(
-			String detailStr, int status) {
+			String detailStr, int status,int type) {
 		try {
 			// 销售明细集合
 			LinkedHashSet<Invoice4SellDetail> details = null;
@@ -242,6 +213,7 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 						resDetails.setId(json.getLong("id"));
 					resDetails.setInvoice4Sell(this.getE());
 					resDetails.setStatus(status);
+					resDetails.setType(type);
 					resDetails.setBuyId(Long.parseLong(json.getString("buyId")
 							.trim()));
 					resDetails.setStartNo(json.getString("startNo").trim());
@@ -315,7 +287,11 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 
 	@Override
 	protected void buildFormPageButtons(PageOption pageOption, boolean editable) {
-		if (!this.isReadonly()) {
+		//带权限且在查看状态为销售和退票时
+		if (!this.isReadonly()
+				&&(readType==null
+					||readType.equals(Invoice4Sell.READ_TYPE_SELL)
+						||readType.equals(Invoice4Sell.READ_TYPE_REFUND))){
 			if (editable) {// 可编辑时显示保存按钮
 				pageOption.addButton(new ButtonOption(getText("label.save"),
 						null, "bs.invoice4SellForm.save")
@@ -324,7 +300,7 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 						null,"bs.invoice4SellForm.saveAndClose")
 						.setId("invoice4SellSave"));
 			} else {// open时
-				if (this.getE().getStatus() == Invoice4Buy.STATUS_NORMAL) {
+				if (this.getE().getStatus() == Invoice4Sell.STATUS_NORMAL) {
 					// 维护
 					pageOption.addButton(new ButtonOption(
 							getText("invoice.optype.edit"), null,
@@ -401,7 +377,7 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 		// 作废销售单不需要进入检测
 		if (this.status == Invoice4Sell.STATUS_NORMAL) {
 			LinkedHashSet<Invoice4SellDetail> details = this
-					.parseSell4DetailString(this.sellDetailsStr, 0);
+					.parseSell4DetailString(this.sellDetailsStr, 0,1);
 			// 检查结果：checkResult
 			String jsonStr = this.checkDetailItself(
 					this.setChangeList4detail(details), json);
