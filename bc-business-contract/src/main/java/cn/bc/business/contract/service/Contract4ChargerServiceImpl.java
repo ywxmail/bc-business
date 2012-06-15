@@ -985,15 +985,10 @@ public class Contract4ChargerServiceImpl extends
 					params.put(code + "4CN", cfd.getPrice() < 1 ? "零"
 							: multiDigit2Chinese(cfd.getPrice() + ""));
 
-					// 每月承包款
-					if (code.equals("MYCBK")) {
-						cfdList.add(cfd);
-					}
-
 					// 收费通知单合同费用项目
 					cDetailMap = new HashMap<String, String>();
 					cDetailMap.put("pg", cfd.getName());
-					cDetailMap.put("desc", cfd.getDescription());
+					cDetailMap.put("desc", cfd.getDescription().replaceAll("/n", "\n"));
 					// 声明金额栏
 					String price = "";
 					// 拼装日期
@@ -1032,6 +1027,18 @@ public class Contract4ChargerServiceImpl extends
 						cDetailMap.put("price", price + strPayTypeDate);
 						cDetailList.add(cDetailMap);
 						continue;
+					}
+					
+					//每月承包款
+					if (!jo.isNull("isMYCBK") && jo.getBoolean("isMYCBK"))
+						cfdList.add(cfd);
+					
+					//收费通知计费开始日期
+					if (!jo.isNull("isRSDV") && jo.getBoolean("isRSDV")){
+						if (cfd.getStartDate() != null) {
+							params.put("chargeDate",DateUtils.formatCalendar(cfd.getStartDate(),
+									"yyyy年MM月dd日"));
+						}
 					}
 
 					// 是否加入每人
@@ -1080,7 +1087,7 @@ public class Contract4ChargerServiceImpl extends
 				params.put("cfded" + i, DateUtils.formatCalendar(
 						cfdList.get(i - 1).getEndDate(), "dd"));
 				// word文档 金额
-				params.put("mycbf" + i, multiDigit2Chinese(String
+				params.put("mycbf" + i, number2Chinese(String
 						.valueOf(cfdList.get(i - 1).getPrice())));
 			}
 			// 每月承包费不足6年时
@@ -1092,7 +1099,7 @@ public class Contract4ChargerServiceImpl extends
 					params.put("cfdey" + (cfdList.size() + i), "　／");
 					params.put("cfdem" + (cfdList.size() + i), "／");
 					params.put("cfded" + (cfdList.size() + i), "／");
-					params.put("mycbf" + (cfdList.size() + i), "／");
+					params.put("mycbf" + (cfdList.size() + i), "／仟／佰／拾／");
 				}
 			}
 		}
@@ -1166,6 +1173,19 @@ public class Contract4ChargerServiceImpl extends
 		params.put("certNo4", carList.get(0).get("certNo4"));
 		// 车队
 		params.put("motorcade", carList.get(0).get("motorcade"));
+		// 原车号
+		params.put("originNo", carList.get(0).get("originNo"));
+		// 原公司
+		params.put("originCompany", carList.get(0).get("originCompany"));
+		
+		//车辆迁入原信息
+		if(carList.get(0).get("originNo")==null||carList.get(0).get("originNo").length()==0){
+			params.put("originInfo","（由外迁入）");
+		}else{
+			params.put("originInfo", "（套"+carList.get(0).get("originCompany")
+					+carList.get(0).get("originNo")+"）");
+		}
+		
 		// ------车辆信息-----结束--
 
 		// ------正副班司机信息-----开始--
@@ -1252,6 +1272,34 @@ public class Contract4ChargerServiceImpl extends
 		this.attachService.save(attach);
 		return attach;
 
+	}
+	
+	// 多位数字转换为中文繁体并且补零 如8000 转后为 捌仟零佰零拾零
+	private String number2Chinese(String n){
+		String num1[] = { "零", "壹", "贰", "叁", "肆", "伍", "陆", "柒", "捌", "玖", };
+		String num2[] = { "", "拾", "佰", "仟", "万", "亿", "兆", "吉", "太", "拍", "艾" };
+		n = n.indexOf(".") > 0 ? n.substring(0, n.indexOf(".")) : n;
+		
+		int len = n.length();
+
+		if (len <= 5) {
+			String ret = "";
+			for (int i = 0; i < len; ++i) {
+					ret = ret + num1[n.substring(i, i + 1).charAt(0) - '0']
+							+ num2[len - i - 1];
+			}
+			return ret;
+		} else if (len <= 8) {
+			String ret = multiDigit2Chinese(n.substring(0, len - 4));
+			if (ret.length() != 0)
+				ret += num2[4];
+			return ret + multiDigit2Chinese(n.substring(len - 4));
+		} else {
+			String ret = multiDigit2Chinese(n.substring(0, len - 8));
+			if (ret.length() != 0)
+				ret += num2[5];
+			return ret + multiDigit2Chinese(n.substring(len - 8));
+		}
 	}
 
 	// 多位数字转换为中文繁体

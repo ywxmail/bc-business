@@ -677,6 +677,11 @@ public class Contract4ChargerDaoImpl extends
 	public List<Map<String, String>> findCarByContractId(Long contractId) {
 		String hql = "SELECT  b.plate_type,b.plate_no,b.factory_type,b.factory_model,b.vin,b.engine_no,b.color";
 		hql += ",to_char(b.register_date,'YYYY-MM-DD'),b.code,b.company,b.cert_no2,b.cert_no4,m.name";
+		//原车号和原公司
+		hql += ",b.origin_no";
+		//通过经营权证找原公司
+		hql += ",(select c.company from bs_car c where c.cert_no2 = b.cert_no2 and c.file_Date < b.file_Date ";
+		hql += "and c.status_ = 1 order by c.register_date Desc limit 1) as originCompany";
 		hql += " FROM bs_car_contract a";
 		hql += " inner join bs_car b on b.id=a.car_id";
 		hql += " inner join bs_motorcade m on m.id=b.motorcade_id";
@@ -693,13 +698,36 @@ public class Contract4ChargerDaoImpl extends
 						oi.put("factoryMode", rs[i++].toString());
 						oi.put("vin", rs[i++].toString());
 						oi.put("engineNo", rs[i++].toString());
-						oi.put("color", rs[i++].toString());
+						Object objColor=rs[i++];
+						if(objColor!=null){
+							oi.put("color", objColor.toString());
+						}else
+						oi.put("color","");
 						oi.put("registerDate", rs[i++].toString());
 						oi.put("code", rs[i++].toString());
 						oi.put("company", rs[i++].toString());
-						oi.put("certNo2", rs[i++].toString());
-						oi.put("certNo4", rs[i++].toString());
-						oi.put("motorcade", rs[i++].toString());
+						Object objCertNo2=rs[i++];
+						if(objCertNo2!=null){
+							oi.put("certNo2", objCertNo2.toString());
+						}else
+						oi.put("certNo2","");
+						Object objCertNo4=rs[i++];
+						if(objCertNo4!=null){
+							oi.put("certNo4", objCertNo4.toString());
+						}else
+						oi.put("certNo4", "");
+						oi.put("motorcade", rs[i++].toString());				
+						Object objOriginNo=rs[i++];
+						if(objOriginNo!=null){
+							oi.put("originNo",objOriginNo.toString());
+						}else
+						oi.put("originNo", "");
+						Object objOriginCompany=rs[i++];
+						if(objOriginCompany!=null){
+							oi.put("originCompany", objOriginCompany.toString());
+						}else{
+							oi.put("originCompany","");
+						}
 						return oi;
 					}
 				});
@@ -717,11 +745,31 @@ public class Contract4ChargerDaoImpl extends
 						Map<String, String> oi = new HashMap<String, String>();
 						int i = 0;
 						oi.put("name", rs[i++].toString());
-						oi.put("address", rs[i++].toString());
-						oi.put("address1", rs[i++].toString());
+						Object objAddress=rs[i++];
+						if(objAddress!=null){
+							oi.put("address", objAddress.toString());
+						}else{
+							oi.put("address","");
+						}
+						Object objAddress1=rs[i++];
+						if(objAddress1!=null){
+							oi.put("address1", objAddress1.toString());
+						}else{
+							oi.put("address1","");
+						}
 						oi.put("certIdentity", rs[i++].toString());
-						oi.put("phone", rs[i++].toString());
-						oi.put("phone1", rs[i++].toString());
+						Object objPhone=rs[i++];
+						if(objPhone!=null){
+							oi.put("phone", objPhone.toString());
+						}else{
+							oi.put("phone","");
+						}
+						Object objPhone1=rs[i++];
+						if(objPhone1!=null){
+							oi.put("phone1", objPhone1.toString());
+						}else{
+							oi.put("phone1","");
+						}
 						oi.put("certFWZG", rs[i++].toString());
 						return oi;
 					}
@@ -762,21 +810,41 @@ public class Contract4ChargerDaoImpl extends
 						Map<String, String> oi = new HashMap<String, String>();
 						int i = 0;
 						oi.put("name", rs[i++].toString());
-						oi.put("address", rs[i++].toString());
-						oi.put("address1", rs[i++].toString());
+						Object objAddress=rs[i++];
+						if(objAddress!=null){
+							oi.put("address", objAddress.toString());
+						}else{
+							oi.put("address","");
+						}
+						Object objAddress1=rs[i++];
+						if(objAddress1!=null){
+							oi.put("address1", objAddress1.toString());
+						}else{
+							oi.put("address1","");
+						}
 						oi.put("certIdentity", rs[i++].toString());
-						oi.put("phone", rs[i++].toString());
-						oi.put("phone1", rs[i++].toString());
+						Object objPhone=rs[i++];
+						if(objPhone!=null){
+							oi.put("phone", objPhone.toString());
+						}else{
+							oi.put("phone","");
+						}
+						Object objPhone1=rs[i++];
+						if(objPhone1!=null){
+							oi.put("phone1", objPhone1.toString());
+						}else{
+							oi.put("phone1","");
+						}
 						oi.put("certFWZG", rs[i++].toString());
 						Object o = rs[i++];
 						if (o == null) {
-							oi.put("houseType", null);
+							oi.put("houseType", "");
 						} else {
 							oi.put("houseType", o.toString());
 						}
 						Object o2 = rs[i++];
 						if (o2 == null) {
-							oi.put("joinDate", null);
+							oi.put("joinDate", "");
 						} else {
 							oi.put("joinDate", o2.toString());
 						}
