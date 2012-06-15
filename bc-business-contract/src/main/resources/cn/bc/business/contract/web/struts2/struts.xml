@@ -63,6 +63,8 @@
 		<action name="getDriverAmount" class="contract4ChargerAction" method="getDriverAmount" />
 		<action name="checkCodeIsExist" class="contract4ChargerAction" method="checkCodeIsExist" />
 		<action name="addAttachFromTemplate" class="contract4ChargerAction" method="addAttachFromTemplate" />
+		<action name="checkDriverOrCarStatus" class="contract4ChargerAction" method="checkDriverOrCarStatus" />
+		
 	</package>
 	
 	<!-- 经济合同的版本管理 -->

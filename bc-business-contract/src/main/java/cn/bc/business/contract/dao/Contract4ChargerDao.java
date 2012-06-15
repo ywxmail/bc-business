@@ -227,4 +227,20 @@ public interface Contract4ChargerDao extends CrudDao<Contract4Charger> {
 	 * @return
 	 */
 	int getDriverAmount(Long carId);
+
+	/**
+	 * 将车辆状态更新为在案
+	 * 
+	 * @param draftCarId
+	 *            车辆Id
+	 */
+	void doWarehous4Car(Long draftCarId);
+
+	/**
+	 * 将司机的状态更新为在案
+	 * 
+	 * @param draftCarManId
+	 *            司机Id
+	 */
+	void doWarehous4CarMan(Long draftCarManId);
 }
