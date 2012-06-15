@@ -133,7 +133,7 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 		sql.append(",nm.name newMotoreade,d.to_unit,oc.plate_type oldPlateType,oc.plate_no oldPlateNo,d.from_classes");
 		sql.append(",om.name oldMotoreade,d.from_unit,d.move_type,d.move_date,d.driver_id,d.from_car_id,d.to_car_id");
 		sql.append(",d.from_motorcade_id,d.to_motorcade_id,d.shiftwork,d.end_date,m.cert_fwzg,d.hand_papers_date");
-		sql.append(",m.status_ status from BS_CAR_DRIVER_HISTORY d");
+		sql.append(",m.status_ status,d.desc_ from BS_CAR_DRIVER_HISTORY d");
 		sql.append(" left join bs_carman m on m.id=d.driver_id");
 		sql.append(" left join bs_car  oc on oc.id=d.from_car_id");
 		sql.append(" left join bs_car  nc on nc.id=d.to_car_id");
@@ -188,6 +188,7 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 				map.put("cert_fwzg", rs[i++]);
 				map.put("hand_papers_date", rs[i++]);
 				map.put("status", rs[i++]);
+				map.put("desc_", rs[i++]);
 
 				return map;
 			}
@@ -269,6 +270,9 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 				getText("carByDriverHistory.shiftwork"), 400)
 				.setValueFormater(new LinkFormater4CarInfo(this
 						.getContextPath())));
+		columns.add(new TextColumn4MapKey("d.desc_", "desc_",
+				getText("carByDriverHistory.description"), 220).setSortable(true)
+				.setUseTitleFromLabel(true));
 		columns.add(new HiddenColumn4MapKey("status", "status"));// 司机的状态，用于是否能删除草稿状态的迁移记录
 		return columns;
 	}

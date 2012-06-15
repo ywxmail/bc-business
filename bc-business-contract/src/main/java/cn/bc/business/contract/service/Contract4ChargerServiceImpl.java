@@ -1389,65 +1389,6 @@ public class Contract4ChargerServiceImpl extends
 
 		json.put("success", true);
 
-		// 经济合同入库
-		// Map<String, Object> carInfoMap; // 车辆Map
-		// Map<String, Object> carManInfoMap; // 车辆Map
-		// Json json = new Json();
-		// boolean success4car = true;
-		// boolean success4carMan = true;
-		// String msg = "";
-		// // 查找车辆的状态和车牌号
-		// carInfoMap = this.contract4ChargerDao.findCarByCarId(contractCarId);
-		// if (carInfoMap != null) {
-		// // 如果车辆状态不为草稿时，不能入库
-		// if (Long.valueOf(String.valueOf(carInfoMap.get("status_"))) ==
-		// BCConstants.STATUS_DRAFT) {
-		// success4car = false;
-		// msg = carInfoMap.get("plate_type") + "."
-		// + carInfoMap.get("plate_no");
-		//
-		// }
-		// }
-		// String[] carManIds = carMansId.split(",");
-		// for (String carManId : carManIds) {
-		// // 查找责任人的状态和姓名
-		// carManInfoMap = this.contract4ChargerDao
-		// .getCarManInfoByCarManId(Long.valueOf(carManId));
-		// if (carManInfoMap != null) {
-		// // 如果责任人状态不为草稿时，不能入库
-		// if (Long.valueOf(String.valueOf(carManInfoMap.get("status_"))) ==
-		// BCConstants.STATUS_DRAFT) {
-		// success4carMan = false;
-		// msg = (String) (msg.length() > 0 || msg != "" ? msg + " 、"
-		// + carManInfoMap.get("name") : carManInfoMap
-		// .get("name"));
-		//
-		// }
-		// }
-		//
-		// }
-		// // 如果都为入库状态，则该经济合同可以入库
-		// if (success4car == true && success4carMan == true) {
-		// contract4Charger.setStatus(BCConstants.STATUS_ENABLED);
-		// // 如果pid不为空，则为变更操作新建入库
-		// if (contract4Charger.getPid() != null) {
-		// this.doOperate(contractCarId, contract4Charger,
-		// getChargerIds(contract4Charger.getExt_str2()),
-		// contract4Charger.getPid(),
-		// contract4Charger.getExt_str3());
-		//
-		// } else {
-		// // 无变更操作下新建
-		// this.save(contract4Charger, contractCarId,
-		// getChargerIds(contract4Charger.getExt_str2()), null);
-		//
-		// }
-		//
-		// json.put("success", true);
-		// } else {
-		// json.put("success", false);
-		// json.put("msg", "入库失败！请先将  " + msg + " 入库！");
-		// }
 		this.json = json.toString();
 		return this.json;
 	}
@@ -1523,7 +1464,7 @@ public class Contract4ChargerServiceImpl extends
 			json.put("success", true);
 		} else {
 			json.put("success", false);
-			json.put("msg", msg + " 尚未入库！是否将" + msg + "同时入库？");
+			json.put("msg", msg + " 尚未入库！是否将 " + msg + " 同时入库？");
 			// 如果车辆或司机Id不为空就写入Id
 			if (draftCarId.length() > 0) {
 				json.put("carId", draftCarId);
