@@ -117,7 +117,7 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 		//查看状态为退票时
 		if(readType!=null&&readType.equals(Invoice4Sell.READ_TYPE_REFUND)){
 			entity.setType(Invoice4Sell.TYPE_REFUND);
-			this.codeList = this.invoice4BuyService.findEnabled4Option();
+			this.codeList = this.invoice4BuyService.findRefundEnabled4Option();
 		}else{
 			entity.setType(Invoice4Sell.TYPE_SELL);
 			// 发票代码
@@ -133,7 +133,7 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 		//查看状态为退票时
 		if(readType!=null&&readType.equals(Invoice4Sell.READ_TYPE_REFUND)){
 			// 发票代码
-			this.codeList = this.invoice4BuyService.findEnabled4Option();
+			this.codeList = this.invoice4BuyService.findRefundEnabled4Option();
 			// 遍历销售单对应的set集合，查出每个集合对应的采购
 			for (Invoice4SellDetail isd : isd4set) {
 				OptionItem.insertIfNotExist(codeList, isd.getBuyId().toString(), 

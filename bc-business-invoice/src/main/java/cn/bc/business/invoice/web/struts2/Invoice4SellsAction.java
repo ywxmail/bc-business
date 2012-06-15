@@ -593,7 +593,15 @@ public class Invoice4SellsAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	public String getAdvanceSearchConditionsJspPath() {
-		return  BSConstants.NAMESPACE + "/invoice/sell";
+		//查看状态为查询时
+		if(readType!=null&&readType.equals(Invoice4Sell.READ_TYPE_READ)){
+			return  BSConstants.NAMESPACE + "/invoice/read";
+		//查看状态为退票时
+		}else if(readType!=null&&readType.equals(Invoice4Sell.READ_TYPE_REFUND)){
+			return  BSConstants.NAMESPACE + "/invoice/refund";
+		}else{
+			return  BSConstants.NAMESPACE + "/invoice/sell";
+		}
 	}
 	// ==高级搜索代码结束==
 }

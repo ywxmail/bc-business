@@ -48,7 +48,7 @@ public class Invoice4Sell extends FileEntityImpl {
 	/** 收款方式：银行卡 */
 	public static final int PAY_TYPE_BANK_CARE = 1;
 	
-	/** 类型：已销 **/
+	/** 类型：实销 **/
 	public static final int TYPE_SELL=1;
 	
 	/** 类型：退票**/

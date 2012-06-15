@@ -37,24 +37,31 @@
 	
 	<!-- 发票退票-->
 	<package name="invoice4Refunds" extends="bc-default" namespace="/bc-business/invoice4Refunds">
-		<action name="create" class="invoice4SellsAction" method="create">
-			
+		<action name="data" class="invoice4SellsAction" method="data">
+			<param name="readType">2</param>
 		</action>		
-		<action name="open" class="invoice4SellsAction" method="open">
-			
+		<action name="list" class="invoice4SellsAction" method="list">
+			<param name="readType">2</param>
 		</action>
-		<action name="edit" class="invoice4SellsAction" method="edit">
-			
+		<action name="paging" class="invoice4SellsAction" method="paging">
+			<param name="readType">2</param>
+		</action>
+		<action name="conditions" class="invoice4SellsAction" method="conditions">
+			<param name="readType">2</param>
+			<result name="success">${advanceSearchConditionsJspPath}/conditions.jsp</result>
 		</action>
 	</package>
 	<package name="invoice4Refund" extends="bc-default" namespace="/bc-business/invoice4Refund">
 		<action name="create" class="invoice4SellAction" method="create">
+			<param name="readType">2</param>
 			<result name="form">/bc-business/invoice/sell/form.jsp</result>
 		</action>		
 		<action name="open" class="invoice4SellAction" method="open">
+			<param name="readType">2</param>
 			<result name="formr">/bc-business/invoice/sell/form.jsp</result>
 		</action>
 		<action name="edit" class="invoice4SellAction" method="edit">
+			<param name="readType">2</param>
 			<result name="form">/bc-business/invoice/sell/form.jsp</result>
 		</action>
 	</package>
