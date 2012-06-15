@@ -25,6 +25,14 @@ public interface Invoice4BuyDao extends CrudDao<Invoice4Buy> {
 	List<Map<String, String>> findEnabled4Option();
 	
 	/**
+	 * 获取当前可用的退票单下拉列表信息
+	 * 
+	 * @return 返回结果中的元素Map格式为：：id -- Invoice4Buy的id,
+	 * name -- Invoice4Buy的code(startNo-endNo),如:XXXX(10001~20000)
+	 */
+	List<Map<String, String>> findRefundEnabled4Option();
+	
+	/**
 	 * 获取一个拼装为字符串的采购单信息
 	 * @param id
 	 * @return value--code(startNo-endNo)company,buy_date,type,balanceCount,

@@ -79,7 +79,7 @@ public class Invoice4BuysAction extends ViewAction<Map<String, Object>> {
 		sql.append(",b.company as company,b.type_ as type_,b.count_ as count_,b.buy_price as buy_price");
 		sql.append(",b.desc_ as desc,b.unit_ as unit_,b.sell_price as sell_price,a.actor_name as buyerName");
 		//计算剩余数量
-		sql.append(",(select sum(count_) from bs_invoice_sell_detail where buy_id=b.id and status_=0) as balance_count");
+		sql.append(",get_balancecount_invoice_buyid(b.id) as balance_count");
 		//sql.append(",getbalancenumberbyinvoicebuyid(b.id,b.count_,b.start_no,b.end_no) as balance_number");
 		sql.append(",au.actor_name as author_name,b.file_date as file_date");
 		sql.append(",am.actor_name as modified_name,b.modified_date as modified_date,b.patch_no,b.project_no");
@@ -120,13 +120,7 @@ public class Invoice4BuysAction extends ViewAction<Map<String, Object>> {
 				map.put("unit_", rs[i++]); // 单位
 				map.put("sell_price", rs[i++]); // 销售单价
 				map.put("buyerName", rs[i++]); // 购买人
-				Object obj_sell_count=rs[i++];
-				if(obj_sell_count==null){
-					map.put("balance_count", map.get("count_"));// 剩余数量
-				}else{
-					int balanceCount=Integer.parseInt(map.get("count_").toString())-Integer.parseInt(obj_sell_count.toString());
-					map.put("balance_count",balanceCount);// 剩余数量
-				}
+				map.put("balance_count",rs[i++]);// 剩余数量
 				map.put("author_name", rs[i++]); // 创建人
 				map.put("file_date", rs[i++]); // 创建时间
 				map.put("modified_name", rs[i++]); // 最后修改人
