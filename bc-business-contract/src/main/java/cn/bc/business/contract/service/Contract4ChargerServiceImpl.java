@@ -1447,7 +1447,7 @@ public class Contract4ChargerServiceImpl extends
 				if (Long.valueOf(String.valueOf(carManInfoMap.get("status_"))) == BCConstants.STATUS_DRAFT) {
 					success4carMan = false;
 					msg = (String) (msg.length() > 0 || msg != "" ? msg + " 、"
-							+ "司机 " + carManInfoMap.get("name") : "司机 "
+							+ "责任人 " + carManInfoMap.get("name") : "责任人 "
 							+ carManInfoMap.get("name"));
 					if (i > 0) {
 						drafDriverId += "," + carManId;
