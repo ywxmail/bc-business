@@ -45,4 +45,12 @@
 		<action name="checkPlateIsExists" class="carAction" method="checkPlateIsExists"/>
 		<action name="checkCodeIsExists" class="carAction" method="checkCodeIsExists"/>
 	</package>
+	
+	<!-- 车辆资料报表高级搜索 -->
+	<package name="cars" extends="bc-default" namespace="/bc-business">
+		<!-- 高级搜索条件窗口 -->
+		<action name="cars/conditions2" class="carsAction" method="conditions">
+			<result name="success">/bc-business/car/conditions2.jsp</result>
+		</action>
+	</package>
 </struts>
