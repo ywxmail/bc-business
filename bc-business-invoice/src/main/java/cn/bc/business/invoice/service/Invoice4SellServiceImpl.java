@@ -62,4 +62,14 @@ public class Invoice4SellServiceImpl extends DefaultCrudService<Invoice4Sell> im
 		return this.invoice4SellDao.selectListSellDetailByCode(buyId);
 	}
 
+	public int countInvoiceRefundCountBySellDate(Integer type,
+			Calendar SellDate, String company, boolean flag) {
+		return this.invoice4SellDao.countInvoiceRefundCountBySellDate(type, SellDate, company, flag);
+	}
+
+	public int countInvoiceRefundCountBySellDate(Integer type,
+			Calendar SellDateFrom, Calendar SellDateTo, String company) {
+		return this.invoice4SellDao.countInvoiceRefundCountBySellDate(type, SellDateFrom, SellDateTo, company);
+	}
+
 }

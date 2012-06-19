@@ -87,9 +87,11 @@ public class Invoice4SellDaoImpl extends HibernateCrudJpaDao<Invoice4Sell> imple
 	 * @return
 	 */
 	public List<Map<String,String>> selectSellDetailByCode(Long buyId,Long sellId) {
-		String sql="select d.start_no,d.end_no,d.sell_id";
+		String sql="select d.start_no,d.end_no,d.sell_id,d.type_";
 				sql+=" from  bs_invoice_sell_detail d"; 
-				sql+=" where d.status_=0 and d.buy_id=? and d.sell_id!=? order by d.start_no";
+				sql+=" inner join bs_invoice_sell s on s.id=d.sell_id"; 
+				sql+=" where d.status_=0 and d.buy_id=?  ";
+				sql+=" and (select file_date from bs_invoice_sell where id=?)<s.fileDate";
 				
 		return HibernateJpaNativeQuery.executeNativeSql(getJpaTemplate(), sql,
 				new Object[]{buyId,sellId},new RowMapper<Map<String, String>>() {
@@ -123,13 +125,10 @@ public class Invoice4SellDaoImpl extends HibernateCrudJpaDao<Invoice4Sell> imple
 			sql.append(" and b.type_=?");
 			args.add(type);
 		} 
-		
-		
 		if(flag){
 			sql.append(" and b.buy_date<=?");
-		}else{
+		}else
 			sql.append(" and b.buy_date<?");
-		}
 		
 		args.add(buyDate);
 		
@@ -138,10 +137,8 @@ public class Invoice4SellDaoImpl extends HibernateCrudJpaDao<Invoice4Sell> imple
 			args.add(company);
 		}
 		
-		
 		//jdbc 查询
 		count = this.jdbcTemplate.queryForInt(sql.toString(), args.toArray());
-		
 		return count;
 	}
 
@@ -194,7 +191,7 @@ public class Invoice4SellDaoImpl extends HibernateCrudJpaDao<Invoice4Sell> imple
 		sql.append("select sum(d.count_) sellCount from bs_invoice_sell_detail d")
 		   .append(" inner join bs_invoice_sell s on s.id=d.sell_id")
 		   .append(" inner join bs_invoice_buy b on b.id=d.buy_id")
-		   .append(" where s.status_=0 ");
+		   .append(" where s.status_=0 and d.type_=1");
 		
 		if(type!=null){
 			sql.append(" and b.type_=?");
@@ -203,9 +200,9 @@ public class Invoice4SellDaoImpl extends HibernateCrudJpaDao<Invoice4Sell> imple
 
 		if(flag){
 			sql.append(" and s.sell_date<=?");
-		}else{
+		}else
 			sql.append(" and s.sell_date<?");
-		}
+		
 		
 		args.add(SellDate);
 		
@@ -236,7 +233,84 @@ public class Invoice4SellDaoImpl extends HibernateCrudJpaDao<Invoice4Sell> imple
 		sql.append("select sum(d.count_) sellCount from bs_invoice_sell_detail d")
 		   .append(" inner join bs_invoice_sell s on s.id=d.sell_id")
 		   .append(" inner join bs_invoice_buy b on b.id=d.buy_id")
-	       .append(" where s.status_=0 and s.sell_date>=? and s.sell_date<=?");
+	       .append(" where s.status_=0 and d.type_=1 and s.sell_date>=? and s.sell_date<=?");
+		
+		args.add(SellDateFrom);
+		args.add(SellDateTo);
+		
+		if(type!=null){
+			sql.append(" and b.type_=?");
+			args.add(type);
+		} 
+
+		if(company != null && company.length() >0){
+			sql.append(" and b.company=?");
+			args.add(company);
+		}
+		
+		//jdbc 查询
+		count = this.jdbcTemplate.queryForInt(sql.toString(),  args.toArray());
+		
+		return count;
+	}
+	
+	/**
+	 * 指定销售日期 总退票数(company为null即查宝城和广发所有记录)
+	 * @param type
+	 * @param SellDate
+	 * @param company
+	 * @return
+	 */
+	public int countInvoiceRefundCountBySellDate(Integer type, Calendar SellDate,String company,boolean flag) {
+		int count = 0;
+		ArrayList<Object> args = new ArrayList<Object>();
+		StringBuffer sql = new StringBuffer();
+		sql.append("select sum(d.count_) sellCount from bs_invoice_sell_detail d")
+		   .append(" inner join bs_invoice_sell s on s.id=d.sell_id")
+		   .append(" inner join bs_invoice_buy b on b.id=d.buy_id")
+		   .append(" where s.status_=0 and d.type_=2");
+		
+		if(type!=null){
+			sql.append(" and b.type_=?");
+			args.add(type);
+		} 
+
+		if(flag){
+			sql.append(" and s.sell_date<=?");
+		}else
+			sql.append(" and s.sell_date<?");
+		
+		
+		args.add(SellDate);
+		
+		if(company != null && company.length() >0){
+			sql.append(" and b.company=?");
+			args.add(company);
+		}
+		
+		//jdbc 查询
+		count = this.jdbcTemplate.queryForInt(sql.toString(),  args.toArray());
+		
+		return count;
+	}
+
+	/**
+	 * 指定销售日期范围  总退票数(company为null即查宝城和广发所有记录)
+	 * @param type
+	 * @param SellDateFrom
+	 * @param SellDateTo
+	 * @param company
+	 * @return
+	 */
+	public int countInvoiceRefundCountBySellDate(Integer type,
+			Calendar SellDateFrom, Calendar SellDateTo,String company) {
+		int count = 0;
+		ArrayList<Object> args = new ArrayList<Object>();
+		StringBuffer sql = new StringBuffer();
+		sql.append("select sum(d.count_) sellCount from bs_invoice_sell_detail d")
+		   .append(" inner join bs_invoice_sell s on s.id=d.sell_id")
+		   .append(" inner join bs_invoice_buy b on b.id=d.buy_id")
+	       .append(" where s.status_=0 and d.type_=2 and s.sell_date>=? and s.sell_date<=?");
 		
 		args.add(SellDateFrom);
 		args.add(SellDateTo);

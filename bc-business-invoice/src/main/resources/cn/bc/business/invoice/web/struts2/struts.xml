@@ -63,7 +63,7 @@
 			<param name="readType">2</param>
 			<result name="form">/bc-business/invoice/refund/form.jsp</result>
 		</action>
-		<action name="save" class="invoice4SellAction" method="save">
+		<action name="save" class="invoice4SellAction" method="saveRefund">
 			<param name="readType">2</param>
 		</action>
 		<action name="autoLoadInvoice4BuyCode" class="invoice4SellAction" method="autoLoadInvoice4BuyCode">

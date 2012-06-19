@@ -88,76 +88,108 @@ public class Invoice4SellStatsAction extends ViewAction<Map<String, Object>> {
 
 	//生成合计行
 	private List<Map<String,Object>> createStatsTr(List<Map<String,Object>> list){
-		if(list.size()==0){
+		if(list.size()==0)
 			return list;
-		}else{
-			List<Map<String,Object>> newList=new ArrayList<Map<String,Object>>();
-			int count=0;
-			float price=0;
-			for(Map<String,Object> map:list){
-				count+=Integer.parseInt(map.get("sum_count").toString());
-				price+=Float.parseFloat(map.get("sum_price").toString());
-				newList.add(map);
-			}
-			Map<String,Object> newMap=new HashMap<String, Object>();
-			newMap.put("actor_name",getText("invoice.amount"));
-			newMap.put("sum_count",count);
-			newMap.put("sum_price",price);
-			newList.add(newMap);
-			return newList;
+		
+		List<Map<String,Object>> newList=new ArrayList<Map<String,Object>>();
+		int count=0;
+		float price=0;
+		int refundCount=0;
+		float refundPrice=0;
+		for(Map<String,Object> map:list){
+			count+=Integer.parseInt(map.get("sellCount").toString());
+			price+=Float.parseFloat(map.get("sellPrice").toString());
+			refundCount+=Integer.parseInt(map.get("refundCount").toString());
+			refundPrice+=Float.parseFloat(map.get("refundPrice").toString());
+			newList.add(map);
 		}
+		Map<String,Object> newMap=new HashMap<String, Object>();
+		newMap.put("actor_name",getText("invoice.amount"));
+		newMap.put("sellCount",count);
+		newMap.put("sellPrice",price);
+		newMap.put("refundCount",refundCount);
+		newMap.put("refundPrice",refundPrice);
+		newList.add(newMap);
+		return newList;
+		
 	}
 	
 
 
 	@Override
 	protected SqlObject<Map<String, Object>> getSqlObject() {
-		SqlObject<Map<String, Object>> sqlObject = new SqlObject<Map<String, Object>>();
-
-		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
-		StringBuffer sql = new StringBuffer();
-		sql.append("select s.cashier_id as id,ah.actor_name,sum(d.count_) as sum_count,sum(d.count_*d.price) as sum_price");
-		sql.append(" from bs_invoice_sell s");
-		sql.append(" inner join bs_invoice_sell_detail d on d.sell_id=s.id");
-		sql.append(" inner join bc_identity_actor_history ah on ah.id=s.cashier_id");
-		sql.append(" where s.status_=0");
-		
-		//根据传入参数拼装sql的where条件
 		Calendar cal = Calendar.getInstance();
 		CalendarFormater calf=new CalendarFormater();
-		if(this.type!=null){
-			if(this.startDate!=null&&!this.startDate.equals("")){
-				sql.append(" and s.sell_date>=");
-				sql.append("'");
-				sql.append(this.startDate);
-				sql.append("'");
-			}
-			if(this.endDate!=null&&!this.endDate.equals("")){
-				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");  
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");  
+		String sDate="";
+		String eDate="";
+		
+		//构建日期
+		if(this.type!=null&&((startDate!=null&&startDate.length()>0)
+				||(endDate!=null&&endDate.length()>0))){
+				sDate=startDate;
 				try {
 					cal.setTime(sdf.parse(this.endDate));
-					sql.append(" and s.sell_date<");
 					//加一天
 			        cal.add(Calendar.DAY_OF_MONTH, 1);
-			        sql.append("'");
-			        sql.append(calf.format(cal));
-			        sql.append("'");
+			        eDate=calf.format("yyyy-MM-dd",cal);
 				} catch (ParseException e) {
-					
-				}
 			}
 		}else{
-			sql.append(" and s.sell_date>=");
-			sql.append("'");
-			sql.append(calf.format(cal));
-			sql.append("'");
-			sql.append(" and s.sell_date<");
+			sDate=calf.format("yyyy-MM-dd",cal);
 	        cal.add(Calendar.DAY_OF_MONTH, 1);
-	        sql.append("'");
-	        sql.append(calf.format(cal));
-	        sql.append("'");
+	        eDate=calf.format("yyyy-MM-dd",cal);
 		}
 		
+		SqlObject<Map<String, Object>> sqlObject = new SqlObject<Map<String, Object>>();
+		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
+		StringBuffer sql = new StringBuffer();
+		sql.append("select s.cashier_id as id,ah.actor_name");
+		// -- 构建销售数量、 销售合计子查询sql---开始--
+		//数量
+		sql.append(",(select sum(b.count_) from bs_invoice_sell a inner join bs_invoice_sell_detail b on b.sell_id=a.id");
+		sql.append(" where a.status_=0 and a.type_=1 and a.cashier_id = s.cashier_id ");
+		if(sDate!=null&&sDate.length()>0)
+			sql.append(" and a.sell_date>='"+sDate+"'");
+		if(eDate!=null&&eDate.length()>0)
+			sql.append(" and a.sell_date<'"+eDate+"'");
+		sql.append(") as sellCount");
+		//合计
+		sql.append(",(select sum(d.count_*d.price) from bs_invoice_sell c inner join bs_invoice_sell_detail d on d.sell_id=c.id");
+		sql.append(" where c.status_=0 and c.type_=1 and c.cashier_id = s.cashier_id ");
+		if(sDate!=null&&sDate.length()>0)
+			sql.append(" and c.sell_date>='"+sDate+"'");
+		if(eDate!=null&&eDate.length()>0)
+			sql.append(" and c.sell_date<'"+eDate+"'");
+		sql.append(") as sellPrice");
+		// -- 构建销售数量、 销售合计子查询sql---结束--
+		
+		// -- 构建退票数量、 退票合计子查询sql---开始--
+		//数量
+		sql.append(",(select sum(f.count_) from bs_invoice_sell e inner join bs_invoice_sell_detail f on f.sell_id=e.id");
+		sql.append(" where e.status_=0 and e.type_=2 and e.cashier_id = s.cashier_id ");
+		if(sDate!=null&&sDate.length()>0)
+			sql.append(" and e.sell_date>='"+sDate+"'");
+		if(eDate!=null&&eDate.length()>0)
+			sql.append(" and e.sell_date<'"+eDate+"'");
+		sql.append(") as refundCount");
+		//合计
+		sql.append(",(select sum(h.count_*h.price) from bs_invoice_sell g inner join bs_invoice_sell_detail h on h.sell_id=g.id");
+		sql.append(" where g.status_=0 and g.type_=2 and g.cashier_id = s.cashier_id ");
+		if(sDate!=null&&sDate.length()>0)
+			sql.append(" and g.sell_date>='"+sDate+"'");
+		if(eDate!=null&&eDate.length()>0)
+			sql.append(" and g.sell_date<'"+eDate+"'");
+		sql.append(") as refundPrice");
+		// -- 构建退票数量、 退票合计子查询sql---结束--
+		
+		sql.append(" from bs_invoice_sell s");
+		sql.append(" inner join bc_identity_actor_history ah on ah.id=s.cashier_id");
+		sql.append(" where s.status_="+BCConstants.STATUS_ENABLED);
+		if(sDate!=null&&sDate.length()>0)
+			sql.append(" and s.sell_date>='"+sDate+"'");
+		if(eDate!=null&&eDate.length()>0)
+			sql.append(" and s.sell_date<'"+eDate+"'");
 		sql.append(" group by s.cashier_id,ah.actor_name");
 		sqlObject.setSql(sql.toString());
 
@@ -170,11 +202,31 @@ public class Invoice4SellStatsAction extends ViewAction<Map<String, Object>> {
 				Map<String, Object> map = new HashMap<String, Object>();
 				int i = 0;
 				map.put("id", rs[i++]);
-				map.put("actor_name", rs[i++]); // 状态
-				map.put("sum_count", rs[i++]); // 采购日期
-				map.put("sum_price", rs[i++]); // 发票代码
-				// 合计
-
+				map.put("actor_name", rs[i++]);
+				Object objSC=rs[i++];
+				Object objSP=rs[i++];
+				Object objRC=rs[i++];
+				Object objRP=rs[i++];
+				if(objSC==null){
+					map.put("sellCount", 0);
+				}else
+				map.put("sellCount", objSC);
+				
+				if(objSP==null){
+					map.put("sellPrice", 0);
+				}else
+				map.put("sellPrice", objSP); 
+				
+				if(objRC==null){
+					map.put("refundCount", 0);
+				}else
+				map.put("refundCount", objRC); 
+				
+				if(objRP==null){
+					map.put("refundPrice", 0);
+				}else
+				map.put("refundPrice", objRP); 
+		
 				return map;
 			}
 		});
@@ -186,13 +238,17 @@ public class Invoice4SellStatsAction extends ViewAction<Map<String, Object>> {
 		List<Column> columns = new ArrayList<Column>();
 		columns.add(new IdColumn4MapKey("s.cashier_id", "id"));
 		columns.add(new TextColumn4MapKey("", "actor_name",
-				getText("invoice4Sell.cashier"),100));
-		// 数量
-		columns.add(new TextColumn4MapKey("", "sum_count",
-				getText("invoice4SellStats.count"), 120));
-		columns.add(new TextColumn4MapKey("", "sum_price",
-				getText("invoice4SellStats.amount"))
-				.setValueFormater(new NubmerFormater("###,###.00")));
+				getText("invoice4Sell.cashier"),80));
+		columns.add(new TextColumn4MapKey("", "sellCount",
+				getText("invoice4SellStats.count"), 100));
+		columns.add(new TextColumn4MapKey("", "sellPrice",
+				getText("invoice4SellStats.amount"), 100)
+				.setValueFormater(new NubmerFormater("###,##0.00")));
+		columns.add(new TextColumn4MapKey("", "refundCount",
+				getText("invoice4SellStats.refundCount"), 100));
+		columns.add(new TextColumn4MapKey("", "refundPrice",
+				getText("invoice4SellStats.refundAmount"))
+				.setValueFormater(new NubmerFormater("###,##0.00")));
 		return columns;
 	}
 
@@ -209,7 +265,7 @@ public class Invoice4SellStatsAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected PageOption getHtmlPageOption() {
-		return super.getHtmlPageOption().setWidth(550).setMinWidth(500)
+		return super.getHtmlPageOption().setWidth(600).setMinWidth(500)
 				.setHeight(300).setMinHeight(200);
 	}
 

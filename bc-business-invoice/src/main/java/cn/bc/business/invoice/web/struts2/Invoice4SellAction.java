@@ -192,100 +192,62 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 		Json json =new Json();
 		Invoice4Sell e=this.getE();
 		this.beforeSave(e);
-		//作废不检测
+		//作废
 		if(e.getStatus()==BCConstants.STATUS_DISABLED){
-			this.getCrudService().save(e);
-			this.afterSave(e);
-			json.put("success", true);
-			json.put("msg", getText("invoice.save.success.invalid"));
-			this.json = json.toString();
-			return "json";
+			if(!e.isNew()){
+				
+			}
+			
 		}else{
 			//检测输入的明细集合，相同code的编码范围是否重叠
 			if(this.isCheckDetailItself(this.setChangeList4detail(e.getInvoice4SellDetail()))){
 				json.put("success", false);
 				//判断是否直接输出msg信息 
 				json.put("isTips", true);
-				if(e.getType()==Invoice4Sell.TYPE_SELL){
-					json.put("msg", getText("invoice4Sell.detail.tips3"));
-				}else
-					json.put("msg", getText("invoice4Refund.detail.tips3"));
+				json.put("msg", getText("invoice4Sell.detail.tips3"));
 				this.json = json.toString();
 				return "json";
-			}else{
-				for(Invoice4SellDetail sd:e.getInvoice4SellDetail()){
-					int s4s=Integer.parseInt(sd.getStartNo().trim());
-					int e4s=Integer.parseInt(sd.getEndNo().trim());
-					
-					// 1.确定一条销售明细的开始和结束号范围在此明细对应的采购单之内
-					Invoice4Buy buy = this.invoice4BuyService.load(sd
-							.getBuyId());
-					int s4buy=Integer.parseInt(buy.getStartNo().trim());
-					int e4buy=Integer.parseInt(buy.getEndNo().trim());
-									
-					if (s4s>=s4buy&&e4s<=e4buy) {
-						if(e.getType()==Invoice4Sell.TYPE_SELL){
-							 //采购单库存数量等于采购数量直接保存
-							int balanceCount=Integer.parseInt(invoice4BuyService.findBalanceCountByInvoice4BuyId(sd.getBuyId()).get(0));
-							if(buy.getCount()==balanceCount){
-								continue;
-							}
-							//判断发票的销售单号码是否在采购单剩余号码之内
-							List<Map<String,String>> bnumber= null;
-							if(e.isNew()){
-								bnumber=invoice4BuyService.findBalanceNumber(sd.getBuyId(),false);
-							}else
-								bnumber=invoice4BuyService.findBalanceNumberExSell(sd.getBuyId(), e.getId(),false);
-							
-							for(Map<String,String> bmap:bnumber){
-								int s4b=Integer.parseInt(bmap.get("sNo"));
-								int e4b=Integer.parseInt(bmap.get("eNo"));
-								if(!(s4s>=s4b&&e4s<=e4b)){
-									json.put("code",buy.getCode());
-									json.put("save_startNo", sd.getStartNo());
-									json.put("save_endNo", sd.getEndNo());
-									json.put("data_startNo", buy.getStartNo());
-									json.put("data_endNo", buy.getEndNo());
-									json.put("data_buyId", buy.getId());
-									json.put("success", false);
-									json.put("isTips", false);
-									json.put("msg", getText("invoice4Sell.detail.tips2"));
-									this.json = json.toString();
-									return "json";
-								}
-							}
-						}else{
-							//采购单库存数量等于0
-							int balanceCount=Integer.parseInt(invoice4BuyService.findBalanceCountByInvoice4BuyId(sd.getBuyId()).get(0));
-							if(balanceCount==0){
-								continue;
-							}
-							//判断发票的退票单号码是否在采购单剩余号码之内
-							List<Map<String,String>> bnumber= null;
-							if(e.isNew()){
-								bnumber=invoice4BuyService.findBalanceNumber(sd.getBuyId(),false);
-							}else
-								bnumber=invoice4BuyService.findBalanceNumberExRefund(sd.getBuyId(), e.getId(),false);
-							
-							for(Map<String,String> bmap:bnumber){
-								int s4b=Integer.parseInt(bmap.get("sNo"));
-								int e4b=Integer.parseInt(bmap.get("eNo"));
-								if(!(s4s>e4b||e4s<s4b)){
-									json.put("code",buy.getCode());
-									json.put("save_startNo", sd.getStartNo());
-									json.put("save_endNo", sd.getEndNo());
-									json.put("data_startNo", buy.getStartNo());
-									json.put("data_endNo", buy.getEndNo());
-									json.put("data_buyId", buy.getId());
-									json.put("success", false);
-									json.put("isTips", false);
-									json.put("msg", getText("invoice4Refund.detail.tips2"));
-									this.json = json.toString();
-									return "json";
-								}
-							}
-						}
-					} else {
+			}
+			
+			//遍历需要保存的明细
+			for(Invoice4SellDetail sd:e.getInvoice4SellDetail()){
+				int s4s=Integer.parseInt(sd.getStartNo().trim());
+				int e4s=Integer.parseInt(sd.getEndNo().trim());
+				
+				// 1.确定一条销售明细的开始和结束号范围在此明细对应的采购单之内
+				Invoice4Buy buy = this.invoice4BuyService.load(sd
+						.getBuyId());
+				int s4buy=Integer.parseInt(buy.getStartNo().trim());
+				int e4buy=Integer.parseInt(buy.getEndNo().trim());
+				if (!(s4s>=s4buy&&e4s<=e4buy)) {
+					json.put("code",buy.getCode());
+					json.put("save_startNo", sd.getStartNo());
+					json.put("save_endNo", sd.getEndNo());
+					json.put("data_startNo", buy.getStartNo());
+					json.put("data_endNo", buy.getEndNo());
+					json.put("data_buyId", buy.getId());
+					json.put("success", false);
+					json.put("msg", getText("invoice4Sell.detail.tips1"));
+					this.json = json.toString();
+					return "json";
+				}
+				
+				 //采购单库存数量等于采购数量直接保存
+				int balanceCount=Integer.parseInt(invoice4BuyService.findBalanceCountByInvoice4BuyId(sd.getBuyId()).get(0));
+				if(buy.getCount()==balanceCount)
+					continue;
+				
+				//判断发票的销售单号码是否在采购单剩余号码之内
+				List<Map<String,String>> bnumber= null;
+				if(e.isNew()){
+					bnumber=invoice4BuyService.findBalanceNumber(sd.getBuyId(),false);
+				}else
+					bnumber=invoice4BuyService.findBalanceNumberExSell(sd.getBuyId(), e.getId(),false);
+				
+				for(Map<String,String> bmap:bnumber){
+					int s4b=Integer.parseInt(bmap.get("sNo"));
+					int e4b=Integer.parseInt(bmap.get("eNo"));
+					if(!(s4s>=s4b&&e4s<=e4b)){
 						json.put("code",buy.getCode());
 						json.put("save_startNo", sd.getStartNo());
 						json.put("save_endNo", sd.getEndNo());
@@ -293,11 +255,8 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 						json.put("data_endNo", buy.getEndNo());
 						json.put("data_buyId", buy.getId());
 						json.put("success", false);
-						if(e.getType()==Invoice4Sell.TYPE_SELL){
-							json.put("msg", getText("invoice4Sell.detail.tips1"));
-						}else
-							json.put("msg", getText("invoice4Refund.detail.tips1"));
-						
+						json.put("isTips", false);
+						json.put("msg", getText("invoice4Sell.detail.tips2"));
 						this.json = json.toString();
 						return "json";
 					}
@@ -307,12 +266,99 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 		this.getCrudService().save(e);
 		this.afterSave(e);
 		json.put("success", true);
+		if(e.getStatus()==BCConstants.STATUS_DISABLED){
+			json.put("msg", getText("invoice.save.success.invalid"));
+		}else
 		json.put("msg", getText("form.save.success"));
 		this.json = json.toString();
 		return "json";
 	}
-
-
+	
+	//退票的保存功能
+	public String saveRefund() throws Exception {
+		Json json =new Json();
+		Invoice4Sell e=this.getE();
+		this.beforeSave(e);
+		if(e.getStatus()==BCConstants.STATUS_DISABLED){
+			
+			
+		}else{
+			//检测输入的明细集合，相同code的编码范围是否重叠
+			if(this.isCheckDetailItself(this.setChangeList4detail(e.getInvoice4SellDetail()))){
+				json.put("success", false);
+				//判断是否直接输出msg信息 
+				json.put("isTips", true);
+				json.put("msg", getText("invoice4Refund.detail.tips3"));
+				this.json = json.toString();
+				return "json";
+				
+			}
+			
+			//遍历需要保存的明细
+			for(Invoice4SellDetail sd:e.getInvoice4SellDetail()){
+				int s4s=Integer.parseInt(sd.getStartNo().trim());
+				int e4s=Integer.parseInt(sd.getEndNo().trim());
+				
+				// 1.确定一条销售明细的开始和结束号范围在此明细对应的采购单之内
+				Invoice4Buy buy = this.invoice4BuyService.load(sd
+						.getBuyId());
+				int s4buy=Integer.parseInt(buy.getStartNo().trim());
+				int e4buy=Integer.parseInt(buy.getEndNo().trim());
+				if (!(s4s>=s4buy&&e4s<=e4buy)) {
+					json.put("code",buy.getCode());
+					json.put("save_startNo", sd.getStartNo());
+					json.put("save_endNo", sd.getEndNo());
+					json.put("data_startNo", buy.getStartNo());
+					json.put("data_endNo", buy.getEndNo());
+					json.put("data_buyId", buy.getId());
+					json.put("success", false);
+					json.put("msg", getText("invoice4Refund.detail.tips1"));
+					this.json = json.toString();
+					return "json";
+				}
+				
+				//采购单库存数量等于0
+				int balanceCount=Integer.parseInt(invoice4BuyService.findBalanceCountByInvoice4BuyId(sd.getBuyId()).get(0));
+				if(balanceCount==0)
+					continue;
+				
+				//判断发票的退票单号码是否在采购单剩余号码之内
+				List<Map<String,String>> bnumber= null;
+				if(e.isNew()){
+					bnumber=invoice4BuyService.findBalanceNumber(sd.getBuyId(),false);
+				}else
+					bnumber=invoice4BuyService.findBalanceNumberExRefund(sd.getBuyId(), e.getId(),false);
+				
+				for(Map<String,String> bmap:bnumber){
+					int s4b=Integer.parseInt(bmap.get("sNo"));
+					int e4b=Integer.parseInt(bmap.get("eNo"));
+					if(!(s4s>e4b||e4s<s4b)){
+						json.put("code",buy.getCode());
+						json.put("save_startNo", sd.getStartNo());
+						json.put("save_endNo", sd.getEndNo());
+						json.put("data_startNo", buy.getStartNo());
+						json.put("data_endNo", buy.getEndNo());
+						json.put("data_buyId", buy.getId());
+						json.put("success", false);
+						json.put("isTips", false);
+						json.put("msg", getText("invoice4Refund.detail.tips2"));
+						this.json = json.toString();
+						return "json";
+					}
+				}
+			}
+		}
+		this.getCrudService().save(e);
+		this.afterSave(e);
+		json.put("success", true);
+		if(e.getStatus()==BCConstants.STATUS_DISABLED){
+			json.put("msg", getText("invoice.save.success.invalid"));
+		}else
+		json.put("msg", getText("form.save.success"));
+		this.json = json.toString();
+		return "json";
+	}
+	
 	// 解析销售明细字符串返回销售明细集合
 	private LinkedHashSet<Invoice4SellDetail> parseSell4DetailString(
 			String detailStr, int status,int type) {
@@ -468,7 +514,7 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 	
 	public Long buyId;// 采购单ID
 
-	// 根据采购单ID查找一个采购单
+	// 根据采购单ID查找一个销售单
 	public String findOneInvoice4Buy() {
 		Json json = null;
 		if (this.buyId != null) {

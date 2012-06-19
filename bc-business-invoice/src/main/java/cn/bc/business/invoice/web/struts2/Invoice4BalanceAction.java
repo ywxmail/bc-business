@@ -19,6 +19,7 @@ import org.springframework.stereotype.Controller;
 import cn.bc.business.invoice.domain.Invoice4Buy;
 import cn.bc.business.invoice.service.Invoice4BuyService;
 import cn.bc.business.invoice.service.Invoice4SellService;
+import cn.bc.web.formater.NubmerFormater;
 import cn.bc.web.ui.html.page.ButtonOption;
 import cn.bc.web.ui.html.page.PageOption;
 import cn.bc.web.ui.json.Json;
@@ -58,11 +59,6 @@ public class Invoice4BalanceAction extends ActionSupport {
 	public Calendar startDate;
 	public Calendar endDate;
 
-	//public String startCount;// 期初数量
-	//public String endCount;// 剩余数量
-	//public String buyCount;// 收入数量
-	//public String sellCount;// 发出数量
-
 	@Override
 	public String execute() throws Exception {
 		// 设置页面
@@ -89,7 +85,7 @@ public class Invoice4BalanceAction extends ActionSupport {
 
 		// 公司
 		this.companyList = this.invoice4BuyService.findCompany4Option();
-	return super.execute();
+		return super.execute();
 	}
 
 	/**
@@ -107,25 +103,40 @@ public class Invoice4BalanceAction extends ActionSupport {
 	public String company;// 公司
 
 	public String select() {
-		Calendar endDate=this.endDate;
+		Calendar endDate = this.endDate;
 		endDate.add(Calendar.DAY_OF_MONTH, 1);
+		// 指定日期前采购总数；
+		int sbuy = invoice4SellService.countInvoiceBuyCountByBuyDate(type,
+				startDate, company, false);
+		int ebuy = invoice4SellService.countInvoiceBuyCountByBuyDate(type,
+				endDate, company, true);
+		// 指定日期范围采购总数
+		int buy4r = invoice4SellService.countInvoiceBuyCountByBuyDate(type,
+				startDate, endDate, company);
+
+		// 指定日期前销售总数；
+		int ssell = invoice4SellService.countInvoiceSellCountBySellDate(type,
+				startDate, company, false);
+		int esell = invoice4SellService.countInvoiceSellCountBySellDate(type,
+				endDate, company, true);
+		// 指定日期范围销售总数；
+		int sell4r = invoice4SellService.countInvoiceSellCountBySellDate(type,
+				startDate, endDate, company);
+
+		// 指定日期前退票总数；
+		int srefund = invoice4SellService.countInvoiceRefundCountBySellDate(
+				type, startDate, company, false);
+		int erefund = invoice4SellService.countInvoiceRefundCountBySellDate(
+				type, endDate, company, true);
+		// 指定日期范围退票总数；
+		int refund4r = invoice4SellService.countInvoiceRefundCountBySellDate(
+				type, startDate, endDate, company);
+		NubmerFormater nf = new NubmerFormater("###,##0");
 		Json json = new Json();
-		json.put("startCount", String.valueOf(this.invoice4SellService
-				.countInvoiceBuyCountByBuyDate(this.type, this.startDate,
-						this.company, false)
-				- this.invoice4SellService.countInvoiceSellCountBySellDate(
-						this.type, this.startDate, this.company, false)));
-		json.put("buyCount", String.valueOf(this.invoice4SellService
-				.countInvoiceBuyCountByBuyDate(this.type, this.startDate,
-						endDate, this.company)));
-		json.put("sellCount", String.valueOf(this.invoice4SellService
-				.countInvoiceSellCountBySellDate(this.type, this.startDate,
-						endDate, this.company)));
-		json.put("endCount", String.valueOf(this.invoice4SellService
-				.countInvoiceBuyCountByBuyDate(this.type, this.endDate,
-						this.company, true)
-				- this.invoice4SellService.countInvoiceSellCountBySellDate(
-						this.type, endDate, this.company, true)));
+		json.put("startCount", nf.format(sbuy - ssell + srefund));
+		json.put("buyCount", nf.format(buy4r + refund4r));
+		json.put("sellCount", nf.format(sell4r));
+		json.put("endCount", nf.format(ebuy - esell + erefund));
 
 		this.json = json.toString();
 		return "json";

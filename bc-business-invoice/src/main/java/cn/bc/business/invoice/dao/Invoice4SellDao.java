@@ -83,6 +83,26 @@ public interface Invoice4SellDao extends CrudDao<Invoice4Sell> {
 	int countInvoiceSellCountBySellDate(Integer type,Calendar SellDateFrom, Calendar SellDateTo, String company);
 	
 	/**
+	 * 指定销售日期 总退票数(company为null即查宝城和广发所有记录)
+	 * @param type
+	 * @param SellDate
+	 * @param company
+	 * @param falg 是否包含本田
+	 * @return
+	 */
+	int countInvoiceRefundCountBySellDate(Integer type,Calendar SellDate, String company,boolean flag);
+	
+	/**
+	 * 指定销售日期范围  总退票数(company为null即查宝城和广发所有记录)
+	 * @param type
+	 * @param SellDateFrom
+	 * @param SellDateTo
+	 * @param company
+	 * @return
+	 */
+	int countInvoiceRefundCountBySellDate(Integer type,Calendar SellDateFrom, Calendar SellDateTo, String company);
+	
+	/**
 	 * 获取销售单中公司列表
 	 * 
 	 * @return

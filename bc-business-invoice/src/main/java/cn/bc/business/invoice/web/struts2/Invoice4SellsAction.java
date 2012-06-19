@@ -476,6 +476,10 @@ public class Invoice4SellsAction extends ViewAction<Map<String, Object>> {
 		//退票
 		if(readType!=null&&readType.equals(Invoice4Sell.READ_TYPE_REFUND))
 			ac.add(new EqualsCondition("s.type_", Invoice4Sell.TYPE_REFUND));
+		
+		//退票
+		if(readType!=null&&readType.equals(Invoice4Sell.READ_TYPE_READ))
+			ac.add(new InCondition("s.type_",new Integer[]{Invoice4Sell.TYPE_SELL, Invoice4Sell.TYPE_REFUND}));
 			
 		// 合并条件
 		return ac;
