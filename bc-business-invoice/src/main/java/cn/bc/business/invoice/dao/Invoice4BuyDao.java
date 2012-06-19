@@ -84,4 +84,11 @@ public interface Invoice4BuyDao extends CrudDao<Invoice4Buy> {
 	 * @return
 	 */
 	public List<String> findBalanceCountByInvoice4BuyId(Long id);
+	
+	/**
+	 * 通过采购单ID，获取指定的销售明细开始结束号,sid不包含此销售单
+	 * 
+	 * @return
+	 */
+	public List<Map<String, String>> findInvoiceDetail(Long id,Long sid);
 }

@@ -82,4 +82,38 @@ public interface Invoice4BuyService extends CrudService<Invoice4Buy> {
 	 * @return
 	 */
 	public List<String> findBalanceCountByInvoice4BuyId(Long id);
+	
+	/**
+	 * 获取采购单剩余号码段
+	 * @param id 采购单id
+	 * @return 集合同包含采购单的范围
+	 *     Map集合{
+	 *     	sNo: 号码段开始号,
+	 *     	eNo: 号码段结束号
+	 *     }
+	 */
+	public List<Map<String,String>> findBalanceNumber(Long id);
+	
+	/**
+	 * 获取采购单剩余号码段 ,不包括销售单
+	 * @param id 采购单id,sellId 销售单Id
+	 * @return 集合同包含采购单的范围
+	 *     Map集合{
+	 *     	sNo: 号码段开始号,
+	 *     	eNo: 号码段结束号
+	 *     }
+	 */
+	public List<Map<String,String>> findBalanceNumberExSell(Long id,Long sellId);
+	
+	/**
+	 * 获取采购单剩余号码段,不报含退票单
+	 * @param id 采购单id,refundId 退票单Id
+	 * @return 集合同包含采购单的范围
+	 *     Map集合{
+	 *     	sNo: 号码段开始号,
+	 *     	eNo: 号码段结束号
+	 *     }
+	 */
+	public List<Map<String,String>> findBalanceNumberExRefund(Long id,Long refundId);
+
 }

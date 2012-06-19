@@ -199,7 +199,7 @@ public class Invoice4BuyDaoImpl extends HibernateCrudJpaDao<Invoice4Buy>
 	 * @return
 	 */
 	public List<Map<String, String>> findSellDetail(Long id) {
-		StringBuffer sbSql = new StringBuffer("select d.start_no,d.end_no");
+		StringBuffer sbSql = new StringBuffer("select d.start_no,d.end_no,d.type_");
 		sbSql.append(" from bs_invoice_sell_detail d");
 		sbSql.append(" where d.status_=0 and d.buy_id=?");
 		sbSql.append(" order by d.start_no");
@@ -209,14 +209,45 @@ public class Invoice4BuyDaoImpl extends HibernateCrudJpaDao<Invoice4Buy>
 					public Map<String, String> mapRow(Object[] rs, int rowNum) {
 						Map<String, String> oi = null;
 						int i = 0;
-						Object a = rs[i++];
-						Object b = rs[i++];
-						if (a != null && !a.equals("") && b != null
-								&& !b.equals("")) {
-							oi = new HashMap<String, String>();
-							oi.put("startNo", a.toString());
-							oi.put("endNo", b.toString());
-						}
+						oi = new HashMap<String, String>();
+						oi.put("startNo", rs[i++].toString());
+						oi.put("endNo", rs[i++].toString());
+						oi.put("sellType",rs[i++].toString());
+						return oi;
+					}
+				});
+	}
+	
+
+	
+	/**
+	 * 通过采购单ID，获取指定的销售明细开始结束号,sid不包含此销售单
+	 * 
+	 * @return
+	 */
+	public List<Map<String, String>> findInvoiceDetail(Long id,Long sid) {
+		StringBuffer sbSql = new StringBuffer("select d.start_no,d.end_no,d.type_");
+		sbSql.append(" from bs_invoice_sell_detail d");
+		sbSql.append(" inner join bs_invoice_sell s on s.id=d.sell_id");
+		sbSql.append(" where d.status_=0 and d.buy_id=?");
+		if(sid!=null)
+			sbSql.append(" and d.sell_id<>?");
+		sbSql.append(" order by s.file_date");
+		String sql = sbSql.toString();
+		Object[] oa=null;
+		if(sid!=null){
+			oa=new Object[] { id,sid };
+		}else
+			oa=new Object[] { id };
+		return HibernateJpaNativeQuery.executeNativeSql(getJpaTemplate(), sql,
+				oa, new RowMapper<Map<String, String>>() {
+					public Map<String, String> mapRow(Object[] rs, int rowNum) {
+						Map<String, String> oi = null;
+						int i = 0;
+						oi = new HashMap<String, String>();
+						oi.put("startNo", rs[i++].toString());
+						oi.put("endNo", rs[i++].toString());
+						oi.put("sellType",rs[i++].toString());
 						return oi;
 					}
 				});
