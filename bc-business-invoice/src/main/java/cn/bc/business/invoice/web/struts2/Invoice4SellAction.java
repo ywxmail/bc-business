@@ -233,9 +233,9 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 							//判断发票的销售单号码是否在采购单剩余号码之内
 							List<Map<String,String>> bnumber= null;
 							if(e.isNew()){
-								bnumber=invoice4BuyService.findBalanceNumber(sd.getBuyId());
+								bnumber=invoice4BuyService.findBalanceNumber(sd.getBuyId(),false);
 							}else
-								bnumber=invoice4BuyService.findBalanceNumberExSell(sd.getBuyId(), e.getId());
+								bnumber=invoice4BuyService.findBalanceNumberExSell(sd.getBuyId(), e.getId(),false);
 							
 							for(Map<String,String> bmap:bnumber){
 								int s4b=Integer.parseInt(bmap.get("sNo"));
@@ -263,9 +263,9 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 							//判断发票的退票单号码是否在采购单剩余号码之内
 							List<Map<String,String>> bnumber= null;
 							if(e.isNew()){
-								bnumber=invoice4BuyService.findBalanceNumber(sd.getBuyId());
+								bnumber=invoice4BuyService.findBalanceNumber(sd.getBuyId(),false);
 							}else
-								bnumber=invoice4BuyService.findBalanceNumberExRefund(sd.getBuyId(), e.getId());
+								bnumber=invoice4BuyService.findBalanceNumberExRefund(sd.getBuyId(), e.getId(),false);
 							
 							for(Map<String,String> bmap:bnumber){
 								int s4b=Integer.parseInt(bmap.get("sNo"));

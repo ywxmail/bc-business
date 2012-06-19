@@ -3,7 +3,6 @@
  */
 package cn.bc.business.invoice.web.struts2;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -23,6 +22,7 @@ import cn.bc.business.web.struts2.FileEntityAction;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.option.domain.OptionItem;
 import cn.bc.option.service.OptionService;
+import cn.bc.web.formater.NubmerFormater;
 import cn.bc.web.ui.html.page.ButtonOption;
 import cn.bc.web.ui.html.page.PageOption;
 import cn.bc.web.ui.json.Json;
@@ -48,9 +48,9 @@ public class Invoice4BuyAction extends FileEntityAction<Long, Invoice4Buy> {
 
 	public String amount;// 合计
 	public String balanceNumber;// 剩余号码段
-	public String balanceCount;//剩余数量
+	public String balanceCount;// 剩余数量
 	public String unitName;
-	
+
 	@Autowired
 	public void setInvoice4BuyService(Invoice4BuyService invoice4BuyService) {
 		this.setCrudService(invoice4BuyService);
@@ -88,42 +88,150 @@ public class Invoice4BuyAction extends FileEntityAction<Long, Invoice4Buy> {
 		// 每（卷/本）默认值为100
 		entity.setEachCount(100);
 		entity.setBuyerId(context.getUserHistory());
-		this.unitName=getText("invoice.unit.juan");
+		this.unitName = getText("invoice.unit.juan");
 		entity.setUnit(Invoice4Buy.UNIT_JUAN);
 	}
 
 	@Override
 	protected void afterEdit(Invoice4Buy entity) {
-		DecimalFormat format = new DecimalFormat("###,##0.00");
 		// 计算合计
-		this.amount = format.format(entity.getCount()*entity.getBuyPrice());
-		this.balanceNumber = this.invoice4BuyService
-				.findBalanceNumberByInvoice4BuyId(entity.getId()).get(0);
-		this.balanceCount = this.invoice4BuyService.findBalanceCountByInvoice4BuyId(entity.getId()).get(0);
-		
-		if(entity.getUnit()==Invoice4Buy.UNIT_BEN){
-			this.unitName=getText("invoice.unit.ben");
-		}else{
-			this.unitName=getText("invoice.unit.juan");
+		amount = new NubmerFormater("###,##0.00").format(entity.getCount()
+				* entity.getBuyPrice());
+		balanceCount = invoice4BuyService.findBalanceCountByInvoice4BuyId(
+				entity.getId()).get(0);
+
+		balanceNumber="";
+		if (Integer.parseInt(balanceCount) > 0) {
+			for (Map<String, String> bmap : invoice4BuyService
+					.findBalanceNumber(entity.getId(), true)) {
+				balanceNumber += "[" + bmap.get("sNo") + "~" + bmap.get("eNo")
+						+ "] ";
+			}
+		}
+
+		if (entity.getUnit() == Invoice4Buy.UNIT_BEN) {
+			this.unitName = getText("invoice.unit.ben");
+		} else {
+			this.unitName = getText("invoice.unit.juan");
 		}
 		super.afterEdit(entity);
 	}
 
 	@Override
 	protected void afterOpen(Invoice4Buy entity) {
-		DecimalFormat format = new DecimalFormat("###,##0.00");
 		// 计算合计
-		this.amount = format.format(entity.getCount()*entity.getBuyPrice());
-		this.balanceNumber = this.invoice4BuyService
-				.findBalanceNumberByInvoice4BuyId(entity.getId()).get(0);
-		this.balanceCount = this.invoice4BuyService.findBalanceCountByInvoice4BuyId(entity.getId()).get(0);
-		if(entity.getUnit()==Invoice4Buy.UNIT_BEN){
-			this.unitName=getText("invoice.unit.ben");
-		}else{
-			this.unitName=getText("invoice.unit.juan");
+		amount = new NubmerFormater("###,##0.00").format(entity.getCount()
+				* entity.getBuyPrice());
+		balanceCount = invoice4BuyService.findBalanceCountByInvoice4BuyId(
+				entity.getId()).get(0);
+		balanceNumber="";
+		if (Integer.parseInt(balanceCount) > 0) {
+			for (Map<String, String> bmap : invoice4BuyService
+					.findBalanceNumber(entity.getId(), true)) {
+				balanceNumber += "[" + bmap.get("sNo") + "~" + bmap.get("eNo")
+						+ "] ";
+			}
+		}
+
+		if (entity.getUnit() == Invoice4Buy.UNIT_BEN) {
+			this.unitName = getText("invoice.unit.ben");
+		} else {
+			this.unitName = getText("invoice.unit.juan");
 		}
 		super.afterOpen(entity);
 
+	}
+
+	@Override
+	public String save() throws Exception {
+		Json json = new Json();
+		Invoice4Buy e = this.getE();
+		beforeSave(e);
+		// 正常
+		if (e.getStatus() == BCConstants.STATUS_ENABLED) {
+			int sNo4Save = Integer.parseInt(e.getStartNo().trim());
+			int eNo4Save = Integer.parseInt(e.getEndNo().trim());
+			// 采购单列表
+			List<Invoice4Buy> bList = null;
+			// 检查相同发票代码的采购开始号和结束号是否出现在已保存的采购编码范围内
+			if (e.isNew()) {
+				bList = invoice4BuyService.selectInvoice4BuyByCode(e.getCode());
+				if (bList != null && bList.size() > 0) {
+					for (Invoice4Buy i4Buy : bList) {
+						int sNo = Integer.parseInt(i4Buy.getStartNo().trim());
+						int eNo = Integer.parseInt(i4Buy.getEndNo().trim());
+						if (!(eNo4Save < sNo || eNo < sNo4Save)) {
+							json.put("code", i4Buy.getCode());
+							json.put("data_startNo", i4Buy.getStartNo());
+							json.put("data_endNo", i4Buy.getEndNo());
+							json.put("data_buyId", i4Buy.getId());
+							json.put("success", false);
+							json.put("isShowBuyInfo", true);
+							json.put("msg", getText("invoice4Buy.tips1"));
+							this.json = json.toString();
+							return "json";
+						}
+					}
+				}
+			} else {
+				bList = invoice4BuyService.selectInvoice4BuyByCode(e.getCode(),
+						e.getId());
+				if (bList != null && bList.size() > 0) {
+					for (Invoice4Buy i4Buy : bList) {
+						int sNo = Integer.parseInt(i4Buy.getStartNo().trim());
+						int eNo = Integer.parseInt(i4Buy.getEndNo().trim());
+						if (!(eNo4Save < sNo || eNo < sNo4Save)) {
+							json.put("code", i4Buy.getCode());
+							json.put("data_startNo", i4Buy.getStartNo());
+							json.put("data_endNo", i4Buy.getEndNo());
+							json.put("data_buyId", i4Buy.getId());
+							json.put("success", false);
+							json.put("isShowBuyInfo", true);
+							json.put("msg", getText("invoice4Buy.tips2"));
+							this.json = json.toString();
+							return "json";
+						}
+					}
+				}
+
+				// 检查相同发票代码的采购开始号和结束号是否出现在已保存的采购编码范围内
+				List<Map<String, String>> bnumber = this.invoice4BuyService
+						.findBalanceNumber(e.getId(), true);
+				if(bnumber!=null&&bnumber.size()>0){
+					int firstENO = Integer.parseInt(bnumber.get(0).get("eNo"));
+					int lastSNO = Integer.parseInt(bnumber.get(bnumber.size() - 1)
+							.get("sNo"));
+					if (!(sNo4Save < firstENO && eNo4Save > lastSNO)) {
+						json.put("success", false);
+						json.put("isShowBuyInfo", false);
+						json.put("msg", getText("invoice4Buy.tips3"));
+						this.json = json.toString();
+						return "json";
+					}
+				}
+			}
+			// 作废
+		} else {
+			if (!e.isNew()) {
+				if (this.invoice4BuyService.isExistSellAndRefund(e.getId())) {
+					json.put("success", false);
+					json.put("isShowBuyInfo", false);
+					json.put("msg", getText("invoice4Buy.tips4"));
+					this.json = json.toString();
+					return "json";
+				}
+			}
+		}
+
+		this.getCrudService().save(e);
+		this.afterSave(e);
+		json.put("success", true);
+		if (e.getStatus() == BCConstants.STATUS_ENABLED) {
+			json.put("msg", getText("form.save.success"));
+		} else
+			json.put("msg", getText("invoice.save.success.invalid"));
+		this.json = json.toString();
+		return "json";
 	}
 
 	@Override
@@ -131,7 +239,7 @@ public class Invoice4BuyAction extends FileEntityAction<Long, Invoice4Buy> {
 		super.initForm(editable);
 		// 批量加载可选项列表
 		Map<String, List<Map<String, String>>> optionItems = this.optionService
-				.findOptionItemByGroupKeys(new String[] { OptionConstants.CAR_COMPANY, });
+				.findOptionItemByGroupKeys(new String[] { OptionConstants.CAR_COMPANY });
 
 		// 所属公司列表
 		this.companyList = optionItems.get(OptionConstants.CAR_COMPANY);
@@ -146,7 +254,6 @@ public class Invoice4BuyAction extends FileEntityAction<Long, Invoice4Buy> {
 		this.typeList = list;
 
 		// 发票单位
-		
 		list = new ArrayList<Map<String, String>>();
 		list.add(this.getOptiomItems(String.valueOf(Invoice4Buy.UNIT_JUAN),
 				getText("invoice.unit.juan")));
@@ -173,8 +280,9 @@ public class Invoice4BuyAction extends FileEntityAction<Long, Invoice4Buy> {
 				pageOption.addButton(new ButtonOption(getText("label.save"),
 						null, "bs.invoice4BuyForm.save")
 						.setId("invoice4BuySave"));
-				pageOption.addButton(new ButtonOption(getText("invoice.saveAndClose"), 
-						null,"bs.invoice4BuyForm.saveAndClose")
+				pageOption.addButton(new ButtonOption(
+						getText("invoice.saveAndClose"), null,
+						"bs.invoice4BuyForm.saveAndClose")
 						.setId("invoice4BuySave"));
 			} else {// open时
 				if (this.getE().getStatus() == Invoice4Buy.STATUS_NORMAL) {
@@ -189,85 +297,4 @@ public class Invoice4BuyAction extends FileEntityAction<Long, Invoice4Buy> {
 
 	}
 
-	// ---检查相同发票代码的采购开始号和结束号是否出现在已保存的采购编码范围内---开始--
-	public String code;// 发票代码
-	public String startNo;
-	public String endNo;
-	public Long id4Buy;// 采购单Id
-	public int status;
-
-	public String checkSameCode4StartNoAndEndNo() {
-		Json json = new Json();
-		List<Invoice4Buy> bList = null;
-		List<Map<String, String>> sellList = null;
-		Long startNo4Long = Long.parseLong(startNo.trim());
-		Long endNo4Long = Long.parseLong(endNo.trim());
-		if (id4Buy != null) {// 编辑
-			sellList = invoice4BuyService.findSellDetail(id4Buy);
-			// 判断采购单对应的销售单号码范围。
-			if (sellList != null && sellList.size() > 0
-					&& sellList.get(0) != null) {
-				// 作废处理
-				if (this.status == Invoice4Buy.STATUS_INVALID) {// 此采购单带有销售单
-																// 不能够作废
-					json.put("checkResult", "3");
-					this.json = json.toString();
-					return "json";
-				} else {// 不是作废
-					this.json = this.checkSellNumberRange(sellList,
-							startNo4Long, endNo4Long, json);
-					// 返回不为{}时，范围已不正确不能够保存
-					if (!this.json.equals("{}")) {
-						return "json";
-					}
-				}
-			}
-
-			bList = invoice4BuyService.selectInvoice4BuyByCode(code, id4Buy);
-		} else {// 新建
-			bList = invoice4BuyService.selectInvoice4BuyByCode(code);
-		}
-		if (bList == null || bList.size() == 0) {// 没有这钟发票代码的采购单
-			// 检查结果：checkResult 0表示没有这钟发票代码的采购单，1表示有且开始号或结束号在其它采购单编码范围内；
-			json.put("checkResult", "0");
-			this.json = json.toString();
-			return "json";
-		} else {
-			this.json = this.eachListInvoice4Buy(bList, startNo4Long,
-					endNo4Long, json);
-			return "json";
-		}
-	}
-
-	// 遍历采购单集合，检查相同发票代码的采购单开始号和结束号是否出现在已保存的采购编码范围内
-	private String eachListInvoice4Buy(List<Invoice4Buy> bList, Long startNo,
-			Long endNo, Json json) {
-		if(endNo>startNo){
-			for(Invoice4Buy i4Buy:bList){
-				if(!(endNo < Long.parseLong(i4Buy.getStartNo().trim())
-						|| startNo > Long.parseLong(i4Buy.getEndNo().trim()))){
-					json.put("checkResult", "1");
-					return json.toString();
-				}
-			}
-		}else{
-			json.put("checkResult", "1");
-			return json.toString();
-		}
-		json.put("checkResult", "0");
-		return json.toString();
-	}
-
-	// 检测需要保存的采购单 号码范围不能够小于对应销售单的号码范围
-	private String checkSellNumberRange(List<Map<String, String>> list,
-			Long startNo, Long endNo, Json json) {
-		if(!(Long.parseLong(list.get(0).get("startNo").trim())>=startNo
-				&& Long.parseLong(list.get(list.size()-1).get("endNo").trim())<=endNo)){
-			json.put("checkResult", "2");
-			return json.toString();
-		}
-		return json.toString();
-	}
-
-	// ---检查相同发票代码的采购开始号和结束号是否出现在已保存的采购编码范围内---结束--
 }

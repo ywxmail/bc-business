@@ -253,17 +253,6 @@ public class Invoice4BuyDaoImpl extends HibernateCrudJpaDao<Invoice4Buy>
 				});
 	}
 
-	public List<String> findBalanceNumberByInvoice4BuyId(Long id) {
-		String sql = "select getbalancenumberbyinvoicebuyid(b.id,b.count_,b.start_no,b.end_no),1";
-		sql += " from bs_invoice_buy b";
-		sql += " where b.id=?";
-		return HibernateJpaNativeQuery.executeNativeSql(getJpaTemplate(), sql,
-				new Object[] { id }, new RowMapper<String>() {
-					public String mapRow(Object[] rs, int rowNum) {
-						return rs[0].toString();
-					}
-				});
-	}
 	
 	public List<String> findBalanceCountByInvoice4BuyId(Long id){
 		String sql = "select b.count_,(select sum(count_) from bs_invoice_sell_detail where buy_id=b.id and status_=";
@@ -303,5 +292,20 @@ public class Invoice4BuyDaoImpl extends HibernateCrudJpaDao<Invoice4Buy>
 						return String.valueOf(int_buy_count-int_sell_count+int_refund_count);
 					}
 				});
+	}
+	
+	
+	public boolean isExistSellAndRefund(Long id){
+		String sql = "select count(*),1 from bs_invoice_sell_detail";
+		sql += " where status_=";
+		sql += BCConstants.STATUS_ENABLED+" and buy_id=?";
+		List<String> l= HibernateJpaNativeQuery.executeNativeSql(getJpaTemplate(), sql,
+				new Object[] { id }, new RowMapper<String>() {
+					public String mapRow(Object[] rs, int rowNum) {
+						int i=0;
+						return rs[i++].toString();
+					}
+				});
+		return Integer.parseInt(l.get(0))>0;
 	}
 }

@@ -71,12 +71,6 @@ public interface Invoice4BuyDao extends CrudDao<Invoice4Buy> {
 	 */
 	public List<Map<String, String>> findSellDetail(Long id);
 
-	/**
-	 * 通过采购单ID，获取剩余号码段
-	 * 
-	 * @return
-	 */
-	public List<String> findBalanceNumberByInvoice4BuyId(Long id);
 	
 	/**
 	 * 通过采购单ID，获取剩余数量
@@ -91,4 +85,13 @@ public interface Invoice4BuyDao extends CrudDao<Invoice4Buy> {
 	 * @return
 	 */
 	public List<Map<String, String>> findInvoiceDetail(Long id,Long sid);
+	
+	
+	/**
+	 * 此采购单时候有对应的销售单或退票单
+	 * 
+	 * @param id 采购单id
+	 * @return
+	 */
+	public boolean isExistSellAndRefund(Long id);
 }

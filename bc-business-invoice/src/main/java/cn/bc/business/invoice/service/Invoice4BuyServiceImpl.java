@@ -47,10 +47,6 @@ public class Invoice4BuyServiceImpl extends DefaultCrudService<Invoice4Buy> impl
 		return invoice4BuyDao.findSellDetail(id);
 	}
 
-	public List<String> findBalanceNumberByInvoice4BuyId(Long id) {
-		return invoice4BuyDao.findBalanceNumberByInvoice4BuyId(id);
-	}
-
 	public List<String> findBalanceCountByInvoice4BuyId(Long id) {
 		return invoice4BuyDao.findBalanceCountByInvoice4BuyId(id);
 	}
@@ -63,23 +59,32 @@ public class Invoice4BuyServiceImpl extends DefaultCrudService<Invoice4Buy> impl
 		return invoice4BuyDao.findRefundEnabled4Option();
 	}
 	
-	public List<Map<String,String>> findBalanceNumber(Long id) {
+	public List<Map<String,String>> findBalanceNumber(Long id,boolean isOrder) {
 		if(id==null)
 			return null;
+		if(isOrder){
+			return findOrderBalanceNumber(id,null);
+		}else
 		return buyBalanceNumber(id,null);
 	}
 
 	public List<Map<String, String>> findBalanceNumberExSell(Long id,
-			Long sellId) {
+			Long sellId,boolean isOrder) {
 		if(id==null||sellId==null)
 			return null;
+		if(isOrder){
+			return findOrderBalanceNumber(id,sellId);
+		}else
 		return buyBalanceNumber(id,sellId);
 	}
 
 	public List<Map<String, String>> findBalanceNumberExRefund(Long id,
-			Long refundId) {
+			Long refundId,boolean isOrder) {
 		if(id==null||refundId==null)
 			return null;
+		if(isOrder){
+			return findOrderBalanceNumber(id,refundId);
+		}else
 		return buyBalanceNumber(id,refundId);
 	}
 	
@@ -217,4 +222,30 @@ public class Invoice4BuyServiceImpl extends DefaultCrudService<Invoice4Buy> impl
 		return new NubmerFormater(patten).format(value);
 	}
 	
+	private List<Map<String,String>> findOrderBalanceNumber(Long id,Long sId) {
+		List<Map<String, String>> bnumber= buyBalanceNumber(id,sId);
+		//临时变量，保存比较后需要临时保存的号码段
+		Map<String, String> temp=null;
+		//冒泡排序
+		for(int i=0;i<(bnumber.size()/2+1);i++){
+			for(int j=0;j+1<bnumber.size();j++){
+				bnumber.get(j);
+				bnumber.get(j+1);
+				int first=Integer.parseInt(bnumber.get(j).get("sNo"));
+				int second=Integer.parseInt(bnumber.get(j+1).get("sNo"));
+				if(first>second){
+					temp=bnumber.get(j);
+					bnumber.add(j, bnumber.get(j+1));
+					bnumber.remove(j+1);
+					bnumber.add(j+1, temp);
+					bnumber.remove(j+2);
+				}
+			}
+		}
+		return bnumber;	
+	}
+
+	public boolean isExistSellAndRefund(Long id) {
+		return this.invoice4BuyDao.isExistSellAndRefund(id);
+	}
 }

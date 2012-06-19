@@ -69,12 +69,6 @@ public interface Invoice4BuyService extends CrudService<Invoice4Buy> {
 	 */
 	public List<Map<String, String>> findSellDetail(Long id);
 	
-	/**
-	 * 通过采购单ID，获取剩余号码段
-	 * 
-	 * @return
-	 */
-	public List<String> findBalanceNumberByInvoice4BuyId(Long id);
 	
 	/**
 	 * 通过采购单ID，获取剩余数量
@@ -85,35 +79,43 @@ public interface Invoice4BuyService extends CrudService<Invoice4Buy> {
 	
 	/**
 	 * 获取采购单剩余号码段
-	 * @param id 采购单id
+	 * @param id 采购单id,isOrder 是否需要排序，true按sNo升序排序 
 	 * @return 集合同包含采购单的范围
 	 *     Map集合{
 	 *     	sNo: 号码段开始号,
 	 *     	eNo: 号码段结束号
 	 *     }
 	 */
-	public List<Map<String,String>> findBalanceNumber(Long id);
+	public List<Map<String,String>> findBalanceNumber(Long id,boolean isOrder);
 	
 	/**
 	 * 获取采购单剩余号码段 ,不包括销售单
-	 * @param id 采购单id,sellId 销售单Id
+	 * @param id 采购单id,sellId 销售单Id,isOrder 是否需要排序，true按sNo升序排序 
 	 * @return 集合同包含采购单的范围
 	 *     Map集合{
 	 *     	sNo: 号码段开始号,
 	 *     	eNo: 号码段结束号
 	 *     }
 	 */
-	public List<Map<String,String>> findBalanceNumberExSell(Long id,Long sellId);
+	public List<Map<String,String>> findBalanceNumberExSell(Long id,Long sellId,boolean isOrder);
 	
 	/**
 	 * 获取采购单剩余号码段,不报含退票单
-	 * @param id 采购单id,refundId 退票单Id
+	 * @param id 采购单id,refundId 退票单Id,isOrder 是否需要排序，true按sNo升序排序 
 	 * @return 集合同包含采购单的范围
 	 *     Map集合{
 	 *     	sNo: 号码段开始号,
 	 *     	eNo: 号码段结束号
 	 *     }
 	 */
-	public List<Map<String,String>> findBalanceNumberExRefund(Long id,Long refundId);
+	public List<Map<String,String>> findBalanceNumberExRefund(Long id,Long refundId,boolean isOrder);
+	
+	/**
+	 * 此采购单时候有对应的销售单或退票单
+	 * 
+	 * @param id 采购单id
+	 * @return
+	 */
+	public boolean isExistSellAndRefund(Long id);
 
 }
