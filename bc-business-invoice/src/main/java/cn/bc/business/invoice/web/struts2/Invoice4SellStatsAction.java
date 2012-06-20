@@ -96,11 +96,27 @@ public class Invoice4SellStatsAction extends ViewAction<Map<String, Object>> {
 		float price=0;
 		int refundCount=0;
 		float refundPrice=0;
+		int bc_count=0;
+		float bc_price=0;
+		int bc_refundCount=0;
+		float bc_refundPrice=0;
+		int gf_count=0;
+		float gf_price=0;
+		int gf_refundCount=0;
+		float gf_refundPrice=0;
 		for(Map<String,Object> map:list){
 			count+=Integer.parseInt(map.get("sellCount").toString());
 			price+=Float.parseFloat(map.get("sellPrice").toString());
 			refundCount+=Integer.parseInt(map.get("refundCount").toString());
 			refundPrice+=Float.parseFloat(map.get("refundPrice").toString());
+			bc_count+=Integer.parseInt(map.get("bcSellCount").toString());
+			bc_price+=Float.parseFloat(map.get("bcSellPrice").toString());
+			bc_refundCount+=Integer.parseInt(map.get("bcRefundCount").toString());
+			bc_refundPrice+=Float.parseFloat(map.get("bcRefundPrice").toString());
+			gf_count+=Integer.parseInt(map.get("gfSellCount").toString());
+			gf_price+=Float.parseFloat(map.get("gfSellPrice").toString());
+			gf_refundCount+=Integer.parseInt(map.get("gfRefundCount").toString());
+			gf_refundPrice+=Float.parseFloat(map.get("gfRefundPrice").toString());
 			newList.add(map);
 		}
 		Map<String,Object> newMap=new HashMap<String, Object>();
@@ -109,6 +125,14 @@ public class Invoice4SellStatsAction extends ViewAction<Map<String, Object>> {
 		newMap.put("sellPrice",price);
 		newMap.put("refundCount",refundCount);
 		newMap.put("refundPrice",refundPrice);
+		newMap.put("bcSellCount",bc_count);
+		newMap.put("bcSellPrice",bc_price);
+		newMap.put("bcRefundCount",bc_refundCount);
+		newMap.put("bcRefundPrice",bc_refundPrice);
+		newMap.put("gfSellCount",gf_count);
+		newMap.put("gfSellPrice",gf_price);
+		newMap.put("gfRefundCount",gf_refundCount);
+		newMap.put("gfRefundPrice",gf_refundPrice);
 		newList.add(newMap);
 		return newList;
 		
@@ -183,6 +207,83 @@ public class Invoice4SellStatsAction extends ViewAction<Map<String, Object>> {
 		sql.append(") as refundPrice");
 		// -- 构建退票数量、 退票合计子查询sql---结束--
 		
+		// -- 宝城构建销售数量、 销售合计子查询sql---开始--
+		//数量
+		sql.append(",(select sum(bc_b.count_) from bs_invoice_sell bc_a inner join bs_invoice_sell_detail bc_b on bc_b.sell_id=bc_a.id");
+		sql.append(" where bc_a.status_=0 and bc_a.type_=1 and bc_a.company='宝城' and bc_a.cashier_id = s.cashier_id ");
+		if(sDate!=null&&sDate.length()>0)
+			sql.append(" and bc_a.sell_date>='"+sDate+"'");
+		if(eDate!=null&&eDate.length()>0)
+			sql.append(" and bc_a.sell_date<'"+eDate+"'");
+		sql.append(") as bcSellCount");
+		//合计
+		sql.append(",(select sum(bc_d.count_*bc_d.price) from bs_invoice_sell bc_c inner join bs_invoice_sell_detail bc_d on bc_d.sell_id=bc_c.id");
+		sql.append(" where bc_c.status_=0 and bc_c.type_=1 and bc_c.company='宝城' and bc_c.cashier_id = s.cashier_id ");
+		if(sDate!=null&&sDate.length()>0)
+			sql.append(" and bc_c.sell_date>='"+sDate+"'");
+		if(eDate!=null&&eDate.length()>0)
+			sql.append(" and bc_c.sell_date<'"+eDate+"'");
+		sql.append(") as bcSellPrice");
+		// -- 构建销售数量、 销售合计子查询sql---结束--
+		
+		// -- 宝城构建退票数量、 退票合计子查询sql---开始--
+		//数量
+		sql.append(",(select sum(bc_f.count_) from bs_invoice_sell bc_e inner join bs_invoice_sell_detail bc_f on bc_f.sell_id=bc_e.id");
+		sql.append(" where bc_e.status_=0 and bc_e.type_=2 and bc_e.company='宝城' and bc_e.cashier_id = s.cashier_id ");
+		if(sDate!=null&&sDate.length()>0)
+			sql.append(" and bc_e.sell_date>='"+sDate+"'");
+		if(eDate!=null&&eDate.length()>0)
+			sql.append(" and bc_e.sell_date<'"+eDate+"'");
+		sql.append(") as bcRefundCount");
+		//合计
+		sql.append(",(select sum(bc_h.count_*bc_h.price) from bs_invoice_sell bc_g inner join bs_invoice_sell_detail bc_h on bc_h.sell_id=bc_g.id");
+		sql.append(" where bc_g.status_=0 and bc_g.type_=2 and bc_g.company='宝城' and bc_g.cashier_id = s.cashier_id ");
+		if(sDate!=null&&sDate.length()>0)
+			sql.append(" and bc_g.sell_date>='"+sDate+"'");
+		if(eDate!=null&&eDate.length()>0)
+			sql.append(" and bc_g.sell_date<'"+eDate+"'");
+		sql.append(") as bcRefundPrice");
+		// -- 构建退票数量、 退票合计子查询sql---结束--
+		
+		// -- 广发构建销售数量、 销售合计子查询sql---开始--
+		//数量
+		sql.append(",(select sum(gf_b.count_) from bs_invoice_sell gf_a inner join bs_invoice_sell_detail gf_b on gf_b.sell_id=gf_a.id");
+		sql.append(" where gf_a.status_=0 and gf_a.type_=1 and gf_a.company='广发' and gf_a.cashier_id = s.cashier_id ");
+		if(sDate!=null&&sDate.length()>0)
+			sql.append(" and gf_a.sell_date>='"+sDate+"'");
+		if(eDate!=null&&eDate.length()>0)
+			sql.append(" and gf_a.sell_date<'"+eDate+"'");
+		sql.append(") as gfSellCount");
+		//合计
+		sql.append(",(select sum(gf_d.count_*gf_d.price) from bs_invoice_sell gf_c inner join bs_invoice_sell_detail gf_d on gf_d.sell_id=gf_c.id");
+		sql.append(" where gf_c.status_=0 and gf_c.type_=1 and gf_c.company='广发' and gf_c.cashier_id = s.cashier_id ");
+		if(sDate!=null&&sDate.length()>0)
+			sql.append(" and gf_c.sell_date>='"+sDate+"'");
+		if(eDate!=null&&eDate.length()>0)
+			sql.append(" and gf_c.sell_date<'"+eDate+"'");
+		sql.append(") as gfSellPrice");
+		// -- 构建销售数量、 销售合计子查询sql---结束--
+		
+		// -- 广发构建退票数量、 退票合计子查询sql---开始--
+		//数量
+		sql.append(",(select sum(gf_f.count_) from bs_invoice_sell gf_e inner join bs_invoice_sell_detail gf_f on gf_f.sell_id=gf_e.id");
+		sql.append(" where gf_e.status_=0 and gf_e.type_=2 and gf_e.company='广发' and gf_e.cashier_id = s.cashier_id ");
+		if(sDate!=null&&sDate.length()>0)
+			sql.append(" and gf_e.sell_date>='"+sDate+"'");
+		if(eDate!=null&&eDate.length()>0)
+			sql.append(" and gf_e.sell_date<'"+eDate+"'");
+		sql.append(") as gfRefundCount");
+		//合计
+		sql.append(",(select sum(gf_h.count_*gf_h.price) from bs_invoice_sell gf_g inner join bs_invoice_sell_detail gf_h on gf_h.sell_id=gf_g.id");
+		sql.append(" where gf_g.status_=0 and gf_g.type_=2 and gf_g.company='广发' and gf_g.cashier_id = s.cashier_id ");
+		if(sDate!=null&&sDate.length()>0)
+			sql.append(" and gf_g.sell_date>='"+sDate+"'");
+		if(eDate!=null&&eDate.length()>0)
+			sql.append(" and gf_g.sell_date<'"+eDate+"'");
+		sql.append(") as gfRefundPrice");
+		// -- 构建退票数量、 退票合计子查询sql---结束--
+		
+		
 		sql.append(" from bs_invoice_sell s");
 		sql.append(" inner join bc_identity_actor_history ah on ah.id=s.cashier_id");
 		sql.append(" where s.status_="+BCConstants.STATUS_ENABLED);
@@ -226,7 +327,57 @@ public class Invoice4SellStatsAction extends ViewAction<Map<String, Object>> {
 					map.put("refundPrice", 0);
 				}else
 				map.put("refundPrice", objRP); 
-		
+				
+				//宝城
+				Object objBC_SC=rs[i++];
+				Object objBC_SP=rs[i++];
+				Object objBC_RC=rs[i++];
+				Object objBC_RP=rs[i++];
+				if(objBC_SC==null){
+					map.put("bcSellCount", 0);
+				}else
+				map.put("bcSellCount", objBC_SC);
+				
+				if(objBC_SP==null){
+					map.put("bcSellPrice", 0);
+				}else
+				map.put("bcSellPrice", objBC_SP); 
+				
+				if(objBC_RC==null){
+					map.put("bcRefundCount", 0);
+				}else
+				map.put("bcRefundCount", objBC_RC); 
+				
+				if(objBC_RP==null){
+					map.put("bcRefundPrice", 0);
+				}else
+				map.put("bcRefundPrice", objBC_RP); 
+				
+				//广发
+				Object objGF_SC=rs[i++];
+				Object objGF_SP=rs[i++];
+				Object objGF_RC=rs[i++];
+				Object objGF_RP=rs[i++];
+				if(objGF_SC==null){
+					map.put("gfSellCount", 0);
+				}else
+				map.put("gfSellCount", objGF_SC);
+				
+				if(objGF_SP==null){
+					map.put("gfSellPrice", 0);
+				}else
+				map.put("gfSellPrice", objGF_SP); 
+				
+				if(objGF_RC==null){
+					map.put("gfRefundCount", 0);
+				}else
+				map.put("gfRefundCount", objGF_RC); 
+				
+				if(objGF_RP==null){
+					map.put("gfRefundPrice", 0);
+				}else
+				map.put("gfRefundPrice", objGF_RP); 
+				
 				return map;
 			}
 		});
@@ -247,7 +398,29 @@ public class Invoice4SellStatsAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("", "refundCount",
 				getText("invoice4SellStats.refundCount"), 100));
 		columns.add(new TextColumn4MapKey("", "refundPrice",
-				getText("invoice4SellStats.refundAmount"))
+				getText("invoice4SellStats.refundAmount"),100)
+				.setValueFormater(new NubmerFormater("###,##0.00")));
+		//宝城
+		columns.add(new TextColumn4MapKey("", "bcSellCount",
+				getText("invoice4SellStats.bc_count"), 120));
+		columns.add(new TextColumn4MapKey("", "bcSellPrice",
+				getText("invoice4SellStats.bc_amount"), 120)
+				.setValueFormater(new NubmerFormater("###,##0.00")));
+		columns.add(new TextColumn4MapKey("", "bcRefundCount",
+				getText("invoice4SellStats.bc_refundCount"), 120));
+		columns.add(new TextColumn4MapKey("", "bcRefundPrice",
+				getText("invoice4SellStats.bc_refundAmount"),120)
+				.setValueFormater(new NubmerFormater("###,##0.00")));
+		//广发
+		columns.add(new TextColumn4MapKey("", "gfSellCount",
+				getText("invoice4SellStats.gf_count"), 120));
+		columns.add(new TextColumn4MapKey("", "gfSellPrice",
+				getText("invoice4SellStats.gf_amount"), 120)
+				.setValueFormater(new NubmerFormater("###,##0.00")));
+		columns.add(new TextColumn4MapKey("", "gfRefundCount",
+				getText("invoice4SellStats.gf_refundCount"), 120));
+		columns.add(new TextColumn4MapKey("", "gfRefundPrice",
+				getText("invoice4SellStats.gf_refundAmount"))
 				.setValueFormater(new NubmerFormater("###,##0.00")));
 		return columns;
 	}
