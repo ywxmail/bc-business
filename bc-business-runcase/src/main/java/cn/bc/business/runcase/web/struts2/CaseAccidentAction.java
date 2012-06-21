@@ -316,6 +316,14 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 			e.setPayDesc(currentE.getPayDesc());
 			e.setPayMoneyTwo(currentE.getPayMoneyTwo());
 			e.setPayDescTwo(currentE.getPayDescTwo());
+		}else if (isPayManage() && !isManage()){
+			currentE.setPayMoney(e.getPayMoney());
+			currentE.setPayDesc(e.getPayDesc());
+			currentE.setPayMoneyTwo(e.getPayMoneyTwo());
+			currentE.setPayDescTwo(e.getPayDescTwo());
+			currentE.setModifier(e.getModifier());
+			currentE.setModifiedDate(e.getModifiedDate());
+			this.setE(currentE);
 		}
 
 		// 设置结案信息
