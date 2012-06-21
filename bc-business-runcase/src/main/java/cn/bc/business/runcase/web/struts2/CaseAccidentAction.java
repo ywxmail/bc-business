@@ -317,6 +317,14 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 			e.setPayMoneyTwo(currentE.getPayMoneyTwo());
 			e.setPayDescTwo(currentE.getPayDescTwo());
 		}else if (isPayManage() && !isManage()){
+			currentE.setPayDriverId(e.getPayDriverId());
+			currentE.setPayDriver(e.getPayDriver());
+			currentE.setPayDate(e.getPayDate());
+			currentE.setPay(e.isPay());
+			currentE.setPayDriverIdTwo(e.getPayDriverIdTwo());
+			currentE.setPayDriverTwo(e.getPayDriverTwo());
+			currentE.setPayDateTwo(e.getPayDateTwo());
+			currentE.setPayTwo(e.isPayTwo());
 			currentE.setPayMoney(e.getPayMoney());
 			currentE.setPayDesc(e.getPayDesc());
 			currentE.setPayMoneyTwo(e.getPayMoneyTwo());
