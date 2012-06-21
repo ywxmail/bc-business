@@ -644,7 +644,7 @@ public class Case4Accident extends CaseBase {
 		this.payDesc = payDesc;
 	}
 	
-	@Column(name="PAY_TWO_DESC")
+	@Column(name="PAY_DESC_TWO")
 	public String getPayDescTwo() {
 		return payDescTwo;
 	}
