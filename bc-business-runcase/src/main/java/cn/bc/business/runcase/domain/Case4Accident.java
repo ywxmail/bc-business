@@ -96,6 +96,27 @@ public class Case4Accident extends CaseBase {
 	private String payDesc;//司机受款说明
 	private String payDescTwo;//司机二次受款说明
 	
+	private Calendar delayDate;//事故延期至日期
+	private String delayDesc;//事故延期说明
+	
+	@Column(name = "DELAY_DATE")
+	public Calendar getDelayDate() {
+		return delayDate;
+	}
+
+	public void setDelayDate(Calendar delayDate) {
+		this.delayDate = delayDate;
+	}
+
+	@Column(name = "DELAY_DESC")
+	public String getDelayDesc() {
+		return delayDesc;
+	}
+
+	public void setDelayDesc(String delayDesc) {
+		this.delayDesc = delayDesc;
+	}
+	
 	@Column(name = "RECEIVE_DATE")
 	public Calendar getReceiveDate() {
 		return receiveDate;

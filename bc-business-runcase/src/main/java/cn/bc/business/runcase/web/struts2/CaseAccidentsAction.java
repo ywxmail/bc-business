@@ -81,6 +81,14 @@ public class CaseAccidentsAction extends ViewAction<Map<String, Object>> {
 		return context.hasAnyRole(getText("key.role.bs.accident.pay.manage"),
 				getText("key.role.bc.admin"));
 	}
+	
+	// 查看司机受款信息 返回false表示没权限
+	public boolean isPayRead() {
+		// 事故理赔司机受款信息
+		SystemContext context = (SystemContext) this.getContext();
+		return context.hasAnyRole(getText("key.role.bs.accident.pay.read"),
+				getText("key.role.bc.admin"));
+	}
 	// ======= 司机受款管理权限结束========
 
 	@Override
@@ -116,6 +124,10 @@ public class CaseAccidentsAction extends ViewAction<Map<String, Object>> {
 		sql.append(",c.receiver_name,c.insurance_company");
 		sql.append(",c.is_deliver,c.is_claim,c.is_pay,a.name as unitname,b.company");
 		sql.append(",b.motorcade_id,b.car_id,b.driver_id,cr.code as carcode");
+		sql.append(",c.deliver_date,c.deliver_money");
+		sql.append(",c.claim_date,c.claim_money");
+		sql.append(",c.pay_date,c.pay_money,c.pay_driver,c.pay_desc");
+		sql.append(",c.delay_date,c.delay_desc");
 		sql.append(" from bs_case_accident c");
 		sql.append(" inner join bs_case_base b on b.id=c.id");
 		sql.append(" left join bs_car cr on cr.id=b.car_id");
@@ -170,6 +182,16 @@ public class CaseAccidentsAction extends ViewAction<Map<String, Object>> {
 				map.put("carId", rs[i++]);
 				map.put("driverId", rs[i++]);
 				map.put("carcode", rs[i++]);//车辆自编号
+				map.put("deliver_date", rs[i++]);//车辆自编号
+				map.put("deliver_money", rs[i++]);//车辆自编号
+				map.put("claim_date", rs[i++]);//车辆自编号
+				map.put("claim_money", rs[i++]);//车辆自编号
+				map.put("pay_date", rs[i++]);//车辆自编号
+				map.put("pay_money", rs[i++]);//车辆自编号
+				map.put("pay_driver", rs[i++]);//车辆自编号
+				map.put("pay_desc", rs[i++]);//车辆自编号
+				map.put("delay_date", rs[i++]);//车辆自编号
+				map.put("delay_desc", rs[i++]);//车辆自编号
 				return map;
 			}
 		});
@@ -288,19 +310,73 @@ public class CaseAccidentsAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("c.is_inner_fix", "is_inner_fix",
 				getText("runcase.innerFix"), 40).setSortable(true)
 				.setValueFormater(new BooleanFormater()));
-		// 送保
-		columns.add(new TextColumn4MapKey("c.is_deliver", "is_deliver",
-				getText("runcase.deliver3"), 40).setSortable(true)
-				.setValueFormater(new BooleanFormater()));
-		// 赔付
-		columns.add(new TextColumn4MapKey("c.is_claim", "is_claim",
-				getText("runcase.claim"), 90).setSortable(true)
-				.setValueFormater(new BooleanFormater()));
-		// 司机受款
-		columns.add(new TextColumn4MapKey("c.is_pay", "is_pay",
-				getText("runcase.pay"), 60).setSortable(true).setValueFormater(
-				new BooleanFormater()));
-
+		if(!isReadonly()||isPayRead()){
+			/*
+			map.put("deliver_date", rs[i++]);//车辆自编号
+			map.put("deliver_money", rs[i++]);//车辆自编号
+			map.put("claim_date", rs[i++]);//车辆自编号
+			map.put("claim_money", rs[i++]);//车辆自编号
+			map.put("pay_date", rs[i++]);//车辆自编号
+			map.put("pay_money", rs[i++]);//车辆自编号
+			map.put("pay_driver", rs[i++]);//车辆自编号
+			map.put("pay_desc", rs[i++]);//车辆自编号
+			*/			
+			// 送保
+			columns.add(new TextColumn4MapKey("c.is_deliver", "is_deliver",
+					getText("runcase.deliver3"), 40).setSortable(true)
+					.setValueFormater(new BooleanFormater()));
+			//送保日期
+			columns.add(new TextColumn4MapKey("c.deliver_date", "deliver_date",
+					getText("runcase.deliverDate2"), 100).setSortable(true)
+					.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+			//送保金额
+			columns.add(new TextColumn4MapKey("c.deliver_money", "deliver_money",
+					getText("runcase.deliverMoney"), 80).setUseTitleFromLabel(true)
+					.setValueFormater(new NubmerFormater("###,###.##")));
+			// 赔付
+			columns.add(new TextColumn4MapKey("c.is_claim", "is_claim",
+					getText("runcase.claim"), 90).setSortable(true)
+					.setValueFormater(new BooleanFormater()));
+			//赔付日期
+			columns.add(new TextColumn4MapKey("c.claim_date", "claim_date",
+					getText("runcase.claimDate"), 120).setSortable(true)
+					.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+			//赔付金额
+			columns.add(new TextColumn4MapKey("c.claim_money", "claim_money",
+					getText("runcase.claimMoney"), 120).setUseTitleFromLabel(true)
+					.setValueFormater(new NubmerFormater("###,###.##")));
+			//司机受款
+			columns.add(new TextColumn4MapKey("c.is_pay", "is_pay",
+					getText("runcase.pay"), 60).setSortable(true).setValueFormater(
+					new BooleanFormater()));
+			//受款司机
+			columns.add(new TextColumn4MapKey("c.pay_driver", "pay_driver",
+					getText("runcase.pay.name"), 90)
+					.setUseTitleFromLabel(true));
+			//受款日期
+			columns.add(new TextColumn4MapKey("c.pay_date", "pay_date",
+					getText("runcase.payDate"), 100).setSortable(true)
+					.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+			
+			if(isPayManage()||isPayRead()){
+				//受款金额
+				columns.add(new TextColumn4MapKey("c.pay_money", "pay_money",
+						getText("runcase.payMoney"), 120).setUseTitleFromLabel(true)
+						.setValueFormater(new NubmerFormater("###,###.##")));
+				//受款说明
+				columns.add(new TextColumn4MapKey("c.pay_desc", "pay_desc",
+						"司机受款说明", 90).setUseTitleFromLabel(true));
+			}
+			
+			//延期至日期
+			columns.add(new TextColumn4MapKey("c.delay_date", "delay_date",
+					getText("runcase.accident.delayDate"), 100).setSortable(true)
+					.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+			//延期说明
+			columns.add(new TextColumn4MapKey("c.delay_desc", "delay_desc",
+					getText("runcase.accident.delayDesc"), 90).setUseTitleFromLabel(true));
+		}
+		
 		// 司机拖车费
 		columns.add(new TextColumn4MapKey("c.carman_cost", "carman_cost",
 				getText("runcase.carmanCost"), 95).setUseTitleFromLabel(true)
@@ -326,13 +402,11 @@ public class CaseAccidentsAction extends ViewAction<Map<String, Object>> {
 				"agreement_payment", getText("runcase.agreementPayment"), 80)
 				.setUseTitleFromLabel(true).setValueFormater(
 						new NubmerFormater("###,###.00")));
-
 		columns.add(new TextColumn4MapKey("b.code", "code",
 				getText("runcase.caseNo3"), 160).setSortable(true));
 		// 备注 DESC_ String
 		columns.add(new TextColumn4MapKey("acc_desc", "acc_desc",
 				getText("runcase.accdesc"), 80).setSortable(true));
-
 		return columns;
 	}
 
@@ -409,19 +483,18 @@ public class CaseAccidentsAction extends ViewAction<Map<String, Object>> {
 	protected Toolbar getHtmlPageToolbar() {
 		Toolbar tb = new Toolbar();
 
-		if (this.isReadonly()) {
+		if (isReadonly()) {
 			// 查看按钮
 			tb.addButton(getDefaultOpenToolbarButton());
 		} else {
-			if(this.isManage())
-				// 新建按钮
-				tb.addButton(getDefaultCreateToolbarButton());
-			
-			// 编辑按钮
-			tb.addButton(getDefaultEditToolbarButton());
-			if(this.isManage())
-				// 删除按钮
-				tb.addButton(getDefaultDeleteToolbarButton());
+				if(this.isManage())
+					// 新建按钮
+					tb.addButton(getDefaultCreateToolbarButton());
+				// 编辑按钮
+				tb.addButton(getDefaultEditToolbarButton());
+				if(this.isManage())
+					// 删除按钮
+					tb.addButton(getDefaultDeleteToolbarButton());
 		}
 		
 		tb.addButton(Toolbar.getDefaultToolbarRadioGroup(
