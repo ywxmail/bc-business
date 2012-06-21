@@ -61,8 +61,10 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 	public boolean isMoreCarMan;// 标识是否一辆车对应多个司机
 	public boolean isNullCar;// 标识是否没有车和司机对应
 	public boolean isNullCarMan;// 标识是否没有司机和车对应
+	public boolean isPayManage;// 标识是否司机受款管理
+	public boolean isPayRead;// 标识是否司机查看
+	public boolean isManage;// 标识事故理赔管理员
 
-	@SuppressWarnings("unused")
 	private CaseAccidentService caseAccidentService;
 	private MotorcadeService motorcadeService;
 	private OptionService optionService;
@@ -164,8 +166,36 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 		// 事故理赔管理员或系统管理员
 		SystemContext context = (SystemContext) this.getContext();
 		return !context.hasAnyRole(getText("key.role.bs.accident"),
+				getText("key.role.bs.accident.pay.manage"),
 				getText("key.role.bc.admin"));
 	}
+
+	// ======= 司机受款管理权限开始 ========
+	// 对事故理赔进行操作(不包括司机受款) 返回false表示没权限
+	public boolean isManage() {
+		// 事故理赔司机受款管理
+		SystemContext context = (SystemContext) this.getContext();
+		return context.hasAnyRole(getText("key.role.bs.accident"),
+				getText("key.role.bc.admin"));
+	}
+
+	// 对司机受款信息进行操作 返回false表示没权限
+	public boolean isPayManage() {
+		// 事故理赔司机受款管理
+		SystemContext context = (SystemContext) this.getContext();
+		return context.hasAnyRole(getText("key.role.bs.accident.pay.manage"),
+				getText("key.role.bc.admin"));
+	}
+
+	// 查看司机受款信息 返回false表示没权限
+	public boolean isPayRead() {
+		// 事故理赔司机受款信息
+		SystemContext context = (SystemContext) this.getContext();
+		return context.hasAnyRole(getText("key.role.bs.accident.pay.read"),
+				getText("key.role.bc.admin"));
+	}
+
+	// ======= 司机受款管理权限结束========
 
 	// 设置页面的尺寸
 	@Override
@@ -175,34 +205,25 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 	}
 
 	protected void buildFormPageButtons(PageOption pageOption, boolean editable) {
-		boolean readonly = this.isReadonly();
-		
-		if (this.useFormPrint()) {
+
+		if (this.useFormPrint())
 			// 添加打印按钮
 			pageOption.addButton(this.getDefaultPrintButtonOption());
-		}
 
-		if (editable && !readonly) {
-			// 新建时
-			if (getE().isNew()) {
-				pageOption.addButton(new ButtonOption(getText("label.save"),
-						null, "bc.caseAccidentForm.save")
-						.setId("caseAccidentSave"));
-			}
-			// 特殊处理结案按钮
-			// 状态为在案时
-			if (Case4Accident.STATUS_ACTIVE == getE().getStatus()
-					&& !getE().isNew()) {
-				ButtonOption buttonOption = new ButtonOption(
-						getText("label.closefile"), null,
-						"bc.caseAccidentForm.closefile");
-				buttonOption.put("id", "bcSaveDlgButton");
-				pageOption.addButton(buttonOption);
-				pageOption.addButton(new ButtonOption(getText("label.save"),
-						null, "bc.caseAccidentForm.save")
-						.setId("caseAccidentSave"));
-			}
-		}
+		// 不可编辑且没有权限
+		if (!editable && isReadonly())
+			return;
+
+		if (Case4Accident.STATUS_ACTIVE == getE().getStatus() && isManage())
+			pageOption.addButton(new ButtonOption(getText("label.closefile"),
+					null, "bc.caseAccidentForm.closefile")
+					.setId("caseAccidentCloseFile"));
+
+		// 状态在案且有权限
+		if (Case4Accident.STATUS_ACTIVE == getE().getStatus() && !isReadonly())
+			pageOption.addButton(new ButtonOption(getText("label.save"), null,
+					"bc.caseAccidentForm.save").setId("caseAccidentSave"));
+
 	}
 
 	@Override
@@ -277,38 +298,34 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 	}
 
 	@Override
-	public String save() throws Exception {
-		String result = "saveSuccess";
-		SystemContext context = this.getSystyemContext();
-		Case4Accident e = this.getE();
+	protected void afterOpen(Case4Accident entity) {
+		super.afterOpen(entity);
+
+	}
+
+	@Override
+	protected void beforeSave(Case4Accident entity) {
+		super.beforeSave(entity);
+
+		Case4Accident e = entity;
+		Case4Accident currentE = this.caseAccidentService.load(e.getId());
+
+		// 没有司机受款管理权限时
+		if (!isPayManage() && isManage()) {
+			e.setPayMoney(currentE.getPayMoney());
+			e.setPayDesc(currentE.getPayDesc());
+			e.setPayMoneyTwo(currentE.getPayMoneyTwo());
+			e.setPayDescTwo(currentE.getPayDescTwo());
+		}
 
 		// 设置结案信息
 		if (isClosed.length() > 0 && isClosed.equals("1")) {
-			this.setCloserInfo(context, e);
+			SystemContext context = this.getSystyemContext();
+			e.setStatus(CaseBase.STATUS_CLOSED);
+			e.setCloserId(context.getUserHistory().getId());
+			e.setCloserName(context.getUserHistory().getName());
+			e.setCloseDate(Calendar.getInstance(Locale.CHINA));
 		}
-
-		// 设置最后更新人的信息
-		e.setModifier(context.getUserHistory());
-		e.setModifiedDate(Calendar.getInstance());
-		this.getCrudService().save(e);
-
-		return result;
-	}
-
-	// 结案信息设置
-	private void setCloserInfo(SystemContext context, Case4Accident e) {
-		e.setStatus(CaseBase.STATUS_CLOSED);
-		e.setCloserId(context.getUserHistory().getId());
-		e.setCloserName(context.getUserHistory().getName());
-		e.setCloseDate(Calendar.getInstance(Locale.CHINA));
-
-		// {"id":"<@s.property value="e.id"/>","msg":"<@s.text name="form.save.success"/>"}
-		Json o;
-		o = new Json();
-		o.put("id", e.getId());
-		o.put("msg", getText("runcase.close.success"));
-		json = o.toString();
-
 	}
 
 	@Override

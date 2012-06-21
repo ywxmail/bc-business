@@ -60,11 +60,28 @@ public class CaseAccidentsAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	public boolean isReadonly() {
-		// 司机管理员或系统管理员
+		// 事故理赔管理员或系统管理员
 		SystemContext context = (SystemContext) this.getContext();
-		return !context.hasAnyRole(getText("key.role.bs.accident"),
+		return !context.hasAnyRole(getText("key.role.bs.accident"),getText("key.role.bs.accident.pay.manage"),
 				getText("key.role.bc.admin"));
 	}
+	
+	// ======= 司机受款管理权限开始 ========
+	// 对事故理赔进行操作(不包括司机受款) 返回false表示没权限
+	public boolean isManage() {
+		// 事故理赔司机受款管理
+		SystemContext context = (SystemContext) this.getContext();
+		return context.hasAnyRole(getText("key.role.bs.accident"),
+				getText("key.role.bc.admin"));
+	}
+	//对司机受款信息进行操作  返回false表示没权限
+	public boolean isPayManage() {
+		// 事故理赔司机受款管理
+		SystemContext context = (SystemContext) this.getContext();
+		return context.hasAnyRole(getText("key.role.bs.accident.pay.manage"),
+				getText("key.role.bc.admin"));
+	}
+	// ======= 司机受款管理权限结束========
 
 	@Override
 	protected OrderCondition getGridDefaultOrderCondition() {
@@ -390,13 +407,35 @@ public class CaseAccidentsAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected Toolbar getHtmlPageToolbar() {
-		return super.getHtmlPageToolbar()
-				.addButton(
-						Toolbar.getDefaultToolbarRadioGroup(
+		Toolbar tb = new Toolbar();
+
+		if (this.isReadonly()) {
+			// 查看按钮
+			tb.addButton(getDefaultOpenToolbarButton());
+		} else {
+			if(this.isManage())
+				// 新建按钮
+				tb.addButton(getDefaultCreateToolbarButton());
+			
+			// 编辑按钮
+			tb.addButton(getDefaultEditToolbarButton());
+			if(this.isManage())
+				// 删除按钮
+				tb.addButton(getDefaultDeleteToolbarButton());
+		}
+		
+		tb.addButton(Toolbar.getDefaultToolbarRadioGroup(
 								this.getBSStatuses2(), "status", 0,
 								getText("title.click2changeSearchStatus")));
+		// 搜索按钮
+		tb.addButton(getDefaultSearchToolbarButton());
+		
+		return tb;
+		
 	}
 
+	
+	
 	// ==高级搜索代码开始==
 	@Override
 	protected boolean useAdvanceSearch() {
