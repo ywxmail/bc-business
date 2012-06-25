@@ -103,7 +103,7 @@ public class Invoice4BuyAction extends FileEntityAction<Long, Invoice4Buy> {
 		balanceNumber="";
 		if (Integer.parseInt(balanceCount) > 0) {
 			for (Map<String, String> bmap : invoice4BuyService
-					.findBalanceNumber(entity.getId(), true)) {
+					.findBalanceNumber(entity.getId())) {
 				balanceNumber += "[" + bmap.get("sNo") + "~" + bmap.get("eNo")
 						+ "] ";
 			}
@@ -127,7 +127,7 @@ public class Invoice4BuyAction extends FileEntityAction<Long, Invoice4Buy> {
 		balanceNumber="";
 		if (Integer.parseInt(balanceCount) > 0) {
 			for (Map<String, String> bmap : invoice4BuyService
-					.findBalanceNumber(entity.getId(), true)) {
+					.findBalanceNumber(entity.getId())) {
 				balanceNumber += "[" + bmap.get("sNo") + "~" + bmap.get("eNo")
 						+ "] ";
 			}
@@ -196,7 +196,7 @@ public class Invoice4BuyAction extends FileEntityAction<Long, Invoice4Buy> {
 
 				// 检查相同发票代码的采购开始号和结束号是否出现在已保存的采购编码范围内
 				List<Map<String, String>> bnumber = this.invoice4BuyService
-						.findBalanceNumber(e.getId(), true);
+						.findBalanceNumber(e.getId());
 				if(bnumber!=null&&bnumber.size()>0){
 					int firstENO = Integer.parseInt(bnumber.get(0).get("eNo"));
 					int lastSNO = Integer.parseInt(bnumber.get(bnumber.size() - 1)
