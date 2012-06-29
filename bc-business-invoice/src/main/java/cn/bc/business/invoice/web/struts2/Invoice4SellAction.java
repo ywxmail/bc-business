@@ -506,7 +506,7 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 		JsonArray jsonArray = new JsonArray();
 		Json json = null;
 		List<Map<String, String>> codeListMap = null;
-		if(readType!=null||readType.equals("2")){
+		if(readType!=null&&readType.equals("2")){
 			codeListMap = invoice4BuyService.findRefundEnabled4Option();
 		}else
 			codeListMap = invoice4BuyService.findEnabled4Option();
