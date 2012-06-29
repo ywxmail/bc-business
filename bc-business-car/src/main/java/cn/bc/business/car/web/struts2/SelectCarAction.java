@@ -47,6 +47,7 @@ public class SelectCarAction extends
 		AbstractSelectPageAction<Map<String, Object>> {
 	private static final long serialVersionUID = 1L;
 	public String status = String.valueOf(BCConstants.STATUS_ENABLED); // 车辆的状态，多个用逗号连接
+	public String loadLevel;//选择视图上加载信息量登记，0或无代表默认，1~代表
 
 	@Override
 	protected OrderCondition getGridDefaultOrderCondition() {
@@ -72,11 +73,30 @@ public class SelectCarAction extends
 
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer sql = new StringBuffer();
-		sql.append("select c.id,c.status_,c.code,c.plate_type,c.plate_no,c.register_date");
+		sql.append(" c.id,c.status_,c.code,c.plate_type,c.plate_no,c.register_date");
 		sql.append(",c.scrap_date,c.motorcade_id,m.name,c.company,c.bs_type,c.charger");
-		sql.append(" from bs_car c");
+		if(loadLevel!=null&&loadLevel.length()>0&&loadLevel.equals("1")){
+			sql.append(" ,a.name as unitCompany,c.return_date");
+			sql.append(" ,(select bc.end_date from bs_contract bc");
+			sql.append(" inner join bs_car_contract bcc on bcc.contract_id=bc.id");
+			sql.append(" where bc.type_=2 and bc.status_ ="+BCConstants.STATUS_ENABLED);
+			sql.append(" and bcc.car_id=c.id");
+			sql.append(" ORDER BY bc.file_date DESC limit 1) as ccEndDate");
+			
+			sql.append(" ,(select bcp.COMMERIAL_END_DATE from bs_car_policy bcp");
+			sql.append(" where bcp.car_id=c.id and bcp.status_ ="+BCConstants.STATUS_ENABLED);
+			sql.append(" ORDER BY bcp.file_date ASC limit 1) as commerialEndDate");
+			
+			sql.append(" ,(select bcp.GREENSLIP_END_DATE from bs_car_policy bcp");
+			sql.append(" where bcp.car_id=c.id and bcp.status_ ="+BCConstants.STATUS_ENABLED);
+			sql.append(" ORDER BY bcp.file_date ASC limit 1) as greenslipEndDate");
+		}
+		sqlObject.setSelect(sql.toString());
+		sql = new StringBuffer();
+		sql.append(" bs_car c");
 		sql.append(" inner join bs_motorcade m on m.id=c.motorcade_id");
-		sqlObject.setSql(sql.toString());
+		sql.append(" inner join bc_identity_actor a on a.id = m.unit_id");
+		sqlObject.setFrom(sql.toString());
 
 		// 注入参数
 		sqlObject.setArgs(null);
@@ -98,6 +118,13 @@ public class SelectCarAction extends
 				map.put("company", rs[i++]);
 				map.put("bs_type", rs[i++]);
 				map.put("charger", rs[i++]);
+				if(loadLevel!=null&&loadLevel.length()>0&&loadLevel.equals("1")){
+					map.put("unitCompany", rs[i++]);
+					map.put("return_date", rs[i++]);
+					map.put("ccEndDate", rs[i++]);
+					map.put("commerialEndDate", rs[i++]);
+					map.put("greenslipEndDate", rs[i++]);			
+				}
 				return map;
 			}
 		});
@@ -143,6 +170,14 @@ public class SelectCarAction extends
 				.setUseTitleFromLabel(true));
 		columns.add(new HiddenColumn4MapKey("motorcadeId", "motorcade_id"));
 		columns.add(new HiddenColumn4MapKey("motorcadeName", "motorcade_name"));
+		
+		if(loadLevel!=null&&loadLevel.length()>0&&loadLevel.equals("1")){
+			columns.add(new HiddenColumn4MapKey("unitCompany", "unitCompany"));
+			columns.add(new HiddenColumn4MapKey("returnDate", "return_date"));
+			columns.add(new HiddenColumn4MapKey("ccEndDate", "ccEndDate"));
+			columns.add(new HiddenColumn4MapKey("commerialEndDate", "commerialEndDate"));
+			columns.add(new HiddenColumn4MapKey("greenslipEndDate", "greenslipEndDate"));
+		}
 		return columns;
 	}
 
@@ -194,13 +229,13 @@ public class SelectCarAction extends
 
 	@Override
 	protected Json getGridExtrasData() {
-		if (this.status == null || this.status.length() == 0) {
-			return null;
-		} else {
-			Json json = new Json();
+		Json json = new Json();
+		if(status!=null&&status.length()>0)
 			json.put("status", status);
-			return json;
-		}
+		if(loadLevel!=null&&loadLevel.length()>0)
+			json.put("loadLevel", loadLevel);
+		return json;
+		
 	}
 
 	@Override
