@@ -3,7 +3,9 @@
  */
 package cn.bc.business.car.web.struts2;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -76,7 +78,7 @@ public class SelectCarAction extends
 		sql.append(" c.id,c.status_,c.code,c.plate_type,c.plate_no,c.register_date");
 		sql.append(",c.scrap_date,c.motorcade_id,m.name,c.company,c.bs_type,c.charger");
 		if(loadLevel!=null&&loadLevel.length()>0&&loadLevel.equals("1")){
-			sql.append(" ,a.name as unitCompany,c.return_date");
+			sql.append(" ,a.name as unitCompany");
 			sql.append(" ,(select bc.end_date from bs_contract bc");
 			sql.append(" inner join bs_car_contract bcc on bcc.contract_id=bc.id");
 			sql.append(" where bc.type_=2 and bc.status_ ="+BCConstants.STATUS_ENABLED);
@@ -120,10 +122,44 @@ public class SelectCarAction extends
 				map.put("charger", rs[i++]);
 				if(loadLevel!=null&&loadLevel.length()>0&&loadLevel.equals("1")){
 					map.put("unitCompany", rs[i++]);
-					map.put("return_date", rs[i++]);
 					map.put("ccEndDate", rs[i++]);
 					map.put("commerialEndDate", rs[i++]);
-					map.put("greenslipEndDate", rs[i++]);			
+					map.put("greenslipEndDate", rs[i++]);
+					//计算预计交车日期
+
+					List<Timestamp> tempList=new ArrayList<Timestamp>();
+					
+					if(map.get("ccEndDate")!=null)
+						tempList.add((Timestamp)map.get("ccEndDate"));
+					
+					if(map.get("commerialEndDate")!=null)
+						tempList.add((Timestamp)map.get("commerialEndDate"));
+					
+					if(map.get("greenslipEndDate")!=null)
+						tempList.add((Timestamp)map.get("greenslipEndDate"));
+					
+					if(tempList.size()==0){
+						map.put("predictReturnDate", null);
+					}else if(tempList.size()==1){
+						map.put("predictReturnDate",tempList.get(0));
+					}else if(tempList.size()==2){
+						if(tempList.get(0).after(tempList.get(1))){
+							map.put("predictReturnDate",tempList.get(1));
+						}else
+							map.put("predictReturnDate",tempList.get(0));
+					}else{
+						//排序	
+						for(int j=0;j<tempList.size();j++){
+							for(int k=0;k+1<tempList.size();k++){
+								if(tempList.get(k).after(tempList.get(k+1))){
+									tempList.add(k, tempList.get(k+1));
+									tempList.remove(k+2);
+								}
+							}
+						}
+						
+						map.put("predictReturnDate",tempList.get(0));
+					}
 				}
 				return map;
 			}
@@ -173,7 +209,8 @@ public class SelectCarAction extends
 		
 		if(loadLevel!=null&&loadLevel.length()>0&&loadLevel.equals("1")){
 			columns.add(new HiddenColumn4MapKey("unitCompany", "unitCompany"));
-			columns.add(new HiddenColumn4MapKey("returnDate", "return_date"));
+			//预计交车日期
+			columns.add(new HiddenColumn4MapKey("predictReturnDate", "predictReturnDate"));
 			columns.add(new HiddenColumn4MapKey("ccEndDate", "ccEndDate"));
 			columns.add(new HiddenColumn4MapKey("commerialEndDate", "commerialEndDate"));
 			columns.add(new HiddenColumn4MapKey("greenslipEndDate", "greenslipEndDate"));
