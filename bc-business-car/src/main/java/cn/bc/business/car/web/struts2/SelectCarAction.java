@@ -5,7 +5,6 @@ package cn.bc.business.car.web.struts2;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -78,7 +77,7 @@ public class SelectCarAction extends
 		sql.append(" c.id,c.status_,c.code,c.plate_type,c.plate_no,c.register_date");
 		sql.append(",c.scrap_date,c.motorcade_id,m.name,c.company,c.bs_type,c.charger");
 		if(loadLevel!=null&&loadLevel.length()>0&&loadLevel.equals("1")){
-			sql.append(" ,a.name as unitCompany");
+			sql.append(" ,a.name as unitCompany,a.id as unitCompanyId");
 			sql.append(" ,(select bc.end_date from bs_contract bc");
 			sql.append(" inner join bs_car_contract bcc on bcc.contract_id=bc.id");
 			sql.append(" where bc.type_=2 and bc.status_ ="+BCConstants.STATUS_ENABLED);
@@ -122,6 +121,7 @@ public class SelectCarAction extends
 				map.put("charger", rs[i++]);
 				if(loadLevel!=null&&loadLevel.length()>0&&loadLevel.equals("1")){
 					map.put("unitCompany", rs[i++]);
+					map.put("unitCompanyId", rs[i++]);
 					map.put("ccEndDate", rs[i++]);
 					map.put("commerialEndDate", rs[i++]);
 					map.put("greenslipEndDate", rs[i++]);
@@ -157,7 +157,6 @@ public class SelectCarAction extends
 								}
 							}
 						}
-						
 						map.put("predictReturnDate",tempList.get(0));
 					}
 				}
@@ -209,6 +208,7 @@ public class SelectCarAction extends
 		
 		if(loadLevel!=null&&loadLevel.length()>0&&loadLevel.equals("1")){
 			columns.add(new HiddenColumn4MapKey("unitCompany", "unitCompany"));
+			columns.add(new HiddenColumn4MapKey("unitCompanyId", "unitCompanyId"));
 			//预计交车日期
 			columns.add(new HiddenColumn4MapKey("predictReturnDate", "predictReturnDate"));
 			columns.add(new HiddenColumn4MapKey("ccEndDate", "ccEndDate"));
