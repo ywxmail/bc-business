@@ -293,42 +293,12 @@ public class CertLostsAction extends ViewAction<Map<String, Object>> {
 		return json.isEmpty() ? null : json;
 	}
 
-	protected Toolbar getHtmlPageToolbar(boolean useDisabledReplaceDelete) {
-		Toolbar tb = new Toolbar();
-
-		if (this.isReadonly()) {
-			// 查看按钮
-			tb.addButton(Toolbar
-					.getDefaultEditToolbarButton(getText("label.read")));
-		} else {
-			// 新建按钮
-			tb.addButton(Toolbar
-					.getDefaultCreateToolbarButton(getText("label.create")));
-
-			// 编辑按钮
-			tb.addButton(Toolbar
-					.getDefaultEditToolbarButton(getText("label.edit")));
-
-			if (useDisabledReplaceDelete) {
-				// 禁用按钮
-				tb.addButton(Toolbar
-						.getDefaultDisabledToolbarButton(getText("label.disabled")));
-			} else {
-				// 删除按钮
-				tb.addButton(Toolbar
-						.getDefaultDeleteToolbarButton(getText("label.delete")));
-			}
-
-		}
-		// 补办结果单选按钮组
-		tb.addButton(Toolbar.getDefaultToolbarRadioGroup(this.getReplace(),
-				"isReplace", 0,
-				getText("certLost.title.click2changeSearchReplace")));
-		// 搜索按钮
-		tb.addButton(Toolbar
-				.getDefaultSearchToolbarButton(getText("title.click2search")));
-
-		return tb;
+	@Override
+	protected Toolbar getHtmlPageToolbar() {
+		return super.getHtmlPageToolbar().addButton(
+				Toolbar.getDefaultToolbarRadioGroup(this.getReplace(),
+						"isReplace", 0,
+						getText("certLost.title.click2changeSearchReplace")));
 	}
 
 	/**
@@ -354,6 +324,11 @@ public class CertLostsAction extends ViewAction<Map<String, Object>> {
 		remains.put("false", getText("certLost.isRemains.no"));
 		remains.put("true", getText("certLost.isRemains.yes"));
 		return remains;
+	}
+
+	@Override
+	protected boolean useAdvanceSearch() {
+		return true;
 	}
 
 }
