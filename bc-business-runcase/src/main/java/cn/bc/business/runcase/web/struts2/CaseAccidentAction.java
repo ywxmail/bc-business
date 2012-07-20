@@ -306,34 +306,34 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 	@Override
 	protected void beforeSave(Case4Accident entity) {
 		super.beforeSave(entity);
-
 		Case4Accident e = entity;
-		Case4Accident currentE = this.caseAccidentService.load(e.getId());
-
-		// 没有司机受款管理权限时
-		if (!isPayManage() && isManage()) {
-			e.setPayMoney(currentE.getPayMoney());
-			e.setPayDesc(currentE.getPayDesc());
-			e.setPayMoneyTwo(currentE.getPayMoneyTwo());
-			e.setPayDescTwo(currentE.getPayDescTwo());
-		}else if (isPayManage() && !isManage()){
-			currentE.setPayDriverId(e.getPayDriverId());
-			currentE.setPayDriver(e.getPayDriver());
-			currentE.setPayDate(e.getPayDate());
-			currentE.setPay(e.isPay());
-			currentE.setPayDriverIdTwo(e.getPayDriverIdTwo());
-			currentE.setPayDriverTwo(e.getPayDriverTwo());
-			currentE.setPayDateTwo(e.getPayDateTwo());
-			currentE.setPayTwo(e.isPayTwo());
-			currentE.setPayMoney(e.getPayMoney());
-			currentE.setPayDesc(e.getPayDesc());
-			currentE.setPayMoneyTwo(e.getPayMoneyTwo());
-			currentE.setPayDescTwo(e.getPayDescTwo());
-			currentE.setModifier(e.getModifier());
-			currentE.setModifiedDate(e.getModifiedDate());
-			this.setE(currentE);
+		if(!e.isNew()){
+			Case4Accident currentE = this.caseAccidentService.load(e.getId());		
+			// 没有司机受款管理权限时
+			if (!isPayManage() && isManage()) {
+				e.setPayMoney(currentE.getPayMoney());
+				e.setPayDesc(currentE.getPayDesc());
+				e.setPayMoneyTwo(currentE.getPayMoneyTwo());
+				e.setPayDescTwo(currentE.getPayDescTwo());
+			}else if (isPayManage() && !isManage()){
+				currentE.setPayDriverId(e.getPayDriverId());
+				currentE.setPayDriver(e.getPayDriver());
+				currentE.setPayDate(e.getPayDate());
+				currentE.setPay(e.isPay());
+				currentE.setPayDriverIdTwo(e.getPayDriverIdTwo());
+				currentE.setPayDriverTwo(e.getPayDriverTwo());
+				currentE.setPayDateTwo(e.getPayDateTwo());
+				currentE.setPayTwo(e.isPayTwo());
+				currentE.setPayMoney(e.getPayMoney());
+				currentE.setPayDesc(e.getPayDesc());
+				currentE.setPayMoneyTwo(e.getPayMoneyTwo());
+				currentE.setPayDescTwo(e.getPayDescTwo());
+				currentE.setModifier(e.getModifier());
+				currentE.setModifiedDate(e.getModifiedDate());
+				this.setE(currentE);
+			}
 		}
-
+		
 		// 设置结案信息
 		if (isClosed.length() > 0 && isClosed.equals("1")) {
 			SystemContext context = this.getSystyemContext();

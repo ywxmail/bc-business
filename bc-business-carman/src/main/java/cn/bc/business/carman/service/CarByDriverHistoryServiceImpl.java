@@ -469,7 +469,7 @@ public class CarByDriverHistoryServiceImpl extends
 			// ---更新司机的相关信息----------------------------------------------------------
 
 			updateDriverRelatedInfo(entity, driver, isNew,
-					BCConstants.STATUS_ENABLED, entity.getMoveDate(), entity
+					BCConstants.STATUS_ENABLED, entity.getEndDate(), entity
 							.getToCar().getId());
 			// 更新司机相关信息----------------------------------结束----------------------
 
