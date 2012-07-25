@@ -17,7 +17,9 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
 import cn.bc.business.OptionConstants;
+import cn.bc.business.car.domain.Car;
 import cn.bc.business.car.service.CarService;
+import cn.bc.business.carman.domain.CarMan;
 import cn.bc.business.carman.service.CarManService;
 import cn.bc.business.certLost.domain.CertLost;
 import cn.bc.business.certLost.domain.CertLostItem;
@@ -54,6 +56,8 @@ public class CertLostAction extends FileEntityAction<Long, CertLost> {
 	private OptionService optionService;
 	private MotorcadeService motorcadeService;
 	public String certs;// 补办证件的json字符串
+	public String carPlate;// 车牌号码
+	public boolean isMoreCarMan;// 标识是否一辆车对应多个司机
 
 	@Autowired
 	public void setMotorcadeService(MotorcadeService motorcadeService) {
@@ -92,6 +96,23 @@ public class CertLostAction extends FileEntityAction<Long, CertLost> {
 	@Override
 	protected void afterCreate(CertLost entity) {
 		super.afterCreate(entity);
+		// 通过车辆信息的证照遗失页签新建证照遗失
+		if (carId != null) {
+			Car car = this.carService.load(carId);
+			carPlate = car.getPlateType() + "." + car.getPlateNo();
+			this.getE().setCar(car);
+			this.getE().setMotorcadeId(car.getMotorcade().getId());
+			List<CarMan> carManList = this.carManService
+					.selectAllCarManByCarId(carId);
+			if (carManList.size() == 1) {
+				CarMan carMan = carManList.get(0);
+				this.getE().setDriverNane(carMan.getName());
+				this.getE().setDriver(carMan);
+			} else if (carManList.size() > 1) {
+				isMoreCarMan = true;
+			}
+
+		}
 		SystemContext context = this.getSystyemContext();
 		entity.setTransactor(context.getUserHistory());
 
