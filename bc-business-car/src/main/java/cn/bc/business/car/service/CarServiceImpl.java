@@ -242,4 +242,9 @@ public class CarServiceImpl extends DefaultCrudService<Car> implements
 		return this.carDao.selectCarByStatus(status);
 	}
 
+	public List<Map<String, Object>> findRetiredCarsOfMonth(Calendar month,
+			Long unitId) {
+		return this.carDao.findRetiredCarsOfMonth(month, unitId);
+	}
+
 }

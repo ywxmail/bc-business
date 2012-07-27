@@ -44,6 +44,7 @@
 		</action>
 		<action name="checkPlateIsExists" class="carAction" method="checkPlateIsExists"/>
 		<action name="checkCodeIsExists" class="carAction" method="checkCodeIsExists"/>
+		<action name="findRetiredCarsOfNextMonth" class="carAction" method="findRetiredCarsOfNextMonth"/>
 	</package>
 	
 	<!-- 车辆资料报表高级搜索 -->

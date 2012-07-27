@@ -122,4 +122,12 @@ public interface CarDao extends CrudDao<Car> {
 	 * @return
 	 */
 	List<Car> selectCarByStatus(Integer status);
+	
+	/**
+	 * 查找指定月份需要交车的信息
+	 * @param month  指定月份 Calendar类型
+	 * @param unitId 分公司id，null默认全部
+	 * @return
+	 */
+	List<Map<String, Object>> findRetiredCarsOfMonth(Calendar month,Long unitId);
 }

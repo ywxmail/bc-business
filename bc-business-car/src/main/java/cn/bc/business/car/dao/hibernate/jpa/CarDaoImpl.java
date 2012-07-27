@@ -5,6 +5,7 @@ package cn.bc.business.car.dao.hibernate.jpa;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -25,13 +26,17 @@ import org.springframework.orm.jpa.JpaCallback;
 import org.springframework.orm.jpa.JpaTemplate;
 import org.springframework.util.StringUtils;
 
+import cn.bc.BCConstants;
 import cn.bc.business.car.dao.CarDao;
 import cn.bc.business.car.domain.Car;
 import cn.bc.business.cert.domain.Cert;
 import cn.bc.business.contract.domain.Contract;
 import cn.bc.core.Page;
 import cn.bc.core.query.condition.Condition;
+import cn.bc.core.util.DateUtils;
+import cn.bc.db.jdbc.RowMapper;
 import cn.bc.orm.hibernate.jpa.HibernateCrudJpaDao;
+import cn.bc.orm.hibernate.jpa.HibernateJpaNativeQuery;
 
 /**
  * 车辆Dao的hibernate jpa实现
@@ -548,5 +553,125 @@ public class CarDaoImpl extends HibernateCrudJpaDao<Car> implements CarDao {
 			hql += " where car.status=?";
 		}
 		return this.getJpaTemplate().find(hql,status);
+	}
+	
+	
+	public List<Map<String, Object>> findRetiredCarsOfMonth(Calendar month,Long unitId){
+		String sql="select a.id,a.status_,a.code,a.plate_type as plateType,a.plate_no as plateNo,to_char(a.register_date,'YYYY-MM-DD') as registerDate";
+		sql+=",to_char(a.scrap_date,'YYYY-MM-DD') as scrapDate,a.motorcade_id as motorcadeId,e.name,a.company,a.bs_type as bsType,a.charger";
+		sql+=",f.name as unitCompany,f.id as unitCompanyId,to_char(c.end_date,'YYYY-MM-DD') as ccEndDate";
+		sql+=",to_char(d.commerial_end_date,'YYYY-MM-DD') as commerialEndDate,to_char(d.greenslip_end_date,'YYYY-MM-DD') as greenslipEndDate";
+		sql+=" from bs_car a";
+		sql+=" inner join bs_car_contract b on b.car_id=a.id";
+		sql+=" inner join bs_contract c on c.id=b.contract_id";
+		sql+=" inner join bs_car_policy d on d.car_id=a.id";
+		sql+=" inner join bs_motorcade e on e.id=a.motorcade_id";
+		sql+=" inner join bc_identity_actor f on f.id = e.unit_id";
+		sql+=" where a.status_=? and c.status_=? and d.status_=? and c.type_=2";
+		if(unitId!=null){
+			sql+=" and e.unit_id="+unitId;
+		}
+		//设置指定月第一日
+		DateUtils.setToFirstDayOfMonth(month);
+		Date fistDayOfMonth=month.getTime();
+		//设置指定月最后日
+		DateUtils.setToLastDayOfMonth(month);
+		Date lastDayOfMonth=month.getTime();
+		
+		//5年前
+		month.add(Calendar.YEAR,-5);
+		Date fiveYearsAgoLastDayOfMonth=month.getTime();
+		DateUtils.setToFirstDayOfMonth(month);
+		Date fiveYearsAgoFistDayOfMonth=month.getTime();
+		
+		//8年前
+		month.add(Calendar.YEAR,-3);
+		Date eightYearsAgoFistDayOfMonth=month.getTime();
+		DateUtils.setToLastDayOfMonth(month);
+		Date eightYearsAgoLastDayOfMonth=month.getTime();
+		
+		//现在
+		month.add(Calendar.YEAR,8);
+		//半年后
+		month.add(Calendar.DAY_OF_MONTH,5);
+		Date halfAYearLaterLastDayOfMonth=month.getTime();
+	
+		sql+=" and (";
+		//1指定月经济合同到期车辆
+		sql+=" (c.end_date>?  and c.end_date<?)";
+		sql+=" or";
+		//2指定月5年前登记日期车辆
+		sql+=" (a.register_date>? and a.register_date<?)";
+		sql+=" or";
+		//3指定月8年前登记日期车辆
+		sql+=" (a.register_date>? and a.register_date<?)";
+		sql+=" or";
+		//4指定月两险日期到期且经济合同在半年内到期的车辆
+		//强制险
+		sql+=" (d.greenslip_end_date>? and d.greenslip_end_date<? and c.end_date>? and c.end_date<?)";
+		sql+=" or";
+		//商业险
+		sql+=" (d.commerial_end_date>? and d.commerial_end_date<? and c.end_date>? and c.end_date<?)";
+		sql+=" )";
+		return HibernateJpaNativeQuery.executeNativeSql(getJpaTemplate(), sql,new Object[] {
+			BCConstants.STATUS_ENABLED,BCConstants.STATUS_ENABLED,BCConstants.STATUS_ENABLED
+			,fistDayOfMonth,lastDayOfMonth
+			,fiveYearsAgoLastDayOfMonth,fiveYearsAgoFistDayOfMonth
+			,eightYearsAgoFistDayOfMonth,eightYearsAgoLastDayOfMonth
+			,fistDayOfMonth,lastDayOfMonth,fistDayOfMonth,halfAYearLaterLastDayOfMonth 
+			,fistDayOfMonth,lastDayOfMonth,fistDayOfMonth,halfAYearLaterLastDayOfMonth 
+			},new RowMapper<Map<String, Object>>() {
+			public Map<String, Object> mapRow(Object[] rs, int rowNum) {
+				Map<String,Object> oi = new HashMap<String, Object>();
+				int i = 0;
+				oi.put("id", rs[i++]);
+				oi.put("status_", rs[i++]);
+				oi.put("code", rs[i++]);
+				oi.put("plateType", rs[i++]);
+				oi.put("plateNo", rs[i++]);
+				oi.put("registerDate", rs[i++]);
+				oi.put("scrapDate", rs[i++]);
+				oi.put("motorcadeId", rs[i++]);
+				oi.put("motorcadeName", rs[i++]);
+				oi.put("company", rs[i++]);
+				oi.put("bsType", rs[i++]);
+				oi.put("charger", rs[i++]);
+				oi.put("unitCompany", rs[i++]);
+				oi.put("unitCompanyId", rs[i++]);
+				oi.put("ccEndDate", rs[i++]);
+				oi.put("commerialEndDate", rs[i++]);
+				oi.put("greenslipEndDate", rs[i++]);
+				//计算预计交车日期
+				List<Date> tempList=new ArrayList<Date>();
+				if(oi.get("ccEndDate")!=null)
+					tempList.add(DateUtils.getDate(oi.get("ccEndDate").toString()));
+				if(oi.get("commerialEndDate")!=null)
+					tempList.add(DateUtils.getDate(oi.get("commerialEndDate").toString()));
+				if(oi.get("greenslipEndDate")!=null)
+					tempList.add(DateUtils.getDate(oi.get("greenslipEndDate").toString()));
+				if(tempList.size()==0){
+					oi.put("predictReturnDate", null);
+				}else if(tempList.size()==1){
+					oi.put("predictReturnDate",DateUtils.formatDate(tempList.get(0)));
+				}else if(tempList.size()==2){
+					if(tempList.get(0).after(tempList.get(1))){
+						oi.put("predictReturnDate",DateUtils.formatDate(tempList.get(1)));
+					}else
+						oi.put("predictReturnDate",DateUtils.formatDate(tempList.get(0)));
+				}else{
+					//排序	
+					for(int j=0;j<tempList.size();j++){
+						for(int k=0;k+1<tempList.size();k++){
+							if(tempList.get(k).after(tempList.get(k+1))){
+								tempList.add(k, tempList.get(k+1));
+								tempList.remove(k+2);
+							}
+						}
+					}
+					oi.put("predictReturnDate",DateUtils.formatDate(tempList.get(0)));
+				}
+				return oi;
+			}
+		});
 	}
 }
