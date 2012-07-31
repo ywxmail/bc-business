@@ -75,6 +75,7 @@ public class Contract4ChargerAction extends
 	public String price;// 金额
 
 	public List<Map<String, String>> scrapToList; // 残值归属
+	public List<Map<String, String>> carMaintainList; // 残值归属
 	public List<Map<String, String>> chargersInfoList; // 司机责任人Map
 	public List<Map<String, String>> payTypeList;// 收费方式列表(每月、每季、每年、一次性)
 	public boolean canCopy;// 是否能复制
@@ -714,7 +715,8 @@ public class Contract4ChargerAction extends
 						OptionConstants.CAR_BUSINESS_NATURE,
 						OptionConstants.CONTRACT_VERSION_NO,
 						OptionConstants.MOTORCADE_PAYMENT_DATE,
-						OptionConstants.CONTRACT4CHARGER_SCRAPTO });
+						OptionConstants.CONTRACT4CHARGER_SCRAPTO,
+						OptionConstants.CONTRACT4CHARGER_CARMAINTAIN });
 
 		// 加载可选签约类型
 		this.signTypeList = optionItems.get(OptionConstants.CONTRACT_SIGNTYPE);
@@ -737,6 +739,9 @@ public class Contract4ChargerAction extends
 		// 经济合同残值归属列表
 		this.scrapToList = optionItems
 				.get(OptionConstants.CONTRACT4CHARGER_SCRAPTO);
+		// 经济合同车辆包修列表
+		this.carMaintainList = optionItems
+				.get(OptionConstants.CONTRACT4CHARGER_CARMAINTAIN);
 
 	}
 

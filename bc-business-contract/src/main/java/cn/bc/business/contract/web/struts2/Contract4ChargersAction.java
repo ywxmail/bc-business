@@ -183,7 +183,7 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 		sql.append(",bia.id batch_company_id,bia.name batch_company");
 		sql.append(",m.id motorcade_id,m.name motorcade_name,c.stop_date,cc.scrapto");
 		sql.append(",c.modified_date,md.actor_name modifier,c.file_date,ad.actor_name author");
-		sql.append(",qu.name qutter,cc.agreement_start_date,cc.agreement_end_date");
+		sql.append(",qu.name qutter,cc.agreement_start_date,cc.agreement_end_date,cc.car_maintain");
 		sql.append(" from BS_CONTRACT_CHARGER cc");
 		sql.append(" inner join BS_CONTRACT c on cc.id = c.id");
 		sql.append(" inner join BS_CAR_CONTRACT carc on c.id = carc.contract_id");
@@ -245,6 +245,7 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 				map.put("qutter", rs[i++]);
 				map.put("agreement_start_date", rs[i++]);
 				map.put("agreement_end_date", rs[i++]);
+				map.put("car_maintain", rs[i++]);
 
 				return map;
 			}
@@ -387,6 +388,9 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("c.modified_date", "modified_date",
 				getText("contract.modifiedDate"), 120).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+		columns.add(new TextColumn4MapKey("cc.car_maintain", "car_maintain",
+				getText("contract4Charger.carMaintain"), 60)
+				.setUseTitleFromLabel(true).setSortable(true));
 
 		return columns;
 	}

@@ -81,13 +81,13 @@ public class OptionConstants extends cn.bc.option.OptionConstants {
 	public final static String PR_TYPE = "pr.type";
 	/** 投诉-责任 */
 	public final static String AD_DUTY = "ad.duty";
-	/** 营运事件报失- 遗失位置*/
+	/** 营运事件报失- 遗失位置 */
 	public final static String LOST_SITE_POSTION = "lost.site.postion";
-	/** 营运事件报失- 级别*/
+	/** 营运事件报失- 级别 */
 	public final static String LOST_LEVEL = "lost.level";
-	/** 营运事件报失- 失物去向*/
+	/** 营运事件报失- 失物去向 */
 	public final static String LOST_RESULT = "lost.result";
-	/** 营运事件报失- 处理结果*/
+	/** 营运事件报失- 处理结果 */
 	public final static String LOST_HANDLE_RESULT = "lost.handle.result";
 	/** 社保险种 */
 	public final static String LB_INSURANCETYPE = "lb.insuranceType";
@@ -110,15 +110,17 @@ public class OptionConstants extends cn.bc.option.OptionConstants {
 	public final static String OWNERSHIP_OWNER = "ownership.owner";
 	/** 经济合同残值归属 */
 	public final static String CONTRACT4CHARGER_SCRAPTO = "contract4Charger.scrapTo";
+	/** 经济合同车辆包修 */
+	public final static String CONTRACT4CHARGER_CARMAINTAIN = "contract4Charger.carMaintain";
 	/** 收费月份 */
 	public final static String FEE_MONTH = "fee.month";
-	
+
 	/** 社保收费规则明细险种名称 */
 	public final static String SOCIALSECURTYRULEDETAIL_NAME = "socialSecurtyRuleDetail.name";
-	
+
 	/** 承包费名称 */
 	public final static String FEE_NAME = "fee.name";
-	/** 文化程度*/
+	/** 文化程度 */
 	public final static String CULTURAL_DEGREE = "contract4Labour.cultural.degree";
 	/** 婚姻状况 */
 	public final static String MARITAL_STATUS = "contract4Labour.marital.status";
