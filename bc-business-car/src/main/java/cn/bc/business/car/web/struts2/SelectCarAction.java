@@ -91,6 +91,7 @@ public class SelectCarAction extends
 			sql.append(" ,(select bcp.GREENSLIP_END_DATE from bs_car_policy bcp");
 			sql.append(" where bcp.car_id=c.id and bcp.status_ ="+BCConstants.STATUS_ENABLED);
 			sql.append(" ORDER BY bcp.file_date ASC limit 1) as greenslipEndDate");
+			sql.append(",c.factory_type");
 		}
 		sqlObject.setSelect(sql.toString());
 		sql = new StringBuffer();
@@ -125,6 +126,7 @@ public class SelectCarAction extends
 					map.put("ccEndDate", rs[i++]);
 					map.put("commerialEndDate", rs[i++]);
 					map.put("greenslipEndDate", rs[i++]);
+					map.put("factoryType", rs[i++]);
 					//计算预计交车日期
 
 					List<Timestamp> tempList=new ArrayList<Timestamp>();
@@ -214,6 +216,7 @@ public class SelectCarAction extends
 			columns.add(new HiddenColumn4MapKey("ccEndDate", "ccEndDate"));
 			columns.add(new HiddenColumn4MapKey("commerialEndDate", "commerialEndDate"));
 			columns.add(new HiddenColumn4MapKey("greenslipEndDate", "greenslipEndDate"));
+			columns.add(new HiddenColumn4MapKey("factoryType", "factoryType"));
 		}
 		return columns;
 	}

@@ -561,6 +561,7 @@ public class CarDaoImpl extends HibernateCrudJpaDao<Car> implements CarDao {
 		sql+=",to_char(a.scrap_date,'YYYY-MM-DD') as scrapDate,a.motorcade_id as motorcadeId,e.name,a.company,a.bs_type as bsType,a.charger";
 		sql+=",f.name as unitCompany,f.id as unitCompanyId,to_char(c.end_date,'YYYY-MM-DD') as ccEndDate";
 		sql+=",to_char(d.commerial_end_date,'YYYY-MM-DD') as commerialEndDate,to_char(d.greenslip_end_date,'YYYY-MM-DD') as greenslipEndDate";
+		sql+=",a.factory_type";
 		sql+=" from bs_car a";
 		sql+=" inner join bs_car_contract b on b.car_id=a.id";
 		sql+=" inner join bs_contract c on c.id=b.contract_id";
@@ -641,6 +642,8 @@ public class CarDaoImpl extends HibernateCrudJpaDao<Car> implements CarDao {
 				oi.put("ccEndDate", rs[i++]);
 				oi.put("commerialEndDate", rs[i++]);
 				oi.put("greenslipEndDate", rs[i++]);
+				oi.put("factoryType", rs[i++]);
+				oi.put("plate",oi.get("plateType").toString()+"."+oi.get("plateNo").toString());
 				//计算预计交车日期
 				List<Date> tempList=new ArrayList<Date>();
 				if(oi.get("ccEndDate")!=null)
