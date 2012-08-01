@@ -872,7 +872,7 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 		sql.append(",c.factory_type,c.factory_model,c.engine_no,c.vin,c.color");
 		sql.append(",c.bs_type,c.register_date,c.operate_date,c.cert_no4");
 		sql.append(",c.taximeter_factory,c.taximeter_type,c.desc1,c.desc2,c.desc3");
-		sql.append(",c.lpg_name,c.lpg_model,c.car_tv_screen");
+		sql.append(",c.lpg_name,c.lpg_model,c.car_tv_screen,getContract4ChargerCarmaintain(c.id)");
 		sql.append(" from bs_car c");
 		sql.append(" inner join bs_motorcade m on m.id=c.motorcade_id");
 		sql.append(" inner join bc_identity_actor unit on unit.id=m.unit_id");
@@ -931,6 +931,8 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 						json.put("lpg",
 								getLPG((String) car[i++], (String) car[i++]));
 						json.put("tv", null2Empty(car[i++]));
+						json.put("Carmaintain", null2Empty(car[i++]));
+						
 						return json;
 					} catch (JSONException e) {
 						logger.error(e.getMessage(), e);

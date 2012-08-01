@@ -33,6 +33,7 @@ public class Contract4Charger extends Contract {
 	private String contractVersionNo;// 合同版本号
 	private String paymentDate;// 缴费日
 	private String scrapTo;// 残值归属
+	private String carMaintain;// 残值归属
 	private Long quitterId;// 提前终止方
 	private Calendar agreementStartDate;// 协议期限开始日期
 	private Calendar agreementEndDate;// 协议期限开始日期
@@ -137,6 +138,15 @@ public class Contract4Charger extends Contract {
 
 	public void setAgreementEndDate(Calendar agreementEndDate) {
 		this.agreementEndDate = agreementEndDate;
+	}
+
+	@Column(name = "CAR_MAINTAIN")
+	public String getCarMaintain() {
+		return carMaintain;
+	}
+
+	public void setCarMaintain(String carMaintain) {
+		this.carMaintain = carMaintain;
 	}
 
 }

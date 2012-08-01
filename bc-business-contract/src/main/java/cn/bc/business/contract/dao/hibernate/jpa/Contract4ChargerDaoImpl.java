@@ -677,9 +677,9 @@ public class Contract4ChargerDaoImpl extends
 	public List<Map<String, String>> findCarByContractId(Long contractId) {
 		String hql = "SELECT  b.plate_type,b.plate_no,b.factory_type,b.factory_model,b.vin,b.engine_no,b.color";
 		hql += ",to_char(b.register_date,'YYYY-MM-DD'),b.code,b.company,b.cert_no2,b.cert_no4,m.name";
-		//原车号和原公司
+		// 原车号和原公司
 		hql += ",b.origin_no";
-		//通过经营权证找原公司
+		// 通过经营权证找原公司
 		hql += ",(select c.company from bs_car c where c.cert_no2 = b.cert_no2 and c.file_Date < b.file_Date ";
 		hql += "and c.status_ = 1 order by c.register_date Desc limit 1) as originCompany";
 		hql += " FROM bs_car_contract a";
@@ -698,35 +698,35 @@ public class Contract4ChargerDaoImpl extends
 						oi.put("factoryMode", rs[i++].toString());
 						oi.put("vin", rs[i++].toString());
 						oi.put("engineNo", rs[i++].toString());
-						Object objColor=rs[i++];
-						if(objColor!=null){
+						Object objColor = rs[i++];
+						if (objColor != null) {
 							oi.put("color", objColor.toString());
-						}else
-						oi.put("color","");
+						} else
+							oi.put("color", "");
 						oi.put("registerDate", rs[i++].toString());
 						oi.put("code", rs[i++].toString());
 						oi.put("company", rs[i++].toString());
-						Object objCertNo2=rs[i++];
-						if(objCertNo2!=null){
+						Object objCertNo2 = rs[i++];
+						if (objCertNo2 != null) {
 							oi.put("certNo2", objCertNo2.toString());
-						}else
-						oi.put("certNo2","");
-						Object objCertNo4=rs[i++];
-						if(objCertNo4!=null){
+						} else
+							oi.put("certNo2", "");
+						Object objCertNo4 = rs[i++];
+						if (objCertNo4 != null) {
 							oi.put("certNo4", objCertNo4.toString());
-						}else
-						oi.put("certNo4", "");
-						oi.put("motorcade", rs[i++].toString());				
-						Object objOriginNo=rs[i++];
-						if(objOriginNo!=null){
-							oi.put("originNo",objOriginNo.toString());
-						}else
-						oi.put("originNo", "");
-						Object objOriginCompany=rs[i++];
-						if(objOriginCompany!=null){
+						} else
+							oi.put("certNo4", "");
+						oi.put("motorcade", rs[i++].toString());
+						Object objOriginNo = rs[i++];
+						if (objOriginNo != null) {
+							oi.put("originNo", objOriginNo.toString());
+						} else
+							oi.put("originNo", "");
+						Object objOriginCompany = rs[i++];
+						if (objOriginCompany != null) {
 							oi.put("originCompany", objOriginCompany.toString());
-						}else{
-							oi.put("originCompany","");
+						} else {
+							oi.put("originCompany", "");
 						}
 						return oi;
 					}
@@ -745,30 +745,30 @@ public class Contract4ChargerDaoImpl extends
 						Map<String, String> oi = new HashMap<String, String>();
 						int i = 0;
 						oi.put("name", rs[i++].toString());
-						Object objAddress=rs[i++];
-						if(objAddress!=null){
+						Object objAddress = rs[i++];
+						if (objAddress != null) {
 							oi.put("address", objAddress.toString());
-						}else{
-							oi.put("address","");
+						} else {
+							oi.put("address", "");
 						}
-						Object objAddress1=rs[i++];
-						if(objAddress1!=null){
+						Object objAddress1 = rs[i++];
+						if (objAddress1 != null) {
 							oi.put("address1", objAddress1.toString());
-						}else{
-							oi.put("address1","");
+						} else {
+							oi.put("address1", "");
 						}
 						oi.put("certIdentity", rs[i++].toString());
-						Object objPhone=rs[i++];
-						if(objPhone!=null){
+						Object objPhone = rs[i++];
+						if (objPhone != null) {
 							oi.put("phone", objPhone.toString());
-						}else{
-							oi.put("phone","");
+						} else {
+							oi.put("phone", "");
 						}
-						Object objPhone1=rs[i++];
-						if(objPhone1!=null){
+						Object objPhone1 = rs[i++];
+						if (objPhone1 != null) {
 							oi.put("phone1", objPhone1.toString());
-						}else{
-							oi.put("phone1","");
+						} else {
+							oi.put("phone1", "");
 						}
 						oi.put("certFWZG", rs[i++].toString());
 						return oi;
@@ -810,30 +810,30 @@ public class Contract4ChargerDaoImpl extends
 						Map<String, String> oi = new HashMap<String, String>();
 						int i = 0;
 						oi.put("name", rs[i++].toString());
-						Object objAddress=rs[i++];
-						if(objAddress!=null){
+						Object objAddress = rs[i++];
+						if (objAddress != null) {
 							oi.put("address", objAddress.toString());
-						}else{
-							oi.put("address","");
+						} else {
+							oi.put("address", "");
 						}
-						Object objAddress1=rs[i++];
-						if(objAddress1!=null){
+						Object objAddress1 = rs[i++];
+						if (objAddress1 != null) {
 							oi.put("address1", objAddress1.toString());
-						}else{
-							oi.put("address1","");
+						} else {
+							oi.put("address1", "");
 						}
 						oi.put("certIdentity", rs[i++].toString());
-						Object objPhone=rs[i++];
-						if(objPhone!=null){
+						Object objPhone = rs[i++];
+						if (objPhone != null) {
 							oi.put("phone", objPhone.toString());
-						}else{
-							oi.put("phone","");
+						} else {
+							oi.put("phone", "");
 						}
-						Object objPhone1=rs[i++];
-						if(objPhone1!=null){
+						Object objPhone1 = rs[i++];
+						if (objPhone1 != null) {
 							oi.put("phone1", objPhone1.toString());
-						}else{
-							oi.put("phone1","");
+						} else {
+							oi.put("phone1", "");
 						}
 						oi.put("certFWZG", rs[i++].toString());
 						Object o = rs[i++];
@@ -911,5 +911,32 @@ public class Contract4ChargerDaoImpl extends
 	public void doWarehous4CarMan(Long draftCarManId) {
 		String sql = "update bs_carman set status_ = 0 where id =?";
 		this.jdbcTemplate.update(sql, new Object[] { draftCarManId });
+	}
+
+	public Map<String, Object> findShiftworkInfoByContractId(Long contractId) {
+		Map<String, Object> shiftwoukInfoMap = null;
+		String sql = "select m.name shiftworkDriver,m.cert_identity shiftworkCertIdentity,m.cert_fwzg shiftworkCertFwzg"
+				+ ",(select h.move_date from bs_car_driver_history h where h.to_car_id = bcc.car_id and h.move_type = 7 order by h.file_date desc limit 1) shiftworkStartTime"
+				+ ",(select dh.end_date from bs_car_driver_history dh where dh.to_car_id = bcc.car_id and dh.move_type = 7 order by file_date desc limit 1) shiftworkEndTime"
+				+ ",m.phone shiftworkPhone,m.address1 shiftworkAddress from bs_car_contract bcc"
+				+ " inner join bs_car_driver cd on cd.car_id = bcc.car_id"
+				+ " inner join bs_carman m on m.id = cd.driver_id"
+				+ " where cd.classes = 3 and cd.status_ = 0 and bcc.contract_id ="
+				+ contractId;
+
+		// jdbc查询BS_CAR记录
+		try {
+			List<Map<String, Object>> list = this.jdbcTemplate
+					.queryForList(sql);
+			if (list.size() > 0) {
+				shiftwoukInfoMap = list.get(0);
+			}
+
+		} catch (EmptyResultDataAccessException e) {
+			e.getStackTrace();
+			// logger.error(e.getMessage(), e);
+		}
+
+		return shiftwoukInfoMap;
 	}
 }

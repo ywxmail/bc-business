@@ -863,8 +863,13 @@ public class Contract4ChargerServiceImpl extends
 
 		// -----合同信息----开始--
 		params.put("code", c.getCode());
-		params.put("signDate",
-				DateUtils.formatCalendar(c.getSignDate(), "yyyy-MM-dd"));
+		// 签订日期
+		Calendar signDate = c.getSignDate();
+		params.put("signDate", DateUtils.formatCalendar(signDate, "yyyy-MM-dd"));
+		params.put("signDateYear", DateUtils.formatCalendar(signDate, "yyyy"));
+		params.put("signDateMonth", DateUtils.formatCalendar(signDate, "MM"));
+		params.put("signDateDay", DateUtils.formatCalendar(signDate, "dd"));
+
 		// 缴费日
 		params.put(
 				"paymentDate",
@@ -988,7 +993,8 @@ public class Contract4ChargerServiceImpl extends
 					// 收费通知单合同费用项目
 					cDetailMap = new HashMap<String, String>();
 					cDetailMap.put("pg", cfd.getName());
-					cDetailMap.put("desc", cfd.getDescription().replaceAll("/n", "\n"));
+					cDetailMap.put("desc",
+							cfd.getDescription().replaceAll("/n", "\n"));
 					// 声明金额栏
 					String price = "";
 					// 拼装日期
@@ -1028,16 +1034,16 @@ public class Contract4ChargerServiceImpl extends
 						cDetailList.add(cDetailMap);
 						continue;
 					}
-					
-					//每月承包款
+
+					// 每月承包款
 					if (!jo.isNull("isMYCBK") && jo.getBoolean("isMYCBK"))
 						cfdList.add(cfd);
-					
-					//收费通知计费开始日期
-					if (!jo.isNull("isRSDV") && jo.getBoolean("isRSDV")){
+
+					// 收费通知计费开始日期
+					if (!jo.isNull("isRSDV") && jo.getBoolean("isRSDV")) {
 						if (cfd.getStartDate() != null) {
-							params.put("chargeDate",DateUtils.formatCalendar(cfd.getStartDate(),
-									"yyyy年MM月dd日"));
+							params.put("chargeDate", DateUtils.formatCalendar(
+									cfd.getStartDate(), "yyyy年MM月dd日"));
 						}
 					}
 
@@ -1087,8 +1093,8 @@ public class Contract4ChargerServiceImpl extends
 				params.put("cfded" + i, DateUtils.formatCalendar(
 						cfdList.get(i - 1).getEndDate(), "dd"));
 				// word文档 金额
-				params.put("mycbf" + i, number2Chinese(String
-						.valueOf(cfdList.get(i - 1).getPrice())));
+				params.put("mycbf" + i, number2Chinese(String.valueOf(cfdList
+						.get(i - 1).getPrice())));
 			}
 			// 每月承包费不足6年时
 			if (cfdList.size() < 6) {
@@ -1177,15 +1183,16 @@ public class Contract4ChargerServiceImpl extends
 		params.put("originNo", carList.get(0).get("originNo"));
 		// 原公司
 		params.put("originCompany", carList.get(0).get("originCompany"));
-		
-		//车辆迁入原信息
-		if(carList.get(0).get("originNo")==null||carList.get(0).get("originNo").length()==0){
-			params.put("originInfo","（由外迁入）");
-		}else{
-			params.put("originInfo", "（套"+carList.get(0).get("originCompany")
-					+carList.get(0).get("originNo")+"）");
+
+		// 车辆迁入原信息
+		if (carList.get(0).get("originNo") == null
+				|| carList.get(0).get("originNo").length() == 0) {
+			params.put("originInfo", "（由外迁入）");
+		} else {
+			params.put("originInfo", "（套" + carList.get(0).get("originCompany")
+					+ carList.get(0).get("originNo") + "）");
 		}
-		
+
 		// ------车辆信息-----结束--
 
 		// ------正副班司机信息-----开始--
@@ -1246,6 +1253,47 @@ public class Contract4ChargerServiceImpl extends
 		}
 		params.put("drivers", drivers);
 		// ------正班司机信息-----结束--
+		// ----顶班主挂车信息-----开始
+		Map<String, Object> shiftworkInfoMap = this.contract4ChargerDao
+				.findShiftworkInfoByContractId(c.getId());
+		if (shiftworkInfoMap != null) {
+			// 主挂司机
+			params.put("shiftworkDriver",
+					shiftworkInfoMap.get("shiftworkDriver"));
+			params.put("shiftworkCertIdentity",
+					shiftworkInfoMap.get("shiftworkCertIdentity"));
+			params.put("shiftworkCertFwzg",
+					shiftworkInfoMap.get("shiftworkCertFwzg"));
+			params.put("shiftworkPhone",
+					shiftworkInfoMap.get("shiftworkPhone"));
+			params.put("shiftworkAddress",
+					shiftworkInfoMap.get("shiftworkAddress"));
+			Date shiftworkStartTime = (Date) shiftworkInfoMap
+					.get("shiftworkStartTime");
+			// 顶班合同期开始日期
+			if (shiftworkStartTime != null) {
+				params.put("shiftworkStartTime", shiftworkStartTime);
+				params.put("shiftworkStartYear",
+						DateUtils.formatDateTime(shiftworkStartTime, "yyyy"));
+				params.put("shiftworkStartMonth",
+						DateUtils.formatDateTime(shiftworkStartTime, "MM"));
+				params.put("shiftworkStartDay",
+						DateUtils.formatDateTime(shiftworkStartTime, "dd"));
+			}
+			// 顶班合同期结束日期
+			Date shiftworkEndTime = (Date) shiftworkInfoMap
+					.get("shiftworkEndTime");
+			if (shiftworkStartTime != null) {
+				params.put("shiftworkEndTime", shiftworkEndTime);
+				params.put("shiftworkEndYear",
+						DateUtils.formatDateTime(shiftworkEndTime, "yyyy"));
+				params.put("shiftworkEndMonth",
+						DateUtils.formatDateTime(shiftworkEndTime, "MM"));
+				params.put("shiftworkEndDay",
+						DateUtils.formatDateTime(shiftworkEndTime, "dd"));
+			}
+		}
+		// ----顶班主挂车信息-----结束
 
 		// word 2007 文档处理
 		if (template.getTemplateType().getCode().equals("word-docx")) {
@@ -1273,20 +1321,20 @@ public class Contract4ChargerServiceImpl extends
 		return attach;
 
 	}
-	
+
 	// 多位数字转换为中文繁体并且补零 如8000 转后为 捌仟零佰零拾零
-	private String number2Chinese(String n){
+	private String number2Chinese(String n) {
 		String num1[] = { "零", "壹", "贰", "叁", "肆", "伍", "陆", "柒", "捌", "玖", };
 		String num2[] = { "", "拾", "佰", "仟", "万", "亿", "兆", "吉", "太", "拍", "艾" };
 		n = n.indexOf(".") > 0 ? n.substring(0, n.indexOf(".")) : n;
-		
+
 		int len = n.length();
 
 		if (len <= 5) {
 			String ret = "";
 			for (int i = 0; i < len; ++i) {
-					ret = ret + num1[n.substring(i, i + 1).charAt(0) - '0']
-							+ num2[len - i - 1];
+				ret = ret + num1[n.substring(i, i + 1).charAt(0) - '0']
+						+ num2[len - i - 1];
 			}
 			return ret;
 		} else if (len <= 8) {
