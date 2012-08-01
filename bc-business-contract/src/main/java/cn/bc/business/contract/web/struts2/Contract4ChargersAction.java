@@ -410,7 +410,7 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 	protected String[] getGridSearchFields() {
 		return new String[] { "c.code", "c.ext_str1", "c.ext_str2",
 				"c.word_no", "cc.bs_type", "c.word_no", "car.company",
-				"bia.name", "m.name" };
+				"bia.name", "m.name", "cc.car_maintain" };
 	}
 
 	@Override
