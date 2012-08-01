@@ -105,7 +105,7 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 		sql.append(",c.taximeter_no,c.taximeter_factory,c.taximeter_type");
 		sql.append(",m.id as motorcade_id,c.scrap_date,c.return_date,c.fuel_type");
 		sql.append(",getContract4ChargerScrapTo(c.id) scrapto,c.modified_date,md.actor_name modifier");
-		sql.append(",c.file_date,ad.actor_name author");
+		sql.append(",getContract4ChargerCarmaintain(c.id) carmaintain,c.file_date,ad.actor_name author");
 		sql.append(" from bs_car c");
 		sql.append(" inner join bs_motorcade m on m.id=c.motorcade_id");
 		sql.append(" inner join bc_identity_actor bia on bia.id=m.unit_id");
@@ -153,9 +153,9 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 				map.put("scrapto", rs[i++]);// 经济合同残值
 				map.put("modified_date", rs[i++]);
 				map.put("modifier", rs[i++]);
+				map.put("carmaintain", rs[i++]);// 经济合同车辆包修
 				map.put("file_date", rs[i++]);
 				map.put("author", rs[i++]);
-
 				return map;
 			}
 		});
@@ -304,6 +304,9 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 					getText("car.scrapto"), 60).setUseTitleFromLabel(true)
 					.setSortable(true));
 		}
+		columns.add(new TextColumn4MapKey("c.fuel_type", "carmaintain",
+				getText("car.carmaintain"), 60).setUseTitleFromLabel(true)
+				.setSortable(true).setSortable(true));
 		columns.add(new TextColumn4MapKey("ad.actor_name", "author",
 				getText("car.author"), 80).setSortable(true));
 		columns.add(new TextColumn4MapKey("c.file_date", "file_date",
@@ -314,7 +317,6 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("c.modified_date", "modified_date",
 				getText("car.modifiedDate"), 120).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
-
 		return columns;
 	}
 
@@ -322,7 +324,7 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 	protected String[] getGridSearchFields() {
 		return new String[] { "c.plate_no", "c.driver", "c.charger",
 				"c.cert_no2", "c.factory_type", "m.name", "c.engine_no",
-				"c.code", "c.bs_type" };
+				"c.code", "c.bs_type","getContract4ChargerCarmaintain(c.id)" };
 	}
 
 	@Override
