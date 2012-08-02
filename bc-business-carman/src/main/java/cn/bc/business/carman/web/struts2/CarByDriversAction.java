@@ -108,7 +108,7 @@ public class CarByDriversAction extends ViewAction<Map<String, Object>> {
 		columns.add(new IdColumn4MapKey("c.id", "id"));
 		columns.add(new TextColumn4MapKey("d.status_", "status_",
 				getText("carByDriver.statuses"), 60).setSortable(true)
-				.setValueFormater(new EntityStatusFormater(getBSStatuses1())));
+				.setValueFormater(new EntityStatusFormater(getBSStatuses3())));
 		if (carManId != null || (carManId == null && carId == null)) {
 			columns.add(new TextColumn4MapKey("c.plate_no", "plate",
 					getText("carByDriver.car.plateNo"), 100)
@@ -271,8 +271,8 @@ public class CarByDriversAction extends ViewAction<Map<String, Object>> {
 			return super.getHtmlPageToolbar();
 		} else {
 			return super.getHtmlPageToolbar().addButton(
-					Toolbar.getDefaultToolbarRadioGroup(getDriverClasses(),
-							"classes", 4,
+					Toolbar.getDefaultToolbarRadioGroup(getBSStatuses3(),
+							"status", 0,
 							getText("title.click2changeSearchClasses")));
 		}
 	}
@@ -290,9 +290,9 @@ public class CarByDriversAction extends ViewAction<Map<String, Object>> {
 					.getDefaultCreateToolbarButton(getText("label.create")));
 
 			// 批量处理顶班按钮
-//			tb.addButton(new ToolbarButton().setIcon("ui-icon-document")
-//					.setText("批量处理顶班")
-//					.setClick("bc.business.chuLiDingBan.create"));
+			// tb.addButton(new ToolbarButton().setIcon("ui-icon-document")
+			// .setText("批量处理顶班")
+			// .setClick("bc.business.chuLiDingBan.create"));
 
 			// 编辑按钮
 			tb.addButton(Toolbar
