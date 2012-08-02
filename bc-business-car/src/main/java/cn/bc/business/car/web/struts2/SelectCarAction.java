@@ -86,15 +86,15 @@ public class SelectCarAction extends
 			
 			sql.append(" ,(select bcp.commerial_end_date from bs_car_policy bcp");
 			sql.append(" where bcp.car_id=c.id and bcp.status_ ="+BCConstants.STATUS_ENABLED);
-			sql.append(" ORDER BY bcp.commerial_end_date ASC limit 1) as commerialEndDate");
+			sql.append(" ORDER BY bcp.commerial_end_date DESC limit 1) as commerialEndDate");
 			
 			sql.append(" ,(select bcp.greenslip_start_date from bs_car_policy bcp");
 			sql.append(" where bcp.car_id=c.id and bcp.status_ ="+BCConstants.STATUS_ENABLED);
-			sql.append(" ORDER BY bcp.greenslip_end_date ASC limit 1) as greenslipStartDate");
+			sql.append(" ORDER BY bcp.greenslip_end_date DESC limit 1) as greenslipStartDate");
 
 			sql.append(" ,(select bcp.greenslip_end_date from bs_car_policy bcp");
 			sql.append(" where bcp.car_id=c.id and bcp.status_ ="+BCConstants.STATUS_ENABLED);
-			sql.append(" ORDER BY bcp.greenslip_end_date ASC limit 1) as greenslipEndDate");
+			sql.append(" ORDER BY bcp.greenslip_end_date DESC limit 1) as greenslipEndDate");
 			
 			sql.append(" ,c.factory_type as factoryType,c.engine_no as engineNo,c.vin");
 			sql.append(" ,c.access_count as accessCount,c.access_weight as accessWeight,c.displacement");
