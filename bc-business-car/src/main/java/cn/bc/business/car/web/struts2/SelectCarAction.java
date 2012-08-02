@@ -82,21 +82,33 @@ public class SelectCarAction extends
 			sql.append(" inner join bs_car_contract bcc on bcc.contract_id=bc.id");
 			sql.append(" where bc.type_=2 and bc.status_ ="+BCConstants.STATUS_ENABLED);
 			sql.append(" and bcc.car_id=c.id");
-			sql.append(" ORDER BY bc.file_date DESC limit 1) as ccEndDate");
+			sql.append(" ORDER BY bc.end_date DESC limit 1) as ccEndDate");
 			
-			sql.append(" ,(select bcp.COMMERIAL_END_DATE from bs_car_policy bcp");
+			sql.append(" ,(select bcp.commerial_end_date from bs_car_policy bcp");
 			sql.append(" where bcp.car_id=c.id and bcp.status_ ="+BCConstants.STATUS_ENABLED);
-			sql.append(" ORDER BY bcp.file_date ASC limit 1) as commerialEndDate");
+			sql.append(" ORDER BY bcp.commerial_end_date ASC limit 1) as commerialEndDate");
 			
-			sql.append(" ,(select bcp.GREENSLIP_END_DATE from bs_car_policy bcp");
+			sql.append(" ,(select bcp.greenslip_start_date from bs_car_policy bcp");
 			sql.append(" where bcp.car_id=c.id and bcp.status_ ="+BCConstants.STATUS_ENABLED);
-			sql.append(" ORDER BY bcp.file_date ASC limit 1) as greenslipEndDate");
+			sql.append(" ORDER BY bcp.greenslip_end_date ASC limit 1) as greenslipStartDate");
+
+			sql.append(" ,(select bcp.greenslip_end_date from bs_car_policy bcp");
+			sql.append(" where bcp.car_id=c.id and bcp.status_ ="+BCConstants.STATUS_ENABLED);
+			sql.append(" ORDER BY bcp.greenslip_end_date ASC limit 1) as greenslipEndDate");
+			
+			sql.append(" ,c.factory_type as factoryType,c.engine_no as engineNo,c.vin");
+			sql.append(" ,c.access_count as accessCount,c.access_weight as accessWeight,c.displacement");
+			sql.append(",(select string_agg(man.name,' ') from bs_carman man");
+			sql.append("inner join bs_car_driver cd on man.id = cd.driver_id ");
+			sql.append("where cd.car_id = c.id and cd.status_ = 0) as driverName");
+			
 		}
 		sqlObject.setSelect(sql.toString());
 		sql = new StringBuffer();
 		sql.append(" bs_car c");
 		sql.append(" inner join bs_motorcade m on m.id=c.motorcade_id");
 		sql.append(" inner join bc_identity_actor a on a.id = m.unit_id");
+		
 		sqlObject.setFrom(sql.toString());
 
 		// 注入参数
@@ -124,7 +136,16 @@ public class SelectCarAction extends
 					map.put("unitCompanyId", rs[i++]);
 					map.put("ccEndDate", rs[i++]);
 					map.put("commerialEndDate", rs[i++]);
+					map.put("greenslipStartDate", rs[i++]);
 					map.put("greenslipEndDate", rs[i++]);
+					map.put("factoryType", rs[i++]);
+					map.put("engineNo", rs[i++]);
+					map.put("vin", rs[i++]);
+					map.put("accessCount", rs[i++]);
+					map.put("accessWeight", rs[i++]);
+					map.put("displacement", rs[i++]);
+					map.put("driverName", rs[i++]);
+					
 					//计算预计交车日期
 
 					List<Timestamp> tempList=new ArrayList<Timestamp>();
@@ -213,7 +234,15 @@ public class SelectCarAction extends
 			columns.add(new HiddenColumn4MapKey("predictReturnDate", "predictReturnDate"));
 			columns.add(new HiddenColumn4MapKey("ccEndDate", "ccEndDate"));
 			columns.add(new HiddenColumn4MapKey("commerialEndDate", "commerialEndDate"));
+			columns.add(new HiddenColumn4MapKey("greenslipStartDate", "greenslipStartDate"));
 			columns.add(new HiddenColumn4MapKey("greenslipEndDate", "greenslipEndDate"));
+			columns.add(new HiddenColumn4MapKey("factoryType", "factoryType"));
+			columns.add(new HiddenColumn4MapKey("engineNo", "engineNo"));
+			columns.add(new HiddenColumn4MapKey("vin", "vin"));
+			columns.add(new HiddenColumn4MapKey("accessCount", "accessCount"));
+			columns.add(new HiddenColumn4MapKey("accessWeight", "accessWeight"));
+			columns.add(new HiddenColumn4MapKey("displacement", "displacement"));
+			columns.add(new HiddenColumn4MapKey("driverName", "driverName"));
 		}
 		return columns;
 	}
