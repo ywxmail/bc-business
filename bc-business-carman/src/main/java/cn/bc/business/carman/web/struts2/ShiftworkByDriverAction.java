@@ -11,6 +11,7 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
+import cn.bc.BCConstants;
 import cn.bc.business.car.domain.Car;
 import cn.bc.business.car.service.CarService;
 import cn.bc.business.carman.domain.CarByDriver;
@@ -20,6 +21,7 @@ import cn.bc.business.carman.service.CarByDriverService;
 import cn.bc.business.carman.service.CarManService;
 import cn.bc.business.web.struts2.FileEntityAction;
 import cn.bc.identity.web.SystemContext;
+import cn.bc.web.ui.html.page.ButtonOption;
 import cn.bc.web.ui.html.page.PageOption;
 
 /**
@@ -42,6 +44,7 @@ public class ShiftworkByDriverAction extends
 	public Long carManId;
 	public int moveType;// 迁移类型
 	public String shiftwork;// 顶班车辆
+	public Map<String, String> statusesValue;// 状态列表
 
 	@Autowired
 	public void setCarManService(CarManService carManService) {
@@ -77,10 +80,30 @@ public class ShiftworkByDriverAction extends
 		super.afterCreate(entity);
 		// 设置迁移类型为顶班
 		this.getE().setMoveType(CarByDriverHistory.MOVETYPE_DINGBAN);
+		this.getE().setStatus(BCConstants.STATUS_DRAFT);
+		// 状态列表
+		statusesValue = this.getBSStatuses3();
+
 		// 顶班车辆
 		cars = new HashMap<Long, String>();
 		if (carManId != null) {
 			this.getE().setDriver(this.carManService.load(carManId));
+		}
+	}
+
+	@Override
+	protected void buildFormPageButtons(PageOption pageOption, boolean editable) {
+
+		if (editable) {// edit,create
+			// 添加默认的保存按钮
+			// 如果是草稿状态的，有保存和入库两个按钮
+			if (this.getE().getStatus() == BCConstants.STATUS_DRAFT) {
+				pageOption.addButton(this.getDefaultSaveButtonOption());
+				pageOption.addButton(new ButtonOption(
+						getText("label.warehousing"), null,
+						"bc.business.carByDriverHistoryForm.warehousing"));
+
+			}
 		}
 	}
 

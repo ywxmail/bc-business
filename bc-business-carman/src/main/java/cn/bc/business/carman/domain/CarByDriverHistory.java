@@ -12,6 +12,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import cn.bc.BCConstants;
 import cn.bc.business.car.domain.Car;
 import cn.bc.identity.domain.FileEntityImpl;
 
@@ -60,6 +61,7 @@ public class CarByDriverHistory extends FileEntityImpl {
 	/** 主体历史版本 */
 	public static final int MAIN_HISTORY = 1;
 
+	private int status = BCConstants.STATUS_DRAFT;// 状态：-1：草稿、0：正常
 	private CarMan driver;// 营运的司机
 	private Car fromCar;// 原车辆
 	private Long fromMotorcadeId;// 原车队
@@ -78,6 +80,15 @@ public class CarByDriverHistory extends FileEntityImpl {
 
 	private Calendar endDate;// 顶班合同结束日期
 	private String shiftwork;// 顶班车辆
+
+	@Column(name = "STATUS_")
+	public int getStatus() {
+		return status;
+	}
+
+	public void setStatus(int status) {
+		this.status = status;
+	}
 
 	@Column(name = "END_DATE")
 	public Calendar getEndDate() {

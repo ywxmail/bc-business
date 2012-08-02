@@ -27,7 +27,7 @@ public class CarByDriverHistoryDaoImpl extends
 
 	public void upDateCar4Driver(Long carManId) {
 		// 更新该司机之前的营运车辆记录的状态为注销状态
-		String hql = "update CarByDriver c set c.status=1 where c.driver.id = ?";
+		String hql = "update CarByDriver c set c.status=1 where c.driver.id = ? and c.status = 0";
 		this.executeUpdate(hql, new Object[] { carManId });
 	}
 

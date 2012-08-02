@@ -27,7 +27,6 @@ import cn.bc.core.query.condition.ConditionUtils;
 import cn.bc.core.query.condition.Direction;
 import cn.bc.core.query.condition.impl.EqualsCondition;
 import cn.bc.core.query.condition.impl.InCondition;
-import cn.bc.core.query.condition.impl.IsNullCondition;
 import cn.bc.core.query.condition.impl.LikeCondition;
 import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.core.util.StringUtils;
@@ -36,6 +35,7 @@ import cn.bc.db.jdbc.SqlObject;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.formater.DateRangeFormater;
+import cn.bc.web.formater.EntityStatusFormater;
 import cn.bc.web.formater.KeyValueFormater;
 import cn.bc.web.formater.LinkFormater4Id;
 import cn.bc.web.ui.html.grid.Column;
@@ -63,8 +63,7 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 	public Long carId;
 	public Long toCarId;
 	public int status4tab;// 页签传递的车辆状态参数
-	public String status = String.valueOf(BCConstants.STATUS_ENABLED) + ","
-			+ String.valueOf(BCConstants.STATUS_DISABLED); // 车辆的状态，多个用逗号连接
+	public String status = String.valueOf(BCConstants.STATUS_ENABLED); // 迁移记录的状态，多个用逗号连接
 
 	@Override
 	public boolean isReadonly() {
@@ -129,11 +128,11 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer sql = new StringBuffer();
-		sql.append("select d.id,m.phone,m.name,nc.plate_type newPlateType,nc.plate_no newPlateNo,d.to_classes");
+		sql.append("select d.id,d.status_,m.phone,m.name,nc.plate_type newPlateType,nc.plate_no newPlateNo,d.to_classes");
 		sql.append(",nm.name newMotoreade,d.to_unit,oc.plate_type oldPlateType,oc.plate_no oldPlateNo,d.from_classes");
 		sql.append(",om.name oldMotoreade,d.from_unit,d.move_type,d.move_date,d.driver_id,d.from_car_id,d.to_car_id");
 		sql.append(",d.from_motorcade_id,d.to_motorcade_id,d.shiftwork,d.end_date,m.cert_fwzg,d.hand_papers_date");
-		sql.append(",m.status_ status,d.desc_ from BS_CAR_DRIVER_HISTORY d");
+		sql.append(",m.status_ carManStatus,d.desc_ from BS_CAR_DRIVER_HISTORY d");
 		sql.append(" left join bs_carman m on m.id=d.driver_id");
 		sql.append(" left join bs_car  oc on oc.id=d.from_car_id");
 		sql.append(" left join bs_car  nc on nc.id=d.to_car_id");
@@ -150,6 +149,7 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 				Map<String, Object> map = new HashMap<String, Object>();
 				int i = 0;
 				map.put("id", rs[i++]);
+				map.put("status", rs[i++]);
 				map.put("phone", rs[i++]);
 				map.put("driver", rs[i++]);
 				map.put("newPlateType", rs[i++]);
@@ -187,7 +187,7 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 				map.put("end_date", rs[i++]);
 				map.put("cert_fwzg", rs[i++]);
 				map.put("hand_papers_date", rs[i++]);
-				map.put("status", rs[i++]);
+				map.put("carManStatus", rs[i++]);
 				map.put("desc_", rs[i++]);
 
 				return map;
@@ -200,6 +200,9 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 	protected List<Column> getGridColumns() {
 		List<Column> columns = new ArrayList<Column>();
 		columns.add(new IdColumn4MapKey("d.id", "id"));
+		columns.add(new TextColumn4MapKey("d.status_", "status",
+				getText("carByDriverHistory.statuses"), 40).setSortable(true)
+				.setValueFormater(new EntityStatusFormater(getBSStatuses())));
 		columns.add(new TextColumn4MapKey("m.cert_fwzg", "cert_fwzg",
 				getText("carByDriverHistory.cert_fwzg"), 70).setSortable(true)
 				.setUseTitleFromLabel(true));
@@ -271,9 +274,9 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 				.setValueFormater(new LinkFormater4CarInfo(this
 						.getContextPath())));
 		columns.add(new TextColumn4MapKey("d.desc_", "desc_",
-				getText("carByDriverHistory.description"), 220).setSortable(true)
-				.setUseTitleFromLabel(true));
-		columns.add(new HiddenColumn4MapKey("status", "status"));// 司机的状态，用于是否能删除草稿状态的迁移记录
+				getText("carByDriverHistory.description"), 220).setSortable(
+				true).setUseTitleFromLabel(true));
+		columns.add(new HiddenColumn4MapKey("carManStatus", "carManStatus"));// 司机的状态，用于是否能删除草稿状态的迁移记录
 		return columns;
 	}
 
@@ -302,38 +305,19 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected Condition getGridSpecalCondition() {
-		// 司机状态条件
-		Condition status4CarManCondition = null;
-		// 迁移类型条件
-		Condition status4NullCondition = null;
-		// 迁出车辆状态
-		Condition status4ToCarCondition = null;
-		// 迁入车辆状态
-		Condition status4FormCarCondition = null;
+		// 状态条件
+		Condition statusCondition = null;
 		if (status != null && status.length() > 0) {
 			String[] ss = status.split(",");
-			//
 			if (ss.length == 1) {
-				status4CarManCondition = new EqualsCondition("m.status_",
-						new Integer(ss[0]));
-				status4ToCarCondition = new EqualsCondition("oc.status_",
-						new Integer(ss[0]));
-				status4FormCarCondition = new EqualsCondition("nc.status_",
-						new Integer(ss[0]));
+				statusCondition = new EqualsCondition("d.status_", new Integer(
+						ss[0]));
 			} else {
-				status4CarManCondition = new InCondition("m.status_",
-						StringUtils.stringArray2IntegerArray(ss));
-				status4ToCarCondition = new InCondition("oc.status_",
-						StringUtils.stringArray2IntegerArray(ss));
-				status4FormCarCondition = new InCondition("nc.status_",
+				statusCondition = new InCondition("d.status_",
 						StringUtils.stringArray2IntegerArray(ss));
 			}
-
-			for (String s : ss) {
-				// 如果是草稿状态下的，不添加转车队的查询条件[状态为null]
-				if (!s.endsWith(String.valueOf(BCConstants.STATUS_DRAFT)))
-					status4NullCondition = new IsNullCondition("m.status_");
-			}
+		} else {
+			return null;
 		}
 
 		// carManId条件
@@ -359,32 +343,17 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 			carId2ShiftworkCarIdCondition = new LikeCondition("d.shiftwork",
 					shiftworkCarId);
 		}
-		// 入库的sql条件：where (f.status_ in (1,0) or t.status_ in (0,1) ) and
-		// (m.status_ in(0,1) or m.status_ is null)
-		// 草稿sql条件：where (f.status_ = -1 or t.status_ =-1 or m.status_ = -1)
-		return ConditionUtils
-				.mix2AndCondition(
-						carManIdCondition,
-						(status != null && status.length() > 0 ? (status != null
-								&& status.endsWith(String
-										.valueOf(BCConstants.STATUS_DRAFT)) ? ConditionUtils
-								.mix2OrCondition(status4CarManCondition,
-										status4ToCarCondition,
-										status4FormCarCondition).setAddBracket(
-										true) : ConditionUtils
-								.mix2AndCondition(
-										ConditionUtils.mix2OrCondition(
-												status4ToCarCondition,
-												status4FormCarCondition)
-												.setAddBracket(true),
-										ConditionUtils.mix2OrCondition(
-												status4CarManCondition,
-												status4NullCondition)
-												.setAddBracket(true)))
-								: null), ConditionUtils.mix2OrCondition(
-								carId2ToCarIdCondition, oldCarIdCondition,
-								carId2ShiftworkCarIdCondition));
+		return ConditionUtils.mix2AndCondition(statusCondition,
+				carManIdCondition, ConditionUtils.mix2OrCondition(
+						carId2ToCarIdCondition, oldCarIdCondition,
+						carId2ShiftworkCarIdCondition));
 
+	}
+
+	@Override
+	protected String getGridDblRowMethod() {
+		// 强制为只读表单
+		return "bs.carByDriverHistoryView.dblclick";
 	}
 
 	@Override
@@ -458,11 +427,6 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 	}
 
 	@Override
-	protected String getGridDblRowMethod() {
-		return "bc.page.open";
-	}
-
-	@Override
 	protected Toolbar getHtmlPageToolbar() {
 		Toolbar tb = new Toolbar();
 
@@ -522,7 +486,7 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 			// 如果有权限的用户可以看到草稿状态的车
 			if (!isReadonly()) {
 				tb.addButton(Toolbar.getDefaultToolbarRadioGroup(
-						this.getBSStatuses(), "status", 0,
+						this.getBSStatuses(), "status", 1,
 						getText("title.click2changeSearchStatus")));
 
 			}
@@ -532,15 +496,16 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 	}
 
 	/**
-	 * 状态值转换列表：入库|草稿|全部
+	 * 状态值转换列表：草稿|入库|全部
 	 * 
 	 * @return
 	 */
 	protected Map<String, String> getBSStatuses() {
 		Map<String, String> statuses = new LinkedHashMap<String, String>();
-		statuses.put("0,1", getText("label.warehousing"));
 		statuses.put(String.valueOf(BCConstants.STATUS_DRAFT),
 				getText("bc.status.draft"));
+		statuses.put(String.valueOf(BCConstants.STATUS_ENABLED),
+				getText("bs.status.active"));
 		statuses.put("", getText("bs.status.all"));
 		return statuses;
 	}
@@ -588,7 +553,9 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 		return this.getContextPath()
 				+ "/bc-business/carByDriverHistory/list.js,"
 				+ this.getContextPath()
-				+ "/bc-business/carByDriverHistory/dingBan.js";
+				+ "/bc-business/carByDriverHistory/dingBan.js,"
+				+ this.getContextPath()
+				+ "/bc-business/carByDriverHistory/view.js";
 	}
 
 }

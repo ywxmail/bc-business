@@ -14,6 +14,7 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
+import cn.bc.BCConstants;
 import cn.bc.business.OptionConstants;
 import cn.bc.business.car.domain.Car;
 import cn.bc.business.car.service.CarService;
@@ -47,7 +48,7 @@ public class CarByDriverHistoryAction extends
 	public CarByDriverHistoryService carByDriverHistoryService;
 	public String portrait;
 	public Map<String, String> classes;
-	public Map<String, String> statusesValueList;// 状态列表
+	public Map<String, String> statusesValue;// 状态列表
 	public Map<String, String> moveTypeValueList;// 迁移类型列表
 	public List<Map<String, String>> motorcadeList; // 可选车队列表
 	public List<Map<String, String>> companyList; // 所属单位列表
@@ -108,6 +109,8 @@ public class CarByDriverHistoryAction extends
 		super.create();
 		// 设置迁移类型
 		this.getE().setMoveType(moveType);
+		// 设置状态[草稿]
+		this.getE().setStatus(BCConstants.STATUS_DRAFT);
 		// 设置司机信息
 		if (carManId != null) {
 			// 填写迁移类型为：车辆到车辆 ,交回转车，公司到公司，注销未有去向，交回未注销。司机的原车辆信息
@@ -275,11 +278,19 @@ public class CarByDriverHistoryAction extends
 
 		if (editable) {// edit,create
 			// 添加默认的保存按钮
-			pageOption.addButton(this.getDefaultSaveButtonOption());
-			pageOption.addButton(new ButtonOption(
-					getText("label.saveAndClose"), null,
-					"bc.business.carByDriverHistoryForm.saveAndClose"));
+			// 如果是草稿状态的，有保存和入库两个按钮
+			if (this.getE().getStatus() == BCConstants.STATUS_DRAFT) {
+				pageOption.addButton(this.getDefaultSaveButtonOption());
+				pageOption.addButton(new ButtonOption(
+						getText("label.warehousing"), null,
+						"bc.business.carByDriverHistoryForm.warehousing"));
 
+			} else {
+				pageOption.addButton(this.getDefaultSaveButtonOption());
+				pageOption.addButton(new ButtonOption(
+						getText("label.saveAndClose"), null,
+						"bc.business.carByDriverHistoryForm.saveAndClose"));
+			}
 			// }
 		} else {// open
 			if (!readonly) {
@@ -322,7 +333,7 @@ public class CarByDriverHistoryAction extends
 				.get(OptionConstants.COMPANY_NAME));
 
 		// 状态列表
-		statusesValueList = this.getBSStatuses1();
+		statusesValue = this.getBSStatuses3();
 
 		// 迁移类型列表
 		moveTypeValueList = this.getMoveType();
