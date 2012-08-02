@@ -898,7 +898,7 @@ public class Contract4ChargerDaoImpl extends
 	}
 
 	public int getDriverAmount(Long carId) {
-		String hql = "select c.driver from CarByDriver c where c.car.id=? and c.classes in (1,2) and c.status =0";
+		String hql = "select c.driver from CarByDriver c where c.car.id=? and c.classes in (1,2) and c.status in(-1,0)";
 		List<?> list = this.getJpaTemplate().find(hql, new Object[] { carId });
 		return list.size();
 	}
