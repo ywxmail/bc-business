@@ -98,9 +98,9 @@ public class SelectCarAction extends
 			
 			sql.append(" ,c.factory_type as factoryType,c.engine_no as engineNo,c.vin");
 			sql.append(" ,c.access_count as accessCount,c.access_weight as accessWeight,c.displacement");
-			sql.append(",(select string_agg(man.name,' ') from bs_carman man");
-			sql.append("inner join bs_car_driver cd on man.id = cd.driver_id ");
-			sql.append("where cd.car_id = c.id and cd.status_ = 0) as driverName");
+			sql.append(",(select string_agg(man.name,',') from bs_carman man");
+			sql.append(" inner join bs_car_driver cd on man.id = cd.driver_id ");
+			sql.append(" where cd.car_id = c.id and cd.status_ = 0) as driverName");
 			
 		}
 		sqlObject.setSelect(sql.toString());
