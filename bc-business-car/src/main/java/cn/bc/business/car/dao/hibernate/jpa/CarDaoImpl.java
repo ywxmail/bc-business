@@ -563,11 +563,11 @@ public class CarDaoImpl extends HibernateCrudJpaDao<Car> implements CarDao {
 		sql+=",to_char(d.commerial_end_date,'YYYY-MM-DD') as commerialEndDate,to_char(d.greenslip_end_date,'YYYY-MM-DD') as greenslipEndDate";
 		sql+=",a.factory_type";
 		sql+=" from bs_car a";
-		sql+=" inner join bs_car_contract b on b.car_id=a.id";
-		sql+=" inner join bs_contract c on c.id=b.contract_id";
-		sql+=" inner join bs_car_policy d on d.car_id=a.id";
 		sql+=" inner join bs_motorcade e on e.id=a.motorcade_id";
 		sql+=" inner join bc_identity_actor f on f.id = e.unit_id";
+		sql+=" inner join bs_car_contract b on b.car_id=a.id";
+		sql+=" inner join bs_contract c on c.id=b.contract_id";
+		sql+=" inner join bs_car_policy d on d.car_id=a.id and d.status_=?";
 		sql+=" where a.status_=? and c.status_=? and d.status_=? and c.type_=2";
 		if(unitId!=null){
 			sql+=" and e.unit_id="+unitId;
@@ -609,13 +609,13 @@ public class CarDaoImpl extends HibernateCrudJpaDao<Car> implements CarDao {
 		sql+=" or";
 		//4指定月两险日期到期且经济合同在半年内到期的车辆
 		//强制险
-		sql+=" (d.greenslip_end_date>? and d.greenslip_end_date<? and c.end_date>? and c.end_date<?)";
+		sql+=" ((d.greenslip_end_date>? and d.greenslip_end_date<? and c.end_date>? and c.end_date<? ) or d.status_ is null)";
 		sql+=" or";
 		//商业险
-		sql+=" (d.commerial_end_date>? and d.commerial_end_date<? and c.end_date>? and c.end_date<?)";
+		sql+=" ((d.commerial_end_date>? and d.commerial_end_date<? and c.end_date>? and c.end_date<? ) or d.status_ is null)";
 		sql+=" )";
 		return HibernateJpaNativeQuery.executeNativeSql(getJpaTemplate(), sql,new Object[] {
-			BCConstants.STATUS_ENABLED,BCConstants.STATUS_ENABLED,BCConstants.STATUS_ENABLED
+			BCConstants.STATUS_ENABLED,BCConstants.STATUS_ENABLED,BCConstants.STATUS_ENABLED,BCConstants.STATUS_ENABLED
 			,fistDayOfMonth,lastDayOfMonth
 			,fiveYearsAgoLastDayOfMonth,fiveYearsAgoFistDayOfMonth
 			,eightYearsAgoFistDayOfMonth,eightYearsAgoLastDayOfMonth
