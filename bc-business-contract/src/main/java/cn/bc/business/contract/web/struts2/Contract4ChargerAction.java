@@ -374,6 +374,7 @@ public class Contract4ChargerAction extends
 	public String carMansId;// 入库时要查验是否为入库状态的责任人ID
 	public Long draftCarId;// 未入库的车辆Id
 	public String draftCarManId;// 未入库的司机Id
+	public String draftcarByDriverHistoryId;// 未入库的迁移记录id
 
 	/**
 	 * 入库
@@ -391,19 +392,26 @@ public class Contract4ChargerAction extends
 			this.getE().setExt_str3(this.stopDate);
 		}
 		carMansId = this.getChargerIds(this.getE().getExt_str2());
-		if (draftCarId != null && draftCarManId != null) {
-			this.json = this.contract4ChargerService.doWarehousing(carId,
-					carMansId, this.getE(), draftCarId, draftCarManId);
-		} else if (draftCarId == null && draftCarManId != null) {
-			this.json = this.contract4ChargerService.doWarehousing(carId,
-					carMansId, this.getE(), null, draftCarManId);
-		} else if (draftCarId != null && draftCarManId == null) {
-			this.json = this.contract4ChargerService.doWarehousing(carId,
-					carMansId, this.getE(), draftCarId, null);
-		} else {
-			this.json = this.contract4ChargerService.doWarehousing(carId,
-					carMansId, this.getE(), null, null);
-		}
+		// if (draftCarId != null && draftCarManId != null) {
+		// this.json = this.contract4ChargerService.doWarehousing(carId,
+		// carMansId, this.getE(), draftCarId, draftCarManId);
+		// } else if (draftCarId == null && draftCarManId != null) {
+		// this.json = this.contract4ChargerService.doWarehousing(carId,
+		// carMansId, this.getE(), null, draftCarManId);
+		// } else if (draftCarId != null && draftCarManId == null) {
+		// this.json = this.contract4ChargerService.doWarehousing(carId,
+		// carMansId, this.getE(), draftCarId, null);
+		// } else {
+		// this.json = this.contract4ChargerService.doWarehousing(carId,
+		// carMansId, this.getE(), null, null);
+		// }
+
+		this.json = this.contract4ChargerService.doWarehousing(carId,
+				carMansId, this.getE(),
+				(draftCarId != null ? draftCarId : null),
+				(draftCarManId != null ? draftCarManId : null),
+				(draftcarByDriverHistoryId != null ? draftcarByDriverHistoryId
+						: null));
 
 		return "json";
 	}

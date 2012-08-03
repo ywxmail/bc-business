@@ -898,9 +898,15 @@ public class Contract4ChargerDaoImpl extends
 	}
 
 	public int getDriverAmount(Long carId) {
-		String hql = "select c.driver from CarByDriver c where c.car.id=? and c.classes in (1,2) and c.status in(-1,0)";
-		List<?> list = this.getJpaTemplate().find(hql, new Object[] { carId });
-		return list.size();
+		int count = 0;
+		String sql = "select count(d.driver_id) from bs_car_driver d where d.classes in (1,2)"
+				+ " and d.status_ in (-1,0) and d.car_id =? and d.driver_id not in"
+				+ " (select h.driver_id from bs_car_driver_history h where h.status_ = -1 and h.move_type in (1,4,2) and h.from_car_id =?)";
+		// String hql =
+		// "select c.driver from CarByDriver c where c.car.id=? and c.classes in (1,2) and c.status in(-1,0)";
+		count = this.jdbcTemplate.queryForInt(sql,
+				new Object[] { carId, carId });
+		return count;
 	}
 
 	public void doWarehous4Car(Long draftCarId) {
@@ -938,5 +944,24 @@ public class Contract4ChargerDaoImpl extends
 		}
 
 		return shiftwoukInfoMap;
+	}
+
+	public List<Map<String, Object>> findDraftCarByDriverHistoryByCarId(
+			Long carId) {
+		List<Map<String, Object>> queryList = null;
+		String sql = "select h.id,h.move_type,m.name from bs_car_driver_history h"
+				+ " inner join bs_carman m on m.id = h.driver_id"
+				+ " where h.status_ = -1 and (h.to_car_id =? or h.from_car_id =?)";
+
+		// jdbc查询BS_CAR记录
+		try {
+			queryList = this.jdbcTemplate.queryForList(sql, new Object[] {
+					carId, carId });
+		} catch (EmptyResultDataAccessException e) {
+			e.getStackTrace();
+			// logger.error(e.getMessage(), e);
+		}
+
+		return queryList;
 	}
 }

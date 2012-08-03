@@ -271,11 +271,13 @@ public interface Contract4ChargerService extends CrudService<Contract4Charger>,
 	 * @param carMansId司机Id
 	 * @param draftCarId未入库的车辆Id
 	 * @param draftCarManId未入库的司机Id
+	 * @param draftcarByDriverHistoryId
+	 *            未入库的迁移记录Id
 	 * @return
 	 */
 	String doWarehousing(Long contractCarId, String carMansId,
 			Contract4Charger contract4Charger, Long draftCarId,
-			String draftCarManId);
+			String draftCarManId, String draftcarByDriverHistoryId);
 
 	/**
 	 * 根据车辆Id获取在案的正副班司机数量

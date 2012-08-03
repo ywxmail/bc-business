@@ -135,6 +135,14 @@ public interface Contract4ChargerDao extends CrudDao<Contract4Charger> {
 	Map<String, Object> findCarByCarManId(Long carManId);
 
 	/**
+	 * 根据车辆Id查找与车辆相关未入库的迁移记录
+	 * 
+	 * @param carId
+	 * @return
+	 */
+	List<Map<String, Object>> findDraftCarByDriverHistoryByCarId(Long carId);
+
+	/**
 	 * 更新司机表的负责人信息
 	 * 
 	 * @param assignChargerNames
@@ -220,7 +228,7 @@ public interface Contract4ChargerDao extends CrudDao<Contract4Charger> {
 	void updateCarWithbusinessType(String businessType, Long carId);
 
 	/**
-	 * 根据车辆Id获取在案的正副班司机数量
+	 * 根据车辆Id获取在案的正副班司机数量排除迁移类型为交回未注销，注销未有去向， 公司到公司草稿状态迁移记录的司机
 	 * 
 	 * @param carId
 	 *            车辆Id

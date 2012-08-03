@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -18,6 +19,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.util.Assert;
 
 import cn.bc.BCConstants;
@@ -28,6 +31,7 @@ import cn.bc.business.contract.domain.Contract4Charger;
 import cn.bc.business.contract.domain.ContractCarManRelation;
 import cn.bc.business.contract.domain.ContractCarRelation;
 import cn.bc.business.contract.domain.ContractFeeDetail;
+import cn.bc.business.contract.event.SaveDraftCarByDrierHistoryEvent;
 import cn.bc.business.socialSecurityRule.service.SocialSecurityRuleService;
 import cn.bc.core.Page;
 import cn.bc.core.exception.CoreException;
@@ -52,7 +56,8 @@ import cn.bc.web.ui.json.Json;
  * @author dragon
  */
 public class Contract4ChargerServiceImpl extends
-		DefaultCrudService<Contract4Charger> implements Contract4ChargerService {
+		DefaultCrudService<Contract4Charger> implements
+		Contract4ChargerService, ApplicationEventPublisherAware {
 	private static Log logger = LogFactory
 			.getLog(Contract4ChargerServiceImpl.class);
 	private Contract4ChargerDao contract4ChargerDao;
@@ -60,6 +65,7 @@ public class Contract4ChargerServiceImpl extends
 	private IdGeneratorService idGeneratorService;// 用于生成uid的服务
 	private AttachService attachService;// 附件服务
 	private TemplateService templateService;// 模板服务
+	private ApplicationEventPublisher eventPublisher;
 
 	@Autowired
 	public void setTemplateService(TemplateService templateService) {
@@ -85,6 +91,11 @@ public class Contract4ChargerServiceImpl extends
 	@Autowired
 	public void setIdGeneratorService(IdGeneratorService idGeneratorService) {
 		this.idGeneratorService = idGeneratorService;
+	}
+
+	public void setApplicationEventPublisher(
+			ApplicationEventPublisher applicationEventPublisher) {
+		this.eventPublisher = applicationEventPublisher;
 	}
 
 	public Contract4Charger save(Contract4Charger contract4Charger, Long carId,
@@ -1264,8 +1275,7 @@ public class Contract4ChargerServiceImpl extends
 					shiftworkInfoMap.get("shiftworkCertIdentity"));
 			params.put("shiftworkCertFwzg",
 					shiftworkInfoMap.get("shiftworkCertFwzg"));
-			params.put("shiftworkPhone",
-					shiftworkInfoMap.get("shiftworkPhone"));
+			params.put("shiftworkPhone", shiftworkInfoMap.get("shiftworkPhone"));
 			params.put("shiftworkAddress",
 					shiftworkInfoMap.get("shiftworkAddress"));
 			Date shiftworkStartTime = (Date) shiftworkInfoMap
@@ -1405,7 +1415,7 @@ public class Contract4ChargerServiceImpl extends
 
 	public String doWarehousing(Long contractCarId, String carMansId,
 			Contract4Charger contract4Charger, Long draftCarId,
-			String draftCarManId) {
+			String draftCarManId, String draftcarByDriverHistoryId) {
 		Json json = new Json();
 		// 如果存在草稿车辆，将草稿车辆的状态更新为在案
 		if (draftCarId != null) {
@@ -1419,7 +1429,21 @@ public class Contract4ChargerServiceImpl extends
 						.valueOf(carManId));
 			}
 		}
+		// 如果存在草稿迁移记录，就将草稿的迁移记录入库
+		if (draftcarByDriverHistoryId != null) {
+			String[] draftcarByDriverHistoryIds = draftcarByDriverHistoryId
+					.split(",");
+			for (String carByDriverHistoryId : draftcarByDriverHistoryIds) {
+				// 发布一个保存迁移记录的事件
 
+				SaveDraftCarByDrierHistoryEvent saveDraftCarByDrierHistoryEvent = new SaveDraftCarByDrierHistoryEvent(
+						Long.valueOf(carByDriverHistoryId));
+				this.eventPublisher
+						.publishEvent(saveDraftCarByDrierHistoryEvent);
+
+			}
+
+		}
 		// 经济合同入库
 		contract4Charger.setStatus(BCConstants.STATUS_ENABLED);
 		// 如果pid不为空，则为变更操作新建入库
@@ -1467,12 +1491,15 @@ public class Contract4ChargerServiceImpl extends
 	public String checkDriverOrCarStatus(Long carId, String carMansId) {
 		Map<String, Object> carInfoMap; // 车辆Map
 		Map<String, Object> carManInfoMap; // 车辆Map
+		List<Map<String, Object>> dreftCarByDriverHistoryList;// 草稿状态的迁移记录List
+		Map<String, Object> dreftCarByDriverHistoryMap; // 草稿状态的迁移记录Map
 		Json json = new Json();
 		boolean success4car = true;
 		boolean success4carMan = true;
 		String msg = "";
 		String draftCarId = "";
 		String drafDriverId = "";
+		String draftCarByDriverHistoryId = "";
 		// 查找车辆的状态和车牌号
 		carInfoMap = this.contract4ChargerDao.findCarByCarId(carId);
 		if (carInfoMap != null) {
@@ -1507,22 +1534,77 @@ public class Contract4ChargerServiceImpl extends
 			}
 
 		}
+
+		// 是否存在草稿的迁移记录
+		dreftCarByDriverHistoryList = this.contract4ChargerDao
+				.findDraftCarByDriverHistoryByCarId(carId);
+		if (dreftCarByDriverHistoryList != null) {
+			for (int n = 0; n < dreftCarByDriverHistoryList.size(); n++) {
+				dreftCarByDriverHistoryMap = dreftCarByDriverHistoryList.get(n);
+				msg = (String) (msg.length() > 0 || msg != "" ? msg
+						+ " 、"
+						+ "司机"
+						+ dreftCarByDriverHistoryMap.get("name")
+						+ "迁移类型为"
+						+ this.getMoveType().get(
+								String.valueOf(dreftCarByDriverHistoryMap
+										.get("move_type"))) + "的迁移记录" : "司机"
+						+ dreftCarByDriverHistoryMap.get("name")
+						+ "迁移类型为"
+						+ this.getMoveType().get(
+								String.valueOf(dreftCarByDriverHistoryMap
+										.get("move_type"))));
+				if (n > 0) {
+					draftCarByDriverHistoryId += ","
+							+ dreftCarByDriverHistoryMap.get("id").toString();
+				} else {
+					draftCarByDriverHistoryId = dreftCarByDriverHistoryMap.get(
+							"id").toString();
+				}
+
+			}
+
+		}
+
 		// 如果都为入库状态，则该经济合同可以入库
-		if (success4car == true && success4carMan == true) {
+		if (success4car == true && success4carMan == true
+				&& dreftCarByDriverHistoryList == null) {
 			json.put("success", true);
 		} else {
 			json.put("success", false);
 			json.put("msg", msg + " 尚未入库！是否将 " + msg + " 同时入库？");
-			// 如果车辆或司机Id不为空就写入Id
+			// 如果车辆或司机Id或草稿合同不为空就写入Id
 			if (draftCarId.length() > 0) {
 				json.put("carId", draftCarId);
 			}
 			if (drafDriverId.length() > 0) {
 				json.put("carManId", drafDriverId);
 			}
+			if (draftCarByDriverHistoryId.length() > 0) {
+				json.put("carByDriverHistoryId", draftCarByDriverHistoryId);
+			}
 		}
 		this.json = json.toString();
 		return this.json;
 	}
 
+	/**
+	 * 获取迁移类型值转换列表
+	 * 
+	 * @return
+	 */
+	protected Map<String, String> getMoveType() {
+		Map<String, String> type = new LinkedHashMap<String, String>();
+		type.put(String.valueOf(0), "车辆到车辆");
+		type.put(String.valueOf(1), "公司到公司(已注销)");
+		type.put(String.valueOf(2), "注销未有去向");
+		type.put(String.valueOf(3), "由外公司迁回");
+		type.put(String.valueOf(4), "交回未注销");
+		type.put(String.valueOf(5), "新入职");
+		type.put(String.valueOf(6), "转车队");
+		type.put(String.valueOf(7), "顶班");
+		type.put(String.valueOf(8), "交回后转车");
+		type.put(String.valueOf(-1), "(无)");
+		return type;
+	}
 }
