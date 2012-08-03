@@ -280,7 +280,10 @@ public class CarByDriverHistoryAction extends
 			// 添加默认的保存按钮
 			// 如果是草稿状态的，有保存和入库两个按钮
 			if (this.getE().getStatus() == BCConstants.STATUS_DRAFT) {
-				pageOption.addButton(this.getDefaultSaveButtonOption());
+				pageOption
+						.addButton(new ButtonOption(
+								getText("label.save4Draft"), "save")
+								.setId("bcSaveBtn"));
 				pageOption.addButton(new ButtonOption(
 						getText("label.warehousing"), null,
 						"bc.business.carByDriverHistoryForm.warehousing"));

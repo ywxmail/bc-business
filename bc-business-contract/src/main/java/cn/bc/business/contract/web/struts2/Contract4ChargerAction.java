@@ -671,7 +671,7 @@ public class Contract4ChargerAction extends
 			} else {
 				// 经过续约，过户，重发包后
 				pageOption.addButton(new ButtonOption(
-						getText("labe.save4Draft"), null,
+						getText("label.save4Draft"), null,
 						"bc.contract4ChargerForm.save"));
 				pageOption.addButton(new ButtonOption(
 						getText("label.warehousing"), null,

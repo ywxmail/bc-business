@@ -668,7 +668,7 @@ public class Contract4LabourAction extends
 				}
 			} else {
 				pageOption.addButton(new ButtonOption(
-						getText("labe.save4Draft"), null,
+						getText("label.save4Draft"), null,
 						"bc.contract4LabourForm.save"));
 				pageOption.addButton(new ButtonOption(
 						getText("label.warehousing"), null,

@@ -486,7 +486,7 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 			// 如果有权限的用户可以看到草稿状态的车
 			if (!isReadonly()) {
 				tb.addButton(Toolbar.getDefaultToolbarRadioGroup(
-						this.getBSStatuses(), "status", 1,
+						this.getBSStatuses(), "status", 0,
 						getText("title.click2changeSearchStatus")));
 
 			}
@@ -502,10 +502,10 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 	 */
 	protected Map<String, String> getBSStatuses() {
 		Map<String, String> statuses = new LinkedHashMap<String, String>();
-		statuses.put(String.valueOf(BCConstants.STATUS_DRAFT),
-				getText("bc.status.draft"));
 		statuses.put(String.valueOf(BCConstants.STATUS_ENABLED),
 				getText("bs.status.active"));
+		statuses.put(String.valueOf(BCConstants.STATUS_DRAFT),
+				getText("bc.status.draft"));
 		statuses.put("", getText("bs.status.all"));
 		return statuses;
 	}
