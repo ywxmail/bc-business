@@ -101,6 +101,7 @@ public class SelectCarAction extends
 			sql.append(",(select string_agg(man.name,',') from bs_carman man");
 			sql.append(" inner join bs_car_driver cd on man.id = cd.driver_id ");
 			sql.append(" where cd.car_id = c.id and cd.status_ = 0) as driverName");
+			sql.append(" ,c.bs_Type bsType");
 			
 		}
 		sqlObject.setSelect(sql.toString());
@@ -145,6 +146,7 @@ public class SelectCarAction extends
 					map.put("accessWeight", rs[i++]);
 					map.put("displacement", rs[i++]);
 					map.put("driverName", rs[i++]);
+					map.put("bsType", rs[i++]);
 					
 					//计算预计交车日期
 
@@ -243,6 +245,7 @@ public class SelectCarAction extends
 			columns.add(new HiddenColumn4MapKey("accessWeight", "accessWeight"));
 			columns.add(new HiddenColumn4MapKey("displacement", "displacement"));
 			columns.add(new HiddenColumn4MapKey("driverName", "driverName"));
+			columns.add(new HiddenColumn4MapKey("bsType", "bsType"));
 		}
 		return columns;
 	}
