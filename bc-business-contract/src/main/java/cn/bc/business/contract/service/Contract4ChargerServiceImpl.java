@@ -31,7 +31,7 @@ import cn.bc.business.contract.domain.Contract4Charger;
 import cn.bc.business.contract.domain.ContractCarManRelation;
 import cn.bc.business.contract.domain.ContractCarRelation;
 import cn.bc.business.contract.domain.ContractFeeDetail;
-import cn.bc.business.contract.event.SaveDraftCarByDrierHistoryEvent;
+import cn.bc.business.contract.event.WarehousingCarByDrierHistoryEvent;
 import cn.bc.business.socialSecurityRule.service.SocialSecurityRuleService;
 import cn.bc.core.Page;
 import cn.bc.core.exception.CoreException;
@@ -1435,12 +1435,10 @@ public class Contract4ChargerServiceImpl extends
 					.split(",");
 			for (String carByDriverHistoryId : draftcarByDriverHistoryIds) {
 				// 发布一个保存迁移记录的事件
-
-				SaveDraftCarByDrierHistoryEvent saveDraftCarByDrierHistoryEvent = new SaveDraftCarByDrierHistoryEvent(
+				WarehousingCarByDrierHistoryEvent warehousingCarByDrierHistoryEvent = new WarehousingCarByDrierHistoryEvent(
 						Long.valueOf(carByDriverHistoryId));
 				this.eventPublisher
-						.publishEvent(saveDraftCarByDrierHistoryEvent);
-
+						.publishEvent(warehousingCarByDrierHistoryEvent);
 			}
 
 		}

@@ -8,7 +8,7 @@ import org.springframework.context.ApplicationEvent;
  * @author zxr
  * 
  */
-public class SaveDraftCarByDrierHistoryEvent extends ApplicationEvent {
+public class WarehousingCarByDrierHistoryEvent extends ApplicationEvent {
 
 	private static final long serialVersionUID = 1L;
 	// 车辆Id
@@ -18,7 +18,7 @@ public class SaveDraftCarByDrierHistoryEvent extends ApplicationEvent {
 		return carByHistoryId;
 	}
 
-	public SaveDraftCarByDrierHistoryEvent(Long carByHistoryId) {
+	public WarehousingCarByDrierHistoryEvent(Long carByHistoryId) {
 		super(carByHistoryId);
 		this.carByHistoryId = carByHistoryId;
 	}
