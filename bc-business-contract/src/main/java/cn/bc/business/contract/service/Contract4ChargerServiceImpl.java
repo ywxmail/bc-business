@@ -1602,6 +1602,7 @@ public class Contract4ChargerServiceImpl extends
 		type.put(String.valueOf(6), "转车队");
 		type.put(String.valueOf(7), "顶班");
 		type.put(String.valueOf(8), "交回后转车");
+		type.put(String.valueOf(9), "未交证注销");
 		type.put(String.valueOf(-1), "(无)");
 		return type;
 	}

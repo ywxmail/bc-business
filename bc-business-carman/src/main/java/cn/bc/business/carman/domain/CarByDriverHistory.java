@@ -53,6 +53,8 @@ public class CarByDriverHistory extends FileEntityImpl {
 	public static final int MOVETYPE_DINGBAN = 7;
 	/** 迁移类型：交回后转车 ：交证日期与转新车日期之间有大于一日间隔 */
 	public static final int MOVETYPE_JHZC = 8;
+	/** 迁移类型：未交证注销 ：司机交了车回公司，但还没有交资格证 */
+	public static final int MOVETYPE_WJZZX = 9;
 	/** 迁移类型：空值：新建司机时，司机视图的迁移类型(int)不能为空所以要设空值 */
 	public static final int MOVETYPE_NULL = -1;
 
@@ -71,7 +73,7 @@ public class CarByDriverHistory extends FileEntityImpl {
 	private int toClasses;// 新营运班次:如正班、副班、顶班
 
 	private Calendar moveDate;// 迁移时间(或顶班合同的开始日期)
-	private int moveType;// 迁移类型:1-公司到公司(已注销);2-注销未有去向;3-由外公司迁回;4-交回未注销;5-新入职;6-转车队;7-顶班;8-交回后转车
+	private int moveType;// 迁移类型:1-公司到公司(已注销);2-注销未有去向;3-由外公司迁回;4-交回未注销;5-新入职;6-转车队;7-顶班;8-交回后转车;9-未交证注销
 	private String fromUnit;// 原单位
 	private String toUnit;// 新单位
 	private Calendar handPapersDate;// 交证日期

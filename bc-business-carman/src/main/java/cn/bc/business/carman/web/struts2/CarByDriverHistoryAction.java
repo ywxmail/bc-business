@@ -113,12 +113,13 @@ public class CarByDriverHistoryAction extends
 		this.getE().setStatus(BCConstants.STATUS_DRAFT);
 		// 设置司机信息
 		if (carManId != null) {
-			// 填写迁移类型为：车辆到车辆 ,交回转车，公司到公司，注销未有去向，交回未注销。司机的原车辆信息
+			// 填写迁移类型为：车辆到车辆 ,交回转车，公司到公司，注销未有去向，交回未注销，未交证注销。司机的原车辆信息
 			if (moveType == CarByDriverHistory.MOVETYPE_CLDCL
 					|| moveType == CarByDriverHistory.MOVETYPE_GSDGSYZX
 					|| moveType == CarByDriverHistory.MOVETYPE_ZXWYQX
 					|| moveType == CarByDriverHistory.MOVETYPE_JHWZX
-					|| moveType == CarByDriverHistory.MOVETYPE_JHZC) {
+					|| moveType == CarByDriverHistory.MOVETYPE_JHZC
+					|| moveType == CarByDriverHistory.MOVETYPE_WJZZX) {
 				setCarInfoByCarManId();
 				this.initForm(true);
 
@@ -205,6 +206,8 @@ public class CarByDriverHistoryAction extends
 			return "dingban";
 		} else if (moveType == CarByDriverHistory.MOVETYPE_JHZC) {
 			return "jiaohuizhuanche";
+		} else if (moveType == CarByDriverHistory.MOVETYPE_WJZZX) {
+			return "weijiaozhengzhuxiao";
 		} else {
 			return null;
 		}
@@ -269,6 +272,8 @@ public class CarByDriverHistoryAction extends
 				getText("carByDriverHistory.moveType.dingban"));
 		type.put(String.valueOf(CarByDriverHistory.MOVETYPE_JHZC),
 				getText("carByDriverHistory.moveType.jiaohuizhuanche"));
+		type.put(String.valueOf(CarByDriverHistory.MOVETYPE_WJZZX),
+				getText("carByDriverHistory.moveType.weijiaozhengzhuxiao"));
 		return type;
 	}
 

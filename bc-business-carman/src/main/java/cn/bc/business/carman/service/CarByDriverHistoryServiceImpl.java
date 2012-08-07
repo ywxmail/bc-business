@@ -328,7 +328,7 @@ public class CarByDriverHistoryServiceImpl extends
 	}
 
 	/**
-	 * 需要注销司机的迁移类型：公司到公司(已注销),交回未注销,注销未有去向
+	 * 需要注销司机的迁移类型：公司到公司(已注销),交回未注销,注销未有去向,未交证注销
 	 * 
 	 * @param entity
 	 * @return
@@ -336,7 +336,8 @@ public class CarByDriverHistoryServiceImpl extends
 	private boolean theMoveTypeOfLogoutDriver(CarByDriverHistory entity) {
 		return entity.getMoveType() == CarByDriverHistory.MOVETYPE_GSDGSYZX
 				|| entity.getMoveType() == CarByDriverHistory.MOVETYPE_JHWZX
-				|| entity.getMoveType() == CarByDriverHistory.MOVETYPE_ZXWYQX;
+				|| entity.getMoveType() == CarByDriverHistory.MOVETYPE_ZXWYQX
+				|| entity.getMoveType() == CarByDriverHistory.MOVETYPE_WJZZX;
 	}
 
 	/**
@@ -627,6 +628,7 @@ public class CarByDriverHistoryServiceImpl extends
 		type.put(String.valueOf(CarByDriverHistory.MOVETYPE_ZCD), "转车队");
 		type.put(String.valueOf(CarByDriverHistory.MOVETYPE_DINGBAN), "顶班");
 		type.put(String.valueOf(CarByDriverHistory.MOVETYPE_JHZC), "交回后转车");
+		type.put(String.valueOf(CarByDriverHistory.MOVETYPE_WJZZX), "未交证注销");
 		type.put(String.valueOf(CarByDriverHistory.MOVETYPE_NULL), "(无)");
 		return type;
 	}
