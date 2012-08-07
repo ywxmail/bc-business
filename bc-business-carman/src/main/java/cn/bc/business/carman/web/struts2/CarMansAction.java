@@ -415,6 +415,8 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 				getText("carByDriverHistory.moveType.dingban"));
 		type.put(String.valueOf(CarByDriverHistory.MOVETYPE_JHZC),
 				getText("carByDriverHistory.moveType.jiaohuizhuanche"));
+		type.put(String.valueOf(CarByDriverHistory.MOVETYPE_WJZZX),
+				getText("carByDriverHistory.moveType.weijiaozhengzhuxiao"));
 		type.put(String.valueOf(CarByDriverHistory.MOVETYPE_NULL), "(无)");
 		return type;
 	}
