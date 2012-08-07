@@ -280,6 +280,9 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 
 			// 关系人:TODO
 			msg.put("link", "");
+			
+			//新建部门
+			msg.put("upper", "");
 
 			// 计算过期天数
 			if (status != Contract4Charger.STATUS_NORMAL) {
@@ -304,6 +307,8 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 			msg.put("date", "");
 			msg.put("limit", "");
 			msg.put("link", "");
+			msg.put("upper", "");
+
 		}
 		return msg;
 	}
@@ -335,6 +340,10 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 
 			// 关系人
 			msg.put("link", man.getString("name"));// 司机姓名
+			
+			//新建部门
+			msg.put("upper", "");
+
 
 			// 计算过期天数
 			if (status != Contract4Labour.STATUS_NORMAL) {
@@ -360,6 +369,8 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 			msg.put("date", "");
 			msg.put("limit", "");
 			msg.put("link", man.getString("name"));// 司机姓名
+			msg.put("upper", "");
+
 		}
 		return msg;
 	}
@@ -421,6 +432,9 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 			// 最后修改人或作者:TODO
 			msg.put("link", "");
 
+			//新建部门
+			msg.put("upper", "");
+			
 			// 计算过期天数
 			if (status == Policy.STATUS_DISABLED) {
 				msg.put("subject", "保单已注销");
@@ -445,6 +459,8 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 			msg.put("date", "");
 			msg.put("limit", "");
 			msg.put("link", "");
+			msg.put("upper", "");
+
 		}
 		return msg;
 	}
@@ -711,9 +727,10 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 	private JSONArray getBlacklist(final Long carId) {
 		final StringBuffer sql = new StringBuffer();
 		sql.append("select b.id,b.subject,b.lock_date,b.type_,b.drivers,appoint_date,conversion_type");
-		sql.append(" from bs_blacklist b");
+		sql.append(",h.upper_name from bs_blacklist b");
 		// sql.append(" left join bs_carman_blacklist cb on cb.blacklist_id=b.id");
 		// sql.append(" left join bs_carman m on m.id=cb.man_id");
+		sql.append(" left join bc_identity_actor_history h on h.id=b.author_id");
 		sql.append(" where b.car_id = ? and b.status_ = 0");
 		sql.append(" order by b.file_date desc");
 
@@ -760,6 +777,8 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 							} else {
 								json.put("limit", type);
 							}
+							// 建黑名单的部门
+							json.put("upper", null2Empty(obj[i++]));
 							jsons.put(json);
 						} catch (JSONException e) {
 							logger.error(e.getMessage(), e);
