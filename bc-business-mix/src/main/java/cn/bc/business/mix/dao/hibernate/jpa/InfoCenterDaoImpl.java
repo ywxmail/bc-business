@@ -932,7 +932,7 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 								getLPG((String) car[i++], (String) car[i++]));
 						json.put("tv", null2Empty(car[i++]));
 						json.put("Carmaintain", null2Empty(car[i++]));
-						
+
 						return json;
 					} catch (JSONException e) {
 						logger.error(e.getMessage(), e);
@@ -1573,6 +1573,8 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 			return "顶班";
 		else if (s == CarByDriverHistory.MOVETYPE_JHZC)
 			return "交回后转车";
+		else if (s == CarByDriverHistory.MOVETYPE_WJZZX)
+			return "未交证注销";
 		else
 			return "";
 	}
