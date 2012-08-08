@@ -142,13 +142,14 @@ public class BlacklistsAction extends ViewAction<Map<String, Object>> {
 			sql.append("select b.id,b.status_,b.file_date,b.code,b.drivers,b.company,unit.name,m.name motorcade_name");
 			sql.append(",c.plate_type,c.plate_no,b.type_,b.subject,b.lock_date,l.name locker");
 			sql.append(",b.unlock_date,u.name unlocker,b.car_id,md.actor_name modifier,b.modified_date,b.appoint_date,b.conversion_type");
-			sql.append(",c.return_date from BS_BLACKLIST b");
+			sql.append(",c.return_date,r.name relatedDepartmennts from BS_BLACKLIST b");
 			sql.append(" left join BS_MOTORCADE m on m.id=b.motorcade_id");
 			sql.append(" left join bc_identity_actor unit on unit.id=m.unit_id");
 			sql.append(" left join BS_CAR c on c.id=b.car_id");
 			sql.append(" left join BC_IDENTITY_ACTOR l on l.id=b.locker_id");
 			sql.append(" left join BC_IDENTITY_ACTOR_HISTORY md on md.id=b.modifier_id");
 			sql.append(" left join BC_IDENTITY_ACTOR u on u.id=b.unlocker_id");
+			sql.append(" left join BC_IDENTITY_ACTOR r on r.id=b.related_departmennts_id");
 			sqlObject.setSql(sql.toString());
 
 			// 注入参数
@@ -188,6 +189,7 @@ public class BlacklistsAction extends ViewAction<Map<String, Object>> {
 					map.put("appoint_date", rs[i++]);
 					map.put("conversion_type", rs[i++]);
 					map.put("return_date", rs[i++]);
+					map.put("relatedDepartmennts", rs[i++]);
 
 					return map;
 				}
@@ -277,6 +279,9 @@ public class BlacklistsAction extends ViewAction<Map<String, Object>> {
 				}));
 		columns.add(new TextColumn4MapKey("b.subject", "subject",
 				getText("blacklist.subject"), 160).setSortable(true)
+				.setUseTitleFromLabel(true));
+		columns.add(new TextColumn4MapKey("r.name", "relatedDepartmennts",
+				getText("blacklist.relatedDepartmennts"), 80).setSortable(true)
 				.setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("l.name", "locker",
 				getText("blacklist.locker.name"), 80).setSortable(true)
