@@ -62,6 +62,7 @@ public class Blacklist extends FileEntityImpl {
 	private Car car;// 车辆
 	private String drivers;// 司机信息
 	private Set<CarMan> carMan;// 司机列表
+	private Long relatedDepartmenntsId;// 相关部门Id
 
 	@Column(name = "APPOINT_DATE ")
 	public Calendar getAppointDate() {
@@ -194,6 +195,15 @@ public class Blacklist extends FileEntityImpl {
 
 	public void setCompany(String company) {
 		this.company = company;
+	}
+
+	@Column(name = "RELATED_DEPARTMENNTS_ID")
+	public Long getRelatedDepartmenntsId() {
+		return relatedDepartmenntsId;
+	}
+
+	public void setRelatedDepartmenntsId(Long relatedDepartmenntsId) {
+		this.relatedDepartmenntsId = relatedDepartmenntsId;
 	}
 
 	@ManyToOne(fetch = FetchType.EAGER, optional = true)

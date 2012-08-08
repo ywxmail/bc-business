@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
@@ -30,6 +31,8 @@ import cn.bc.business.motorcade.domain.Motorcade;
 import cn.bc.business.motorcade.service.MotorcadeService;
 import cn.bc.business.web.struts2.FileEntityAction;
 import cn.bc.core.util.DateUtils;
+import cn.bc.identity.domain.Actor;
+import cn.bc.identity.service.ActorService;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.option.domain.OptionItem;
 import cn.bc.option.service.OptionService;
@@ -55,6 +58,7 @@ public class BlacklistAction extends FileEntityAction<Long, Blacklist> {
 	public List<Map<String, String>> motorcadeList; // 可选车队列表
 	public List<Map<String, String>> blackLevelList;// 黑名单等级列表
 	public List<Map<String, String>> blackTypeList;// 黑名单限制项目
+	public List<Map<String, String>> relatedDepartmenntsList;// 相关部门列表
 	public CarByDriverService carByDriverService;
 	public String carPlate;// 车牌号码
 	public String unitName;// 车辆所属单位名
@@ -70,6 +74,13 @@ public class BlacklistAction extends FileEntityAction<Long, Blacklist> {
 	public boolean isNullCar;// 标识是否没有车和司机对应
 	public boolean isNullCarMan;// 标识是否没有司机和车对应
 	public List<Map<String, String>> driversInfoList; // 司机责任人Map
+	private ActorService actorService;
+
+	@Autowired
+	public void setActorService(
+			@Qualifier("actorService") ActorService actorService) {
+		this.actorService = actorService;
+	}
 
 	public Long getCarManId() {
 		return carManId;
@@ -180,6 +191,8 @@ public class BlacklistAction extends FileEntityAction<Long, Blacklist> {
 		this.getE().setLockDate(Calendar.getInstance());
 		this.getE().setCode(
 				this.getIdGeneratorService().nextSN4Month(Blacklist.KEY_CODE));
+		this.getE().setRelatedDepartmenntsId(
+				context.getUserHistory().getUpperId());
 
 	}
 
@@ -346,7 +359,11 @@ public class BlacklistAction extends FileEntityAction<Long, Blacklist> {
 		this.blackTypeList = optionItems.get(OptionConstants.BLACKLIST_TYPE);
 		// 组装司机
 		this.driversInfoList = this.formatDrivers(this.getE().getDrivers());
-
+		// 相关部门列表
+		relatedDepartmenntsList = OptionItem.insertIfNotExist(
+				this.actorService.find4option(new Integer[] { Actor.TYPE_UNIT,
+						Actor.TYPE_DEPARTMENT }, (Integer[]) null), "id",
+				"name");
 		if (logger.isInfoEnabled())
 			logger.info("findOptionItem耗时：" + DateUtils.getWasteTime(startTime));
 
