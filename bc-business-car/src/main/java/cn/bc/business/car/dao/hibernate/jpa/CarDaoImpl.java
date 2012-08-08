@@ -561,13 +561,15 @@ public class CarDaoImpl extends HibernateCrudJpaDao<Car> implements CarDao {
 		sql+=",to_char(a.scrap_date,'YYYY-MM-DD') as scrapDate,a.motorcade_id as motorcadeId,e.name,a.company,a.bs_type as bsType,a.charger";
 		sql+=",f.name as unitCompany,f.id as unitCompanyId,to_char(c.end_date,'YYYY-MM-DD') as ccEndDate";
 		sql+=",to_char(d.commerial_end_date,'YYYY-MM-DD') as commerialEndDate,to_char(d.greenslip_end_date,'YYYY-MM-DD') as greenslipEndDate";
-		sql+=",a.factory_type";
+		sql+=",a.factory_type,to_char(d.greenslip_Start_Date,'YYYY-MM-DD') as greenslipStartDate,a.engine_no,a.vin,a.access_count,a.access_weight,a.displacement";
+		sql+=",(select string_agg(man.name,',') from bs_carman man inner join bs_car_driver cd on man.id = cd.driver_id"; 
+		sql+=" where cd.car_id = a.id and cd.status_ = 0) as driver";
 		sql+=" from bs_car a";
 		sql+=" inner join bs_motorcade e on e.id=a.motorcade_id";
 		sql+=" inner join bc_identity_actor f on f.id = e.unit_id";
 		sql+=" inner join bs_car_contract b on b.car_id=a.id";
 		sql+=" inner join bs_contract c on c.id=b.contract_id";
-		sql+=" inner join bs_car_policy d on d.car_id=a.id and d.status_=?";
+		sql+=" left join bs_car_policy d on d.car_id=a.id and d.status_=?";
 		sql+=" where a.status_=? and c.status_=? and d.status_=? and c.type_=2";
 		if(unitId!=null){
 			sql+=" and e.unit_id="+unitId;
@@ -643,6 +645,19 @@ public class CarDaoImpl extends HibernateCrudJpaDao<Car> implements CarDao {
 				oi.put("commerialEndDate", rs[i++]);
 				oi.put("greenslipEndDate", rs[i++]);
 				oi.put("factoryType", rs[i++]);
+				oi.put("greenslipStartDate", rs[i++]);
+				oi.put("engineNo", rs[i++]);
+				oi.put("vin", rs[i++]);
+				oi.put("accessCount", rs[i++]);
+				oi.put("accessWeight", rs[i++]);
+				oi.put("displacement", rs[i++]);
+				oi.put("driverName", rs[i++]);
+				String companyFullName = oi.get("company").toString();
+				if(companyFullName.length() > 0 && companyFullName.equalsIgnoreCase("宝城")){
+					oi.put("companyFullName","广州市宝城汽车出租有限公司");
+				}else if(companyFullName.length() > 0 && companyFullName.equalsIgnoreCase("广发")){
+					oi.put("companyFullName","广州市广发出租汽车有限公司");
+				}
 				oi.put("plate",oi.get("plateType").toString()+"."+oi.get("plateNo").toString());
 				//计算预计交车日期
 				List<Date> tempList=new ArrayList<Date>();
