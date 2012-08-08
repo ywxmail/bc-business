@@ -88,9 +88,9 @@ public class SelectCarAction extends
 			sql.append(" where bcp.car_id=c.id and bcp.status_ ="+BCConstants.STATUS_ENABLED);
 			sql.append(" ORDER BY bcp.commerial_end_date DESC limit 1) as commerialEndDate");
 			
-			sql.append(" ,(select bcp.greenslip_start_date from bs_car_policy bcp");
+			sql.append(" ,to_char((select bcp.greenslip_start_date from bs_car_policy bcp");
 			sql.append(" where bcp.car_id=c.id and bcp.status_ ="+BCConstants.STATUS_ENABLED);
-			sql.append(" ORDER BY bcp.greenslip_end_date DESC limit 1) as greenslipStartDate");
+			sql.append(" ORDER BY bcp.greenslip_end_date DESC limit 1),'YYYY-MM-DD') as greenslipStartDate");
 
 			sql.append(" ,(select bcp.greenslip_end_date from bs_car_policy bcp");
 			sql.append(" where bcp.car_id=c.id and bcp.status_ ="+BCConstants.STATUS_ENABLED);
@@ -147,6 +147,13 @@ public class SelectCarAction extends
 					map.put("displacement", rs[i++]);
 					map.put("driverName", rs[i++]);
 					map.put("bsType", rs[i++]);
+					String companyFullName = map.get("company").toString();
+					if(companyFullName.length() > 0 && companyFullName.equalsIgnoreCase("宝城")){
+						map.put("companyFullName","广州市宝城汽车出租有限公司");
+					}else if(companyFullName.length() > 0 && companyFullName.equalsIgnoreCase("广发")){
+						map.put("companyFullName","广州市广发出租汽车有限公司");
+					}
+					
 					
 					//计算预计交车日期
 
@@ -246,6 +253,7 @@ public class SelectCarAction extends
 			columns.add(new HiddenColumn4MapKey("displacement", "displacement"));
 			columns.add(new HiddenColumn4MapKey("driverName", "driverName"));
 			columns.add(new HiddenColumn4MapKey("bsType", "bsType"));
+			columns.add(new HiddenColumn4MapKey("companyFullName", "companyFullName"));
 		}
 		return columns;
 	}
