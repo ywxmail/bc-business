@@ -19,6 +19,7 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
+import cn.bc.BCConstants;
 import cn.bc.business.OptionConstants;
 import cn.bc.business.blacklist.domain.Blacklist;
 import cn.bc.business.blacklist.service.BlacklistService;
@@ -191,8 +192,7 @@ public class BlacklistAction extends FileEntityAction<Long, Blacklist> {
 		this.getE().setLockDate(Calendar.getInstance());
 		this.getE().setCode(
 				this.getIdGeneratorService().nextSN4Month(Blacklist.KEY_CODE));
-		this.getE().setRelatedDepartmenntsId(
-				context.getUserHistory().getUpperId());
+		this.getE().setRelatedDepartmenntsId(context.getBelong().getId());
 
 	}
 
@@ -360,10 +360,9 @@ public class BlacklistAction extends FileEntityAction<Long, Blacklist> {
 		// 组装司机
 		this.driversInfoList = this.formatDrivers(this.getE().getDrivers());
 		// 相关部门列表
-		relatedDepartmenntsList = OptionItem.insertIfNotExist(
-				this.actorService.find4option(new Integer[] { Actor.TYPE_UNIT,
-						Actor.TYPE_DEPARTMENT }, (Integer[]) null), "id",
-				"name");
+		relatedDepartmenntsList = this.actorService.find4option(new Integer[] {
+				Actor.TYPE_UNIT, Actor.TYPE_DEPARTMENT },
+				new Integer[] { BCConstants.STATUS_ENABLED });
 		if (logger.isInfoEnabled())
 			logger.info("findOptionItem耗时：" + DateUtils.getWasteTime(startTime));
 
