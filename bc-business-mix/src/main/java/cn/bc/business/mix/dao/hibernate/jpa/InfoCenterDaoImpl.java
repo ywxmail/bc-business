@@ -1017,7 +1017,7 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 		sql.append(" from bs_contract_charger cc");
 		sql.append(" inner join bs_contract c on cc.id = c.id");
 		sql.append(" inner join bs_car_contract carc on c.id = carc.contract_id");
-		sql.append(" where carc.car_id = ? and c.main = 0");
+		sql.append(" where carc.car_id = ? and c.main = 0 and c.status_ in (0,1)");
 		sql.append(" order by c.file_date desc");
 
 		if (logger.isDebugEnabled()) {
@@ -1097,7 +1097,7 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 		sql.append(" inner join bs_carman_contract mc on mc.contract_id=c.id");
 		sql.append(" inner join bs_car_contract carc on carc.contract_id=c.id");
 		sql.append(" inner join bs_carman m on m.id = mc.man_id");
-		sql.append(" where carc.car_id = ?");
+		sql.append(" where carc.car_id = ? and c.status_ in (0,1)");
 		args.add(carId);
 		if (driverIds.length == 1) {
 			sql.append(" and m.id = ?");
@@ -1286,13 +1286,13 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 		sql.append(" inner join bs_contract_charger cc on cc.id=c.id");
 		sql.append(" inner join bs_car_contract carc on carc.contract_id=c.id");
 		sql.append(" where carc.car_id = ?");
-		sql.append(" and m.status_ in (0,1)");
+		sql.append(" and m.status_ in (0,1) and c.status_ in (0,1)");
 		// 排除相同责任人的旧记录
 		sql.append(" and not exists (select 1 from bs_carman_contract mci");
 		sql.append(" 	inner join bs_contract ci on ci.id = mci.contract_id");
 		sql.append("	inner join bs_contract_charger cci on cci.id=ci.id");
 		sql.append("	inner join bs_car_contract carci on carci.contract_id=ci.id");
-		sql.append("	where carci.car_id = carc.car_id and mci.man_id=mc.man_id and ci.start_date > c.start_date ");
+		sql.append("	where carci.car_id = carc.car_id and mci.man_id=mc.man_id and ci.status_ in (0,1) and ci.start_date > c.start_date ");
 		sql.append("    or( cc.agreement_start_date < current_date and cc.quitter_id =mc.man_id))");
 		sql.append(" order by c.start_date desc");
 		if (logger.isDebugEnabled()) {
