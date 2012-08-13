@@ -562,8 +562,10 @@ public class CarDaoImpl extends HibernateCrudJpaDao<Car> implements CarDao {
 		sql+=",f.name as unitCompany,f.id as unitCompanyId,to_char(c.end_date,'YYYY-MM-DD') as ccEndDate";
 		sql+=",to_char(d.commerial_end_date,'YYYY-MM-DD') as commerialEndDate,to_char(d.greenslip_end_date,'YYYY-MM-DD') as greenslipEndDate";
 		sql+=",a.factory_type,to_char(d.greenslip_Start_Date,'YYYY-MM-DD') as greenslipStartDate,a.engine_no,a.vin,a.access_count,a.access_weight,a.displacement";
-		sql+=",(select string_agg(man.name,',') from bs_carman man inner join bs_car_driver cd on man.id = cd.driver_id"; 
-		sql+=" where cd.car_id = a.id and cd.status_ = 0) as driver";
+		sql+=",(select string_agg(oman.name,',') from (select man.name form bs_carman man inner join bs_car_driver cd on man.id = cd.driver_id"; 
+		sql+=" where cd.car_id = a.id and cd.status_ = 0 ORDER BY man.id) oman) as driver";
+		sql+=",(select string_agg(oman.cert_fwzg,',') from (select man.cert_fwzg from bs_carman man inner join bs_car_driver cd on man.id = cd.driver_id"; 
+		sql+=" where cd.car_id = a.id and cd.status_ = 0 ORDER BY man.id) oman) as driverFWZG";
 		sql+=" from bs_car a";
 		sql+=" inner join bs_motorcade e on e.id=a.motorcade_id";
 		sql+=" inner join bc_identity_actor f on f.id = e.unit_id";
@@ -652,6 +654,7 @@ public class CarDaoImpl extends HibernateCrudJpaDao<Car> implements CarDao {
 				oi.put("accessWeight", rs[i++]);
 				oi.put("displacement", rs[i++]);
 				oi.put("driverName", rs[i++]);
+				oi.put("driverFWZG", rs[i++]);
 				String companyFullName = oi.get("company").toString();
 				if(companyFullName.length() > 0 && companyFullName.equalsIgnoreCase("宝城")){
 					oi.put("companyFullName","广州市宝城汽车出租有限公司");
