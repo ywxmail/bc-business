@@ -296,4 +296,13 @@ public interface Contract4ChargerService extends CrudService<Contract4Charger>,
 	 * @return
 	 */
 	String checkDriverOrCarStatus(Long carId, String carMansId);
+
+	/**
+	 * 根据合同获取合同车辆在案的司机和责任人
+	 * 
+	 * @param contractId
+	 * @return
+	 */
+	List<Map<String, String>> getNormalChargerAndDriverByContractId(
+			Long contractId);
 }

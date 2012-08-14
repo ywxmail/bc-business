@@ -1606,4 +1606,10 @@ public class Contract4ChargerServiceImpl extends
 		type.put(String.valueOf(-1), "(无)");
 		return type;
 	}
+
+	public List<Map<String, String>> getNormalChargerAndDriverByContractId(
+			Long contractId) {
+		return this.contract4ChargerDao
+				.getNormalChargerAndDriverByContractId(contractId);
+	}
 }

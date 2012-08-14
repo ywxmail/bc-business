@@ -964,4 +964,28 @@ public class Contract4ChargerDaoImpl extends
 
 		return queryList;
 	}
+
+	public List<Map<String, String>> getNormalChargerAndDriverByContractId(
+			Long contractId) {
+		// ArrayList<Object> args = new ArrayList<Object>();
+		StringBuffer hql = new StringBuffer();
+
+		hql.append("select distinct m.id id,m.name driver from bs_carman m")
+				.append(" left join bs_carman_contract bmc on bmc.man_id = m.id")
+				.append(" left join bs_car_contract bcc on bcc.contract_id = bmc.contract_id")
+				.append(" left join bs_contract bc on bc.id = bcc.contract_id")
+				.append(" where bc.status_ = 0 and bcc.car_id = (select car_id from bs_car_contract where contract_id = ?)");
+		List<Map<String, String>> list = this.jdbcTemplate.query(
+				hql.toString(), new Object[] { contractId },
+				new RowMapper<Map<String, String>>() {
+					public Map<String, String> mapRow(ResultSet rs, int rowNum)
+							throws SQLException {
+						Map<String, String> map = new HashMap<String, String>();
+						map.put("id", rs.getString("id"));
+						map.put("name", rs.getString("driver"));
+						return map;
+					}
+				});
+		return list;
+	}
 }

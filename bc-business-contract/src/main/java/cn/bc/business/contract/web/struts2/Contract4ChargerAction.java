@@ -425,7 +425,13 @@ public class Contract4ChargerAction extends
 		// 初始化责任人
 		this.chargersInfoList = formatChargers(e.getExt_str2());
 		// 提前终止合同方
-		this.quittersList = quitterOptionItem(e.getExt_str2());
+		// this.quittersList = quitterOptionItem(e.getExt_str2());
+		if (BCConstants.STATUS_DRAFT == this.getE().getStatus()) {
+			this.quittersList = quitterOptionItem(e.getExt_str2());
+		} else {
+			this.quittersList = this.contract4ChargerService
+					.getNormalChargerAndDriverByContractId(this.getE().getId());
+		}
 		// 根据合同获取车辆Id
 		carId = this.contract4ChargerService.findCarIdByContractId(e.getId());
 		// 构建附件控件
@@ -448,7 +454,9 @@ public class Contract4ChargerAction extends
 		// == 合同维护处理
 		// 初始化责任人
 		this.chargersInfoList = formatChargers(e.getExt_str2());
-		this.quittersList = quitterOptionItem(e.getExt_str2());
+		// this.quittersList = quitterOptionItem(e.getExt_str2());
+		this.quittersList = this.contract4ChargerService
+				.getNormalChargerAndDriverByContractId(this.getE().getId());
 		// 根据合同获取车辆Id
 		carId = this.contract4ChargerService.findCarIdByContractId(e.getId());
 		// setChargerList(e);
@@ -511,8 +519,8 @@ public class Contract4ChargerAction extends
 				charger = new HashMap<String, String>();
 				name = chargerAry[i].split(",")[0];
 				id = chargerAry[i].split(",")[1];
-				charger.put("key", id);
-				charger.put("value", name);
+				charger.put("id", id);
+				charger.put("name", name);
 				chargersInfo.add(charger);
 			}
 

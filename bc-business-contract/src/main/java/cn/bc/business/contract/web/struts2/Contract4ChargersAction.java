@@ -183,7 +183,7 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 		sql.append(",bia.id batch_company_id,bia.name batch_company");
 		sql.append(",m.id motorcade_id,m.name motorcade_name,c.stop_date,cc.scrapto");
 		sql.append(",c.modified_date,md.actor_name modifier,c.file_date,ad.actor_name author");
-		sql.append(",qu.name qutter,cc.agreement_start_date,cc.agreement_end_date,cc.car_maintain");
+		sql.append(",qu.name qutter,cc.agreement_start_date,cc.agreement_end_date,cc.car_maintain,cc.quitter_id");
 		sql.append(" from BS_CONTRACT_CHARGER cc");
 		sql.append(" inner join BS_CONTRACT c on cc.id = c.id");
 		sql.append(" inner join BS_CAR_CONTRACT carc on c.id = carc.contract_id");
@@ -246,6 +246,7 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 				map.put("agreement_start_date", rs[i++]);
 				map.put("agreement_end_date", rs[i++]);
 				map.put("car_maintain", rs[i++]);
+				map.put("quitter_id", rs[i++]);
 
 				return map;
 			}

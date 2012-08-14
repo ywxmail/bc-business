@@ -44,7 +44,6 @@ public class LinkFormater4ChargerInfo extends LinkFormater {
 		this.showTip = showTip;
 	}
 
-	@SuppressWarnings("null")
 	public String format(Object context, Object value) {
 		@SuppressWarnings("rawtypes")
 		Map contract = (Map) context;
@@ -69,6 +68,8 @@ public class LinkFormater4ChargerInfo extends LinkFormater {
 		StringBuffer tpl = new StringBuffer();
 		List<String> labels = new ArrayList<String>();
 		int i = 0;
+		// 提前终止方是否为责任人标识
+		boolean isChanger = false;
 		for (String vv : vvs) {
 			if (i > 0)
 				tpl.append(",");
@@ -89,8 +90,9 @@ public class LinkFormater4ChargerInfo extends LinkFormater {
 
 				// 链接显示的文字：张三
 				// 经济合同视图:责任人列特殊处理，如"张三,李四(~[补充协议的结束日期])"
-				if (qutter != null || qutter.length() > 0) {
+				if (qutter.length() > 0) {
 					if (qutter.endsWith(vs[0])) {
+						isChanger = true;
 						Date endDate = (Date) contract
 								.get("agreement_start_date");
 						CalendarFormater cf = new CalendarFormater();
@@ -118,6 +120,37 @@ public class LinkFormater4ChargerInfo extends LinkFormater {
 			}
 
 			i++;
+		}
+		// 如果存在不是责任为提前终止方
+		if (isChanger == false && qutter.length() > 0) {
+			// 提前终止方
+			String qutterId = "";
+			// 如果提前终止方不为空
+			if (contract.get("qutter") != null) {
+				qutterId = String.valueOf(contract.get("quitter_id"));
+			}
+
+			// 链接地址、模块类型、样式控制
+			tpl.append("<a class=\"bc-link\" data-mtype=\"" + this.moduleKey
+					+ "\" href=\"" + this.contextPath + this.urlPattern
+					+ qutterId + "\"");
+
+			// 任务栏显示的标题：责任人张三
+			tpl.append(" data-title=\"司机" + qutter + "\"");
+
+			// 对话框的id
+			tpl.append(" data-mid=\"" + this.moduleKey + qutterId + "\"");
+
+			Date endDate = (Date) contract.get("agreement_start_date");
+			CalendarFormater cf = new CalendarFormater();
+			String date = cf.format(context, endDate);
+			if (date != null) {
+				labels.add(",司机" + qutter + "(~" + date + ")");
+				tpl.append(">" + ",司机" + qutter + "(" + date + "终止)" + "</a>");
+			} else {
+				labels.add(",司机" + qutter);
+				tpl.append(">" + ",司机" + qutter + "</a>");
+			}
 		}
 
 		if (this.showTip) {
@@ -154,6 +187,8 @@ public class LinkFormater4ChargerInfo extends LinkFormater {
 		String[] vs;
 		String labels = "";
 		int i = 0;
+		// 提前终止方是否为责任人标识
+		boolean isChanger = false;
 		for (String vv : vvs) {
 			if (i > 0)
 				labels += ",";
@@ -163,6 +198,7 @@ public class LinkFormater4ChargerInfo extends LinkFormater {
 				// 经济合同视图:责任人列特殊处理，如"张三,李四([补充协议的开始日期]终止)"
 				if (qutter != null || qutter.length() > 0) {
 					if (qutter.endsWith(vs[0])) {
+						isChanger = true;
 						Date endDate = (Date) contract
 								.get("agreement_start_date");
 						CalendarFormater cf = new CalendarFormater();
@@ -184,6 +220,18 @@ public class LinkFormater4ChargerInfo extends LinkFormater {
 			}
 
 			i++;
+		}
+		// 如果存在不是责任为提前终止方
+		if (isChanger == false && qutter.length() > 0) {
+			Date endDate = (Date) contract.get("agreement_start_date");
+			CalendarFormater cf = new CalendarFormater();
+			String date = cf.format(context, endDate);
+			if (date != null) {
+				labels += ",司机" + qutter + "(" + date + "终止)";
+			} else {
+				labels += ",司机" + qutter;
+			}
+
 		}
 		return labels;
 	}
