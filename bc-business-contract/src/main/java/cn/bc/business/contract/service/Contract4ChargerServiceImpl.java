@@ -1322,7 +1322,15 @@ public class Contract4ChargerServiceImpl extends
 			params.put("FinancialFeeMsg", cDetailList);
 			params.put("GarageFeeMsg", cDetailFactoryList);
 		}
-
+		
+		//根据模板参数获取的替换值
+		Map<String,Object> mapFormatSql=new HashMap<String, Object>();
+		mapFormatSql.put("key", "id");
+		mapFormatSql.put("value", id);
+		Map<String,Object> mapParams=templateService.getMapParams(template.getId(), mapFormatSql);
+		if(mapParams!=null)
+			params.putAll(mapParams);
+		
 		// 生成附件
 		String ptype = Contract4Charger.ATTACH_TYPE;
 		String puid = c.getUid();

@@ -98,10 +98,12 @@ public class SelectCarAction extends
 			
 			sql.append(" ,c.factory_type as factoryType,c.engine_no as engineNo,c.vin");
 			sql.append(" ,c.access_count as accessCount,c.access_weight as accessWeight,c.displacement");
-			sql.append(",(select string_agg(man.name,',') from bs_carman man");
+			sql.append(",(select string_agg(oman.name,',') from (select man.name from bs_carman man");
 			sql.append(" inner join bs_car_driver cd on man.id = cd.driver_id ");
-			sql.append(" where cd.car_id = c.id and cd.status_ = 0) as driverName");
-			sql.append(" ,c.bs_Type bsType");
+			sql.append(" where cd.car_id = c.id and cd.status_ = 0 ORDER BY man.id) oman) as driverName");
+			sql.append(",(select string_agg(oman.cert_fwzg,',') from (select man.cert_fwzg from bs_carman man");
+			sql.append(" inner join bs_car_driver cd on man.id = cd.driver_id ");
+			sql.append(" where cd.car_id = c.id and cd.status_ = 0 ORDER BY man.id) oman) as driverFWZG");
 			
 		}
 		sqlObject.setSelect(sql.toString());
@@ -146,7 +148,7 @@ public class SelectCarAction extends
 					map.put("accessWeight", rs[i++]);
 					map.put("displacement", rs[i++]);
 					map.put("driverName", rs[i++]);
-					map.put("bsType", rs[i++]);
+					map.put("driverFWZG", rs[i++]);
 					String companyFullName = map.get("company").toString();
 					if(companyFullName.length() > 0 && companyFullName.equalsIgnoreCase("宝城")){
 						map.put("companyFullName","广州市宝城汽车出租有限公司");
@@ -252,8 +254,9 @@ public class SelectCarAction extends
 			columns.add(new HiddenColumn4MapKey("accessWeight", "accessWeight"));
 			columns.add(new HiddenColumn4MapKey("displacement", "displacement"));
 			columns.add(new HiddenColumn4MapKey("driverName", "driverName"));
-			columns.add(new HiddenColumn4MapKey("bsType", "bsType"));
+			columns.add(new HiddenColumn4MapKey("bsType", "bs_type"));
 			columns.add(new HiddenColumn4MapKey("companyFullName", "companyFullName"));
+			columns.add(new HiddenColumn4MapKey("driverFWZG", "driverFWZG"));
 		}
 		return columns;
 	}
