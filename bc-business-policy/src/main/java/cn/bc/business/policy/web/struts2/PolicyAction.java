@@ -190,6 +190,9 @@ public class PolicyAction extends FileEntityAction<Long, Policy> {
 			// 添加默认的保存按钮
 			pageOption.addButton(new ButtonOption(getText("label.save"), null,
 					"bc.policyForm.save").setId("policySave"));
+			pageOption.addButton(new ButtonOption(
+					getText("label.saveAndClose"), null,
+					"bc.policyForm.saveAndClose"));
 			// }
 		} else {// open
 			if (!readonly) {
