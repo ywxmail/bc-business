@@ -1304,7 +1304,48 @@ public class Contract4ChargerServiceImpl extends
 			}
 		}
 		// ----顶班主挂车信息-----结束
+		// ----------交车司机的信息----------开始
+		List<Map<String, Object>> returnCarDriverInfoList = this.contract4ChargerDao
+				.findReturnCarDriverInfoByContractId(c.getId());
+		// 循环变量
+		int drivercount = 1;
+		@SuppressWarnings("unused")
+		String returnCardrivers = "";
+		for (Map<String, Object> returnCardriverMap : returnCarDriverInfoList) {
+			String returnCardriver = returnCardriverMap.get("returnCarDriver")
+					.toString();
+			params.put("returnCarDriver" + String.valueOf(drivercount),
+					returnCardriver);
+			params.put(
+					"returnCarDriverCertIdentity" + String.valueOf(drivercount),
+					returnCardriverMap.get("returnCarDriverCertIdentity")
+							.toString());
+			// 如果存在两个司机的就取第一个司机的迁移日期[两个司机的迁移日期是一样的]
+			if (drivercount == 1) {
+				// 迁移日期
+				Date returnCarMoveDate = (Date) returnCardriverMap
+						.get("returnCarMoveDate");
+				if (returnCarMoveDate != null) {
+					params.put("returnCarMoveDate", returnCarMoveDate);
+					params.put("returnCarMoveDateYear",
+							DateUtils.formatDateTime(returnCarMoveDate, "yyyy"));
+					params.put("returnCarMoveDateMonth",
+							DateUtils.formatDateTime(returnCarMoveDate, "MM"));
+					params.put("returnCarMoveDateDay",
+							DateUtils.formatDateTime(returnCarMoveDate, "dd"));
 
+				}
+
+				returnCardrivers = returnCardriver;
+			} else if (drivercount == 2) {
+				// 合并两个交车司机的名字
+				returnCardrivers += "、" + returnCardriver;
+			}
+			drivercount++;
+		}
+		params.put("returnCarDrivers", returnCardrivers);
+
+		// ----------交车司机的信息----------结束
 		// word 2007 文档处理
 		if (template.getTemplateType().getCode().equals("word-docx")) {
 			// 获取文件中的${XXXX}占位标记的键名列表
@@ -1322,15 +1363,16 @@ public class Contract4ChargerServiceImpl extends
 			params.put("FinancialFeeMsg", cDetailList);
 			params.put("GarageFeeMsg", cDetailFactoryList);
 		}
-		
-		//根据模板参数获取的替换值
-		Map<String,Object> mapFormatSql=new HashMap<String, Object>();
+
+		// 根据模板参数获取的替换值
+		Map<String, Object> mapFormatSql = new HashMap<String, Object>();
 		mapFormatSql.put("key", "id");
 		mapFormatSql.put("value", id);
-		Map<String,Object> mapParams=templateService.getMapParams(template.getId(), mapFormatSql);
-		if(mapParams!=null)
+		Map<String, Object> mapParams = templateService.getMapParams(
+				template.getId(), mapFormatSql);
+		if (mapParams != null)
 			params.putAll(mapParams);
-		
+
 		// 生成附件
 		String ptype = Contract4Charger.ATTACH_TYPE;
 		String puid = c.getUid();

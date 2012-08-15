@@ -988,4 +988,32 @@ public class Contract4ChargerDaoImpl extends
 				});
 		return list;
 	}
+
+	public List<Map<String, Object>> findReturnCarDriverInfoByContractId(
+			Long contractId) {
+		List<Map<String, Object>> list = null;
+		String sql = "select m.name returnCarDriver,m.cert_identity returnCarDriverCertIdentity,h.move_date returnCarMoveDate"
+				+ " from bs_car_driver_history h"
+				+ " left join bs_carman m on m.id = h.driver_id"
+				+ " left join bs_car_contract bcc on bcc.car_id = h.from_car_id"
+				+ " left join bs_contract bc on bc.id = bcc.contract_id"
+				+ " where bc.sign_date < h.move_date and h.move_type in (1,2,4,9)"
+				+ " and bc.id = ? and not exists (select 1 from bs_car_driver_history h1"
+				+ " left join bs_car_contract bcc1 on bcc1.car_id = h1.from_car_id"
+				+ " left join bs_contract bc1 on bc1.id = bcc1.contract_id"
+				+ " where bc1.sign_date < h1.move_date and h.move_date > h1.move_date"
+				+ " and h.driver_id =h1.driver_id and h1.move_type in (1,2,4,9) and bc1.id = ?)";
+
+		// jdbc查询BS_CAR记录
+		try {
+			list = this.jdbcTemplate.queryForList(sql, new Object[] {
+					contractId, contractId });
+
+		} catch (EmptyResultDataAccessException e) {
+			e.getStackTrace();
+			// logger.error(e.getMessage(), e);
+		}
+
+		return list;
+	}
 }
