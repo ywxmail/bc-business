@@ -862,6 +862,15 @@ public class Contract4ChargerServiceImpl extends
 			logger.warn("模板不存在,返回null:code=" + templateCode);
 			return null;
 		}
+		
+		//不能格式化
+		if(!template.isFormatted()){
+			String ptype = Contract4Charger.ATTACH_TYPE;
+			String puid = c.getUid();
+			Attach attach = template.format2Attach(null, ptype, puid);
+			this.attachService.save(attach);
+			return attach;
+		}
 
 		// 生成格式化参数
 		Map<String, Object> params = new HashMap<String, Object>();
