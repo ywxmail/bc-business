@@ -987,6 +987,11 @@ public class Contract4ChargerServiceImpl extends
 		// ---合同费用明细----开始---
 		// 声明保存每月承包款的集合
 		List<ContractFeeDetail> cfdList = new ArrayList<ContractFeeDetail>();
+		//声明保存维修费的集合
+		List<ContractFeeDetail> wxfcfdList = new ArrayList<ContractFeeDetail>();
+		//声明保存预交承包款的集合
+		List<ContractFeeDetail> yjcfdList = new ArrayList<ContractFeeDetail>();
+		
 		if (c.getContractFeeDetail() != null
 				&& c.getContractFeeDetail().size() > 0) {
 			try {
@@ -1049,6 +1054,14 @@ public class Contract4ChargerServiceImpl extends
 					// 每月承包款
 					if (!jo.isNull("isMYCBK") && jo.getBoolean("isMYCBK"))
 						cfdList.add(cfd);
+					
+					// 预交承包款
+					if (!jo.isNull("isYJCBK") && jo.getBoolean("isYJCBK"))
+						yjcfdList.add(cfd);
+					
+					// 维修承包款
+					if (!jo.isNull("isWXF") && jo.getBoolean("isWXF"))
+						wxfcfdList.add(cfd);
 
 					// 收费通知计费开始日期
 					if (!jo.isNull("isRSDV") && jo.getBoolean("isRSDV")) {
@@ -1117,6 +1130,65 @@ public class Contract4ChargerServiceImpl extends
 					params.put("cfdem" + (cfdList.size() + i), "／");
 					params.put("cfded" + (cfdList.size() + i), "／");
 					params.put("mycbf" + (cfdList.size() + i), "／仟／佰／拾／");
+				}
+			}
+		}
+		
+		//处理预交承包款
+		if(yjcfdList.size()==1){
+			ContractFeeDetail cfd=yjcfdList.get(0);
+			if(cfd.getStartDate()!=null&&cfd.getEndDate()!=null){
+				params.put("yjcfdsy" , DateUtils.formatCalendar(
+						cfd.getStartDate(), "yyyy"));
+				params.put("yjcfdsm", DateUtils.formatCalendar(
+						cfd.getStartDate(), "MM"));
+				params.put("yjcfdsd", DateUtils.formatCalendar(
+						cfd.getStartDate(), "dd"));
+				params.put("yjcfdey", DateUtils.formatCalendar(
+						cfd.getEndDate(), "yyyy"));
+				params.put("yjcfdem", DateUtils.formatCalendar(
+						cfd.getEndDate(), "MM"));
+				params.put("yjcfded", DateUtils.formatCalendar(
+						cfd.getEndDate(), "dd"));
+			}
+			params.put("yjcbf4nu", cfd.getPrice());
+			params.put("yjcbf", number2Chinese(String.valueOf(cfd.getPrice())));
+		}
+		
+		//处理维修费
+		if (wxfcfdList.size() > 0) {
+			for (int i = 1; i < wxfcfdList.size() + 1; i++) {
+				ContractFeeDetail cfd=wxfcfdList.get(i-1);
+				if(cfd.getStartDate()!=null&&cfd.getEndDate()!=null){
+					params.put("wxfsy" + i, DateUtils.formatCalendar(
+							cfd.getStartDate(), "yyyy"));
+					params.put("wxfsm" + i, DateUtils.formatCalendar(
+							cfd.getStartDate(), "MM"));
+					params.put("wxfsd" + i, DateUtils.formatCalendar(
+							cfd.getStartDate(), "dd"));
+					params.put("wxfey" + i, DateUtils.formatCalendar(
+							cfd.getEndDate(), "yyyy"));
+					params.put("wxfem" + i, DateUtils.formatCalendar(
+							cfd.getEndDate(), "MM"));
+					params.put("wxfed" + i, DateUtils.formatCalendar(
+							cfd.getEndDate(), "dd"));
+				}
+				
+				// word文档 金额
+				params.put("wxf4nu" + i, number2Chinese(String.valueOf(cfd.getPrice())));
+				params.put("wxf" + i, number2Chinese(String.valueOf(cfd.getPrice())));
+			}
+			// 维修费包费不足6年时
+			if (wxfcfdList.size() < 6) {
+				for (int i = 1; i < 6 - wxfcfdList.size() + 1; i++) {
+					params.put("wxfsy" + (wxfcfdList.size() + i), "　／");
+					params.put("wxfsm" + (wxfcfdList.size() + i), "／");
+					params.put("wxfsd" + (wxfcfdList.size() + i), "／");
+					params.put("wxfey" + (wxfcfdList.size() + i), "　／");
+					params.put("wxfem" + (wxfcfdList.size() + i), "／");
+					params.put("wxfed" + (wxfcfdList.size() + i), "／");
+					params.put("wxf" + (wxfcfdList.size() + i), "／");
+					params.put("wxf4nu" + (wxfcfdList.size() + i), "/");
 				}
 			}
 		}
@@ -1309,7 +1381,6 @@ public class Contract4ChargerServiceImpl extends
 				.findReturnCarDriverInfoByContractId(c.getId());
 		// 循环变量
 		int drivercount = 1;
-		@SuppressWarnings("unused")
 		String returnCardrivers = "";
 		for (Map<String, Object> returnCardriverMap : returnCarDriverInfoList) {
 			String returnCardriver = returnCardriverMap.get("returnCarDriver")
