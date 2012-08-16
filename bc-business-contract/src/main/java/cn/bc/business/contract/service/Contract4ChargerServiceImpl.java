@@ -1363,7 +1363,7 @@ public class Contract4ChargerServiceImpl extends
 					.get("shiftworkStartTime");
 			// 顶班合同期开始日期
 			if (shiftworkStartTime != null) {
-				params.put("shiftworkStartTime", shiftworkStartTime);
+				params.put("shiftworkStartTime", DateUtils.formatDateTime(shiftworkStartTime,"yyyy-MM-dd"));
 				params.put("shiftworkStartYear",
 						DateUtils.formatDateTime(shiftworkStartTime, "yyyy"));
 				params.put("shiftworkStartMonth",
@@ -1375,7 +1375,7 @@ public class Contract4ChargerServiceImpl extends
 			Date shiftworkEndTime = (Date) shiftworkInfoMap
 					.get("shiftworkEndTime");
 			if (shiftworkStartTime != null) {
-				params.put("shiftworkEndTime", shiftworkEndTime);
+				params.put("shiftworkEndTime", DateUtils.formatDateTime(shiftworkEndTime,"yyyy-MM-dd"));
 				params.put("shiftworkEndYear",
 						DateUtils.formatDateTime(shiftworkEndTime, "yyyy"));
 				params.put("shiftworkEndMonth",
@@ -1406,7 +1406,7 @@ public class Contract4ChargerServiceImpl extends
 				Date returnCarMoveDate = (Date) returnCardriverMap
 						.get("returnCarMoveDate");
 				if (returnCarMoveDate != null) {
-					params.put("returnCarMoveDate", returnCarMoveDate);
+					params.put("returnCarMoveDate", DateUtils.formatDateTime(returnCarMoveDate, "yyyy-MM-dd"));
 					params.put("returnCarMoveDateYear",
 							DateUtils.formatDateTime(returnCarMoveDate, "yyyy"));
 					params.put("returnCarMoveDateMonth",
