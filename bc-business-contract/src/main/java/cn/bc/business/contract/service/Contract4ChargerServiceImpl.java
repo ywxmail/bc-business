@@ -862,9 +862,9 @@ public class Contract4ChargerServiceImpl extends
 			logger.warn("模板不存在,返回null:code=" + templateCode);
 			return null;
 		}
-		
-		//不能格式化
-		if(!template.isFormatted()){
+
+		// 不能格式化
+		if (!template.isFormatted()) {
 			String ptype = Contract4Charger.ATTACH_TYPE;
 			String puid = c.getUid();
 			Attach attach = template.format2Attach(null, ptype, puid);
@@ -996,11 +996,11 @@ public class Contract4ChargerServiceImpl extends
 		// ---合同费用明细----开始---
 		// 声明保存每月承包款的集合
 		List<ContractFeeDetail> cfdList = new ArrayList<ContractFeeDetail>();
-		//声明保存维修费的集合
+		// 声明保存维修费的集合
 		List<ContractFeeDetail> wxfcfdList = new ArrayList<ContractFeeDetail>();
-		//声明保存预交承包款的集合
+		// 声明保存预交承包款的集合
 		List<ContractFeeDetail> yjcfdList = new ArrayList<ContractFeeDetail>();
-		
+
 		if (c.getContractFeeDetail() != null
 				&& c.getContractFeeDetail().size() > 0) {
 			try {
@@ -1063,11 +1063,11 @@ public class Contract4ChargerServiceImpl extends
 					// 每月承包款
 					if (!jo.isNull("isMYCBK") && jo.getBoolean("isMYCBK"))
 						cfdList.add(cfd);
-					
+
 					// 预交承包款
 					if (!jo.isNull("isYJCBK") && jo.getBoolean("isYJCBK"))
 						yjcfdList.add(cfd);
-					
+
 					// 维修承包款
 					if (!jo.isNull("isWXF") && jo.getBoolean("isWXF"))
 						wxfcfdList.add(cfd);
@@ -1142,50 +1142,52 @@ public class Contract4ChargerServiceImpl extends
 				}
 			}
 		}
-		
-		//处理预交承包款
-		if(yjcfdList.size()==1){
-			ContractFeeDetail cfd=yjcfdList.get(0);
-			if(cfd.getStartDate()!=null&&cfd.getEndDate()!=null){
-				params.put("yjcfdsy" , DateUtils.formatCalendar(
-						cfd.getStartDate(), "yyyy"));
-				params.put("yjcfdsm", DateUtils.formatCalendar(
-						cfd.getStartDate(), "MM"));
-				params.put("yjcfdsd", DateUtils.formatCalendar(
-						cfd.getStartDate(), "dd"));
-				params.put("yjcfdey", DateUtils.formatCalendar(
-						cfd.getEndDate(), "yyyy"));
-				params.put("yjcfdem", DateUtils.formatCalendar(
-						cfd.getEndDate(), "MM"));
-				params.put("yjcfded", DateUtils.formatCalendar(
-						cfd.getEndDate(), "dd"));
+
+		// 处理预交承包款
+		if (yjcfdList.size() == 1) {
+			ContractFeeDetail cfd = yjcfdList.get(0);
+			if (cfd.getStartDate() != null && cfd.getEndDate() != null) {
+				params.put("yjcfdsy",
+						DateUtils.formatCalendar(cfd.getStartDate(), "yyyy"));
+				params.put("yjcfdsm",
+						DateUtils.formatCalendar(cfd.getStartDate(), "MM"));
+				params.put("yjcfdsd",
+						DateUtils.formatCalendar(cfd.getStartDate(), "dd"));
+				params.put("yjcfdey",
+						DateUtils.formatCalendar(cfd.getEndDate(), "yyyy"));
+				params.put("yjcfdem",
+						DateUtils.formatCalendar(cfd.getEndDate(), "MM"));
+				params.put("yjcfded",
+						DateUtils.formatCalendar(cfd.getEndDate(), "dd"));
 			}
 			params.put("yjcbf4nu", cfd.getPrice());
 			params.put("yjcbf", number2Chinese(String.valueOf(cfd.getPrice())));
 		}
-		
-		//处理维修费
+
+		// 处理维修费
 		if (wxfcfdList.size() > 0) {
 			for (int i = 1; i < wxfcfdList.size() + 1; i++) {
-				ContractFeeDetail cfd=wxfcfdList.get(i-1);
-				if(cfd.getStartDate()!=null&&cfd.getEndDate()!=null){
+				ContractFeeDetail cfd = wxfcfdList.get(i - 1);
+				if (cfd.getStartDate() != null && cfd.getEndDate() != null) {
 					params.put("wxfsy" + i, DateUtils.formatCalendar(
 							cfd.getStartDate(), "yyyy"));
-					params.put("wxfsm" + i, DateUtils.formatCalendar(
-							cfd.getStartDate(), "MM"));
-					params.put("wxfsd" + i, DateUtils.formatCalendar(
-							cfd.getStartDate(), "dd"));
-					params.put("wxfey" + i, DateUtils.formatCalendar(
-							cfd.getEndDate(), "yyyy"));
-					params.put("wxfem" + i, DateUtils.formatCalendar(
-							cfd.getEndDate(), "MM"));
-					params.put("wxfed" + i, DateUtils.formatCalendar(
-							cfd.getEndDate(), "dd"));
+					params.put("wxfsm" + i,
+							DateUtils.formatCalendar(cfd.getStartDate(), "MM"));
+					params.put("wxfsd" + i,
+							DateUtils.formatCalendar(cfd.getStartDate(), "dd"));
+					params.put("wxfey" + i,
+							DateUtils.formatCalendar(cfd.getEndDate(), "yyyy"));
+					params.put("wxfem" + i,
+							DateUtils.formatCalendar(cfd.getEndDate(), "MM"));
+					params.put("wxfed" + i,
+							DateUtils.formatCalendar(cfd.getEndDate(), "dd"));
 				}
-				
+
 				// word文档 金额
-				params.put("wxf4nu" + i, number2Chinese(String.valueOf(cfd.getPrice())));
-				params.put("wxf" + i, number2Chinese(String.valueOf(cfd.getPrice())));
+				params.put("wxf4nu" + i,
+						number2Chinese(String.valueOf(cfd.getPrice())));
+				params.put("wxf" + i,
+						number2Chinese(String.valueOf(cfd.getPrice())));
 			}
 			// 维修费包费不足6年时
 			if (wxfcfdList.size() < 6) {
@@ -1363,7 +1365,8 @@ public class Contract4ChargerServiceImpl extends
 					.get("shiftworkStartTime");
 			// 顶班合同期开始日期
 			if (shiftworkStartTime != null) {
-				params.put("shiftworkStartTime", DateUtils.formatDateTime(shiftworkStartTime,"yyyy-MM-dd"));
+				params.put("shiftworkStartTime", DateUtils.formatDateTime(
+						shiftworkStartTime, "yyyy-MM-dd"));
 				params.put("shiftworkStartYear",
 						DateUtils.formatDateTime(shiftworkStartTime, "yyyy"));
 				params.put("shiftworkStartMonth",
@@ -1375,7 +1378,8 @@ public class Contract4ChargerServiceImpl extends
 			Date shiftworkEndTime = (Date) shiftworkInfoMap
 					.get("shiftworkEndTime");
 			if (shiftworkStartTime != null) {
-				params.put("shiftworkEndTime", DateUtils.formatDateTime(shiftworkEndTime,"yyyy-MM-dd"));
+				params.put("shiftworkEndTime", DateUtils.formatDateTime(
+						shiftworkEndTime, "yyyy-MM-dd"));
 				params.put("shiftworkEndYear",
 						DateUtils.formatDateTime(shiftworkEndTime, "yyyy"));
 				params.put("shiftworkEndMonth",
@@ -1406,7 +1410,8 @@ public class Contract4ChargerServiceImpl extends
 				Date returnCarMoveDate = (Date) returnCardriverMap
 						.get("returnCarMoveDate");
 				if (returnCarMoveDate != null) {
-					params.put("returnCarMoveDate", DateUtils.formatDateTime(returnCarMoveDate, "yyyy-MM-dd"));
+					params.put("returnCarMoveDate", DateUtils.formatDateTime(
+							returnCarMoveDate, "yyyy-MM-dd"));
 					params.put("returnCarMoveDateYear",
 							DateUtils.formatDateTime(returnCarMoveDate, "yyyy"));
 					params.put("returnCarMoveDateMonth",
@@ -1741,5 +1746,11 @@ public class Contract4ChargerServiceImpl extends
 			Long contractId) {
 		return this.contract4ChargerDao
 				.getNormalChargerAndDriverByContractId(contractId);
+	}
+
+	public Map<String, Object> getContractFeeInfoMapByEndDate(String stopDate,
+			Long contractId) {
+		return this.contract4ChargerDao.getContractFeeInfoMapByEndDate(
+				stopDate, contractId);
 	}
 }
