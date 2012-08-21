@@ -64,6 +64,7 @@
 		<action name="checkCodeIsExist" class="contract4ChargerAction" method="checkCodeIsExist" />
 		<action name="addAttachFromTemplate" class="contract4ChargerAction" method="addAttachFromTemplate" />
 		<action name="checkDriverOrCarStatus" class="contract4ChargerAction" method="checkDriverOrCarStatus" />
+		<action name="getContractFeeInfoByEndDate" class="contract4ChargerAction" method="getContractFeeInfoByEndDate" />
 		
 	</package>
 	
