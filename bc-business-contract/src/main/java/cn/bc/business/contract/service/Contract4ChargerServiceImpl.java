@@ -1698,10 +1698,9 @@ public class Contract4ChargerServiceImpl extends
 			}
 
 		}
-
 		// 如果都为入库状态，则该经济合同可以入库
 		if (success4car == true && success4carMan == true
-				&& dreftCarByDriverHistoryList == null) {
+				&& dreftCarByDriverHistoryList.size() == 0) {
 			json.put("success", true);
 		} else {
 			json.put("success", false);
