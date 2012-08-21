@@ -1014,6 +1014,7 @@ public class Contract4ChargerServiceImpl extends
 					// 将编码的后半部分作为占位符key+4cn，并加入相应的中文值
 					params.put(code + "4CN", cfd.getPrice() < 1 ? "零"
 							: multiDigit2Chinese(cfd.getPrice() + ""));
+					params.put(code + "4NU", cfd.getPrice());
 
 					// 收费通知单合同费用项目
 					cDetailMap = new HashMap<String, String>();
@@ -1109,6 +1110,7 @@ public class Contract4ChargerServiceImpl extends
 				;
 			}
 		}
+		
 
 		// word-docx文档上的特殊处理，处理每月承包费的生成
 		if (cfdList.size() > 0) {
@@ -1128,6 +1130,10 @@ public class Contract4ChargerServiceImpl extends
 				// word文档 金额
 				params.put("mycbf" + i, number2Chinese(String.valueOf(cfdList
 						.get(i - 1).getPrice())));
+				params.put("mycbf4nu" + i, nf.format(cfdList
+						.get(i - 1).getPrice()));
+				params.put("mycbf4NU" + i,cfdList
+						.get(i - 1).getPrice());
 			}
 			// 每月承包费不足6年时
 			if (cfdList.size() < 6) {
@@ -1139,6 +1145,7 @@ public class Contract4ChargerServiceImpl extends
 					params.put("cfdem" + (cfdList.size() + i), "／");
 					params.put("cfded" + (cfdList.size() + i), "／");
 					params.put("mycbf" + (cfdList.size() + i), "／仟／佰／拾／");
+					params.put("mycbf4nu" + (cfdList.size() + i), "／");
 				}
 			}
 		}
@@ -1160,7 +1167,9 @@ public class Contract4ChargerServiceImpl extends
 				params.put("yjcfded",
 						DateUtils.formatCalendar(cfd.getEndDate(), "dd"));
 			}
-			params.put("yjcbf4nu", cfd.getPrice());
+			params.put("yjcbf4NU", cfd.getPrice());
+			params.put("yjcbf4nu", nf.format(cfd.getPrice()));
+			params.put("yjcbf4nuSum", nf.format(cfd.getPrice()*cfd.getCount()));
 			params.put("yjcbf", number2Chinese(String.valueOf(cfd.getPrice())));
 		}
 
@@ -1184,10 +1193,9 @@ public class Contract4ChargerServiceImpl extends
 				}
 
 				// word文档 金额
-				params.put("wxf4nu" + i,
-						number2Chinese(String.valueOf(cfd.getPrice())));
-				params.put("wxf" + i,
-						number2Chinese(String.valueOf(cfd.getPrice())));
+				params.put("wxf4NU" + i, cfd.getPrice());
+				params.put("wxf4nu" + i, nf.format(cfd.getPrice()));
+				params.put("wxf" + i, number2Chinese(String.valueOf(cfd.getPrice())));
 			}
 			// 维修费包费不足6年时
 			if (wxfcfdList.size() < 6) {
@@ -1438,7 +1446,8 @@ public class Contract4ChargerServiceImpl extends
 					.getInputStream());
 			// 占位符列表与参数列表匹配,当占位符列表值没出现在参数列表key值时，增加此key值
 			for (String key : markers) {
-				if (!params.containsKey(key))
+				if (key.indexOf("?")==-1&&key.indexOf("!")==-1
+						&&key.indexOf(":")==-1&&!params.containsKey(key))
 					params.put(key, "　　");
 			}
 		}
@@ -1451,8 +1460,7 @@ public class Contract4ChargerServiceImpl extends
 
 		// 根据模板参数获取的替换值
 		Map<String, Object> mapFormatSql = new HashMap<String, Object>();
-		mapFormatSql.put("key", "id");
-		mapFormatSql.put("value", id);
+		mapFormatSql.put("id", id);
 		Map<String, Object> mapParams = templateService.getMapParams(
 				template.getId(), mapFormatSql);
 		if (mapParams != null)
