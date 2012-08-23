@@ -244,9 +244,9 @@ public class Contract4ChargerServiceImpl extends
 		}
 
 		// 复制原合同的附件给新的合同
-		String oldUid = oldContract.getUid();
-		attachService.doCopy(Contract4Charger.KEY_UID, oldUid,
-				Contract4Charger.KEY_UID, newContract.getUid(), true);
+		//String oldUid = oldContract.getUid();
+		//attachService.doCopy(Contract4Charger.KEY_UID, oldUid,
+				//Contract4Charger.KEY_UID, newContract.getUid(), true);
 
 		// 返回续签的合同
 		return newContract;
@@ -331,9 +331,9 @@ public class Contract4ChargerServiceImpl extends
 		Long newId = newContract.getId();
 
 		// 复制原合同的附件给新的合同
-		String oldUid = oldContract.getUid();
-		attachService.doCopy(Contract4Charger.KEY_UID, oldUid,
-				Contract4Charger.KEY_UID, newContract.getUid(), true);
+		//String oldUid = oldContract.getUid();
+		//attachService.doCopy(Contract4Charger.KEY_UID, oldUid,
+				//Contract4Charger.KEY_UID, newContract.getUid(), true);
 
 		// 参数有效性验证
 		Assert.notNull(carId);
@@ -444,9 +444,9 @@ public class Contract4ChargerServiceImpl extends
 		Long newId = newContract.getId();
 
 		// 复制原合同的附件给新的合同
-		String oldUid = oldContract.getUid();
-		attachService.doCopy(Contract4Charger.KEY_UID, oldUid,
-				Contract4Charger.KEY_UID, newContract.getUid(), true);
+		//String oldUid = oldContract.getUid();
+		//attachService.doCopy(Contract4Charger.KEY_UID, oldUid,
+				//Contract4Charger.KEY_UID, newContract.getUid(), true);
 
 		// 参数有效性验证
 		Assert.notNull(carId);
@@ -520,9 +520,9 @@ public class Contract4ChargerServiceImpl extends
 				.next(Contract4Charger.KEY_UID));
 
 		// 复制原合同的附件给新的合同
-		String oldUid = oldContract.getUid();
-		attachService.doCopy(Contract4Charger.KEY_UID, oldUid,
-				Contract4Charger.KEY_UID, newContract.getUid(), true);
+		//String oldUid = oldContract.getUid();
+		//attachService.doCopy(Contract4Charger.KEY_UID, oldUid,
+				//Contract4Charger.KEY_UID, newContract.getUid(), true);
 
 		// 设置创建人,最后更新人的信息
 		SystemContext context = SystemContextHolder.get();
@@ -1225,6 +1225,8 @@ public class Contract4ChargerServiceImpl extends
 				params.put("charger", chargerMap.get("name"));
 				params.put("FWZGZ", chargerMap.get("certFWZG"));
 				params.put("cert4Indentity", chargerMap.get("certIdentity"));
+				params.put("cert4Identity", chargerMap.get("certIdentity"));
+				params.put("certIdentity", chargerMap.get("certIdentity"));
 				params.put(
 						"phone",
 						chargerMap.get("phone") != null
@@ -1236,6 +1238,10 @@ public class Contract4ChargerServiceImpl extends
 				params.put("charger" + chargerI, chargerMap.get("name"));
 				params.put("FWZGZ" + chargerI, chargerMap.get("certFWZG"));
 				params.put("cert4Indentity" + chargerI,
+						chargerMap.get("certIdentity"));
+				params.put("cert4Identity" + chargerI,
+						chargerMap.get("certIdentity"));
+				params.put("certIdentity" + chargerI,
 						chargerMap.get("certIdentity"));
 				params.put(
 						"phone" + chargerI,
