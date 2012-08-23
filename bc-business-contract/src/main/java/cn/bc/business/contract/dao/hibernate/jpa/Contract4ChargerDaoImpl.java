@@ -798,13 +798,23 @@ public class Contract4ChargerDaoImpl extends
 		hql += "  and ee.man_id=b.id";
 		hql += "  ORDER BY dd.file_date DESC";
 		hql += "  LIMIT 1) as joindate";
-		hql += " FROM bs_car_contract a";
-		hql += " inner join bs_car_driver c on c.car_id=a.car_id";
-		hql += " inner join bs_carman b on b.id=c.driver_id";
-		hql += " where b.classes in (1,2) and a.contract_id=? and c.status_="
-				+ BCConstants.STATUS_ENABLED;
+		hql += " from bs_contract a";
+		hql += " inner join bs_car_contract c on c.contract_id=a.id";
+		hql += " inner join bs_car_driver d on d.car_id=c.car_id";
+		hql += " inner join bs_carman b on b.id=d.driver_id";
+		hql += " where d.classes in (1,2) and d.status_ in (-1,0) and a.id=?";
+		hql += " and d.driver_id not in(";
+		hql += " select h.driver_id ";
+		hql += " from bs_contract e ";
+		hql += " inner join bs_car_contract f on f.contract_id=e.id ";
+		hql += " inner join bs_car_driver g on g.car_id=f.car_id";
+		hql += " inner join bs_car_driver_history h on h.id=g.pid";
+		hql += " where h.status_ = -1";
+		hql += " and h.move_type in (1,4,2)";
+		hql += " and e.id =?";
+		hql += ")";
 		return HibernateJpaNativeQuery.executeNativeSql(getJpaTemplate(), hql,
-				new Object[] { contractId },
+				new Object[] { contractId, contractId},
 				new cn.bc.db.jdbc.RowMapper<Map<String, String>>() {
 					public Map<String, String> mapRow(Object[] rs, int rowNum) {
 						Map<String, String> oi = new HashMap<String, String>();
@@ -927,7 +937,7 @@ public class Contract4ChargerDaoImpl extends
 				+ ",m.phone shiftworkPhone,m.address1 shiftworkAddress from bs_car_contract bcc"
 				+ " inner join bs_car_driver cd on cd.car_id = bcc.car_id"
 				+ " inner join bs_carman m on m.id = cd.driver_id"
-				+ " where cd.classes = 3 and cd.status_ = 0 and bcc.contract_id ="
+				+ " where cd.classes = 3 and cd.status_ in(0,-1) and bcc.contract_id ="
 				+ contractId;
 
 		// jdbc查询BS_CAR记录
