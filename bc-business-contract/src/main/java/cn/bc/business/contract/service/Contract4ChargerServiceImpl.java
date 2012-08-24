@@ -244,9 +244,9 @@ public class Contract4ChargerServiceImpl extends
 		}
 
 		// 复制原合同的附件给新的合同
-		//String oldUid = oldContract.getUid();
-		//attachService.doCopy(Contract4Charger.KEY_UID, oldUid,
-				//Contract4Charger.KEY_UID, newContract.getUid(), true);
+		// String oldUid = oldContract.getUid();
+		// attachService.doCopy(Contract4Charger.KEY_UID, oldUid,
+		// Contract4Charger.KEY_UID, newContract.getUid(), true);
 
 		// 返回续签的合同
 		return newContract;
@@ -331,9 +331,9 @@ public class Contract4ChargerServiceImpl extends
 		Long newId = newContract.getId();
 
 		// 复制原合同的附件给新的合同
-		//String oldUid = oldContract.getUid();
-		//attachService.doCopy(Contract4Charger.KEY_UID, oldUid,
-				//Contract4Charger.KEY_UID, newContract.getUid(), true);
+		// String oldUid = oldContract.getUid();
+		// attachService.doCopy(Contract4Charger.KEY_UID, oldUid,
+		// Contract4Charger.KEY_UID, newContract.getUid(), true);
 
 		// 参数有效性验证
 		Assert.notNull(carId);
@@ -444,9 +444,9 @@ public class Contract4ChargerServiceImpl extends
 		Long newId = newContract.getId();
 
 		// 复制原合同的附件给新的合同
-		//String oldUid = oldContract.getUid();
-		//attachService.doCopy(Contract4Charger.KEY_UID, oldUid,
-				//Contract4Charger.KEY_UID, newContract.getUid(), true);
+		// String oldUid = oldContract.getUid();
+		// attachService.doCopy(Contract4Charger.KEY_UID, oldUid,
+		// Contract4Charger.KEY_UID, newContract.getUid(), true);
 
 		// 参数有效性验证
 		Assert.notNull(carId);
@@ -520,9 +520,9 @@ public class Contract4ChargerServiceImpl extends
 				.next(Contract4Charger.KEY_UID));
 
 		// 复制原合同的附件给新的合同
-		//String oldUid = oldContract.getUid();
-		//attachService.doCopy(Contract4Charger.KEY_UID, oldUid,
-				//Contract4Charger.KEY_UID, newContract.getUid(), true);
+		// String oldUid = oldContract.getUid();
+		// attachService.doCopy(Contract4Charger.KEY_UID, oldUid,
+		// Contract4Charger.KEY_UID, newContract.getUid(), true);
 
 		// 设置创建人,最后更新人的信息
 		SystemContext context = SystemContextHolder.get();
@@ -859,12 +859,12 @@ public class Contract4ChargerServiceImpl extends
 		// 获取模板
 		Template template = this.templateService.loadByCode(templateCode);
 		if (template == null) {
-			logger.warn("模板不存在,返回null:code=" + templateCode);
-			return null;
+			logger.error("模板不存在,返回null:code=" + templateCode);
+			throw new CoreException("模板不存在,code=" + templateCode);
 		}
-		
-		//不能格式化
-		if(!template.isFormatted()){
+
+		// 不能格式化
+		if (!template.isFormatted()) {
 			String ptype = Contract4Charger.ATTACH_TYPE;
 			String puid = c.getUid();
 			Attach attach = template.format2Attach(null, ptype, puid);
@@ -897,7 +897,10 @@ public class Contract4ChargerServiceImpl extends
 						.getPaymentDate().equals("0") ? "月末" : c
 						.getPaymentDate() : " ");
 		// 合同开始日期
-		Calendar startDate = c.getStartDate();
+		Calendar startDate = Calendar.getInstance();
+		startDate.set(c.getStartDate().get(Calendar.YEAR), 
+						c.getStartDate().get(Calendar.MONTH), 
+							c.getStartDate().get(Calendar.DAY_OF_MONTH));
 		// 合同结束日期
 		Calendar endDate = c.getEndDate();
 		// 合同期限内的总月份的数量
@@ -929,6 +932,15 @@ public class Contract4ChargerServiceImpl extends
 		params.put("sumEndYear", DateUtils.formatCalendar(endDate, "yyyy"));
 		params.put("sumEndMonth", DateUtils.formatCalendar(endDate, "MM"));
 		params.put("sumEndDay", DateUtils.formatCalendar(endDate, "dd"));
+
+		// 收费通知计费开始日
+		startDate.add(Calendar.DAY_OF_MONTH, 1);
+		params.put("informStartYear",
+				DateUtils.formatCalendar(startDate, "yyyy"));
+		params.put("informStartMonth",
+				DateUtils.formatCalendar(startDate, "MM"));
+		params.put("informStartDay", DateUtils.formatCalendar(startDate, "dd"));
+
 		// 挂靠合同加载社保信息
 		NubmerFormater nf = new NubmerFormater("0.##");
 		// 公司unit
@@ -996,11 +1008,16 @@ public class Contract4ChargerServiceImpl extends
 		// ---合同费用明细----开始---
 		// 声明保存每月承包款的集合
 		List<ContractFeeDetail> cfdList = new ArrayList<ContractFeeDetail>();
-		//声明保存维修费的集合
+		// 声明保存维修费的集合
 		List<ContractFeeDetail> wxfcfdList = new ArrayList<ContractFeeDetail>();
-		//声明保存预交承包款的集合
+		// 声明保存预交承包款的集合
 		List<ContractFeeDetail> yjcfdList = new ArrayList<ContractFeeDetail>();
-		
+
+		// 第一条每月承包款状态控制
+		boolean isFirstMYCBK = true;
+		// 是否加入收费通知项目控制
+		boolean isAddFeeDetail = true;
+
 		if (c.getContractFeeDetail() != null
 				&& c.getContractFeeDetail().size() > 0) {
 			try {
@@ -1016,22 +1033,15 @@ public class Contract4ChargerServiceImpl extends
 							: multiDigit2Chinese(cfd.getPrice() + ""));
 					params.put(code + "4NU", cfd.getPrice());
 
-					// 收费通知单合同费用项目
+					// ----收费通知单合同费用项目---
 					cDetailMap = new HashMap<String, String>();
 					cDetailMap.put("pg", cfd.getName());
 					cDetailMap.put("desc",
 							cfd.getDescription().replaceAll("/n", "\n"));
-					// 声明金额栏
-					String price = "";
-					// 拼装日期
-					if (cfd.getStartDate() != null && cfd.getEndDate() != null) {
-						price += DateUtils.formatCalendar(cfd.getStartDate(),
-								"yyyy年MM月dd日");
-						price += "至";
-						price += DateUtils.formatCalendar(cfd.getEndDate(),
-								"yyyy年MM月dd日");
-					}
-					price += nf.format(cfd.getPrice()) + "元";
+
+					// 声明金额
+					String price = nf.format(cfd.getPrice()) + "元";
+
 					// 付款方式
 					String strPayTypeDate = "";
 					switch (cfd.getPayType()) {
@@ -1046,71 +1056,95 @@ public class Contract4ChargerServiceImpl extends
 						break;
 					}
 
-					// 没特殊配置的默认加入财务部收费通知集合
-					if (cfd.getSpec() == null || cfd.getSpec().length() == 0) {
-						cDetailMap.put("price", price + strPayTypeDate);
-						cDetailList.add(cDetailMap);
-						continue;
-					}
-
 					// 特殊配置
-					JSONObject jo = new JSONObject(cfd.getSpec());
-					if (jo.length() == 0) {
-						cDetailMap.put("price", price + strPayTypeDate);
-						cDetailList.add(cDetailMap);
-						continue;
+					String spec = cfd.getSpec();
+					// 没特殊配置的默认加入临时特殊配置
+					if (spec == null || spec.length() == 0) {
+						spec = "{\"temp\":1}";
 					}
-
-					// 每月承包款
-					if (!jo.isNull("isMYCBK") && jo.getBoolean("isMYCBK"))
-						cfdList.add(cfd);
-					
-					// 预交承包款
-					if (!jo.isNull("isYJCBK") && jo.getBoolean("isYJCBK"))
-						yjcfdList.add(cfd);
-					
-					// 维修承包款
-					if (!jo.isNull("isWXF") && jo.getBoolean("isWXF"))
-						wxfcfdList.add(cfd);
-
-					// 收费通知计费开始日期
-					if (!jo.isNull("isRSDV") && jo.getBoolean("isRSDV")) {
-						if (cfd.getStartDate() != null) {
-							params.put("chargeDate", DateUtils.formatCalendar(
-									cfd.getStartDate(), "yyyy年MM月dd日"));
-						}
-					}
+					JSONObject jo = new JSONObject(spec);
 
 					// 是否加入每人
 					String strTemp = "";
 					if (!jo.isNull("isByDriver") && jo.getBoolean("isByDriver"))
 						strTemp = "/人";
 
-					cDetailMap.put("price", price + strTemp + strPayTypeDate);
+					// 项目金额中的日期
+					String date = "";
 
-					// 财务部收费通知集合
-					if (jo.isNull("isByFinancial")
-							|| jo.getBoolean("isByFinancial")) {
-						cDetailList.add(cDetailMap);
+					// 对第一条MYCBK进行特殊处理
+					if (isFirstMYCBK && !jo.isNull("isMYCBK")
+							&& jo.getBoolean("isMYCBK")
+							&& cfd.getStartDate() != null
+							&& cfd.getEndDate() != null) {
+						// 月份的最后一天
+						Calendar lastDayOfMonth = DateUtils
+								.getLastDayOfMonth(cfd.getStartDate());
+						if (!(lastDayOfMonth.get(Calendar.DAY_OF_MONTH) == cfd
+								.getStartDate().get(Calendar.DAY_OF_MONTH))) {
+							Calendar nextDay = Calendar.getInstance();
+							nextDay.set(cfd.getStartDate().get(Calendar.YEAR)
+									, cfd.getStartDate().get(Calendar.MONTH)
+									, cfd.getStartDate().get(Calendar.DAY_OF_MONTH));
+							// 加一天
+							nextDay.add(Calendar.DAY_OF_MONTH, 1);
+							date += DateUtils.formatCalendar(nextDay,
+									"yyyy年MM月dd日");
+							date += "至";
+							date += DateUtils.formatCalendar(cfd.getEndDate(),
+									"yyyy年MM月dd日");
+						} else
+							isAddFeeDetail = false;
+
+						isFirstMYCBK = false;
+					} else if (cfd.getStartDate() != null
+							&& cfd.getEndDate() != null) {
+						date += DateUtils.formatCalendar(cfd.getStartDate(),
+								"yyyy年MM月dd日");
+						date += "至";
+						date += DateUtils.formatCalendar(cfd.getEndDate(),
+								"yyyy年MM月dd日");
 					}
 
-					// 维修厂收费通知集合
-					if (!jo.isNull("isByGarage") && jo.getBoolean("isByGarage")) {
-						cDetailFactoryList.add(cDetailMap);
+					// 生成收费通知金额栏参数信息
+					cDetailMap.put("price", date + price + strTemp
+							+ strPayTypeDate);
+
+					if (isAddFeeDetail) {
+						// 财务部收费通知集合
+						if (jo.isNull("isByFinancial")
+								|| jo.getBoolean("isByFinancial"))
+							cDetailList.add(cDetailMap);
+
+						// 维修厂收费通知集合
+						if (!jo.isNull("isByGarage")
+								&& jo.getBoolean("isByGarage"))
+							cDetailFactoryList.add(cDetailMap);
+					} else {
+						isAddFeeDetail = true;
 					}
+
+					// 每月承包款
+					if (!jo.isNull("isMYCBK") && jo.getBoolean("isMYCBK"))
+						cfdList.add(cfd);
+
+					// 预交承包款
+					if (!jo.isNull("isYJCBK") && jo.getBoolean("isYJCBK"))
+						yjcfdList.add(cfd);
+
+					// 维修费
+					if (!jo.isNull("isWXF") && jo.getBoolean("isWXF"))
+						wxfcfdList.add(cfd);
 				}
-
 			} catch (JSONException e) {
 				logger.error(e.getMessage(), e);
 				try {
 					throw e;
 				} catch (JSONException e1) {
-					e1.printStackTrace();
+					e.printStackTrace();
 				}
-				;
 			}
 		}
-		
 
 		// word-docx文档上的特殊处理，处理每月承包费的生成
 		if (cfdList.size() > 0) {
@@ -1127,13 +1161,24 @@ public class Contract4ChargerServiceImpl extends
 						cfdList.get(i - 1).getEndDate(), "MM"));
 				params.put("cfded" + i, DateUtils.formatCalendar(
 						cfdList.get(i - 1).getEndDate(), "dd"));
+				params.put("mycbfsy" + i, DateUtils.formatCalendar(
+						cfdList.get(i - 1).getStartDate(), "yyyy"));
+				params.put("mycbfsm" + i, DateUtils.formatCalendar(
+						cfdList.get(i - 1).getStartDate(), "MM"));
+				params.put("mycbfsd" + i, DateUtils.formatCalendar(
+						cfdList.get(i - 1).getStartDate(), "dd"));
+				params.put("mycbfey" + i, DateUtils.formatCalendar(
+						cfdList.get(i - 1).getEndDate(), "yyyy"));
+				params.put("mycbfem" + i, DateUtils.formatCalendar(
+						cfdList.get(i - 1).getEndDate(), "MM"));
+				params.put("mycbfed" + i, DateUtils.formatCalendar(
+						cfdList.get(i - 1).getEndDate(), "dd"));
 				// word文档 金额
 				params.put("mycbf" + i, number2Chinese(String.valueOf(cfdList
 						.get(i - 1).getPrice())));
-				params.put("mycbf4nu" + i, nf.format(cfdList
-						.get(i - 1).getPrice()));
-				params.put("mycbf4NU" + i,cfdList
-						.get(i - 1).getPrice());
+				params.put("mycbf4nu" + i,
+						nf.format(cfdList.get(i - 1).getPrice()));
+				params.put("mycbf4NU" + i, cfdList.get(i - 1).getPrice());
 			}
 			// 每月承包费不足6年时
 			if (cfdList.size() < 6) {
@@ -1144,60 +1189,67 @@ public class Contract4ChargerServiceImpl extends
 					params.put("cfdey" + (cfdList.size() + i), "　／");
 					params.put("cfdem" + (cfdList.size() + i), "／");
 					params.put("cfded" + (cfdList.size() + i), "／");
+					params.put("mycbf" + (cfdList.size() + i), "　／");
+					params.put("mycbf" + (cfdList.size() + i), "／");
+					params.put("mycbf" + (cfdList.size() + i), "／");
+					params.put("mycbf" + (cfdList.size() + i), "　／");
+					params.put("mycbf" + (cfdList.size() + i), "／");
+					params.put("mycbf" + (cfdList.size() + i), "／");
 					params.put("mycbf" + (cfdList.size() + i), "／仟／佰／拾／");
 					params.put("mycbf4nu" + (cfdList.size() + i), "／");
 				}
 			}
 		}
-		
-		//处理预交承包款
-		if(yjcfdList.size()==1){
-			ContractFeeDetail cfd=yjcfdList.get(0);
-			if(cfd.getStartDate()!=null&&cfd.getEndDate()!=null){
-				params.put("yjcfdsy" , DateUtils.formatCalendar(
-						cfd.getStartDate(), "yyyy"));
-				params.put("yjcfdsm", DateUtils.formatCalendar(
-						cfd.getStartDate(), "MM"));
-				params.put("yjcfdsd", DateUtils.formatCalendar(
-						cfd.getStartDate(), "dd"));
-				params.put("yjcfdey", DateUtils.formatCalendar(
-						cfd.getEndDate(), "yyyy"));
-				params.put("yjcfdem", DateUtils.formatCalendar(
-						cfd.getEndDate(), "MM"));
-				params.put("yjcfded", DateUtils.formatCalendar(
-						cfd.getEndDate(), "dd"));
+
+		// 处理预交承包款
+		if (yjcfdList.size() == 1) {
+			ContractFeeDetail cfd = yjcfdList.get(0);
+			if (cfd.getStartDate() != null && cfd.getEndDate() != null) {
+				params.put("yjcbfsy",
+						DateUtils.formatCalendar(cfd.getStartDate(), "yyyy"));
+				params.put("yjcbfsm",
+						DateUtils.formatCalendar(cfd.getStartDate(), "MM"));
+				params.put("yjcbfsd",
+						DateUtils.formatCalendar(cfd.getStartDate(), "dd"));
+				params.put("yjcbfey",
+						DateUtils.formatCalendar(cfd.getEndDate(), "yyyy"));
+				params.put("yjcbfem",
+						DateUtils.formatCalendar(cfd.getEndDate(), "MM"));
+				params.put("yjcbfed",
+						DateUtils.formatCalendar(cfd.getEndDate(), "dd"));
 			}
 			params.put("yjcbf4NU", cfd.getPrice());
 			params.put("yjcbf4nu", nf.format(cfd.getPrice()));
-			params.put("yjcbf4nuSum", nf.format(cfd.getPrice()*cfd.getCount()));
+			params.put("yjcbf4nuSum",
+					nf.format(cfd.getPrice() * cfd.getCount()));
 			params.put("yjcbf", number2Chinese(String.valueOf(cfd.getPrice())));
 		}
-		
-		//处理维修费
+
+		// 处理维修费
 		if (wxfcfdList.size() > 0) {
 			for (int i = 1; i < wxfcfdList.size() + 1; i++) {
-				ContractFeeDetail cfd=wxfcfdList.get(i-1);
-				if(cfd.getStartDate()!=null&&cfd.getEndDate()!=null){
+				ContractFeeDetail cfd = wxfcfdList.get(i - 1);
+				if (cfd.getStartDate() != null && cfd.getEndDate() != null) {
 					params.put("wxfsy" + i, DateUtils.formatCalendar(
 							cfd.getStartDate(), "yyyy"));
-					params.put("wxfsm" + i, DateUtils.formatCalendar(
-							cfd.getStartDate(), "MM"));
-					params.put("wxfsd" + i, DateUtils.formatCalendar(
-							cfd.getStartDate(), "dd"));
-					params.put("wxfey" + i, DateUtils.formatCalendar(
-							cfd.getEndDate(), "yyyy"));
-					params.put("wxfem" + i, DateUtils.formatCalendar(
-							cfd.getEndDate(), "MM"));
-					params.put("wxfed" + i, DateUtils.formatCalendar(
-							cfd.getEndDate(), "dd"));
+					params.put("wxfsm" + i,
+							DateUtils.formatCalendar(cfd.getStartDate(), "MM"));
+					params.put("wxfsd" + i,
+							DateUtils.formatCalendar(cfd.getStartDate(), "dd"));
+					params.put("wxfey" + i,
+							DateUtils.formatCalendar(cfd.getEndDate(), "yyyy"));
+					params.put("wxfem" + i,
+							DateUtils.formatCalendar(cfd.getEndDate(), "MM"));
+					params.put("wxfed" + i,
+							DateUtils.formatCalendar(cfd.getEndDate(), "dd"));
 				}
-				
-				// word文档 金额
+
 				params.put("wxf4NU" + i, cfd.getPrice());
 				params.put("wxf4nu" + i, nf.format(cfd.getPrice()));
-				params.put("wxf" + i, number2Chinese(String.valueOf(cfd.getPrice())));
+				params.put("wxf" + i,
+						number2Chinese(String.valueOf(cfd.getPrice())));
 			}
-			// 维修费包费不足6年时
+			// 维修费不足6年时
 			if (wxfcfdList.size() < 6) {
 				for (int i = 1; i < 6 - wxfcfdList.size() + 1; i++) {
 					params.put("wxfsy" + (wxfcfdList.size() + i), "　／");
@@ -1379,7 +1431,8 @@ public class Contract4ChargerServiceImpl extends
 					.get("shiftworkStartTime");
 			// 顶班合同期开始日期
 			if (shiftworkStartTime != null) {
-				params.put("shiftworkStartTime", DateUtils.formatDateTime(shiftworkStartTime,"yyyy-MM-dd"));
+				params.put("shiftworkStartTime", DateUtils.formatDateTime(
+						shiftworkStartTime, "yyyy-MM-dd"));
 				params.put("shiftworkStartYear",
 						DateUtils.formatDateTime(shiftworkStartTime, "yyyy"));
 				params.put("shiftworkStartMonth",
@@ -1391,7 +1444,8 @@ public class Contract4ChargerServiceImpl extends
 			Date shiftworkEndTime = (Date) shiftworkInfoMap
 					.get("shiftworkEndTime");
 			if (shiftworkStartTime != null) {
-				params.put("shiftworkEndTime", DateUtils.formatDateTime(shiftworkEndTime,"yyyy-MM-dd"));
+				params.put("shiftworkEndTime", DateUtils.formatDateTime(
+						shiftworkEndTime, "yyyy-MM-dd"));
 				params.put("shiftworkEndYear",
 						DateUtils.formatDateTime(shiftworkEndTime, "yyyy"));
 				params.put("shiftworkEndMonth",
@@ -1422,7 +1476,8 @@ public class Contract4ChargerServiceImpl extends
 				Date returnCarMoveDate = (Date) returnCardriverMap
 						.get("returnCarMoveDate");
 				if (returnCarMoveDate != null) {
-					params.put("returnCarMoveDate", DateUtils.formatDateTime(returnCarMoveDate, "yyyy-MM-dd"));
+					params.put("returnCarMoveDate", DateUtils.formatDateTime(
+							returnCarMoveDate, "yyyy-MM-dd"));
 					params.put("returnCarMoveDateYear",
 							DateUtils.formatDateTime(returnCarMoveDate, "yyyy"));
 					params.put("returnCarMoveDateMonth",
@@ -1449,8 +1504,8 @@ public class Contract4ChargerServiceImpl extends
 					.getInputStream());
 			// 占位符列表与参数列表匹配,当占位符列表值没出现在参数列表key值时，增加此key值
 			for (String key : markers) {
-				if (key.indexOf("?")==-1&&key.indexOf("!")==-1
-						&&key.indexOf(":")==-1&&!params.containsKey(key))
+				if (key.indexOf("?") == -1 && key.indexOf("!") == -1
+						&& key.indexOf(":") == -1 && !params.containsKey(key))
 					params.put(key, "　　");
 			}
 		}
