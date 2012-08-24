@@ -80,6 +80,13 @@ public class Contract4ChargerAction extends
 	public List<Map<String, String>> payTypeList;// 收费方式列表(每月、每季、每年、一次性)
 	public boolean canCopy;// 是否能复制
 
+	public boolean isChange = false;// 经济合同的责任人是否变更
+	public String contractFee4EndDate;// 相关的每月承包费(上一份合同结果时间段的)的结果日期
+	public String contractFee4Price;// 相关的每月承包费(上一份合同结果时间段的)的金额
+	public Long oldContractId; // 合同ID
+
+	public Map<String, Object> contractFeeInfoMap; // 车辆Map
+
 	@Autowired
 	public void setContract4ChargerService(
 			Contract4ChargerService contract4ChargerService) {
@@ -147,6 +154,10 @@ public class Contract4ChargerAction extends
 			this.chargersInfoList = formatChargers(newContract.getExt_str2());
 			carId = this.contract4ChargerService
 					.findCarIdByContractId(newContract.getPid());
+			// 标识是否执行续约，重发包，过户操作
+			isChange = true;
+			// 旧合同Id
+			oldContractId = contractId;
 
 		} else {
 			// 初始化E
@@ -392,19 +403,6 @@ public class Contract4ChargerAction extends
 			this.getE().setExt_str3(this.stopDate);
 		}
 		carMansId = this.getChargerIds(this.getE().getExt_str2());
-		// if (draftCarId != null && draftCarManId != null) {
-		// this.json = this.contract4ChargerService.doWarehousing(carId,
-		// carMansId, this.getE(), draftCarId, draftCarManId);
-		// } else if (draftCarId == null && draftCarManId != null) {
-		// this.json = this.contract4ChargerService.doWarehousing(carId,
-		// carMansId, this.getE(), null, draftCarManId);
-		// } else if (draftCarId != null && draftCarManId == null) {
-		// this.json = this.contract4ChargerService.doWarehousing(carId,
-		// carMansId, this.getE(), draftCarId, null);
-		// } else {
-		// this.json = this.contract4ChargerService.doWarehousing(carId,
-		// carMansId, this.getE(), null, null);
-		// }
 
 		this.json = this.contract4ChargerService.doWarehousing(carId,
 				carMansId, this.getE(),
@@ -821,6 +819,37 @@ public class Contract4ChargerAction extends
 			this.json = String.valueOf(0);
 		}
 		return "json";
+	}
+
+	/**
+	 * 根据结束日期获取相关承包款的信息
+	 * 
+	 * @return
+	 */
+	public String getContractFeeInfoByEndDate() {
+		Json json = new Json();
+		// 如果是进行重发包或过户操作，需要获取上份合同相关的每月基准承包费信息
+		// 根据结束日期获取相关承包款的信息
+		if (this.contractId != null) {
+			contractFeeInfoMap = this.contract4ChargerService
+					.getContractFeeInfoMapByEndDate(this.stopDate, contractId);
+			if (contractFeeInfoMap != null) {
+				contractFee4EndDate = isNullObject(contractFeeInfoMap
+						.get("end_date"));
+				contractFee4Price = isNullObject(contractFeeInfoMap
+						.get("price"));
+				json.put("contractFee4EndDate", contractFee4EndDate);
+				json.put("contractFee4Price", contractFee4Price);
+				this.json = json.toString();
+			} else {
+				this.json = "";
+			}
+		} else {
+			this.json = "";
+		}
+
+		return "json";
+
 	}
 
 	// 查看车辆或司机的状态

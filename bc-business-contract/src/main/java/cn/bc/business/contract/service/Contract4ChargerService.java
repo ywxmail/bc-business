@@ -305,4 +305,16 @@ public interface Contract4ChargerService extends CrudService<Contract4Charger>,
 	 */
 	List<Map<String, String>> getNormalChargerAndDriverByContractId(
 			Long contractId);
+
+	/**
+	 * 根据结束日期获取相关承包款的信息
+	 * 
+	 * @param stopDate
+	 *            结束日期
+	 * @param contractId
+	 *            合同ID
+	 * @return
+	 */
+	Map<String, Object> getContractFeeInfoMapByEndDate(String stopDate,
+			Long contractId);
 }

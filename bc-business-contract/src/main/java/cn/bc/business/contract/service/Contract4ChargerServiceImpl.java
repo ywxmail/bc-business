@@ -1127,25 +1127,26 @@ public class Contract4ChargerServiceImpl extends
 					// 每月承包款
 					if (!jo.isNull("isMYCBK") && jo.getBoolean("isMYCBK"))
 						cfdList.add(cfd);
-
+					
 					// 预交承包款
 					if (!jo.isNull("isYJCBK") && jo.getBoolean("isYJCBK"))
 						yjcfdList.add(cfd);
-
+					
 					// 维修费
 					if (!jo.isNull("isWXF") && jo.getBoolean("isWXF"))
 						wxfcfdList.add(cfd);
+
 				}
 			} catch (JSONException e) {
 				logger.error(e.getMessage(), e);
 				try {
 					throw e;
 				} catch (JSONException e1) {
-					e.printStackTrace();
-				}
-			}
+					e1.printStackTrace();
+					e.printStackTrace();			}
+				;			}
 		}
-
+		
 		// word-docx文档上的特殊处理，处理每月承包费的生成
 		if (cfdList.size() > 0) {
 			for (int i = 1; i < cfdList.size() + 1; i++) {
@@ -1200,7 +1201,7 @@ public class Contract4ChargerServiceImpl extends
 				}
 			}
 		}
-
+	
 		// 处理预交承包款
 		if (yjcfdList.size() == 1) {
 			ContractFeeDetail cfd = yjcfdList.get(0);
@@ -1243,7 +1244,6 @@ public class Contract4ChargerServiceImpl extends
 					params.put("wxfed" + i,
 							DateUtils.formatCalendar(cfd.getEndDate(), "dd"));
 				}
-
 				params.put("wxf4NU" + i, cfd.getPrice());
 				params.put("wxf4nu" + i, nf.format(cfd.getPrice()));
 				params.put("wxf" + i,
@@ -1764,10 +1764,9 @@ public class Contract4ChargerServiceImpl extends
 			}
 
 		}
-
 		// 如果都为入库状态，则该经济合同可以入库
 		if (success4car == true && success4carMan == true
-				&& dreftCarByDriverHistoryList == null) {
+				&& dreftCarByDriverHistoryList.size() == 0) {
 			json.put("success", true);
 		} else {
 			json.put("success", false);
@@ -1812,5 +1811,11 @@ public class Contract4ChargerServiceImpl extends
 			Long contractId) {
 		return this.contract4ChargerDao
 				.getNormalChargerAndDriverByContractId(contractId);
+	}
+
+	public Map<String, Object> getContractFeeInfoMapByEndDate(String stopDate,
+			Long contractId) {
+		return this.contract4ChargerDao.getContractFeeInfoMapByEndDate(
+				stopDate, contractId);
 	}
 }

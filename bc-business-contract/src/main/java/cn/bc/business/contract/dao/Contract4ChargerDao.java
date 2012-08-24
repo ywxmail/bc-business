@@ -277,4 +277,16 @@ public interface Contract4ChargerDao extends CrudDao<Contract4Charger> {
 	 * @return
 	 */
 	List<Map<String, Object>> findReturnCarDriverInfoByContractId(Long id);
+
+	/**
+	 * 根据结束日期获取相关承包款的信息
+	 * 
+	 * @param stopDate
+	 *            结束日期
+	 * @param contractId
+	 *            合同Id
+	 * @return
+	 */
+	Map<String, Object> getContractFeeInfoMapByEndDate(String stopDate,
+			Long contractId);
 }

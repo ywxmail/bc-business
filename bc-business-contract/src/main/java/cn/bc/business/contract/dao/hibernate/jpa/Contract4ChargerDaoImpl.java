@@ -1026,4 +1026,30 @@ public class Contract4ChargerDaoImpl extends
 
 		return list;
 	}
+
+	public Map<String, Object> getContractFeeInfoMapByEndDate(String stopDate,
+			Long contractId) {
+		Map<String, Object> queryMap = null;
+		String sql = "select price,to_char(end_date,'YYYY-MM-DD') end_date from bs_contract_fee_detail"
+				+ " where pid ="
+				+ contractId
+				+ " and (start_date <= to_date("
+				+ "'"
+				+ stopDate
+				+ "'"
+				+ ",'YYYY-MM-DD') and  end_date >= to_date("
+				+ "'"
+				+ stopDate
+				+ "'" + ",'YYYY-MM-DD'))";
+
+		// jdbc查询BS_CAR记录
+		try {
+			queryMap = this.jdbcTemplate.queryForMap(sql);
+		} catch (EmptyResultDataAccessException e) {
+			e.getStackTrace();
+			// logger.error(e.getMessage(), e);
+		}
+
+		return queryMap;
+	}
 }
