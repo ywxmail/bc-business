@@ -1015,6 +1015,8 @@ public class Contract4ChargerServiceImpl extends
 
 		// 第一条每月承包款状态控制
 		boolean isFirstMYCBK = true;
+		// 第一条维修费状态控制
+		boolean isFirstWXF = true;
 		// 是否加入收费通知项目控制
 		boolean isAddFeeDetail = true;
 
@@ -1096,7 +1098,22 @@ public class Contract4ChargerServiceImpl extends
 						} else
 							isAddFeeDetail = false;
 
-						isFirstMYCBK = false;
+						isFirstMYCBK = false;						
+					//对第一条且有日期的维修费进行处理
+					}else if(isFirstWXF && !jo.isNull("isWXF")
+							&& jo.getBoolean("isWXF")
+							&& cfd.getStartDate() != null
+							&& cfd.getEndDate() != null){
+						date += params.get("informStartYear").toString();
+						date += "年";
+						date += params.get("informStartMonth").toString();
+						date += "月";
+						date += params.get("informStartDay").toString();
+						date += "日";
+						date += "至";
+						date += DateUtils.formatCalendar(cfd.getEndDate(),
+								"yyyy年MM月dd日");
+						isFirstWXF=false;						
 					} else if (cfd.getStartDate() != null
 							&& cfd.getEndDate() != null) {
 						date += DateUtils.formatCalendar(cfd.getStartDate(),
@@ -1143,8 +1160,10 @@ public class Contract4ChargerServiceImpl extends
 					throw e;
 				} catch (JSONException e1) {
 					e1.printStackTrace();
-					e.printStackTrace();			}
-				;			}
+					e.printStackTrace();			
+				}
+			}
+			
 		}
 		
 		// word-docx文档上的特殊处理，处理每月承包费的生成
