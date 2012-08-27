@@ -1386,6 +1386,8 @@ public class Contract4ChargerServiceImpl extends
 				params.put("driver", driverMap.get("name"));
 				params.put("dFWZGZ", driverMap.get("certFWZG"));
 				params.put("dCert4Indentity", driverMap.get("certIdentity"));
+				params.put("dCert4Identity", driverMap.get("certIdentity"));
+				params.put("dCertIdentity", driverMap.get("certIdentity"));
 				params.put(
 						"dPhone",
 						driverMap.get("phone") != null
@@ -1397,6 +1399,10 @@ public class Contract4ChargerServiceImpl extends
 				params.put("driver" + driverI, driverMap.get("name"));
 				params.put("dFWZGZ" + driverI, driverMap.get("certFWZG"));
 				params.put("dCert4Indentity" + driverI,
+						driverMap.get("certIdentity"));
+				params.put("dCert4Identity" + driverI,
+						driverMap.get("certIdentity"));
+				params.put("dCertIdentity" + driverI,
 						driverMap.get("certIdentity"));
 				params.put(
 						"dPhone" + driverI,
