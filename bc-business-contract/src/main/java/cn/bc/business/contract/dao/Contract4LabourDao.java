@@ -150,15 +150,14 @@ public interface Contract4LabourDao extends CrudDao<Contract4Labour> {
 	boolean isExistContractByDriverId(Long driverId);
 
 	/**
-	 * 更新指定司机的户口性质,区域,籍贯,出生日期
+	 * 更新指定司机的id,户口性质,区域
 	 * 
 	 * @param driverId
 	 * @param houseType
 	 * @param region
-	 * @param origin
 	 */
 	void updateCarMan4CarManInfo(Long driverId, String houseType,
-			Integer region, String origin);
+			Integer region);
 
 	// /**
 	// * 更新司机的备注列
