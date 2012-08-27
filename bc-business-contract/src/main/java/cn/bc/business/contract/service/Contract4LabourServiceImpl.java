@@ -111,10 +111,10 @@ public class Contract4LabourServiceImpl extends
 		}
 		if (contract4Labour.getStatus() == BCConstants.STATUS_ENABLED) {
 			// 在案时才更新
-			// 更新司机的户口性质,区域,籍贯备注
+			// 更新司机的户口性质,区域
 			this.contract4LabourDao.updateCarMan4CarManInfo(driverId,
 					contract4Labour.getHouseType(),
-					contract4Labour.getRegion(), contract4Labour.getOrigin());
+					contract4Labour.getRegion());
 		}
 		// this.contract4LabourDao.updateCarMan4Description(driverId,description);
 

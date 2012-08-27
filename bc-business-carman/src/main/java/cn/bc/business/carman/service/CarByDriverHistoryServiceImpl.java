@@ -268,6 +268,7 @@ public class CarByDriverHistoryServiceImpl extends
 								.findCarByDriverInfoByPid(entity.getId());
 						CarByDriver carByDriver = carByDriverList.get(0);
 						carByDriver.setStatus(BCConstants.STATUS_ENABLED);
+						carByDriver.setClasses(entity.getToClasses());
 						Car toCar = entity.getToCar();
 						// 如果有修改过草稿状态迁移记录的车辆就更新营运记录的车辆信息
 						if (!carByDriver.getCar().equals(toCar)) {
