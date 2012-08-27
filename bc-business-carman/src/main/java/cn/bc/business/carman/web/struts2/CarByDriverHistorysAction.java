@@ -502,7 +502,7 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 	protected Map<String, String> getBSStatuses() {
 		Map<String, String> statuses = new LinkedHashMap<String, String>();
 		statuses.put(String.valueOf(BCConstants.STATUS_ENABLED),
-				getText("bs.status.active"));
+				getText("carByDriverHistory.status.warehoused"));
 		statuses.put(String.valueOf(BCConstants.STATUS_DRAFT),
 				getText("bc.status.draft"));
 		statuses.put("", getText("bs.status.all"));

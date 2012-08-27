@@ -467,4 +467,20 @@ public class CarByDriverHistoryAction extends
 		}
 		return super.getDeleteExceptionMsg(e);
 	}
+
+	/**
+	 * 状态值转换列表：已入库|草稿|全部
+	 * 
+	 * @return
+	 */
+	protected Map<String, String> getBSStatuses3() {
+		Map<String, String> statuses = new LinkedHashMap<String, String>();
+		statuses.put(String.valueOf(BCConstants.STATUS_ENABLED),
+				getText("carByDriverHistory.status.warehoused"));
+		statuses.put(String.valueOf(BCConstants.STATUS_DRAFT),
+				getText("bc.status.draft"));
+		statuses.put("", getText("bs.status.all"));
+		return statuses;
+	}
+
 }
