@@ -605,25 +605,20 @@ public class Contract4LabourDaoImpl extends
 	}
 
 	/**
-	 * 更新指定司机的户口性质,区域,籍贯,出生日期,备注
+	 * 更新指定司机的司机id,户口性质,区域
 	 * 
 	 * @param driverId
 	 * @param houseType
 	 * @param region
-	 * @param origin
-	 * @param birthDate
-	 * @param description
 	 */
 	public void updateCarMan4CarManInfo(Long driverId, String houseType,
-			Integer region, String origin) {
+			Integer region) {
 		ArrayList<Object> args = new ArrayList<Object>();
 		StringBuffer hql = new StringBuffer();
 		hql.append("UPDATE CarMan c SET c.houseType=?,c.region=?");
-		hql.append(",c.origin=?");
 		hql.append(" WHERE c.id =?");
 		args.add(houseType);
 		args.add(region);
-		args.add(origin);
 		args.add(driverId);
 		this.executeUpdate(hql.toString(), args);
 
