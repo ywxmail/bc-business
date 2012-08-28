@@ -34,7 +34,7 @@ public class Invoice4BuyDaoImpl extends HibernateCrudJpaDao<Invoice4Buy>
 	 *         Invoice4Buy的code(startNo-endNo),如:XXXX(10001~20000)
 	 */
 	public List<Map<String, String>> findEnabled4Option() {
-		return this.find4Option(new Integer[] { BCConstants.STATUS_ENABLED},1);
+		return this.find4Option(new Integer[] { BCConstants.STATUS_ENABLED},1,null);
 	}
 	
 	/**
@@ -44,11 +44,11 @@ public class Invoice4BuyDaoImpl extends HibernateCrudJpaDao<Invoice4Buy>
 	 *         Invoice4Buy的code(startNo-endNo),如:XXXX(10001~20000)
 	 */
 	public List<Map<String, String>> findRefundEnabled4Option() {
-		return this.find4Option(new Integer[] { BCConstants.STATUS_ENABLED},2);
+		return this.find4Option(new Integer[] { BCConstants.STATUS_ENABLED},2,null);
 	}
 
 	//sell_type 销售类型，1-购买单下拉 2-退票单下拉,其它=全部
-	public List<Map<String, String>> find4Option(Integer[] statuses,int sell_type) {
+	public List<Map<String, String>> find4Option(Integer[] statuses,int sell_type,String company) {
 		String hql = "select b.id,b.code,b.start_no,b.end_no";
 				hql += ",b.company,to_char(b.buy_date,'YYYY-MM-DD') as buyDate";
 				hql += ",case b.unit_ when "+Invoice4Buy.UNIT_BEN+" then '"+Invoice4Buy.UNIT_STR_BEN;
@@ -77,6 +77,10 @@ public class Invoice4BuyDaoImpl extends HibernateCrudJpaDao<Invoice4Buy>
 		//可选退票单
 		}else if(sell_type==2){
 			hql += " and get_balancecount_invoice_buyid(b.id)<b.count_";
+		}
+		
+		if(company != null && company.length()>0){
+			hql += " and b.company='"+company+"' ";
 		}
 
 		hql += " order by b.buy_date DESC";
@@ -307,5 +311,9 @@ public class Invoice4BuyDaoImpl extends HibernateCrudJpaDao<Invoice4Buy>
 					}
 				});
 		return Integer.parseInt(l.get(0))>0;
+	}
+
+	public List<Map<String, String>> findEnabled4Option(String company) {
+		return this.find4Option(new Integer[] { BCConstants.STATUS_ENABLED},1,company);
 	}
 }

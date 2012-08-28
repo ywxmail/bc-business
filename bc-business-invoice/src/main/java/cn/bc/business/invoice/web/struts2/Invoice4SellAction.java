@@ -122,11 +122,11 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 		if (readType != null && readType.equals(Invoice4Sell.READ_TYPE_REFUND)) {
 			entity.setType(Invoice4Sell.TYPE_REFUND);
 			this.codeList = this.invoice4BuyService.findRefundEnabled4Option();
-		} else {
+		}/* else {
 			entity.setType(Invoice4Sell.TYPE_SELL);
 			// 发票代码
 			this.codeList = this.invoice4BuyService.findEnabled4Option();
-		}
+		}*/
 	}
 
 	@Override
@@ -520,6 +520,9 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 			}
 		}
 	}
+	
+	//公司
+	public String company;
 
 	// 自动加载采购单发票代码信息
 	public String autoLoadInvoice4BuyCode() {
@@ -529,7 +532,7 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 		if (readType != null && readType.equals("2")) {
 			codeListMap = invoice4BuyService.findRefundEnabled4Option();
 		} else
-			codeListMap = invoice4BuyService.findEnabled4Option();
+			codeListMap = invoice4BuyService.findEnabled4Option(company);
 
 		for (Map<String, String> codMap : codeListMap) {
 			if (codMap != null) {

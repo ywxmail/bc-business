@@ -296,4 +296,8 @@ public class Invoice4BuyServiceImpl extends DefaultCrudService<Invoice4Buy> impl
 		return this.invoice4BuyDao.isExistSellAndRefund(id);
 	}
 
+	public List<Map<String, String>> findEnabled4Option(String company) {
+		return this.invoice4BuyDao.findEnabled4Option(company);
+	}
+
 }

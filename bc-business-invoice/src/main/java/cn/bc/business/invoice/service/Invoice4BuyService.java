@@ -25,6 +25,14 @@ public interface Invoice4BuyService extends CrudService<Invoice4Buy> {
 	List<Map<String, String>> findEnabled4Option();
 	
 	/**
+	 * 根据公司，获取当前可用的采购单下拉列表信息
+	 * 
+	 * @param company 公司，例如宝城 、广发
+	 * @return
+	 */
+	List<Map<String, String>> findEnabled4Option(String company);
+	
+	/**
 	 * 获取当前可用的退票单下拉列表信息
 	 * 
 	 * @return 返回结果中的元素Map格式为：：id -- Invoice4Buy的id,
