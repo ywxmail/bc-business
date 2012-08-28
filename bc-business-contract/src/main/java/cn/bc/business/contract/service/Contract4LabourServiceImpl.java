@@ -650,7 +650,6 @@ public class Contract4LabourServiceImpl extends
 			}
 		}
 			
-		
 
 		// 生成附件
 		String ptype = Contract4Labour.ATTACH_TYPE;
@@ -660,6 +659,15 @@ public class Contract4LabourServiceImpl extends
 			logger.warn("模板不存在,返回null:code=" + templateCode);
 			return null;
 		} else {
+			
+			// 根据模板参数获取的替换值
+			Map<String, Object> mapFormatSql = new HashMap<String, Object>();
+			mapFormatSql.put("id", id);
+			Map<String, Object> mapParams = templateService.getMapParams(
+					template.getId(), mapFormatSql);
+			if (mapParams != null)
+				params.putAll(mapParams);
+			
 			if(template.getTemplateType().getCode().equals("word-docx")&&
 					template.isFormatted()){
 				// 获取文件中的${XXXX}占位标记的键名列表

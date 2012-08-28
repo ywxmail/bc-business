@@ -74,8 +74,13 @@ public class Invoice4BuyAction extends FileEntityAction<Long, Invoice4Buy> {
 
 	@Override
 	protected PageOption buildFormPageOption(boolean editable) {
-		return super.buildFormPageOption(editable).setWidth(680)
+		PageOption po = super.buildFormPageOption(editable).setWidth(680)
 				.setMinWidth(250).setMinHeight(200);
+		if (this.getE().isNew())
+			return po;
+
+		return po.setPrint("tpl:" + getText("invoice4Buy.print.key") + ":id="
+				+ this.getE().getId());
 	}
 
 	@Override
@@ -100,7 +105,7 @@ public class Invoice4BuyAction extends FileEntityAction<Long, Invoice4Buy> {
 		balanceCount = invoice4BuyService.findBalanceCountByInvoice4BuyId(
 				entity.getId()).get(0);
 
-		balanceNumber="";
+		balanceNumber = "";
 		if (Integer.parseInt(balanceCount) > 0) {
 			for (Map<String, String> bmap : invoice4BuyService
 					.findBalanceNumber(entity.getId())) {
@@ -124,7 +129,7 @@ public class Invoice4BuyAction extends FileEntityAction<Long, Invoice4Buy> {
 				* entity.getBuyPrice());
 		balanceCount = invoice4BuyService.findBalanceCountByInvoice4BuyId(
 				entity.getId()).get(0);
-		balanceNumber="";
+		balanceNumber = "";
 		if (Integer.parseInt(balanceCount) > 0) {
 			for (Map<String, String> bmap : invoice4BuyService
 					.findBalanceNumber(entity.getId())) {
@@ -197,10 +202,10 @@ public class Invoice4BuyAction extends FileEntityAction<Long, Invoice4Buy> {
 				// 检查相同发票代码的采购开始号和结束号是否出现在已保存的采购编码范围内
 				List<Map<String, String>> bnumber = this.invoice4BuyService
 						.findBalanceNumber(e.getId());
-				if(bnumber!=null&&bnumber.size()>0){
+				if (bnumber != null && bnumber.size() > 0) {
 					int firstENO = Integer.parseInt(bnumber.get(0).get("eNo"));
-					int lastSNO = Integer.parseInt(bnumber.get(bnumber.size() - 1)
-							.get("sNo"));
+					int lastSNO = Integer.parseInt(bnumber.get(
+							bnumber.size() - 1).get("sNo"));
 					if (!(sNo4Save < firstENO && eNo4Save > lastSNO)) {
 						json.put("success", false);
 						json.put("isShowBuyInfo", false);
