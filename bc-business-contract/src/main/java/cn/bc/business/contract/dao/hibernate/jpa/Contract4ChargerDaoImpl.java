@@ -878,7 +878,7 @@ public class Contract4ChargerDaoImpl extends
 		hql += " inner join bs_car_driver_history h on h.id=g.pid";
 		hql += " where h.status_ = -1";
 		//迁移类型：1-公司到公司(已注销);2-注销未有去向;4-交回未注销;9-未交证注销
-		hql += " and h.move_type in (1,4,2,9)";
+		hql += " and h.move_type not in (1,4,2,9)";
 		hql += " and e.id =?";
 		hql += ")";
 		return HibernateJpaNativeQuery.executeNativeSql(getJpaTemplate(), hql,
