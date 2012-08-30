@@ -340,12 +340,17 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 			carId2ShiftworkCarIdCondition = new LikeCondition("d.shiftwork",
 					shiftworkCarId);
 		}
-		return ConditionUtils.mix2AndCondition(
-				statusCondition,
-				carManIdCondition,
-				ConditionUtils.mix2OrCondition(carId2ToCarIdCondition,
-						oldCarIdCondition, carId2ShiftworkCarIdCondition)
-						.setAddBracket(true));
+		return ConditionUtils
+				.mix2AndCondition(
+						statusCondition,
+						carManIdCondition,
+						(carId2ToCarIdCondition != null
+								|| oldCarIdCondition != null
+								|| carId2ShiftworkCarIdCondition != null ? ConditionUtils
+								.mix2OrCondition(carId2ToCarIdCondition,
+										oldCarIdCondition,
+										carId2ShiftworkCarIdCondition)
+								.setAddBracket(true) : null));
 
 	}
 
