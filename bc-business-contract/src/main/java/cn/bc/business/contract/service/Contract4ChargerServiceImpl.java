@@ -1416,7 +1416,7 @@ public class Contract4ChargerServiceImpl extends
 			if (driverMap.get("houseType") != null
 					&& driverMap.get("houseType").length() > 0) {
 				// 收费通知单社保项目
-				Float unit = this.SocialSecurityRuleService
+				Float unit = this.SocialSecurityRuleService 
 						.countNowUnit4GZ(driverMap.get("houseType"));
 				Float personal = this.SocialSecurityRuleService
 						.countNowPersonal4GZ(driverMap.get("houseType"));
@@ -1522,6 +1522,48 @@ public class Contract4ChargerServiceImpl extends
 		params.put("returnCarDrivers", returnCardrivers);
 
 		// ----------交车司机的信息----------结束
+		
+		// ----------需要交车车辆对应的正副班司机的信息----------开始
+		List<Map<String, String>> returnDriverList = this.contract4ChargerDao
+				.findReturnDriverByContractId(c.getId());
+		// 循环变量
+		int tempCount = 1;
+		String returnDrivers = "";
+		for (Map<String, String> driverMap: returnDriverList) {	
+			if (tempCount == 1) {
+				returnDrivers = driverMap.get("name");
+				params.put("rdriver", driverMap.get("name"));
+				params.put("rdFWZGZ", driverMap.get("certFWZG"));
+				params.put("rdCert4Identity", driverMap.get("certIdentity"));
+				params.put("rdCertIdentity", driverMap.get("certIdentity"));
+				params.put(
+						"rdPhone",
+						driverMap.get("phone") != null
+								|| driverMap.get("phone").length() > 0 ? driverMap
+								.get("phone") : driverMap.get("phone1"));
+				params.put("rdAddress", driverMap.get("address"));
+			} else {
+				drivers += "、" + driverMap.get("name");
+				params.put("rdriver" + tempCount, driverMap.get("name"));
+				params.put("rdFWZGZ" + tempCount, driverMap.get("certFWZG"));
+				params.put("rdCert4Identity" + tempCount,
+						driverMap.get("certIdentity"));
+				params.put("rdCertIdentity" + tempCount,
+						driverMap.get("certIdentity"));
+				params.put(
+						"rdPhone" + tempCount,
+						driverMap.get("phone") != null
+								|| driverMap.get("phone").length() > 0 ? driverMap
+								.get("phone") : driverMap.get("phone1"));
+				params.put("rdAddress" + tempCount, driverMap.get("address"));
+			}
+			tempCount++;
+		}
+		params.put("rdrivers", returnDrivers);
+
+		// ----------需要交车车辆对应的正副班司机的信息----------结束
+				
+				
 		// word 2007 文档处理
 		if (template.getTemplateType().getCode().equals("word-docx")) {
 			// 获取文件中的${XXXX}占位标记的键名列表
