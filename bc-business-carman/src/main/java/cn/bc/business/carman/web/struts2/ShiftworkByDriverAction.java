@@ -143,7 +143,8 @@ public class ShiftworkByDriverAction extends
 	@Override
 	protected PageOption buildFormPageOption(boolean editable) {
 		return super.buildFormPageOption(editable).setWidth(430)
-				.setMinWidth(320).setMinHeight(200).setModal(true);
+				.setMinWidth(320).setMinHeight(200).setModal(true)
+				.setHelp("qianyijilu");
 
 	}
 }

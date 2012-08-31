@@ -440,19 +440,23 @@ public class CarByDriverHistoryAction extends
 		if (this.getE().getMoveType() == CarByDriverHistory.MOVETYPE_DINGBAN) {
 			if (this.getE().isNew()) {
 				return super.buildFormPageOption(editable).setWidth(430)
-						.setMinWidth(320).setMinHeight(200).setModal(true);
+						.setMinWidth(320).setMinHeight(200).setModal(true)
+						.setHelp("qianyijilu");
 			} else {
 				return super.buildFormPageOption(editable).setWidth(430)
-						.setMinWidth(320).setMinHeight(200).setModal(false);
+						.setMinWidth(320).setMinHeight(200).setModal(false)
+						.setHelp("qianyijilu");
 			}
 
 		} else {
 			if (this.getE().isNew()) {
 				return super.buildFormPageOption(editable).setWidth(745)
-						.setMinWidth(320).setMinHeight(200).setModal(true);
+						.setMinWidth(320).setMinHeight(200).setModal(true)
+						.setHelp("qianyijilu");
 			} else {
 				return super.buildFormPageOption(editable).setWidth(745)
-						.setMinWidth(320).setMinHeight(200).setModal(false);
+						.setMinWidth(320).setMinHeight(200).setModal(false)
+						.setHelp("qianyijilu");
 			}
 		}
 

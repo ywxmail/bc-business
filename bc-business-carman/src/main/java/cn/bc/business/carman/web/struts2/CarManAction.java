@@ -138,7 +138,7 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 	@Override
 	protected PageOption buildFormPageOption(boolean editable) {
 		PageOption pageOption = new PageOption().setWidth(760).setMinWidth(250)
-				.setMinHeight(200);
+				.setMinHeight(200).setHelp("sijixinxi");
 
 		if (this.useFormPrint())
 			pageOption.setPrint("default.form");
@@ -173,8 +173,9 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 
 			} else {
 				pageOption
-						.addButton(new ButtonOption(getText("label.save4Draft"),
-								null, "bc.carManForm.save"));
+						.addButton(new ButtonOption(
+								getText("label.save4Draft"), null,
+								"bc.carManForm.save"));
 				pageOption.addButton(new ButtonOption(
 						getText("label.warehousing"), null,
 						"bc.carManForm.warehousing"));
