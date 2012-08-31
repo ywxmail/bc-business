@@ -802,7 +802,7 @@ public class Contract4ChargerDaoImpl extends
 		hql += " inner join bs_car_contract c on c.contract_id=a.id";
 		hql += " inner join bs_car_driver d on d.car_id=c.car_id";
 		hql += " inner join bs_carman b on b.id=d.driver_id";
-		hql += " where d.classes in (1,2) and d.status_ in (-1,0) and a.id=?";
+		hql += " where d.classes in (0,1,2) and d.status_ in (-1,0) and a.id=?";
 		//迁移类型非 1-公司到公司(已注销);2-注销未有去向;4-交回未注销;9-未交证注销 的司机
 		hql += " and d.driver_id not in(";
 		hql += " select h.driver_id ";
@@ -869,7 +869,7 @@ public class Contract4ChargerDaoImpl extends
 		hql += " inner join bs_car_contract c on c.contract_id=a.id";
 		hql += " inner join bs_car_driver d on d.car_id=c.car_id";
 		hql += " inner join bs_carman b on b.id=d.driver_id";
-		hql += " where d.classes in (1,2) and d.status_ in (-1,0) and a.id=?";
+		hql += " where d.classes in (0,1,2) and d.status_ in (-1,0) and a.id=?";
 		hql += " and d.driver_id not in(";
 		hql += " select h.driver_id ";
 		hql += " from bs_contract e ";
@@ -965,7 +965,7 @@ public class Contract4ChargerDaoImpl extends
 
 	public int getDriverAmount(Long carId) {
 		int count = 0;
-		String sql = "select count(d.driver_id) from bs_car_driver d where d.classes in (1,2)"
+		String sql = "select count(d.driver_id) from bs_car_driver d where d.classes in (0,1,2)"
 				+ " and d.status_ in (-1,0) and d.car_id =? and d.driver_id not in"
 				+ " (select h.driver_id from bs_car_driver_history h where h.status_ = -1 and h.move_type in (1,4,2,9) and h.from_car_id =?)";
 		// String hql =
