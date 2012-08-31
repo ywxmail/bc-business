@@ -163,7 +163,7 @@ public class CarAction extends FileEntityAction<Long, Car> {
 	@Override
 	protected PageOption buildFormPageOption(boolean editable) {
 		PageOption pageOption = new PageOption().setWidth(765).setMinWidth(250)
-				.setMinHeight(200);
+				.setMinHeight(200).setHelp("cheliangxinxi");
 
 		if (this.useFormPrint())
 			pageOption.setPrint("default.form");
@@ -562,28 +562,29 @@ public class CarAction extends FileEntityAction<Long, Car> {
 		}
 		return super.getDeleteExceptionMsg(e);
 	}
-	
-	
-	//	============查找下一个月需要交车的车辆信息===开始=========
+
+	// ============查找下一个月需要交车的车辆信息===开始=========
 	public Long unitId;
-	public String findRetiredCarsOfNextMonth(){
+
+	public String findRetiredCarsOfNextMonth() {
 		JsonArray jsonArray = new JsonArray();
 		Json json = null;
-		Calendar month=Calendar.getInstance();
-		//下一个月
+		Calendar month = Calendar.getInstance();
+		// 下一个月
 		month.add(Calendar.MONTH, 1);
-		for (Map<String, Object> codMap : this.carService.findRetiredCarsOfMonth(month, unitId)) {
+		for (Map<String, Object> codMap : this.carService
+				.findRetiredCarsOfMonth(month, unitId)) {
 			if (codMap != null) {
 				json = new Json();
-				for(String key:codMap.keySet()){
+				for (String key : codMap.keySet()) {
 					json.put(key, codMap.get(key));
 				}
 				jsonArray.add(json);
 			}
 		}
-		this.json=jsonArray.toString();
+		this.json = jsonArray.toString();
 		return "json";
 	}
-	//	============查找下一个月需要交车的车辆信息===结束=========
+	// ============查找下一个月需要交车的车辆信息===结束=========
 
 }
