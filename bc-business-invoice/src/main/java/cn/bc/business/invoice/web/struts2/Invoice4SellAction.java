@@ -112,10 +112,15 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 	protected PageOption buildFormPageOption(boolean editable) {
 		PageOption po = super.buildFormPageOption(editable).setWidth(770)
 				.setMinWidth(250).setMinHeight(200);
-		if (this.getE().isNew())
-			return po;
-		return po.setPrint("tpl:" + getText("invoice4Sell.print.key") + ":id="
-				+ this.getE().getId());
+		
+		Invoice4Sell e=this.getE();
+		
+		// 查看状态为退票时
+		if ((readType != null && readType.equals(Invoice4Sell.READ_TYPE_REFUND))
+				||(e!=null && e.getType() == Invoice4Sell.TYPE_REFUND)) {
+			return po.setPrint("callback:bs.invoice4RefundForm.print");
+		} else 
+			return po.setPrint("callback:bs.invoice4SellForm.print");
 	}
 
 	@Override
