@@ -802,15 +802,15 @@ public class Contract4ChargerDaoImpl extends
 		hql += " inner join bs_car_contract c on c.contract_id=a.id";
 		hql += " inner join bs_car_driver d on d.car_id=c.car_id";
 		hql += " inner join bs_carman b on b.id=d.driver_id";
-		hql += " where d.classes in (1,2) and d.status_ in (-1,0) and a.id=?";
+		hql += " where d.classes in (0,1,2) and d.status_ in (-1,0) and a.id=?";
+		//迁移类型非 1-公司到公司(已注销);2-注销未有去向;4-交回未注销;9-未交证注销 的司机
 		hql += " and d.driver_id not in(";
 		hql += " select h.driver_id ";
 		hql += " from bs_contract e ";
 		hql += " inner join bs_car_contract f on f.contract_id=e.id ";
-		hql += " inner join bs_car_driver g on g.car_id=f.car_id";
-		hql += " inner join bs_car_driver_history h on h.id=g.pid";
+		hql += " inner join bs_car_driver_history h on h.from_car_id=f.car_id";
 		hql += " where h.status_ = -1";
-		hql += " and h.move_type in (1,4,2)";
+		hql += " and h.move_type in (1,4,2,9)";
 		hql += " and e.id =?";
 		hql += ")";
 		return HibernateJpaNativeQuery.executeNativeSql(getJpaTemplate(), hql,
@@ -862,6 +862,62 @@ public class Contract4ChargerDaoImpl extends
 					}
 				});
 	}
+	
+	public List<Map<String, String>> findReturnDriverByContractId(Long contractId) {
+		String hql = "SELECT  b.name,b.address,b.address1,b.cert_identity,b.phone,b.phone1,b.cert_fwzg";
+		hql += " from bs_contract a";
+		hql += " inner join bs_car_contract c on c.contract_id=a.id";
+		hql += " inner join bs_car_driver d on d.car_id=c.car_id";
+		hql += " inner join bs_carman b on b.id=d.driver_id";
+		hql += " where d.classes in (0,1,2) and d.status_ in (-1,0) and a.id=?";
+		hql += " and d.driver_id not in(";
+		hql += " select h.driver_id ";
+		hql += " from bs_contract e ";
+		hql += " inner join bs_car_contract f on f.contract_id=e.id ";
+		hql += " inner join bs_car_driver g on g.car_id=f.car_id";
+		hql += " inner join bs_car_driver_history h on h.id=g.pid";
+		hql += " where h.status_ = -1";
+		//迁移类型：1-公司到公司(已注销);2-注销未有去向;4-交回未注销;9-未交证注销
+		hql += " and h.move_type not in (1,4,2,9)";
+		hql += " and e.id =?";
+		hql += ")";
+		return HibernateJpaNativeQuery.executeNativeSql(getJpaTemplate(), hql,
+				new Object[] { contractId, contractId},
+				new cn.bc.db.jdbc.RowMapper<Map<String, String>>() {
+					public Map<String, String> mapRow(Object[] rs, int rowNum) {
+						Map<String, String> oi = new HashMap<String, String>();
+						int i = 0;
+						oi.put("name", rs[i++].toString());
+						Object objAddress = rs[i++];
+						if (objAddress != null) {
+							oi.put("address", objAddress.toString());
+						} else {
+							oi.put("address", "");
+						}
+						Object objAddress1 = rs[i++];
+						if (objAddress1 != null) {
+							oi.put("address1", objAddress1.toString());
+						} else {
+							oi.put("address1", "");
+						}
+						oi.put("certIdentity", rs[i++].toString());
+						Object objPhone = rs[i++];
+						if (objPhone != null) {
+							oi.put("phone", objPhone.toString());
+						} else {
+							oi.put("phone", "");
+						}
+						Object objPhone1 = rs[i++];
+						if (objPhone1 != null) {
+							oi.put("phone1", objPhone1.toString());
+						} else {
+							oi.put("phone1", "");
+						}
+						oi.put("certFWZG", rs[i++].toString());
+						return oi;
+					}
+				});
+	}
 
 	/**
 	 * 根据司机ID查找司机信息
@@ -909,9 +965,9 @@ public class Contract4ChargerDaoImpl extends
 
 	public int getDriverAmount(Long carId) {
 		int count = 0;
-		String sql = "select count(d.driver_id) from bs_car_driver d where d.classes in (1,2)"
+		String sql = "select count(d.driver_id) from bs_car_driver d where d.classes in (0,1,2)"
 				+ " and d.status_ in (-1,0) and d.car_id =? and d.driver_id not in"
-				+ " (select h.driver_id from bs_car_driver_history h where h.status_ = -1 and h.move_type in (1,4,2) and h.from_car_id =?)";
+				+ " (select h.driver_id from bs_car_driver_history h where h.status_ = -1 and h.move_type in (1,4,2,9) and h.from_car_id =?)";
 		// String hql =
 		// "select c.driver from CarByDriver c where c.car.id=? and c.classes in (1,2) and c.status in(-1,0)";
 		count = this.jdbcTemplate.queryForInt(sql,

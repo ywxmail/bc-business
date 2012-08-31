@@ -76,11 +76,7 @@ public class Invoice4BuyAction extends FileEntityAction<Long, Invoice4Buy> {
 	protected PageOption buildFormPageOption(boolean editable) {
 		PageOption po = super.buildFormPageOption(editable).setWidth(680)
 				.setMinWidth(250).setMinHeight(200);
-		if (this.getE().isNew())
-			return po;
-
-		return po.setPrint("tpl:" + getText("invoice4Buy.print.key") + ":id="
-				+ this.getE().getId());
+		return po.setPrint("callback:bs.invoice4BuyForm.print");
 	}
 
 	@Override

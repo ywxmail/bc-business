@@ -28,9 +28,11 @@ import cn.bc.business.invoice.service.Invoice4BuyService;
 import cn.bc.business.invoice.service.Invoice4SellService;
 import cn.bc.business.motorcade.service.MotorcadeService;
 import cn.bc.business.web.struts2.FileEntityAction;
+import cn.bc.identity.service.IdGeneratorService;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.option.domain.OptionItem;
 import cn.bc.option.service.OptionService;
+import cn.bc.web.formater.NubmerFormater;
 import cn.bc.web.ui.html.page.ButtonOption;
 import cn.bc.web.ui.html.page.PageOption;
 import cn.bc.web.ui.json.Json;
@@ -52,6 +54,8 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 	private Invoice4BuyService invoice4BuyService;
 	private OptionService optionService;
 	private MotorcadeService motorcadeService;
+	private IdGeneratorService idGeneratorService;
+
 	public String readType;// 查询类型，1-发票销售，2-发票退票，3，发票查询,默认null为发票销售
 
 	public Long buyerId;
@@ -90,6 +94,11 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 		this.motorcadeService = motorcadeService;
 	}
 
+	@Autowired
+	public void setIdGeneratorService(IdGeneratorService idGeneratorService) {
+		this.idGeneratorService = idGeneratorService;
+	}
+
 	@Override
 	public boolean isReadonly() {
 		// 票务管理员或系统管理员
@@ -103,10 +112,15 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 	protected PageOption buildFormPageOption(boolean editable) {
 		PageOption po = super.buildFormPageOption(editable).setWidth(770)
 				.setMinWidth(250).setMinHeight(200);
-		if (this.getE().isNew())
-			return po;
-		return po.setPrint("tpl:" + getText("invoice4Sell.print.key") + ":id="
-				+ this.getE().getId());
+		
+		Invoice4Sell e=this.getE();
+		
+		// 查看状态为退票时
+		if ((readType != null && readType.equals(Invoice4Sell.READ_TYPE_REFUND))
+				||(e!=null && e.getType() == Invoice4Sell.TYPE_REFUND)) {
+			return po.setPrint("callback:bs.invoice4RefundForm.print");
+		} else 
+			return po.setPrint("callback:bs.invoice4SellForm.print");
 	}
 
 	@Override
@@ -122,11 +136,11 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 		if (readType != null && readType.equals(Invoice4Sell.READ_TYPE_REFUND)) {
 			entity.setType(Invoice4Sell.TYPE_REFUND);
 			this.codeList = this.invoice4BuyService.findRefundEnabled4Option();
-		}/* else {
+		} else {
 			entity.setType(Invoice4Sell.TYPE_SELL);
 			// 发票代码
-			this.codeList = this.invoice4BuyService.findEnabled4Option();
-		}*/
+			// this.codeList = this.invoice4BuyService.findEnabled4Option();
+		}
 	}
 
 	@Override
@@ -283,6 +297,14 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 				}
 			}
 		}
+
+		if (e.isNew()) {
+			String type = Invoice4Sell.KEY_CODE + "." + Invoice4Sell.TYPE_SELL
+					+ "." + Calendar.getInstance().get(Calendar.YEAR);
+			NubmerFormater nf = new NubmerFormater("0000000");
+			e.setCodeNo(nf.format(this.idGeneratorService.nextValue(type)));
+		}
+
 		this.getCrudService().save(e);
 		this.afterSave(e);
 		json.put("success", true);
@@ -290,6 +312,8 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 			json.put("msg", getText("invoice.save.success.invalid"));
 		} else
 			json.put("msg", getText("form.save.success"));
+		json.put("id", e.getId());
+		json.put("codeNo", e.getCodeNo());
 		this.json = json.toString();
 		return "json";
 	}
@@ -376,6 +400,13 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 				}
 			}
 		}
+		if (e.isNew()) {
+			String type = Invoice4Sell.KEY_CODE + "."
+					+ Invoice4Sell.TYPE_REFUND + "."
+					+ Calendar.getInstance().get(Calendar.YEAR);
+			NubmerFormater nf = new NubmerFormater("0000000");
+			e.setCodeNo(nf.format(this.idGeneratorService.nextValue(type)));
+		}
 		this.getCrudService().save(e);
 		this.afterSave(e);
 		json.put("success", true);
@@ -383,6 +414,8 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 			json.put("msg", getText("invoice.save.success.invalid"));
 		} else
 			json.put("msg", getText("form.save.success"));
+		json.put("id", e.getId());
+		json.put("codeNo", e.getCodeNo());
 		this.json = json.toString();
 		return "json";
 	}
@@ -520,8 +553,8 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 			}
 		}
 	}
-	
-	//公司
+
+	// 公司
 	public String company;
 
 	// 自动加载采购单发票代码信息

@@ -289,4 +289,11 @@ public interface Contract4ChargerDao extends CrudDao<Contract4Charger> {
 	 */
 	Map<String, Object> getContractFeeInfoMapByEndDate(String stopDate,
 			Long contractId);
+	/**
+	 * 查找交车车辆的正副班司机信息
+	 * 
+	 * @param contractId
+	 * @return
+	 */
+	List<Map<String, String>> findReturnDriverByContractId(Long contractId);
 }

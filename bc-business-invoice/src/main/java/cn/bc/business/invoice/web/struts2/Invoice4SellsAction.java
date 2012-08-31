@@ -113,6 +113,7 @@ public class Invoice4SellsAction extends ViewAction<Map<String, Object>> {
 		sql.append(",bia.name as unit_name,cm.cert_fwzg as fwzg");
 		sql.append(",au.actor_name as author_name,s.file_date as file_date");
 		sql.append(",am.actor_name as modified_name,s.modified_date as modified_date,s.type_ as sellType");
+		sql.append(",s.code_no as codeNo");
 		sql.append(" from bs_invoice_sell_detail d");
 		sql.append(" inner join bs_invoice_buy b on b.id=d.buy_id");
 		sql.append(" inner join bs_invoice_sell s on s.id=d.sell_id");
@@ -167,6 +168,7 @@ public class Invoice4SellsAction extends ViewAction<Map<String, Object>> {
 				map.put("modified_name", rs[i++]); // 最后修改人
 				map.put("modified_date", rs[i++]); // 最后修改时间
 				map.put("sellType", rs[i++]); // 销售类型
+				map.put("codeNo", rs[i++]); // 流水号
 				return map;
 			}
 		});
@@ -341,6 +343,9 @@ public class Invoice4SellsAction extends ViewAction<Map<String, Object>> {
 					getText("invoice4Sell.unit"), 40).setSortable(true)
 					.setValueFormater(new KeyValueFormater(getUnits())));
 		}
+		// 流水号
+		columns.add(new TextColumn4MapKey("s.code_no", "codeNo",
+				getText("invoice.codeNo"), 65).setSortable(true));
 		columns.add(new TextColumn4MapKey("au.actor_name", "author_name",
 				getText("invoice.author"), 60));
 		columns.add(new TextColumn4MapKey("s.file_date", "file_date",
@@ -413,7 +418,7 @@ public class Invoice4SellsAction extends ViewAction<Map<String, Object>> {
 	@Override
 	protected String[] getGridSearchFields() {
 		return new String[] { "m.name", "car_plate", "s.buyer_name"
-				,"a.actor_name","d.start_no","d.end_no","au.actor_name","am.actor_name" };
+				,"a.actor_name","d.start_no","d.end_no","au.actor_name","am.actor_name","s.code_no" };
 	}
 
 	@Override
