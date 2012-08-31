@@ -68,7 +68,16 @@ public class Invoice4Sell extends FileEntityImpl {
 	private String desc;//备注
 	private int status;//状态
 	private int type;//类型
+	private String codeNo;//发票单流水号，以年计算
 	
+	
+	@Column(name = "CODE_NO")
+	public String getCodeNo() {
+		return codeNo;
+	}
+	public void setCodeNo(String codeNo) {
+		this.codeNo = codeNo;
+	}
 	@OneToMany(mappedBy = "invoice4Sell", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
 	public Set<Invoice4SellDetail> getInvoice4SellDetail() {
 		return invoice4SellDetail;
