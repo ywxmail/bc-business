@@ -501,3 +501,19 @@ BEGIN
 END;
 $BODY$
 LANGUAGE plpgsql;
+
+-- 获取指定车辆最新的经济合同车辆包修值
+-- 参数：cid - 车辆的id
+CREATE OR REPLACE FUNCTION getContract4ChargerCarmaintain(cid IN integer) RETURNS varchar AS $$
+DECLARE
+	--定义变量
+	carmaintain varchar(4000);
+BEGIN
+	select ch.car_maintain into carmaintain
+		from bs_contract_charger ch 
+			inner join bs_contract bc on bc.id=ch.id
+			inner join bs_car_contract carc on ch.id = carc.contract_id
+			where carc.car_id=cid  order by bc.file_date desc limit 1 ;
+	return carmaintain;
+END;
+$$ LANGUAGE plpgsql;
