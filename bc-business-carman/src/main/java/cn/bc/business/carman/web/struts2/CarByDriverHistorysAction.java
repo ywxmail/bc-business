@@ -288,7 +288,7 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 	@Override
 	protected PageOption getHtmlPageOption() {
 		return super.getHtmlPageOption().setWidth(900).setMinWidth(400)
-				.setHeight(400).setMinHeight(200);
+				.setHeight(400).setMinHeight(200).setHelp("qianyijilu");
 	}
 
 	@Override
