@@ -505,7 +505,7 @@ public class Contract4LabourDaoImpl extends
 				+ ",car.total_weight,car.dim_len,car.dim_width,car.dim_height,car.access_weight,car.access_count,cd.car_id FROM BS_CAR_DRIVER cd left join BS_CAR car on cd.car_id = car.id"
 				+ " where cd.driver_id="
 				+ carManId
-				+ " and cd.status_=0 order by cd.file_date DESC";
+				+ " and cd.status_ in (-1,0) order by cd.file_date DESC";
 
 		list = this.jdbcTemplate.queryForList(sql);
 
