@@ -24,7 +24,9 @@ import cn.bc.core.query.condition.Condition;
 import cn.bc.core.query.condition.Direction;
 import cn.bc.core.query.condition.impl.AndCondition;
 import cn.bc.core.query.condition.impl.EqualsCondition;
+import cn.bc.core.query.condition.impl.InCondition;
 import cn.bc.core.query.condition.impl.OrderCondition;
+import cn.bc.core.util.StringUtils;
 import cn.bc.db.jdbc.RowMapper;
 import cn.bc.db.jdbc.SqlObject;
 import cn.bc.orm.hibernate.jpa.HibernateJpaNativeQuery;
@@ -45,6 +47,7 @@ public class FindInfoByCarAction extends ActionSupport {
 	private static final long serialVersionUID = 1L;
 	private Long carId;// 车辆id
 	public String carPlate;// 车牌号，如"粤A.E1P11"，如果指定了carId将忽略该参数
+	public String status;// 迁移记录状态值
 	public Json json;// 返回的json信息
 	protected JpaTemplate jpaTemplate;
 
@@ -74,23 +77,23 @@ public class FindInfoByCarAction extends ActionSupport {
 		JsonArray drivers = new JsonArray();
 		if (infos != null && !infos.isEmpty()) {
 			Map<String, Object> first = infos.get(0);
-			//车队信息
+			// 车队信息
 			motorcade.put("id", first.get("motorcadeId"));
 			motorcade.put("name", first.get("motorcadeName"));
-			//车辆信息
+			// 车辆信息
 			car.put("id", first.get("carId"));
 			car.put("status", first.get("carStatus"));
 			car.put("plateType", first.get("carPlateType"));
 			car.put("plateNo", first.get("carPlateNo"));
 			car.put("plate",
 					first.get("carPlateType") + "." + first.get("carPlateNo"));
-			car.put("registerDate", getDateToString(first.get("carRegisterDate")));
+			car.put("registerDate",
+					getDateToString(first.get("carRegisterDate")));
 			car.put("bsType", first.get("carBsType"));
 			car.put("company", first.get("carCompany"));
 			car.put("charger", first.get("charger"));
 
-			
-			//营运司机信息
+			// 营运司机信息
 			for (Map<String, Object> info : infos) {
 				driver = new Json();
 				driver.put("id", info.get("driverId"));
@@ -101,10 +104,13 @@ public class FindInfoByCarAction extends ActionSupport {
 				driver.put("cert4IDENTITY", info.get("driverCert4IDENTITY"));
 				driver.put("origin", info.get("driverOrigin"));
 				driver.put("houseType", info.get("driverHouseType"));
-				driver.put("birthDate", getDateToString(info.get("driverBirthDate")));
-				driver.put("age", getBirthDateToString(info.get("driverBirthDate")));
-				driver.put("workDate", getDateToString(info.get("driverWorkDate")));
-				
+				driver.put("birthDate",
+						getDateToString(info.get("driverBirthDate")));
+				driver.put("age",
+						getBirthDateToString(info.get("driverBirthDate")));
+				driver.put("workDate",
+						getDateToString(info.get("driverWorkDate")));
+
 				drivers.add(driver);
 			}
 		}
@@ -124,8 +130,20 @@ public class FindInfoByCarAction extends ActionSupport {
 	private Condition getCondition() {
 		AndCondition and = new AndCondition();
 		and.add(new OrderCondition("cd.classes", Direction.Asc));
-		and.add(new EqualsCondition("cd.status_", new Integer(
-				BCConstants.STATUS_ENABLED)));
+		// 默认的迁移记录为在案状态
+		if (status == null) {
+			and.add(new EqualsCondition("cd.status_", new Integer(
+					BCConstants.STATUS_ENABLED)));
+		} else {
+			String[] ss = status.split(",");
+			if (ss.length == 1) {
+				and.add(new EqualsCondition("cd.status_", new Integer(ss[0])));
+			} else {
+				and.add(new InCondition("cd.status_", StringUtils
+						.stringArray2IntegerArray(ss)));
+			}
+
+		}
 		if (carId != null) {
 			and.add(new EqualsCondition("c.id", carId));
 		} else {
@@ -184,28 +202,30 @@ public class FindInfoByCarAction extends ActionSupport {
 		});
 		return sqlObject;
 	}
-	
-    /**
-     * 格式化日期
-     * @return
-     */
-    public String getDateToString(Object object){
-    	if(null != object){
-	    	DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-	    	StringBuffer str = new StringBuffer(df.format(object));
-	        return str.toString();
-    	}else{
-    		return "";
-    	}
-    }
-    
-    /**
-     * 计算当前岁数
-     * @return
-     */
-    public String getBirthDateToString(Object object){
-    	String birthDay = getDateToString(object);
-		if(birthDay.length() > 0){
+
+	/**
+	 * 格式化日期
+	 * 
+	 * @return
+	 */
+	public String getDateToString(Object object) {
+		if (null != object) {
+			DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+			StringBuffer str = new StringBuffer(df.format(object));
+			return str.toString();
+		} else {
+			return "";
+		}
+	}
+
+	/**
+	 * 计算当前岁数
+	 * 
+	 * @return
+	 */
+	public String getBirthDateToString(Object object) {
+		String birthDay = getDateToString(object);
+		if (birthDay.length() > 0) {
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 			Date date = new Date();
 			Date myDate = null;
@@ -214,17 +234,18 @@ public class FindInfoByCarAction extends ActionSupport {
 			} catch (ParseException e) {
 				e.printStackTrace();
 			}
-			long day = (date.getTime() - myDate.getTime())/(24*60*60*1000) + 1;
-			birthDay = new DecimalFormat("#,00").format(day/365f);
+			long day = (date.getTime() - myDate.getTime())
+					/ (24 * 60 * 60 * 1000) + 1;
+			birthDay = new DecimalFormat("#,00").format(day / 365f);
 			birthDay = birthDay.split(",")[0];
-//			//得到当前的年份
-//			String cYear = sdf.format(new Date()).substring(0,4);
-//			//得到生日年份
-//			String birthYear = birthDay.substring(0,4);
-//			//计算当前年龄
-//			int age = Integer.parseInt(cYear) - Integer.parseInt(birthYear);
-//			birthDay = age+"";
+			// //得到当前的年份
+			// String cYear = sdf.format(new Date()).substring(0,4);
+			// //得到生日年份
+			// String birthYear = birthDay.substring(0,4);
+			// //计算当前年龄
+			// int age = Integer.parseInt(cYear) - Integer.parseInt(birthYear);
+			// birthDay = age+"";
 		}
-    	return birthDay;
-    }
+		return birthDay;
+	}
 }
