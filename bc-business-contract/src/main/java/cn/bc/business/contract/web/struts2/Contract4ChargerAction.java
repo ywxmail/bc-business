@@ -123,7 +123,7 @@ public class Contract4ChargerAction extends
 	}
 
 	public boolean isEntering() {
-		// 经济合同录入管理员
+		// 经济合同草稿信息录入
 		SystemContext context = (SystemContext) this.getContext();
 		return context
 				.hasAnyRole(getText("key.role.bs.contract4charger.entering"));

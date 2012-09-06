@@ -125,7 +125,7 @@ public class Contract4LabourAction extends
 	}
 
 	public boolean isEntering() {
-		// 劳动合同录入管理员
+		// 劳动合同草稿信息录入
 		SystemContext context = (SystemContext) this.getContext();
 		return context
 				.hasAnyRole(getText("key.role.bs.contract4labour.entering"));
@@ -705,7 +705,8 @@ public class Contract4LabourAction extends
 	@Override
 	protected PageOption buildFormPageOption(boolean editable) {
 
-		PageOption pageOption = new PageOption().setWidth(740).setHelp("laodonghetong");
+		PageOption pageOption = new PageOption().setWidth(740).setHelp(
+				"laodonghetong");
 
 		if (this.useFormPrint())
 			pageOption.setPrint("default.form");
