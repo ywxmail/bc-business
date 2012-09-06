@@ -69,9 +69,15 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 	}
 
 	public boolean isEntering() {
-		// 车辆录入管理员
+		// 车辆草稿信息录入
 		SystemContext context = (SystemContext) this.getContext();
 		return context.hasAnyRole(getText("key.role.bs.car.entering"));
+	}
+
+	public boolean isCheck() {
+		// 车辆草稿信息查看
+		SystemContext context = (SystemContext) this.getContext();
+		return context.hasAnyRole(getText("key.role.bs.car.check"));
 	}
 
 	private boolean isScrapTo() {
@@ -402,7 +408,7 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 
 		// 状态单选按钮组
 		// 如果有权限的用户可以看到草稿状态的车
-		if (!isReadonly() || this.isEntering()) {
+		if (!isReadonly() || this.isEntering() || this.isCheck()) {
 			tb.addButton(Toolbar.getDefaultToolbarRadioGroup(
 					this.getBSStatuses3(), "status", 0,
 					getText("title.click2changeSearchStatus")));

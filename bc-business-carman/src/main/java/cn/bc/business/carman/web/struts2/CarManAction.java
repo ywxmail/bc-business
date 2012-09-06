@@ -72,7 +72,7 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 	}
 
 	public boolean isEntering() {
-		// 司机录入管理员
+		// 司机草稿信息录入
 		SystemContext context = (SystemContext) this.getContext();
 		return context.hasAnyRole(getText("key.role.bs.driver.entering"));
 	}

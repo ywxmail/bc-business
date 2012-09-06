@@ -78,10 +78,16 @@ public class Contract4LaboursAction extends ViewAction<Map<String, Object>> {
 	}
 
 	public boolean isEntering() {
-		// 劳动合同录入管理员
+		// 劳动合同草稿信息录入
 		SystemContext context = (SystemContext) this.getContext();
-		return !context
+		return context
 				.hasAnyRole(getText("key.role.bs.contract4labour.entering"));
+	}
+
+	public boolean isCheck() {
+		// 劳动合同草稿信息查询
+		SystemContext context = (SystemContext) this.getContext();
+		return context.hasAnyRole(getText("key.role.bs.contract4labour.check"));
 	}
 
 	@Override
@@ -101,7 +107,7 @@ public class Contract4LaboursAction extends ViewAction<Map<String, Object>> {
 		if (this.isReadonly()) {
 			// 查看按钮
 			tb.addButton(this.getDefaultOpenToolbarButton());
-			if (!this.isEntering()) {
+			if (this.isEntering()) {
 				// 新建按钮
 				tb.addButton(this.getDefaultCreateToolbarButton());
 
@@ -132,7 +138,7 @@ public class Contract4LaboursAction extends ViewAction<Map<String, Object>> {
 		}
 		// 状态单选按钮组
 		// 如果有权限的用户可以看到草稿状态的车
-		if (!isReadonly() || !this.isEntering()) {
+		if (!isReadonly() || this.isEntering() || this.isCheck()) {
 			tb.addButton(Toolbar.getDefaultToolbarRadioGroup(
 					this.getEntityStatuses2(), "status", 0,
 					getText("title.click2changeSearchStatus")));
@@ -379,15 +385,16 @@ public class Contract4LaboursAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("c.stop_date", "stop_date",
 				getText("contract.stopDate"), 120).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
-		
-		columns.add(new TextColumn4MapKey("cl.domicile_place", "domicile_place",
-				getText("contract4Labour.domicilePlace"), 150)
+
+		columns.add(new TextColumn4MapKey("cl.domicile_place",
+				"domicile_place", getText("contract4Labour.domicilePlace"), 150)
 				.setSortable(true).setUseTitleFromLabel(true));
-		columns.add(new TextColumn4MapKey("cl.cultural_degree", "cultural_degree",
-				getText("contract4Labour.culturalDegree"), 60));
-		columns.add(new TextColumn4MapKey("cl.marital_status", "marital_status",
-				getText("contract4Labour.maritalStatus"), 60));
-		
+		columns.add(new TextColumn4MapKey("cl.cultural_degree",
+				"cultural_degree", getText("contract4Labour.culturalDegree"),
+				60));
+		columns.add(new TextColumn4MapKey("cl.marital_status",
+				"marital_status", getText("contract4Labour.maritalStatus"), 60));
+
 		columns.add(new TextColumn4MapKey("c.op_type", "op_type",
 				getText("contract4Labour.op"), 40).setSortable(true)
 				.setValueFormater(new EntityStatusFormater(getEntityOpTypes())));
@@ -582,7 +589,7 @@ public class Contract4LaboursAction extends ViewAction<Map<String, Object>> {
 	public void setMotorcadeService(MotorcadeService motorcadeService) {
 		this.motorcadeService = motorcadeService;
 	}
-	
+
 	@Autowired
 	public void setOptionService(OptionService optionService) {
 		this.optionService = optionService;
@@ -602,13 +609,11 @@ public class Contract4LaboursAction extends ViewAction<Map<String, Object>> {
 		// 可选车队列表
 		motorcades = OptionItem.toLabelValues(this.motorcadeService
 				.find4Option(null));
-		
+
 		// 批量加载可选项列表
 		Map<String, List<Map<String, String>>> optionItems = this.optionService
-				.findOptionItemByGroupKeys(new String[] {
-					OptionConstants.CARMAN_HOUSETYPE
-				});
-		
+				.findOptionItemByGroupKeys(new String[] { OptionConstants.CARMAN_HOUSETYPE });
+
 		// 户口性质列表
 		this.houseTypes = OptionItem.toLabelValues(
 				optionItems.get(OptionConstants.CARMAN_HOUSETYPE), "value");

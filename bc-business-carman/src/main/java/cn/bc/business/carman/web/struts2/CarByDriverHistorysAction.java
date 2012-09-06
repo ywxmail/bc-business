@@ -74,6 +74,13 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 				getText("key.role.bc.admin"));
 	}
 
+	public boolean isCheck() {
+		// 迁移记录草稿信息查询
+		SystemContext context = (SystemContext) this.getContext();
+		return context
+				.hasAnyRole(getText("key.role.bs.driverByDriverHistory.check"));
+	}
+
 	@Override
 	protected OrderCondition getGridDefaultOrderCondition() {
 		// 默认排序方向：状态|迁移日期
@@ -489,15 +496,15 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 												"bc.business.chuLiDingBan.create"));
 
 			}
-			// 如果有权限的用户可以看到草稿状态的车
-			if (!isReadonly()) {
-				tb.addButton(Toolbar.getDefaultToolbarRadioGroup(
-						this.getBSStatuses(), "status", 0,
-						getText("title.click2changeSearchStatus")));
-
-			}
+		}
+		// 如果有权限的用户可以看到草稿状态的车
+		if (!isReadonly() || isCheck()) {
+			tb.addButton(Toolbar.getDefaultToolbarRadioGroup(
+					this.getBSStatuses(), "status", 0,
+					getText("title.click2changeSearchStatus")));
 
 		}
+
 		return tb;
 	}
 
