@@ -734,14 +734,17 @@ public class Contract4ChargerAction extends
 
 		// 加载可选签约类型
 		this.signTypeList = optionItems.get(OptionConstants.CONTRACT_SIGNTYPE);
-		if (!this.getE().isNew()
-				&& this.getE().getSignType()
-						.equals(getText("contract4Labour.optype.renew"))) {
-			OptionItem.insertIfNotExist(signTypeList,
-					getText("contract4Labour.optype.renew"),
-					getText("contract4Labour.optype.renew"));
-		}
-		// 加载可选营运性质列表
+
+//		因原旧bc数据经济合同的签约类型有"续签",新bc已经将签约类型为"续签"的数据统一改为"续约".注释于2012.9.7  何智
+//		if (!this.getE().isNew()
+//				&& this.getE().getSignType()
+//						.equals(getText("contract4Labour.optype.renew"))) {
+//			OptionItem.insertIfNotExist(signTypeList,
+//					getText("contract4Labour.optype.renew"),
+//					getText("contract4Labour.optype.renew"));
+//		}
+		
+		//加载可选营运性质列表
 		this.businessTypeList = optionItems
 				.get(OptionConstants.CAR_BUSINESS_NATURE);
 		// 加载可选合同版本号列表
