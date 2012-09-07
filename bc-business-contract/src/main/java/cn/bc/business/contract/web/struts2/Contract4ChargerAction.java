@@ -721,10 +721,9 @@ public class Contract4ChargerAction extends
 
 	// 表单可选项的加载
 	public void initSelects() {
-
 		// 批量加载可选项列表
 		Map<String, List<Map<String, String>>> optionItems = this.optionService
-				.findOptionItemByGroupKeys(new String[] {
+				.findActiveOptionItemByGroupKeys(new String[] {
 						OptionConstants.CONTRACT_SIGNTYPE,
 						OptionConstants.CAR_BUSINESS_NATURE,
 						OptionConstants.CONTRACT_VERSION_NO,
@@ -757,6 +756,22 @@ public class Contract4ChargerAction extends
 		this.carMaintainList = optionItems
 				.get(OptionConstants.CONTRACT4CHARGER_CARMAINTAIN);
 
+		// 非新建状态插入不存在的值
+		Contract4Charger e = this.getE();
+		if (!e.isNew()) {
+			OptionItem.insertIfNotExist(signTypeList, e.getSignType(),
+					e.getSignType());// 签约类型
+			OptionItem.insertIfNotExist(businessTypeList, e.getBusinessType(),
+					e.getBusinessType());// 营运性质
+			OptionItem.insertIfNotExist(paymentDates, e.getPaymentDate(),
+					e.getPaymentDate());// 缴费日
+			OptionItem.insertIfNotExist(contractVersionNoList,
+					e.getContractVersionNo(), e.getContractVersionNo());// 合同版本号
+			OptionItem.insertIfNotExist(scrapToList, e.getScrapTo(),
+					e.getScrapTo());// 残值归属
+			OptionItem.insertIfNotExist(carMaintainList, e.getCarMaintain(),
+					e.getCarMaintain());// 车辆包修
+		}
 	}
 
 	/**
