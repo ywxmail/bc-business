@@ -1169,18 +1169,6 @@ public class Contract4ChargerServiceImpl extends
 		// word-docx文档上的特殊处理，处理每月承包费的生成
 		if (cfdList.size() > 0) {
 			for (int i = 1; i < cfdList.size() + 1; i++) {
-				params.put("cfdsy" + i, DateUtils.formatCalendar(
-						cfdList.get(i - 1).getStartDate(), "yyyy"));
-				params.put("cfdsm" + i, DateUtils.formatCalendar(
-						cfdList.get(i - 1).getStartDate(), "MM"));
-				params.put("cfdsd" + i, DateUtils.formatCalendar(
-						cfdList.get(i - 1).getStartDate(), "dd"));
-				params.put("cfdey" + i, DateUtils.formatCalendar(
-						cfdList.get(i - 1).getEndDate(), "yyyy"));
-				params.put("cfdem" + i, DateUtils.formatCalendar(
-						cfdList.get(i - 1).getEndDate(), "MM"));
-				params.put("cfded" + i, DateUtils.formatCalendar(
-						cfdList.get(i - 1).getEndDate(), "dd"));
 				params.put("mycbfsy" + i, DateUtils.formatCalendar(
 						cfdList.get(i - 1).getStartDate(), "yyyy"));
 				params.put("mycbfsm" + i, DateUtils.formatCalendar(
@@ -1203,18 +1191,12 @@ public class Contract4ChargerServiceImpl extends
 			// 每月承包费不足6年时
 			if (cfdList.size() < 6) {
 				for (int i = 1; i < 6 - cfdList.size() + 1; i++) {
-					params.put("cfdsy" + (cfdList.size() + i), "　／");
-					params.put("cfdsm" + (cfdList.size() + i), "／");
-					params.put("cfdsd" + (cfdList.size() + i), "／");
-					params.put("cfdey" + (cfdList.size() + i), "　／");
-					params.put("cfdem" + (cfdList.size() + i), "／");
-					params.put("cfded" + (cfdList.size() + i), "／");
-					params.put("mycbf" + (cfdList.size() + i), "　／");
-					params.put("mycbf" + (cfdList.size() + i), "／");
-					params.put("mycbf" + (cfdList.size() + i), "／");
-					params.put("mycbf" + (cfdList.size() + i), "　／");
-					params.put("mycbf" + (cfdList.size() + i), "／");
-					params.put("mycbf" + (cfdList.size() + i), "／");
+					params.put("mycbfsy" + (cfdList.size() + i), "　／");
+					params.put("mycbfsm" + (cfdList.size() + i), "／");
+					params.put("mycbfsd" + (cfdList.size() + i), "／");
+					params.put("mycbfey" + (cfdList.size() + i), "　／");
+					params.put("mycbfem" + (cfdList.size() + i), "／");
+					params.put("mycbfed" + (cfdList.size() + i), "／");
 					params.put("mycbf" + (cfdList.size() + i), "／仟／佰／拾／");
 					params.put("mycbf4nu" + (cfdList.size() + i), "／");
 				}
