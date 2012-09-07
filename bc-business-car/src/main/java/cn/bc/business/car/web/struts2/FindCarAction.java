@@ -134,7 +134,7 @@ public class FindCarAction extends
 		} else if (status == BCConstants.STATUS_DISABLED) {
 			return getText("bs.status.logout");
 		} else if (status == BCConstants.STATUS_DRAFT) {
-			return getText("bs.status.draft");
+			return getText("bc.status.draft");
 		} else {
 			return String.valueOf(status);
 		}
