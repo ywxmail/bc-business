@@ -130,7 +130,7 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 		// entity.setBuyPrice(7F);
 		entity.setStatus(BCConstants.STATUS_ENABLED);
 		entity.setPayType(Invoice4Sell.PAY_TYPE_CASH);
-		entity.setCashierId(entity.getAuthor());
+		entity.setCashier(entity.getAuthor());
 
 		// 查看状态为退票时
 		if (readType != null && readType.equals(Invoice4Sell.READ_TYPE_REFUND)) {
@@ -138,8 +138,6 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 			this.codeList = this.invoice4BuyService.findRefundEnabled4Option();
 		} else {
 			entity.setType(Invoice4Sell.TYPE_SELL);
-			// 发票代码
-			// this.codeList = this.invoice4BuyService.findEnabled4Option();
 		}
 	}
 
@@ -281,7 +279,7 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 					if (s4s >= s4b && e4s <= e4b)
 						count++;
 				}
-				// 当在剩余号码段内的次数不等于1时，表明此销售单的范围不在在此采购单的剩余号码段。
+				// 当在剩余号码段内的次数不等于1时，表明此销售单的范围不在此采购单的剩余号码段。
 				if (count != 1) {
 					json.put("code", buy.getCode());
 					json.put("save_startNo", sd.getStartNo());
@@ -468,10 +466,10 @@ public class Invoice4SellAction extends FileEntityAction<Long, Invoice4Sell> {
 
 		// 加载可选车队列表
 		this.motorcadeList = this.motorcadeService.findEnabled4Option();
-		if (this.getE().getMotorcadeId() != null) {
+		if (this.getE().getMotorcade() != null) {
 			OptionItem.insertIfNotExist(this.motorcadeList, this.getE()
-					.getMotorcadeId().getId().toString(), this.getE()
-					.getMotorcadeId().getName());
+					.getMotorcade().getId().toString(), this.getE()
+					.getMotorcade().getName());
 		}
 
 		// 批量加载可选项列表

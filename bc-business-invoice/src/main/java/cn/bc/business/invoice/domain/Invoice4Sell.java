@@ -59,17 +59,17 @@ public class Invoice4Sell extends FileEntityImpl {
 	private String buyerName;//购买人姓名;
 	private Long carId;//车辆ID
 	private String carPlate;//车牌号码
-	private Motorcade motorcadeId;//车队ID
+	private Motorcade motorcade;//车队ID
 	private String company;//所属公司
 	private Calendar sellDate; //销售日期
-	private ActorHistory cashierId;// 收银员id
+	private ActorHistory cashier;// 收银员id
 	private Integer payType; //收款方式
 	private String bankCode; //银行流水号
 	private String desc;//备注
 	private int status;//状态
 	private int type;//类型
 	private String codeNo;//发票单流水号，以年计算
-	
+	private ActorHistory refunder;// 退票人id
 	
 	@Column(name = "CODE_NO")
 	public String getCodeNo() {
@@ -116,11 +116,11 @@ public class Invoice4Sell extends FileEntityImpl {
 	}
 	@ManyToOne(fetch = FetchType.EAGER, optional = true)
 	@JoinColumn(name = "MOTORCADE_ID", referencedColumnName = "ID")
-	public Motorcade getMotorcadeId() {
-		return motorcadeId;
+	public Motorcade getMotorcade() {
+		return motorcade;
 	}
-	public void setMotorcadeId(Motorcade motorcadeId) {
-		this.motorcadeId = motorcadeId;
+	public void setMotorcade(Motorcade motorcade) {
+		this.motorcade = motorcade;
 	}
 	public String getCompany() {
 		return company;
@@ -137,11 +137,11 @@ public class Invoice4Sell extends FileEntityImpl {
 	}
 	@ManyToOne(fetch = FetchType.EAGER, optional = true)
 	@JoinColumn(name = "CASHIER_ID", referencedColumnName = "ID")
-	public ActorHistory getCashierId() {
-		return cashierId;
+	public ActorHistory getCashier() {
+		return cashier;
 	}
-	public void setCashierId(ActorHistory cashierId) {
-		this.cashierId = cashierId;
+	public void setCashier(ActorHistory cashier) {
+		this.cashier = cashier;
 	}
 	@Column(name = "PAY_TYPE")
 	public Integer getPayType() {
@@ -180,5 +180,13 @@ public class Invoice4Sell extends FileEntityImpl {
 		this.type = type;
 	}
 	
+	@ManyToOne(fetch = FetchType.EAGER, optional = true)
+	@JoinColumn(name = "REFUNDER_ID", referencedColumnName = "ID")
+	public ActorHistory getRefunder() {
+		return refunder;
+	}
+	public void setRefunder(ActorHistory refunder) {
+		this.refunder = refunder;
+	}
 	
 }
