@@ -791,7 +791,7 @@ public class Contract4LabourAction extends
 		this.getE().setAuthor(context.getUserHistory());
 		this.getE().setFileDate(Calendar.getInstance());
 		// 如果是新建将实际停保日期设置到冗余字段
-		if (this.getE().isNew()) {
+		if (this.getE().isNew() || this.stopDate.length() > 0) {
 			this.getE().setExt_str3(this.stopDate);
 		}
 		this.json = this.contract4LabourService.doWarehousing(carId, driverId,

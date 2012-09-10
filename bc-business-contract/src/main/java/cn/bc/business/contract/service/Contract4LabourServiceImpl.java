@@ -112,9 +112,10 @@ public class Contract4LabourServiceImpl extends
 		if (contract4Labour.getStatus() == BCConstants.STATUS_ENABLED) {
 			// 在案时才更新
 			// 更新司机的户口性质,区域
-			this.contract4LabourDao.updateCarMan4CarManInfo(driverId,
-					contract4Labour.getHouseType(),
-					contract4Labour.getRegion());
+			this.contract4LabourDao
+					.updateCarMan4CarManInfo(driverId,
+							contract4Labour.getHouseType(),
+							contract4Labour.getRegion());
 		}
 		// this.contract4LabourDao.updateCarMan4Description(driverId,description);
 
@@ -565,19 +566,27 @@ public class Contract4LabourServiceImpl extends
 		Long newId = newContract.getId();
 		// 如果是新建
 		if (isNew) {
+			// 转车操作的人车关系
+			if (e.getOpType() == Contract.OPTYPE_CHANGECAR) {
+				// 处理与车辆的关联关系
+				ContractCarRelation carRelation = new ContractCarRelation(
+						e.getId(), carId);
+				this.contractDao.saveContractCarRelation(carRelation);
 
-			// 复制合同与车辆的关系
-			List<ContractCarRelation> oldCCRelations = this.contractDao
-					.findContractCarRelation(contractId);
-			if (!oldCCRelations.isEmpty()) {
-				List<ContractCarRelation> copyCCRelations = new ArrayList<ContractCarRelation>();
-				for (ContractCarRelation old : oldCCRelations) {
-					copyCCRelations.add(new ContractCarRelation(newId, old
-							.getCarId()));
+			} else {
+				// 续约操作的人车 关系
+				// 复制合同与车辆的关系
+				List<ContractCarRelation> oldCCRelations = this.contractDao
+						.findContractCarRelation(contractId);
+				if (!oldCCRelations.isEmpty()) {
+					List<ContractCarRelation> copyCCRelations = new ArrayList<ContractCarRelation>();
+					for (ContractCarRelation old : oldCCRelations) {
+						copyCCRelations.add(new ContractCarRelation(newId, old
+								.getCarId()));
+					}
+					this.contractDao.saveContractCarRelation(copyCCRelations);
 				}
-				this.contractDao.saveContractCarRelation(copyCCRelations);
 			}
-
 			// 复制合同与司机的关系：劳动合同
 			// 复制合同与责任人的关系：经济合同
 			List<ContractCarManRelation> oldCMRelations = this.contractDao
@@ -590,6 +599,7 @@ public class Contract4LabourServiceImpl extends
 				}
 				this.contractDao.saveContractCarManRelation(copyCMRelations);
 			}
+
 		}
 
 		// 返回续签的合同
@@ -636,7 +646,7 @@ public class Contract4LabourServiceImpl extends
 		// 经济合同信息
 		List<Map<String, String>> chargerList = this.contract4LabourDao
 				.findContract4ChargerByContarct4LabourId(id);
-		if(chargerList!=null&&chargerList.size()>0){
+		if (chargerList != null && chargerList.size() > 0) {
 			String signDate = chargerList.get(0).get("signDate");
 			if (signDate != null && signDate != "") {
 				params.put("chargerSignYear",
@@ -649,7 +659,6 @@ public class Contract4LabourServiceImpl extends
 						signDate.substring(signDate.lastIndexOf("-") + 1));
 			}
 		}
-			
 
 		// 生成附件
 		String ptype = Contract4Labour.ATTACH_TYPE;
@@ -659,7 +668,7 @@ public class Contract4LabourServiceImpl extends
 			logger.warn("模板不存在,返回null:code=" + templateCode);
 			return null;
 		} else {
-			
+
 			// 根据模板参数获取的替换值
 			Map<String, Object> mapFormatSql = new HashMap<String, Object>();
 			mapFormatSql.put("id", id);
@@ -667,16 +676,16 @@ public class Contract4LabourServiceImpl extends
 					template.getId(), mapFormatSql);
 			if (mapParams != null)
 				params.putAll(mapParams);
-			
-			if(template.getTemplateType().getCode().equals("word-docx")&&
-					template.isFormatted()){
+
+			if (template.getTemplateType().getCode().equals("word-docx")
+					&& template.isFormatted()) {
 				// 获取文件中的${XXXX}占位标记的键名列表
 				List<String> markers = DocxUtils.findMarkers(template
 						.getInputStream());
 				// 占位符列表与参数列表匹配,当占位符列表值没出现在参数列表key值时，增加此key值
 				for (String key : markers) {
-					if (!params.containsKey(key)) 
-						params.put(key,"　　");
+					if (!params.containsKey(key))
+						params.put(key, "　　");
 				}
 			}
 			Attach attach = template.format2Attach(params, ptype, puid);
