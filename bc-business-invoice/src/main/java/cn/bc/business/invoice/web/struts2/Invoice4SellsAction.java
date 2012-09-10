@@ -113,7 +113,7 @@ public class Invoice4SellsAction extends ViewAction<Map<String, Object>> {
 		sql.append(",bia.name as unit_name,cm.cert_fwzg as fwzg");
 		sql.append(",au.actor_name as author_name,s.file_date as file_date");
 		sql.append(",am.actor_name as modified_name,s.modified_date as modified_date,s.type_ as sellType");
-		sql.append(",s.code_no as codeNo");
+		sql.append(",s.code_no as codeNo,ar.actor_name as refunder");
 		sql.append(" from bs_invoice_sell_detail d");
 		sql.append(" inner join bs_invoice_buy b on b.id=d.buy_id");
 		sql.append(" inner join bs_invoice_sell s on s.id=d.sell_id");
@@ -123,6 +123,7 @@ public class Invoice4SellsAction extends ViewAction<Map<String, Object>> {
 		sql.append(" left join bs_carman cm on cm.id=s.buyer_id");
 		sql.append(" inner join bc_identity_actor_history au on au.id=s.author_id");
 		sql.append(" left join bc_identity_actor_history am on am.id=s.modifier_id");
+		sql.append(" left join bc_identity_actor_history ar on ar.id=s.refunder_id");
 		sqlObject.setSql(sql.toString());
 
 		// 注入参数
@@ -169,6 +170,13 @@ public class Invoice4SellsAction extends ViewAction<Map<String, Object>> {
 				map.put("modified_date", rs[i++]); // 最后修改时间
 				map.put("sellType", rs[i++]); // 销售类型
 				map.put("codeNo", rs[i++]); // 流水号
+				map.put("refunder", rs[i++]);// 退票人
+				
+				if(map.get("sellType").equals(Invoice4Sell.TYPE_SELL)){
+					map.put("s_r_name", map.get("buyer_name"));//发票查询：购买/退票人
+				}else{
+					map.put("s_r_name", map.get("refunder"));//发票查询：购买/退票人
+				}
 				return map;
 			}
 		});
@@ -258,7 +266,7 @@ public class Invoice4SellsAction extends ViewAction<Map<String, Object>> {
 		if (buyerId == null) {
 			//查看状态为查询时
 			if(readType!=null&&readType.equals(Invoice4Sell.READ_TYPE_READ)){
-				columns.add(new TextColumn4MapKey("s.buyer_name", "buyer_name",
+				columns.add(new TextColumn4MapKey("", "s_r_name",
 						getText("invoice.select.carman"), 90).setSortable(true)
 						.setValueFormater(
 								new LinkFormater4Id(this.getContextPath()
@@ -268,28 +276,20 @@ public class Invoice4SellsAction extends ViewAction<Map<String, Object>> {
 									@Override
 									public String getIdValue(Object context,
 											Object value) {
-										return StringUtils
-												.toString(((Map<String, Object>) context)
-														.get("buyer_id"));
+										Object type=((Map<String, Object>) context).get("sellType");
+										if(type.equals(Invoice4Sell.TYPE_SELL)){
+											return StringUtils
+													.toString(((Map<String, Object>) context)
+															.get("buyer_id"));
+										}else{
+											return null;
+										}
 									}
 								}));
 			//类型为退票时
 			}else if(readType!=null&&readType.equals(Invoice4Sell.READ_TYPE_REFUND)){
-				columns.add(new TextColumn4MapKey("s.buyer_name", "buyer_name",
-						getText("invoice4Refund.carman"), 60).setSortable(true)
-						.setValueFormater(
-								new LinkFormater4Id(this.getContextPath()
-										+ "/bc-business/carMan/edit?id={0}",
-										"drivers") {
-									@SuppressWarnings("unchecked")
-									@Override
-									public String getIdValue(Object context,
-											Object value) {
-										return StringUtils
-												.toString(((Map<String, Object>) context)
-														.get("buyer_id"));
-									}
-								}));
+				columns.add(new TextColumn4MapKey("ar.actor_name", "refunder",
+						getText("invoice4Refund.carman"), 60).setSortable(true));
 			}else{
 				columns.add(new TextColumn4MapKey("s.buyer_name", "buyer_name",
 						getText("invoice.buyer"), 60).setSortable(true)
@@ -417,8 +417,18 @@ public class Invoice4SellsAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected String[] getGridSearchFields() {
-		return new String[] { "m.name", "car_plate", "s.buyer_name"
-				,"a.actor_name","d.start_no","d.end_no","au.actor_name","am.actor_name","s.code_no" };
+		//查看状态为查询时
+		if(readType!=null&&readType.equals(Invoice4Sell.READ_TYPE_READ)){
+			return new String[] { "m.name", "car_plate", "s.buyer_name"
+					,"a.actor_name","d.start_no","d.end_no","au.actor_name","am.actor_name","s.code_no","ar.actor_name" };
+			//类型为退票时
+		}else if(readType!=null&&readType.equals(Invoice4Sell.READ_TYPE_REFUND)){
+			return new String[] { "m.name", "car_plate"
+					,"a.actor_name","d.start_no","d.end_no","au.actor_name","am.actor_name","s.code_no","ar.actor_name" };
+		}else{
+			return new String[] { "m.name", "car_plate", "s.buyer_name"
+					,"a.actor_name","d.start_no","d.end_no","au.actor_name","am.actor_name","s.code_no" };
+		}
 	}
 
 	@Override
