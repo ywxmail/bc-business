@@ -44,7 +44,7 @@ public class Car extends RichFileEntityImpl {
 	private String businessType;// 营运性质
 
 	private String code;// 自编号
-	private String manageNo;// 管理号
+	private Long manageNo;// 管理号
 	private String originNo;// 原车号
 	private String plateType;// 车牌归属，如“粤A”
 	private String plateNo;// 车牌号码，如“C4X74”
@@ -816,11 +816,11 @@ public class Car extends RichFileEntityImpl {
 	}
 
 	@Column(name = "MANAGE_NO")
-	public String getManageNo() {
+	public Long getManageNo() {
 		return manageNo;
 	}
 
-	public void setManageNo(String manageNo) {
+	public void setManageNo(Long manageNo) {
 		this.manageNo = manageNo;
 	}
 

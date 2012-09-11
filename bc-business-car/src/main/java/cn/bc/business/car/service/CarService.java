@@ -127,5 +127,5 @@ public interface CarService extends CrudService<Car> {
 	 *            管理号
 	 * @return
 	 */
-	Long checkManageNoIsExists(Long carId, String manageNo);
+	Long checkManageNoIsExists(Long carId, Long manageNo);
 }

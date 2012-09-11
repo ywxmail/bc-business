@@ -84,6 +84,7 @@ public class CarAction extends FileEntityAction<Long, Car> {
 	public String vinPrefix;// 车架号前缀
 	public String vinSuffix;// 车架号后缀
 	public Long carId;// 车辆Id
+	public Long manageNo;// 管理号
 
 	@Autowired
 	public void setCarService(CarService carService) {
@@ -253,11 +254,18 @@ public class CarAction extends FileEntityAction<Long, Car> {
 			existsId = this.carService.checkPlateIsExists(e.getId(),
 					e.getPlateType(), e.getPlateNo());
 		}
+		// 保存之前在案车辆管理号的唯一性检测
+		Long existsManageNo = null;
+		if (this.getE().getStatus() != BCConstants.STATUS_DISABLED) {
+			existsManageNo = this.carService.checkManageNoIsExists(this.getE()
+					.getId(), this.getE().getManageNo());
+		}
 		if (existsId != null) {
 			json.put("success", false);
 			json.put("msg", getText("car.error.plateIsExists2"));
-			this.json = json.toString();
-			return "json";
+		} else if (existsManageNo != null) {
+			json.put("success", false);
+			json.put("msg", getText("car.error.manageNoIsExists"));
 		} else {
 			// // 合并车架号的前缀和后缀
 			// this.getE().setVin(this.vinPrefix + this.vinSuffix);
@@ -267,9 +275,10 @@ public class CarAction extends FileEntityAction<Long, Car> {
 			json.put("id", e.getId());
 			json.put("success", true);
 			json.put("msg", getText("form.save.success"));
-			this.json = json.toString();
-			return "json";
 		}
+		this.json = json.toString();
+		return "json";
+
 	}
 
 	@Override
@@ -534,7 +543,6 @@ public class CarAction extends FileEntityAction<Long, Car> {
 	// ========判断车辆自编号唯一性代码结束========
 
 	// ========判断车辆管理号唯一性代码开始========
-	public String manageNo;// 管理号
 
 	public String checkManageNoIsExists() {
 		Json json = new Json();

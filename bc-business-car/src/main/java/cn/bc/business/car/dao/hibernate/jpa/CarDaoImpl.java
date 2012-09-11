@@ -411,14 +411,13 @@ public class CarDaoImpl extends HibernateCrudJpaDao<Car> implements CarDao {
 
 	public Long checkCodeIsExists(Long excludeId, String code) {
 		// 只查在案的车辆，因为新车可能沿用旧车的自编号
-		String sql = "select c.id as id from BS_CAR c where c.status_=? and c.code=?";
+		String sql = "select c.id as id from BS_CAR c where c.status_ in (-1,0) and c.code=?";
 		Object[] args;
 		if (excludeId != null) {
 			sql += " and c.id!=?";
-			args = new Object[] { new Integer(Car.CAR_STAUTS_NORMAL), code,
-					excludeId };
+			args = new Object[] { code, excludeId };
 		} else {
-			args = new Object[] { new Integer(Car.CAR_STAUTS_NORMAL), code };
+			args = new Object[] { code };
 		}
 		List<Map<String, Object>> list = this.jdbcTemplate.queryForList(sql,
 				args);
@@ -712,15 +711,14 @@ public class CarDaoImpl extends HibernateCrudJpaDao<Car> implements CarDao {
 				});
 	}
 
-	public Long checkManageNoIsExists(Long carId, String manageNo) {
-		String sql = "select c.id as id from BS_CAR c where c.status_=? and c.manage_no=?";
+	public Long checkManageNoIsExists(Long carId, Long manageNo) {
+		String sql = "select c.id as id from BS_CAR c where c.status_ in (-1,0) and c.manage_no=?";
 		Object[] args;
 		if (carId != null) {
 			sql += " and c.id!=?";
-			args = new Object[] { new Integer(Car.CAR_STAUTS_NORMAL), manageNo,
-					carId };
+			args = new Object[] { manageNo, carId };
 		} else {
-			args = new Object[] { new Integer(Car.CAR_STAUTS_NORMAL), manageNo };
+			args = new Object[] { manageNo };
 		}
 		List<Map<String, Object>> list = this.jdbcTemplate.queryForList(sql,
 				args);
