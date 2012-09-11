@@ -98,19 +98,34 @@ public interface CarService extends CrudService<Car> {
 	 * @return 如果车牌被占用，返回占用此车牌的车辆id，否则返回null
 	 */
 	Long checkPlateIsExists(Long excludeId, String plateType, String plateNo);
-	
+
 	/**
 	 * 根据状态查找车辆列表
+	 * 
 	 * @param status
 	 * @return
 	 */
 	List<Car> selectCarByStatus(Integer status);
-	
+
 	/**
 	 * 查找指定月份需要交车的信息
-	 * @param month  指定月份 Calendar类型
-	 * @param unitId 分公司id，null默认全部
+	 * 
+	 * @param month
+	 *            指定月份 Calendar类型
+	 * @param unitId
+	 *            分公司id，null默认全部
 	 * @return
 	 */
-	List<Map<String, Object>> findRetiredCarsOfMonth(Calendar month,Long unitId);
+	List<Map<String, Object>> findRetiredCarsOfMonth(Calendar month, Long unitId);
+
+	/**
+	 * 判断车辆管理号唯一
+	 * 
+	 * @param carId
+	 *            车辆Id
+	 * @param manageNo
+	 *            管理号
+	 * @return
+	 */
+	Long checkManageNoIsExists(Long carId, Long manageNo);
 }

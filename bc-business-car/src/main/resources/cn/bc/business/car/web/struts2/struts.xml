@@ -44,6 +44,7 @@
 		</action>
 		<action name="checkPlateIsExists" class="carAction" method="checkPlateIsExists"/>
 		<action name="checkCodeIsExists" class="carAction" method="checkCodeIsExists"/>
+		<action name="checkManageNoIsExists" class="carAction" method="checkManageNoIsExists"/>
 		<action name="findRetiredCarsOfNextMonth" class="carAction" method="findRetiredCarsOfNextMonth"/>
 		
 		<!-- Ajax查询车辆信息 -->
