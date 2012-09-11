@@ -83,6 +83,7 @@ public class CarAction extends FileEntityAction<Long, Car> {
 	public JSONArray carLPGList;
 	public String vinPrefix;// 车架号前缀
 	public String vinSuffix;// 车架号后缀
+	public Long carId;// 车辆Id
 
 	@Autowired
 	public void setCarService(CarService carService) {
@@ -523,6 +524,26 @@ public class CarAction extends FileEntityAction<Long, Car> {
 			json.put("id", existsId);
 			json.put("isExists", "true"); // 存在重复自编号
 			json.put("msg", getText("car.error.codeIsExists"));
+		} else {
+			json.put("isExists", "false");
+		}
+		this.json = json.toString();
+		return "json";
+	}
+
+	// ========判断车辆自编号唯一性代码结束========
+
+	// ========判断车辆管理号唯一性代码开始========
+	public String manageNo;// 管理号
+
+	public String checkManageNoIsExists() {
+		Json json = new Json();
+		Long existsId = this.carService.checkManageNoIsExists(this.carId,
+				this.manageNo);
+		if (existsId != null) {
+			// json.put("id", existsId);
+			json.put("isExists", "true"); // 存在重复管理号
+			json.put("msg", getText("car.error.manageNoIsExists"));
 		} else {
 			json.put("isExists", "false");
 		}

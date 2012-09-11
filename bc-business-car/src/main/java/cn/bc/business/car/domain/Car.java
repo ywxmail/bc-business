@@ -44,6 +44,7 @@ public class Car extends RichFileEntityImpl {
 	private String businessType;// 营运性质
 
 	private String code;// 自编号
+	private String manageNo;// 管理号
 	private String originNo;// 原车号
 	private String plateType;// 车牌归属，如“粤A”
 	private String plateNo;// 车牌号码，如“C4X74”
@@ -107,25 +108,24 @@ public class Car extends RichFileEntityImpl {
 
 	private Set<Cert> certs;// 拥有的证件
 	private Set<Contract> contracts;// 合同
-	
-	//LPG属性配置
-	private String lpgName;//专用装置供应商
-	private String lpgModel;//专用装置品牌型号
-	private String lpgGpModel;//钢瓶品牌型号
-	private String lpgGpId;//钢瓶编号
-	private Calendar lpgGpDate;//钢瓶出厂日期
-	private String lpgJcfModel;//集成阀品牌型号
-	private String lpgQhqModel;//汽化器品牌型号
-	private String lpgPsqModel;//混合/喷射器品牌型号
-	private String lpgRefitFactory;//改装厂
-	private Calendar lpgRefitDate;//改装出厂日期
-	private String lpgInsuranceId;//LPG保单号
-	private Calendar lpgInsuranceStartDate;//LPG保单开始日期
-	private Calendar lpgInsuranceEndDate;//LPG保单结束日期
-	
-	private String carTvScreen;//车载电视屏
+
+	// LPG属性配置
+	private String lpgName;// 专用装置供应商
+	private String lpgModel;// 专用装置品牌型号
+	private String lpgGpModel;// 钢瓶品牌型号
+	private String lpgGpId;// 钢瓶编号
+	private Calendar lpgGpDate;// 钢瓶出厂日期
+	private String lpgJcfModel;// 集成阀品牌型号
+	private String lpgQhqModel;// 汽化器品牌型号
+	private String lpgPsqModel;// 混合/喷射器品牌型号
+	private String lpgRefitFactory;// 改装厂
+	private Calendar lpgRefitDate;// 改装出厂日期
+	private String lpgInsuranceId;// LPG保单号
+	private Calendar lpgInsuranceStartDate;// LPG保单开始日期
+	private Calendar lpgInsuranceEndDate;// LPG保单结束日期
+
+	private String carTvScreen;// 车载电视屏
 	private String rentNo;//
-	
 
 	@ManyToOne(fetch = FetchType.EAGER, optional = false)
 	@JoinColumn(name = "MOTORCADE_ID", referencedColumnName = "ID")
@@ -769,7 +769,7 @@ public class Car extends RichFileEntityImpl {
 	public void setLpgRefitDate(Calendar lpgRefitDate) {
 		this.lpgRefitDate = lpgRefitDate;
 	}
-	
+
 	@Column(name = "LPG_INSURANCE_ID")
 	public String getLpgInsuranceId() {
 		return lpgInsuranceId;
@@ -813,6 +813,15 @@ public class Car extends RichFileEntityImpl {
 
 	public void setRentNo(String rentNo) {
 		this.rentNo = rentNo;
+	}
+
+	@Column(name = "MANAGE_NO")
+	public String getManageNo() {
+		return manageNo;
+	}
+
+	public void setManageNo(String manageNo) {
+		this.manageNo = manageNo;
 	}
 
 }

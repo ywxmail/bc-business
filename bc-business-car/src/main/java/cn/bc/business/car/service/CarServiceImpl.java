@@ -247,4 +247,8 @@ public class CarServiceImpl extends DefaultCrudService<Car> implements
 		return this.carDao.findRetiredCarsOfMonth(month, unitId);
 	}
 
+	public Long checkManageNoIsExists(Long carId, String manageNo) {
+		return this.carDao.checkManageNoIsExists(carId, manageNo);
+	}
+
 }
