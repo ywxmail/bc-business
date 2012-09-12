@@ -253,8 +253,16 @@ public class CarByDriverHistoryServiceImpl extends
 								.findCarByDriverInfo4DriverId(entity
 										.getDriver().getId());
 						// 如果存在就更新该司机的在案的营运车辆记录状态为注销
-						this.carByDriverHistoryDao.upDateCar4Driver(entity
-								.getDriver().getId());
+						if (oldCarByDrivers != null) {
+							for (CarByDriver oldAr : oldCarByDrivers) {
+								// 如果迁移记录的车辆与在案的营运记录的车辆的不一样时就更新营运班次记录为注销
+								if (!oldAr.getCar().equals(entity.getToCar())) {
+									this.carByDriverHistoryDao
+											.upDateCar4Driver(entity
+													.getDriver().getId());
+								}
+							}
+						}
 						// 如果是顶班转到新入职,车辆到车辆,由外公司迁回时，更新顶班车辆的营运司机信息
 						if (oldCarByDrivers != null) {
 							for (CarByDriver oldAr : oldCarByDrivers) {
