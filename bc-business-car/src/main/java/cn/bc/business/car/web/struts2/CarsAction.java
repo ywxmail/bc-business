@@ -185,7 +185,7 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 				.setUseTitleFromLabel(true));
 		// 分公司
 		columns.add(new TextColumn4MapKey("bia.name", "unit_name",
-				getText("label.carUnit"), 70).setSortable(true)
+				getText("label.carUnit"), 60).setSortable(true)
 				.setUseTitleFromLabel(true));
 		// 车队
 		columns.add(new TextColumn4MapKey("m.name", "motorcade_name",
@@ -205,13 +205,13 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 												.get("motorcade_id"));
 							}
 						}));
-		// 管理号
-		columns.add(new TextColumn4MapKey("c.manage_no", "manage_no",
-				getText("car.manageNo"), 55).setSortable(true)
-				.setUseTitleFromLabel(true));
 		// 自编号
 		columns.add(new TextColumn4MapKey("c.code", "code",
-				getText("car.code"), 55).setSortable(true)
+				getText("car.code"), 50).setSortable(true)
+				.setUseTitleFromLabel(true));
+		// 管理号
+		columns.add(new TextColumn4MapKey("c.manage_no", "manage_no",
+				getText("car.manageNo"), 50).setSortable(true)
 				.setUseTitleFromLabel(true));
 		// 车牌号码
 		columns.add(new TextColumn4MapKey("c.plate_no", "plate_no",
@@ -231,7 +231,7 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
 		// 营运司机
 		columns.add(new TextColumn4MapKey("c.driver", "driver",
-				getText("car.carMan"), 220)
+				getText("car.carMan"), 200)
 				.setValueFormater(new LinkFormater4DriverInfo(this
 						.getContextPath())));
 		// 责任人

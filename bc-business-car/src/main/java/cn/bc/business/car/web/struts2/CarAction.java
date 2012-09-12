@@ -264,6 +264,7 @@ public class CarAction extends FileEntityAction<Long, Car> {
 			json.put("success", false);
 			json.put("msg", getText("car.error.plateIsExists2"));
 		} else if (existsManageNo != null) {
+			//json.put("id", existsManageNo);
 			json.put("success", false);
 			json.put("msg", getText("car.error.manageNoIsExists"));
 		} else {
@@ -549,9 +550,9 @@ public class CarAction extends FileEntityAction<Long, Car> {
 		Long existsId = this.carService.checkManageNoIsExists(this.carId,
 				this.manageNo);
 		if (existsId != null) {
-			// json.put("id", existsId);
+			json.put("id", existsId);
 			json.put("isExists", "true"); // 存在重复管理号
-			json.put("msg", getText("car.error.manageNoIsExists"));
+			json.put("msg", getText("car.error.manageNoIsExists2"));
 		} else {
 			json.put("isExists", "false");
 		}
