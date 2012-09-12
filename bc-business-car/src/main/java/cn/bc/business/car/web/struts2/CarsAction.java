@@ -112,6 +112,7 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 		sql.append(",m.id as motorcade_id,c.scrap_date,c.return_date,c.fuel_type");
 		sql.append(",getContract4ChargerScrapTo(c.id) scrapto,c.modified_date,md.actor_name modifier");
 		sql.append(",getContract4ChargerCarmaintain(c.id) carmaintain,c.file_date,ad.actor_name author");
+		sql.append(",c.manage_no");
 		sql.append(" from bs_car c");
 		sql.append(" inner join bs_motorcade m on m.id=c.motorcade_id");
 		sql.append(" inner join bc_identity_actor bia on bia.id=m.unit_id");
@@ -162,6 +163,8 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 				map.put("carmaintain", rs[i++]);// 经济合同车辆包修
 				map.put("file_date", rs[i++]);
 				map.put("author", rs[i++]);
+				map.put("manage_no", rs[i++]);
+
 				return map;
 			}
 		});
@@ -202,6 +205,10 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 												.get("motorcade_id"));
 							}
 						}));
+		// 管理号
+		columns.add(new TextColumn4MapKey("c.manage_no", "manage_no",
+				getText("car.manageNo"), 55).setSortable(true)
+				.setUseTitleFromLabel(true));
 		// 自编号
 		columns.add(new TextColumn4MapKey("c.code", "code",
 				getText("car.code"), 55).setSortable(true)
