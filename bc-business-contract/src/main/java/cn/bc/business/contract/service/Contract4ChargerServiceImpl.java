@@ -548,6 +548,7 @@ public class Contract4ChargerServiceImpl extends
 		newContract.setAgreementStartDate(null);
 
 		newContract.setVerMajor(newContract.getVerMajor() + 1);// 版本号+1
+		newContract.setVerMinor(Contract.MINOR_DEFALUT);
 		if (newContract.getOpType() == Contract.OPTYPE_CHANGECHARGER
 				|| newContract.getOpType() == Contract.OPTYPE_CHANGECHARGER2) {
 			newContract.setTakebackOrigin(true);
