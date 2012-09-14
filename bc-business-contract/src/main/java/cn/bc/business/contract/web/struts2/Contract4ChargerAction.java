@@ -320,7 +320,7 @@ public class Contract4ChargerAction extends
 			this.json = json.toString();
 			return "json";
 		} else {
-			// 如果Pid不为空，且为新建的则该合同执行的是过户或生发包或续约操作
+			// 如果Pid不为空，且为新建的该合同执行的是过户或重发包或续约操作
 			if (this.getE().isNew() && this.getE().getPid() != null) {
 				// 设置最后更新人的信息
 				SystemContext context = this.getSystyemContext();
@@ -359,7 +359,11 @@ public class Contract4ChargerAction extends
 
 				// 执行基类的保存
 				this.beforeSave(e);
-
+				//将上一份经济合同的实际结束日期保存起来
+				if (e.getStatus() == BCConstants.STATUS_DRAFT
+						&& this.stopDate.length() != 0) {
+					e.setExt_str3(this.stopDate);
+				}
 				// 设置最后更新人的信息
 				SystemContext context = this.getSystyemContext();
 				e.setModifier(context.getUserHistory());
@@ -734,16 +738,16 @@ public class Contract4ChargerAction extends
 		// 加载可选签约类型
 		this.signTypeList = optionItems.get(OptionConstants.CONTRACT_SIGNTYPE);
 
-//		因原旧bc数据经济合同的签约类型有"续签",新bc已经将签约类型为"续签"的数据统一改为"续约".注释于2012.9.7  何智
-//		if (!this.getE().isNew()
-//				&& this.getE().getSignType()
-//						.equals(getText("contract4Labour.optype.renew"))) {
-//			OptionItem.insertIfNotExist(signTypeList,
-//					getText("contract4Labour.optype.renew"),
-//					getText("contract4Labour.optype.renew"));
-//		}
-		
-		//加载可选营运性质列表
+		// 因原旧bc数据经济合同的签约类型有"续签",新bc已经将签约类型为"续签"的数据统一改为"续约".注释于2012.9.7 何智
+		// if (!this.getE().isNew()
+		// && this.getE().getSignType()
+		// .equals(getText("contract4Labour.optype.renew"))) {
+		// OptionItem.insertIfNotExist(signTypeList,
+		// getText("contract4Labour.optype.renew"),
+		// getText("contract4Labour.optype.renew"));
+		// }
+
+		// 加载可选营运性质列表
 		this.businessTypeList = optionItems
 				.get(OptionConstants.CAR_BUSINESS_NATURE);
 		// 加载可选合同版本号列表
