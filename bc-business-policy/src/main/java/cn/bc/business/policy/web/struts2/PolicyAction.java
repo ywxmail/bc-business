@@ -203,6 +203,11 @@ public class PolicyAction extends FileEntityAction<Long, Policy> {
 									getText("policy.optype.edit"), null,
 									"bc.policyForm.doMaintenance")
 									.setId("policyeEdit"));
+					// 续保
+					pageOption.addButton(new ButtonOption(
+							getText("policy.optype.renewal"), null,
+							"bc.policyForm.doRenew"));
+
 					// 注销
 					pageOption.addButton(new ButtonOption(
 							getText("policy.status.disabled"), null,

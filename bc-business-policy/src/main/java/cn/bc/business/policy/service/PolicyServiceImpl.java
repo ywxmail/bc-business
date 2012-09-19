@@ -85,9 +85,15 @@ public class PolicyServiceImpl extends DefaultCrudService<Policy> implements
 		newPolicy.setBuyPlants(s);
 
 		// 设置最后修改人信息
+		// SystemContext context = SystemContextHolder.get();
+		// newPolicy.setModifier(context.getUserHistory());
+		// newPolicy.setModifiedDate(Calendar.getInstance());
+		// 设置最后创建人信息
 		SystemContext context = SystemContextHolder.get();
-		newPolicy.setModifier(context.getUserHistory());
-		newPolicy.setModifiedDate(Calendar.getInstance());
+		newPolicy.setAuthor(context.getUserHistory());
+		newPolicy.setFileDate(Calendar.getInstance());
+		newPolicy.setModifier(null);
+		newPolicy.setModifiedDate(null);
 
 		// 主版本号 加1
 		newPolicy.setVerMajor(oldPolicy.getVerMajor() + 1);
@@ -127,21 +133,20 @@ public class PolicyServiceImpl extends DefaultCrudService<Policy> implements
 		this.policyDao.save(policy);
 
 	}
-	
-	//注销
-	public void doLogout(Long policyId){
+
+	// 注销
+	public void doLogout(Long policyId) {
 		// 获取车保信息
 		Policy policy = this.policyDao.load(policyId);
 		// 设置注销日期
 		policy.setLogoutDate(Calendar.getInstance());
 		SystemContext context = SystemContextHolder.get();
-		//设置注销人
+		// 设置注销人
 		policy.setLogout(context.getUserHistory());
 		// 设置状态为注销
 		policy.setStatus(Policy.STATUS_DISABLED);
 		this.policyDao.save(policy);
 
-		
 	}
 
 	@Override
@@ -161,8 +166,7 @@ public class PolicyServiceImpl extends DefaultCrudService<Policy> implements
 		return super.save(entity);
 	}
 
-
-	public List<Policy> getPolicise(Long carId, Calendar happenTime) {	
+	public List<Policy> getPolicise(Long carId, Calendar happenTime) {
 		return this.policyDao.getPolicise(carId, happenTime);
 	}
 
