@@ -4,7 +4,7 @@
 package cn.bc.business.policy.service;
 
 import java.util.Calendar;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -73,8 +73,9 @@ public class PolicyServiceImpl extends DefaultCrudService<Policy> implements
 		newPolicy.setId(null);
 
 		// 复制承保险种
-		Set<BuyPlant> s = new HashSet<BuyPlant>();
+		Set<BuyPlant> s = new LinkedHashSet<BuyPlant>();
 		BuyPlant newBP;
+
 		for (BuyPlant oldBP : oldPolicy.getBuyPlants()) {
 			newBP = new BuyPlant();
 			BeanUtils.copyProperties(oldBP, newBP);
