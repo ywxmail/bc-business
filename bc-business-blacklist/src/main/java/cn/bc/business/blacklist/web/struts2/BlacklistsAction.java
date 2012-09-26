@@ -83,7 +83,8 @@ public class BlacklistsAction extends ViewAction<Map<String, Object>> {
 			sql.append("select b.id,b.status_,b.file_date,b.code,b.drivers,b.company,unit.name,m.name motorcade_name");
 			sql.append(",c.plate_type,c.plate_no,b.type_,b.subject,b.lock_date,l.name locker");
 			sql.append(",b.unlock_date,u.name unlocker,b.car_id,cb.man_id,md.actor_name modifier,b.modified_date");
-			sql.append(",c.return_date from BS_BLACKLIST b");
+			sql.append(",c.return_date,c.company nowCompany,nm.name nowMotorcade,nbia.name nowUnitName");
+			sql.append(" from BS_BLACKLIST b");
 			sql.append(" left join BS_CARMAN_BLACKLIST cb on cb.blacklist_id=b.id");
 			sql.append(" left join BS_CARMAN cm on cm.id=cb.man_id");
 			sql.append(" left join BS_MOTORCADE m on m.id=b.motorcade_id");
@@ -92,6 +93,9 @@ public class BlacklistsAction extends ViewAction<Map<String, Object>> {
 			sql.append(" left join BC_IDENTITY_ACTOR l on l.id=b.locker_id");
 			sql.append(" left join BC_IDENTITY_ACTOR_HISTORY md on md.id=b.modifier_id");
 			sql.append(" left join BC_IDENTITY_ACTOR u on u.id=b.unlocker_id");
+			sql.append(" left join bs_motorcade nm on nm.id=c.motorcade_id");
+			sql.append(" left join bc_identity_actor nbia on nbia.id=nm.unit_id");
+
 			sqlObject.setSql(sql.toString());
 
 			// 注入参数
@@ -130,6 +134,9 @@ public class BlacklistsAction extends ViewAction<Map<String, Object>> {
 					map.put("modifier", rs[i++]);
 					map.put("modified_date", rs[i++]);
 					map.put("return_date", rs[i++]);
+					map.put("nowCompany", rs[i++]);
+					map.put("nowMotorcade", rs[i++]);
+					map.put("nowUnitName", rs[i++]);
 
 					return map;
 				}
@@ -142,7 +149,8 @@ public class BlacklistsAction extends ViewAction<Map<String, Object>> {
 			sql.append("select b.id,b.status_,b.file_date,b.code,b.drivers,b.company,unit.name,m.name motorcade_name");
 			sql.append(",c.plate_type,c.plate_no,b.type_,b.subject,b.lock_date,l.name locker");
 			sql.append(",b.unlock_date,u.name unlocker,b.car_id,md.actor_name modifier,b.modified_date,b.appoint_date,b.conversion_type");
-			sql.append(",c.return_date,r.name relatedDepartmennts from BS_BLACKLIST b");
+			sql.append(",c.return_date,r.name relatedDepartmennts,c.company nowCompany,nm.name nowMotorcade,nbia.name nowUnitName");
+			sql.append(" from BS_BLACKLIST b");
 			sql.append(" left join BS_MOTORCADE m on m.id=b.motorcade_id");
 			sql.append(" left join bc_identity_actor unit on unit.id=m.unit_id");
 			sql.append(" left join BS_CAR c on c.id=b.car_id");
@@ -150,6 +158,9 @@ public class BlacklistsAction extends ViewAction<Map<String, Object>> {
 			sql.append(" left join BC_IDENTITY_ACTOR_HISTORY md on md.id=b.modifier_id");
 			sql.append(" left join BC_IDENTITY_ACTOR u on u.id=b.unlocker_id");
 			sql.append(" left join BC_IDENTITY_ACTOR r on r.id=b.related_departmennts_id");
+			sql.append(" left join bs_motorcade nm on nm.id=c.motorcade_id");
+			sql.append(" left join bc_identity_actor nbia on nbia.id=nm.unit_id");
+
 			sqlObject.setSql(sql.toString());
 
 			// 注入参数
@@ -190,6 +201,9 @@ public class BlacklistsAction extends ViewAction<Map<String, Object>> {
 					map.put("conversion_type", rs[i++]);
 					map.put("return_date", rs[i++]);
 					map.put("relatedDepartmennts", rs[i++]);
+					map.put("nowCompany", rs[i++]);
+					map.put("nowMotorcade", rs[i++]);
+					map.put("nowUnitName", rs[i++]);
 
 					return map;
 				}
@@ -215,15 +229,15 @@ public class BlacklistsAction extends ViewAction<Map<String, Object>> {
 				.setValueFormater(new LinkFormater4DriverInfo(this
 						.getContextPath())));
 		// 公司
-		columns.add(new TextColumn4MapKey("b.company", "company",
-				getText("label.carCompany"), 40).setSortable(true)
+		columns.add(new TextColumn4MapKey("c.company", "nowCompany",
+				getText("blacklist.company"), 50).setSortable(true)
 				.setUseTitleFromLabel(true));
 		// 分公司
-		columns.add(new TextColumn4MapKey("unit.name", "unit_name",
-				getText("label.carUnit"), 70).setSortable(true)
+		columns.add(new TextColumn4MapKey("nbia.name", "nowUnitName",
+				getText("blacklist.unit"), 70).setSortable(true)
 				.setUseTitleFromLabel(true));
 		// 车队
-		columns.add(new TextColumn4MapKey("m.name", "motorcade_name",
+		columns.add(new TextColumn4MapKey("nm.name", "nowMotorcade",
 				getText("blacklist.motorcade.name"), 60).setSortable(true));
 
 		if (carId == null) {
@@ -303,6 +317,18 @@ public class BlacklistsAction extends ViewAction<Map<String, Object>> {
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
 		columns.add(new TextColumn4MapKey("b.code", "code",
 				getText("blacklist.code"), 160).setSortable(true));
+		// 事发公司
+		columns.add(new TextColumn4MapKey("b.company", "company",
+				getText("blacklist.company4Happen"), 50).setSortable(true)
+				.setUseTitleFromLabel(true));
+		// 事发分公司
+		columns.add(new TextColumn4MapKey("unit.name", "unit_name",
+				getText("blacklist.unit4Happen"), 70).setSortable(true)
+				.setUseTitleFromLabel(true));
+		// 事发车队
+		columns.add(new TextColumn4MapKey("m.name", "motorcade_name",
+				getText("blacklist.motorcade4Happen.name"), 60)
+				.setSortable(true));
 
 		return columns;
 	}
