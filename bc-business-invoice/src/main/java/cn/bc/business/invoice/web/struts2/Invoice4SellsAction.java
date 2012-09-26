@@ -89,7 +89,7 @@ public class Invoice4SellsAction extends ViewAction<Map<String, Object>> {
 	}
 
 	@Override
-	protected LikeCondition getGridSearchCondition4OneField(String field,
+	protected Condition getGridSearchCondition4OneField(String field,
 			String value) {
 		if (field.indexOf("car_plate") != -1) {
 			return new LikeCondition(field, value != null ? value.toUpperCase()
