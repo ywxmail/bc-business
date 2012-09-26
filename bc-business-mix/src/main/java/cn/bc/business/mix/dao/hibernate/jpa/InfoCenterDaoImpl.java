@@ -83,13 +83,21 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 		if (searchType == null || searchText == null
 				|| searchType.length() == 0 || searchText.length() == 0)
 			return new JSONArray();
-
-		final String value = "%" + searchText.toUpperCase() + "%";
+		final String value;
+		// 如果是管理号查询
+		if (searchType.equals(InfoCenter.TYPE_CAR_MANAGENO)) {
+			value = searchText;
+		} else {
+			value = "%" + searchText.toUpperCase() + "%";
+		}
 		final StringBuffer sql = new StringBuffer();
 		sql.append("select distinct car.id,car.code,car.plate_type,car.plate_no,car.status_,car.return_date,car.register_date");
 		sql.append(" from bs_car car");
 		if (searchType.equals(InfoCenter.TYPE_CAR_PLATE)) {// 车牌-车牌
 			sql.append(" where car.plate_no like ?");
+			sql.append(" and car.status_ in (0,1)");
+		} else if (searchType.equals(InfoCenter.TYPE_CAR_MANAGENO)) {// 车牌-管理号
+			sql.append(" where car.manage_no = ?");
 			sql.append(" and car.status_ in (0,1)");
 		} else if (searchType.equals(InfoCenter.TYPE_CAR_CODE)) {// 车牌-自编号
 			sql.append(" where car.code like ?");
@@ -128,7 +136,16 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 			logger.debug("searchType=" + searchType + ",searchText="
 					+ searchText + ";sql=" + sql);
 		}
-		return findCars(sql, new Object[] { value });
+		// 如果是管理号查询
+		if (searchType.equals(InfoCenter.TYPE_CAR_MANAGENO)) {
+			try {
+				return findCars(sql, new Object[] { new Integer(value) });
+			} catch (NumberFormatException e) {
+				return null;
+			}
+		} else {
+			return findCars(sql, new Object[] { value });
+		}
 	}
 
 	private JSONArray findCars(final StringBuffer sql, final Object[] args) {
@@ -891,7 +908,7 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 		sql.append(",c.bs_type,c.register_date,c.operate_date,c.cert_no4");
 		sql.append(",c.taximeter_factory,c.taximeter_type,c.desc1,c.desc2,c.desc3");
 		sql.append(",c.lpg_name,c.lpg_model,c.car_tv_screen,getContract4ChargerCarmaintain(c.id)");
-		sql.append(" from bs_car c");
+		sql.append(",c.manage_no from bs_car c");
 		sql.append(" inner join bs_motorcade m on m.id=c.motorcade_id");
 		sql.append(" inner join bc_identity_actor unit on unit.id=m.unit_id");
 		sql.append(" where c.id = ?");
@@ -950,6 +967,7 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 								getLPG((String) car[i++], (String) car[i++]));
 						json.put("tv", null2Empty(car[i++]));
 						json.put("Carmaintain", null2Empty(car[i++]));
+						json.put("manageNo", null2Empty(car[i++]));
 
 						return json;
 					} catch (JSONException e) {
