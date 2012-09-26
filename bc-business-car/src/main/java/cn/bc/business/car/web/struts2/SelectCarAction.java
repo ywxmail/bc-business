@@ -58,7 +58,7 @@ public class SelectCarAction extends
 	}
 
 	@Override
-	protected LikeCondition getGridSearchCondition4OneField(String field,
+	protected Condition getGridSearchCondition4OneField(String field,
 			String value) {
 		if (field.indexOf("plate_no") != -1) {
 			return new LikeCondition(field, value != null ? value.toUpperCase()
