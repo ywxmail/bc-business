@@ -33,7 +33,7 @@ public class ManStatusComparator implements Comparator<JSONObject> {
 					} else if ("司机和责任人".equals(type2)) {
 						r = -1;
 					} else if ("司机".equals(type2)) {
-						r = 1;
+						r = -1;
 					}
 				} else if ("司机和责任人".equals(type1)) {
 					if ("责任人".equals(type2)) {
@@ -47,7 +47,7 @@ public class ManStatusComparator implements Comparator<JSONObject> {
 					if ("责任人".equals(type2)) {
 						r = 1;
 					} else if ("司机和责任人".equals(type2)) {
-						r = -1;
+						r = 1;
 					} else if ("司机".equals(type2)) {
 						r = 0;
 					}
