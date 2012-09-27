@@ -278,7 +278,7 @@ public class BlacklistAction extends FileEntityAction<Long, Blacklist> {
 
 	@Override
 	protected PageOption buildFormPageOption(boolean editable) {
-		return super.buildFormPageOption(editable).setWidth(720)
+		return super.buildFormPageOption(editable).setWidth(680)
 				.setMinWidth(250).setMinHeight(300);
 	}
 
