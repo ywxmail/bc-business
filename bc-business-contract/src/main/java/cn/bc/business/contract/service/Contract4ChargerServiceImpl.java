@@ -1345,6 +1345,8 @@ public class Contract4ChargerServiceImpl extends
 		params.put("originNo", carList.get(0).get("originNo"));
 		// 原公司
 		params.put("originCompany", carList.get(0).get("originCompany"));
+		// 管理号
+		params.put("manageNo", carList.get(0).get("manageNo"));
 
 		// 车辆迁入原信息
 		if (carList.get(0).get("originNo") == null
