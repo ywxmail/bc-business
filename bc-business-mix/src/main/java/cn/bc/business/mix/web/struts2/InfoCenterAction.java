@@ -130,10 +130,12 @@ public class InfoCenterAction extends ActionSupport {
 	private JSONArray getSearchTypes() throws JSONException {
 		JSONArray jsons = new JSONArray();
 		jsons.put(getOneSearchTypeJson("车牌", InfoCenter.TYPE_CAR_PLATE));
+		jsons.put(getOneSearchTypeJson("管理号", InfoCenter.TYPE_CAR_MANAGENO));
 		jsons.put(getOneSearchTypeJson("自编号", InfoCenter.TYPE_CAR_CODE));
 		jsons.put(getOneSearchTypeJson("发动机号", InfoCenter.TYPE_CAR_ENGINENO));
 		jsons.put(getOneSearchTypeJson("车架号", InfoCenter.TYPE_CAR_VIN));
-//		jsons.put(getOneSearchTypeJson("购置税发票号", InfoCenter.TYPE_CAR_INVOICENO));
+		// jsons.put(getOneSearchTypeJson("购置税发票号",
+		// InfoCenter.TYPE_CAR_INVOICENO));
 		jsons.put(getOneSearchTypeJson("服务资格证", InfoCenter.TYPE_MAN_CERT_FWZG));
 		jsons.put(getOneSearchTypeJson("姓名", InfoCenter.TYPE_MAN_NAME));
 		return jsons;

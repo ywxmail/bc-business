@@ -12,6 +12,8 @@ import org.springframework.stereotype.Controller;
 
 import cn.bc.BCConstants;
 import cn.bc.business.BSConstants;
+import cn.bc.core.query.condition.Condition;
+import cn.bc.core.query.condition.impl.EqualsCondition;
 import cn.bc.core.query.condition.impl.LikeCondition;
 
 /**
@@ -38,11 +40,17 @@ public abstract class ViewAction<T extends Object> extends
 	 *      java.lang.String)
 	 */
 	@Override
-	protected LikeCondition getGridSearchCondition4OneField(String field,
+	protected Condition getGridSearchCondition4OneField(String field,
 			String value) {
-		if (field.indexOf("plate_no") != -1) {
-			return new LikeCondition(field, value != null ? value.toUpperCase()
-					: value);
+		if (field.endsWith(".plate_no")) {// 车牌号
+			return buildDefaultLikeCondition(field,
+					value != null ? value.toUpperCase() : value);
+		} else if (field.endsWith(".manage_no")) {// 管理号
+			try {
+				return new EqualsCondition(field, new Integer(value));
+			} catch (NumberFormatException e) {
+				return null;
+			}
 		} else {
 			return super.getGridSearchCondition4OneField(field, value);
 		}

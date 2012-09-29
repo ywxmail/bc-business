@@ -322,7 +322,7 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 	}
 
 	@Override
-	protected LikeCondition getGridSearchCondition4OneField(String field,
+	protected Condition getGridSearchCondition4OneField(String field,
 			String value) {
 		if ("m.carinfo".equals(field)) {
 			return new LikeCondition(field, value != null ? value.toUpperCase()

@@ -221,26 +221,28 @@ public class BlacklistAction extends FileEntityAction<Long, Blacklist> {
 			this.getE().setUnlockDate(Calendar.getInstance());
 		}
 
-		// 司机与黑名单的关系
-		blacklistDriverIds = this.getDriversId(this.getE().getDrivers());
+		// // 司机与黑名单的关系[非新建]
+		if (!this.getE().isNew()) {
+			blacklistDriverIds = this.getDriversId(this.getE().getDrivers());
 
-		Set<CarMan> carMans = null;
-		if (this.blacklistDriverIds != null
-				&& this.blacklistDriverIds.length() > 0) {
-			carMans = new HashSet<CarMan>();
-			String[] driverIds = this.blacklistDriverIds.split(",");
-			CarMan carMan;
-			for (String driverId : driverIds) {
-				carMan = new CarMan();
-				carMan.setId(new Long(driverId));
-				carMans.add(carMan);
+			Set<CarMan> carMans = null;
+			if (this.blacklistDriverIds != null
+					&& this.blacklistDriverIds.length() > 0) {
+				carMans = new HashSet<CarMan>();
+				String[] driverIds = this.blacklistDriverIds.split(",");
+				CarMan carMan;
+				for (String driverId : driverIds) {
+					carMan = new CarMan();
+					carMan.setId(new Long(driverId));
+					carMans.add(carMan);
+				}
 			}
-		}
-		if (this.getE().getCarMan() != null) {
-			this.getE().getCarMan().clear();
-			this.getE().getCarMan().addAll(carMans);
-		} else {
-			this.getE().setCarMan(carMans);
+			if (this.getE().getCarMan() != null) {
+				this.getE().getCarMan().clear();
+				this.getE().getCarMan().addAll(carMans);
+			} else {
+				this.getE().setCarMan(carMans);
+			}
 		}
 
 	}
@@ -276,7 +278,7 @@ public class BlacklistAction extends FileEntityAction<Long, Blacklist> {
 
 	@Override
 	protected PageOption buildFormPageOption(boolean editable) {
-		return super.buildFormPageOption(editable).setWidth(720)
+		return super.buildFormPageOption(editable).setWidth(680)
 				.setMinWidth(250).setMinHeight(300);
 	}
 
