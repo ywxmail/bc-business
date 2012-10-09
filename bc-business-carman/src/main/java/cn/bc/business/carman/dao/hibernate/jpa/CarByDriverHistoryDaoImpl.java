@@ -32,13 +32,37 @@ public class CarByDriverHistoryDaoImpl extends
 	}
 
 	public CarByDriverHistory findNewestCar(final Long carManId) {
-		final String hql = "select c from CarByDriverHistory c  where c.driver.id = ? order by c.moveDate desc";
+		final String hql = "select c from CarByDriverHistory c  where c.driver.id = ? and c.status != -1 order by c.moveDate desc";
 		CarByDriverHistory carByDriverHistory = this.getJpaTemplate().execute(
 				new JpaCallback<CarByDriverHistory>() {
 					public CarByDriverHistory doInJpa(EntityManager em)
 							throws PersistenceException {
 						Query queryObject = em.createQuery(hql);
 						queryObject.setParameter(1, carManId);// jpa的索引号从1开始
+						getJpaTemplate().prepareQuery(queryObject);
+						queryObject.setFirstResult(0);
+						queryObject.setMaxResults(1);
+						try {
+							return (CarByDriverHistory) queryObject
+									.getSingleResult();
+						} catch (NoResultException e) {
+							return null;
+						}
+					}
+				});
+		return carByDriverHistory;
+	}
+
+	public CarByDriverHistory findNewestCarByDriverHistoryByCarId(
+			final Long carId) {
+		final String hql = "select c from CarByDriverHistory c  where (c.fromCar.id = ? or c.toCar.id = ?) and c.status != -1 order by c.moveDate desc";
+		CarByDriverHistory carByDriverHistory = this.getJpaTemplate().execute(
+				new JpaCallback<CarByDriverHistory>() {
+					public CarByDriverHistory doInJpa(EntityManager em)
+							throws PersistenceException {
+						Query queryObject = em.createQuery(hql);
+						queryObject.setParameter(1, carId);// jpa的索引号从1开始
+						queryObject.setParameter(2, carId);
 						getJpaTemplate().prepareQuery(queryObject);
 						queryObject.setFirstResult(0);
 						queryObject.setMaxResults(1);
