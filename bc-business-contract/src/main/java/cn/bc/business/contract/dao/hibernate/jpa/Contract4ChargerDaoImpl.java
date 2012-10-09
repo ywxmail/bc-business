@@ -682,6 +682,8 @@ public class Contract4ChargerDaoImpl extends
 		// 通过经营权证找原公司
 		hql += ",(select c.company from bs_car c where c.cert_no2 = b.cert_no2 and c.file_Date < b.file_Date ";
 		hql += "and c.status_ = 1 order by c.register_date Desc limit 1) as originCompany";
+		//车辆管理号
+		hql += ",b.manage_no";
 		hql += " FROM bs_car_contract a";
 		hql += " inner join bs_car b on b.id=a.car_id";
 		hql += " inner join bs_motorcade m on m.id=b.motorcade_id";
@@ -727,6 +729,12 @@ public class Contract4ChargerDaoImpl extends
 							oi.put("originCompany", objOriginCompany.toString());
 						} else {
 							oi.put("originCompany", "");
+						}
+						Object objManageNo = rs[i++];
+						if (objManageNo != null) {
+							oi.put("manageNo", objManageNo.toString());
+						} else {
+							oi.put("manageNo", "");
 						}
 						return oi;
 					}
