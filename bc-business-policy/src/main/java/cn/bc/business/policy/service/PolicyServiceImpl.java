@@ -171,4 +171,9 @@ public class PolicyServiceImpl extends DefaultCrudService<Policy> implements
 		return this.policyDao.getPolicise(carId, happenTime);
 	}
 
+	public void doLogoutPastDuePolicy() {
+
+		this.policyDao.logoutPastDuePolicy(Calendar.getInstance());
+
+	}
 }
