@@ -353,6 +353,12 @@ public class CaseBusinesssAction extends ViewAction<Map<String, Object>> {
 			return super.getGridSearchCondition4OneField(field, value);
 		}
 	}
+	
+	@Override
+	protected String getGridDblRowMethod() {
+		// 强制为只读表单
+		return "bc.page.open";
+	}
 
 	// ==高级搜索代码开始==
 	@Override

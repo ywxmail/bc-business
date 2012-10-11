@@ -257,22 +257,41 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 			pageOption.addButton(this.getDefaultPrintButtonOption());
 		}
 		
-		if (editable && !readonly) {
-			if(!getE().isNew()){
-				//生成通知单
-				pageOption.addButton(new ButtonOption(
-						"生成通知单", null,
-						"bc.caseBusinessForm.doGenNotice"));
+//		if (editable && !readonly) {
+//
+//			//特殊处理结案按钮
+//			if(CaseBase.STATUS_ACTIVE == getE().getStatus() && !getE().isNew()){
+//				ButtonOption buttonOption = new ButtonOption(getText("label.closefile"),null,"bc.caseBusinessForm.doCloseFile");
+//				buttonOption.put("id", "bcSaveDlgButton");
+//				pageOption.addButton(buttonOption);
+//			}
+//			if(CaseBase.STATUS_ACTIVE == getE().getStatus()){
+//				// 添加默认的保存按钮
+//				pageOption.addButton(this.getDefaultSaveButtonOption());
+//			}
+//		}
+		
+		if (!readonly) {
+			if(editable){
+				// 添加默认的保存按钮
+				pageOption.addButton(this.getDefaultSaveButtonOption());
+			}else{
+				if(!getE().isNew()){
+					//生成通知单
+					pageOption.addButton(new ButtonOption(
+							"生成通知单", null,
+							"bc.caseBusinessForm.doGenNotice"));
+					//维护按钮
+					pageOption.addButton(new ButtonOption(
+							getText("维护"), null,
+							"bc.caseBusinessForm.doMaintenance"));
+				}
 			}
 			//特殊处理结案按钮
 			if(CaseBase.STATUS_ACTIVE == getE().getStatus() && !getE().isNew()){
 				ButtonOption buttonOption = new ButtonOption(getText("label.closefile"),null,"bc.caseBusinessForm.doCloseFile");
 				buttonOption.put("id", "bcSaveDlgButton");
 				pageOption.addButton(buttonOption);
-			}
-			if(CaseBase.STATUS_ACTIVE == getE().getStatus()){
-				// 添加默认的保存按钮
-				pageOption.addButton(this.getDefaultSaveButtonOption());
 			}
 		}
 	}
