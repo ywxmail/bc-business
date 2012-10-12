@@ -30,7 +30,7 @@ public interface PolicyDao extends CrudDao<Policy> {
 	/**
 	 * 注销两险已过期的保单
 	 * 
-	 * @param instance当前时间
+	 * @param instance注销时间
 	 */
 	void logoutPastDuePolicy(Calendar instance);
 
