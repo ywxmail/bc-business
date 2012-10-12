@@ -46,8 +46,7 @@ public class PolicyDaoImpl extends HibernateCrudJpaDao<Policy> implements
 	}
 
 	public void logoutPastDuePolicy(Calendar instance) {
-		@SuppressWarnings("static-access")
-		String date = new DateUtils().formatCalendar2Second(instance);
+		String date = DateUtils.formatCalendar2Second(instance);
 		String insertSql = "insert into bc_log_operate (id,type_,way,file_date,author_id,ptype,pid,operate,subject,content)"
 				+ "select NEXTVAL('CORE_SEQUENCE'),0,1,to_timestamp('"
 				+ date
@@ -61,16 +60,22 @@ public class PolicyDaoImpl extends HibernateCrudJpaDao<Policy> implements
 				+ date
 				+ "','YYYY-MM-DD HH24:mi:ss') and p.status_ = 0";
 
-		this.jdbcTemplate.update(insertSql);
-		String updateSql = "update bs_car_policy set status_ = 1,logout_id = 1146,logout_date=to_timestamp('"
+		int insertCount = this.jdbcTemplate.update(insertSql);
+		if(logger.isDebugEnabled()){
+			logger.debug("insertSql=" + insertSql);
+			logger.debug("insertCount=" + insertCount);
+		}
+		String updateSql = "update bs_car_policy set status_ = 1,logout_id = ?,logout_date=to_timestamp('"
 				+ date
 				+ "','YYYY-MM-DD HH24:mi:ss')"
 				+ " where commerial_end_date < to_timestamp('"
 				+ date
 				+ "','YYYY-MM-DD HH24:mi:ss') and greenslip_end_date < to_timestamp('"
 				+ date + "','YYYY-MM-DD HH24:mi:ss') and status_ = 0";
-		this.jdbcTemplate.update(updateSql);
-
+		int updateCount = this.jdbcTemplate.update(updateSql);
+		if(logger.isDebugEnabled()){
+			logger.debug("updateSql=" + updateSql);
+			logger.debug("updateCount=" + updateCount);
+		}
 	}
-
 }
