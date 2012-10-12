@@ -193,6 +193,8 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 				new KeyValueFormater(getType())));
 		columns.add(new TextColumn4MapKey("m.name", "drvierName",
 				getText("carMan.name"), 60).setSortable(true));
+		columns.add(new TextColumn4MapKey("m.cert_fwzg", "cert_fwzg",
+				getText("carMan.cert4FWZG"), 80));
 		columns.add(new TextColumn4MapKey("m.sex", "sex",
 				getText("carMan.sex"), 40).setSortable(true).setValueFormater(
 				new SexFormater()));
@@ -248,8 +250,6 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 						}
 					}
 				}));
-		columns.add(new TextColumn4MapKey("m.cert_fwzg", "cert_fwzg",
-				getText("carMan.cert4FWZG"), 80));
 		columns.add(new TextColumn4MapKey("m.phone", "phone1",
 				getText("carMan.phone1"), 100).setSortable(false)
 				.setUseTitleFromLabel(true));
