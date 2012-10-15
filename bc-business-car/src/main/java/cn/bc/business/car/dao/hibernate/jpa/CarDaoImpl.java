@@ -596,8 +596,9 @@ public class CarDaoImpl extends HibernateCrudJpaDao<Car> implements CarDao {
 
 		// 现在
 		month.add(Calendar.YEAR, 8);
+		
 		// 半年后
-		month.add(Calendar.DAY_OF_MONTH, 5);
+		month.add(Calendar.MONTH, 6);
 		Date halfAYearLaterLastDayOfMonth = month.getTime();
 
 		sql += " and (";
@@ -617,18 +618,32 @@ public class CarDaoImpl extends HibernateCrudJpaDao<Car> implements CarDao {
 		// 商业险
 		sql += " ((d.commerial_end_date>? and d.commerial_end_date<? and c.end_date>? and c.end_date<? ) or d.status_ is null)";
 		sql += " )";
+		
+		Object[] args = new Object[] { 
+				BCConstants.STATUS_ENABLED,
+				BCConstants.STATUS_ENABLED, 
+				BCConstants.STATUS_ENABLED,
+				BCConstants.STATUS_ENABLED, 
+				fistDayOfMonth,
+				lastDayOfMonth, 				
+				fiveYearsAgoFistDayOfMonth,
+				fiveYearsAgoLastDayOfMonth,	
+				eightYearsAgoFistDayOfMonth,
+				eightYearsAgoLastDayOfMonth, 
+				fistDayOfMonth,
+				lastDayOfMonth, 
+				fistDayOfMonth,
+				halfAYearLaterLastDayOfMonth, 
+				fistDayOfMonth,
+				lastDayOfMonth, 
+				fistDayOfMonth,
+				halfAYearLaterLastDayOfMonth };
+		if(logger.isDebugEnabled()){
+			logger.debug("sql=" + sql);
+			logger.debug("args=" + args);
+		}
 		return HibernateJpaNativeQuery.executeNativeSql(getJpaTemplate(), sql,
-				new Object[] { BCConstants.STATUS_ENABLED,
-						BCConstants.STATUS_ENABLED, BCConstants.STATUS_ENABLED,
-						BCConstants.STATUS_ENABLED, fistDayOfMonth,
-						lastDayOfMonth, fiveYearsAgoLastDayOfMonth,
-						fiveYearsAgoFistDayOfMonth,
-						eightYearsAgoFistDayOfMonth,
-						eightYearsAgoLastDayOfMonth, fistDayOfMonth,
-						lastDayOfMonth, fistDayOfMonth,
-						halfAYearLaterLastDayOfMonth, fistDayOfMonth,
-						lastDayOfMonth, fistDayOfMonth,
-						halfAYearLaterLastDayOfMonth },
+				args,
 				new RowMapper<Map<String, Object>>() {
 					public Map<String, Object> mapRow(Object[] rs, int rowNum) {
 						Map<String, Object> oi = new HashMap<String, Object>();
