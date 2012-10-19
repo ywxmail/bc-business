@@ -4,6 +4,7 @@
 package cn.bc.business.carman.service;
 
 import cn.bc.business.carman.domain.CarByDriverHistory;
+import cn.bc.core.EntityImpl;
 import cn.bc.core.service.CrudService;
 
 /**
@@ -53,4 +54,13 @@ public interface CarByDriverHistoryService extends
 	 */
 	CarByDriverHistory getNeWsetCarByDriverHistory4CarAndMoveType(Long carId,
 			int movetypeZcd);
+
+	/**
+	 * 根据车辆ID获取最新的迁移记录
+	 * 
+	 * @param carId
+	 * @return
+	 */
+	CarByDriverHistory findNewestCarByDriverHistoryByCarId(Long carId);
+
 }

@@ -63,6 +63,7 @@ public class CarByDriverHistoryAction extends
 	public int moveType;
 	private MotorcadeService motorcadeService;
 	public Map<Long, String> cars;// 顶班车辆
+	public boolean isNewest = true;// 是否来最新的迁移记录
 
 	@Autowired
 	public void setMotorcadeService(MotorcadeService motorcadeService) {
@@ -215,6 +216,20 @@ public class CarByDriverHistoryAction extends
 
 	@Override
 	public String edit() throws Exception {
+		CarByDriverHistory carByDriverHistory = this.carByDriverHistoryService
+				.load(this.getId());
+		// 判断该迁移记录是否最新的迁移记录[排除转车队的]
+		if (carByDriverHistory.getMoveType() != CarByDriverHistory.MOVETYPE_ZCD) {
+			if (!this.getId().equals(
+					this.carByDriverHistoryService
+							.findNewestCarByDriverHistory(
+									carByDriverHistory.getDriver().getId())
+							.getId())) {
+				// 如果编辑的迁移记录不是最新的标记
+				isNewest = false;
+			}
+
+		}
 		super.edit();
 		return this.getFormName(this.getE().getMoveType());
 	}
@@ -280,7 +295,24 @@ public class CarByDriverHistoryAction extends
 	@Override
 	protected void buildFormPageButtons(PageOption pageOption, boolean editable) {
 		boolean readonly = this.isReadonly();
+		boolean isExistEditButton = true;
+		// 如果是编辑历史的转车队迁移记录
+		if (this.getId() != null) {
+			CarByDriverHistory carByDriverHistory = this.carByDriverHistoryService
+					.load(this.getId());
+			if (carByDriverHistory.getMoveType() == CarByDriverHistory.MOVETYPE_ZCD) {
+				if (!this
+						.getId()
+						.equals(this.carByDriverHistoryService
+								.findNewestCarByDriverHistoryByCarId(
+										carByDriverHistory.getFromCar().getId())
+								.getId())) {
+					// 如果编辑的迁移记录不是最新的标记
+					isExistEditButton = false;
+				}
 
+			}
+		}
 		if (editable) {// edit,create
 			// 添加默认的保存按钮
 			// 如果是草稿状态的，有保存和入库两个按钮
@@ -301,7 +333,7 @@ public class CarByDriverHistoryAction extends
 			}
 			// }
 		} else {// open
-			if (!readonly) {
+			if (!readonly && isExistEditButton) {
 				pageOption.addButton(new ButtonOption(
 						getText("carByDriverHistory.optype.doMaintenance"),
 						null,

@@ -35,20 +35,27 @@ public interface PolicyService extends CrudService<Policy> {
 	 */
 	void doSurrender(Long policyId, Calendar surrenderDate);
 
-	
 	/**
 	 * 注销处理：记录不变
 	 * 
-	 * @param policyId  原车保id
+	 * @param policyId
+	 *            原车保id
 	 */
 	void doLogout(Long policyId);
-	
+
 	/**
 	 * 获取相关保单
 	 * 
-	 * @param carId		车辆ID
-	 * @param happenTime 事故发生时间
+	 * @param carId
+	 *            车辆ID
+	 * @param happenTime
+	 *            事故发生时间
 	 * @return
 	 */
-	List<Policy> getPolicise(Long carId,Calendar happenTime);
+	List<Policy> getPolicise(Long carId, Calendar happenTime);
+
+	/**
+	 * 注销商业险和强制险都过期的保单[保险日期小于运行方法的当前时间]
+	 */
+	void doLogoutPastDuePolicy();
 }

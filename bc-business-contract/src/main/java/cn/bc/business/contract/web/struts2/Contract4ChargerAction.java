@@ -359,7 +359,7 @@ public class Contract4ChargerAction extends
 
 				// 执行基类的保存
 				this.beforeSave(e);
-				//将上一份经济合同的实际结束日期保存起来
+				// 将上一份经济合同的实际结束日期保存起来
 				if (e.getStatus() == BCConstants.STATUS_DRAFT
 						&& this.stopDate.length() != 0) {
 					e.setExt_str3(this.stopDate);
@@ -766,17 +766,15 @@ public class Contract4ChargerAction extends
 		// 非新建状态插入不存在的值
 		Contract4Charger e = this.getE();
 		if (!e.isNew()) {
-			OptionItem.insertIfNotExist(signTypeList, e.getSignType(),
-					e.getSignType());// 签约类型
-			OptionItem.insertIfNotExist(businessTypeList, e.getBusinessType(),
+			OptionItem.insertIfNotExist(signTypeList, null, e.getSignType());// 签约类型
+			OptionItem.insertIfNotExist(businessTypeList, null,
 					e.getBusinessType());// 营运性质
 			OptionItem.insertIfNotExist(paymentDates, e.getPaymentDate(),
 					e.getPaymentDate());// 缴费日
 			OptionItem.insertIfNotExist(contractVersionNoList,
 					e.getContractVersionNo(), e.getContractVersionNo());// 合同版本号
-			OptionItem.insertIfNotExist(scrapToList, e.getScrapTo(),
-					e.getScrapTo());// 残值归属
-			OptionItem.insertIfNotExist(carMaintainList, e.getCarMaintain(),
+			OptionItem.insertIfNotExist(scrapToList, null, e.getScrapTo());// 残值归属
+			OptionItem.insertIfNotExist(carMaintainList, null,
 					e.getCarMaintain());// 车辆包修
 		}
 	}

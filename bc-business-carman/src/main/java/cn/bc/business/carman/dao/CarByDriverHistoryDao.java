@@ -95,4 +95,12 @@ public interface CarByDriverHistoryDao extends CrudDao<CarByDriverHistory> {
 	CarByDriverHistory findNeWsetCarByDriverHistory4CarAndMoveType(Long carId,
 			int movety);
 
+	/**
+	 * 根据车辆Id获取最新的迁移记录
+	 * 
+	 * @param carId
+	 * @return
+	 */
+	CarByDriverHistory findNewestCarByDriverHistoryByCarId(Long carId);
+
 }
