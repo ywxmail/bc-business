@@ -225,7 +225,7 @@ public class BlacklistsAction extends ViewAction<Map<String, Object>> {
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
 		// 营运司机
 		columns.add(new TextColumn4MapKey("b.drivers", "drivers",
-				getText("blacklist.driver"), 220)
+				getText("blacklist.driver"), 160)
 				.setValueFormater(new LinkFormater4DriverInfo(this
 						.getContextPath())));
 		// 公司
