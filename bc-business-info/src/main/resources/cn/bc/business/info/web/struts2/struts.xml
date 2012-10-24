@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<!-- 公共 -->
+	<package name="info" extends="bc-default" namespace="/bc-business/info">
+		<action name="doIssue" class="infoAction" method="doIssue"/>
+		<action name="doDisabled" class="infoAction" method="doDisabled"/>
+	</package>
+	<!-- 公司文件 -->
+	<package name="companyFile" extends="bc-default" namespace="/bc-business/info/companyFile">
+		<action name="create" class="companyFileAction" method="create">
+			<result name="form">/bc-business/info/companyFile/form.jsp</result>
+		</action>
+		<action name="edit" class="companyFileAction" method="edit">
+			<result name="form">/bc-business/info/companyFile/form.jsp</result>
+		</action>
+		<action name="open" class="companyFileAction" method="open">
+			<result name="formr">/bc-business/info/companyFile/formr.jsp</result>
+		</action>
+		<action name="save" class="companyFileAction" method="save"/>
+		<action name="issue" class="companyFileAction" method="issue"/>
+		<action name="delete" class="companyFileAction" method="delete"/>
+	</package>
+	<package name="companyFiles" extends="bc-default" namespace="/bc-business/info/companyFiles">
+		<!-- 删除 -->
+		<action name="delete" class="companyFilesAction" method="delete" />
+		<!-- 非分页视图 -->
+		<action name="list" class="companyFilesAction" method="list" />
+		<!-- 分页视图 -->
+		<action name="paging" class="companyFilesAction" method="paging" />
+		<!-- 分页数据 -->
+		<action name="data" class="companyFilesAction" method="data" />
+		<!-- 导出 视图数据-->
+		<action name="export" class="companyFilesAction" method="export" />
+	</package>
+</struts>
