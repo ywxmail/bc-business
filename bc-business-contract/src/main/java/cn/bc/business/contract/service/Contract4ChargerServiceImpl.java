@@ -1528,7 +1528,7 @@ public class Contract4ChargerServiceImpl extends
 								.get("phone") : driverMap.get("phone1"));
 				params.put("rdAddress", driverMap.get("address"));
 			} else {
-				drivers += "、" + driverMap.get("name");
+				returnDrivers += "、" + driverMap.get("name");
 				params.put("rdriver" + tempCount, driverMap.get("name"));
 				params.put("rdFWZGZ" + tempCount, driverMap.get("certFWZG"));
 				params.put("rdCert4Identity" + tempCount,
