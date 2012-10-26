@@ -144,7 +144,7 @@ public class InfoAction extends FileEntityAction<Long, Info> implements
 		attachsUI = buildAttachsUI(false, true);
 
 		// 状态描述
-		typeDesc = this.getTypes().get(String.valueOf(this.getE().getType()));
+		typeDesc = this.getTypes().get(String.valueOf(e.getType()));
 
 		// 状态描述
 		statusDesc = this.getStatuses().get(

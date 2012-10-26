@@ -20,9 +20,6 @@
 			<param name="customType">0</param>
 			<param name="customRole">BS_COMPANYFILE_MANAGE</param>
 		</action>
-		<action name="delete" class="infoAction" method="delete">
-			<param name="customRole">BS_COMPANYFILE_MANAGE</param>
-		</action>
 		<action name="edit" class="infoAction" method="edit">
 			<result name="form">/bc-business/info/form.jsp</result>
 			<param name="customRole">BS_COMPANYFILE_MANAGE</param>
@@ -30,13 +27,6 @@
 	</package>
 	<!-- 公司文件：普通用户视图 -->
 	<package name="companyFiles" extends="bc-default" namespace="/bc-business/info/companyFiles">
-		<!-- 非分页视图 -->
-		<action name="list" class="infosAction" method="list">
-			<param name="viewType">0</param>
-			<param name="customName">companyFile</param>
-			<param name="customType">0</param>
-			<param name="customRole">BS_COMPANYFILE_MANAGE</param>
-		</action>
 		<!-- 分页视图 -->
 		<action name="paging" class="infosAction" method="paging">
 			<param name="viewType">0</param>
@@ -61,20 +51,6 @@
 	</package>
 	<!-- 公司文件：管理端视图 -->
 	<package name="companyFilesManage" extends="bc-default" namespace="/bc-business/info/companyFilesManage">
-		<!-- 删除 -->
-		<action name="delete" class="infosAction" method="delete" >
-			<param name="viewType">1</param>
-			<param name="customName">companyFile</param>
-			<param name="customType">0</param>
-			<param name="customRole">BS_COMPANYFILE_MANAGE</param>
-		</action>
-		<!-- 非分页视图 -->
-		<action name="list" class="infosAction" method="list" >
-			<param name="viewType">1</param>
-			<param name="customName">companyFile</param>
-			<param name="customType">0</param>
-			<param name="customRole">BS_COMPANYFILE_MANAGE</param>
-		</action>
 		<!-- 分页视图 -->
 		<action name="paging" class="infosAction" method="paging" >
 			<param name="viewType">1</param>
@@ -103,30 +79,16 @@
 		<action name="create" class="infoAction" method="create">
 			<result name="form">/bc-business/info/form.jsp</result>
 			<param name="customType">1</param>
-			<param name="customRole">BS_COMPANYFILE_MANAGE</param>
+			<param name="customRole">BS_REGULATION_MANAGE</param>
 		</action>
 		<action name="edit" class="infoAction" method="edit">
 			<result name="form">/bc-business/info/form.jsp</result>
 			<param name="customType">1</param>
-			<param name="customRole">BS_COMPANYFILE_MANAGE</param>
+			<param name="customRole">BS_REGULATION_MANAGE</param>
 		</action>
-		<action name="open" class="infoAction" method="open">
-			<result name="formr">/bc-business/info/formr.jsp</result>
-			<param name="customType">1</param>
-			<param name="customRole">BS_COMPANYFILE_MANAGE</param>
-		</action>
-		<action name="save" class="infoAction" method="save"/>
-		<action name="delete" class="infoAction" method="delete"/>
 	</package>
 	<!-- 法规文件：普通用户视图 -->
 	<package name="regulations" extends="bc-default" namespace="/bc-business/info/regulations">
-		<!-- 非分页视图 -->
-		<action name="list" class="infosAction" method="list">
-			<param name="viewType">0</param>
-			<param name="customName">regulation</param>
-			<param name="customType">1</param>
-			<param name="customRole">BS_REGULATION_MANAGE</param>
-		</action>
 		<!-- 分页视图 -->
 		<action name="paging" class="infosAction" method="paging">
 			<param name="viewType">0</param>
@@ -151,20 +113,6 @@
 	</package>
 	<!-- 法规文件：管理端视图 -->
 	<package name="regulationsManage" extends="bc-default" namespace="/bc-business/info/regulationsManage">
-		<!-- 删除 -->
-		<action name="delete" class="infosAction" method="delete" >
-			<param name="viewType">1</param>
-			<param name="customName">regulation</param>
-			<param name="customType">1</param>
-			<param name="customRole">BS_REGULATION_MANAGE</param>
-		</action>
-		<!-- 非分页视图 -->
-		<action name="list" class="infosAction" method="list" >
-			<param name="viewType">1</param>
-			<param name="customName">regulation</param>
-			<param name="customType">1</param>
-			<param name="customRole">BS_REGULATION_MANAGE</param>
-		</action>
 		<!-- 分页视图 -->
 		<action name="paging" class="infosAction" method="paging" >
 			<param name="viewType">1</param>
@@ -185,6 +133,68 @@
 			<param name="customName">regulation</param>
 			<param name="customType">1</param>
 			<param name="customRole">BS_REGULATION_MANAGE</param>
+		</action>
+	</package>
+		
+	<!-- 通知：表单 -->
+	<package name="notice" extends="bc-default" namespace="/bc-business/info/notice">
+		<action name="create" class="infoAction" method="create">
+			<result name="form">/bc-business/info/form.jsp</result>
+			<param name="customType">2</param>
+			<param name="customRole">BS_NOTICE_MANAGE</param>
+		</action>
+		<action name="edit" class="infoAction" method="edit">
+			<result name="form">/bc-business/info/form.jsp</result>
+			<param name="customType">2</param>
+			<param name="customRole">BS_NOTICE_MANAGE</param>
+		</action>
+	</package>
+	<!-- 通知：普通用户视图 -->
+	<package name="notices" extends="bc-default" namespace="/bc-business/info/notices">
+		<!-- 分页视图 -->
+		<action name="paging" class="infosAction" method="paging">
+			<param name="viewType">0</param>
+			<param name="customName">notice</param>
+			<param name="customType">2</param>
+			<param name="customRole">BS_NOTICE_MANAGE</param>
+		</action>
+		<!-- 分页数据 -->
+		<action name="data" class="infosAction" method="data">
+			<param name="viewType">0</param>
+			<param name="customName">notice</param>
+			<param name="customType">2</param>
+			<param name="customRole">BS_NOTICE_MANAGE</param>
+		</action>
+		<!-- 导出 视图数据-->
+		<action name="export" class="infosAction" method="export">
+			<param name="viewType">0</param>
+			<param name="customName">notice</param>
+			<param name="customType">2</param>
+			<param name="customRole">BS_NOTICE_MANAGE</param>
+		</action>
+	</package>
+	<!-- 通知：管理端视图 -->
+	<package name="noticesManage" extends="bc-default" namespace="/bc-business/info/noticesManage">
+		<!-- 分页视图 -->
+		<action name="paging" class="infosAction" method="paging" >
+			<param name="viewType">1</param>
+			<param name="customName">notice</param>
+			<param name="customType">2</param>
+			<param name="customRole">BS_NOTICE_MANAGE</param>
+		</action>
+		<!-- 分页数据 -->
+		<action name="data" class="infosAction" method="data" >
+			<param name="viewType">1</param>
+			<param name="customName">notice</param>
+			<param name="customType">2</param>
+			<param name="customRole">BS_NOTICE_MANAGE</param>
+		</action>
+		<!-- 导出 视图数据-->
+		<action name="export" class="infosAction" method="export" >
+			<param name="viewType">1</param>
+			<param name="customName">notice</param>
+			<param name="customType">2</param>
+			<param name="customRole">BS_NOTICE_MANAGE</param>
 		</action>
 	</package>
 </struts>
