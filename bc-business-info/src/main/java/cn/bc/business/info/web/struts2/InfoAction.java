@@ -16,7 +16,6 @@ import org.springframework.stereotype.Controller;
 import cn.bc.business.info.domain.Info;
 import cn.bc.business.info.service.InfoService;
 import cn.bc.business.web.struts2.FileEntityAction;
-import cn.bc.core.exception.CoreException;
 import cn.bc.docs.service.AttachService;
 import cn.bc.docs.web.ui.html.AttachWidget;
 import cn.bc.identity.service.IdGeneratorService;
@@ -41,6 +40,11 @@ public class InfoAction extends FileEntityAction<Long, Info> implements
 	protected AttachService attachService;
 	protected InfoService infoService;
 	public String statusDesc;
+	public String typeDesc;
+
+	// 以下变量通过Struts的xml配置文件进行配置
+	public int customType = Info.TYPE_COMPANYGILE;// 默认的信息类型
+	public String customRole;// 管理者的角色编码，多个用逗号连接
 
 	public InfoAction() {
 		super();
@@ -63,19 +67,15 @@ public class InfoAction extends FileEntityAction<Long, Info> implements
 		this.idGeneratorService = idGeneratorService;
 	}
 
-	/**
-	 * 信息类型
-	 * 
-	 * @return
-	 */
-	protected int getType() {
-		throw new CoreException("unimplement method.");
-	}
-
 	@Override
 	public boolean isReadonly() {
 		SystemContext context = (SystemContext) this.getContext();
-		return !context.hasAnyRole("BC_ADMIN");
+		String roles;
+		if (customRole == null || customRole.length() == 0)
+			roles = "BC_ADMIN";
+		else
+			roles = customRole + ",BC_ADMIN";
+		return !context.hasAnyOneRole(roles);
 	}
 
 	@Override
@@ -86,15 +86,19 @@ public class InfoAction extends FileEntityAction<Long, Info> implements
 		e.setSendDate(e.getFileDate());// 发布日期默认等于创建日期
 		e.setSource(context.getBelong().getName());// 来源默认等于当前用户所属部门
 		e.setAuthor(context.getUserHistory());
-
 		e.setStatus(Info.STATUS_DRAFT);
-
 		e.setUid(this.idGeneratorService.next("info.uid"));
-
-		e.setType(getType());
+		e.setType(this.customType);
 
 		// 构建附件控件
 		attachsUI = buildAttachsUI(true, false);
+
+		// 状态描述
+		typeDesc = this.getTypes().get(String.valueOf(this.getE().getType()));
+
+		// 状态描述
+		statusDesc = this.getStatuses().get(
+				String.valueOf(this.getE().getStatus()));
 	}
 
 	@Override
@@ -116,9 +120,75 @@ public class InfoAction extends FileEntityAction<Long, Info> implements
 		// 管理员
 		if (!this.isReadonly()) {
 			option.addButton(new ButtonOption(getText("label.preview"), null,
-					"bs.companyFileForm.preview"));
+					"bs.infoForm.preview"));
 			option.addButton(this.getDefaultSaveButtonOption());
 		}
+	}
+
+	public AttachWidget attachsUI;
+
+	@Override
+	protected void afterEdit(Info entity) {
+		// 构建附件控件
+		attachsUI = buildAttachsUI(false, false);
+
+		// 状态描述
+		typeDesc = this.getTypes().get(String.valueOf(this.getE().getType()));
+	}
+
+	@Override
+	protected void afterOpen(Info e) {
+		this.customType = e.getType();
+		
+		// 构建附件控件
+		attachsUI = buildAttachsUI(false, true);
+
+		// 状态描述
+		typeDesc = this.getTypes().get(String.valueOf(this.getE().getType()));
+
+		// 状态描述
+		statusDesc = this.getStatuses().get(
+				String.valueOf(this.getE().getStatus()));
+	}
+
+	protected AttachWidget buildAttachsUI(boolean isNew, boolean forceReadonly) {
+		// 构建附件控件
+		String ptype = "info.main";
+		String puid = this.getE().getUid();
+		boolean readonly = forceReadonly ? true : this.isReadonly();
+		AttachWidget attachsUI = AttachWidget.defaultAttachWidget(isNew,
+				readonly, isFlashUpload(), this.attachService, ptype, puid);
+
+		// 上传附件的限制
+		attachsUI.addExtension(getText("app.attachs.extensions"))
+				.setMaxCount(Integer.parseInt(getText("app.attachs.maxCount")))
+				.setMaxSize(Integer.parseInt(getText("app.attachs.maxSize")));
+
+		return attachsUI;
+	}
+
+	private Map<String, String> getTypes() {
+		Map<String, String> types = new LinkedHashMap<String, String>();
+		types.put(String.valueOf(Info.TYPE_COMPANYGILE), getText("companyFile"));
+		types.put(String.valueOf(Info.TYPE_REGULATION), getText("regulation"));
+		types.put(String.valueOf(Info.TYPE_NOTICE), getText("notice"));
+		return types;
+	}
+
+	/**
+	 * 获取状态值转换列表
+	 * 
+	 * @return
+	 */
+	public Map<String, String> getStatuses() {
+		Map<String, String> statuses = new LinkedHashMap<String, String>();
+		statuses.put(String.valueOf(Info.STATUS_DRAFT),
+				getText("info.status.draft"));
+		statuses.put(String.valueOf(Info.STATUS_ISSUED),
+				getText("info.status.issued"));
+		statuses.put(String.valueOf(Info.STATUS_DISABLED),
+				getText("info.status.disadled"));
+		return statuses;
 	}
 
 	// 发布
@@ -151,62 +221,5 @@ public class InfoAction extends FileEntityAction<Long, Info> implements
 		}
 		this.json = json.toString();
 		return "json";
-	}
-
-	public AttachWidget attachsUI;
-
-	@Override
-	protected void afterEdit(Info entity) {
-		// 构建附件控件
-		attachsUI = buildAttachsUI(false, false);
-	}
-
-	public String typeDesc;
-
-	@Override
-	protected void afterOpen(Info e) {
-		// 构建附件控件
-		attachsUI = buildAttachsUI(false, true);
-	}
-
-	protected AttachWidget buildAttachsUI(boolean isNew, boolean forceReadonly) {
-		// 构建附件控件
-		String ptype = "info.main";
-		String puid = this.getE().getUid();
-		boolean readonly = forceReadonly ? true : this.isReadonly();
-		AttachWidget attachsUI = AttachWidget.defaultAttachWidget(isNew,
-				readonly, isFlashUpload(), this.attachService, ptype, puid);
-
-		// 上传附件的限制
-		attachsUI.addExtension(getText("app.attachs.extensions"))
-				.setMaxCount(Integer.parseInt(getText("app.attachs.maxCount")))
-				.setMaxSize(Integer.parseInt(getText("app.attachs.maxSize")));
-
-		return attachsUI;
-	}
-
-	@Override
-	protected void initForm(boolean editable) throws Exception {
-		super.initForm(editable);
-
-		// 状态描述
-		statusDesc = this.getStatuses().get(
-				String.valueOf(this.getE().getStatus()));
-	}
-
-	/**
-	 * 获取状态值转换列表
-	 * 
-	 * @return
-	 */
-	public Map<String, String> getStatuses() {
-		Map<String, String> statuses = new LinkedHashMap<String, String>();
-		statuses.put(String.valueOf(Info.STATUS_DRAFT),
-				getText("info.status.draft"));
-		statuses.put(String.valueOf(Info.STATUS_ISSUED),
-				getText("info.status.issued"));
-		statuses.put(String.valueOf(Info.STATUS_DISABLED),
-				getText("info.status.disadled"));
-		return statuses;
 	}
 }

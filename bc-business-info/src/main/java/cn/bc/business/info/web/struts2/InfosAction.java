@@ -18,6 +18,7 @@ import cn.bc.business.web.struts2.ViewAction;
 import cn.bc.core.query.condition.Condition;
 import cn.bc.core.query.condition.ConditionUtils;
 import cn.bc.core.query.condition.Direction;
+import cn.bc.core.query.condition.impl.EqualsCondition;
 import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.db.jdbc.RowMapper;
 import cn.bc.db.jdbc.SqlObject;
@@ -29,6 +30,7 @@ import cn.bc.web.ui.html.grid.Column;
 import cn.bc.web.ui.html.grid.IdColumn4MapKey;
 import cn.bc.web.ui.html.grid.TextColumn4MapKey;
 import cn.bc.web.ui.html.page.HtmlPage;
+import cn.bc.web.ui.html.page.ListPage;
 import cn.bc.web.ui.html.page.PageOption;
 import cn.bc.web.ui.html.toolbar.Toolbar;
 import cn.bc.web.ui.html.toolbar.ToolbarButton;
@@ -41,7 +43,7 @@ import cn.bc.web.ui.html.toolbar.ToolbarButton;
  */
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 @Controller
-public abstract class InfosAction extends ViewAction<Map<String, Object>> {
+public class InfosAction extends ViewAction<Map<String, Object>> {
 	private static final long serialVersionUID = 1L;
 	/** 视图类型：信息查阅视图 */
 	public static final int VT_READ = 0;
@@ -49,14 +51,12 @@ public abstract class InfosAction extends ViewAction<Map<String, Object>> {
 	public static final int VT_MANAGE = 1;
 
 	public String status;// 要查看的状态，多个值间用逗号连接
-	public int viewType = 0;// 视图类型：0-信息查阅视图，1-管理端视图
 
-	/**
-	 * 信息类型
-	 * 
-	 * @return
-	 */
-	protected abstract int getType();
+	// 以下变量通过Struts的xml配置文件进行配置
+	public String customName = "info";// 表单名
+	public int customType = Info.TYPE_COMPANYGILE;// 默认的信息类型
+	public String customRole;// 管理者的角色编码，多个用逗号连接
+	public int viewType = 0;// 视图类型：0-信息查阅视图，1-管理端视图
 
 	@Override
 	protected String getHtmlPageNamespace() {
@@ -65,14 +65,32 @@ public abstract class InfosAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected HtmlPage buildHtmlPage() {
-		return super.buildHtmlPage().setNamespace(
-				getHtmlPageNamespace() + "/" + getViewActionName()
-						+ (canUseManageView() ? "Manage" : ""));
+		ListPage p = (ListPage) super.buildHtmlPage();
+		p.setNamespace(getHtmlPageNamespace() + "/" + getViewActionName()
+				+ (canUseManageView() ? "Manage" : ""));
+		p.setAttr("data-infoType", String.valueOf(this.customType));
+		return p;
 	}
 
 	@Override
 	protected String getFormActionName() {
-		return "info";
+		return customName;
+	}
+
+	@Override
+	protected String getOpenUrl() {
+		return getHtmlPageNamespace() + "/open";
+	}
+
+	@Override
+	public boolean isReadonly() {
+		SystemContext context = (SystemContext) this.getContext();
+		String roles;
+		if (customRole == null || customRole.length() == 0)
+			roles = "BC_ADMIN";
+		else
+			roles = customRole + ",BC_ADMIN";
+		return !context.hasAnyOneRole(roles);
 	}
 
 	@Override
@@ -90,12 +108,6 @@ public abstract class InfosAction extends ViewAction<Map<String, Object>> {
 					+ this.getText("info.manage");
 		else
 			return this.getText(this.getFormActionName() + ".title");
-	}
-
-	@Override
-	public boolean isReadonly() {
-		SystemContext context = (SystemContext) this.getContext();
-		return !context.hasAnyRole("BC_ADMIN");
 	}
 
 	@Override
@@ -277,11 +289,15 @@ public abstract class InfosAction extends ViewAction<Map<String, Object>> {
 						canUseManageView() ? this.status : String
 								.valueOf(Info.STATUS_ISSUED), "i.status_");
 
+		// 信息类型条件
+		Condition typeCondition = new EqualsCondition("i.type_",
+				this.customType);
+
 		// TODO 按权限的条件
 		Condition securityCondition = null;
 
 		// 合并条件
-		return ConditionUtils.mix2AndCondition(statusCondition,
+		return ConditionUtils.mix2AndCondition(typeCondition, statusCondition,
 				securityCondition);
 	}
 
