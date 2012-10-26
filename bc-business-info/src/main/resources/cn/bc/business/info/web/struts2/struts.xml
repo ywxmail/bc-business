@@ -24,8 +24,6 @@
 		<action name="delete" class="companyFileAction" method="delete"/>
 	</package>
 	<package name="companyFiles" extends="bc-default" namespace="/bc-business/info/companyFiles">
-		<!-- 删除 -->
-		<action name="delete" class="companyFilesAction" method="delete" />
 		<!-- 非分页视图 -->
 		<action name="list" class="companyFilesAction" method="list" />
 		<!-- 分页视图 -->
@@ -34,5 +32,27 @@
 		<action name="data" class="companyFilesAction" method="data" />
 		<!-- 导出 视图数据-->
 		<action name="export" class="companyFilesAction" method="export" />
+	</package>
+	<package name="companyFilesManage" extends="bc-default" namespace="/bc-business/info/companyFilesManage">
+		<!-- 删除 -->
+		<action name="delete" class="companyFilesAction" method="delete" >
+			<param name="viewType">1</param>
+		</action>
+		<!-- 非分页视图 -->
+		<action name="list" class="companyFilesAction" method="list" >
+			<param name="viewType">1</param>
+		</action>
+		<!-- 分页视图 -->
+		<action name="paging" class="companyFilesAction" method="paging" >
+			<param name="viewType">1</param>
+		</action>
+		<!-- 分页数据 -->
+		<action name="data" class="companyFilesAction" method="data" >
+			<param name="viewType">1</param>
+		</action>
+		<!-- 导出 视图数据-->
+		<action name="export" class="companyFilesAction" method="export" >
+			<param name="viewType">1</param>
+		</action>
 	</package>
 </struts>

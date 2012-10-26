@@ -28,6 +28,7 @@ import cn.bc.web.ui.html.Button;
 import cn.bc.web.ui.html.grid.Column;
 import cn.bc.web.ui.html.grid.IdColumn4MapKey;
 import cn.bc.web.ui.html.grid.TextColumn4MapKey;
+import cn.bc.web.ui.html.page.HtmlPage;
 import cn.bc.web.ui.html.page.PageOption;
 import cn.bc.web.ui.html.toolbar.Toolbar;
 import cn.bc.web.ui.html.toolbar.ToolbarButton;
@@ -42,7 +43,13 @@ import cn.bc.web.ui.html.toolbar.ToolbarButton;
 @Controller
 public abstract class InfosAction extends ViewAction<Map<String, Object>> {
 	private static final long serialVersionUID = 1L;
-	public String status;
+	/** 视图类型：信息查阅视图 */
+	public static final int VT_READ = 0;
+	/** 视图类型：管理端视图 */
+	public static final int VT_MANAGE = 1;
+
+	public String status;// 要查看的状态，多个值间用逗号连接
+	public int viewType = 0;// 视图类型：0-信息查阅视图，1-管理端视图
 
 	/**
 	 * 信息类型
@@ -57,13 +64,32 @@ public abstract class InfosAction extends ViewAction<Map<String, Object>> {
 	}
 
 	@Override
+	protected HtmlPage buildHtmlPage() {
+		return super.buildHtmlPage().setNamespace(
+				getHtmlPageNamespace() + "/" + getViewActionName()
+						+ (canUseManageView() ? "Manage" : ""));
+	}
+
+	@Override
 	protected String getFormActionName() {
 		return "info";
 	}
 
 	@Override
 	protected String getGridDblRowMethod() {
-		return "bc.page.open";
+		if (canUseManageView())
+			return "bc.page.edit";
+		else
+			return "bc.page.open";
+	}
+
+	@Override
+	protected String getHtmlPageTitle() {
+		if (canUseManageView())
+			return this.getText(this.getFormActionName() + ".title")
+					+ this.getText("info.manage");
+		else
+			return this.getText(this.getFormActionName() + ".title");
 	}
 
 	@Override
@@ -116,8 +142,8 @@ public abstract class InfosAction extends ViewAction<Map<String, Object>> {
 		List<Column> columns = new ArrayList<Column>();
 		columns.add(new IdColumn4MapKey("i.id", "id"));
 
-		boolean isManager = !this.isReadonly();
-		if (isManager) {
+		boolean canUseManageView = canUseManageView();
+		if (canUseManageView) {
 			columns.add(new TextColumn4MapKey("i.status_", "status",
 					getText("info.status"), 45).setSortable(true)
 					.setValueFormater(new KeyValueFormater(getStatuses())));
@@ -131,12 +157,12 @@ public abstract class InfosAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("i.source_", "source",
 				getText("info.source"), 80).setSortable(true)
 				.setUseTitleFromLabel(true));
-		if (isManager) {
-			// columns.add(new TextColumn4MapKey("i.file_date", "fileDate",
-			// getText("info.fileDate"), 90).setSortable(true)
-			// .setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+		if (canUseManageView) {
 			columns.add(new TextColumn4MapKey("uh.actor_name", "authorName",
 					getText("info.authorName"), 80).setSortable(true));
+			columns.add(new TextColumn4MapKey("i.file_date", "fileDate",
+					getText("info.fileDate"), 90).setSortable(true)
+					.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
 		}
 
 		return columns;
@@ -161,16 +187,11 @@ public abstract class InfosAction extends ViewAction<Map<String, Object>> {
 	@Override
 	protected Toolbar getHtmlPageToolbar(boolean useDisabledReplaceDelete) {
 		Toolbar tb = new Toolbar();
-		boolean isManager = !this.isReadonly();
-		if (isManager) {
+
+		if (canUseManageView()) {// 管理端视图
 			// 新建按钮
 			tb.addButton(getDefaultCreateToolbarButton());
-		}
 
-		// 查看按钮
-		tb.addButton(getDefaultOpenToolbarButton());
-
-		if (isManager) {
 			// 编辑按钮
 			tb.addButton(getDefaultEditToolbarButton());
 
@@ -179,26 +200,38 @@ public abstract class InfosAction extends ViewAction<Map<String, Object>> {
 
 			// 禁用按钮
 			tb.addButton(getToolbarButton4Disabled());
-		}
 
-		// 状态单选按钮组
-		// 管理员：草稿、已发布、已禁用
-		// 一般用户：未阅、已阅
-		if (isManager) {
+			// 状态单选按钮组：草稿、已发布、已禁用
 			tb.addButton(Toolbar.getDefaultToolbarRadioGroup(
-					this.getStatuses(), "status", 0,
+					this.getStatuses(), "status", 3,
 					getText("title.click2changeSearchStatus")));
+		} else {// 一般用户：信息查阅视图
+			// 查看按钮
+			tb.addButton(getDefaultOpenToolbarButton());
 
-		} else {
-			tb.addButton(Toolbar.getDefaultToolbarRadioGroup(
-					this.getReadStatuses(), "readStatus", 2,
-					getText("title.click2changeSearchStatus")));
+			// 跳转到管理端视图的按钮
+			if (!isReadonly())
+				tb.addButton(getToolbarButton4Manage());
+
+			// TODO 状态单选按钮组：未阅、已阅
+			// tb.addButton(Toolbar.getDefaultToolbarRadioGroup(
+			// this.getReadStatuses(), "readStatus", 2,
+			// getText("title.click2changeSearchStatus")));
 		}
 
 		// 搜索按钮
 		tb.addButton(getDefaultSearchToolbarButton());
 
 		return tb;
+	}
+
+	/**
+	 * 判断能否打开管理端视图
+	 * 
+	 * @return
+	 */
+	protected boolean canUseManageView() {
+		return viewType == VT_MANAGE && !this.isReadonly();
 	}
 
 	/**
@@ -209,6 +242,16 @@ public abstract class InfosAction extends ViewAction<Map<String, Object>> {
 	protected Button getToolbarButton4Issue() {
 		return new ToolbarButton().setIcon("ui-icon-flag")
 				.setText(getText("info.issue")).setClick("bs.info.doIssue");
+	}
+
+	/**
+	 * 跳转到管理端视图的按钮
+	 * 
+	 * @return
+	 */
+	protected Button getToolbarButton4Manage() {
+		return new ToolbarButton().setIcon("ui-icon-wrench")
+				.setText(getText("info.manage")).setClick("bs.info.doManage");
 	}
 
 	/**
@@ -230,7 +273,9 @@ public abstract class InfosAction extends ViewAction<Map<String, Object>> {
 	protected Condition getGridSpecalCondition() {
 		// 状态条件
 		Condition statusCondition = ConditionUtils
-				.toConditionByComma4IntegerValue(this.status, "i.status_");
+				.toConditionByComma4IntegerValue(
+						canUseManageView() ? this.status : String
+								.valueOf(Info.STATUS_ISSUED), "i.status_");
 
 		// TODO 按权限的条件
 		Condition securityCondition = null;
