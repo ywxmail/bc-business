@@ -112,7 +112,7 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 		sql.append(",m.id as motorcade_id,c.scrap_date,c.return_date,c.fuel_type");
 		sql.append(",getContract4ChargerScrapTo(c.id) scrapto,c.modified_date,md.actor_name modifier");
 		sql.append(",getContract4ChargerCarmaintain(c.id) carmaintain,c.file_date,ad.actor_name author");
-		sql.append(",c.manage_no");
+		sql.append(",c.manage_no,c.operate_date");
 		sql.append(" from bs_car c");
 		sql.append(" inner join bs_motorcade m on m.id=c.motorcade_id");
 		sql.append(" inner join bc_identity_actor bia on bia.id=m.unit_id");
@@ -164,6 +164,7 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 				map.put("file_date", rs[i++]);
 				map.put("author", rs[i++]);
 				map.put("manage_no", rs[i++]);
+				map.put("operate_date", rs[i++]);
 
 				return map;
 			}
@@ -303,6 +304,10 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("c.fuel_type", "fuel_type",
 				getText("car.fuelType"), 60).setUseTitleFromLabel(true));
 
+		// 投产日期
+		columns.add(new TextColumn4MapKey("c.operate_date", "operate_date",
+				getText("car.operateDate"), 90).setSortable(true)
+				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
 		// 报废日期
 		columns.add(new TextColumn4MapKey("c.scrap_date", "scrap_date",
 				getText("car.scrapDate"), 90).setSortable(true)
