@@ -16,6 +16,9 @@ drop table if exists BS_ARRANGE_MEMBER;
 drop table if exists BS_ARRANGE;
 drop table if exists BS_MEMBER;
 
+-- 信息管理
+drop table if exists BS_INFO;
+
 -- 承包费
 drop table if exists BS_FEE_DETAIL;
 drop table if exists BS_FEE;
