@@ -21,11 +21,11 @@ import cn.bc.identity.domain.RichFileEntityImpl;
 public class Info extends RichFileEntityImpl {
 	private static final long serialVersionUID = 1L;
 	/** 状态：草稿 */
-	public static final int STATUS_DRAFT = 0;
+	public static final int STATUS_DRAFT = -1;
 	/** 状态：已发布 */
-	public static final int STATUS_ISSUED = 1;
-	/** 状态：已归档 */
-	public static final int STATUS_ARCHIVED = 2;
+	public static final int STATUS_ISSUED = 0;
+	/** 状态：已禁用 */
+	public static final int STATUS_DISABLED = 1;
 
 	/** 类型：公司文件 */
 	public static final int TYPE_COMPANYGILE = 0;
