@@ -45,6 +45,7 @@ public class ShiftworkByDriverAction extends
 	public int moveType;// 迁移类型
 	public String shiftwork;// 顶班车辆
 	public Map<String, String> statusesValue;// 状态列表
+	//public boolean isNewest = true;// 是否来最新的迁移记录
 
 	@Autowired
 	public void setCarManService(CarManService carManService) {
