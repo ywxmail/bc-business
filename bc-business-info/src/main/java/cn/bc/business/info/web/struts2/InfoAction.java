@@ -25,7 +25,7 @@ import cn.bc.web.ui.html.page.PageOption;
 import cn.bc.web.ui.json.Json;
 
 /**
- * ä¿¡æ¯Action
+ * ĞÅÏ¢Action
  * 
  * @author dragon
  * 
@@ -42,9 +42,9 @@ public class InfoAction extends FileEntityAction<Long, Info> implements
 	public String statusDesc;
 	public String typeDesc;
 
-	// ä»¥ä¸‹å˜é‡é€šè¿‡Strutsçš„xmlé…ç½®æ–‡ä»¶è¿›è¡Œé…ç½®
-	public int customType = Info.TYPE_COMPANYGILE;// é»˜è®¤çš„ä¿¡æ¯ç±»å‹
-	public String customRole;// ç®¡ç†è€…çš„è§’è‰²ç¼–ç ï¼Œå¤šä¸ªç”¨é€—å·è¿æ¥
+	// ÒÔÏÂ±äÁ¿Í¨¹ıStrutsµÄxmlÅäÖÃÎÄ¼ş½øĞĞÅäÖÃ
+	public int customType = Info.TYPE_COMPANYGILE;// Ä¬ÈÏµÄĞÅÏ¢ÀàĞÍ
+	public String customRole;// ¹ÜÀíÕßµÄ½ÇÉ«±àÂë£¬¶à¸öÓÃ¶ººÅÁ¬½Ó
 
 	public InfoAction() {
 		super();
@@ -83,20 +83,20 @@ public class InfoAction extends FileEntityAction<Long, Info> implements
 		SystemContext context = (SystemContext) this.getContext();
 		Info e = this.getE();
 		e.setFileDate(Calendar.getInstance());
-		e.setSendDate(e.getFileDate());// å‘å¸ƒæ—¥æœŸé»˜è®¤ç­‰äºåˆ›å»ºæ—¥æœŸ
-		e.setSource(context.getBelong().getName());// æ¥æºé»˜è®¤ç­‰äºå½“å‰ç”¨æˆ·æ‰€å±éƒ¨é—¨
+		e.setSendDate(e.getFileDate());// ·¢²¼ÈÕÆÚÄ¬ÈÏµÈÓÚ´´½¨ÈÕÆÚ
+		e.setSource(context.getBelong().getName());// À´Ô´Ä¬ÈÏµÈÓÚµ±Ç°ÓÃ»§ËùÊô²¿ÃÅ
 		e.setAuthor(context.getUserHistory());
 		e.setStatus(Info.STATUS_DRAFT);
 		e.setUid(this.idGeneratorService.next("info.uid"));
 		e.setType(this.customType);
 
-		// æ„å»ºé™„ä»¶æ§ä»¶
+		// ¹¹½¨¸½¼ş¿Ø¼ş
 		attachsUI = buildAttachsUI(true, false);
 
-		// çŠ¶æ€æè¿°
+		// ×´Ì¬ÃèÊö
 		typeDesc = this.getTypes().get(String.valueOf(this.getE().getType()));
 
-		// çŠ¶æ€æè¿°
+		// ×´Ì¬ÃèÊö
 		statusDesc = this.getStatuses().get(
 				String.valueOf(this.getE().getStatus()));
 	}
@@ -113,11 +113,11 @@ public class InfoAction extends FileEntityAction<Long, Info> implements
 
 	@Override
 	protected void buildFormPageButtons(PageOption option, boolean editable) {
-		// éç¼–è¾‘çŠ¶æ€æ²¡æœ‰ä»»ä½•æ“ä½œæŒ‰é’®
+		// ·Ç±à¼­×´Ì¬Ã»ÓĞÈÎºÎ²Ù×÷°´Å¥
 		if (!editable)
 			return;
 
-		// ç®¡ç†å‘˜
+		// ¹ÜÀíÔ±
 		if (!this.isReadonly()) {
 			option.addButton(new ButtonOption(getText("label.preview"), null,
 					"bs.infoForm.preview"));
@@ -129,10 +129,10 @@ public class InfoAction extends FileEntityAction<Long, Info> implements
 
 	@Override
 	protected void afterEdit(Info entity) {
-		// æ„å»ºé™„ä»¶æ§ä»¶
+		// ¹¹½¨¸½¼ş¿Ø¼ş
 		attachsUI = buildAttachsUI(false, false);
 
-		// çŠ¶æ€æè¿°
+		// ×´Ì¬ÃèÊö
 		typeDesc = this.getTypes().get(String.valueOf(this.getE().getType()));
 	}
 
@@ -140,26 +140,26 @@ public class InfoAction extends FileEntityAction<Long, Info> implements
 	protected void afterOpen(Info e) {
 		this.customType = e.getType();
 		
-		// æ„å»ºé™„ä»¶æ§ä»¶
+		// ¹¹½¨¸½¼ş¿Ø¼ş
 		attachsUI = buildAttachsUI(false, true);
 
-		// çŠ¶æ€æè¿°
+		// ×´Ì¬ÃèÊö
 		typeDesc = this.getTypes().get(String.valueOf(e.getType()));
 
-		// çŠ¶æ€æè¿°
+		// ×´Ì¬ÃèÊö
 		statusDesc = this.getStatuses().get(
 				String.valueOf(this.getE().getStatus()));
 	}
 
 	protected AttachWidget buildAttachsUI(boolean isNew, boolean forceReadonly) {
-		// æ„å»ºé™„ä»¶æ§ä»¶
+		// ¹¹½¨¸½¼ş¿Ø¼ş
 		String ptype = "info.main";
 		String puid = this.getE().getUid();
 		boolean readonly = forceReadonly ? true : this.isReadonly();
 		AttachWidget attachsUI = AttachWidget.defaultAttachWidget(isNew,
 				readonly, isFlashUpload(), this.attachService, ptype, puid);
 
-		// ä¸Šä¼ é™„ä»¶çš„é™åˆ¶
+		// ÉÏ´«¸½¼şµÄÏŞÖÆ
 		attachsUI.addExtension(getText("app.attachs.extensions"))
 				.setMaxCount(Integer.parseInt(getText("app.attachs.maxCount")))
 				.setMaxSize(Integer.parseInt(getText("app.attachs.maxSize")));
@@ -176,7 +176,7 @@ public class InfoAction extends FileEntityAction<Long, Info> implements
 	}
 
 	/**
-	 * è·å–çŠ¶æ€å€¼è½¬æ¢åˆ—è¡¨
+	 * »ñÈ¡×´Ì¬Öµ×ª»»ÁĞ±í
 	 * 
 	 * @return
 	 */
@@ -191,7 +191,7 @@ public class InfoAction extends FileEntityAction<Long, Info> implements
 		return statuses;
 	}
 
-	// å‘å¸ƒ
+	// ·¢²¼
 	public String doIssue() throws Exception {
 		Json json = new Json();
 		json.put("id", getId());
@@ -207,7 +207,7 @@ public class InfoAction extends FileEntityAction<Long, Info> implements
 		return "json";
 	}
 
-	// ç¦ç”¨
+	// ½ûÓÃ
 	public String doDisabled() throws Exception {
 		Json json = new Json();
 		json.put("id", getId());
