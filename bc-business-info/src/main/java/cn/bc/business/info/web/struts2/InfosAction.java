@@ -187,8 +187,9 @@ public class InfosAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected PageOption getHtmlPageOption() {
-		return super.getHtmlPageOption().setWidth(isReadonly() ? 640 : 780)
-				.setMinWidth(350).setHeight(350).setMinHeight(250);
+		return super.getHtmlPageOption()
+				.setWidth(canUseManageView() ? 780 : 640).setMinWidth(350)
+				.setHeight(350).setMinHeight(250);
 	}
 
 	@Override
