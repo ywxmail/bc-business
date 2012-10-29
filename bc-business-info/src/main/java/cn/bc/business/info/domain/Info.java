@@ -12,7 +12,7 @@ import javax.persistence.Table;
 import cn.bc.identity.domain.RichFileEntityImpl;
 
 /**
- * ĞÅÏ¢
+ * ä¿¡æ¯
  * 
  * @author dragon
  */
@@ -20,26 +20,26 @@ import cn.bc.identity.domain.RichFileEntityImpl;
 @Table(name = "BS_INFO")
 public class Info extends RichFileEntityImpl {
 	private static final long serialVersionUID = 1L;
-	/** ×´Ì¬£º²İ¸å */
+	/** çŠ¶æ€ï¼šè‰ç¨¿ */
 	public static final int STATUS_DRAFT = -1;
-	/** ×´Ì¬£ºÒÑ·¢²¼ */
+	/** çŠ¶æ€ï¼šå·²å‘å¸ƒ */
 	public static final int STATUS_ISSUED = 0;
-	/** ×´Ì¬£ºÒÑ½ûÓÃ */
+	/** çŠ¶æ€ï¼šå·²ç¦ç”¨ */
 	public static final int STATUS_DISABLED = 1;
 
-	/** ÀàĞÍ£º¹«Ë¾ÎÄ¼ş */
+	/** ç±»å‹ï¼šå…¬å¸æ–‡ä»¶ */
 	public static final int TYPE_COMPANYGILE = 0;
-	/** ÀàĞÍ£º·¨¹æÎÄ¼ş */
+	/** ç±»å‹ï¼šæ³•è§„æ–‡ä»¶ */
 	public static final int TYPE_REGULATION = 1;
-	/** ÀàĞÍ£ºÍ¨Öª */
+	/** ç±»å‹ï¼šé€šçŸ¥ */
 	public static final int TYPE_NOTICE = 2;
 
-	private Calendar sendDate;// ·¢ËÍÊ±¼ä
-	private Calendar endDate;// ½áÊøÈÕÆÚ
-	private String subject;// ĞÅÏ¢±êÌâ
-	private String content;// ÏêÏ¸ÄÚÈİ
-	private int type;// ÀàĞÍ
-	private String source;// ĞÅÏ¢À´Ô´£ºÈç¹«¸æµÄ·¢²¼²¿ÃÅ£¬ÌáĞÑĞÅÏ¢µÄÁ´½ÓµØÖ·µÈ£¬¾ßÌå¸ñÊ½ÓĞÏàÓ¦µÄĞÅÏ¢ÀàĞÍ¾ö¶¨
+	private Calendar sendDate;// å‘é€æ—¶é—´
+	private Calendar endDate;// ç»“æŸæ—¥æœŸ
+	private String subject;// ä¿¡æ¯æ ‡é¢˜
+	private String content;// è¯¦ç»†å†…å®¹
+	private int type;// ç±»å‹
+	private String source;// ä¿¡æ¯æ¥æºï¼šå¦‚å…¬å‘Šçš„å‘å¸ƒéƒ¨é—¨ï¼Œæé†’ä¿¡æ¯çš„é“¾æ¥åœ°å€ç­‰ï¼Œå…·ä½“æ ¼å¼æœ‰ç›¸åº”çš„ä¿¡æ¯ç±»å‹å†³å®š
 
 	public String getSubject() {
 		return subject;

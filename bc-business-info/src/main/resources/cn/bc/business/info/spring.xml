@@ -12,9 +12,9 @@
         http://www.springframework.org/schema/aop
         http://www.springframework.org/schema/aop/spring-aop-3.0.xsd">
 
-	<!-- ÐèÒªÔÚÖ÷ÅäÖÃÎÄ¼þÅäÖÃentityManagerFactoryºÍtransactionManagerµÄÊµÏÖ -->
+	<!-- éœ€è¦åœ¨ä¸»é…ç½®æ–‡ä»¶é…ç½®entityManagerFactoryå’ŒtransactionManagerçš„å®žçŽ° -->
 
-	<!-- ÐÅÏ¢¹ÜÀí -->
+	<!-- ä¿¡æ¯ç®¡ç† -->
 	<bean id="infoDao" class="cn.bc.orm.hibernate.jpa.HibernateCrudJpaDao"
 		p:entityClass="cn.bc.business.info.domain.Info"
 		p:entityManagerFactory-ref="entityManagerFactory" />

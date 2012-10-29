@@ -3,7 +3,7 @@
     "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
     "http://struts.apache.org/dtds/struts-2.0.dtd">
 <struts>
-	<!-- ¹«¹² -->
+	<!-- å…¬å…± -->
 	<package name="info" extends="bc-default" namespace="/bc-business/info">
 		<action name="doIssue" class="infoAction" method="doIssue"/>
 		<action name="doDisabled" class="infoAction" method="doDisabled"/>
@@ -13,7 +13,7 @@
 		</action>
 	</package>
 	
-	<!-- ¹«Ë¾ÎÄ¼þ£º±íµ¥ -->
+	<!-- å…¬å¸æ–‡ä»¶ï¼šè¡¨å• -->
 	<package name="companyFile" extends="bc-default" namespace="/bc-business/info/companyFile">
 		<action name="create" class="infoAction" method="create">
 			<result name="form">/bc-business/info/form.jsp</result>
@@ -25,23 +25,23 @@
 			<param name="customRole">BS_COMPANYFILE_MANAGE</param>
 		</action>
 	</package>
-	<!-- ¹«Ë¾ÎÄ¼þ£ºÆÕÍ¨ÓÃ»§ÊÓÍ¼ -->
+	<!-- å…¬å¸æ–‡ä»¶ï¼šæ™®é€šç”¨æˆ·è§†å›¾ -->
 	<package name="companyFiles" extends="bc-default" namespace="/bc-business/info/companyFiles">
-		<!-- ·ÖÒ³ÊÓÍ¼ -->
+		<!-- åˆ†é¡µè§†å›¾ -->
 		<action name="paging" class="infosAction" method="paging">
 			<param name="viewType">0</param>
 			<param name="customName">companyFile</param>
 			<param name="customType">0</param>
 			<param name="customRole">BS_COMPANYFILE_MANAGE</param>
 		</action>
-		<!-- ·ÖÒ³Êý¾Ý -->
+		<!-- åˆ†é¡µæ•°æ® -->
 		<action name="data" class="infosAction" method="data">
 			<param name="viewType">0</param>
 			<param name="customName">companyFile</param>
 			<param name="customType">0</param>
 			<param name="customRole">BS_COMPANYFILE_MANAGE</param>
 		</action>
-		<!-- µ¼³ö ÊÓÍ¼Êý¾Ý-->
+		<!-- å¯¼å‡º è§†å›¾æ•°æ®-->
 		<action name="export" class="infosAction" method="export">
 			<param name="viewType">0</param>
 			<param name="customName">companyFile</param>
@@ -49,23 +49,23 @@
 			<param name="customRole">BS_COMPANYFILE_MANAGE</param>
 		</action>
 	</package>
-	<!-- ¹«Ë¾ÎÄ¼þ£º¹ÜÀí¶ËÊÓÍ¼ -->
+	<!-- å…¬å¸æ–‡ä»¶ï¼šç®¡ç†ç«¯è§†å›¾ -->
 	<package name="companyFilesManage" extends="bc-default" namespace="/bc-business/info/companyFilesManage">
-		<!-- ·ÖÒ³ÊÓÍ¼ -->
+		<!-- åˆ†é¡µè§†å›¾ -->
 		<action name="paging" class="infosAction" method="paging" >
 			<param name="viewType">1</param>
 			<param name="customName">companyFile</param>
 			<param name="customType">0</param>
 			<param name="customRole">BS_COMPANYFILE_MANAGE</param>
 		</action>
-		<!-- ·ÖÒ³Êý¾Ý -->
+		<!-- åˆ†é¡µæ•°æ® -->
 		<action name="data" class="infosAction" method="data" >
 			<param name="viewType">1</param>
 			<param name="customName">companyFile</param>
 			<param name="customType">0</param>
 			<param name="customRole">BS_COMPANYFILE_MANAGE</param>
 		</action>
-		<!-- µ¼³ö ÊÓÍ¼Êý¾Ý-->
+		<!-- å¯¼å‡º è§†å›¾æ•°æ®-->
 		<action name="export" class="infosAction" method="export" >
 			<param name="viewType">1</param>
 			<param name="customName">companyFile</param>
@@ -74,7 +74,7 @@
 		</action>
 	</package>
 	
-	<!-- ·¨¹æÎÄ¼þ£º±íµ¥ -->
+	<!-- æ³•è§„æ–‡ä»¶ï¼šè¡¨å• -->
 	<package name="regulation" extends="bc-default" namespace="/bc-business/info/regulation">
 		<action name="create" class="infoAction" method="create">
 			<result name="form">/bc-business/info/form.jsp</result>
@@ -87,23 +87,23 @@
 			<param name="customRole">BS_REGULATION_MANAGE</param>
 		</action>
 	</package>
-	<!-- ·¨¹æÎÄ¼þ£ºÆÕÍ¨ÓÃ»§ÊÓÍ¼ -->
+	<!-- æ³•è§„æ–‡ä»¶ï¼šæ™®é€šç”¨æˆ·è§†å›¾ -->
 	<package name="regulations" extends="bc-default" namespace="/bc-business/info/regulations">
-		<!-- ·ÖÒ³ÊÓÍ¼ -->
+		<!-- åˆ†é¡µè§†å›¾ -->
 		<action name="paging" class="infosAction" method="paging">
 			<param name="viewType">0</param>
 			<param name="customName">regulation</param>
 			<param name="customType">1</param>
 			<param name="customRole">BS_REGULATION_MANAGE</param>
 		</action>
-		<!-- ·ÖÒ³Êý¾Ý -->
+		<!-- åˆ†é¡µæ•°æ® -->
 		<action name="data" class="infosAction" method="data">
 			<param name="viewType">0</param>
 			<param name="customName">regulation</param>
 			<param name="customType">1</param>
 			<param name="customRole">BS_REGULATION_MANAGE</param>
 		</action>
-		<!-- µ¼³ö ÊÓÍ¼Êý¾Ý-->
+		<!-- å¯¼å‡º è§†å›¾æ•°æ®-->
 		<action name="export" class="infosAction" method="export">
 			<param name="viewType">0</param>
 			<param name="customName">regulation</param>
@@ -111,23 +111,23 @@
 			<param name="customRole">BS_REGULATION_MANAGE</param>
 		</action>
 	</package>
-	<!-- ·¨¹æÎÄ¼þ£º¹ÜÀí¶ËÊÓÍ¼ -->
+	<!-- æ³•è§„æ–‡ä»¶ï¼šç®¡ç†ç«¯è§†å›¾ -->
 	<package name="regulationsManage" extends="bc-default" namespace="/bc-business/info/regulationsManage">
-		<!-- ·ÖÒ³ÊÓÍ¼ -->
+		<!-- åˆ†é¡µè§†å›¾ -->
 		<action name="paging" class="infosAction" method="paging" >
 			<param name="viewType">1</param>
 			<param name="customName">regulation</param>
 			<param name="customType">1</param>
 			<param name="customRole">BS_REGULATION_MANAGE</param>
 		</action>
-		<!-- ·ÖÒ³Êý¾Ý -->
+		<!-- åˆ†é¡µæ•°æ® -->
 		<action name="data" class="infosAction" method="data" >
 			<param name="viewType">1</param>
 			<param name="customName">regulation</param>
 			<param name="customType">1</param>
 			<param name="customRole">BS_REGULATION_MANAGE</param>
 		</action>
-		<!-- µ¼³ö ÊÓÍ¼Êý¾Ý-->
+		<!-- å¯¼å‡º è§†å›¾æ•°æ®-->
 		<action name="export" class="infosAction" method="export" >
 			<param name="viewType">1</param>
 			<param name="customName">regulation</param>
@@ -136,7 +136,7 @@
 		</action>
 	</package>
 		
-	<!-- Í¨Öª£º±íµ¥ -->
+	<!-- é€šçŸ¥ï¼šè¡¨å• -->
 	<package name="notice" extends="bc-default" namespace="/bc-business/info/notice">
 		<action name="create" class="infoAction" method="create">
 			<result name="form">/bc-business/info/form.jsp</result>
@@ -149,23 +149,23 @@
 			<param name="customRole">BS_NOTICE_MANAGE</param>
 		</action>
 	</package>
-	<!-- Í¨Öª£ºÆÕÍ¨ÓÃ»§ÊÓÍ¼ -->
+	<!-- é€šçŸ¥ï¼šæ™®é€šç”¨æˆ·è§†å›¾ -->
 	<package name="notices" extends="bc-default" namespace="/bc-business/info/notices">
-		<!-- ·ÖÒ³ÊÓÍ¼ -->
+		<!-- åˆ†é¡µè§†å›¾ -->
 		<action name="paging" class="infosAction" method="paging">
 			<param name="viewType">0</param>
 			<param name="customName">notice</param>
 			<param name="customType">2</param>
 			<param name="customRole">BS_NOTICE_MANAGE</param>
 		</action>
-		<!-- ·ÖÒ³Êý¾Ý -->
+		<!-- åˆ†é¡µæ•°æ® -->
 		<action name="data" class="infosAction" method="data">
 			<param name="viewType">0</param>
 			<param name="customName">notice</param>
 			<param name="customType">2</param>
 			<param name="customRole">BS_NOTICE_MANAGE</param>
 		</action>
-		<!-- µ¼³ö ÊÓÍ¼Êý¾Ý-->
+		<!-- å¯¼å‡º è§†å›¾æ•°æ®-->
 		<action name="export" class="infosAction" method="export">
 			<param name="viewType">0</param>
 			<param name="customName">notice</param>
@@ -173,23 +173,23 @@
 			<param name="customRole">BS_NOTICE_MANAGE</param>
 		</action>
 	</package>
-	<!-- Í¨Öª£º¹ÜÀí¶ËÊÓÍ¼ -->
+	<!-- é€šçŸ¥ï¼šç®¡ç†ç«¯è§†å›¾ -->
 	<package name="noticesManage" extends="bc-default" namespace="/bc-business/info/noticesManage">
-		<!-- ·ÖÒ³ÊÓÍ¼ -->
+		<!-- åˆ†é¡µè§†å›¾ -->
 		<action name="paging" class="infosAction" method="paging" >
 			<param name="viewType">1</param>
 			<param name="customName">notice</param>
 			<param name="customType">2</param>
 			<param name="customRole">BS_NOTICE_MANAGE</param>
 		</action>
-		<!-- ·ÖÒ³Êý¾Ý -->
+		<!-- åˆ†é¡µæ•°æ® -->
 		<action name="data" class="infosAction" method="data" >
 			<param name="viewType">1</param>
 			<param name="customName">notice</param>
 			<param name="customType">2</param>
 			<param name="customRole">BS_NOTICE_MANAGE</param>
 		</action>
-		<!-- µ¼³ö ÊÓÍ¼Êý¾Ý-->
+		<!-- å¯¼å‡º è§†å›¾æ•°æ®-->
 		<action name="export" class="infosAction" method="export" >
 			<param name="viewType">1</param>
 			<param name="customName">notice</param>

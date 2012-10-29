@@ -7,20 +7,20 @@ import cn.bc.business.info.domain.Info;
 import cn.bc.core.service.CrudService;
 
 /**
- * ĞÅÏ¢¹ÜÀíService
+ * ä¿¡æ¯ç®¡ç†Service
  * 
  * @author dragon
  */
 public interface InfoService extends CrudService<Info> {
 	/**
-	 * ·¢²¼Ö¸¶¨µÄĞÅÏ¢
+	 * å‘å¸ƒæŒ‡å®šçš„ä¿¡æ¯
 	 * 
 	 * @param id
 	 */
 	void doIssue(Long id);
 
 	/**
-	 * ½ûÓÃÖ¸¶¨µÄĞÅÏ¢
+	 * ç¦ç”¨æŒ‡å®šçš„ä¿¡æ¯
 	 * 
 	 * @param id
 	 */

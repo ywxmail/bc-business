@@ -36,7 +36,7 @@ import cn.bc.web.ui.html.toolbar.Toolbar;
 import cn.bc.web.ui.html.toolbar.ToolbarButton;
 
 /**
- * ĞÅÏ¢ÊÓÍ¼Action
+ * ä¿¡æ¯è§†å›¾Action
  * 
  * @author dragon
  * 
@@ -45,18 +45,18 @@ import cn.bc.web.ui.html.toolbar.ToolbarButton;
 @Controller
 public class InfosAction extends ViewAction<Map<String, Object>> {
 	private static final long serialVersionUID = 1L;
-	/** ÊÓÍ¼ÀàĞÍ£ºĞÅÏ¢²éÔÄÊÓÍ¼ */
+	/** è§†å›¾ç±»å‹ï¼šä¿¡æ¯æŸ¥é˜…è§†å›¾ */
 	public static final int VT_READ = 0;
-	/** ÊÓÍ¼ÀàĞÍ£º¹ÜÀí¶ËÊÓÍ¼ */
+	/** è§†å›¾ç±»å‹ï¼šç®¡ç†ç«¯è§†å›¾ */
 	public static final int VT_MANAGE = 1;
 
-	public String status;// Òª²é¿´µÄ×´Ì¬£¬¶à¸öÖµ¼äÓÃ¶ººÅÁ¬½Ó
+	public String status;// è¦æŸ¥çœ‹çš„çŠ¶æ€ï¼Œå¤šä¸ªå€¼é—´ç”¨é€—å·è¿æ¥
 
-	// ÒÔÏÂ±äÁ¿Í¨¹ıStrutsµÄxmlÅäÖÃÎÄ¼ş½øĞĞÅäÖÃ
-	public String customName = "info";// ±íµ¥Ãû
-	public int customType = Info.TYPE_COMPANYGILE;// Ä¬ÈÏµÄĞÅÏ¢ÀàĞÍ
-	public String customRole;// ¹ÜÀíÕßµÄ½ÇÉ«±àÂë£¬¶à¸öÓÃ¶ººÅÁ¬½Ó
-	public int viewType = 0;// ÊÓÍ¼ÀàĞÍ£º0-ĞÅÏ¢²éÔÄÊÓÍ¼£¬1-¹ÜÀí¶ËÊÓÍ¼
+	// ä»¥ä¸‹å˜é‡é€šè¿‡Strutsçš„xmlé…ç½®æ–‡ä»¶è¿›è¡Œé…ç½®
+	public String customName = "info";// è¡¨å•å
+	public int customType = Info.TYPE_COMPANYGILE;// é»˜è®¤çš„ä¿¡æ¯ç±»å‹
+	public String customRole;// ç®¡ç†è€…çš„è§’è‰²ç¼–ç ï¼Œå¤šä¸ªç”¨é€—å·è¿æ¥
+	public int viewType = 0;// è§†å›¾ç±»å‹ï¼š0-ä¿¡æ¯æŸ¥é˜…è§†å›¾ï¼Œ1-ç®¡ç†ç«¯è§†å›¾
 
 	@Override
 	protected String getHtmlPageNamespace() {
@@ -120,7 +120,7 @@ public class InfosAction extends ViewAction<Map<String, Object>> {
 	protected SqlObject<Map<String, Object>> getSqlObject() {
 		SqlObject<Map<String, Object>> sqlObject = new SqlObject<Map<String, Object>>();
 
-		// ¹¹½¨²éÑ¯Óï¾ä,whereºÍorder by²»Òª°üº¬ÔÚsqlÖĞ(ÒªÍ³Ò»·Åµ½conditionÖĞ)
+		// æ„å»ºæŸ¥è¯¢è¯­å¥,whereå’Œorder byä¸è¦åŒ…å«åœ¨sqlä¸­(è¦ç»Ÿä¸€æ”¾åˆ°conditionä¸­)
 		StringBuffer sql = new StringBuffer();
 		sql.append("select i.id id,i.status_ status,i.subject subject,i.source_ source");
 		sql.append(",i.send_date sendDate,i.file_date fileDate,uh.actor_name authorName");
@@ -128,10 +128,10 @@ public class InfosAction extends ViewAction<Map<String, Object>> {
 		sql.append(" inner join bc_identity_actor_history uh on uh.id = i.author_id");
 		sqlObject.setSql(sql.toString());
 
-		// ×¢Èë²ÎÊı
+		// æ³¨å…¥å‚æ•°
 		sqlObject.setArgs(null);
 
-		// Êı¾İÓ³ÉäÆ÷
+		// æ•°æ®æ˜ å°„å™¨
 		sqlObject.setRowMapper(new RowMapper<Map<String, Object>>() {
 			public Map<String, Object> mapRow(Object[] rs, int rowNum) {
 				Map<String, Object> map = new HashMap<String, Object>();
@@ -200,45 +200,45 @@ public class InfosAction extends ViewAction<Map<String, Object>> {
 	protected Toolbar getHtmlPageToolbar(boolean useDisabledReplaceDelete) {
 		Toolbar tb = new Toolbar();
 
-		if (canUseManageView()) {// ¹ÜÀí¶ËÊÓÍ¼
-			// ĞÂ½¨°´Å¥
+		if (canUseManageView()) {// ç®¡ç†ç«¯è§†å›¾
+			// æ–°å»ºæŒ‰é’®
 			tb.addButton(getDefaultCreateToolbarButton());
 
-			// ±à¼­°´Å¥
+			// ç¼–è¾‘æŒ‰é’®
 			tb.addButton(getDefaultEditToolbarButton());
 
-			// ·¢²¼°´Å¥
+			// å‘å¸ƒæŒ‰é’®
 			tb.addButton(getToolbarButton4Issue());
 
-			// ½ûÓÃ°´Å¥
+			// ç¦ç”¨æŒ‰é’®
 			tb.addButton(getToolbarButton4Disabled());
 
-			// ×´Ì¬µ¥Ñ¡°´Å¥×é£º²İ¸å¡¢ÒÑ·¢²¼¡¢ÒÑ½ûÓÃ
+			// çŠ¶æ€å•é€‰æŒ‰é’®ç»„ï¼šè‰ç¨¿ã€å·²å‘å¸ƒã€å·²ç¦ç”¨
 			tb.addButton(Toolbar.getDefaultToolbarRadioGroup(
 					this.getStatuses(), "status", 3,
 					getText("title.click2changeSearchStatus")));
-		} else {// Ò»°ãÓÃ»§£ºĞÅÏ¢²éÔÄÊÓÍ¼
-			// ²é¿´°´Å¥
+		} else {// ä¸€èˆ¬ç”¨æˆ·ï¼šä¿¡æ¯æŸ¥é˜…è§†å›¾
+			// æŸ¥çœ‹æŒ‰é’®
 			tb.addButton(getDefaultOpenToolbarButton());
 
-			// Ìø×ªµ½¹ÜÀí¶ËÊÓÍ¼µÄ°´Å¥
+			// è·³è½¬åˆ°ç®¡ç†ç«¯è§†å›¾çš„æŒ‰é’®
 			if (!isReadonly())
 				tb.addButton(getToolbarButton4Manage());
 
-			// TODO ×´Ì¬µ¥Ñ¡°´Å¥×é£ºÎ´ÔÄ¡¢ÒÑÔÄ
+			// TODO çŠ¶æ€å•é€‰æŒ‰é’®ç»„ï¼šæœªé˜…ã€å·²é˜…
 			// tb.addButton(Toolbar.getDefaultToolbarRadioGroup(
 			// this.getReadStatuses(), "readStatus", 2,
 			// getText("title.click2changeSearchStatus")));
 		}
 
-		// ËÑË÷°´Å¥
+		// æœç´¢æŒ‰é’®
 		tb.addButton(getDefaultSearchToolbarButton());
 
 		return tb;
 	}
 
 	/**
-	 * ÅĞ¶ÏÄÜ·ñ´ò¿ª¹ÜÀí¶ËÊÓÍ¼
+	 * åˆ¤æ–­èƒ½å¦æ‰“å¼€ç®¡ç†ç«¯è§†å›¾
 	 * 
 	 * @return
 	 */
@@ -247,7 +247,7 @@ public class InfosAction extends ViewAction<Map<String, Object>> {
 	}
 
 	/**
-	 * ·¢²¼°´Å¥
+	 * å‘å¸ƒæŒ‰é’®
 	 * 
 	 * @return
 	 */
@@ -257,7 +257,7 @@ public class InfosAction extends ViewAction<Map<String, Object>> {
 	}
 
 	/**
-	 * Ìø×ªµ½¹ÜÀí¶ËÊÓÍ¼µÄ°´Å¥
+	 * è·³è½¬åˆ°ç®¡ç†ç«¯è§†å›¾çš„æŒ‰é’®
 	 * 
 	 * @return
 	 */
@@ -267,7 +267,7 @@ public class InfosAction extends ViewAction<Map<String, Object>> {
 	}
 
 	/**
-	 * ½ûÓÃ°´Å¥
+	 * ç¦ç”¨æŒ‰é’®
 	 * 
 	 * @return
 	 */
@@ -283,26 +283,26 @@ public class InfosAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected Condition getGridSpecalCondition() {
-		// ×´Ì¬Ìõ¼ş
+		// çŠ¶æ€æ¡ä»¶
 		Condition statusCondition = ConditionUtils
 				.toConditionByComma4IntegerValue(
 						canUseManageView() ? this.status : String
 								.valueOf(Info.STATUS_ISSUED), "i.status_");
 
-		// ĞÅÏ¢ÀàĞÍÌõ¼ş
+		// ä¿¡æ¯ç±»å‹æ¡ä»¶
 		Condition typeCondition = new EqualsCondition("i.type_",
 				this.customType);
 
-		// TODO °´È¨ÏŞµÄÌõ¼ş
+		// TODO æŒ‰æƒé™çš„æ¡ä»¶
 		Condition securityCondition = null;
 
-		// ºÏ²¢Ìõ¼ş
+		// åˆå¹¶æ¡ä»¶
 		return ConditionUtils.mix2AndCondition(typeCondition, statusCondition,
 				securityCondition);
 	}
 
 	/**
-	 * »ñÈ¡×´Ì¬Öµ×ª»»ÁĞ±í
+	 * è·å–çŠ¶æ€å€¼è½¬æ¢åˆ—è¡¨
 	 * 
 	 * @return
 	 */
@@ -319,7 +319,7 @@ public class InfosAction extends ViewAction<Map<String, Object>> {
 	}
 
 	/**
-	 * »ñÈ¡×´Ì¬Öµ×ª»»ÁĞ±í
+	 * è·å–çŠ¶æ€å€¼è½¬æ¢åˆ—è¡¨
 	 * 
 	 * @return
 	 */
