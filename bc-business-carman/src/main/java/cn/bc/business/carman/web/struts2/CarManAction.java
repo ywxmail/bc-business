@@ -172,10 +172,10 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 						"bc.carManForm.saveAndClose"));
 
 			} else {
-				pageOption
-						.addButton(new ButtonOption(
-								getText("label.save4Draft"), null,
-								"bc.carManForm.save"));
+				// pageOption
+				// .addButton(new ButtonOption(
+				// getText("label.save4Draft"), null,
+				// "bc.carManForm.save"));
 				pageOption.addButton(new ButtonOption(
 						getText("label.warehousing"), null,
 						"bc.carManForm.warehousing"));
@@ -185,7 +185,7 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 		}
 
 		// 如果有录入权限的就有保存按钮
-		if (this.isEntering()
+		if ((this.isEntering()||!readonly)
 				&& this.getE().getStatus() == BCConstants.STATUS_DRAFT) {
 			pageOption.addButton(new ButtonOption(getText("label.save4Draft"),
 					null, "bc.carManForm.save"));
