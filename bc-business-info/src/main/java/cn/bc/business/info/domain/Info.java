@@ -22,7 +22,7 @@ public class Info extends RichFileEntityImpl {
 	private static final long serialVersionUID = 1L;
 	/** 状态：草稿 */
 	public static final int STATUS_DRAFT = -1;
-	/** 状态：已发布 */
+	/** 状态：已发布(邮件的已发送) */
 	public static final int STATUS_ISSUED = 0;
 	/** 状态：已禁用 */
 	public static final int STATUS_DISABLED = 1;
@@ -33,6 +33,10 @@ public class Info extends RichFileEntityImpl {
 	public static final int TYPE_REGULATION = 1;
 	/** 类型：通知 */
 	public static final int TYPE_NOTICE = 2;
+	/** 类型：督查分数文件 */
+	public static final int TYPE_INSPECTIONFILE = 3;
+	/** 类型：邮件 */
+	public static final int TYPE_EMAIL = 9;
 
 	private Calendar sendDate;// 发送时间
 	private Calendar endDate;// 结束日期

@@ -171,6 +171,7 @@ public class InfoAction extends FileEntityAction<Long, Info> implements
 		Map<String, String> types = new LinkedHashMap<String, String>();
 		types.put(String.valueOf(Info.TYPE_COMPANYGILE), getText("companyFile"));
 		types.put(String.valueOf(Info.TYPE_REGULATION), getText("regulation"));
+		types.put(String.valueOf(Info.TYPE_INSPECTIONFILE), getText("inspectionFile"));
 		types.put(String.valueOf(Info.TYPE_NOTICE), getText("notice"));
 		return types;
 	}
