@@ -141,19 +141,31 @@ public class CarByDriverHistoryServiceImpl extends
 	public CarByDriverHistory save(CarByDriverHistory entity) {
 		boolean isNew = entity.isNew();
 		boolean isNewest = true;
+		// 旧迁移记录的状态
+		int oldStatus = 0;
+		if (!isNew) {
+			CarByDriverHistory oldCarByDriverHistory = this.carByDriverHistoryDao
+					.load(entity.getId());
+			oldStatus = oldCarByDriverHistory.getStatus();
+		}
+
 		// 如果车辆最新的迁移记录的类型为转车队时可以进行编辑，历史的不能进行编辑
 		if (entity.getMoveType() == CarByDriverHistory.MOVETYPE_ZCD) {
-			if (!entity.getId().equals(
-					this.findNewestCarByDriverHistoryByCarId(
-							entity.getFromCar().getId()).getId())) {
-				if (!isNew) {
-					throw new CoreException("这里不处理转车队类型迁移记录的历史信息修改！");
+			// 入库的操作的不作检测
+			if (!(oldStatus == BCConstants.STATUS_DRAFT && entity.getStatus() == BCConstants.STATUS_ENABLED)) {
+				if (!entity.getId().equals(
+						this.findNewestCarByDriverHistoryByCarId(
+								entity.getFromCar().getId()).getId())) {
+					if (!isNew) {
+						throw new CoreException("这里不处理转车队类型迁移记录的历史信息修改！");
+					}
+					// 断言【以属于抛异常的一钟】
+					// Assert.isTrue(
+					// !(entity.getMoveType() == CarByDriverHistory.MOVETYPE_ZCD
+					// &&
+					// !isNew),
+					// "这里不处理转车队类型迁移记录的历史信息修改！");
 				}
-				// 断言【以属于抛异常的一钟】
-				// Assert.isTrue(
-				// !(entity.getMoveType() == CarByDriverHistory.MOVETYPE_ZCD &&
-				// !isNew),
-				// "这里不处理转车队类型迁移记录的历史信息修改！");
 			}
 
 		}
@@ -161,13 +173,16 @@ public class CarByDriverHistoryServiceImpl extends
 		// 判断该迁移记录是否最新的迁移记录[排除历史的转车队迁移记录]
 		if (entity.getMoveType() != CarByDriverHistory.MOVETYPE_ZCD
 				&& isNew == false) {
-			if (!entity.getId().equals(
-					this.findNewestCarByDriverHistory(
-							entity.getDriver().getId()).getId())) {
-				// 如果编辑的迁移记录不是最新的标记
-				isNewest = false;
-			}
+			// 入库的操作的不作检测
+			if (!(oldStatus == BCConstants.STATUS_DRAFT && entity.getStatus() == BCConstants.STATUS_ENABLED)) {
 
+				if (!entity.getId().equals(
+						this.findNewestCarByDriverHistory(
+								entity.getDriver().getId()).getId())) {
+					// 如果编辑的迁移记录不是最新的标记
+					isNewest = false;
+				}
+			}
 		}
 		// 如果修改不是最新的迁移记录就不更新任何数据
 		if (!isNewest) {
@@ -175,14 +190,14 @@ public class CarByDriverHistoryServiceImpl extends
 			entity = super.save(entity);
 
 		} else {
-			int oldStatus = 0;
-			if (!isNew) {
-				// 获取非编辑前的迁移记录
-				CarByDriverHistory oldCarByDriverHistory = this.load(entity
-						.getId());
-				oldStatus = oldCarByDriverHistory.getStatus();
-
-			}
+			// int oldStatus = 0;
+			// if (!isNew) {
+			// // 获取非编辑前的迁移记录
+			// CarByDriverHistory oldCarByDriverHistory = this.load(entity
+			// .getId());
+			// oldStatus = oldCarByDriverHistory.getStatus();
+			//
+			// }
 			// 保存迁移历史记录
 			entity = super.save(entity);
 			// 转车队的迁移记录[不存在草稿的概念]
