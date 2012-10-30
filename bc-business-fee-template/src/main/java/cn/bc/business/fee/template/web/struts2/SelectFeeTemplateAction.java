@@ -22,6 +22,7 @@ import cn.bc.core.query.condition.Direction;
 import cn.bc.core.query.condition.impl.AndCondition;
 import cn.bc.core.query.condition.impl.EqualsCondition;
 import cn.bc.core.query.condition.impl.InCondition;
+import cn.bc.core.query.condition.impl.IsNullCondition;
 import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.db.jdbc.RowMapper;
 import cn.bc.db.jdbc.SqlObject;
@@ -112,9 +113,9 @@ public class SelectFeeTemplateAction extends
 				getText("feeTemplate.type"), 40)
 				.setValueFormater(new KeyValueFormater(this.getTypes())));
 		// 所属模板
-		columns.add(new TextColumn4MapKey("b.name", "pname",
+		/*columns.add(new TextColumn4MapKey("b.name", "pname",
 				getText("feeTemplate.ptempalte"), 100)
-				.setUseTitleFromLabel(true));
+				.setUseTitleFromLabel(true));*/
 		columns.add(new TextColumn4MapKey("a.name", "name",
 				getText("feeTemplate.name"), 150).setSortable(true).setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("a.price", "price",
@@ -208,6 +209,8 @@ public class SelectFeeTemplateAction extends
 						.add(new InCondition("a.module_", module.split(",")));
 			}
 		}
+		
+		andCondition.add(new IsNullCondition("a.pid"));
 
 		return andCondition;
 	}
