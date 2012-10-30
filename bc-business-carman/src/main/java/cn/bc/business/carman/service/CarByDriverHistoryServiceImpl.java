@@ -152,7 +152,8 @@ public class CarByDriverHistoryServiceImpl extends
 		// 如果车辆最新的迁移记录的类型为转车队时可以进行编辑，历史的不能进行编辑
 		if (entity.getMoveType() == CarByDriverHistory.MOVETYPE_ZCD) {
 			// 入库的操作的不作检测
-			if (!(oldStatus == BCConstants.STATUS_DRAFT && entity.getStatus() == BCConstants.STATUS_ENABLED)) {
+			if (!(oldStatus == BCConstants.STATUS_DRAFT && entity.getStatus() == BCConstants.STATUS_ENABLED)
+					|| entity.getStatus() == BCConstants.STATUS_DRAFT) {
 				if (!entity.getId().equals(
 						this.findNewestCarByDriverHistoryByCarId(
 								entity.getFromCar().getId()).getId())) {
@@ -173,14 +174,20 @@ public class CarByDriverHistoryServiceImpl extends
 		// 判断该迁移记录是否最新的迁移记录[排除历史的转车队迁移记录]
 		if (entity.getMoveType() != CarByDriverHistory.MOVETYPE_ZCD
 				&& isNew == false) {
-			// 入库的操作的不作检测
-			if (!(oldStatus == BCConstants.STATUS_DRAFT && entity.getStatus() == BCConstants.STATUS_ENABLED)) {
+			// 编辑草稿的迁移记录标记为不是最新
+			if (entity.getStatus() == BCConstants.STATUS_DRAFT) {
+				isNewest = false;
+			} else {
+				// 入库的操作的不作检测
+				if (!(oldStatus == BCConstants.STATUS_DRAFT && entity
+						.getStatus() == BCConstants.STATUS_ENABLED)) {
 
-				if (!entity.getId().equals(
-						this.findNewestCarByDriverHistory(
-								entity.getDriver().getId()).getId())) {
-					// 如果编辑的迁移记录不是最新的标记
-					isNewest = false;
+					if (!entity.getId().equals(
+							this.findNewestCarByDriverHistory(
+									entity.getDriver().getId()).getId())) {
+						// 如果编辑的迁移记录不是最新的标记
+						isNewest = false;
+					}
 				}
 			}
 		}
