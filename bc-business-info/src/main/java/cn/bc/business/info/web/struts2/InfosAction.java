@@ -164,9 +164,11 @@ public class InfosAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("i.send_date", "sendDate",
 				getText("info.sendDate"), 85).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
-		columns.add(new TextColumn4MapKey("i.code", "code",
-				getText("info.code"), 80).setSortable(true)
-				.setUseTitleFromLabel(true));
+		if (canUseManageView) {
+			columns.add(new TextColumn4MapKey("i.code", "code",
+					getText("info.code"), 80).setSortable(true)
+					.setUseTitleFromLabel(true));
+		}
 		columns.add(new TextColumn4MapKey("i.subject", "subject",
 				getText("info.subject")).setSortable(true)
 				.setUseTitleFromLabel(true));
