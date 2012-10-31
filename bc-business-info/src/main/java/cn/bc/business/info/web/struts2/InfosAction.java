@@ -113,7 +113,7 @@ public class InfosAction extends ViewAction<Map<String, Object>> {
 	@Override
 	protected OrderCondition getGridDefaultOrderCondition() {
 		return new OrderCondition("i.status_", Direction.Asc).add("i.code",
-				Direction.Asc).add("i.send_date", Direction.Desc);
+				Direction.Desc).add("i.send_date", Direction.Desc);
 	}
 
 	@Override
