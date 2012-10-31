@@ -112,8 +112,8 @@ public class InfosAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected OrderCondition getGridDefaultOrderCondition() {
-		return new OrderCondition("i.status_", Direction.Asc).add(
-				"i.file_date", Direction.Desc);
+		return new OrderCondition("i.status_", Direction.Asc).add("i.code",
+				Direction.Asc).add("i.send_date", Direction.Desc);
 	}
 
 	@Override
@@ -122,7 +122,7 @@ public class InfosAction extends ViewAction<Map<String, Object>> {
 
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer sql = new StringBuffer();
-		sql.append("select i.id id,i.status_ status,i.subject subject,i.source_ source");
+		sql.append("select i.id id,i.status_ status,i.code code,i.subject subject,i.source_ source");
 		sql.append(",i.send_date sendDate,i.file_date fileDate,uh.actor_name authorName");
 		sql.append(" from bs_info i");
 		sql.append(" inner join bc_identity_actor_history uh on uh.id = i.author_id");
@@ -138,6 +138,7 @@ public class InfosAction extends ViewAction<Map<String, Object>> {
 				int i = 0;
 				map.put("id", rs[i++]);
 				map.put("status", rs[i++]);
+				map.put("code", rs[i++]);
 				map.put("subject", rs[i++]);
 				map.put("source", rs[i++]);
 				map.put("sendDate", rs[i++]);
@@ -163,6 +164,9 @@ public class InfosAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("i.send_date", "sendDate",
 				getText("info.sendDate"), 85).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+		columns.add(new TextColumn4MapKey("i.code", "code",
+				getText("info.code"), 80).setSortable(true)
+				.setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("i.subject", "subject",
 				getText("info.subject")).setSortable(true)
 				.setUseTitleFromLabel(true));
