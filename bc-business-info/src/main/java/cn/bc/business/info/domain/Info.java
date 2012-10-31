@@ -44,6 +44,16 @@ public class Info extends RichFileEntityImpl {
 	private String content;// 详细内容
 	private int type;// 类型
 	private String source;// 信息来源：如公告的发布部门，提醒信息的链接地址等，具体格式有相应的信息类型决定
+	private String code;// 编号
+
+	@Column(name = "CODE")
+	public String getCode() {
+		return code;
+	}
+
+	public void setCode(String code) {
+		this.code = code;
+	}
 
 	public String getSubject() {
 		return subject;
