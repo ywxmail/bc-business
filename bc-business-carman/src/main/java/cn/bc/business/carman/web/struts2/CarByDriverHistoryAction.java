@@ -303,14 +303,16 @@ public class CarByDriverHistoryAction extends
 			CarByDriverHistory carByDriverHistory = this.carByDriverHistoryService
 					.load(this.getId());
 			if (carByDriverHistory.getMoveType() == CarByDriverHistory.MOVETYPE_ZCD) {
-				if (!this
-						.getId()
-						.equals(this.carByDriverHistoryService
-								.findNewestCarByDriverHistoryByCarId(
-										carByDriverHistory.getFromCar().getId())
-								.getId())) {
-					// 如果编辑的迁移记录不是最新的标记
-					isExistEditButton = false;
+				// 草稿的不作检测
+				if (carByDriverHistory.getStatus() != BCConstants.STATUS_DRAFT) {
+					if (!this.getId().equals(
+							this.carByDriverHistoryService
+									.findNewestCarByDriverHistoryByCarId(
+											carByDriverHistory.getFromCar()
+													.getId()).getId())) {
+						// 如果编辑的迁移记录不是最新的标记
+						isExistEditButton = false;
+					}
 				}
 
 			}
