@@ -105,10 +105,10 @@ public class InfoAction extends FileEntityAction<Long, Info> implements
 	protected PageOption buildFormPageOption(boolean editable) {
 		if (editable)
 			return super.buildFormPageOption(editable).setWidth(680)
-					.setHeight(450);
+					.setHeight(450).setPrint(null);
 		else
 			return super.buildFormPageOption(editable).setWidth(650)
-					.setHeight(400);
+					.setHeight(400).setPrint(null);
 	}
 
 	@Override
@@ -139,7 +139,7 @@ public class InfoAction extends FileEntityAction<Long, Info> implements
 	@Override
 	protected void afterOpen(Info e) {
 		this.customType = e.getType();
-		
+
 		// 构建附件控件
 		attachsUI = buildAttachsUI(false, true);
 
@@ -171,7 +171,8 @@ public class InfoAction extends FileEntityAction<Long, Info> implements
 		Map<String, String> types = new LinkedHashMap<String, String>();
 		types.put(String.valueOf(Info.TYPE_COMPANYGILE), getText("companyFile"));
 		types.put(String.valueOf(Info.TYPE_REGULATION), getText("regulation"));
-		types.put(String.valueOf(Info.TYPE_INSPECTIONFILE), getText("inspectionFile"));
+		types.put(String.valueOf(Info.TYPE_INSPECTIONFILE),
+				getText("inspectionFile"));
 		types.put(String.valueOf(Info.TYPE_NOTICE), getText("notice"));
 		return types;
 	}

@@ -4,7 +4,6 @@
 package cn.bc.business.carman.service;
 
 import cn.bc.business.carman.domain.CarByDriverHistory;
-import cn.bc.core.EntityImpl;
 import cn.bc.core.service.CrudService;
 
 /**
