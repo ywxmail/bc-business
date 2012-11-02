@@ -520,6 +520,7 @@ public class Contract4LabourServiceImpl extends
 		newContract.setStartDate(null);
 		newContract.setVerMajor(oldContract.getVerMajor() + 1);// 版本号+1
 		newContract.setVerMinor(0);
+		newContract.setStatus(BCConstants.STATUS_DRAFT);
 		// 记录旧的保存合同id
 		newContract.setPid(id);
 
