@@ -688,9 +688,9 @@ public class Contract4ChargerAction extends
 				}
 			} else {
 				// 经过续约，过户，重发包后
-//				pageOption.addButton(new ButtonOption(
-//						getText("label.save4Draft"), null,
-//						"bc.contract4ChargerForm.save"));
+				// pageOption.addButton(new ButtonOption(
+				// getText("label.save4Draft"), null,
+				// "bc.contract4ChargerForm.save"));
 				pageOption.addButton(new ButtonOption(
 						getText("label.warehousing"), null,
 						"bc.contract4ChargerForm.warehousing"));
@@ -707,10 +707,10 @@ public class Contract4ChargerAction extends
 			}
 		}
 		// 如果有录入权限的就有保存按钮
-		if (this.isEntering()
+		if ((this.isEntering() || !isReadonly())
 				&& this.getE().getStatus() == BCConstants.STATUS_DRAFT) {
-			pageOption.addButton(new ButtonOption(getText("label.save4Draft"), null,
-					"bc.contract4ChargerForm.save"));
+			pageOption.addButton(new ButtonOption(getText("label.save4Draft"),
+					null, "bc.contract4ChargerForm.save"));
 
 		}
 
