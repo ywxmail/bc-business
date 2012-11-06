@@ -220,15 +220,17 @@ public class CarByDriverHistoryAction extends
 				.load(this.getId());
 		// 判断该迁移记录是否最新的迁移记录[排除转车队的]
 		if (carByDriverHistory.getMoveType() != CarByDriverHistory.MOVETYPE_ZCD) {
-			if (!this.getId().equals(
-					this.carByDriverHistoryService
-							.findNewestCarByDriverHistory(
-									carByDriverHistory.getDriver().getId())
-							.getId())) {
-				// 如果编辑的迁移记录不是最新的标记
-				isNewest = false;
+			// 排除草稿状态的迁移记录
+			if (carByDriverHistory.getStatus() != BCConstants.STATUS_DRAFT) {
+				if (!this.getId().equals(
+						this.carByDriverHistoryService
+								.findNewestCarByDriverHistory(
+										carByDriverHistory.getDriver().getId())
+								.getId())) {
+					// 如果编辑的迁移记录不是最新的标记
+					isNewest = false;
+				}
 			}
-
 		}
 		super.edit();
 		return this.getFormName(this.getE().getMoveType());
@@ -301,14 +303,16 @@ public class CarByDriverHistoryAction extends
 			CarByDriverHistory carByDriverHistory = this.carByDriverHistoryService
 					.load(this.getId());
 			if (carByDriverHistory.getMoveType() == CarByDriverHistory.MOVETYPE_ZCD) {
-				if (!this
-						.getId()
-						.equals(this.carByDriverHistoryService
-								.findNewestCarByDriverHistoryByCarId(
-										carByDriverHistory.getFromCar().getId())
-								.getId())) {
-					// 如果编辑的迁移记录不是最新的标记
-					isExistEditButton = false;
+				// 草稿的不作检测
+				if (carByDriverHistory.getStatus() != BCConstants.STATUS_DRAFT) {
+					if (!this.getId().equals(
+							this.carByDriverHistoryService
+									.findNewestCarByDriverHistoryByCarId(
+											carByDriverHistory.getFromCar()
+													.getId()).getId())) {
+						// 如果编辑的迁移记录不是最新的标记
+						isExistEditButton = false;
+					}
 				}
 
 			}

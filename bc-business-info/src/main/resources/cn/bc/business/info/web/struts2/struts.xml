@@ -197,4 +197,66 @@
 			<param name="customRole">BS_NOTICE_MANAGE</param>
 		</action>
 	</package>
+		
+	<!-- 督查分数文件：表单 -->
+	<package name="inspectionFile" extends="bc-default" namespace="/bc-business/info/inspectionFile">
+		<action name="create" class="infoAction" method="create">
+			<result name="form">/bc-business/info/form.jsp</result>
+			<param name="customType">3</param>
+			<param name="customRole">BS_INSPECTIONFILE_MANAGE</param>
+		</action>
+		<action name="edit" class="infoAction" method="edit">
+			<result name="form">/bc-business/info/form.jsp</result>
+			<param name="customType">3</param>
+			<param name="customRole">BS_INSPECTIONFILE_MANAGE</param>
+		</action>
+	</package>
+	<!-- 督查分数文件：普通用户视图 -->
+	<package name="inspectionFiles" extends="bc-default" namespace="/bc-business/info/inspectionFiles">
+		<!-- 分页视图 -->
+		<action name="paging" class="infosAction" method="paging">
+			<param name="viewType">0</param>
+			<param name="customName">inspectionFile</param>
+			<param name="customType">3</param>
+			<param name="customRole">BS_INSPECTIONFILE_MANAGE</param>
+		</action>
+		<!-- 分页数据 -->
+		<action name="data" class="infosAction" method="data">
+			<param name="viewType">0</param>
+			<param name="customName">inspectionFile</param>
+			<param name="customType">3</param>
+			<param name="customRole">BS_INSPECTIONFILE_MANAGE</param>
+		</action>
+		<!-- 导出 视图数据-->
+		<action name="export" class="infosAction" method="export">
+			<param name="viewType">0</param>
+			<param name="customName">inspectionFile</param>
+			<param name="customType">3</param>
+			<param name="customRole">BS_INSPECTIONFILE_MANAGE</param>
+		</action>
+	</package>
+	<!-- 督查分数文件：管理端视图 -->
+	<package name="inspectionFilesManage" extends="bc-default" namespace="/bc-business/info/inspectionFilesManage">
+		<!-- 分页视图 -->
+		<action name="paging" class="infosAction" method="paging" >
+			<param name="viewType">1</param>
+			<param name="customName">inspectionFile</param>
+			<param name="customType">3</param>
+			<param name="customRole">BS_INSPECTIONFILE_MANAGE</param>
+		</action>
+		<!-- 分页数据 -->
+		<action name="data" class="infosAction" method="data" >
+			<param name="viewType">1</param>
+			<param name="customName">inspectionFile</param>
+			<param name="customType">3</param>
+			<param name="customRole">BS_INSPECTIONFILE_MANAGE</param>
+		</action>
+		<!-- 导出 视图数据-->
+		<action name="export" class="infosAction" method="export" >
+			<param name="viewType">1</param>
+			<param name="customName">inspectionFile</param>
+			<param name="customType">3</param>
+			<param name="customRole">BS_INSPECTIONFILE_MANAGE</param>
+		</action>
+	</package>
 </struts>
