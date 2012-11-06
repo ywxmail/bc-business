@@ -28,6 +28,7 @@ import cn.bc.web.ui.html.grid.IdColumn4MapKey;
 import cn.bc.web.ui.html.grid.TextColumn4MapKey;
 import cn.bc.web.ui.html.page.PageOption;
 import cn.bc.web.ui.html.toolbar.Toolbar;
+import cn.bc.web.ui.html.toolbar.ToolbarButton;
 import cn.bc.web.ui.json.Json;
 
 /**
@@ -163,7 +164,6 @@ public class MotorcadesAction extends ViewAction<Map<String, Object>> {
 	@Override
 	protected void extendGridExtrasData(Json json) {
 		super.extendGridExtrasData(json);
-
 		// 状态条件
 		if (this.status != null && this.status.trim().length() > 0) {
 			json.put("status", status);
@@ -172,6 +172,17 @@ public class MotorcadesAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected Toolbar getHtmlPageToolbar() {
-		return getHtmlPageToolbar(true);
+		Toolbar tb = getHtmlPageToolbar(true);
+		if(!isReadonly()){
+			tb.addButton(new ToolbarButton().setIcon("ui-icon-lightbulb")
+					.setText(getText("motorcade.viewHistoryCarQuantity"))
+					.setClick("bc.motorcadeList.viewHistoryCarQuantity"));
+		}
+		return tb;
+	}
+	
+	@Override
+	protected String getHtmlPageJs() {
+		return this.getHtmlPageNamespace() + "/motorcade/list.js";
 	}
 }
