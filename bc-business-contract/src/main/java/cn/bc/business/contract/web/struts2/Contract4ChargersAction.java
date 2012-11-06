@@ -182,7 +182,7 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer sql = new StringBuffer();
-		sql.append("select cc.id,cc.sign_type,cc.bs_type,cc.contract_version_no,c.word_no,c.status_,c.ext_str1,c.ext_str2");
+		sql.append("select cc.id,cc.sign_type,cc.bs_type,cc.contract_version_no,car.code,c.status_,c.ext_str1,c.ext_str2");
 		sql.append(",c.transactor_name,c.sign_date,c.start_date,c.end_date,c.code,c.logout_id,iah.actor_name,c.logout_date");
 		sql.append(",cc.payment_date,car.id carId");
 		sql.append(",c.ver_major,c.ver_minor,c.op_type");
@@ -303,7 +303,7 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 												.get("carId"));
 							}
 						}));
-		columns.add(new TextColumn4MapKey("c.word_no", "word_no",
+		columns.add(new TextColumn4MapKey("car.code", "word_no",
 				getText("contract4Charger.wordNo"), 70)
 				.setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("c.ext_str2", "ext_str2",
@@ -417,7 +417,7 @@ public class Contract4ChargersAction extends ViewAction<Map<String, Object>> {
 	@Override
 	protected String[] getGridSearchFields() {
 		return new String[] { "c.code", "c.ext_str1", "c.ext_str2",
-				"c.word_no", "cc.bs_type", "c.word_no", "car.company",
+				"car.code", "cc.bs_type", "car.company",
 				"bia.name", "m.name", "cc.car_maintain" };
 	}
 
