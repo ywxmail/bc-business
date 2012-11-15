@@ -93,7 +93,8 @@ public class OwnershipServiceImpl extends DefaultCrudService<Ownership>
 				for (Long carId : (Long[]) allCarIds.toArray(new Long[0])) {
 					Ownership ow = new Ownership();
 					Car insertCar = this.carDao.load(carId);
-					ow.setCar(insertCar);
+					//TODO
+					// ow.setCar(insertCar);
 					ow.setAuthor(author);
 					ow.setFileDate(fileDate);
 					ow.setModifier(modifier);

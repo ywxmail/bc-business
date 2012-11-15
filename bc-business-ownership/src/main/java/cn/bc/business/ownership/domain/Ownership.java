@@ -2,12 +2,9 @@ package cn.bc.business.ownership.domain;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
-import cn.bc.business.car.domain.Car;
+import cn.bc.BCConstants;
 import cn.bc.identity.domain.FileEntityImpl;
 
 /**
@@ -19,20 +16,41 @@ import cn.bc.identity.domain.FileEntityImpl;
 @Table(name = "BS_CAR_OWNERSHIP")
 public class Ownership extends FileEntityImpl {
 	private static final long serialVersionUID = 1L;
+	private int status = BCConstants.STATUS_ENABLED;
+	private String number;// 经营权证号
 	private String nature;// 经营权性质
 	private String situation;// 经营权情况
+	private String source;// 经营权来源
 	private String owner;// 车辆产权
 	private String description;// 备注
-	private Car car;// 车辆
 
-	@OneToOne(fetch = FetchType.EAGER, optional = true)
-	@JoinColumn(name = "CAR_ID", referencedColumnName = "ID")
-	public Car getCar() {
-		return car;
+	// private Car car;// 车辆
+
+	// @OneToOne(fetch = FetchType.EAGER, optional = true)
+	// @JoinColumn(name = "CAR_ID", referencedColumnName = "ID")
+	// public Car getCar() {
+	// return car;
+	// }
+	//
+	// public void setCar(Car car) {
+	// this.car = car;
+	// }
+	@Column(name = "STATUS_")
+	public int getStatus() {
+		return status;
 	}
 
-	public void setCar(Car car) {
-		this.car = car;
+	public void setStatus(int status) {
+		this.status = status;
+	}
+
+	@Column(name = "NUMBER_")
+	public String getNumber() {
+		return number;
+	}
+
+	public void setNumber(String number) {
+		this.number = number;
 	}
 
 	public String getNature() {
@@ -49,6 +67,14 @@ public class Ownership extends FileEntityImpl {
 
 	public void setSituation(String situation) {
 		this.situation = situation;
+	}
+
+	public String getSource() {
+		return source;
+	}
+
+	public void setSource(String source) {
+		this.source = source;
 	}
 
 	@Column(name = "OWNER_")
