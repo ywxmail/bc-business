@@ -500,7 +500,7 @@ public class CarAction extends FileEntityAction<Long, Car> {
 	}
 
 	/**
-	 * 通过自编号是否被其他车辆使用过,并且将使用过此编号的车辆的车牌号生成到新车的原车号. 如果返回多辆车只取最新登记日期那辆车牌号.
+	 * 通过经营权号是否被其他车辆使用过,并且将使用过此编号的车辆的车牌号生成到新车的原车号. 如果返回多辆车只取最新登记日期那辆车牌号.
 	 */
 	public String autoSetOriginNo() {
 		Json json = new Json();
