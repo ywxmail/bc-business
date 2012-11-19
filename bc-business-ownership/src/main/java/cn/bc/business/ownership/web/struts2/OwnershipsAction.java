@@ -5,6 +5,7 @@ package cn.bc.business.ownership.web.struts2;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -15,6 +16,8 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
+import com.google.gson.JsonObject;
+
 import cn.bc.BCConstants;
 import cn.bc.business.OptionConstants;
 import cn.bc.business.motorcade.service.MotorcadeService;
@@ -23,9 +26,11 @@ import cn.bc.business.web.struts2.ViewAction;
 import cn.bc.core.query.condition.Condition;
 import cn.bc.core.query.condition.ConditionUtils;
 import cn.bc.core.query.condition.Direction;
+import cn.bc.core.query.condition.impl.AndCondition;
 import cn.bc.core.query.condition.impl.EqualsCondition;
 import cn.bc.core.query.condition.impl.InCondition;
 import cn.bc.core.query.condition.impl.OrderCondition;
+import cn.bc.core.query.condition.impl.QlCondition;
 import cn.bc.core.util.StringUtils;
 import cn.bc.db.jdbc.RowMapper;
 import cn.bc.db.jdbc.SqlObject;
@@ -38,6 +43,7 @@ import cn.bc.web.formater.AbstractFormater;
 import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.formater.KeyValueFormater;
 import cn.bc.web.ui.html.grid.Column;
+import cn.bc.web.ui.html.grid.FooterButton;
 import cn.bc.web.ui.html.grid.IdColumn4MapKey;
 import cn.bc.web.ui.html.grid.TextColumn4MapKey;
 import cn.bc.web.ui.html.page.PageOption;
@@ -57,6 +63,7 @@ public class OwnershipsAction extends ViewAction<Map<String, Object>> {
 	public String status = String.valueOf(BCConstants.STATUS_ENABLED); // 车辆的状态，多个用逗号连接
 	public Long carId;// 车辆Id
 	private OptionService optionService;
+	public List<Map<String, String>> logoutReasonList; // 注销原因列表
 
 	@Autowired
 	public void setOptionService(OptionService optionService) {
@@ -88,10 +95,16 @@ public class OwnershipsAction extends ViewAction<Map<String, Object>> {
 		sql.append("select o.id,o.status_,o.number_,o.nature,o.situation,o.source,o.owner_");
 		sql.append(",o.file_date,ac.actor_name author,o.modified_date,md.actor_name modifier");
 		sql.append(",c.plate_type,c.plate_no,c.register_date,c.operate_date,getDisabledCarByOwnerNumber(o.number_) carInfo");
+		sql.append(",oc.plate_type oplate_type,oc.plate_no oplate_no,oc.register_date oregister_date,oc.factory_type,oc.factory_model,oc.bs_type");
+		sql.append(",getContract4ChargerScrapTo(oc.id) scrapto,oc.logout_reason,oc.return_date,oc.verify_date");
 		sql.append(" from bs_car_ownership o");
-		sql.append(" left join bs_car c on c.cert_no2=o.number_");
+		sql.append(" left join bs_car c on (c.cert_no2=o.number_ and c.status_ = 0)");
+		sql.append(" left join bs_car oc on (oc.cert_no2=o.number_ and oc.status_ =1)");
 		sql.append(" left join BC_IDENTITY_ACTOR_HISTORY md on md.id=o.modifier_id");
 		sql.append(" left join BC_IDENTITY_ACTOR_HISTORY ac on ac.id=o.author_id");
+		sql.append(" left join bs_motorcade m on m.id=c.motorcade_id");
+		sql.append(" left join bc_identity_actor bia on bia.id=m.unit_id");
+
 		sqlObject.setSql(sql.toString());
 
 		// 注入参数
@@ -119,6 +132,17 @@ public class OwnershipsAction extends ViewAction<Map<String, Object>> {
 				map.put("operate_date", rs[i++]);
 				map.put("carInfo", rs[i++]);
 
+				map.put("oplate_type", rs[i++]);
+				map.put("oplate_no", rs[i++]);
+				map.put("oregister_date", rs[i++]);
+				map.put("factory_type", rs[i++]);
+				map.put("factory_model", rs[i++]);
+				map.put("bs_type", rs[i++]);
+				map.put("scrapto", rs[i++]);
+				map.put("logout_reason", rs[i++]);
+				map.put("return_date", rs[i++]);
+				map.put("verify_date", rs[i++]);
+
 				return map;
 			}
 		});
@@ -144,26 +168,88 @@ public class OwnershipsAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("o.owner_", "owner_",
 				getText("ownership.owner"), 80).setSortable(true)
 				.setUseTitleFromLabel(true));
-		// 车牌号码
+		// 新车牌号码
 		columns.add(new TextColumn4MapKey("c.plate_no", "plate_no",
-				getText("car.plate"), 80).setUseTitleFromLabel(true)
+				getText("ownership.newPlate"), 90).setUseTitleFromLabel(true)
 				.setValueFormater(new AbstractFormater<String>() {
 					@SuppressWarnings("unchecked")
 					@Override
 					public String format(Object context, Object value) {
 						Map<String, Object> car = (Map<String, Object>) context;
-						return car.get("plate_type") + "."
-								+ car.get("plate_no");
+						return (car.get("plate_no") != null ? car
+								.get("plate_type") + "." + car.get("plate_no")
+								: "");
 					}
 				}));
 		// 登记日期
 		columns.add(new TextColumn4MapKey("c.register_date", "register_date",
-				getText("ownership.registerDate"), 90).setSortable(true)
+				getText("ownership.newRegisterDate"), 90).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
 		// 投产日期
 		columns.add(new TextColumn4MapKey("c.operate_date", "operate_date",
-				getText("ownership.operate_date"), 90).setSortable(true)
+				getText("ownership.newOperate_date"), 90).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+		columns.add(new TextColumn4MapKey("oc.logout_reason", "logout_reason",
+				getText("ownership.model"), 100).setSortable(true)
+				.setUseTitleFromLabel(true)
+				.setValueFormater(new KeyValueFormater(getModelValue())));
+		columns.add(new TextColumn4MapKey("oc.return_date", "return_date",
+				getText("ownership.return_date"), 90).setSortable(true)
+				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+		columns.add(new TextColumn4MapKey("oc.verify_date", "verify_date",
+				getText("ownership.verify_date"), 90).setSortable(true)
+				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+		// 旧车牌号码
+		columns.add(new TextColumn4MapKey("oc.plate_no", "plate_no",
+				getText("ownership.oldPlate"), 90).setUseTitleFromLabel(true)
+				.setValueFormater(new AbstractFormater<String>() {
+					@SuppressWarnings("unchecked")
+					@Override
+					public String format(Object context, Object value) {
+						Map<String, Object> car = (Map<String, Object>) context;
+
+						return (car.get("oplate_no") != null ? car
+								.get("oplate_type")
+								+ "."
+								+ car.get("oplate_no") : "");
+					}
+				}));
+		// 登记日期
+		columns.add(new TextColumn4MapKey("oc.register_date", "oregister_date",
+				getText("ownership.oldRegisterDate"), 90).setSortable(true)
+				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+		// columns.add(new TextColumn4MapKey("oc.factory_type", "factory_type",
+		// getText("ownership.factory_type"), 80).setSortable(true)
+		// .setUseTitleFromLabel(true));
+		// 车型 -厂牌类型、厂牌型号
+		columns.add(new TextColumn4MapKey("oc.factory_type", "factory_type",
+				getText("ownership.oldFactory_type"), 150).setUseTitleFromLabel(
+				true).setValueFormater(new AbstractFormater<String>() {
+			@Override
+			public String format(Object context, Object value) {
+				// 从上下文取出元素Map
+				@SuppressWarnings("unchecked")
+				Map<String, Object> ownership = (Map<String, Object>) context;
+				if (ownership.get("factory_type") != null
+						&& ownership.get("factory_model") != null) {
+					return ownership.get("factory_type") + " "
+							+ ownership.get("factory_model");
+				} else if (ownership.get("factory_model") != null) {
+					return ownership.get("factory_model").toString();
+				} else if (ownership.get("factory_type") != null) {
+					return ownership.get("factory_type") + " ";
+				} else {
+					return "";
+				}
+			}
+		}));
+		columns.add(new TextColumn4MapKey("oc.bs_type", "bs_type",
+				getText("ownership.oldBs_type"), 80).setSortable(true)
+				.setUseTitleFromLabel(true));
+		columns.add(new TextColumn4MapKey("oc.bs_type", "scrapto",
+				getText("ownership.oldScrapto"), 80).setSortable(true)
+				.setUseTitleFromLabel(true));
+
 		columns.add(new TextColumn4MapKey("c.carinfo", "carInfo",
 				getText("ownership.oldCar"), 560)
 				.setValueFormater(new LinkFormater4CarInfo(this
@@ -180,6 +266,23 @@ public class OwnershipsAction extends ViewAction<Map<String, Object>> {
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
 
 		return columns;
+	}
+
+	public Map<String, String> getModelValue() {
+
+		// 批量加载可选项列表
+		Map<String, List<Map<String, String>>> optionItems = this.optionService
+				.findOptionItemByGroupKeys(new String[] { OptionConstants.CAR_LOGOUT_REASON });
+		// 车辆注销原因
+		logoutReasonList = optionItems.get(OptionConstants.CAR_LOGOUT_REASON);
+		Map<String, String> model = new LinkedHashMap<String, String>();
+		for (int i = 0; i < logoutReasonList.size(); i++) {
+			model.put(logoutReasonList.get(i).get("key"),
+					logoutReasonList.get(i).get("value"));
+		}
+
+		return model;
+
 	}
 
 	@Override
@@ -246,25 +349,30 @@ public class OwnershipsAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected Condition getGridSpecalCondition() {
+		AndCondition andCondition = new AndCondition();
 		// 状态条件
 		Condition statusCondition = null;
-		Condition carStatusCondition = null;
+		Condition filterCondition = null;
 		// 状态
 		if (status != null && status.length() > 0) {
 			String[] ss = status.split(",");
 			if (ss.length == 1) {
-				statusCondition = new EqualsCondition("c.status_", new Integer(
+				statusCondition = new EqualsCondition("o.status_", new Integer(
 						ss[0]));
 			} else {
-				statusCondition = new InCondition("c.status_",
+				statusCondition = new InCondition("o.status_",
 						StringUtils.stringArray2IntegerArray(ss));
 			}
 		}
-		// 车辆状态
-		carStatusCondition = new EqualsCondition("c.status_",
-				BCConstants.STATUS_ENABLED);
-		return ConditionUtils.mix2AndCondition(statusCondition,
-				carStatusCondition);
+		// 取报废日期最新的注销车辆
+		filterCondition = andCondition
+				.add(new QlCondition(
+						"not exists(select 1 from bs_car_ownership o2 left join bs_car oc2 on (oc2.cert_no2=o2.number_ and oc2.status_ ="
+								+ BCConstants.STATUS_DISABLED
+								+ ") where oc.cert_no2=oc2.cert_no2"
+								+ " and oc2.scrap_date > oc.scrap_date)"));
+		return ConditionUtils
+				.mix2AndCondition(statusCondition, filterCondition);
 	}
 
 	@Override
@@ -276,6 +384,22 @@ public class OwnershipsAction extends ViewAction<Map<String, Object>> {
 			json.put("status", status);
 		}
 
+	}
+
+	@Override
+	protected FooterButton getGridFooterImportButton() {
+		// 获取默认的导入按钮设置
+		FooterButton fb = this.getDefaultGridFooterImportButton();
+
+		// 配置特殊参数
+		JsonObject cfg = new JsonObject();
+		cfg.addProperty("tplCode", "IMPORT_OWNERSHIP");// 模板编码
+		cfg.addProperty("importAction", "bc-business/ownership/import");// 导入数据的action路径(使用相对路径)
+		cfg.addProperty("headerRowIndex", 0);// 列标题所在行的索引号(0-based)
+		fb.setAttr("data-cfg", cfg.toString());
+
+		// 返回导入按钮
+		return fb;
 	}
 
 	// ==高级搜索代码开始==
@@ -311,7 +435,8 @@ public class OwnershipsAction extends ViewAction<Map<String, Object>> {
 				.findOptionItemByGroupKeys(new String[] {
 						OptionConstants.OWNERSHIP_NATURE,
 						OptionConstants.OWNERSHIP_OWNER,
-						OptionConstants.OWNERSHIP_SITUATION });
+						OptionConstants.OWNERSHIP_SITUATION,
+						OptionConstants.CAR_LOGOUT_REASON });
 		// 经营权性质
 		natures = OptionItem.toLabelValues(optionItems
 				.get(OptionConstants.OWNERSHIP_NATURE));
@@ -329,6 +454,8 @@ public class OwnershipsAction extends ViewAction<Map<String, Object>> {
 		// 可选车队列表
 		motorcades = OptionItem.toLabelValues(this.motorcadeService
 				.find4Option(null));
+		// 车辆注销原因
+		logoutReasonList = optionItems.get(OptionConstants.CAR_LOGOUT_REASON);
 	}
 
 	// ==高级搜索代码结束==

@@ -108,4 +108,19 @@ public class OwnershipDaoImpl extends HibernateCrudJpaDao<Ownership> implements
 			return ((ArrayList<Object>) updateCarIds);
 		}
 	}
+
+	public Ownership getOwershipByNumber(String number) {
+		Ownership os = null;
+		String hql = "select o from Ownership o where o.number=?";
+		List<?> list = this.getJpaTemplate().find(hql, new Object[] { number });
+		if (list.size() == 1) {
+			os = (Ownership) list.get(0);
+			return os;
+		} else if (list.size() == 0) {
+			return null;
+		} else {
+			os = (Ownership) list.get(0);
+		}
+		return os;
+	}
 }

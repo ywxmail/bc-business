@@ -8,7 +8,6 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import cn.bc.business.car.dao.CarDao;
-import cn.bc.business.car.domain.Car;
 import cn.bc.business.ownership.dao.OwnershipDao;
 import cn.bc.business.ownership.domain.Ownership;
 import cn.bc.core.service.DefaultCrudService;
@@ -90,31 +89,34 @@ public class OwnershipServiceImpl extends DefaultCrudService<Ownership>
 		if (allCarIds != null) {
 			if ((Long[]) allCarIds.toArray(new Long[0]) != null
 					|| ((Long[]) allCarIds.toArray(new Long[0])).length != 0) {
-				for (Long carId : (Long[]) allCarIds.toArray(new Long[0])) {
-					Ownership ow = new Ownership();
-					Car insertCar = this.carDao.load(carId);
-					//TODO
-					// ow.setCar(insertCar);
-					ow.setAuthor(author);
-					ow.setFileDate(fileDate);
-					ow.setModifier(modifier);
-					ow.setModifiedDate(modifiedDate);
-					if (nature != null) {
-						ow.setNature(nature);
-					}
-					if (situation != null) {
-						ow.setSituation(situation);
-					}
-					if (owner != null) {
-						ow.setOwner(owner);
-					}
-					if (description != null) {
-						ow.setDescription(description);
-					}
-					this.ownershipDao.save(ow);
+				// for (Long carId : (Long[]) allCarIds.toArray(new Long[0])) {
+				Ownership ow = new Ownership();
+				// Car insertCar = this.carDao.load(carId);
+				// ow.setCar(insertCar);
+				ow.setAuthor(author);
+				ow.setFileDate(fileDate);
+				ow.setModifier(modifier);
+				ow.setModifiedDate(modifiedDate);
+				if (nature != null) {
+					ow.setNature(nature);
 				}
+				if (situation != null) {
+					ow.setSituation(situation);
+				}
+				if (owner != null) {
+					ow.setOwner(owner);
+				}
+				if (description != null) {
+					ow.setDescription(description);
+				}
+				this.ownershipDao.save(ow);
+				// }
 			}
 		}
+	}
+
+	public Ownership getOwershipByNumber(String number) {
+		return this.ownershipDao.getOwershipByNumber(number);
 	}
 
 }

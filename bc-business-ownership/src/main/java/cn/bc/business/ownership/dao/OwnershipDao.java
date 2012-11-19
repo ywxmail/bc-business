@@ -38,4 +38,13 @@ public interface OwnershipDao extends CrudDao<Ownership> {
 	 */
 	ArrayList<Object> getUpdateCarIdsList(Long[] carIds);
 
+	/**
+	 * 根据经营权证号查找经营权
+	 * 
+	 * @param number
+	 *            经营权证号
+	 * @return
+	 */
+	Ownership getOwershipByNumber(String number);
+
 }
