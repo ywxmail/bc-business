@@ -81,6 +81,11 @@ public class OwnershipAction extends FileEntityAction<Long, Ownership> {
 
 	}
 
+	// 不使用打印按钮
+	protected boolean useFormPrint() {
+		return false;
+	}
+
 	@Override
 	protected PageOption buildFormPageOption(boolean editable) {
 		return super.buildFormPageOption(editable).setWidth(400)
