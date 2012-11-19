@@ -84,7 +84,8 @@ public class OwnershipAction extends FileEntityAction<Long, Ownership> {
 	@Override
 	protected PageOption buildFormPageOption(boolean editable) {
 		return super.buildFormPageOption(editable).setWidth(400)
-				.setMinWidth(250);
+				.setMinWidth(250).setMaximizable(false).setMinimizable(false)
+				.setPrint(null);
 	}
 
 }

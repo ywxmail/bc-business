@@ -22,6 +22,8 @@ public class Ownership extends FileEntityImpl {
 	private String situation;// 经营权情况
 	private String source;// 经营权来源
 	private String owner;// 车辆产权
+	private String ownership;// 车辆权属
+	private String whither;// 车辆去向
 	private String description;// 备注
 
 	// private Car car;// 车辆
@@ -94,4 +96,21 @@ public class Ownership extends FileEntityImpl {
 	public void setDescription(String description) {
 		this.description = description;
 	}
+
+	public String getOwnership() {
+		return ownership;
+	}
+
+	public void setOwnership(String ownership) {
+		this.ownership = ownership;
+	}
+
+	public String getWhither() {
+		return whither;
+	}
+
+	public void setWhither(String whither) {
+		this.whither = whither;
+	}
+
 }

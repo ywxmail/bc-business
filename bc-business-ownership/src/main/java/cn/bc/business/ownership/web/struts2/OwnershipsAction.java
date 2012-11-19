@@ -92,11 +92,12 @@ public class OwnershipsAction extends ViewAction<Map<String, Object>> {
 
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer sql = new StringBuffer();
-		sql.append("select o.id,o.status_,o.number_,o.nature,o.situation,o.source,o.owner_");
+		sql.append("select o.id,o.status_,o.number_,o.nature,o.situation,o.source,o.owner_,o.ownership,o.whither");
 		sql.append(",o.file_date,ac.actor_name author,o.modified_date,md.actor_name modifier");
 		sql.append(",c.plate_type,c.plate_no,c.register_date,c.operate_date,getDisabledCarByOwnerNumber(o.number_) carInfo");
-		sql.append(",oc.plate_type oplate_type,oc.plate_no oplate_no,oc.register_date oregister_date,oc.factory_type,oc.factory_model,oc.bs_type");
-		sql.append(",getContract4ChargerScrapTo(oc.id) scrapto,oc.logout_reason,oc.return_date,oc.verify_date");
+		sql.append(",c.company,bia.name as unit_name,c.bs_type nbs_type,c.factory_type,c.factory_model,c.origin_no");
+		sql.append(",oc.plate_type oplate_type,oc.plate_no oplate_no,oc.register_date oregister_date,oc.factory_type ofactory_type");
+		sql.append(",oc.factory_model ofactory_model,oc.bs_type,getContract4ChargerScrapTo(oc.id) scrapto,oc.logout_reason,oc.return_date,oc.verify_date");
 		sql.append(" from bs_car_ownership o");
 		sql.append(" left join bs_car c on (c.cert_no2=o.number_ and c.status_ = 0)");
 		sql.append(" left join bs_car oc on (oc.cert_no2=o.number_ and oc.status_ =1)");
@@ -122,6 +123,8 @@ public class OwnershipsAction extends ViewAction<Map<String, Object>> {
 				map.put("situation", rs[i++]);
 				map.put("source", rs[i++]);
 				map.put("owner_", rs[i++]);
+				map.put("ownership", rs[i++]);
+				map.put("whither", rs[i++]);
 				map.put("file_date", rs[i++]);
 				map.put("author", rs[i++]);
 				map.put("modified_date", rs[i++]);
@@ -131,12 +134,18 @@ public class OwnershipsAction extends ViewAction<Map<String, Object>> {
 				map.put("register_date", rs[i++]);
 				map.put("operate_date", rs[i++]);
 				map.put("carInfo", rs[i++]);
-
+				map.put("company", rs[i++]);
+				map.put("unit_name", rs[i++]);
+				map.put("nbs_type", rs[i++]);
+				map.put("factory_type", rs[i++]);
+				map.put("factory_model", rs[i++]);
+				map.put("origin_no", rs[i++]);
+				
 				map.put("oplate_type", rs[i++]);
 				map.put("oplate_no", rs[i++]);
 				map.put("oregister_date", rs[i++]);
-				map.put("factory_type", rs[i++]);
-				map.put("factory_model", rs[i++]);
+				map.put("ofactory_type", rs[i++]);
+				map.put("ofactory_model", rs[i++]);
 				map.put("bs_type", rs[i++]);
 				map.put("scrapto", rs[i++]);
 				map.put("logout_reason", rs[i++]);
@@ -157,7 +166,13 @@ public class OwnershipsAction extends ViewAction<Map<String, Object>> {
 				getText("label.status"), 60).setSortable(true)
 				.setValueFormater(new KeyValueFormater(getEntityStatuses())));
 		columns.add(new TextColumn4MapKey("o.number_", "number_",
-				getText("car.certNo2"), 120).setSortable(true)
+				getText("ownership.number"), 120).setSortable(true)
+				.setUseTitleFromLabel(true));
+		columns.add(new TextColumn4MapKey("o.ownership", "ownership",
+				getText("ownership.owner_ship"), 80).setSortable(true)
+				.setUseTitleFromLabel(true));
+		columns.add(new TextColumn4MapKey("o.source", "source",
+				getText("ownership.source"), 80).setSortable(true)
 				.setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("o.nature", "nature",
 				getText("ownership.nature"), 80).setSortable(true)
@@ -168,6 +183,18 @@ public class OwnershipsAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("o.owner_", "owner_",
 				getText("ownership.owner"), 80).setSortable(true)
 				.setUseTitleFromLabel(true));
+		columns.add(new TextColumn4MapKey("o.whither", "whither",
+				getText("ownership.whither"), 80).setSortable(true)
+				.setUseTitleFromLabel(true));
+		// 公司
+		columns.add(new TextColumn4MapKey("c.company", "company",
+				getText("car.company"), 40).setSortable(true)
+				.setUseTitleFromLabel(true));
+		// 分公司
+		columns.add(new TextColumn4MapKey("bia.name", "unit_name",
+				getText("car.unitname"), 60).setSortable(true)
+				.setUseTitleFromLabel(true));
+
 		// 新车牌号码
 		columns.add(new TextColumn4MapKey("c.plate_no", "plate_no",
 				getText("ownership.newPlate"), 90).setUseTitleFromLabel(true)
@@ -181,9 +208,37 @@ public class OwnershipsAction extends ViewAction<Map<String, Object>> {
 								: "");
 					}
 				}));
+		columns.add(new TextColumn4MapKey("c.bs_type", "nbs_type",
+				getText("car.businessType"), 80).setSortable(true)
+				.setUseTitleFromLabel(true));
+		// 车型 -厂牌类型、厂牌型号
+		columns.add(new TextColumn4MapKey("c.factory_type", "factory_type",
+				getText("ownership.factory_type"), 150).setUseTitleFromLabel(
+				true).setValueFormater(new AbstractFormater<String>() {
+			@Override
+			public String format(Object context, Object value) {
+				// 从上下文取出元素Map
+				@SuppressWarnings("unchecked")
+				Map<String, Object> ownership = (Map<String, Object>) context;
+				if (ownership.get("factory_type") != null
+						&& ownership.get("factory_model") != null) {
+					return ownership.get("factory_type") + " "
+							+ ownership.get("factory_model");
+				} else if (ownership.get("factory_model") != null) {
+					return ownership.get("factory_model").toString();
+				} else if (ownership.get("factory_type") != null) {
+					return ownership.get("factory_type") + " ";
+				} else {
+					return "";
+				}
+			}
+		}));
+		columns.add(new TextColumn4MapKey("c.origin_no", "origin_no",
+				getText("ownership.origin_no"), 60).setSortable(true)
+				.setUseTitleFromLabel(true));
 		// 登记日期
 		columns.add(new TextColumn4MapKey("c.register_date", "register_date",
-				getText("ownership.newRegisterDate"), 90).setSortable(true)
+				getText("car.registerDate"), 90).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
 		// 投产日期
 		columns.add(new TextColumn4MapKey("c.operate_date", "operate_date",
@@ -222,27 +277,29 @@ public class OwnershipsAction extends ViewAction<Map<String, Object>> {
 		// getText("ownership.factory_type"), 80).setSortable(true)
 		// .setUseTitleFromLabel(true));
 		// 车型 -厂牌类型、厂牌型号
-		columns.add(new TextColumn4MapKey("oc.factory_type", "factory_type",
-				getText("ownership.oldFactory_type"), 150).setUseTitleFromLabel(
-				true).setValueFormater(new AbstractFormater<String>() {
-			@Override
-			public String format(Object context, Object value) {
-				// 从上下文取出元素Map
-				@SuppressWarnings("unchecked")
-				Map<String, Object> ownership = (Map<String, Object>) context;
-				if (ownership.get("factory_type") != null
-						&& ownership.get("factory_model") != null) {
-					return ownership.get("factory_type") + " "
-							+ ownership.get("factory_model");
-				} else if (ownership.get("factory_model") != null) {
-					return ownership.get("factory_model").toString();
-				} else if (ownership.get("factory_type") != null) {
-					return ownership.get("factory_type") + " ";
-				} else {
-					return "";
-				}
-			}
-		}));
+		columns.add(new TextColumn4MapKey("oc.factory_type", "ofactory_type",
+				getText("ownership.oldFactory_type"), 150)
+				.setUseTitleFromLabel(true).setValueFormater(
+						new AbstractFormater<String>() {
+							@Override
+							public String format(Object context, Object value) {
+								// 从上下文取出元素Map
+								@SuppressWarnings("unchecked")
+								Map<String, Object> ownership = (Map<String, Object>) context;
+								if (ownership.get("ofactory_type") != null
+										&& ownership.get("ofactory_model") != null) {
+									return ownership.get("ofactory_type") + " "
+											+ ownership.get("ofactory_model");
+								} else if (ownership.get("ofactory_model") != null) {
+									return ownership.get("ofactory_model")
+											.toString();
+								} else if (ownership.get("ofactory_type") != null) {
+									return ownership.get("ofactory_type") + " ";
+								} else {
+									return "";
+								}
+							}
+						}));
 		columns.add(new TextColumn4MapKey("oc.bs_type", "bs_type",
 				getText("ownership.oldBs_type"), 80).setSortable(true)
 				.setUseTitleFromLabel(true));
