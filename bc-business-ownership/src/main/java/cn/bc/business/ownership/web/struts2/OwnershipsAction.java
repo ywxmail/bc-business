@@ -140,7 +140,7 @@ public class OwnershipsAction extends ViewAction<Map<String, Object>> {
 				map.put("factory_type", rs[i++]);
 				map.put("factory_model", rs[i++]);
 				map.put("origin_no", rs[i++]);
-				
+
 				map.put("oplate_type", rs[i++]);
 				map.put("oplate_no", rs[i++]);
 				map.put("oregister_date", rs[i++]);
@@ -163,8 +163,8 @@ public class OwnershipsAction extends ViewAction<Map<String, Object>> {
 		List<Column> columns = new ArrayList<Column>();
 		columns.add(new IdColumn4MapKey("o.id", "id"));
 		columns.add(new TextColumn4MapKey("o.status_", "status_",
-				getText("label.status"), 60).setSortable(true)
-				.setValueFormater(new KeyValueFormater(getEntityStatuses())));
+				getText("label.status"), 40).setSortable(true)
+				.setValueFormater(new KeyValueFormater(getBSStatuses1())));
 		columns.add(new TextColumn4MapKey("o.number_", "number_",
 				getText("ownership.number"), 120).setSortable(true)
 				.setUseTitleFromLabel(true));
@@ -197,7 +197,7 @@ public class OwnershipsAction extends ViewAction<Map<String, Object>> {
 
 		// 新车牌号码
 		columns.add(new TextColumn4MapKey("c.plate_no", "plate_no",
-				getText("ownership.newPlate"), 90).setUseTitleFromLabel(true)
+				getText("ownership.newPlate"), 80).setUseTitleFromLabel(true)
 				.setValueFormater(new AbstractFormater<String>() {
 					@SuppressWarnings("unchecked")
 					@Override
@@ -233,9 +233,10 @@ public class OwnershipsAction extends ViewAction<Map<String, Object>> {
 				}
 			}
 		}));
-		columns.add(new TextColumn4MapKey("c.origin_no", "origin_no",
-				getText("ownership.origin_no"), 60).setSortable(true)
-				.setUseTitleFromLabel(true));
+		// 删除旧车号
+		// columns.add(new TextColumn4MapKey("c.origin_no", "origin_no",
+		// getText("ownership.origin_no"), 60).setSortable(true)
+		// .setUseTitleFromLabel(true));
 		// 登记日期
 		columns.add(new TextColumn4MapKey("c.register_date", "register_date",
 				getText("car.registerDate"), 90).setSortable(true)
@@ -243,16 +244,6 @@ public class OwnershipsAction extends ViewAction<Map<String, Object>> {
 		// 投产日期
 		columns.add(new TextColumn4MapKey("c.operate_date", "operate_date",
 				getText("ownership.newOperate_date"), 90).setSortable(true)
-				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
-		columns.add(new TextColumn4MapKey("oc.logout_reason", "logout_reason",
-				getText("ownership.model"), 100).setSortable(true)
-				.setUseTitleFromLabel(true)
-				.setValueFormater(new KeyValueFormater(getModelValue())));
-		columns.add(new TextColumn4MapKey("oc.return_date", "return_date",
-				getText("ownership.return_date"), 90).setSortable(true)
-				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
-		columns.add(new TextColumn4MapKey("oc.verify_date", "verify_date",
-				getText("ownership.verify_date"), 90).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
 		// 旧车牌号码
 		columns.add(new TextColumn4MapKey("oc.plate_no", "plate_no",
@@ -301,11 +292,21 @@ public class OwnershipsAction extends ViewAction<Map<String, Object>> {
 							}
 						}));
 		columns.add(new TextColumn4MapKey("oc.bs_type", "bs_type",
-				getText("ownership.oldBs_type"), 80).setSortable(true)
+				getText("ownership.oldBs_type"), 90).setSortable(true)
 				.setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("oc.bs_type", "scrapto",
-				getText("ownership.oldScrapto"), 80).setSortable(true)
+				getText("ownership.oldScrapto"), 90).setSortable(true)
 				.setUseTitleFromLabel(true));
+		columns.add(new TextColumn4MapKey("oc.logout_reason", "logout_reason",
+				getText("ownership.model"), 100).setSortable(true)
+				.setUseTitleFromLabel(true)
+				.setValueFormater(new KeyValueFormater(getModelValue())));
+		columns.add(new TextColumn4MapKey("oc.return_date", "return_date",
+				getText("ownership.return_date"), 90).setSortable(true)
+				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+		columns.add(new TextColumn4MapKey("oc.verify_date", "verify_date",
+				getText("ownership.verify_date"), 90).setSortable(true)
+				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
 
 		columns.add(new TextColumn4MapKey("c.carinfo", "carInfo",
 				getText("ownership.oldCar"), 560)
