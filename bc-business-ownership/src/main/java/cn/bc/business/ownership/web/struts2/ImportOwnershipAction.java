@@ -87,7 +87,9 @@ public class ImportOwnershipAction extends ImportDataAction {
 					// 设置创建人信息
 					SystemContext context = (SystemContext) SystemContextHolder
 							.get();
-					ownership.setFileDate(Calendar.getInstance());
+					Calendar now = Calendar.getInstance();
+					now.set(Calendar.MILLISECOND, 0);
+					ownership.setFileDate(now);
 					ownership.setAuthor(context.getUserHistory());
 					this.ownershipService.save(ownership);
 				} else {
