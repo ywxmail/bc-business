@@ -98,7 +98,7 @@ public class OwnershipsAction extends ViewAction<Map<String, Object>> {
 		sql.append(",c.plate_type,c.plate_no,c.register_date,c.operate_date,getDisabledCarByOwnerNumber(o.number_) carInfo");
 		sql.append(",c.company,bia.name as unit_name,c.bs_type nbs_type,c.factory_type,c.factory_model,c.origin_no");
 		sql.append(",oc.plate_type oplate_type,oc.plate_no oplate_no,oc.register_date oregister_date,oc.factory_type ofactory_type");
-		sql.append(",oc.factory_model ofactory_model,oc.bs_type,getContract4ChargerScrapTo(oc.id) scrapto,oc.logout_reason,oc.return_date,oc.verify_date");
+		sql.append(",oc.factory_model ofactory_model,oc.bs_type,oc.logout_reason,oc.return_date,oc.verify_date");
 		sql.append(",c.id newCarId,oc.id oldCarId,m.name motorcadeName from bs_car_ownership o");
 		sql.append(" left join bs_car c on (c.cert_no2=o.number_ and c.status_ = 0)");
 		sql.append(" left join bs_car oc on (oc.cert_no2=o.number_ and oc.status_ =1)");
@@ -162,7 +162,6 @@ public class OwnershipsAction extends ViewAction<Map<String, Object>> {
 				map.put("ofactory_type", rs[i++]);
 				map.put("ofactory_model", rs[i++]);
 				map.put("bs_type", rs[i++]);
-				map.put("scrapto", rs[i++]);
 				map.put("logout_reason", rs[i++]);
 				map.put("return_date", rs[i++]);
 				map.put("verify_date", rs[i++]);
@@ -189,9 +188,6 @@ public class OwnershipsAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("o.ownership", "ownership",
 				getText("ownership.owner_ship"), 80).setSortable(true)
 				.setUseTitleFromLabel(true));
-		columns.add(new TextColumn4MapKey("o.source", "source",
-				getText("ownership.source"), 80).setSortable(true)
-				.setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("o.nature", "nature",
 				getText("ownership.nature"), 80).setSortable(true)
 				.setUseTitleFromLabel(true));
@@ -200,9 +196,6 @@ public class OwnershipsAction extends ViewAction<Map<String, Object>> {
 				.setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("o.owner_", "owner_",
 				getText("ownership.owner"), 80).setSortable(true)
-				.setUseTitleFromLabel(true));
-		columns.add(new TextColumn4MapKey("o.whither", "whither",
-				getText("ownership.whither"), 80).setSortable(true)
 				.setUseTitleFromLabel(true));
 		// 公司
 		columns.add(new TextColumn4MapKey("c.company", "company",
@@ -324,13 +317,11 @@ public class OwnershipsAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("oc.bs_type", "bs_type",
 				getText("ownership.oldBs_type"), 90).setSortable(true)
 				.setUseTitleFromLabel(true));
-		columns.add(new TextColumn4MapKey("oc.bs_type", "scrapto",
-				getText("ownership.oldScrapto"), 90).setSortable(true)
-				.setUseTitleFromLabel(true));
-		columns.add(new TextColumn4MapKey("oc.logout_reason", "logout_reason",
-				getText("ownership.model"), 100).setSortable(true)
-				.setUseTitleFromLabel(true)
-				.setValueFormater(new KeyValueFormater(getModelValue())));
+		// columns.add(new TextColumn4MapKey("oc.logout_reason",
+		// "logout_reason",
+		// getText("ownership.model"), 100).setSortable(true)
+		// .setUseTitleFromLabel(true)
+		// .setValueFormater(new KeyValueFormater(getModelValue())));
 		columns.add(new TextColumn4MapKey("oc.return_date", "return_date",
 				getText("ownership.return_date"), 90).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
@@ -342,6 +333,12 @@ public class OwnershipsAction extends ViewAction<Map<String, Object>> {
 				getText("ownership.oldCar"), 220)
 				.setValueFormater(new LinkFormater4CarInfo(this
 						.getContextPath())));
+		columns.add(new TextColumn4MapKey("o.source", "source",
+				getText("ownership.source"), 80).setSortable(true)
+				.setUseTitleFromLabel(true));
+		columns.add(new TextColumn4MapKey("o.whither", "whither",
+				getText("ownership.whither"), 80).setSortable(true)
+				.setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("ac.actor_name", "author",
 				getText("ownership.author"), 100).setSortable(true));
 		columns.add(new TextColumn4MapKey("o.file_date", "file_date",
