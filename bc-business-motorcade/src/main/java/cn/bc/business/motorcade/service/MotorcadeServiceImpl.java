@@ -50,4 +50,8 @@ public class MotorcadeServiceImpl extends DefaultCrudService<Motorcade>
 	public List<Map<String, String>> find4Option(Integer[] statuses) {
 		return this.motorcadeDao.find4Option(statuses);
 	}
+
+	public Motorcade loadByName(String name) {
+		return this.motorcadeDao.loadByName(name);
+	}
 }
