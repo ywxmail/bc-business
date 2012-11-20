@@ -1,7 +1,6 @@
 package cn.bc.business.ownership.web.struts2;
 
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -115,7 +114,6 @@ public class ImportOwnershipAction extends ImportDataAction {
 		int existeNumber = 0;// 数据库中已存在相同经营权号的数量
 		String existeOwnershipNumer = null;// 数据库中已存在的经营权号，多个时用逗号连接
 		for (int i = 0; i < data.size(); i++) {
-			map = new HashMap<String, Object>();
 			ownership = new Ownership();
 			map = data.get(i);
 			// 判断数据库是否存在相同经营权号的数据，如果存在就不插入
