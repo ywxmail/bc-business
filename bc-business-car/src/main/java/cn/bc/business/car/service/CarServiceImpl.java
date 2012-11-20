@@ -251,4 +251,7 @@ public class CarServiceImpl extends DefaultCrudService<Car> implements
 		return this.carDao.checkManageNoIsExists(carId, manageNo);
 	}
 
+	public Car loadByPlateNo(String carNo) {
+		return this.carDao.loadByPlateNo(carNo);
+	}
 }
