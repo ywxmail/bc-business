@@ -7,12 +7,11 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.poi.ss.usermodel.Cell;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
-
-import com.google.gson.JsonObject;
 
 import cn.bc.BCConstants;
 import cn.bc.business.ownership.domain.Ownership;
@@ -20,6 +19,8 @@ import cn.bc.business.ownership.service.OwnershipService;
 import cn.bc.docs.web.struts2.ImportDataAction;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.identity.web.SystemContextHolder;
+
+import com.google.gson.JsonObject;
 
 /**
  * 导入经营权数据的Action
@@ -111,5 +112,28 @@ public class ImportOwnershipAction extends ImportDataAction {
 		logger.fatal((existeNumber == 0 ? "成功导入" + data.size() + "条数据！"
 				: "成功导入" + (data.size() - existeNumber) + "条数据！没导入的经营权号："
 						+ existeOwnershipNumer));
+	}
+
+	@Override
+	protected Object getCellValue(Cell cell, String columnName, String fileType) {
+		// 特殊处理权证号：如：11107912转换后变为1.1107912E7
+		if (columnName.equals("权证号")) {
+			if (cell.getCellType() == Cell.CELL_TYPE_STRING) {// 字符串
+				// 列名去空格
+				if (cell.getStringCellValue() != null) {
+					return cell.getStringCellValue().trim();
+				} else {
+					return cell.getStringCellValue();
+				}
+			} else if (cell.getCellType() == Cell.CELL_TYPE_NUMERIC) {// 数字
+				return String.valueOf((long) cell.getNumericCellValue());
+			}
+			// try {
+			// return cell.getStringCellValue();
+			// } catch (Exception e) {
+			// return String.valueOf((long) cell.getNumericCellValue());
+			// }
+		}
+		return super.getCellValue(cell, columnName, fileType);
 	}
 }
