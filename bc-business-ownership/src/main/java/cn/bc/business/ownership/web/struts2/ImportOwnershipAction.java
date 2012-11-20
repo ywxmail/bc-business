@@ -85,6 +85,11 @@ public class ImportOwnershipAction extends ImportDataAction {
 						ownership.setOwnership(map.get("经营权权属").toString()
 								.trim());
 					}
+					// 经营权去向
+					if (map.get("经营权去向") != null) {
+						ownership
+								.setWhither(map.get("经营权去向").toString().trim());
+					}
 					// 设置创建人信息
 					SystemContext context = (SystemContext) SystemContextHolder
 							.get();
