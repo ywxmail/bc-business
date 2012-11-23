@@ -128,4 +128,12 @@ public interface CarService extends CrudService<Car> {
 	 * @return
 	 */
 	Long checkManageNoIsExists(Long carId, Long manageNo);
+
+	/**
+	 * 加载指定车号的车辆信息
+	 * 
+	 * @param carNo
+	 * @return
+	 */
+	Car loadByPlateNo(String carNo);
 }
