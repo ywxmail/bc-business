@@ -145,4 +145,12 @@ public interface CarDao extends CrudDao<Car> {
 	 * @return
 	 */
 	Long checkManageNoIsExists(Long carId, Long manageNo);
+
+	/**
+	 * 加载指定车号的车辆信息
+	 * 
+	 * @param plateNo
+	 * @return
+	 */
+	Car loadByPlateNo(String plateNo);
 }
