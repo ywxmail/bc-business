@@ -4,6 +4,8 @@
 package cn.bc.business.ownership.web.struts2;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -39,6 +41,7 @@ import cn.bc.identity.service.ActorService;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.option.domain.OptionItem;
 import cn.bc.option.service.OptionService;
+import cn.bc.web.formater.AbstractFormater;
 import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.formater.KeyValueFormater;
 import cn.bc.web.formater.LinkFormater4Id;
@@ -77,8 +80,14 @@ public class OwnershipsAction extends ViewAction<Map<String, Object>> {
 	public boolean isReadonly() {
 		// 车辆经营权管理员或系统管理员
 		SystemContext context = (SystemContext) this.getContext();
-		return !context.hasAnyRole(getText("key.role.bs.ownership"),
-				getText("key.role.bc.admin"));
+		return !context.hasAnyRole(getText("key.role.bs.ownership"));
+	}
+
+	public boolean isCheck4Advanced() {
+		// 车辆经营权查看(高级)
+		SystemContext context = (SystemContext) this.getContext();
+		return context
+				.hasAnyRole(getText("key.role.bs.ownership.check_advanced"));
 	}
 
 	@Override
@@ -101,7 +110,7 @@ public class OwnershipsAction extends ViewAction<Map<String, Object>> {
 		sql.append(",c.company,bia.name as unit_name,c.bs_type nbs_type,c.factory_type,c.factory_model,c.origin_no");
 		sql.append(",oc.plate_type oplate_type,oc.plate_no oplate_no,oc.register_date oregister_date,oc.factory_type ofactory_type");
 		sql.append(",oc.factory_model ofactory_model,oc.bs_type,oc.logout_reason,oc.return_date,oc.verify_date");
-		sql.append(",c.id newCarId,oc.id oldCarId,m.name motorcadeName from bs_car_ownership o");
+		sql.append(",c.id newCarId,oc.id oldCarId,oc.return_date oreturn_date,m.name motorcadeName from bs_car_ownership o");
 		sql.append(" left join bs_car c on (c.cert_no2=o.number_ and c.status_ = 0)");
 		sql.append(" left join bs_car oc on (oc.cert_no2=o.number_ and oc.status_ =1)");
 		sql.append(" left join BC_IDENTITY_ACTOR_HISTORY md on md.id=o.modifier_id");
@@ -169,6 +178,7 @@ public class OwnershipsAction extends ViewAction<Map<String, Object>> {
 				map.put("verify_date", rs[i++]);
 				map.put("newCarId", rs[i++]);
 				map.put("oldCarId", rs[i++]);
+				map.put("oreturn_date", rs[i++]);
 				map.put("motorcadeName", rs[i++]);
 
 				return map;
@@ -187,18 +197,79 @@ public class OwnershipsAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("o.number_", "number_",
 				getText("ownership.number"), 120).setSortable(true)
 				.setUseTitleFromLabel(true));
-		columns.add(new TextColumn4MapKey("o.ownership", "ownership",
-				getText("ownership.owner_ship"), 80).setSortable(true)
-				.setUseTitleFromLabel(true));
-		columns.add(new TextColumn4MapKey("o.nature", "nature",
-				getText("ownership.nature"), 80).setSortable(true)
-				.setUseTitleFromLabel(true));
-		columns.add(new TextColumn4MapKey("o.situation", "situation",
-				getText("ownership.situation"), 100).setSortable(true)
-				.setUseTitleFromLabel(true));
+		if (!this.isReadonly() || this.isCheck4Advanced()) {
+			columns.add(new TextColumn4MapKey("o.ownership", "ownership",
+					getText("ownership.owner_ship"), 80).setSortable(true)
+					.setUseTitleFromLabel(true));
+			columns.add(new TextColumn4MapKey("o.nature", "nature",
+					getText("ownership.nature"), 80).setSortable(true)
+					.setUseTitleFromLabel(true));
+			columns.add(new TextColumn4MapKey("o.situation", "situation",
+					getText("ownership.situation"), 100).setSortable(true)
+					.setUseTitleFromLabel(true));
+		}
 		columns.add(new TextColumn4MapKey("o.owner_", "owner_",
 				getText("ownership.owner"), 80).setSortable(true)
 				.setUseTitleFromLabel(true));
+		// 更新天数
+		columns.add(new TextColumn4MapKey("c.operate_date", "operate_date",
+				getText("ownership.updateDays"), 80).setUseTitleFromLabel(true)
+				.setValueFormater(new AbstractFormater<String>() {
+					@SuppressWarnings("unchecked")
+					@Override
+					public String format(Object context, Object value) {
+						Map<String, Object> car = (Map<String, Object>) context;
+						// 新车投产日期
+						Date operateDate = (Date) car.get("operate_date");
+
+						// 旧车交车日期
+						Date oreturnDate = (Date) car.get("oreturn_date");
+						// 经营权创建时间
+						Date createDate = (Date) car.get("file_date");
+
+						// 如果新车的投产日期和旧车的交车日期不为空就返回更新天数
+						if (operateDate != null && oreturnDate != null) {
+							return String.valueOf((operateDate.getTime() - oreturnDate
+									.getTime()) / (1000 * 60 * 60 * 24));
+						} else if (operateDate != null && oreturnDate == null) {
+							return String.valueOf((operateDate.getTime() - createDate
+									.getTime()) / (1000 * 60 * 60 * 24));
+						} else {
+							return "";
+						}
+					}
+				}));
+		// 交车天数
+		columns.add(new TextColumn4MapKey("c.operate_date", "operate_date",
+				getText("ownership.returnCarDays"), 80).setUseTitleFromLabel(
+				true).setValueFormater(new AbstractFormater<String>() {
+			@SuppressWarnings("unchecked")
+			@Override
+			public String format(Object context, Object value) {
+				Map<String, Object> car = (Map<String, Object>) context;
+				// 新车投产日期
+				Date operateDate = (Date) car.get("operate_date");
+
+				// 旧车交车日期
+				Date oreturnDate = (Date) car.get("oreturn_date");
+				// 经营权创建时间
+				Date createDate = (Date) car.get("file_date");
+
+				// 如果新车的投产日期和旧车的交车日期不为空就返回更新天数
+				if (operateDate == null && oreturnDate != null) {
+
+					return String.valueOf((Calendar.getInstance().getTime()
+							.getTime() - oreturnDate.getTime())
+							/ (1000 * 60 * 60 * 24));
+				} else if (operateDate == null && oreturnDate == null) {
+					return String.valueOf((Calendar.getInstance().getTime()
+							.getTime() - createDate.getTime())
+							/ (1000 * 60 * 60 * 24));
+				} else {
+					return "";
+				}
+			}
+		}));
 		// 公司
 		columns.add(new TextColumn4MapKey("c.company", "company",
 				getText("ownership.company"), 40).setSortable(true)
