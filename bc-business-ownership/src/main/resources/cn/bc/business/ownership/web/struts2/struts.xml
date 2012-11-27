@@ -16,6 +16,9 @@
 		</action>
 		<action name="save" class="ownershipAction" method="save" />
 		<action name="delete" class="ownershipAction" method="delete" />
+		<!-- Ajax查询经营权信息 -->
+		<action name="find" class="findOwnershipAction" />
+
 	</package>
 
 	<!-- 导入数据 -->
