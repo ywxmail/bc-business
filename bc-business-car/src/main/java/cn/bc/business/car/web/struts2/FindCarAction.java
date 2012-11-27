@@ -24,7 +24,7 @@ import cn.bc.db.jdbc.SqlObject;
 import cn.bc.web.struts2.AbstractRichInputWithJpaAction;
 
 /**
- * Ajax查询车辆信息的Action
+ * Ajax查询经营权信息的Action
  * 
  * @author dragon
  * 
