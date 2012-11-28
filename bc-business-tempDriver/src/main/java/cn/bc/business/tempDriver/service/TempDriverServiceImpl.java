@@ -96,7 +96,7 @@ public class TempDriverServiceImpl extends DefaultCrudService<TempDriver> implem
 			variables.put("tDriver_modifierCode", tempDriver.getModifier().getCode());
 			variables.put("tDriver_modifiedDate", DateUtils.formatCalendar2Day(tempDriver.getModifiedDate()));
 		}
-		//variables.put("subject","待招聘司机："+tempDriver.getName()+"的入职流程");
+		variables.put("subject","待招聘司机："+tempDriver.getName()+"的入职流程（待开发）");
 
 		return variables;
 	}
