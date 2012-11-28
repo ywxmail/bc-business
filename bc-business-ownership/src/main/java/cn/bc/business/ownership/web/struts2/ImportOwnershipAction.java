@@ -1,7 +1,6 @@
 package cn.bc.business.ownership.web.struts2;
 
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -49,7 +48,6 @@ public class ImportOwnershipAction extends ImportDataAction {
 		int existeNumber = 0;// 数据库中已存在相同经营权号的数量
 		String existeOwnershipNumer = null;// 数据库中已存在的经营权号，多个时用逗号连接
 		for (int i = 0; i < data.size(); i++) {
-			map = new HashMap<String, Object>();
 			ownership = new Ownership();
 			map = data.get(i);
 			// 判断数据库是否存在相同经营权号的数据，如果存在就不插入
@@ -99,7 +97,48 @@ public class ImportOwnershipAction extends ImportDataAction {
 					ownership.setAuthor(context.getUserHistory());
 					this.ownershipService.save(ownership);
 				} else {
-					// 已存在就不插入
+					// 如果不为空就更新经营权导入的信息
+					// 经营权性质
+					if (map.get("经营权性质") != null) {
+						ownershipByNumber.setNature(map.get("经营权性质").toString()
+								.trim());
+					}
+					// 经营权情况
+					if (map.get("权证抵押情况") != null) {
+						ownershipByNumber.setSituation(map.get("权证抵押情况")
+								.toString().trim());
+					}
+					// 经营权来源
+					if (map.get("经营权来源") != null) {
+						ownershipByNumber.setSource(map.get("经营权来源").toString()
+								.trim());
+					}
+					// 车辆产权
+					if (map.get("车辆产权") != null) {
+						ownershipByNumber.setOwner(map.get("车辆产权").toString()
+								.trim());
+					}
+					// 经营权权属
+					if (map.get("经营权权属") != null) {
+						ownershipByNumber.setOwnership(map.get("经营权权属")
+								.toString().trim());
+					}
+					// 经营权去向
+					if (map.get("经营权去向") != null) {
+						ownershipByNumber.setWhither(map.get("经营权去向")
+								.toString().trim());
+					}
+
+					// 设置修改人信息
+					SystemContext context = (SystemContext) SystemContextHolder
+							.get();
+					Calendar now = Calendar.getInstance();
+					now.set(Calendar.MILLISECOND, 0);
+					ownershipByNumber.setModifiedDate(now);
+					ownershipByNumber.setModifier(context.getUserHistory());
+					this.ownershipService.save(ownershipByNumber);
+
+					// 统计更新的经营权号
 					existeNumber++;
 					if (existeNumber < 1 || existeNumber == 1) {
 						existeOwnershipNumer = ownershipByNumber.getNumber();
@@ -111,11 +150,16 @@ public class ImportOwnershipAction extends ImportDataAction {
 			}
 		}
 		json.addProperty("msg", (existeNumber == 0 ? "成功导入" + data.size()
-				+ "条数据！" : "成功导入" + (data.size() - existeNumber) + "条数据！其中"
-				+ existeNumber + "条数据没导入，其经营权号为：" + existeOwnershipNumer));
+				+ "条数据！" : ((data.size() - existeNumber) == 0 ? "" : "成功导入"
+				+ (data.size() - existeNumber) + "条数据！")
+				+ "更新" + existeNumber + "条数据，其经营权号为：" + existeOwnershipNumer));
 		logger.fatal("TODO: ImportOptionAction.importData");
 		logger.fatal((existeNumber == 0 ? "成功导入" + data.size() + "条数据！"
-				: "成功导入" + (data.size() - existeNumber) + "条数据！没导入的经营权号："
+				: ((data.size() - existeNumber) == 0 ? "" : "成功导入"
+						+ (data.size() - existeNumber) + "条数据！")
+						+ "更新"
+						+ existeNumber
+						+ "条数据，其经营权号为："
 						+ existeOwnershipNumer));
 	}
 
@@ -133,11 +177,6 @@ public class ImportOwnershipAction extends ImportDataAction {
 			} else if (cell.getCellType() == Cell.CELL_TYPE_NUMERIC) {// 数字
 				return String.valueOf((long) cell.getNumericCellValue());
 			}
-			// try {
-			// return cell.getStringCellValue();
-			// } catch (Exception e) {
-			// return String.valueOf((long) cell.getNumericCellValue());
-			// }
 		}
 		return super.getCellValue(cell, columnName, fileType);
 	}

@@ -47,4 +47,14 @@ public interface OwnershipDao extends CrudDao<Ownership> {
 	 */
 	Ownership getOwershipByNumber(String number);
 
+	/**
+	 * 更新经营权号已配车的车辆产权字段
+	 * 
+	 * @param owner
+	 *            产权
+	 * 
+	 * @param number经营权号
+	 */
+	void updateCar4OwnerByNumber(String owner, String number);
+
 }
