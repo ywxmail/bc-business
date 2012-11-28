@@ -88,6 +88,7 @@ public class Car extends RichFileEntityImpl {
 
 	private String certNo1;// 购置税证号
 	private String certNo2;// 经营权使用证号
+	private String owner;// 车辆产权
 	private String certNo3;// 强检证号
 	private String certNo4;// 道路运输证号
 	private String taximeterFactory;// 计价器制造厂
@@ -822,6 +823,15 @@ public class Car extends RichFileEntityImpl {
 
 	public void setManageNo(Long manageNo) {
 		this.manageNo = manageNo;
+	}
+
+	@Column(name = "OWNER_")
+	public String getOwner() {
+		return owner;
+	}
+
+	public void setOwner(String owner) {
+		this.owner = owner;
 	}
 
 }
