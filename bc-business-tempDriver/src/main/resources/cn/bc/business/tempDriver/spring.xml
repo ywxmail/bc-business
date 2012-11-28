@@ -15,15 +15,15 @@
 	<!-- 需要在主配置文件配置entityManagerFactory和transactionManager的实现 -->
 
 	<!--tempDriver -->
-	<bean id="tempDriverDao" class="cn.bc.business.tempDriver.dao.hibernate.jpa.TempDriverDaoImpl"
+	<bean id="tempDriverDao" class="cn.bc.business.tempdriver.dao.hibernate.jpa.TempDriverDaoImpl"
 		p:entityManagerFactory-ref="entityManagerFactory" />
-	<bean id="tempDriverService" class="cn.bc.business.tempDriver.service.TempDriverServiceImpl"
+	<bean id="tempDriverService" class="cn.bc.business.tempdriver.service.TempDriverServiceImpl"
 		p:tempDriverDao-ref="tempDriverDao" />
 		
 	<!--tempDriver -->
-	<bean id="tempDriverWorkFlowDao" class="cn.bc.business.tempDriver.dao.hibernate.jpa.TempDriverWorkFlowDaoImpl"
+	<bean id="tempDriverWorkFlowDao" class="cn.bc.business.tempdriver.dao.hibernate.jpa.TempDriverWorkFlowDaoImpl"
 		p:entityManagerFactory-ref="entityManagerFactory" />
-	<bean id="tempDriverWorkFlowService" class="cn.bc.business.tempDriver.service.TempDriverWorkFlowServiceImpl"
+	<bean id="tempDriverWorkFlowService" class="cn.bc.business.tempdriver.service.TempDriverWorkFlowServiceImpl"
 		p:tempDriverWorkFlowDao-ref="tempDriverWorkFlowDao" />
 	
 </beans>

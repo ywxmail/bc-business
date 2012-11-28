@@ -1,9 +1,8 @@
-package cn.bc.business.tempDriver.domain;
+package cn.bc.business.tempdriver.domain;
 
 import java.util.Calendar;
 import java.util.Set;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -11,7 +10,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
 import javax.persistence.Table;
 
-import cn.bc.identity.domain.FileEntityImpl;
+import cn.bc.identity.domain.RichFileEntityImpl;
 
 /**
  * 司机招聘信息
@@ -20,9 +19,22 @@ import cn.bc.identity.domain.FileEntityImpl;
  */
 @Entity
 @Table(name = "BS_TEMP_DRIVER")
-public class TempDriver extends FileEntityImpl {
+public class TempDriver extends RichFileEntityImpl {
 	private static final long serialVersionUID = 1L;
 
+	public static final String KEY_UID = "tempDriver.uid";
+	
+	/** 聘用状态：待聘 */
+	public static final int STATUS_RESERVE = 0;
+	/** 聘用状态：审批中 */
+	public static final int STATUS_CHECK = 1;
+	/** 聘用状态：聘用 */
+	public static final int STATUS_PASS = 2;
+	/** 聘用状态：弃用 */
+	public static final int STATUS_GIVEUP = 3;
+	/** 聘用状态：删除 */
+	public static final int STATUS_DELETE = 4;
+	
 	/** 性别：男 */
 	public static final int SEX_MAN = 1;
 	/** 性别：女 */
@@ -51,14 +63,20 @@ public class TempDriver extends FileEntityImpl {
 	private String certCYZG;// 从业资格证
 	private String education;// 学历
 	private String nation;// 民族
-	private String picPath;// 样貌相片地址
 	private String listWorkExperience;// 工作经历信息集合
 	private String listFamily;// 家庭成员信息集合
 	private String marry;// 婚姻状况
 	private String desc;// 备注
+	private String credit;// 信誉档案
+	private Integer caseTraffic;//最近一年交通违法宗数
+	private Integer casePraise;//最近一年服务投诉宗数
+	private Integer caseBusiness;//最近一年营运违章宗数
+	private Integer caseAccident;//最近一年事故宗数
+	private Integer caseAdvice;//最近一年获表扬次数
 
-	@OneToMany(mappedBy = "tempDriver", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
-	@OrderBy("startTime DESC")
+
+	@OneToMany(mappedBy = "tempDriver", fetch = FetchType.LAZY)
+	@OrderBy(value =("startTime DESC"))
 	public Set<TempDriverWorkFlow> getTempDriverWorkFlowList() {
 		return tempDriverWorkFlowList;
 	}
@@ -160,15 +178,6 @@ public class TempDriver extends FileEntityImpl {
 		this.nation = nation;
 	}
 
-	@Column(name = "PIC_PATH")
-	public String getPicPath() {
-		return picPath;
-	}
-
-	public void setPicPath(String picPath) {
-		this.picPath = picPath;
-	}
-
 	@Column(name = "LIST_WORK_EXPERIENCE")
 	public String getListWorkExperience() {
 		return listWorkExperience;
@@ -219,7 +228,59 @@ public class TempDriver extends FileEntityImpl {
 	public void setBirthdate(Calendar birthdate) {
 		this.birthdate = birthdate;
 	}
+
+	@Column(name = "CREDIT_")
+	public String getCredit() {
+		return credit;
+	}
+
+	public void setCredit(String credit) {
+		this.credit = credit;
+	}
 	
-	
+	@Column(name = "CASE_TRAFFIC")
+	public Integer getCaseTraffic() {
+		return caseTraffic;
+	}
+
+	public void setCaseTraffic(Integer caseTraffic) {
+		this.caseTraffic = caseTraffic;
+	}
+
+	@Column(name = "CASE_PRAISE")
+	public Integer getCasePraise() {
+		return casePraise;
+	}
+
+	public void setCasePraise(Integer casePraise) {
+		this.casePraise = casePraise;
+	}
+
+	@Column(name = "CASE_BUSINESS")
+	public Integer getCaseBusiness() {
+		return caseBusiness;
+	}
+
+	public void setCaseBusiness(Integer caseBusiness) {
+		this.caseBusiness = caseBusiness;
+	}
+
+	@Column(name = "CASE_ACCIDENT")
+	public Integer getCaseAccident() {
+		return caseAccident;
+	}
+
+	public void setCaseAccident(Integer caseAccident) {
+		this.caseAccident = caseAccident;
+	}
+
+	@Column(name = "CASE_ADVICE")
+	public Integer getCaseAdvice() {
+		return caseAdvice;
+	}
+
+	public void setCaseAdvice(Integer caseAdvice) {
+		this.caseAdvice = caseAdvice;
+	}
 	
 }

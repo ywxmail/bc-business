@@ -1,7 +1,7 @@
 /**
  * 
  */
-package cn.bc.business.tempDriver.web.struts2;
+package cn.bc.business.tempdriver.web.struts2;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,24 +13,27 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
-import cn.bc.business.tempDriver.domain.TempDriver;
-import cn.bc.business.tempDriver.domain.TempDriverWorkFlow;
+import cn.bc.BCConstants;
+import cn.bc.business.tempdriver.domain.TempDriver;
+import cn.bc.business.web.struts2.ViewAction;
 import cn.bc.core.query.condition.Condition;
 import cn.bc.core.query.condition.Direction;
 import cn.bc.core.query.condition.impl.AndCondition;
+import cn.bc.core.query.condition.impl.EqualsCondition;
+import cn.bc.core.query.condition.impl.InCondition;
 import cn.bc.core.query.condition.impl.OrderCondition;
-import cn.bc.core.query.condition.impl.QlCondition;
+import cn.bc.core.util.StringUtils;
 import cn.bc.db.jdbc.RowMapper;
 import cn.bc.db.jdbc.SqlObject;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.formater.KeyValueFormater;
-import cn.bc.web.struts2.ViewAction;
 import cn.bc.web.ui.html.grid.Column;
 import cn.bc.web.ui.html.grid.IdColumn4MapKey;
 import cn.bc.web.ui.html.grid.TextColumn4MapKey;
 import cn.bc.web.ui.html.page.PageOption;
 import cn.bc.web.ui.html.toolbar.Toolbar;
+import cn.bc.web.ui.html.toolbar.ToolbarButton;
 import cn.bc.web.ui.json.Json;
 
 /**
@@ -43,6 +46,7 @@ import cn.bc.web.ui.json.Json;
 @Controller
 public class TempDriversAction extends ViewAction<Map<String, Object>> {
 	private static final long serialVersionUID = 1L;
+	public String status = String.valueOf(BCConstants.STATUS_ENABLED); // 聘用的状态，多个用逗号连接
 
 	@Override
 	public boolean isReadonly() {
@@ -54,8 +58,8 @@ public class TempDriversAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected OrderCondition getGridDefaultOrderCondition() {
-		// 默认排序方向：创建日期
-		return new OrderCondition("t.file_date", Direction.Desc);
+		// 默认排序方向：最新修改日期|创建日期
+		return new OrderCondition("t.modified_date", Direction.Desc).add("t.file_date", Direction.Desc);
 	}
 
 	@Override
@@ -65,12 +69,14 @@ public class TempDriversAction extends ViewAction<Map<String, Object>> {
 		StringBuffer sql = new StringBuffer();
 		sql.append("SELECT t.id,t.name,t.sex,t.birthdate,t.origin,t.region_ as region,t.address,t.new_addr as newAddress,t.phone");
 		sql.append(",t.cert_identity as certIdentity,t.cert_fwzg as fwzg,t.cert_cyzg as cyzg,t.education,t.nation");
-		sql.append(",t.pic_path as picPath,t.marry,t.desc_ as desc,t.phone");
-		sql.append(",w.offer_status as ostatus");
+		sql.append(",t.marry,t.desc_ as desc,t.phone");
+		//sql.append(",w.offer_status as ostatus");
+		sql.append(",t.status_ as status,d.status_ as bstatus");
 		sql.append(",t.file_date,u.actor_name as aname,t.modified_date,m.actor_name as mname");
 		sql.append(" FROM bs_temp_driver t");
-		sql.append(" LEFT JOIN bs_temp_driver_workflow w on w.pid=t.id");
 		sql.append(" INNER JOIN bc_identity_actor_history u on u.id=t.author_id");
+		//sql.append(" LEFT JOIN bs_temp_driver_workflow w on w.pid=t.id");
+		sql.append(" LEFT JOIN bs_carman d on d.cert_identity = t.cert_identity");
 		sql.append(" LEFT JOIN bc_identity_actor_history m on m.id=t.modifier_id");
 
 		sqlObject.setSql(sql.toString());
@@ -97,11 +103,12 @@ public class TempDriversAction extends ViewAction<Map<String, Object>> {
 				map.put("cyzg",rs[i++]);
 				map.put("education",rs[i++]);
 				map.put("nation",rs[i++]);
-				map.put("picPath",rs[i++]);
 				map.put("marry",rs[i++]);
 				map.put("desc",rs[i++]);
 				map.put("phone",rs[i++]);
-				map.put("ostatus",rs[i++]);
+				//map.put("ostatus",rs[i++]);
+				map.put("status",rs[i++]);
+				map.put("bstatus",rs[i++]);
 				map.put("file_date",rs[i++]);
 				map.put("aname",rs[i++]);
 				map.put("modified_date",rs[i++]);
@@ -110,6 +117,41 @@ public class TempDriversAction extends ViewAction<Map<String, Object>> {
 			}
 		});
 		return sqlObject;
+	}
+	
+	/**
+	 * 聘用状态值转换列表：
+	 * 
+	 * @return
+	 */
+	protected Map<String, String> getStatusValues() {
+		Map<String, String> s = new LinkedHashMap<String, String>();
+		s.put(String.valueOf(TempDriver.STATUS_RESERVE),
+				getText("tempDriver.status.reserve"));
+		s.put(String.valueOf(TempDriver.STATUS_CHECK),
+				getText("tempDriver.status.check"));
+		s.put(String.valueOf(TempDriver.STATUS_PASS),
+				getText("tempDriver.status.pass"));
+		s.put(String.valueOf(TempDriver.STATUS_GIVEUP),
+				getText("tempDriver.status.giveup"));
+		s.put("",getText("bs.status.all"));
+		return s;
+	}
+	
+	/**
+	 * 营运状态值转换列表：
+	 * 
+	 * @return
+	 */
+	protected Map<String, String> getBusinessValues() {
+		Map<String, String> s = new LinkedHashMap<String, String>();
+		s.put(String.valueOf(BCConstants.STATUS_ENABLED),
+				getText("bs.status.active"));
+		s.put(String.valueOf(BCConstants.STATUS_DRAFT),
+				getText("bc.status.draft"));
+		s.put(String.valueOf(BCConstants.STATUS_DISABLED),
+				getText("bs.status.logout"));
+		return s;
 	}
 	
 	/**
@@ -149,7 +191,7 @@ public class TempDriversAction extends ViewAction<Map<String, Object>> {
 	 * 
 	 * @return
 	 */
-	protected Map<String, String> getOfferStatusValues() {
+	/*protected Map<String, String> getOfferStatusValues() {
 		Map<String, String> s = new LinkedHashMap<String, String>();
 		s.put(String.valueOf(TempDriverWorkFlow.OFFER_STATUS_CHECK),
 				getText("tempDriverWorkFlow.offerStatus.check"));
@@ -159,16 +201,24 @@ public class TempDriversAction extends ViewAction<Map<String, Object>> {
 				getText("tempDriverWorkFlow.offerStatus.noPass"));
 		s.put("","未参与");
 		return s;
-	}
+	}*/
 
 	@Override
 	protected List<Column> getGridColumns() {
 		List<Column> columns = new ArrayList<Column>();
 		columns.add(new IdColumn4MapKey("t.id", "id"));
 		//录用状态
-		columns.add(new TextColumn4MapKey("w.offer_status", "ostatus",
+		/*columns.add(new TextColumn4MapKey("w.offer_status", "ostatus",
 				getText("tempDriverWorkFlow.newOfferStatus"), 80).setSortable(true)
-				.setValueFormater(new KeyValueFormater(getOfferStatusValues())));
+				.setValueFormater(new KeyValueFormater(getOfferStatusValues())));*/
+		//状态
+		columns.add(new TextColumn4MapKey("t.status_", "status",
+				getText("tempDriver.status"), 80).setSortable(true)
+				.setValueFormater(new KeyValueFormater(getStatusValues())));
+		//营运状态
+		columns.add(new TextColumn4MapKey("d.status_", "bstatus",
+				getText("tempDriver.statusBusiness"), 80).setSortable(true)
+				.setValueFormater(new KeyValueFormater(getBusinessValues())));
 		//姓名
 		columns.add(new TextColumn4MapKey("t.name", "name",
 				getText("tempDriver.name"),60).setSortable(true)
@@ -223,9 +273,9 @@ public class TempDriversAction extends ViewAction<Map<String, Object>> {
 				getText("tempDriver.desc")).setSortable(true)
 				.setUseTitleFromLabel(true));
 		
-		columns.add(new TextColumn4MapKey("u.actor_name", "uname",
+		columns.add(new TextColumn4MapKey("u.actor_name", "aname",
 				getText("label.authorName"), 80).setSortable(true));
-		columns.add(new TextColumn4MapKey("t.file_date", "fileDate",
+		columns.add(new TextColumn4MapKey("t.file_date", "file_date",
 				getText("label.fileDate"), 100).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
 		columns.add(new TextColumn4MapKey("m.actor_name", "mname",
@@ -249,7 +299,7 @@ public class TempDriversAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected PageOption getHtmlPageOption() {
-		return super.getHtmlPageOption().setWidth(700).setMinWidth(300)
+		return super.getHtmlPageOption().setWidth(850).setMinWidth(300)
 				.setHeight(400).setMinHeight(300);
 	}
 
@@ -261,14 +311,20 @@ public class TempDriversAction extends ViewAction<Map<String, Object>> {
 	@Override
 	protected Condition getGridSpecalCondition() {
 		AndCondition andCondition = new AndCondition();
+		if(status !=null && status.length()>0){
+			String[] ss = status.split(",");
+			if (ss.length == 1) {
+				andCondition.add(new EqualsCondition("t.status_", new Integer(
+						ss[0])));
+			} else {
+				andCondition.add(new InCondition("t.status_",
+						StringUtils.stringArray2IntegerArray(ss)));
+			}
+		}
+		
 		//过滤旧的流程
-		andCondition.add(new QlCondition("NOT EXISTS(select 1 from bs_temp_driver_workflow w2 where w2.pid=t.id and w.start_time>w2.start_time)"));
+		//andCondition.add(new QlCondition("NOT EXISTS(select 1 from bs_temp_driver_workflow w2 where w2.pid=t.id and w.start_time>w2.start_time)"));
 		return andCondition;
-	}
-
-	@Override
-	protected void extendGridExtrasData(Json json) {
-		super.extendGridExtrasData(json);
 	}
 
 	@Override
@@ -283,12 +339,46 @@ public class TempDriversAction extends ViewAction<Map<String, Object>> {
 
 			// 编辑按钮
 			tb.addButton(getDefaultEditToolbarButton());
+			
+			// 发起流程
+			tb.addButton(new ToolbarButton().setIcon("ui-icon-play")
+					.setText(getText("tempDriverWorkFlow.startFlow"))
+					.setClick("bs.tempDriverView.startFlow"));
+			//出租车协会查询
+			tb.addButton(new ToolbarButton().setIcon("ui-icon-check")
+					.setText(getText("tempDriver.gztaxixhDriverInfo"))
+					.setClick("bs.tempDriverView.gztaxixhDriverInfo"));
 
 		}
+		
+		tb.addButton(Toolbar.getDefaultToolbarRadioGroup(
+				this.getStatusValues(), "status", 0,
+				getText("title.click2changeSearchStatus")));
 		
 		// 搜索按钮
 		tb.addButton(getDefaultSearchToolbarButton());
 		
 		return tb;
 	}
+	
+	
+	@Override
+	protected String getHtmlPageJs() {
+		return this.getContextPath() + "/bc-business/tempDriver/view.js";
+	}
+
+	@Override
+	protected Json getGridExtrasData() {
+		Json json = new Json();
+		json.put("status", status);
+		return status==null||status.length()==0?null:json;
+	}
+
+	//高级搜索
+	@Override
+	protected boolean useAdvanceSearch() {
+		return true;
+	}
+
+	
 }

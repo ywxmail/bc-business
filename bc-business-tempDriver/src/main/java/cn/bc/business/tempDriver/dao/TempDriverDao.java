@@ -1,13 +1,33 @@
-package cn.bc.business.tempDriver.dao;
+package cn.bc.business.tempdriver.dao;
 
-import cn.bc.business.tempDriver.domain.TempDriver;
+import cn.bc.business.tempdriver.domain.TempDriver;
 import cn.bc.core.dao.CrudDao;
 
 /**
- * 安排Dao
+ * 司机招聘Dao
  * 
- * @author dragon
+ * @author lbj
  * 
  */
 public interface TempDriverDao extends CrudDao<TempDriver> {
+	
+	
+	/**
+	 * 身份证号唯一性检测
+	 * 
+	 * @param id 招聘司机Id
+	 * @param certIdentity 身份证号码
+	 * @return
+	 */
+	boolean isUniqueCertIdentity(Long id,String certIdentity);
+	
+	/**
+	 * 身份证号查对象
+	 * 
+	 * @param certIdentity 身份证号码
+	 * @return
+	 */
+	TempDriver loadByCertIdentity(String certIdentity);
 }
+
+
