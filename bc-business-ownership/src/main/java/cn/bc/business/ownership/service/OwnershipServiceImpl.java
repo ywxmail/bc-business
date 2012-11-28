@@ -119,4 +119,7 @@ public class OwnershipServiceImpl extends DefaultCrudService<Ownership>
 		return this.ownershipDao.getOwershipByNumber(number);
 	}
 
+	public void updateCar4OwnerByNumber(String owner, String number) {
+		this.ownershipDao.updateCar4OwnerByNumber(owner, number);
+	}
 }

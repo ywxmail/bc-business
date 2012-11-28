@@ -82,19 +82,45 @@ public class OwnershipAction extends FileEntityAction<Long, Ownership> {
 		if (this.getE().getNumber() != null) {
 			Ownership ownership = this.ownershipService
 					.getOwershipByNumber(this.getE().getNumber());
-			if (ownership != null) {
-				jsonObject.put("success", false);
-				jsonObject.put("id", this.getE().getId());
-				jsonObject.put("msg", "经营权：" + this.getE().getNumber()
-						+ "已经存在！");
+			// 新建的判断
+			if (this.getE().isNew()) {
+				if (ownership != null) {
+					jsonObject.put("success", false);
+					jsonObject.put("id", this.getE().getId());
+					jsonObject.put("msg", "经营权：" + this.getE().getNumber()
+							+ "已经存在！");
+				} else {
+					this.beforeSave(this.getE());
+					this.ownershipService.save(this.getE());
+					// 更新车辆的产权字段
+					this.ownershipService.updateCar4OwnerByNumber(this.getE()
+							.getOwner(), this.getE().getNumber());
+					jsonObject.put("success", true);
+					jsonObject.put("id", this.getE().getId());
+					jsonObject.put("msg", "保存成功！");
+				}
 
 			} else {
-				this.beforeSave(this.getE());
-				this.ownershipService.save(this.getE());
-				jsonObject.put("success", true);
-				jsonObject.put("id", this.getE().getId());
-				jsonObject.put("msg", "保存成功！");
+				// 已存在的
+				if (ownership != null
+						&& !this.getE().getId().equals(ownership.getId())) {
+					jsonObject.put("success", false);
+					jsonObject.put("id", this.getE().getId());
+					jsonObject.put("msg", "经营权：" + this.getE().getNumber()
+							+ "已经存在！");
+				} else {
+					this.beforeSave(this.getE());
+					this.ownershipService.save(this.getE());
+					// 更新车辆的产权字段
+					this.ownershipService.updateCar4OwnerByNumber(this.getE()
+							.getOwner(), this.getE().getNumber());
+					jsonObject.put("success", true);
+					jsonObject.put("id", this.getE().getId());
+					jsonObject.put("msg", "保存成功！");
+				}
+
 			}
+
 		}
 		this.json = jsonObject.toString();
 		return "json";
