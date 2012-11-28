@@ -369,7 +369,7 @@ public class OwnershipsAction extends ViewAction<Map<String, Object>> {
 				.setValueFormater(new LinkFormater4CarInfo(this
 						.getContextPath())));
 		columns.add(new TextColumn4MapKey("o.source", "source",
-				getText("ownership.source"), 80).setSortable(true)
+				getText("ownership.source"), 100).setSortable(true)
 				.setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("o.whither", "whither",
 				getText("ownership.whither"), 80).setSortable(true)
