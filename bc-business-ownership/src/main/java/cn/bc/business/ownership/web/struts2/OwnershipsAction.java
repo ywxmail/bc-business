@@ -106,13 +106,14 @@ public class OwnershipsAction extends ViewAction<Map<String, Object>> {
 
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer sql = new StringBuffer();
-		sql.append("select o.id,o.status_,o.number_,o.nature,o.situation,o.source,o.owner_,o.ownership,o.whither");
+		sql.append("select o.id,o.status_,o.number_,o.nature,o.situation,o.source,c.owner_,o.ownership,o.whither");
 		sql.append(",o.file_date,ac.actor_name author,o.modified_date,md.actor_name modifier");
 		sql.append(",c.plate_type,c.plate_no,c.register_date,c.operate_date,getDisabledCarByOwnerNumber(o.number_) carInfo");
 		sql.append(",c.company,bia.name as unit_name,c.bs_type nbs_type,c.factory_type,c.factory_model,c.origin_no");
 		sql.append(",oc.plate_type oplate_type,oc.plate_no oplate_no,oc.register_date oregister_date,oc.factory_type ofactory_type");
 		sql.append(",oc.factory_model ofactory_model,oc.bs_type,oc.logout_reason,oc.return_date,oc.verify_date");
-		sql.append(",c.id newCarId,oc.id oldCarId,oc.return_date oreturn_date,m.name motorcadeName from bs_car_ownership o");
+		sql.append(",c.id newCarId,oc.id oldCarId,oc.return_date oreturn_date,m.name motorcadeName,o.desc_");
+		sql.append(" from bs_car_ownership o");
 		sql.append(" left join bs_car c on (c.cert_no2=o.number_ and c.status_ = 0)");
 		sql.append(" left join bs_car oc on (oc.cert_no2=o.number_ and oc.status_ =1)");
 		sql.append(" left join BC_IDENTITY_ACTOR_HISTORY md on md.id=o.modifier_id");
@@ -182,6 +183,7 @@ public class OwnershipsAction extends ViewAction<Map<String, Object>> {
 				map.put("oldCarId", rs[i++]);
 				map.put("oreturn_date", rs[i++]);
 				map.put("motorcadeName", rs[i++]);
+				map.put("desc_", rs[i++]);
 
 				return map;
 			}
@@ -210,7 +212,7 @@ public class OwnershipsAction extends ViewAction<Map<String, Object>> {
 					getText("ownership.situation"), 100).setSortable(true)
 					.setUseTitleFromLabel(true));
 		}
-		columns.add(new TextColumn4MapKey("o.owner_", "owner_",
+		columns.add(new TextColumn4MapKey("c.owner_", "owner_",
 				getText("ownership.owner"), 80).setSortable(true)
 				.setUseTitleFromLabel(true));
 		// 更新天数
@@ -386,6 +388,9 @@ public class OwnershipsAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("o.modified_date", "modified_date",
 				getText("ownership.modifiedDate"), 100).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+		columns.add(new TextColumn4MapKey("o.desc_", "desc_",
+				getText("ownership.description"), 250).setSortable(true)
+				.setUseTitleFromLabel(true));
 
 		return columns;
 	}
