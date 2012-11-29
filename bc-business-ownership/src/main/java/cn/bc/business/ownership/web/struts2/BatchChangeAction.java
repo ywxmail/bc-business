@@ -148,7 +148,7 @@ public class BatchChangeAction extends FileEntityAction<Long, Ownership> {
 		// 如果车辆产权有改动则设置车辆产权值
 		if (isOwner) {
 			ownershipInfo.put("owner", ownerValue);
-			o.setOwner(ownerValue);
+			//o.setOwner(ownerValue);
 
 		}
 		// 设置备注

@@ -8,6 +8,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import cn.bc.business.car.dao.CarDao;
+import cn.bc.business.car.domain.Car;
 import cn.bc.business.ownership.dao.OwnershipDao;
 import cn.bc.business.ownership.domain.Ownership;
 import cn.bc.core.service.DefaultCrudService;
@@ -104,7 +105,7 @@ public class OwnershipServiceImpl extends DefaultCrudService<Ownership>
 					ow.setSituation(situation);
 				}
 				if (owner != null) {
-					ow.setOwner(owner);
+					// ow.setOwner(owner);
 				}
 				if (description != null) {
 					ow.setDescription(description);
@@ -121,5 +122,9 @@ public class OwnershipServiceImpl extends DefaultCrudService<Ownership>
 
 	public void updateCar4OwnerByNumber(String owner, String number) {
 		this.ownershipDao.updateCar4OwnerByNumber(owner, number);
+	}
+
+	public Car getCarByNumber(String number) {
+		return this.ownershipDao.getCarByNumber(number);
 	}
 }

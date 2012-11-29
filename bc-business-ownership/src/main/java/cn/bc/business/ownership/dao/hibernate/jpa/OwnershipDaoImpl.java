@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import cn.bc.BCConstants;
+import cn.bc.business.car.domain.Car;
 import cn.bc.business.ownership.dao.OwnershipDao;
 import cn.bc.business.ownership.domain.Ownership;
 import cn.bc.orm.hibernate.jpa.HibernateCrudJpaDao;
@@ -147,5 +148,22 @@ public class OwnershipDaoImpl extends HibernateCrudJpaDao<Ownership> implements
 				+ ")";
 		logger.debug("sql: " + sql + " owner: " + owner + " number: " + number);
 		this.jdbcTemplate.update(sql, new Object[] { owner, number });
+	}
+
+	public Car getCarByNumber(String number) {
+		Car car = null;
+		String hql = "select c from Car c where c.certNo2=? and c.status="
+				+ BCConstants.STATUS_ENABLED;
+		logger.debug("hql: " + hql + " number: " + number);
+		List<?> list = this.getJpaTemplate().find(hql, new Object[] { number });
+		if (list.size() == 1) {
+			car = (Car) list.get(0);
+			return car;
+		} else if (list.size() == 0) {
+			return null;
+		} else {
+			car = (Car) list.get(0);
+		}
+		return car;
 	}
 }
