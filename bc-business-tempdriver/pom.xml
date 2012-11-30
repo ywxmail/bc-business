@@ -6,7 +6,7 @@
 		<version>1.0-SNAPSHOT</version>
 		<relativePath>../bc-business-parent/pom.xml</relativePath>
 	</parent>
-	<artifactId>bc-business-tempDriver</artifactId>
+	<artifactId>bc-business-tempdriver</artifactId>
 	<description>司机招聘</description>
 	
 	<dependencies>
