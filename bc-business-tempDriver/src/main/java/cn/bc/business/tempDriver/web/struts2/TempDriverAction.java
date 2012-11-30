@@ -57,7 +57,7 @@ public class TempDriverAction extends FileEntityAction<Long, TempDriver> {
 	protected void afterCreate(TempDriver entity) {
 		super.afterCreate(entity);
 		entity.setSex(TempDriver.SEX_MAN);
-		entity.setStatus(TempDriver.STATUS_CHECK);
+		entity.setStatus(TempDriver.STATUS_RESERVE);
 		entity.setUid(this.getIdGeneratorService().next(TempDriver.KEY_UID));
 	}
 
@@ -71,7 +71,7 @@ public class TempDriverAction extends FileEntityAction<Long, TempDriver> {
 	@Override
 	protected PageOption buildFormPageOption(boolean editable) {
 		PageOption option = super.buildFormPageOption(editable);
-		option.setWidth(770).setMinWidth(500).setHeight(420).setMinHeight(200);
+		option.setWidth(675).setMinWidth(500).setHeight(420).setMinHeight(200);
 		return option;
 	}
 

@@ -68,10 +68,8 @@ public class TempDriverServiceImpl extends DefaultCrudService<TempDriver> implem
 		variables.put("tDriver_id", tempDriver.getId());
 		variables.put("tDriver_address", tempDriver.getAddress()+"");
 		variables.put("tDriver_birthdate", DateUtils.formatCalendar2Day(tempDriver.getBirthdate()));
-		variables.put("tDriver_caseAccident", tempDriver.getCaseAccident()+"");
-		variables.put("tDriver_caseAdvice", tempDriver.getCaseAdvice()+"");
-		variables.put("tDriver_caseBusiness", tempDriver.getCaseBusiness()+"");
-		variables.put("tDriver_caseTraffic", tempDriver.getCaseTraffic()+"");
+		variables.put("tDriver_certDrivingFirstDate", tempDriver.getCertDrivingFirstDate()+"");
+		variables.put("tDriver_cyStartYear", tempDriver.getCyStartYear()+"");
 		variables.put("tDriver_certCYZG", tempDriver.getCertCYZG()+"");
 		variables.put("tDriver_certFWZG", tempDriver.getCertFWZG()+"");
 		variables.put("tDriver_certIdentity", tempDriver.getCertIdentity()+"");
@@ -96,7 +94,6 @@ public class TempDriverServiceImpl extends DefaultCrudService<TempDriver> implem
 			variables.put("tDriver_modifierCode", tempDriver.getModifier().getCode());
 			variables.put("tDriver_modifiedDate", DateUtils.formatCalendar2Day(tempDriver.getModifiedDate()));
 		}
-		variables.put("subject","待招聘司机："+tempDriver.getName()+"的入职流程（待开发）");
 
 		return variables;
 	}

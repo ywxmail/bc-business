@@ -68,12 +68,8 @@ public class TempDriver extends RichFileEntityImpl {
 	private String marry;// 婚姻状况
 	private String desc;// 备注
 	private String credit;// 信誉档案
-	private Integer caseTraffic;//最近一年交通违法宗数
-	private Integer casePraise;//最近一年服务投诉宗数
-	private Integer caseBusiness;//最近一年营运违章宗数
-	private Integer caseAccident;//最近一年事故宗数
-	private Integer caseAdvice;//最近一年获表扬次数
-
+	private Calendar certDrivingFirstDate;//本市驾驶证初领日期
+	private Integer cyStartYear;//本市出租车从业初始年份
 
 	@OneToMany(mappedBy = "tempDriver", fetch = FetchType.LAZY)
 	@OrderBy(value =("startTime DESC"))
@@ -237,50 +233,24 @@ public class TempDriver extends RichFileEntityImpl {
 	public void setCredit(String credit) {
 		this.credit = credit;
 	}
+
+	@Column(name = "CERT_DRIVING_FIRST_DATE")
+	public Calendar getCertDrivingFirstDate() {
+		return certDrivingFirstDate;
+	}
+
+	public void setCertDrivingFirstDate(Calendar certDrivingFirstDate) {
+		this.certDrivingFirstDate = certDrivingFirstDate;
+	}
+
+	@Column(name = "CY_START_YEAR")
+	public Integer getCyStartYear() {
+		return cyStartYear;
+	}
+
+	public void setCyStartYear(Integer cyStartYear) {
+		this.cyStartYear = cyStartYear;
+	}
 	
-	@Column(name = "CASE_TRAFFIC")
-	public Integer getCaseTraffic() {
-		return caseTraffic;
-	}
-
-	public void setCaseTraffic(Integer caseTraffic) {
-		this.caseTraffic = caseTraffic;
-	}
-
-	@Column(name = "CASE_PRAISE")
-	public Integer getCasePraise() {
-		return casePraise;
-	}
-
-	public void setCasePraise(Integer casePraise) {
-		this.casePraise = casePraise;
-	}
-
-	@Column(name = "CASE_BUSINESS")
-	public Integer getCaseBusiness() {
-		return caseBusiness;
-	}
-
-	public void setCaseBusiness(Integer caseBusiness) {
-		this.caseBusiness = caseBusiness;
-	}
-
-	@Column(name = "CASE_ACCIDENT")
-	public Integer getCaseAccident() {
-		return caseAccident;
-	}
-
-	public void setCaseAccident(Integer caseAccident) {
-		this.caseAccident = caseAccident;
-	}
-
-	@Column(name = "CASE_ADVICE")
-	public Integer getCaseAdvice() {
-		return caseAdvice;
-	}
-
-	public void setCaseAdvice(Integer caseAdvice) {
-		this.caseAdvice = caseAdvice;
-	}
 	
 }
