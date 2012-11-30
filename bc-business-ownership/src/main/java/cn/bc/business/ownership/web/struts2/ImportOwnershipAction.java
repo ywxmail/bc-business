@@ -74,10 +74,6 @@ public class ImportOwnershipAction extends ImportDataAction {
 					if (map.get("经营权来源") != null) {
 						ownership.setSource(map.get("经营权来源").toString().trim());
 					}
-					// 车辆产权
-					if (map.get("车辆产权") != null) {
-						ownership.setOwner(map.get("车辆产权").toString().trim());
-					}
 					// 经营权权属
 					if (map.get("经营权权属") != null) {
 						ownership.setOwnership(map.get("经营权权属").toString()
@@ -96,6 +92,14 @@ public class ImportOwnershipAction extends ImportDataAction {
 					ownership.setFileDate(now);
 					ownership.setAuthor(context.getUserHistory());
 					this.ownershipService.save(ownership);
+					// 车辆产权
+					if (map.get("车辆产权") != null) {
+						// 更新车辆的产权值
+						this.ownershipService.updateCar4OwnerByNumber(
+								map.get("车辆产权").toString().trim(),
+								map.get("权证号").toString().trim());
+					}
+
 				} else {
 					// 如果不为空就更新经营权导入的信息
 					// 经营权性质
@@ -111,11 +115,6 @@ public class ImportOwnershipAction extends ImportDataAction {
 					// 经营权来源
 					if (map.get("经营权来源") != null) {
 						ownershipByNumber.setSource(map.get("经营权来源").toString()
-								.trim());
-					}
-					// 车辆产权
-					if (map.get("车辆产权") != null) {
-						ownershipByNumber.setOwner(map.get("车辆产权").toString()
 								.trim());
 					}
 					// 经营权权属
@@ -137,6 +136,13 @@ public class ImportOwnershipAction extends ImportDataAction {
 					ownershipByNumber.setModifiedDate(now);
 					ownershipByNumber.setModifier(context.getUserHistory());
 					this.ownershipService.save(ownershipByNumber);
+					// 车辆产权
+					if (map.get("车辆产权") != null) {
+						// 更新车辆的产权值
+						this.ownershipService.updateCar4OwnerByNumber(
+								map.get("车辆产权").toString().trim(),
+								map.get("权证号").toString().trim());
+					}
 
 					// 统计更新的经营权号
 					existeNumber++;
