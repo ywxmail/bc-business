@@ -16,6 +16,7 @@
 	<properties>
 		<!-- 平台的版本号 -->
 		<framework.version>1.0.7</framework.version>
+		<workflow.version>1.0.7</workflow.version>
 	</properties>
 	
 	<dependencies>
@@ -39,6 +40,13 @@
 			<groupId>cn.bc</groupId>
 			<artifactId>bc-docs</artifactId>
 			<version>${framework.version}</version>
+		</dependency>
+		
+		<!-- 流程 -->
+		<dependency>
+			<groupId>cn.bc.workflow</groupId>
+			<artifactId>bc-workflow-core</artifactId>
+			<version>${workflow.version}</version>
 		</dependency>
 		
 		<!-- provided -->

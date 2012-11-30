@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
 import cn.bc.business.OptionConstants;
+import cn.bc.business.car.domain.Car;
 import cn.bc.business.car.service.CarService;
 import cn.bc.business.ownership.domain.Ownership;
 import cn.bc.business.ownership.service.OwnershipService;
@@ -16,6 +17,7 @@ import cn.bc.business.web.struts2.FileEntityAction;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.option.service.OptionService;
 import cn.bc.web.ui.html.page.PageOption;
+import cn.bc.web.ui.json.Json;
 
 /**
  * 车辆经营权Action
@@ -33,7 +35,8 @@ public class OwnershipAction extends FileEntityAction<Long, Ownership> {
 	private OptionService optionService;
 	public List<Map<String, String>> natures; // 经营权性质
 	public List<Map<String, String>> situations; // 经营权情况
-	public List<Map<String, String>> owners; // 车辆产权
+	public List<Map<String, String>> owners; // 车辆产权列表
+	public String owner;// 车辆产权值
 
 	@Autowired
 	public void setOptionService(OptionService optionService) {
@@ -55,8 +58,85 @@ public class OwnershipAction extends FileEntityAction<Long, Ownership> {
 	public boolean isReadonly() {
 		// 车辆经营权管理员或系统管理员
 		SystemContext context = (SystemContext) this.getContext();
-		return !context.hasAnyRole(getText("key.role.bs.ownership"),
-				getText("key.role.bc.admin"));
+		return !context.hasAnyRole(getText("key.role.bs.ownership"));
+	}
+
+	public boolean isCheck() {
+		// 车辆经营权查看角色
+		SystemContext context = (SystemContext) this.getContext();
+		return !context.hasAnyRole(getText("key.role.bs.ownership.check"));
+	}
+
+	public boolean isCheck4Advanced() {
+		// 车辆经营权查看(高级)
+		SystemContext context = (SystemContext) this.getContext();
+		return context
+				.hasAnyRole(getText("key.role.bs.ownership.check_advanced"));
+	}
+
+	public String json;
+	Json jsonObject = new Json();
+
+	@Override
+	protected void afterEdit(Ownership entity) {
+		super.afterEdit(entity);
+		// 如果该经营权号已配车(在案)就获取车的产权值
+		Car car = this.ownershipService.getCarByNumber(entity.getNumber());
+		if (car != null) {
+			owner = car.getOwner();
+		}
+	}
+
+	@Override
+	public String save() throws Exception {
+
+		// 如果存在相同经营权号的就提示已存在
+		if (this.getE().getNumber() != null) {
+			Ownership ownership = this.ownershipService
+					.getOwershipByNumber(this.getE().getNumber());
+			// 新建的判断
+			if (this.getE().isNew()) {
+				if (ownership != null) {
+					jsonObject.put("success", false);
+					jsonObject.put("id", this.getE().getId());
+					jsonObject.put("msg", "经营权：" + this.getE().getNumber()
+							+ "已经存在！");
+				} else {
+					this.beforeSave(this.getE());
+					this.ownershipService.save(this.getE());
+					// 更新车辆的产权字段
+					this.ownershipService.updateCar4OwnerByNumber(owner, this
+							.getE().getNumber());
+					jsonObject.put("success", true);
+					jsonObject.put("id", this.getE().getId());
+					jsonObject.put("msg", "保存成功！");
+				}
+
+			} else {
+				// 已存在的
+				if (ownership != null
+						&& !this.getE().getId().equals(ownership.getId())) {
+					jsonObject.put("success", false);
+					jsonObject.put("id", this.getE().getId());
+					jsonObject.put("msg", "经营权：" + this.getE().getNumber()
+							+ "已经存在！");
+				} else {
+					this.beforeSave(this.getE());
+					this.ownershipService.save(this.getE());
+					// 更新车辆的产权字段
+					this.ownershipService.updateCar4OwnerByNumber(owner, this
+							.getE().getNumber());
+					jsonObject.put("success", true);
+					jsonObject.put("id", this.getE().getId());
+					jsonObject.put("msg", "保存成功！");
+				}
+
+			}
+
+		}
+		this.json = jsonObject.toString();
+		return "json";
+
 	}
 
 	@Override

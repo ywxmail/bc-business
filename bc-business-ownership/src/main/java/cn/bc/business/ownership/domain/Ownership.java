@@ -21,7 +21,7 @@ public class Ownership extends FileEntityImpl {
 	private String nature;// 经营权性质
 	private String situation;// 经营权情况
 	private String source;// 经营权来源
-	private String owner;// 车辆产权
+	//private String owner;// 车辆产权
 	private String ownership;// 车辆权属
 	private String whither;// 车辆去向
 	private String description;// 备注
@@ -79,14 +79,14 @@ public class Ownership extends FileEntityImpl {
 		this.source = source;
 	}
 
-	@Column(name = "OWNER_")
-	public String getOwner() {
-		return owner;
-	}
-
-	public void setOwner(String owner) {
-		this.owner = owner;
-	}
+	// @Column(name = "OWNER_")
+	// public String getOwner() {
+	// return owner;
+	// }
+	//
+	// public void setOwner(String owner) {
+	// this.owner = owner;
+	// }
 
 	@Column(name = "DESC_")
 	public String getDescription() {
