@@ -74,7 +74,7 @@ public class OwnershipAction extends FileEntityAction<Long, Ownership> {
 				.hasAnyRole(getText("key.role.bs.ownership.check_advanced"));
 	}
 
-	public String json;
+	// public String json;
 	Json jsonObject = new Json();
 
 	@Override
@@ -99,8 +99,8 @@ public class OwnershipAction extends FileEntityAction<Long, Ownership> {
 				if (ownership != null) {
 					jsonObject.put("success", false);
 					jsonObject.put("id", this.getE().getId());
-					jsonObject.put("msg", "经营权：" + this.getE().getNumber()
-							+ "已经存在！");
+					jsonObject.put("msg", "经营权：“" + this.getE().getNumber()
+							+ "”已经存在！");
 				} else {
 					this.beforeSave(this.getE());
 					this.ownershipService.save(this.getE());
@@ -118,8 +118,8 @@ public class OwnershipAction extends FileEntityAction<Long, Ownership> {
 						&& !this.getE().getId().equals(ownership.getId())) {
 					jsonObject.put("success", false);
 					jsonObject.put("id", this.getE().getId());
-					jsonObject.put("msg", "经营权：" + this.getE().getNumber()
-							+ "已经存在！");
+					jsonObject.put("msg", "经营权：“" + this.getE().getNumber()
+							+ "”已经存在！");
 				} else {
 					this.beforeSave(this.getE());
 					this.ownershipService.save(this.getE());
