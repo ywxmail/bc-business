@@ -68,5 +68,4 @@ public class TempDriverWorkFlow extends EntityImpl {
 		this.startTime = startTime;
 	}
 	
-	
 }

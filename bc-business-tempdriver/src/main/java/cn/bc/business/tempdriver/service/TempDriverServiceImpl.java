@@ -66,28 +66,31 @@ public class TempDriverServiceImpl extends DefaultCrudService<TempDriver> implem
 	//返回流程需加载的全局参数
 	private Map<String,Object> returnFlowParam(TempDriver tempDriver,Map<String,Object> variables){
 		variables.put("tDriver_id", tempDriver.getId());
-		variables.put("tDriver_address", tempDriver.getAddress()+"");
+		variables.put("tDriver_address", tempDriver.getAddress() != null?tempDriver.getAddress():"");
 		variables.put("tDriver_birthdate", DateUtils.formatCalendar2Day(tempDriver.getBirthdate()));
-		variables.put("tDriver_certDrivingFirstDate", tempDriver.getCertDrivingFirstDate()+"");
-		variables.put("tDriver_cyStartYear", tempDriver.getCyStartYear()+"");
-		variables.put("tDriver_certCYZG", tempDriver.getCertCYZG()+"");
-		variables.put("tDriver_certFWZG", tempDriver.getCertFWZG()+"");
-		variables.put("tDriver_certIdentity", tempDriver.getCertIdentity()+"");
-		variables.put("tDriver_desc", tempDriver.getDesc()+"");
-		variables.put("tDriver_education", tempDriver.getEducation()+"");
-		variables.put("list_tDriver_family", tempDriver.getListFamily()+"");
-		variables.put("list_tDriver_workExperience", tempDriver.getListWorkExperience()+"");
-		variables.put("tDriver_marry", tempDriver.getMarry()+"");
+		variables.put("tDriver_certDrivingFirstDate", tempDriver.getCertDrivingFirstDate()!=null?DateUtils.formatCalendar2Day(tempDriver.getCertDrivingFirstDate()):"");
+		variables.put("tDriver_cyStartYear", tempDriver.getCyStartYear()!=null?tempDriver.getCyStartYear():"");
+		variables.put("tDriver_certCYZG", tempDriver.getCertCYZG()!=null?tempDriver.getCertCYZG():"");
+		variables.put("tDriver_certFWZG", tempDriver.getCertFWZG()!=null?tempDriver.getCertFWZG():"");
+		variables.put("tDriver_certIdentity", tempDriver.getCertIdentity());
+		variables.put("tDriver_desc", tempDriver.getDesc()!=null?tempDriver.getDesc():"");
+		variables.put("tDriver_education", tempDriver.getEducation()!=null?tempDriver.getEducation():"");
+		variables.put("list_tDriver_family", tempDriver.getListFamily()!=null?tempDriver.getListFamily():"");
+		variables.put("list_tDriver_workExperience", tempDriver.getListWorkExperience()!=null?tempDriver.getListWorkExperience():"");
+		variables.put("tDriver_marry", tempDriver.getMarry()!=null?tempDriver.getMarry():"");
 		variables.put("tDriver_name", tempDriver.getName());
-		variables.put("tDriver_nation", tempDriver.getNation()+"");
-		variables.put("tDriver_newAddress", tempDriver.getNewAddress()+"");
-		variables.put("tDriver_origin", tempDriver.getOrigin()+"");
-		variables.put("tDriver_phone", tempDriver.getPhone()+"");
-		variables.put("tDriver_region", tempDriver.getRegion()+"");
+		variables.put("tDriver_nation", tempDriver.getNation()!=null?tempDriver.getNation():"");
+		variables.put("tDriver_newAddress", tempDriver.getNewAddress()!=null?tempDriver.getNewAddress():"");
+		variables.put("tDriver_origin", tempDriver.getOrigin()!=null?tempDriver.getOrigin():"");
+		variables.put("tDriver_phone", tempDriver.getPhone()!=null?tempDriver.getPhone():"");
+		variables.put("tDriver_region", tempDriver.getRegion());
 		variables.put("tDriver_sex", tempDriver.getSex());
 		variables.put("tDriver_status", tempDriver.getStatus());
 		variables.put("tDriver_uid", tempDriver.getUid());
-		variables.put("tDriver_credit", tempDriver.getCredit()+"");
+		variables.put("tDriver_credit", tempDriver.getCredit()!=null?tempDriver.getCredit():"");
+		variables.put("tDriver_validStartDate", tempDriver.getValidStartDate()!=null?DateUtils.formatCalendar2Day(tempDriver.getValidStartDate()):"");
+		variables.put("tDriver_validEndDate", tempDriver.getValidEndDate()!=null?DateUtils.formatCalendar2Day(tempDriver.getValidEndDate()):"");
+		variables.put("tDriver_creditDate", tempDriver.getCreditDate()!=null?DateUtils.formatCalendar2Day(tempDriver.getCreditDate()):"");
 		if(tempDriver.getModifier()!=null){
 			variables.put("tDriver_modifierId", tempDriver.getModifier().getId());
 			variables.put("tDriver_modifier", tempDriver.getModifier().getName());
