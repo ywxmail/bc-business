@@ -134,6 +134,17 @@ public class CarAction extends FileEntityAction<Long, Car> {
 		return context.hasAnyRole(getText("key.role.bs.car.entering"));
 	}
 
+	public boolean isCheckOwnershipNumber() {
+		// 车辆经营权号查看
+		SystemContext context = (SystemContext) this.getContext();
+		return context.hasAnyRole(
+				getText("key.role.bs.car.ownershipNumber.check"),
+				getText("key.role.bs.ownership"),
+				getText("key.role.bs.ownership.check"),
+				getText("key.role.bs.ownership.check_advanced"),
+				getText("key.role.bs.car"), getText("key.role.bc.admin"));
+	}
+
 	@Override
 	protected void buildFormPageButtons(PageOption pageOption, boolean editable) {
 		// 特殊处理的部分
@@ -220,7 +231,8 @@ public class CarAction extends FileEntityAction<Long, Car> {
 
 	@Override
 	protected void afterOpen(Car entity) {
-		if (isReadonly() && this.getE().getStatus() != BCConstants.STATUS_DRAFT) {
+		if (!this.isCheckOwnershipNumber()
+				&& this.getE().getStatus() != BCConstants.STATUS_DRAFT) {
 			this.getE().setCertNo2("******");
 		}
 	}
