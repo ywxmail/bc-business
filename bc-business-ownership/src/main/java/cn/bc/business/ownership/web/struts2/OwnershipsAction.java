@@ -414,7 +414,8 @@ public class OwnershipsAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected String[] getGridSearchFields() {
-		return new String[] { "o.number_", "o.nature", "o.situation",
+		return new String[] { "c.plate_no", "c.manage_no", "oc.plate_no",
+				"oc.manage_no", "o.number_", "o.nature", "o.situation",
 				"c.owner_", "ac.actor_name", "md.actor_name" };
 	}
 
