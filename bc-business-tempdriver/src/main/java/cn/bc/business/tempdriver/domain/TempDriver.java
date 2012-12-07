@@ -70,6 +70,17 @@ public class TempDriver extends RichFileEntityImpl {
 	private String credit;// 信誉档案
 	private Calendar certDrivingFirstDate;//本市驾驶证初领日期
 	private Integer cyStartYear;//本市出租车从业初始年份
+	private Calendar validStartDate;//身份证有效期开始日
+	private Calendar validEndDate;//身份证有效期结束日
+	private Calendar creditDate;//信誉档案最后更新日期
+	private Calendar interviewDate;//面试日期
+	private Calendar registerDate;//报名时间
+	private String creditDesc;//信誉档案简述
+	private String crimeRecode;//犯罪记录
+	private String backGround;//背景调查
+	private String entryCar;//将入车号
+	private String applyAttr;//申请属性
+	private String formerUnit;//入职原单位
 
 	@OneToMany(mappedBy = "tempDriver", fetch = FetchType.LAZY)
 	@OrderBy(value =("startTime DESC"))
@@ -251,6 +262,100 @@ public class TempDriver extends RichFileEntityImpl {
 	public void setCyStartYear(Integer cyStartYear) {
 		this.cyStartYear = cyStartYear;
 	}
+
+	@Column(name = "VALID_START_DATE")
+	public Calendar getValidStartDate() {
+		return validStartDate;
+	}
+
+	public void setValidStartDate(Calendar validStartDate) {
+		this.validStartDate = validStartDate;
+	}
+
+	@Column(name = "VALID_END_DATE")
+	public Calendar getValidEndDate() {
+		return validEndDate;
+	}
+
+	public void setValidEndDate(Calendar validEndDate) {
+		this.validEndDate = validEndDate;
+	}
+
+	@Column(name = "CREDIT_DATE")
+	public Calendar getCreditDate() {
+		return creditDate;
+	}
+
+	public void setCreditDate(Calendar creditDate) {
+		this.creditDate = creditDate;
+	}
+	
+	@Column(name = "INTERVIEW_DATE")
+	public Calendar getInterviewDate() {
+		return interviewDate;
+	}
+
+	public void setInterviewDate(Calendar interviewDate) {
+		this.interviewDate = interviewDate;
+	}
+	@Column(name = "REGISTER_DATE")
+	public Calendar getRegisterDate() {
+		return registerDate;
+	}
+
+	public void setRegisterDate(Calendar registerDate) {
+		this.registerDate = registerDate;
+	}
+	@Column(name = "CREDIT_DESC")
+	public String getCreditDesc() {
+		return creditDesc;
+	}
+
+	public void setCreditDesc(String creditDesc) {
+		this.creditDesc = creditDesc;
+	}
+	@Column(name = "CRIME_RECODE")
+	public String getCrimeRecode() {
+		return crimeRecode;
+	}
+
+	public void setCrimeRecode(String crimeRecode) {
+		this.crimeRecode = crimeRecode;
+	}
+	@Column(name = "BACK_GROUND")
+	public String getBackGround() {
+		return backGround;
+	}
+
+	public void setBackGround(String backGround) {
+		this.backGround = backGround;
+	}
+	@Column(name = "ENTRY_CAR")
+	public String getEntryCar() {
+		return entryCar;
+	}
+
+	public void setEntryCar(String entryCar) {
+		this.entryCar = entryCar;
+	}
+	@Column(name = "APPLY_ATTRIBUTE")
+	public String getApplyAttr() {
+		return applyAttr;
+	}
+
+	public void setApplyAttr(String applyAttr) {
+		this.applyAttr = applyAttr;
+	}
+	@Column(name = "FORMER_UNIT")
+	public String getFormerUnit() {
+		return formerUnit;
+	}
+
+	public void setFormerUnit(String formerUnit) {
+		this.formerUnit = formerUnit;
+	}
+	
+	
 	
 	
 }

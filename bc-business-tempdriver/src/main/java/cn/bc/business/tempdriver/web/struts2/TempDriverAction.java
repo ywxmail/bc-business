@@ -38,6 +38,8 @@ public class TempDriverAction extends FileEntityAction<Long, TempDriver> {
 	private TempDriverService tempDriverService;
 	public List<Map<String, String>> list_WorkExperience; // 工作经历集合
 	public List<Map<String, String>> list_Family; // 家庭成员集合
+	
+	public Integer creditStatus;//信誉档案更新的状态 控制
 
 	@Autowired
 	public void setArrangeService(TempDriverService tempDriverService) {
@@ -51,6 +53,12 @@ public class TempDriverAction extends FileEntityAction<Long, TempDriver> {
 		SystemContext context = (SystemContext) this.getContext();
 		return !context.hasAnyRole(getText("key.role.bs.tempDriver"),
 				getText("key.role.bc.admin"));
+	}
+	
+	public boolean isAdvancedRead(){
+		// 司机招聘高级查询角色
+		SystemContext context = (SystemContext) this.getContext();
+		return context.hasAnyRole(getText("key.role.bs.tempDriver.read.advanced"));
 	}
 
 	@Override
@@ -66,6 +74,12 @@ public class TempDriverAction extends FileEntityAction<Long, TempDriver> {
 		super.beforeSave(entity);
 		if (entity.getCredit() != null && entity.getCredit() != "")
 			entity.setCredit(StringUtils.compressHtml(entity.getCredit()));
+		
+		//信誉档案已更新时
+		if(creditStatus.equals(2)){
+			entity.setCreditDate(Calendar.getInstance());
+		}
+
 	}
 
 	@Override
@@ -93,7 +107,9 @@ public class TempDriverAction extends FileEntityAction<Long, TempDriver> {
 	protected void initForm(boolean editable) throws Exception {
 		super.initForm(editable);
 		TempDriver td = this.getE();
-
+		
+		creditStatus=1;
+		
 		// 初始化集合
 		list_WorkExperience = parseListStr(td.getListWorkExperience());
 		list_Family = parseListStr(td.getListFamily());
