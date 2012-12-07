@@ -19,6 +19,8 @@ import cn.bc.business.tempdriver.service.TempDriverService;
 import cn.bc.business.web.struts2.FileEntityAction;
 import cn.bc.core.util.DateUtils;
 import cn.bc.core.util.StringUtils;
+import cn.bc.docs.domain.Attach;
+import cn.bc.docs.web.ui.html.AttachWidget;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.web.ui.html.page.ButtonOption;
 import cn.bc.web.ui.html.page.PageOption;
@@ -40,6 +42,7 @@ public class TempDriverAction extends FileEntityAction<Long, TempDriver> {
 	public List<Map<String, String>> list_Family; // 家庭成员集合
 	
 	public Integer creditStatus;//信誉档案更新的状态 控制
+	public AttachWidget attachsUI;
 
 	@Autowired
 	public void setArrangeService(TempDriverService tempDriverService) {
@@ -108,6 +111,9 @@ public class TempDriverAction extends FileEntityAction<Long, TempDriver> {
 		super.initForm(editable);
 		TempDriver td = this.getE();
 		
+		this.buildAttachsUI();
+		
+		//设置信誉档案更新的控制值
 		creditStatus=1;
 		
 		// 初始化集合
@@ -191,4 +197,35 @@ public class TempDriverAction extends FileEntityAction<Long, TempDriver> {
 		return "json";
 	}
 	// ---发起流程结束---
+
+	//构建附件UI
+	private void buildAttachsUI() {
+		attachsUI=this.buildAttachsUI(this.getE().isNew(), this.isReadonly()
+				, TempDriver.ATTACH_TYPE, this.getE().getUid());
+		
+		//设置最大附件数量控制
+		attachsUI.setMaxCount(20);
+		
+		if(!attachsUI.isReadOnly())
+			attachsUI.addHeadButton(AttachWidget.createButton("添加模板", null,
+					"bs.tempDriverForm.addAttachFromTemplate", null));// 添加模板
+		
+		
+		attachsUI.addHeadButton(AttachWidget
+				.defaultHeadButton4DownloadAll(null));// 打包下载
+		
+		if (!attachsUI.isReadOnly()) 
+			attachsUI.addHeadButton(AttachWidget
+					.defaultHeadButton4DeleteAll(null));// 删除
+
+	}
+	
+	// 从模板添加附件
+	@Override
+	protected Attach buildAttachFromTemplate() throws Exception {
+		return this.tempDriverService.doAddAttachFromTemplate(
+				this.getId(), this.tpl);
+	}
+	
+	
 }

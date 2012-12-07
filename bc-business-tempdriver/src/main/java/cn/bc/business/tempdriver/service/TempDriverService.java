@@ -2,6 +2,7 @@ package cn.bc.business.tempdriver.service;
 
 import cn.bc.business.tempdriver.domain.TempDriver;
 import cn.bc.core.service.CrudService;
+import cn.bc.template.service.AddAttachFromTemplateService;
 
 /**
  * 司机招聘Service
@@ -9,7 +10,7 @@ import cn.bc.core.service.CrudService;
  * @author lbj
  * 
  */
-public interface TempDriverService extends CrudService<TempDriver> {
+public interface TempDriverService extends CrudService<TempDriver>,AddAttachFromTemplateService {
 	
 	/**
 	 * 身份证号唯一性检测

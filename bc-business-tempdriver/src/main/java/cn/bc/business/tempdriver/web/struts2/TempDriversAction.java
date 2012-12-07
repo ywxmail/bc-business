@@ -84,7 +84,7 @@ public class TempDriversAction extends ViewAction<Map<String, Object>> {
 
 		sql.append(",t.interview_date as interviewDate,t.register_date as registerDate,t.credit_desc as creditDesc");
 		sql.append(",t.crime_recode as crimeRecode,t.back_ground as backGround,t.entry_car as entryCar");
-		sql.append(",t.apply_attribute as applyAttr,t.former_unit as formerUnit");
+		sql.append(",t.apply_attribute as applyAttr,t.former_unit as formerUnit,t.issue");
 		sql.append(" FROM bs_temp_driver t");
 		sql.append(" INNER JOIN bc_identity_actor_history u on u.id=t.author_id");
 		//sql.append(" LEFT JOIN bs_temp_driver_workflow w on w.pid=t.id");
@@ -135,6 +135,7 @@ public class TempDriversAction extends ViewAction<Map<String, Object>> {
 				map.put("entryCar",rs[i++]);
 				map.put("applyAttr",rs[i++]);
 				map.put("formerUnit",rs[i++]);
+				map.put("issue",rs[i++]);
 				
 				return map;
 			}
@@ -278,6 +279,10 @@ public class TempDriversAction extends ViewAction<Map<String, Object>> {
 				return (Date) contract.get("validEndDate");
 			}
 		}));
+		//签发机关
+		columns.add(new TextColumn4MapKey("t.issue", "issue",
+				getText("tempDriver.issue"),150).setSortable(true)
+				.setUseTitleFromLabel(true));
 		//身份证地址
 		columns.add(new TextColumn4MapKey("t.address", "address",
 				getText("tempDriver.address"),150).setSortable(true)

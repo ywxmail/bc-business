@@ -23,6 +23,7 @@ public class TempDriver extends RichFileEntityImpl {
 	private static final long serialVersionUID = 1L;
 
 	public static final String KEY_UID = "tempDriver.uid";
+	public static final String ATTACH_TYPE =TempDriver.class.getSimpleName();
 	
 	/** 聘用状态：待聘 */
 	public static final int STATUS_RESERVE = 0;
@@ -81,6 +82,7 @@ public class TempDriver extends RichFileEntityImpl {
 	private String entryCar;//将入车号
 	private String applyAttr;//申请属性
 	private String formerUnit;//入职原单位
+	private String issue;//签发机关
 
 	@OneToMany(mappedBy = "tempDriver", fetch = FetchType.LAZY)
 	@OrderBy(value =("startTime DESC"))
@@ -353,6 +355,14 @@ public class TempDriver extends RichFileEntityImpl {
 
 	public void setFormerUnit(String formerUnit) {
 		this.formerUnit = formerUnit;
+	}
+
+	public String getIssue() {
+		return issue;
+	}
+
+	public void setIssue(String issue) {
+		this.issue = issue;
 	}
 	
 	
