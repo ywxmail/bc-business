@@ -89,6 +89,17 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 				getText("key.role.bs.ownership.check_advanced"));
 	}
 
+	public boolean isCheckOwnershipNumber() {
+		// 车辆经营权号查看
+		SystemContext context = (SystemContext) this.getContext();
+		return context.hasAnyRole(
+				getText("key.role.bs.car.ownershipNumber.check"),
+				getText("key.role.bs.ownership"),
+				getText("key.role.bs.ownership.check"),
+				getText("key.role.bs.ownership.check_advanced"),
+				getText("key.role.bs.car"), getText("key.role.bc.admin"));
+	}
+
 	private boolean isScrapTo() {
 		// 是否能读写经济合同残值归属管理角色
 		SystemContext context = (SystemContext) this.getContext();
@@ -265,7 +276,7 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 				getText("car.originNo"), 55).setSortable(true)
 				.setUseTitleFromLabel(true));
 		// 经营权证:权限控制
-		if (!isReadonly()) {
+		if (isCheckOwnershipNumber()) {
 			columns.add(new TextColumn4MapKey("c.cert_no2", "cert_no2",
 					getText("car.certNo2"), 100).setUseTitleFromLabel(true));
 		}
