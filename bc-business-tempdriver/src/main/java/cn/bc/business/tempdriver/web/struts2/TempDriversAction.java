@@ -14,6 +14,8 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
+import com.google.gson.JsonObject;
+
 import cn.bc.BCConstants;
 import cn.bc.business.tempdriver.domain.TempDriver;
 import cn.bc.business.web.struts2.ViewAction;
@@ -31,6 +33,7 @@ import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.formater.DateRangeFormater;
 import cn.bc.web.formater.KeyValueFormater;
 import cn.bc.web.ui.html.grid.Column;
+import cn.bc.web.ui.html.grid.FooterButton;
 import cn.bc.web.ui.html.grid.IdColumn4MapKey;
 import cn.bc.web.ui.html.grid.TextColumn4MapKey;
 import cn.bc.web.ui.html.page.PageOption;
@@ -461,6 +464,22 @@ public class TempDriversAction extends ViewAction<Map<String, Object>> {
 		Json json = new Json();
 		json.put("status", status);
 		return status==null||status.length()==0?null:json;
+	}
+	
+	@Override
+	protected FooterButton getGridFooterImportButton() {
+		// 获取默认的导入按钮设置
+		FooterButton fb = this.getDefaultGridFooterImportButton();
+
+		// 配置特殊参数
+		JsonObject cfg = new JsonObject();
+		cfg.addProperty("tplCode", "IMPORT_TEMPDRIVER");// 模板编码
+		cfg.addProperty("importAction", "bc-business/tempDriver/import");// 导入数据的action路径(使用相对路径)
+		cfg.addProperty("headerRowIndex", 0);// 列标题所在行的索引号(0-based)
+		fb.setAttr("data-cfg", cfg.toString());
+
+		// 返回导入按钮
+		return fb;
 	}
 
 	//高级搜索

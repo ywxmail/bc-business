@@ -70,6 +70,7 @@ public class TempDriverAction extends FileEntityAction<Long, TempDriver> {
 		entity.setSex(TempDriver.SEX_MAN);
 		entity.setStatus(TempDriver.STATUS_RESERVE);
 		entity.setUid(this.getIdGeneratorService().next(TempDriver.KEY_UID));
+		entity.setRegisterDate(Calendar.getInstance());
 	}
 
 	@Override

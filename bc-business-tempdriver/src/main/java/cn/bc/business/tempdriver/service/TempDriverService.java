@@ -1,5 +1,7 @@
 package cn.bc.business.tempdriver.service;
 
+import java.util.List;
+
 import cn.bc.business.tempdriver.domain.TempDriver;
 import cn.bc.core.service.CrudService;
 import cn.bc.template.service.AddAttachFromTemplateService;
@@ -36,4 +38,6 @@ public interface TempDriverService extends CrudService<TempDriver>,AddAttachFrom
 	 * @return
 	 */
 	String doStartFlow(String key,Long[] ids);
+	
+	void doSaveList(List<TempDriver> lists);
 }

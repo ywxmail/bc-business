@@ -3,6 +3,7 @@ package cn.bc.business.tempdriver.service;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
@@ -181,6 +182,14 @@ public class TempDriverServiceImpl extends DefaultCrudService<TempDriver> implem
 		Attach attach = template.format2Attach(params, ptype, puid);
 		this.attachService.save(attach);
 		return attach;
+	}
+
+	public void doSaveList(List<TempDriver> lists) {
+		if(lists == null || lists.size()==0)
+			return;
+		for(TempDriver tempDriver:lists){
+			this.tempDriverDao.save(tempDriver);
+		}
 	}
 
 }
