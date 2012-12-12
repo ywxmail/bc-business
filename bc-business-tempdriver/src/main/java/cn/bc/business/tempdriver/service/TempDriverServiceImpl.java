@@ -90,7 +90,7 @@ public class TempDriverServiceImpl extends DefaultCrudService<TempDriver> implem
 		variables.put("address", tempDriver.getAddress() != null?tempDriver.getAddress():"");
 		variables.put("birthdate", DateUtils.formatCalendar2Day(tempDriver.getBirthdate()));
 		variables.put("certDrivingFirstDate", tempDriver.getCertDrivingFirstDate()!=null?DateUtils.formatCalendar2Day(tempDriver.getCertDrivingFirstDate()):"");
-		variables.put("cyStartYear", tempDriver.getCyStartYear()!=null?tempDriver.getCyStartYear():"");
+		variables.put("cyStartYear", tempDriver.getCyStartYear()!=null?tempDriver.getCyStartYear().toString():"");
 		variables.put("certCYZG", tempDriver.getCertCYZG()!=null?tempDriver.getCertCYZG():"");
 		variables.put("certFWZG", tempDriver.getCertFWZG()!=null?tempDriver.getCertFWZG():"");
 		variables.put("certIdentity", tempDriver.getCertIdentity());
@@ -183,4 +183,7 @@ public class TempDriverServiceImpl extends DefaultCrudService<TempDriver> implem
 		return attach;
 	}
 
+	public void doSyncPortrait() throws Exception {
+		this.tempDriverDao.doSyncPortrait();
+	}
 }

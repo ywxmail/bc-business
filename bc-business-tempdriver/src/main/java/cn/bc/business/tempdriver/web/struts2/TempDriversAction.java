@@ -14,6 +14,8 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
+import com.google.gson.JsonObject;
+
 import cn.bc.BCConstants;
 import cn.bc.business.tempdriver.domain.TempDriver;
 import cn.bc.business.web.struts2.ViewAction;
@@ -31,6 +33,7 @@ import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.formater.DateRangeFormater;
 import cn.bc.web.formater.KeyValueFormater;
 import cn.bc.web.ui.html.grid.Column;
+import cn.bc.web.ui.html.grid.FooterButton;
 import cn.bc.web.ui.html.grid.IdColumn4MapKey;
 import cn.bc.web.ui.html.grid.TextColumn4MapKey;
 import cn.bc.web.ui.html.page.PageOption;
@@ -237,11 +240,11 @@ public class TempDriversAction extends ViewAction<Map<String, Object>> {
 				.setValueFormater(new KeyValueFormater(getOfferStatusValues())));*/
 		//状态
 		columns.add(new TextColumn4MapKey("t.status_", "status",
-				getText("tempDriver.status"), 80).setSortable(true)
+				getText("tempDriver.status"), 45).setSortable(true)
 				.setValueFormater(new KeyValueFormater(getStatusValues())));
 		//营运状态
 		columns.add(new TextColumn4MapKey("d.status_", "bstatus",
-				getText("tempDriver.statusBusiness"), 80).setSortable(true)
+				getText("tempDriver.statusBusiness"), 60).setSortable(true)
 				.setValueFormater(new KeyValueFormater(getBusinessValues())));
 		//姓名
 		columns.add(new TextColumn4MapKey("t.name", "name",
@@ -253,7 +256,17 @@ public class TempDriversAction extends ViewAction<Map<String, Object>> {
 				.setValueFormater(new KeyValueFormater(getSexValues())));
 		//出生日期
 		columns.add(new TextColumn4MapKey("t.birthdate", "birthdate",
-				getText("tempDriver.birthdate"), 90).setSortable(true)
+				getText("tempDriver.birthdate"), 80).setSortable(true)
+				.setUseTitleFromLabel(true)
+				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+		//面试日期
+		columns.add(new TextColumn4MapKey("t.interview_date", "interviewDate",
+				getText("tempDriver.interviewDate"), 80).setSortable(true)
+				.setUseTitleFromLabel(true)
+				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+		//报名日期
+		columns.add(new TextColumn4MapKey("t.register_date", "registerDate",
+				getText("tempDriver.registerDate"), 80).setSortable(true)
 				.setUseTitleFromLabel(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
 		//籍贯
@@ -303,31 +316,16 @@ public class TempDriversAction extends ViewAction<Map<String, Object>> {
 					getText("tempDriver.phone"),100).setSortable(true)
 					.setUseTitleFromLabel(true));
 		}
-		
 		//从业资格证
 		columns.add(new TextColumn4MapKey("t.cert_cyzg", "cyzg",
 				getText("tempDriver.cyzg"),120).setSortable(true)
 				.setUseTitleFromLabel(true));
-		//学历
-		columns.add(new TextColumn4MapKey("t.education", "education",
-				getText("tempDriver.education"),60).setSortable(true)
-				.setUseTitleFromLabel(true));
-		//民族
-		columns.add(new TextColumn4MapKey("t.nation", "nation",
-				getText("tempDriver.nation"),100).setSortable(true)
-				.setUseTitleFromLabel(true));
+		
 		//婚姻状况
 		columns.add(new TextColumn4MapKey("t.marry", "marry",
 				getText("tempDriver.marry"),80).setSortable(true)
 				.setUseTitleFromLabel(true));
-		//面试日期
-		columns.add(new TextColumn4MapKey("t.interview_date", "interviewDate",
-				getText("tempDriver.interviewDate"), 120).setSortable(true)
-				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
-		//报名日期
-		columns.add(new TextColumn4MapKey("t.register_date", "registerDate",
-				getText("tempDriver.registerDate"), 120).setSortable(true)
-				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+		
 		//信誉档案简述
 		columns.add(new TextColumn4MapKey("t.credit_desc", "creditDesc",
 				getText("tempDriver.creditDesc"),100).setSortable(true)
@@ -355,6 +353,14 @@ public class TempDriversAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("t.former_unit", "formerUnit",
 				getText("tempDriver.formerUnit"),100).setSortable(true)
 				.setUseTitleFromLabel(true));
+		//学历
+		columns.add(new TextColumn4MapKey("t.education", "education",
+				getText("tempDriver.education"),60).setSortable(true)
+				.setUseTitleFromLabel(true));
+		//民族
+		columns.add(new TextColumn4MapKey("t.nation", "nation",
+				getText("tempDriver.nation"),100).setSortable(true)
+				.setUseTitleFromLabel(true));
 				
 		//备注
 		columns.add(new TextColumn4MapKey("t.desc_", "desc",
@@ -364,13 +370,13 @@ public class TempDriversAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("u.actor_name", "aname",
 				getText("label.authorName"), 80).setSortable(true));
 		columns.add(new TextColumn4MapKey("t.file_date", "file_date",
-				getText("label.fileDate"), 100).setSortable(true)
-				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+				getText("label.fileDate"), 120).setSortable(true)
+				.setValueFormater(new CalendarFormater("yyyy-MM-dd hh:mm")));
 		columns.add(new TextColumn4MapKey("m.actor_name", "mname",
 				getText("tempDriver.modifier"), 80).setSortable(true));
 		columns.add(new TextColumn4MapKey("t.modified_date", "modified_date",
 				getText("tempDriver.modifiedDate"), 120).setSortable(true)
-				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+				.setValueFormater(new CalendarFormater("yyyy-MM-dd hh:mm")));
 		return columns;
 	}
 
@@ -434,14 +440,14 @@ public class TempDriversAction extends ViewAction<Map<String, Object>> {
 					.setText(getText("tempDriverWorkFlow.startFlow"))
 					.setClick("bs.tempDriverView.startFlow"));
 			//出租车协会查询
-			tb.addButton(new ToolbarButton().setIcon("ui-icon-check")
+			/*tb.addButton(new ToolbarButton().setIcon("ui-icon-check")
 					.setText(getText("tempDriver.gztaxixhDriverInfo"))
-					.setClick("bs.tempDriverView.gztaxixhDriverInfo"));
+					.setClick("bs.tempDriverView.gztaxixhDriverInfo"));*/
 
 		}
 		
 		tb.addButton(Toolbar.getDefaultToolbarRadioGroup(
-				this.getStatusValues(), "status", 0,
+				this.getStatusValues(), "status",4,
 				getText("title.click2changeSearchStatus")));
 		
 		// 搜索按钮
@@ -461,6 +467,22 @@ public class TempDriversAction extends ViewAction<Map<String, Object>> {
 		Json json = new Json();
 		json.put("status", status);
 		return status==null||status.length()==0?null:json;
+	}
+	
+	@Override
+	protected FooterButton getGridFooterImportButton() {
+		// 获取默认的导入按钮设置
+		FooterButton fb = this.getDefaultGridFooterImportButton();
+
+		// 配置特殊参数
+		JsonObject cfg = new JsonObject();
+		cfg.addProperty("tplCode", "IMPORT_TEMPDRIVER");// 模板编码
+		cfg.addProperty("importAction", "bc-business/tempDriver/import");// 导入数据的action路径(使用相对路径)
+		cfg.addProperty("headerRowIndex", 0);// 列标题所在行的索引号(0-based)
+		fb.setAttr("data-cfg", cfg.toString());
+
+		// 返回导入按钮
+		return fb;
 	}
 
 	//高级搜索

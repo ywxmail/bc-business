@@ -36,4 +36,10 @@ public interface TempDriverService extends CrudService<TempDriver>,AddAttachFrom
 	 * @return
 	 */
 	String doStartFlow(String key,Long[] ids);
+	
+	
+	/**
+	 * 同步司机身份证照片的方法
+	 */
+	void doSyncPortrait() throws Exception;
 }
