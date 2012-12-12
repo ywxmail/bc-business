@@ -240,11 +240,11 @@ public class TempDriversAction extends ViewAction<Map<String, Object>> {
 				.setValueFormater(new KeyValueFormater(getOfferStatusValues())));*/
 		//状态
 		columns.add(new TextColumn4MapKey("t.status_", "status",
-				getText("tempDriver.status"), 80).setSortable(true)
+				getText("tempDriver.status"), 45).setSortable(true)
 				.setValueFormater(new KeyValueFormater(getStatusValues())));
 		//营运状态
 		columns.add(new TextColumn4MapKey("d.status_", "bstatus",
-				getText("tempDriver.statusBusiness"), 80).setSortable(true)
+				getText("tempDriver.statusBusiness"), 60).setSortable(true)
 				.setValueFormater(new KeyValueFormater(getBusinessValues())));
 		//姓名
 		columns.add(new TextColumn4MapKey("t.name", "name",
@@ -256,7 +256,17 @@ public class TempDriversAction extends ViewAction<Map<String, Object>> {
 				.setValueFormater(new KeyValueFormater(getSexValues())));
 		//出生日期
 		columns.add(new TextColumn4MapKey("t.birthdate", "birthdate",
-				getText("tempDriver.birthdate"), 90).setSortable(true)
+				getText("tempDriver.birthdate"), 80).setSortable(true)
+				.setUseTitleFromLabel(true)
+				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+		//面试日期
+		columns.add(new TextColumn4MapKey("t.interview_date", "interviewDate",
+				getText("tempDriver.interviewDate"), 80).setSortable(true)
+				.setUseTitleFromLabel(true)
+				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+		//报名日期
+		columns.add(new TextColumn4MapKey("t.register_date", "registerDate",
+				getText("tempDriver.registerDate"), 80).setSortable(true)
 				.setUseTitleFromLabel(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
 		//籍贯
@@ -306,31 +316,16 @@ public class TempDriversAction extends ViewAction<Map<String, Object>> {
 					getText("tempDriver.phone"),100).setSortable(true)
 					.setUseTitleFromLabel(true));
 		}
-		
 		//从业资格证
 		columns.add(new TextColumn4MapKey("t.cert_cyzg", "cyzg",
 				getText("tempDriver.cyzg"),120).setSortable(true)
 				.setUseTitleFromLabel(true));
-		//学历
-		columns.add(new TextColumn4MapKey("t.education", "education",
-				getText("tempDriver.education"),60).setSortable(true)
-				.setUseTitleFromLabel(true));
-		//民族
-		columns.add(new TextColumn4MapKey("t.nation", "nation",
-				getText("tempDriver.nation"),100).setSortable(true)
-				.setUseTitleFromLabel(true));
+		
 		//婚姻状况
 		columns.add(new TextColumn4MapKey("t.marry", "marry",
 				getText("tempDriver.marry"),80).setSortable(true)
 				.setUseTitleFromLabel(true));
-		//面试日期
-		columns.add(new TextColumn4MapKey("t.interview_date", "interviewDate",
-				getText("tempDriver.interviewDate"), 120).setSortable(true)
-				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
-		//报名日期
-		columns.add(new TextColumn4MapKey("t.register_date", "registerDate",
-				getText("tempDriver.registerDate"), 120).setSortable(true)
-				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+		
 		//信誉档案简述
 		columns.add(new TextColumn4MapKey("t.credit_desc", "creditDesc",
 				getText("tempDriver.creditDesc"),100).setSortable(true)
@@ -358,6 +353,14 @@ public class TempDriversAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("t.former_unit", "formerUnit",
 				getText("tempDriver.formerUnit"),100).setSortable(true)
 				.setUseTitleFromLabel(true));
+		//学历
+				columns.add(new TextColumn4MapKey("t.education", "education",
+						getText("tempDriver.education"),60).setSortable(true)
+						.setUseTitleFromLabel(true));
+		//民族
+		columns.add(new TextColumn4MapKey("t.nation", "nation",
+				getText("tempDriver.nation"),100).setSortable(true)
+				.setUseTitleFromLabel(true));
 				
 		//备注
 		columns.add(new TextColumn4MapKey("t.desc_", "desc",
@@ -367,13 +370,13 @@ public class TempDriversAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("u.actor_name", "aname",
 				getText("label.authorName"), 80).setSortable(true));
 		columns.add(new TextColumn4MapKey("t.file_date", "file_date",
-				getText("label.fileDate"), 100).setSortable(true)
-				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+				getText("label.fileDate"), 120).setSortable(true)
+				.setValueFormater(new CalendarFormater("yyyy-MM-dd hh:mm")));
 		columns.add(new TextColumn4MapKey("m.actor_name", "mname",
 				getText("tempDriver.modifier"), 80).setSortable(true));
 		columns.add(new TextColumn4MapKey("t.modified_date", "modified_date",
 				getText("tempDriver.modifiedDate"), 120).setSortable(true)
-				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+				.setValueFormater(new CalendarFormater("yyyy-MM-dd hh:mm")));
 		return columns;
 	}
 

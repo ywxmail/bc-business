@@ -1,6 +1,5 @@
 package cn.bc.business.tempdriver.web.struts2;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -64,12 +63,9 @@ public class ImportTempDriverAction extends ImportDataAction {
 	protected void importData(List<Map<String, Object>> data, JsonObject json,
 			String fileType) {
 		
-		List<TempDriver> lists=new ArrayList<TempDriver>();//声明将要保存的集合
-		
 		TempDriver entity;//司机招聘对象
 		int updateCount = 0;//更新的行数
-		int insertCount = 0;//插入的行数
-		int invalidCount = 0;//无效数据
+		int exceptionCount = 0;//异常数据数量
 		String invalidCert = "";//插入不成功的身份证号
 		String key;//声明取map值的key
 		// 系统上下文
@@ -78,113 +74,110 @@ public class ImportTempDriverAction extends ImportDataAction {
 		ActorHistory user=context.getUserHistory();
 		
 		for(Map<String, Object> map:data){
-			key="身份证号码";
-			if(map.get(key)!=null && validateCertIdentity(map.get(key).toString()) && map.get("姓名")!=null ){
-				String certIdentity=map.get(key).toString();
-				entity=this.tempDriverService.loadByCertIdentity(certIdentity);
-				
-				if(entity==null){//非空：更新信息，空：插入信息
-					entity=new TempDriver();
-					insertCount++;
-					//身份证号
-					entity.setCertIdentity(certIdentity);
-					entity.setUid(this.idGeneratorService.next(TempDriver.KEY_UID));
-					//设置创建者
-					entity.setAuthor(user);
-					entity.setFileDate(Calendar.getInstance());
+			try{
+				key="身份证号码";
+				if(map.get(key)!=null && validateCertIdentity(map.get(key).toString()) && map.get("姓名")!=null ){
+					String certIdentity=map.get(key).toString();
+					entity=this.tempDriverService.loadByCertIdentity(certIdentity);
+					
+					//判断是否存在
+					if(entity!=null){
+						updateCount++;
+					}else{
+						entity=new TempDriver();
+						//状态都修改为待聘
+						entity.setStatus(TempDriver.STATUS_RESERVE);
+						//身份证号
+						entity.setCertIdentity(certIdentity);
+						entity.setUid(this.idGeneratorService.next(TempDriver.KEY_UID));
+						//设置创建者
+						entity.setAuthor(user);
+						entity.setFileDate(Calendar.getInstance());
+					}
+					
+					//设置最后修改人
+					entity.setModifier(user);
+					entity.setModifiedDate(Calendar.getInstance());
+					
+					key="姓名";
+					if(map.get(key)!=null){
+						entity.setName(map.get(key).toString().trim());
+					}
+					key="服务资格证";
+					if(map.get(key)!=null)
+						entity.setCertFWZG(map.get(key).toString().trim());
+					key="电话";
+					if(map.get(key)!=null)
+						entity.setPhone(map.get(key).toString().trim());
+					key="原单位";
+					if(map.get(key)!=null)
+						entity.setFormerUnit(map.get(key).toString().trim());
+					key="将入车号";
+					if(map.get(key)!=null)
+						entity.setEntryCar(map.get(key).toString().trim());
+					key="申请属性";
+					if(map.get(key)!=null)
+						entity.setApplyAttr(map.get(key).toString().trim());
+					key="犯罪记录";
+					if(map.get(key)!=null)
+						entity.setCrimeRecode(map.get(key).toString().trim());
+					key="信誉档案";
+					if(map.get(key)!=null)
+						entity.setCreditDesc(map.get(key).toString().trim());
+					key="背景调查";
+					if(map.get(key)!=null)
+						entity.setBackGround(map.get(key).toString().trim());
+					key="面试日期";
+					if(map.get(key)!=null){
+						Date d=(Date) map.get(key);
+						Calendar cal=Calendar.getInstance();
+						cal.setTime(d);	
+						entity.setInterviewDate(cal);
+					}
+					key="报名日期";
+					if(map.get(key)!=null){
+						Date d=(Date) map.get(key);
+						Calendar cal=Calendar.getInstance();
+						cal.setTime(d);	
+						entity.setRegisterDate(cal);
+					}
+					
+					loadCertIdentityInfo(certIdentity,map,entity);	
+					
+					tempDriverService.save(entity);
+
 				}else{
-					updateCount++;
+					//拼接不能插入的身份证信息
+					if(map.get(key)!=null){
+						invalidCert+=","+map.get(key).toString();
+					}
+					//记录不能导入的数量
+					exceptionCount++;
 				}
-				
-				//状态都修改为待聘
-				entity.setStatus(TempDriver.STATUS_RESERVE);
-				//设置最后修改人
-				entity.setModifier(user);
-				entity.setModifiedDate(Calendar.getInstance());
-				
-				key="姓名";
-				if(map.get(key)!=null){
-					entity.setName(map.get(key).toString().trim());
-				}
-				key="服务资格证";
-				if(map.get(key)!=null)
-					entity.setCertFWZG(map.get(key).toString().trim());
-				key="电话";
-				if(map.get(key)!=null)
-					entity.setPhone(map.get(key).toString().trim());
-				key="原单位";
-				if(map.get(key)!=null)
-					entity.setFormerUnit(map.get(key).toString().trim());
-				key="将入车号";
-				if(map.get(key)!=null)
-					entity.setEntryCar(map.get(key).toString().trim());
-				key="申请属性";
-				if(map.get(key)!=null)
-					entity.setApplyAttr(map.get(key).toString().trim());
-				key="犯罪记录";
-				if(map.get(key)!=null)
-					entity.setCrimeRecode(map.get(key).toString().trim());
-				key="信誉档案";
-				if(map.get(key)!=null)
-					entity.setCreditDesc(map.get(key).toString().trim());
-				key="背景调查";
-				if(map.get(key)!=null)
-					entity.setBackGround(map.get(key).toString().trim());
-				key="面试日期";
-				if(map.get(key)!=null){
-					Date d=(Date) map.get(key);
-					Calendar cal=Calendar.getInstance();
-					cal.setTime(d);	
-					entity.setInterviewDate(cal);
-				}
-				key="报名日期";
-				if(map.get(key)!=null){
-					Date d=(Date) map.get(key);
-					Calendar cal=Calendar.getInstance();
-					cal.setTime(d);	
-					entity.setRegisterDate(cal);
-				}
-				
-				loadCertIdentityInfo(certIdentity,map,entity,
-						//更新的数量，不超过配置的最大值才会更新籍贯和区域
-						data.size()<=Integer.valueOf(this.getText("importTempDriver.updateOR.maxCount")));	
-				
-				lists.add(entity);
-			}else{
-				//拼接不能插入的身份证信息
-				if(map.get(key)!=null){
-					invalidCert+=","+map.get(key).toString();
-				}
-				
-				invalidCount++;
+			}catch(Exception e){
+				logger.warn(e.getMessage(), e);
+				exceptionCount++;
 			}
 		}
+		String msg="成功导入" +(data.size()-updateCount-exceptionCount)+ "条数据.";
 		
-		if(lists.size()>0)//保存数据
-			this.tempDriverService.doSaveList(lists);
+		if(updateCount>0)
+			msg+="更新"+updateCount+"条现有数据!";
 		
-		String msg="总数："+data.size()+"条数据！"+"成功导入:" + (updateCount+insertCount)+ "条，"
-				+ "其中更新数据"+updateCount+"条,"+"插入数据"+insertCount+"条.";
-		
-		String invalidMsg=invalidCount >0 ? "不能导入：" + invalidCount + "条!"
-				+(invalidCert.length()>0?"身份证号为:"+invalidCert.substring(1):""):"";
-		
-		json.addProperty("msg",msg+invalidMsg);
-		
-		if(logger.isDebugEnabled()){
-			//logger.debug("TODO: ImportOptionAction.importData");
-			logger.debug("ImportOptionAction.importData:"+msg+invalidMsg);
-		}
+		if(exceptionCount>0)
+			msg+=exceptionCount+"数据存在异常没被导入，"+(invalidCert.length()>0?"没被导入数据的身份证号为:"+invalidCert.substring(1):"");
+			
+		json.addProperty("msg",msg);
 		
 	}
 	
-	//自动加载与身份证相关的信息 updateOR:更新籍贯和区域的控制
-	private void loadCertIdentityInfo(String certIdentity,Map<String, Object> map,TempDriver entity,boolean updateOR){
+	//自动加载与身份证相关的信息
+	private void loadCertIdentityInfo(String certIdentity,Map<String, Object> map,TempDriver entity){
 		String origin="";
 		int region=TempDriver.REGION_;
 		
-		//更新的数量，不超过配置的最大值才会更新籍贯和区域
-		if(updateOR){
+		//符合这些情况才查籍贯和区域
+		if(map.get("籍贯")==null||entity.isNew()||entity.getOrigin()==null||entity.getRegion()==0){
 			// 根据编码找出籍贯
 			List<PlaceOrigin> pList = null;
 			String code = certIdentity.substring(0, 6);
@@ -215,20 +208,22 @@ public class ImportTempDriverAction extends ImportDataAction {
 			}
 		}
 		
-		
 		if(map.get("籍贯")!=null){
 			entity.setOrigin(map.get("籍贯").toString().trim());
-		}else if(updateOR){
+		}else{
 			entity.setOrigin(origin);
 		}
 		
-		//区域
-		entity.setRegion(region);
+		if(entity.isNew()||entity.getRegion()==0){
+			//区域
+			entity.setRegion(region);
+		}
 		
 		String b_year = "";// 年份     
 		String b_month = "";// 月份     
 		String b_day = "";// 月份  
 		String _sex="";
+		
 		if(certIdentity.length()==15){
 			_sex=certIdentity.substring(13,14);
 			b_year="19"+certIdentity.substring(6,8);
@@ -241,16 +236,18 @@ public class ImportTempDriverAction extends ImportDataAction {
 			b_day=certIdentity.substring(12,14);
 		}
 		
-		//性别
-		if(Integer.valueOf(_sex)%2 == 1){//男
-			entity.setSex(TempDriver.SEX_MAN);
-		}else{//女
-			entity.setSex(TempDriver.SEX_WOMAN);
+		if(entity.isNew()){
+			//性别
+			if(Integer.valueOf(_sex)%2 == 1){//男
+				entity.setSex(TempDriver.SEX_MAN);
+			}else{//女
+				entity.setSex(TempDriver.SEX_WOMAN);
+			}
 		}
 		
 		//出生日期
 		String birthdate=b_year+"-"+b_month+"-"+b_day;
-		if(isDate(birthdate))
+		if(isDate(birthdate)||entity.isNew()||entity.getBirthdate()==null)
 			entity.setBirthdate(DateUtils.getCalendar(birthdate));	
 	}
 	

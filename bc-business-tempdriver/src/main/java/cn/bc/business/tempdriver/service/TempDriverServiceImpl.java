@@ -192,4 +192,8 @@ public class TempDriverServiceImpl extends DefaultCrudService<TempDriver> implem
 		}
 	}
 
+	public boolean isExistCertIdentity(String certIdentity) {
+		return this.tempDriverDao.isExistCertIdentity(certIdentity);
+	}
+
 }

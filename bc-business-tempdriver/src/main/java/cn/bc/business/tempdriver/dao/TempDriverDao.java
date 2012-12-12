@@ -28,6 +28,14 @@ public interface TempDriverDao extends CrudDao<TempDriver> {
 	 * @return
 	 */
 	TempDriver loadByCertIdentity(String certIdentity);
+	
+	/**
+	 * 查招聘司机表是否已保存此身份证号的心
+	 * 
+	 * @param certIdentity 身份证号码
+	 * @return true 是，false 否
+	 */
+	boolean isExistCertIdentity(String certIdentity);
 }
 
 
