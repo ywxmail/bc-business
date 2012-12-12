@@ -1,7 +1,5 @@
 package cn.bc.business.tempdriver.service;
 
-import java.util.List;
-
 import cn.bc.business.tempdriver.domain.TempDriver;
 import cn.bc.core.service.CrudService;
 import cn.bc.template.service.AddAttachFromTemplateService;
@@ -39,17 +37,4 @@ public interface TempDriverService extends CrudService<TempDriver>,AddAttachFrom
 	 */
 	String doStartFlow(String key,Long[] ids);
 	
-	/**
-	 * 批量保存方法
-	 * @param lists
-	 */
-	void doSaveList(List<TempDriver> lists);
-	
-	/**
-	 * 查招聘司机表是否已保存此身份证号的心
-	 * 
-	 * @param certIdentity 身份证号码
-	 * @return true 是，false 否
-	 */
-	boolean isExistCertIdentity(String certIdentity);
 }
