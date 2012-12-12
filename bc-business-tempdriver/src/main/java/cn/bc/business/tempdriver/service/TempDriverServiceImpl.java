@@ -196,4 +196,7 @@ public class TempDriverServiceImpl extends DefaultCrudService<TempDriver> implem
 		return this.tempDriverDao.isExistCertIdentity(certIdentity);
 	}
 
+	public void doSyncPortrait() throws Exception {
+		this.tempDriverDao.doSyncPortrait();
+	}
 }

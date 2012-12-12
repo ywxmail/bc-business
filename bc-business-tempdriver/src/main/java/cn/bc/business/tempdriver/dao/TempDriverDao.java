@@ -36,6 +36,11 @@ public interface TempDriverDao extends CrudDao<TempDriver> {
 	 * @return true 是，false 否
 	 */
 	boolean isExistCertIdentity(String certIdentity);
+	
+	/**
+	 * 同步司机身份证照片的方法
+	 */
+	void doSyncPortrait() throws Exception;
 }
 
 
