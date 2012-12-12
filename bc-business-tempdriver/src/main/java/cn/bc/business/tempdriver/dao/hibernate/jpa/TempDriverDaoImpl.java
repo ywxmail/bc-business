@@ -33,7 +33,7 @@ import cn.bc.orm.hibernate.jpa.HibernateCrudJpaDao;
 public class TempDriverDaoImpl extends HibernateCrudJpaDao<TempDriver>
 		implements TempDriverDao {
 	private JdbcTemplate jdbcTemplate;
-	//private static Log logger = LogFactory.getLog(TempDriverDaoImpl.class);
+	private static Log logger = LogFactory.getLog(TempDriverDaoImpl.class);
 
 	@Autowired
 	public void setDataSource(DataSource dataSource) {
