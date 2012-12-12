@@ -32,8 +32,8 @@ import cn.bc.orm.hibernate.jpa.HibernateCrudJpaDao;
  */
 public class TempDriverDaoImpl extends HibernateCrudJpaDao<TempDriver>
 		implements TempDriverDao {
-	private static Log logger = LogFactory.getLog(TempDriverDaoImpl.class);
 	private JdbcTemplate jdbcTemplate;
+	//private static Log logger = LogFactory.getLog(TempDriverDaoImpl.class);
 
 	@Autowired
 	public void setDataSource(DataSource dataSource) {
@@ -52,19 +52,6 @@ public class TempDriverDaoImpl extends HibernateCrudJpaDao<TempDriver>
 	public TempDriver loadByCertIdentity(String certIdentity) {
 		Condition c = new EqualsCondition("certIdentity", certIdentity);
 		return this.createQuery().condition(c).singleResult();
-	}
-
-	public boolean isExistCertIdentity(String certIdentity) {
-		String sql = "select count(*) from bs_temp_driver where cert_identity=?";
-		Object[] args = new Object[] { certIdentity };
-		this.jdbcTemplate.queryForLong(sql, args);
-
-		if (logger.isDebugEnabled()) {
-			logger.debug("sql=" + sql);
-			logger.debug("args=" + args.toString());
-		}
-
-		return this.jdbcTemplate.queryForLong(sql, args) > 0;
 	}
 
 	private static DateFormat df2month = new SimpleDateFormat("yyyyMM");

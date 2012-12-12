@@ -3,7 +3,6 @@ package cn.bc.business.tempdriver.service;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
@@ -91,7 +90,7 @@ public class TempDriverServiceImpl extends DefaultCrudService<TempDriver> implem
 		variables.put("address", tempDriver.getAddress() != null?tempDriver.getAddress():"");
 		variables.put("birthdate", DateUtils.formatCalendar2Day(tempDriver.getBirthdate()));
 		variables.put("certDrivingFirstDate", tempDriver.getCertDrivingFirstDate()!=null?DateUtils.formatCalendar2Day(tempDriver.getCertDrivingFirstDate()):"");
-		variables.put("cyStartYear", tempDriver.getCyStartYear()!=null?tempDriver.getCyStartYear():"");
+		variables.put("cyStartYear", tempDriver.getCyStartYear()!=null?tempDriver.getCyStartYear().toString():"");
 		variables.put("certCYZG", tempDriver.getCertCYZG()!=null?tempDriver.getCertCYZG():"");
 		variables.put("certFWZG", tempDriver.getCertFWZG()!=null?tempDriver.getCertFWZG():"");
 		variables.put("certIdentity", tempDriver.getCertIdentity());
@@ -182,18 +181,6 @@ public class TempDriverServiceImpl extends DefaultCrudService<TempDriver> implem
 		Attach attach = template.format2Attach(params, ptype, puid);
 		this.attachService.save(attach);
 		return attach;
-	}
-
-	public void doSaveList(List<TempDriver> lists) {
-		if(lists == null || lists.size()==0)
-			return;
-		for(TempDriver tempDriver:lists){
-			this.tempDriverDao.save(tempDriver);
-		}
-	}
-
-	public boolean isExistCertIdentity(String certIdentity) {
-		return this.tempDriverDao.isExistCertIdentity(certIdentity);
 	}
 
 	public void doSyncPortrait() throws Exception {

@@ -354,9 +354,9 @@ public class TempDriversAction extends ViewAction<Map<String, Object>> {
 				getText("tempDriver.formerUnit"),100).setSortable(true)
 				.setUseTitleFromLabel(true));
 		//学历
-				columns.add(new TextColumn4MapKey("t.education", "education",
-						getText("tempDriver.education"),60).setSortable(true)
-						.setUseTitleFromLabel(true));
+		columns.add(new TextColumn4MapKey("t.education", "education",
+				getText("tempDriver.education"),60).setSortable(true)
+				.setUseTitleFromLabel(true));
 		//民族
 		columns.add(new TextColumn4MapKey("t.nation", "nation",
 				getText("tempDriver.nation"),100).setSortable(true)
@@ -440,14 +440,14 @@ public class TempDriversAction extends ViewAction<Map<String, Object>> {
 					.setText(getText("tempDriverWorkFlow.startFlow"))
 					.setClick("bs.tempDriverView.startFlow"));
 			//出租车协会查询
-			tb.addButton(new ToolbarButton().setIcon("ui-icon-check")
+			/*tb.addButton(new ToolbarButton().setIcon("ui-icon-check")
 					.setText(getText("tempDriver.gztaxixhDriverInfo"))
-					.setClick("bs.tempDriverView.gztaxixhDriverInfo"));
+					.setClick("bs.tempDriverView.gztaxixhDriverInfo"));*/
 
 		}
 		
 		tb.addButton(Toolbar.getDefaultToolbarRadioGroup(
-				this.getStatusValues(), "status", 0,
+				this.getStatusValues(), "status",4,
 				getText("title.click2changeSearchStatus")));
 		
 		// 搜索按钮
