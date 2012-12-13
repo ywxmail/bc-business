@@ -16,6 +16,8 @@ import cn.bc.core.service.DefaultCrudService;
 import cn.bc.core.util.DateUtils;
 import cn.bc.docs.domain.Attach;
 import cn.bc.docs.service.AttachService;
+import cn.bc.identity.web.SystemContext;
+import cn.bc.identity.web.SystemContextHolder;
 import cn.bc.template.domain.Template;
 import cn.bc.template.service.TemplateService;
 import cn.bc.workflow.service.WorkflowService;
@@ -157,6 +159,7 @@ public class TempDriverServiceImpl extends DefaultCrudService<TempDriver> implem
 		String ptype = TempDriver.ATTACH_TYPE;
 		String puid = tempDriver.getUid();
 		
+		
 		// 不能格式化
 		if (!template.isFormatted()) {
 			Attach attach = template.format2Attach(null, ptype,puid);
@@ -177,6 +180,9 @@ public class TempDriverServiceImpl extends DefaultCrudService<TempDriver> implem
 				template.getId(), mapFormatSql);
 		if (mapParams != null)
 			params.putAll(mapParams);
+		
+		//加载系统上下文属性
+		params.put(SystemContext.class.getSimpleName(),SystemContextHolder.get());
 		
 		Attach attach = template.format2Attach(params, ptype, puid);
 		this.attachService.save(attach);
