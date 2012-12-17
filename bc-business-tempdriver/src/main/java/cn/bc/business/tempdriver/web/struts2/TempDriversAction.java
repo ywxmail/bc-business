@@ -51,7 +51,7 @@ import cn.bc.web.ui.json.Json;
 @Controller
 public class TempDriversAction extends ViewAction<Map<String, Object>> {
 	private static final long serialVersionUID = 1L;
-	public String status = String.valueOf(BCConstants.STATUS_ENABLED); // 聘用的状态，多个用逗号连接
+	public String status ; // 聘用的状态，多个用逗号连接
 
 	@Override
 	public boolean isReadonly() {
