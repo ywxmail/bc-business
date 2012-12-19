@@ -4,6 +4,7 @@
 package cn.bc.business.tempdriver.web.struts2;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -12,6 +13,8 @@ import java.util.Map;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
+
+import com.google.gson.JsonObject;
 
 import cn.bc.BCConstants;
 import cn.bc.business.tempdriver.domain.TempDriver;
@@ -27,8 +30,10 @@ import cn.bc.db.jdbc.RowMapper;
 import cn.bc.db.jdbc.SqlObject;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.web.formater.CalendarFormater;
+import cn.bc.web.formater.DateRangeFormater;
 import cn.bc.web.formater.KeyValueFormater;
 import cn.bc.web.ui.html.grid.Column;
+import cn.bc.web.ui.html.grid.FooterButton;
 import cn.bc.web.ui.html.grid.IdColumn4MapKey;
 import cn.bc.web.ui.html.grid.TextColumn4MapKey;
 import cn.bc.web.ui.html.page.PageOption;
@@ -46,7 +51,7 @@ import cn.bc.web.ui.json.Json;
 @Controller
 public class TempDriversAction extends ViewAction<Map<String, Object>> {
 	private static final long serialVersionUID = 1L;
-	public String status = String.valueOf(BCConstants.STATUS_ENABLED); // 聘用的状态，多个用逗号连接
+	public String status ; // 聘用的状态，多个用逗号连接
 
 	@Override
 	public boolean isReadonly() {
@@ -54,6 +59,12 @@ public class TempDriversAction extends ViewAction<Map<String, Object>> {
 		SystemContext context = (SystemContext) this.getContext();
 		return !context.hasAnyRole(getText("key.role.bs.tempDriver"),
 				getText("key.role.bc.admin"));
+	}
+	
+	public boolean isAdvancedRead(){
+		// 司机招聘高级查询角色
+		SystemContext context = (SystemContext) this.getContext();
+		return context.hasAnyRole(getText("key.role.bs.tempDriver.read.advanced"));
 	}
 
 	@Override
@@ -71,8 +82,12 @@ public class TempDriversAction extends ViewAction<Map<String, Object>> {
 		sql.append(",t.cert_identity as certIdentity,t.cert_fwzg as fwzg,t.cert_cyzg as cyzg,t.education,t.nation");
 		sql.append(",t.marry,t.desc_ as desc,t.phone");
 		//sql.append(",w.offer_status as ostatus");
-		sql.append(",t.status_ as status,d.status_ as bstatus");
+		sql.append(",t.status_ as status,d.status_ as bstatus,t.valid_start_date as validStartDate ,t.valid_end_date as validEndDate");
 		sql.append(",t.file_date,u.actor_name as aname,t.modified_date,m.actor_name as mname");
+
+		sql.append(",t.interview_date as interviewDate,t.register_date as registerDate,t.credit_desc as creditDesc");
+		sql.append(",t.crime_recode as crimeRecode,t.back_ground as backGround,t.entry_car as entryCar");
+		sql.append(",t.apply_attribute as applyAttr,t.former_unit as formerUnit,t.issue");
 		sql.append(" FROM bs_temp_driver t");
 		sql.append(" INNER JOIN bc_identity_actor_history u on u.id=t.author_id");
 		//sql.append(" LEFT JOIN bs_temp_driver_workflow w on w.pid=t.id");
@@ -109,10 +124,22 @@ public class TempDriversAction extends ViewAction<Map<String, Object>> {
 				//map.put("ostatus",rs[i++]);
 				map.put("status",rs[i++]);
 				map.put("bstatus",rs[i++]);
+				map.put("validStartDate",rs[i++]);
+				map.put("validEndDate",rs[i++]);
 				map.put("file_date",rs[i++]);
 				map.put("aname",rs[i++]);
 				map.put("modified_date",rs[i++]);
 				map.put("mname",rs[i++]);
+				map.put("interviewDate",rs[i++]);
+				map.put("registerDate",rs[i++]);
+				map.put("creditDesc",rs[i++]);
+				map.put("crimeRecode",rs[i++]);
+				map.put("backGround",rs[i++]);
+				map.put("entryCar",rs[i++]);
+				map.put("applyAttr",rs[i++]);
+				map.put("formerUnit",rs[i++]);
+				map.put("issue",rs[i++]);
+				
 				return map;
 			}
 		});
@@ -213,11 +240,11 @@ public class TempDriversAction extends ViewAction<Map<String, Object>> {
 				.setValueFormater(new KeyValueFormater(getOfferStatusValues())));*/
 		//状态
 		columns.add(new TextColumn4MapKey("t.status_", "status",
-				getText("tempDriver.status"), 80).setSortable(true)
+				getText("tempDriver.status"), 45).setSortable(true)
 				.setValueFormater(new KeyValueFormater(getStatusValues())));
 		//营运状态
 		columns.add(new TextColumn4MapKey("d.status_", "bstatus",
-				getText("tempDriver.statusBusiness"), 80).setSortable(true)
+				getText("tempDriver.statusBusiness"), 60).setSortable(true)
 				.setValueFormater(new KeyValueFormater(getBusinessValues())));
 		//姓名
 		columns.add(new TextColumn4MapKey("t.name", "name",
@@ -229,7 +256,17 @@ public class TempDriversAction extends ViewAction<Map<String, Object>> {
 				.setValueFormater(new KeyValueFormater(getSexValues())));
 		//出生日期
 		columns.add(new TextColumn4MapKey("t.birthdate", "birthdate",
-				getText("tempDriver.birthdate"), 90).setSortable(true)
+				getText("tempDriver.birthdate"), 80).setSortable(true)
+				.setUseTitleFromLabel(true)
+				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+		//面试日期
+		columns.add(new TextColumn4MapKey("t.interview_date", "interviewDate",
+				getText("tempDriver.interviewDate"), 80).setSortable(true)
+				.setUseTitleFromLabel(true)
+				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+		//报名日期
+		columns.add(new TextColumn4MapKey("t.register_date", "registerDate",
+				getText("tempDriver.registerDate"), 80).setSortable(true)
 				.setUseTitleFromLabel(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
 		//籍贯
@@ -240,21 +277,81 @@ public class TempDriversAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("t.region_", "region",
 				getText("tempDriver.region"), 40).setSortable(true)
 				.setValueFormater(new KeyValueFormater(getRegionValues())));
-		//身份证地址
+		//身份证
 		columns.add(new TextColumn4MapKey("t.cert_identity", "certIdentity",
 				getText("tempDriver.certIdentity"),150).setSortable(true)
 				.setUseTitleFromLabel(true));
+		//身份证有效期
+		columns.add(new TextColumn4MapKey("t.valid_start_date",
+				"validStartDate", getText("tempDriver.validDate"),
+				180).setValueFormater(new DateRangeFormater("yyyy-MM-dd") {
+			@Override
+			public Date getToDate(Object context, Object value) {
+				@SuppressWarnings("rawtypes")
+				Map contract = (Map) context;
+				return (Date) contract.get("validEndDate");
+			}
+		}));
+		//签发机关
+		columns.add(new TextColumn4MapKey("t.issue", "issue",
+				getText("tempDriver.issue"),150).setSortable(true)
+				.setUseTitleFromLabel(true));
+		//身份证地址
+		columns.add(new TextColumn4MapKey("t.address", "address",
+				getText("tempDriver.address"),150).setSortable(true)
+				.setUseTitleFromLabel(true));
+		//最新地址
+		columns.add(new TextColumn4MapKey("t.new_addr", "newAddress",
+				getText("tempDriver.newAddress"),150).setSortable(true)
+				.setUseTitleFromLabel(true));
+
 		//服务资格证
 		columns.add(new TextColumn4MapKey("t.cert_fwzg", "fwzg",
 				getText("tempDriver.fwzg"),80).setSortable(true)
 				.setUseTitleFromLabel(true));
-		//电话号码
-		columns.add(new TextColumn4MapKey("t.phone", "phone",
-				getText("tempDriver.phone"),100).setSortable(true)
-				.setUseTitleFromLabel(true));
+		
+		if(!isReadonly()||isAdvancedRead()){
+			//电话号码
+			columns.add(new TextColumn4MapKey("t.phone", "phone",
+					getText("tempDriver.phone"),100).setSortable(true)
+					.setUseTitleFromLabel(true));
+		}
 		//从业资格证
 		columns.add(new TextColumn4MapKey("t.cert_cyzg", "cyzg",
 				getText("tempDriver.cyzg"),120).setSortable(true)
+				.setUseTitleFromLabel(true));
+		
+		//婚姻状况
+		columns.add(new TextColumn4MapKey("t.marry", "marry",
+				getText("tempDriver.marry"),80).setSortable(true)
+				.setUseTitleFromLabel(true));
+		
+		//信誉档案简述
+		columns.add(new TextColumn4MapKey("t.credit_desc", "creditDesc",
+				getText("tempDriver.creditDesc"),100).setSortable(true)
+				.setUseTitleFromLabel(true));
+		
+		if(!isReadonly()||isAdvancedRead()){
+			//犯罪记录
+			columns.add(new TextColumn4MapKey("t.crime_recode", "crimeRecode",
+					getText("tempDriver.crimeRecode"),100).setSortable(true)
+					.setUseTitleFromLabel(true));
+		}
+		//背景调查
+		columns.add(new TextColumn4MapKey("t.back_ground", "backGround",
+				getText("tempDriver.backGround"),100).setSortable(true)
+				.setUseTitleFromLabel(true));
+		//将入车号
+		columns.add(new TextColumn4MapKey("t.entry_car", "entryCar",
+				getText("tempDriver.entryCar"),100).setSortable(true)
+				.setUseTitleFromLabel(true));
+		//申请属性
+		columns.add(new TextColumn4MapKey("t.apply_attribute", "applyAttr",
+				getText("tempDriver.applyAttr"),100).setSortable(true)
+				.setUseTitleFromLabel(true));
+		//原单位
+		columns.add(new TextColumn4MapKey("t.former_unit", "formerUnit",
+				getText("tempDriver.formerUnit"),100).setSortable(true)
 				.setUseTitleFromLabel(true));
 		//学历
 		columns.add(new TextColumn4MapKey("t.education", "education",
@@ -264,10 +361,7 @@ public class TempDriversAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("t.nation", "nation",
 				getText("tempDriver.nation"),100).setSortable(true)
 				.setUseTitleFromLabel(true));
-		//婚姻状况
-		columns.add(new TextColumn4MapKey("t.marry", "marry",
-				getText("tempDriver.marry"),80).setSortable(true)
-				.setUseTitleFromLabel(true));
+				
 		//备注
 		columns.add(new TextColumn4MapKey("t.desc_", "desc",
 				getText("tempDriver.desc")).setSortable(true)
@@ -276,20 +370,21 @@ public class TempDriversAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("u.actor_name", "aname",
 				getText("label.authorName"), 80).setSortable(true));
 		columns.add(new TextColumn4MapKey("t.file_date", "file_date",
-				getText("label.fileDate"), 100).setSortable(true)
-				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+				getText("label.fileDate"), 120).setSortable(true)
+				.setValueFormater(new CalendarFormater("yyyy-MM-dd hh:mm")));
 		columns.add(new TextColumn4MapKey("m.actor_name", "mname",
 				getText("tempDriver.modifier"), 80).setSortable(true));
 		columns.add(new TextColumn4MapKey("t.modified_date", "modified_date",
 				getText("tempDriver.modifiedDate"), 120).setSortable(true)
-				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+				.setValueFormater(new CalendarFormater("yyyy-MM-dd hh:mm")));
 		return columns;
 	}
 
 	@Override
 	protected String[] getGridSearchFields() {
 		return new String[] { "t.name","t.origin","t.address","t.new_addr" ,"t.cert_identity"
-				,"t.cert_fwzg","t.cert_cyzg","t.education","t.nation", "t.marry","u.actor_name","m.actor_name"};
+				,"t.cert_fwzg","t.cert_cyzg","t.education","t.nation", "t.marry","u.actor_name","m.actor_name"
+				,"t.back_ground","t.entry_car","t.apply_attribute","t.former_unit"};
 	}
 
 	@Override
@@ -324,7 +419,7 @@ public class TempDriversAction extends ViewAction<Map<String, Object>> {
 		
 		//过滤旧的流程
 		//andCondition.add(new QlCondition("NOT EXISTS(select 1 from bs_temp_driver_workflow w2 where w2.pid=t.id and w.start_time>w2.start_time)"));
-		return andCondition;
+		return andCondition.isEmpty()?null:andCondition;
 	}
 
 	@Override
@@ -345,14 +440,14 @@ public class TempDriversAction extends ViewAction<Map<String, Object>> {
 					.setText(getText("tempDriverWorkFlow.startFlow"))
 					.setClick("bs.tempDriverView.startFlow"));
 			//出租车协会查询
-			tb.addButton(new ToolbarButton().setIcon("ui-icon-check")
+			/*tb.addButton(new ToolbarButton().setIcon("ui-icon-check")
 					.setText(getText("tempDriver.gztaxixhDriverInfo"))
-					.setClick("bs.tempDriverView.gztaxixhDriverInfo"));
+					.setClick("bs.tempDriverView.gztaxixhDriverInfo"));*/
 
 		}
 		
 		tb.addButton(Toolbar.getDefaultToolbarRadioGroup(
-				this.getStatusValues(), "status", 0,
+				this.getStatusValues(), "status",4,
 				getText("title.click2changeSearchStatus")));
 		
 		// 搜索按钮
@@ -372,6 +467,22 @@ public class TempDriversAction extends ViewAction<Map<String, Object>> {
 		Json json = new Json();
 		json.put("status", status);
 		return status==null||status.length()==0?null:json;
+	}
+	
+	@Override
+	protected FooterButton getGridFooterImportButton() {
+		// 获取默认的导入按钮设置
+		FooterButton fb = this.getDefaultGridFooterImportButton();
+
+		// 配置特殊参数
+		JsonObject cfg = new JsonObject();
+		cfg.addProperty("tplCode", "IMPORT_TEMPDRIVER");// 模板编码
+		cfg.addProperty("importAction", "bc-business/tempDriver/import");// 导入数据的action路径(使用相对路径)
+		cfg.addProperty("headerRowIndex", 0);// 列标题所在行的索引号(0-based)
+		fb.setAttr("data-cfg", cfg.toString());
+
+		// 返回导入按钮
+		return fb;
 	}
 
 	//高级搜索

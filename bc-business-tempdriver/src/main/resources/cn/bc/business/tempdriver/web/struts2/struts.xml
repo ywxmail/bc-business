@@ -16,5 +16,12 @@
 		<action name="save" class="tempDriverAction" method="save"/>
 		<action name="isUniqueCertIdentity" class="tempDriverAction" method="isUniqueCertIdentity"/>
 		<action name="startFlow" class="tempDriverAction" method="startFlow"/>
+		<action name="addAttachFromTemplate" class="tempDriverAction" method="addAttachFromTemplate" />
+
+	</package>
+	
+	<!-- 导入数据 -->
+	<package name="importTempDriver" extends="bc-default" namespace="/bc-business/tempDriver">
+		<action name="import" class="importTempDriverAction" />
 	</package>
 </struts>

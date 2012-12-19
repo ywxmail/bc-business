@@ -19,6 +19,8 @@ import cn.bc.business.tempdriver.service.TempDriverService;
 import cn.bc.business.web.struts2.FileEntityAction;
 import cn.bc.core.util.DateUtils;
 import cn.bc.core.util.StringUtils;
+import cn.bc.docs.domain.Attach;
+import cn.bc.docs.web.ui.html.AttachWidget;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.web.ui.html.page.ButtonOption;
 import cn.bc.web.ui.html.page.PageOption;
@@ -38,6 +40,9 @@ public class TempDriverAction extends FileEntityAction<Long, TempDriver> {
 	private TempDriverService tempDriverService;
 	public List<Map<String, String>> list_WorkExperience; // 工作经历集合
 	public List<Map<String, String>> list_Family; // 家庭成员集合
+	
+	public Integer creditStatus;//信誉档案更新的状态 控制
+	public AttachWidget attachsUI;
 
 	@Autowired
 	public void setArrangeService(TempDriverService tempDriverService) {
@@ -52,6 +57,12 @@ public class TempDriverAction extends FileEntityAction<Long, TempDriver> {
 		return !context.hasAnyRole(getText("key.role.bs.tempDriver"),
 				getText("key.role.bc.admin"));
 	}
+	
+	public boolean isAdvancedRead(){
+		// 司机招聘高级查询角色
+		SystemContext context = (SystemContext) this.getContext();
+		return context.hasAnyRole(getText("key.role.bs.tempDriver.read.advanced"));
+	}
 
 	@Override
 	protected void afterCreate(TempDriver entity) {
@@ -59,6 +70,7 @@ public class TempDriverAction extends FileEntityAction<Long, TempDriver> {
 		entity.setSex(TempDriver.SEX_MAN);
 		entity.setStatus(TempDriver.STATUS_RESERVE);
 		entity.setUid(this.getIdGeneratorService().next(TempDriver.KEY_UID));
+		entity.setRegisterDate(Calendar.getInstance());
 	}
 
 	@Override
@@ -66,6 +78,12 @@ public class TempDriverAction extends FileEntityAction<Long, TempDriver> {
 		super.beforeSave(entity);
 		if (entity.getCredit() != null && entity.getCredit() != "")
 			entity.setCredit(StringUtils.compressHtml(entity.getCredit()));
+		
+		//信誉档案已更新时
+		if(creditStatus.equals(2)){
+			entity.setCreditDate(Calendar.getInstance());
+		}
+
 	}
 
 	@Override
@@ -93,7 +111,12 @@ public class TempDriverAction extends FileEntityAction<Long, TempDriver> {
 	protected void initForm(boolean editable) throws Exception {
 		super.initForm(editable);
 		TempDriver td = this.getE();
-
+		
+		this.buildAttachsUI();
+		
+		//设置信誉档案更新的控制值
+		creditStatus=1;
+		
 		// 初始化集合
 		list_WorkExperience = parseListStr(td.getListWorkExperience());
 		list_Family = parseListStr(td.getListFamily());
@@ -175,4 +198,35 @@ public class TempDriverAction extends FileEntityAction<Long, TempDriver> {
 		return "json";
 	}
 	// ---发起流程结束---
+
+	//构建附件UI
+	private void buildAttachsUI() {
+		attachsUI=this.buildAttachsUI(this.getE().isNew(), this.isReadonly()
+				, TempDriver.ATTACH_TYPE, this.getE().getUid());
+		
+		//设置最大附件数量控制
+		attachsUI.setMaxCount(20);
+		
+		if(!attachsUI.isReadOnly())
+			attachsUI.addHeadButton(AttachWidget.createButton("添加模板", null,
+					"bs.tempDriverForm.addAttachFromTemplate", null));// 添加模板
+		
+		
+		attachsUI.addHeadButton(AttachWidget
+				.defaultHeadButton4DownloadAll(null));// 打包下载
+		
+		if (!attachsUI.isReadOnly()) 
+			attachsUI.addHeadButton(AttachWidget
+					.defaultHeadButton4DeleteAll(null));// 删除
+
+	}
+	
+	// 从模板添加附件
+	@Override
+	protected Attach buildAttachFromTemplate() throws Exception {
+		return this.tempDriverService.doAddAttachFromTemplate(
+				this.getId(), this.tpl);
+	}
+	
+	
 }

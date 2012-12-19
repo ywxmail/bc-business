@@ -28,6 +28,12 @@ public interface TempDriverDao extends CrudDao<TempDriver> {
 	 * @return
 	 */
 	TempDriver loadByCertIdentity(String certIdentity);
+	
+	
+	/**
+	 * 同步司机身份证照片的方法
+	 */
+	void doSyncPortrait() throws Exception;
 }
 
 
