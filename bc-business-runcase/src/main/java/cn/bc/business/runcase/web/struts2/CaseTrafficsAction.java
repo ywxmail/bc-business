@@ -37,6 +37,7 @@ import cn.bc.web.formater.AbstractFormater;
 import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.formater.EntityStatusFormater;
 import cn.bc.web.formater.LinkFormater4Id;
+import cn.bc.web.formater.NubmerFormater;
 import cn.bc.web.ui.html.grid.Column;
 import cn.bc.web.ui.html.grid.IdColumn4MapKey;
 import cn.bc.web.ui.html.grid.TextColumn4MapKey;
@@ -81,7 +82,7 @@ public class CaseTrafficsAction extends ViewAction<Map<String, Object>> {
 		StringBuffer sql = new StringBuffer();
 		sql.append("select cit.id,b.status_,b.subject,b.motorcade_name,b.car_plate,b.driver_name,b.closer_name,b.happen_date");
 		sql.append(",b.close_date,b.address,b.from_,b.source,b.driver_cert,b.case_no,b.driver_id,b.car_id,b.company,c.code");
-		sql.append(",bia.id batch_company_id,bia.name batch_company");
+		sql.append(",bia.id batch_company_id,bia.name batch_company,cit.infract_code,cit.penalty");
 		sql.append(" from bs_case_infract_traffic cit inner join BS_CASE_BASE b on cit.id=b.id");
 		sql.append(" left join BS_CAR c on b.car_id = c.id");
 		sql.append(" left join BS_CARMAN man on b.driver_id=man.id");
@@ -118,6 +119,8 @@ public class CaseTrafficsAction extends ViewAction<Map<String, Object>> {
 				map.put("code", rs[i++]);
 				map.put("batch_company_id", rs[i++]);
 				map.put("batch_company", rs[i++]);
+				map.put("infract_code", rs[i++]);
+				map.put("penalty", rs[i++]);
 
 				return map;
 			}
@@ -198,6 +201,11 @@ public class CaseTrafficsAction extends ViewAction<Map<String, Object>> {
 				getText("runcase.caseNo1"), 150).setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("b.closer_name", "closer_name",
 				getText("runcase.closerName"), 70).setUseTitleFromLabel(true));
+		columns.add(new TextColumn4MapKey("cit.infract_code", "infract_code",
+				getText("runcase.infractCode"), 70).setUseTitleFromLabel(true));
+		columns.add(new TextColumn4MapKey("cit.penalty", "penalty",
+				getText("runcase.penalty"), 120).setUseTitleFromLabel(true)
+				.setValueFormater(new NubmerFormater("###,###.##")));
 		columns.add(new TextColumn4MapKey("b.close_date", "close_date",
 				getText("runcase.closeDate"), 120).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
