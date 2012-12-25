@@ -31,6 +31,8 @@ import cn.bc.business.sync.service.JinDunJTWFService;
 import cn.bc.business.web.struts2.FileEntityAction;
 import cn.bc.core.query.condition.Direction;
 import cn.bc.core.query.condition.impl.OrderCondition;
+import cn.bc.core.util.DateUtils;
+import cn.bc.core.util.StringUtils;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.option.domain.OptionItem;
 import cn.bc.option.service.OptionService;
@@ -75,6 +77,7 @@ public class CaseTrafficAction extends
 	private JinDunJTWFService jinDunJTWFService; // 金盾Service
 	private String sourceStr;
 	private String chargers;
+	public String happenDate;// 违法日期
 
 	public List<Map<String, String>> motorcadeList; // 可选车队列表
 	public List<Map<String, String>> dutyList; // 可选责任列表
@@ -434,6 +437,39 @@ public class CaseTrafficAction extends
 				+ traffics.size() + " 条交通违章信息");
 		this.json = json.toString();
 		return "json";
+	}
+
+	// ---发起流程---开始---
+	public String tdIds;
+
+	public String startFlow() {
+		Json json = new Json();
+		// 去掉最后一个逗号
+		String[] _ids = tdIds.substring(0, tdIds.lastIndexOf(",")).split(",");
+		String procInstIds = this.caseTrafficService.doStartFlow(
+				getText("runcase.startFlow.key"),
+				StringUtils.stringArray2LongArray(_ids));
+		if (procInstIds == "") {
+			json.put("success", false);
+			json.put("msg", getText("runcase.startFlow.success.false"));
+		} else {
+			json.put("success", true);
+			json.put("msg", getText("runcase.startFlow.success.true"));
+		}
+		this.json = json.toString();
+		return "json";
+	}
+
+	// ---发起流程结束---
+
+	// 根据司机ID和违法时间查找司机在该违法周期内所有的违法信息
+	public String getCaseTrafficInfoByCarManId() {
+		Calendar happenDate = DateUtils.getCalendar(this.happenDate);
+
+		this.json = this.caseTrafficService.getCaseTrafficInfoByCarManId(
+				carManId, happenDate);
+		return "json";
+
 	}
 
 	// ========批量生成交通违法代码结束========

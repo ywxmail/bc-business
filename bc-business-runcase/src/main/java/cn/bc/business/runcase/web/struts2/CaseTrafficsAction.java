@@ -43,6 +43,7 @@ import cn.bc.web.ui.html.grid.IdColumn4MapKey;
 import cn.bc.web.ui.html.grid.TextColumn4MapKey;
 import cn.bc.web.ui.html.page.PageOption;
 import cn.bc.web.ui.html.toolbar.Toolbar;
+import cn.bc.web.ui.html.toolbar.ToolbarButton;
 import cn.bc.web.ui.json.Json;
 
 /**
@@ -308,11 +309,42 @@ public class CaseTrafficsAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected Toolbar getHtmlPageToolbar() {
-		return super.getHtmlPageToolbar()
-				.addButton(
-						Toolbar.getDefaultToolbarRadioGroup(
-								this.getBSStatuses2(), "status", 0,
-								getText("title.click2changeSearchStatus")));
+		Toolbar tb = new Toolbar();
+		if (this.isReadonly()) {
+			// 查看按钮
+			tb.addButton(getDefaultOpenToolbarButton());
+		} else {
+			// 新建按钮
+			tb.addButton(getDefaultCreateToolbarButton());
+
+			// 编辑按钮
+			tb.addButton(getDefaultEditToolbarButton());
+
+			// 发起流程
+			tb.addButton(new ToolbarButton().setIcon("ui-icon-play")
+					.setText(getText("runcase.startFlow"))
+					.setClick("bs.caseTrafficView.startFlow"));
+			// 出租车协会查询
+			/*
+			 * tb.addButton(new ToolbarButton().setIcon("ui-icon-check")
+			 * .setText(getText("tempDriver.gztaxixhDriverInfo"))
+			 * .setClick("bs.tempDriverView.gztaxixhDriverInfo"));
+			 */
+
+		}
+
+		tb.addButton(Toolbar.getDefaultToolbarRadioGroup(this.getBSStatuses2(),
+				"status", 0, getText("title.click2changeSearchStatus")));
+
+		// 搜索按钮
+		tb.addButton(getDefaultSearchToolbarButton());
+
+		return tb;
+	}
+
+	@Override
+	protected String getHtmlPageJs() {
+		return this.getContextPath() + "/bc-business/caseTraffic/view.js";
 	}
 
 	@Override

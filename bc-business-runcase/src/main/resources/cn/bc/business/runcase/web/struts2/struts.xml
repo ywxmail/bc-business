@@ -3,63 +3,89 @@
     "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
     "http://struts.apache.org/dtds/struts-2.0.dtd">
 <struts>
-	
+
 	<!-- 交通违章 -->
 	<package name="caseTraffic" extends="bc-default" namespace="/bc-business">
-		<action name="caseTraffic/closefile" class="caseTrafficAction" method="closefile">
+		<action name="caseTraffic/closefile" class="caseTrafficAction"
+			method="closefile">
 		</action>
-		<action name="caseTraffic/selectCarMansInfo" class="caseTrafficAction" method="selectCarMansInfo">
+		<action name="caseTraffic/selectCarMansInfo" class="caseTrafficAction"
+			method="selectCarMansInfo">
 		</action>
-		<action name="caseTraffic/createFromJinDun" class="caseTrafficAction" method="create">
-			<result name="form" >/bc-business/caseTraffic/form.jsp</result>
+		<action name="caseTraffic/createFromJinDun" class="caseTrafficAction"
+			method="create">
+			<result name="form">/bc-business/caseTraffic/form.jsp</result>
 		</action>
-		<action name="caseTraffic/createFromJiaoWei" class="caseTrafficAction" method="create">
-			<result name="form" >/bc-business/caseTraffic/form.jsp</result>
+		<action name="caseTraffic/createFromJiaoWei" class="caseTrafficAction"
+			method="create">
+			<result name="form">/bc-business/caseTraffic/form.jsp</result>
 		</action>
+		<!--发起司机交通违法处理流程 -->
+		<action name="caseTraffic/startFlow" class="caseTrafficAction"
+			method="startFlow" />
+		<!--查找司机领证周期内的违法信息 -->
+		<action name="caseTraffic/getCaseTrafficInfoByCarManId" class="caseTrafficAction"
+			method="getCaseTrafficInfoByCarManId" />
 		<!-- 批量生成 -->
-		<action name="caseTraffic/doPatchSave" class="caseTrafficAction" method="doPatchSave"/>
+		<action name="caseTraffic/doPatchSave" class="caseTrafficAction"
+			method="doPatchSave" />
 	</package>
-	
+
 	<!-- 营运违章操作 -->
-	<package name="caseBusinessOperate" extends="bc-default" namespace="/bc-business/casebusinessOperate">
+	<package name="caseBusinessOperate" extends="bc-default"
+		namespace="/bc-business/casebusinessOperate">
 		<!-- 核准 -->
-		<action name="doCloseFile" class="caseBusinessOperateAction" method="doCloseFile"/>
+		<action name="doCloseFile" class="caseBusinessOperateAction"
+			method="doCloseFile" />
 	</package>
-	
+
 	<!-- 营运违章 -->
 	<package name="caseBusiness" extends="bc-default" namespace="/bc-business">
-		<action name="caseBusiness/closefile" class="caseBusinessAction" method="closefile">
+		<action name="caseBusiness/closefile" class="caseBusinessAction"
+			method="closefile">
 		</action>
-		<action name="caseBusiness/selectCarMansInfo" class="caseBusinessAction" method="selectCarMansInfo">
+		<action name="caseBusiness/selectCarMansInfo" class="caseBusinessAction"
+			method="selectCarMansInfo">
 		</action>
-		<action name="caseBusiness/createFromJiaoWei" class="caseBusinessAction" method="create">
-			<result name="form" >/bc-business/caseBusiness/form.jsp</result>
+		<action name="caseBusiness/createFromJiaoWei" class="caseBusinessAction"
+			method="create">
+			<result name="form">/bc-business/caseBusiness/form.jsp
+			</result>
 		</action>
-		
+
 	</package>
-	
+
 	<!-- 事故理赔 -->
 	<package name="caseAccident" extends="bc-default" namespace="/bc-business">
-		<action name="caseAccident/selectCarMansInfo" class="caseAccidentAction" method="selectCarMansInfo"/>
-		<action name="caseAccident/loadPolicyInfo" class="caseAccidentAction" method="loadPolicyInfo"/>
+		<action name="caseAccident/selectCarMansInfo" class="caseAccidentAction"
+			method="selectCarMansInfo" />
+		<action name="caseAccident/loadPolicyInfo" class="caseAccidentAction"
+			method="loadPolicyInfo" />
 	</package>
-	
+
 	<!-- 投诉建议 -->
 	<package name="caseAdvice" extends="bc-default" namespace="/bc-business">
-		<action name="caseAdvice/closefile" class="caseAdviceAction" method="closefile">
+		<action name="caseAdvice/closefile" class="caseAdviceAction"
+			method="closefile">
 		</action>
-		<action name="caseAdvice/selectSubject" class="caseAdviceAction" method="selectSubject">
-			<result name="showdialog" >/bc-business/caseAdvice/select.jsp</result>
+		<action name="caseAdvice/selectSubject" class="caseAdviceAction"
+			method="selectSubject">
+			<result name="showdialog">/bc-business/caseAdvice/select.jsp
+			</result>
 		</action>
-		<action name="caseAdvice/selectCarMansInfo" class="caseAdviceAction" method="selectCarMansInfo">
+		<action name="caseAdvice/selectCarMansInfo" class="caseAdviceAction"
+			method="selectCarMansInfo">
 		</action>
-		<action name="caseAdvice/closed" class="caseAdviceAction" method="closed">
+		<action name="caseAdvice/closed" class="caseAdviceAction"
+			method="closed">
 		</action>
-		<action name="caseAdvice/createFromJiaoWei" class="caseAdviceAction" method="create">
-			<result name="form" >/bc-business/caseAdvice/form.jsp</result>
+		<action name="caseAdvice/createFromJiaoWei" class="caseAdviceAction"
+			method="create">
+			<result name="form">/bc-business/caseAdvice/form.jsp</result>
 		</action>
-		
-		<action name="caseAdvice/create" class="caseAdviceAction" method="create">
+
+		<action name="caseAdvice/create" class="caseAdviceAction"
+			method="create">
 			<result name="form">/bc-business/caseAdvice/form.jsp</result>
 		</action>
 		<action name="caseAdvice/open" class="caseAdviceAction" method="open">
@@ -68,34 +94,42 @@
 		<action name="caseAdvice/edit" class="caseAdviceAction" method="edit">
 			<result name="form">/bc-business/caseAdvice/form.jsp</result>
 		</action>
-		<action name="caseAdvice/delete" class="caseAdviceAction" method="delete" />
-		<action name="caseAdvice/save" class="caseAdviceAction" method="save"/>
-		
+		<action name="caseAdvice/delete" class="caseAdviceAction"
+			method="delete" />
+		<action name="caseAdvice/save" class="caseAdviceAction" method="save" />
+
 	</package>
-	
+
 	<!-- 投诉建议操作 -->
-	<package name="caseAdviceOperate" extends="bc-default" namespace="/bc-business/caseAdviceOperate">
+	<package name="caseAdviceOperate" extends="bc-default"
+		namespace="/bc-business/caseAdviceOperate">
 		<!-- 核准 -->
-		<action name="doManage" class="caseAdviceOperateAction" method="doManage"/>
+		<action name="doManage" class="caseAdviceOperateAction" method="doManage" />
 	</package>
-	
+
 	<!-- 投诉建议选择 -->
-	<package name="selectDateAndHandler" extends="bc-default" namespace="/bc-business/selectDateAndHandler">
+	<package name="selectDateAndHandler" extends="bc-default"
+		namespace="/bc-business/selectDateAndHandler">
 		<!-- 核准选择 -->
-		<action name="select" class="selectDateAndHandlerAction" >
-			<result name="success">/bc-business/caseAdvice/selectDateAndHandler.jsp</result>
+		<action name="select" class="selectDateAndHandlerAction">
+			<result name="success">/bc-business/caseAdvice/selectDateAndHandler.jsp
+			</result>
 		</action>
 	</package>
-	
-	
+
+
 	<!-- 表扬 -->
 	<package name="casePraise" extends="bc-default" namespace="/bc-business">
-		<action name="casePraise/closefile" class="casePraiseAction" method="closefile">
+		<action name="casePraise/closefile" class="casePraiseAction"
+			method="closefile">
 		</action>
-		<action name="casePraise/selectCarMansInfo" class="casePraiseAction" method="selectCarMansInfo">
+		<action name="casePraise/selectCarMansInfo" class="casePraiseAction"
+			method="selectCarMansInfo">
 		</action>
-		<action name="casePraise/selectSubject" class="casePraiseAction" method="selectSubject">
-			<result name="showdialog" >/bc-business/casePraise/select.jsp</result>
+		<action name="casePraise/selectSubject" class="casePraiseAction"
+			method="selectSubject">
+			<result name="showdialog">/bc-business/casePraise/select.jsp
+			</result>
 		</action>
 	</package>
 

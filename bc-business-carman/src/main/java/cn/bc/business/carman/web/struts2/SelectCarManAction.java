@@ -4,6 +4,7 @@
 package cn.bc.business.carman.web.struts2;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -22,6 +23,7 @@ import cn.bc.core.query.condition.impl.AndCondition;
 import cn.bc.core.query.condition.impl.EqualsCondition;
 import cn.bc.core.query.condition.impl.InCondition;
 import cn.bc.core.query.condition.impl.OrderCondition;
+import cn.bc.core.util.DateUtils;
 import cn.bc.core.util.StringUtils;
 import cn.bc.db.jdbc.RowMapper;
 import cn.bc.db.jdbc.SqlObject;
@@ -29,6 +31,7 @@ import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.formater.KeyValueFormater;
 import cn.bc.web.struts2.AbstractSelectPageAction;
 import cn.bc.web.ui.html.grid.Column;
+import cn.bc.web.ui.html.grid.HiddenColumn4MapKey;
 import cn.bc.web.ui.html.grid.IdColumn4MapKey;
 import cn.bc.web.ui.html.grid.TextColumn4MapKey;
 import cn.bc.web.ui.html.page.HtmlPage;
@@ -62,7 +65,8 @@ public class SelectCarManAction extends
 
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer sql = new StringBuffer();
-		sql.append("select c.id,c.name,c.cert_fwzg,c.work_date,c.classes,c.type_ from BS_CARMAN c");
+		sql.append("select c.id,c.name,c.cert_fwzg,c.work_date,c.classes");
+		sql.append(",c.cert_driving_first_date,c.work_date,c.type_ from BS_CARMAN c");
 		sqlObject.setSql(sql.toString());
 
 		// 注入参数
@@ -78,6 +82,8 @@ public class SelectCarManAction extends
 				map.put("cert_fwzg", rs[i++]);
 				map.put("work_date", rs[i++]);
 				map.put("classes", rs[i++]);
+				map.put("cert_driving_first_date",
+						DateUtils.formatDate((Date) rs[i++]));
 				return map;
 			}
 		});
@@ -98,6 +104,8 @@ public class SelectCarManAction extends
 		columns.add(new TextColumn4MapKey("c.classes", "classes",
 				getText("carMan.classes"), 80)
 				.setValueFormater(new KeyValueFormater(getDriverClasses())));
+		columns.add(new HiddenColumn4MapKey("certDriverFirstDate",
+				"cert_driving_first_date"));
 
 		return columns;
 	}
