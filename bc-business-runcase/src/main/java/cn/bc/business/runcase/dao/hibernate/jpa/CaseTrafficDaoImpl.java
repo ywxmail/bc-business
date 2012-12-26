@@ -84,7 +84,9 @@ public class CaseTrafficDaoImpl extends
 		// 累计扣分
 		int accumulatedPoints = 0;
 		for (Object obj : list) {
-			accumulatedPoints += ((Float) obj).intValue();
+			if (obj != null) {
+				accumulatedPoints += ((Float) obj).intValue();
+			}
 		}
 		// 剩余分数
 		int remainder;
