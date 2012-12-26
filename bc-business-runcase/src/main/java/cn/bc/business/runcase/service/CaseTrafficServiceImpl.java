@@ -278,7 +278,9 @@ public class CaseTrafficServiceImpl extends
 				case4InfractTraffic.getAddress());
 		variables.put("case4InfractTrafficr_subject",
 				case4InfractTraffic.getSubject());
-		variables.put("subject", case4InfractTraffic.getSubject());
+		// 组装主题
+		variables.put("subject", case4InfractTraffic.getCarPlate() + "交通违法处理："
+				+ case4InfractTraffic.getSubject());
 		variables.put("case4InfractTrafficr_infractCode",
 				case4InfractTraffic.getInfractCode());
 		variables.put("case4InfractTrafficr_jeom",
