@@ -5,11 +5,17 @@ package cn.bc.business.runcase.dao.hibernate.jpa;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Map;
+
+import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import cn.bc.business.runcase.dao.CaseTrafficDao;
 import cn.bc.business.runcase.domain.Case4InfractTraffic;
@@ -24,6 +30,12 @@ import cn.bc.web.ui.json.Json;
 public class CaseTrafficDaoImpl extends
 		HibernateCrudJpaDao<Case4InfractTraffic> implements CaseTrafficDao {
 	protected final Log logger = LogFactory.getLog(getClass());
+	private JdbcTemplate jdbcTemplate;
+
+	@Autowired
+	public void setDataSource(DataSource dataSource) {
+		this.jdbcTemplate = new JdbcTemplate(dataSource);
+	}
 
 	/**
 	 * author : wis.ho update date: 2011-9-26 description:
@@ -101,5 +113,41 @@ public class CaseTrafficDaoImpl extends
 		json.put("remainder", remainder);
 
 		return json.toString();
+	}
+
+	public void updateCaseTrafficInfo4Flow(Long id,
+			Map<String, Object> attributes) {
+		final List<Object> args = new ArrayList<Object>();
+		final StringBuffer sql = new StringBuffer();
+		sql.append("update bs_case_base");
+		// set
+		int i = 0;
+		Object value;
+		for (String key : attributes.keySet()) {
+			value = attributes.get(key);
+			if (value != null) {
+				if (i > 0)
+					sql.append("," + key + "=?");
+				else
+					sql.append(" set " + key + "=?");
+				args.add(attributes.get(key));
+				logger.debug(attributes.get(key) + "  :  "
+						+ attributes.get(key).getClass());
+			} else {
+				if (i > 0)
+					sql.append("," + key + "=null");
+				else
+					sql.append(" set " + key + "=null");
+			}
+			i++;
+		}
+
+		// pks
+		if (id != null) {
+			sql.append(" where id=?");
+			args.add(id);
+		}
+		logger.debug("sql: " + sql);
+		this.jdbcTemplate.update(sql.toString(), args.toArray());
 	}
 }

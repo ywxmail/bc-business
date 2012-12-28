@@ -5,6 +5,7 @@ package cn.bc.business.runcase.service;
 
 import java.util.Calendar;
 import java.util.List;
+import java.util.Map;
 
 import cn.bc.business.runcase.domain.Case4InfractTraffic;
 import cn.bc.core.service.CrudService;
@@ -53,4 +54,14 @@ public interface CaseTrafficService extends CrudService<Case4InfractTraffic> {
 	 * @return
 	 */
 	String getCaseTrafficInfoByCarManId(Long carManId, Calendar happenDate);
+
+	/**
+	 * 驾驶员交通违法流程结束后更新交通违法的状态和司机
+	 * 
+	 * @param id
+	 *            交通违法信息ID
+	 * @param attributes
+	 *            更新的信息
+	 */
+	void updateCaseTrafficInfo4Flow(Long id, Map<String, Object> attributes);
 }

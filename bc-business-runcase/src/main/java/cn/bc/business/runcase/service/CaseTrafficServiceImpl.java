@@ -348,4 +348,10 @@ public class CaseTrafficServiceImpl extends
 
 		return json;
 	}
+
+	public void updateCaseTrafficInfo4Flow(Long id,
+			Map<String, Object> attributes) {
+		this.caseTrafficDao.updateCaseTrafficInfo4Flow(id, attributes);
+
+	}
 }
