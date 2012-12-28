@@ -20,10 +20,4 @@
 	<bean id="tempDriverService" class="cn.bc.business.tempdriver.service.TempDriverServiceImpl"
 		p:tempDriverDao-ref="tempDriverDao" />
 		
-	<!--tempDriver -->
-	<bean id="tempDriverWorkFlowDao" class="cn.bc.business.tempdriver.dao.hibernate.jpa.TempDriverWorkFlowDaoImpl"
-		p:entityManagerFactory-ref="entityManagerFactory" />
-	<bean id="tempDriverWorkFlowService" class="cn.bc.business.tempdriver.service.TempDriverWorkFlowServiceImpl"
-		p:tempDriverWorkFlowDao-ref="tempDriverWorkFlowDao" />
-	
 </beans>
