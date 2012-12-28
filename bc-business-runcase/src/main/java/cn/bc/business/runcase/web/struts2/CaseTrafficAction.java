@@ -42,6 +42,7 @@ import cn.bc.web.ui.html.page.ButtonOption;
 import cn.bc.web.ui.html.page.PageOption;
 import cn.bc.web.ui.json.Json;
 import cn.bc.web.ui.json.JsonArray;
+import cn.bc.workflow.service.WorkflowModuleRelationService;
 
 /**
  * 交通违章Action
@@ -55,6 +56,8 @@ public class CaseTrafficAction extends
 		FileEntityAction<Long, Case4InfractTraffic> {
 	// private static Log logger = LogFactory.getLog(CarAction.class);
 	private static final long serialVersionUID = 1L;
+	private WorkflowModuleRelationService workflowModuleRelationService;
+
 	private Long carId;
 	private Long carManId;
 	private Long syncId; // 同步ID
@@ -86,6 +89,7 @@ public class CaseTrafficAction extends
 	public Map<String, String> statusesValue;
 	public Map<String, String> sourcesValue;
 	private Map<String, List<Map<String, String>>> allList;
+	public List<Map<String, Object>> carTrafficHandleFlowList; // 交通违法流程集合
 
 	public Long getCarId() {
 		return carId;
@@ -125,6 +129,12 @@ public class CaseTrafficAction extends
 
 	public void setChargers(String chargers) {
 		this.chargers = chargers;
+	}
+
+	@Autowired
+	public void setWorkflowModuleRelationService(
+			WorkflowModuleRelationService workflowModuleRelationService) {
+		this.workflowModuleRelationService = workflowModuleRelationService;
 	}
 
 	@Autowired
@@ -418,6 +428,12 @@ public class CaseTrafficAction extends
 		sourcesValue = this.getSourceStatuses();
 		// 表单可选项的加载
 		initSelects();
+		Case4InfractTraffic c = this.getE();
+		if (!c.isNew()) {
+			carTrafficHandleFlowList = this.workflowModuleRelationService
+					.findList(c.getId(), Case4InfractTraffic.ATTACH_TYPE, null);
+		}
+
 	}
 
 	// ========批量生成交通违法代码开始========
