@@ -34,6 +34,8 @@ import cn.bc.identity.web.SystemContext;
 import cn.bc.identity.web.SystemContextHolder;
 import cn.bc.sync.dao.SyncBaseDao;
 import cn.bc.sync.domain.SyncBase;
+import cn.bc.workflow.domain.WorkflowModuleRelation;
+import cn.bc.workflow.service.WorkflowModuleRelationService;
 import cn.bc.workflow.service.WorkflowService;
 
 /**
@@ -45,6 +47,7 @@ public class CaseTrafficServiceImpl extends
 		DefaultCrudService<Case4InfractTraffic> implements CaseTrafficService {
 	private CaseTrafficDao caseTrafficDao;
 	private WorkflowService workflowService;
+	private WorkflowModuleRelationService workflowModuleRelationService;
 	private TaskService taskService;
 	private SyncBaseDao syncBaseDao; // 同步基表
 	private JinDunJTWFDao jinDunJTWFDao; // 金盾网交通违法
@@ -53,6 +56,12 @@ public class CaseTrafficServiceImpl extends
 	private CarManDao carManDao;
 	private MotorcadeDao motorcadeDao;
 	private IdGeneratorService idGeneratorService;// 用于生成uid的服务
+
+	@Autowired
+	public void setWorkflowModuleRelationService(
+			WorkflowModuleRelationService workflowModuleRelationService) {
+		this.workflowModuleRelationService = workflowModuleRelationService;
+	}
 
 	@Autowired
 	public void setTaskService(TaskService taskService) {
@@ -229,9 +238,10 @@ public class CaseTrafficServiceImpl extends
 		Map<String, Object> variables;
 		Case4InfractTraffic case4InfractTraffic;
 		// 声明返回的流程实例id 多个逗号隔开
-		String procInstIds = "";
+		// String procInstIds = "";
 
 		// 循环Id数组
+		int i = 0;
 		for (Long id : ids) {
 			case4InfractTraffic = this.caseTrafficDao.load(id);
 			variables = new HashMap<String, Object>();
@@ -242,10 +252,21 @@ public class CaseTrafficServiceImpl extends
 			Task task = this.taskService.createTaskQuery()
 					.processInstanceId(procInstId).singleResult();
 			this.workflowService.completeTask(task.getId());
-			procInstIds += procInstId + ",";
+			// 保存流程与交通违法信息的关系
+			WorkflowModuleRelation workflowModuleRelation = new WorkflowModuleRelation();
+			workflowModuleRelation.setMid(id);
+			workflowModuleRelation.setPid(procInstId);
+			workflowModuleRelation.setMtype(Case4InfractTraffic.class
+					.getSimpleName());
+			this.workflowModuleRelationService.save(workflowModuleRelation);
+			// procInstIds += procInstId + ",";
+			// 将交通违法信息的状态更改为处理中
+			case4InfractTraffic.setStatus(CaseBase.STATUS_HANDLING);
+			this.caseTrafficDao.save(case4InfractTraffic);
+			i++;
 		}
 
-		return procInstIds;
+		return String.valueOf(i);
 	}
 
 	// 返回的全局参数
@@ -276,11 +297,15 @@ public class CaseTrafficServiceImpl extends
 										"yyyy-MM-dd HH:mm") : "");
 		variables.put("case4InfractTrafficr_address",
 				case4InfractTraffic.getAddress());
-		variables.put("case4InfractTrafficr_subject",
-				case4InfractTraffic.getSubject());
+		variables.put("case4InfractTrafficr_subject", case4InfractTraffic
+				.getSubject() != null ? case4InfractTraffic.getSubject() : "");
 		// 组装主题
-		variables.put("subject", case4InfractTraffic.getCarPlate() + "交通违法处理："
-				+ case4InfractTraffic.getSubject());
+		variables
+				.put("subject",
+						case4InfractTraffic.getCarPlate()
+								+ "交通违法处理："
+								+ (case4InfractTraffic.getSubject() != null ? case4InfractTraffic
+										.getSubject() : ""));
 		variables.put("case4InfractTrafficr_infractCode",
 				case4InfractTraffic.getInfractCode());
 		variables.put("case4InfractTrafficr_jeom",

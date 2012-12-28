@@ -5,6 +5,7 @@ package cn.bc.business.runcase.web.struts2;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -15,6 +16,7 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
+import cn.bc.BCConstants;
 import cn.bc.business.OptionConstants;
 import cn.bc.business.motorcade.service.MotorcadeService;
 import cn.bc.business.runcase.domain.CaseBase;
@@ -288,6 +290,8 @@ public class CaseTrafficsAction extends ViewAction<Map<String, Object>> {
 				getText("runcase.select.status.active"));
 		statuses.put(String.valueOf(CaseBase.STATUS_CLOSED),
 				getText("runcase.select.status.closed"));
+		statuses.put(String.valueOf(CaseBase.STATUS_HANDLING),
+				getText("runcase.select.status.handling"));
 		return statuses;
 	}
 
@@ -340,6 +344,23 @@ public class CaseTrafficsAction extends ViewAction<Map<String, Object>> {
 		tb.addButton(getDefaultSearchToolbarButton());
 
 		return tb;
+	}
+
+	/**
+	 * 状态值转换列表：在案|处理中|结案|全部
+	 * 
+	 * @return
+	 */
+	protected Map<String, String> getBSStatuses2() {
+		Map<String, String> statuses = new LinkedHashMap<String, String>();
+		statuses.put(String.valueOf(BCConstants.STATUS_ENABLED),
+				getText("bs.status.active"));
+		statuses.put(String.valueOf(CaseBase.STATUS_HANDLING),
+				getText("runcase.select.status.handling"));
+		statuses.put(String.valueOf(BCConstants.STATUS_DISABLED),
+				getText("bs.status.closed"));
+		statuses.put("", getText("bs.status.all"));
+		return statuses;
 	}
 
 	@Override

@@ -446,15 +446,16 @@ public class CaseTrafficAction extends
 		Json json = new Json();
 		// 去掉最后一个逗号
 		String[] _ids = tdIds.substring(0, tdIds.lastIndexOf(",")).split(",");
-		String procInstIds = this.caseTrafficService.doStartFlow(
+		String count = this.caseTrafficService.doStartFlow(
 				getText("runcase.startFlow.key"),
 				StringUtils.stringArray2LongArray(_ids));
-		if (procInstIds == "") {
+		if (count.equals("0")) {
 			json.put("success", false);
 			json.put("msg", getText("runcase.startFlow.success.false"));
 		} else {
 			json.put("success", true);
-			json.put("msg", getText("runcase.startFlow.success.true"));
+			// json.put("msg", getText("runcase.startFlow.success.true"));
+			json.put("msg", getText("成功发起" + count + "条交通违法处理流程"));
 		}
 		this.json = json.toString();
 		return "json";
@@ -546,6 +547,8 @@ public class CaseTrafficAction extends
 				getText("runcase.select.status.active"));
 		statuses.put(String.valueOf(CaseBase.STATUS_CLOSED),
 				getText("runcase.select.status.closed"));
+		statuses.put(String.valueOf(CaseBase.STATUS_HANDLING),
+				getText("runcase.select.status.handling"));
 		return statuses;
 	}
 
