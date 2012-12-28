@@ -20,6 +20,8 @@ import cn.bc.identity.web.SystemContext;
 import cn.bc.identity.web.SystemContextHolder;
 import cn.bc.template.domain.Template;
 import cn.bc.template.service.TemplateService;
+import cn.bc.workflow.domain.WorkflowModuleRelation;
+import cn.bc.workflow.service.WorkflowModuleRelationService;
 import cn.bc.workflow.service.WorkflowService;
 
 /**
@@ -35,17 +37,17 @@ public class TempDriverServiceImpl extends DefaultCrudService<TempDriver> implem
 	
 	private TempDriverDao tempDriverDao;
 	private WorkflowService workflowService;
-	private TempDriverWorkFlowService tempDriverWorkFlowService;
+	private WorkflowModuleRelationService workflowModuleRelationService;
 	
 	@Autowired
-	public void setWorkflowService(WorkflowService workflowService) {
-		this.workflowService = workflowService;
+	public void setWorkflowModuleRelationService(
+			WorkflowModuleRelationService workflowModuleRelationService) {
+		this.workflowModuleRelationService = workflowModuleRelationService;
 	}
 
 	@Autowired
-	public void setTempDriverWorkFlowService(
-			TempDriverWorkFlowService tempDriverWorkFlowService) {
-		this.tempDriverWorkFlowService = tempDriverWorkFlowService;
+	public void setWorkflowService(WorkflowService workflowService) {
+		this.workflowService = workflowService;
 	}
 
 	public void setTempDriverDao(TempDriverDao tempDriverDao) {
@@ -53,10 +55,12 @@ public class TempDriverServiceImpl extends DefaultCrudService<TempDriver> implem
 		this.setCrudDao(tempDriverDao);
 	}
 
-	public String doStartFlow(String key, Long[] ids) {
+	public String doStartFlow(String key, Long[] ids,boolean flag_status) {
 		//声明变量
 		Map<String,Object> variables;
 		TempDriver tempDriver;
+		//流程模块关系domain
+		WorkflowModuleRelation workflowModuleRelation;
 		//声明返回的流程实例id 多个逗号隔开
 		String procInstIds="";
 		
@@ -67,10 +71,17 @@ public class TempDriverServiceImpl extends DefaultCrudService<TempDriver> implem
 			//发起流程
 			String procInstId= this.workflowService.startFlowByKey(key, this.returnParam(tempDriver, variables));
 			procInstIds+=procInstId+",";
-			this.tempDriverWorkFlowService.save(Calendar.getInstance(), procInstId, tempDriver);
-			//更新司机的状态为审批中
-			tempDriver.setStatus(TempDriver.STATUS_CHECK);
-			this.tempDriverDao.save(tempDriver);
+			workflowModuleRelation=new WorkflowModuleRelation();
+			workflowModuleRelation.setMid(id);
+			workflowModuleRelation.setPid(procInstId);
+			workflowModuleRelation.setMtype(TempDriver.WORKFLOW_MTYPE);
+			this.workflowModuleRelationService.save(workflowModuleRelation);
+			if(flag_status){
+				//更新司机的状态为审批中
+				tempDriver.setStatus(TempDriver.STATUS_CHECK);
+				this.tempDriverDao.save(tempDriver);
+			}
+			
 		}
 		
 		return procInstIds;
@@ -120,6 +131,7 @@ public class TempDriverServiceImpl extends DefaultCrudService<TempDriver> implem
 		variables.put("applyAttr", tempDriver.getApplyAttr()!=null?tempDriver.getApplyAttr():"");
 		variables.put("formerUnit", tempDriver.getFormerUnit()!=null?tempDriver.getFormerUnit():"");
 		variables.put("issue", tempDriver.getIssue()!=null?tempDriver.getIssue():"");
+		variables.put("isCrimeRecode", tempDriver.getIsCrimeRecode()!=null?tempDriver.getIsCrimeRecode()+"":"");
 		return variables;
 	}
 
@@ -191,5 +203,21 @@ public class TempDriverServiceImpl extends DefaultCrudService<TempDriver> implem
 
 	public void doSyncPortrait() throws Exception {
 		this.tempDriverDao.doSyncPortrait();
+	}
+
+	public void doUpdateStatus(Long[] ids, int status) {
+		Map<String,Object> attributes=new HashMap<String, Object>();
+		attributes.put("status", status);
+		attributes.put("modifiedDate",Calendar.getInstance());
+		attributes.put("modifier",SystemContextHolder.get().getUserHistory());
+		this.tempDriverDao.update(ids, attributes);
+	}
+
+	public void doUpdateInterviewDate(Long[] ids, Calendar interviewDate) {
+		Map<String,Object> attributes=new HashMap<String, Object>();
+		attributes.put("interviewDate", interviewDate);
+		attributes.put("modifiedDate",Calendar.getInstance());
+		attributes.put("modifier",SystemContextHolder.get().getUserHistory());
+		this.tempDriverDao.update(ids, attributes);
 	}
 }

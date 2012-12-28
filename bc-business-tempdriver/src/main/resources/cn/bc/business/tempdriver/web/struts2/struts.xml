@@ -17,7 +17,8 @@
 		<action name="isUniqueCertIdentity" class="tempDriverAction" method="isUniqueCertIdentity"/>
 		<action name="startFlow" class="tempDriverAction" method="startFlow"/>
 		<action name="addAttachFromTemplate" class="tempDriverAction" method="addAttachFromTemplate" />
-
+		<action name="updateStatus" class="tempDriverAction" method="updateStatus"/>
+		<action name="updateInterviewDate" class="tempDriverAction" method="updateInterviewDate"/>
 	</package>
 	
 	<!-- 导入数据 -->
