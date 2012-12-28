@@ -34,6 +34,7 @@ public class TempDriverWorkFlow extends EntityImpl {
 	private String procInstId;//流程实例ID
 	private int offerStatus;//审批结果
 	private Calendar startTime;//流程发起时间
+	private String flowKey;//流程编码
 	
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@JoinColumn(name = "PID", referencedColumnName = "ID")
@@ -67,5 +68,13 @@ public class TempDriverWorkFlow extends EntityImpl {
 	public void setStartTime(Calendar startTime) {
 		this.startTime = startTime;
 	}
+	@Column(name = "FLOW_KEY")
+	public String getFlowKey() {
+		return flowKey;
+	}
+	public void setFlowKey(String flowKey) {
+		this.flowKey = flowKey;
+	}
+	
 	
 }

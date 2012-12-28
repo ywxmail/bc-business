@@ -1,13 +1,9 @@
 package cn.bc.business.tempdriver.domain;
 
 import java.util.Calendar;
-import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.OneToMany;
-import javax.persistence.OrderBy;
 import javax.persistence.Table;
 
 import cn.bc.identity.domain.RichFileEntityImpl;
@@ -22,6 +18,7 @@ import cn.bc.identity.domain.RichFileEntityImpl;
 public class TempDriver extends RichFileEntityImpl {
 	private static final long serialVersionUID = 1L;
 
+	public static final String WORKFLOW_MTYPE = TempDriver.class.getSimpleName();
 	public static final String KEY_UID = "tempDriver.uid";
 	public static final String ATTACH_TYPE =TempDriver.class.getSimpleName();
 	
@@ -49,8 +46,12 @@ public class TempDriver extends RichFileEntityImpl {
 	public static final int REGION_WAI_SHENG = 3;
 	/** 区域：空 */
 	public static final int REGION_ = 0;
+	
+	/** 是否有犯罪记录：无 */
+	public static final int IS_CRIME_RECODE_NONE = 0;
+	/** 是否有犯罪记录：有 */
+	public static final int IS_CRIME_RECODE_HAVE = 1;
 
-	private Set<TempDriverWorkFlow> tempDriverWorkFlowList;// 参加的面试流程记录集合
 	private String name;// 姓名
 	private Calendar birthdate;// 生日
 	private int sex;// 性别
@@ -83,17 +84,7 @@ public class TempDriver extends RichFileEntityImpl {
 	private String applyAttr;//申请属性
 	private String formerUnit;//入职原单位
 	private String issue;//签发机关
-
-	@OneToMany(mappedBy = "tempDriver", fetch = FetchType.LAZY)
-	@OrderBy(value =("startTime DESC"))
-	public Set<TempDriverWorkFlow> getTempDriverWorkFlowList() {
-		return tempDriverWorkFlowList;
-	}
-
-	public void setTempDriverWorkFlowList(
-			Set<TempDriverWorkFlow> tempDriverWorkFlowList) {
-		this.tempDriverWorkFlowList = tempDriverWorkFlowList;
-	}
+	private Integer isCrimeRecode;//是否有犯罪记录
 
 	public String getName() {
 		return name;
@@ -363,6 +354,15 @@ public class TempDriver extends RichFileEntityImpl {
 
 	public void setIssue(String issue) {
 		this.issue = issue;
+	}
+
+	@Column(name = "IS_CRIME_RECODE")
+	public Integer getIsCrimeRecode() {
+		return isCrimeRecode;
+	}
+
+	public void setIsCrimeRecode(Integer isCrimeRecode) {
+		this.isCrimeRecode = isCrimeRecode;
 	}
 	
 	

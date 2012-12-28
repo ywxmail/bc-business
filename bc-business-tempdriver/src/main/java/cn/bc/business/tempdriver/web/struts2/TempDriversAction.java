@@ -14,8 +14,6 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
-import com.google.gson.JsonObject;
-
 import cn.bc.BCConstants;
 import cn.bc.business.tempdriver.domain.TempDriver;
 import cn.bc.business.web.struts2.ViewAction;
@@ -38,8 +36,10 @@ import cn.bc.web.ui.html.grid.IdColumn4MapKey;
 import cn.bc.web.ui.html.grid.TextColumn4MapKey;
 import cn.bc.web.ui.html.page.PageOption;
 import cn.bc.web.ui.html.toolbar.Toolbar;
-import cn.bc.web.ui.html.toolbar.ToolbarButton;
+import cn.bc.web.ui.html.toolbar.ToolbarMenuButton;
 import cn.bc.web.ui.json.Json;
+
+import com.google.gson.JsonObject;
 
 /**
  * 司机招聘信息的视图Action
@@ -87,7 +87,7 @@ public class TempDriversAction extends ViewAction<Map<String, Object>> {
 
 		sql.append(",t.interview_date as interviewDate,t.register_date as registerDate,t.credit_desc as creditDesc");
 		sql.append(",t.crime_recode as crimeRecode,t.back_ground as backGround,t.entry_car as entryCar");
-		sql.append(",t.apply_attribute as applyAttr,t.former_unit as formerUnit,t.issue");
+		sql.append(",t.apply_attribute as applyAttr,t.former_unit as formerUnit,t.issue,t.is_crime_recode");
 		sql.append(" FROM bs_temp_driver t");
 		sql.append(" INNER JOIN bc_identity_actor_history u on u.id=t.author_id");
 		//sql.append(" LEFT JOIN bs_temp_driver_workflow w on w.pid=t.id");
@@ -139,6 +139,7 @@ public class TempDriversAction extends ViewAction<Map<String, Object>> {
 				map.put("applyAttr",rs[i++]);
 				map.put("formerUnit",rs[i++]);
 				map.put("issue",rs[i++]);
+				map.put("isCrimeRecode",rs[i++]);
 				
 				return map;
 			}
@@ -210,6 +211,21 @@ public class TempDriversAction extends ViewAction<Map<String, Object>> {
 				getText("tempDriver.region.bensheng"));
 		s.put(String.valueOf(TempDriver.REGION_WAI_SHENG),
 				getText("tempDriver.region.waisheng"));
+		return s;
+	}
+	
+	/**
+	 * 是否有犯罪记录值转换列表：0 无 ，1 有
+	 * 
+	 * @return
+	 */
+	protected Map<String, String> getIsCrimeRecodeValues() {
+		Map<String, String> s = new LinkedHashMap<String, String>();
+		s.put(String.valueOf(TempDriver.IS_CRIME_RECODE_HAVE),
+				getText("tempDriver.isCrimeRecode.have"));
+		s.put(String.valueOf(TempDriver.IS_CRIME_RECODE_NONE),
+				getText("tempDriver.isCrimeRecode.none"));
+		s.put("","");
 		return s;
 	}
 	
@@ -316,6 +332,10 @@ public class TempDriversAction extends ViewAction<Map<String, Object>> {
 					getText("tempDriver.phone"),100).setSortable(true)
 					.setUseTitleFromLabel(true));
 		}
+		//是否有犯罪记录
+		columns.add(new TextColumn4MapKey("t.is_crime_recode", "isCrimeRecode",
+				getText("tempDriver.isCrimeRecode"), 100).setSortable(true)
+				.setValueFormater(new KeyValueFormater(getIsCrimeRecodeValues())));
 		//从业资格证
 		columns.add(new TextColumn4MapKey("t.cert_cyzg", "cyzg",
 				getText("tempDriver.cyzg"),120).setSortable(true)
@@ -371,12 +391,12 @@ public class TempDriversAction extends ViewAction<Map<String, Object>> {
 				getText("label.authorName"), 80).setSortable(true));
 		columns.add(new TextColumn4MapKey("t.file_date", "file_date",
 				getText("label.fileDate"), 120).setSortable(true)
-				.setValueFormater(new CalendarFormater("yyyy-MM-dd hh:mm")));
+				.setValueFormater(new CalendarFormater("yyyy-MM-dd HH:mm")));
 		columns.add(new TextColumn4MapKey("m.actor_name", "mname",
 				getText("tempDriver.modifier"), 80).setSortable(true));
 		columns.add(new TextColumn4MapKey("t.modified_date", "modified_date",
 				getText("tempDriver.modifiedDate"), 120).setSortable(true)
-				.setValueFormater(new CalendarFormater("yyyy-MM-dd hh:mm")));
+				.setValueFormater(new CalendarFormater("yyyy-MM-dd HH:mm")));
 		return columns;
 	}
 
@@ -436,14 +456,28 @@ public class TempDriversAction extends ViewAction<Map<String, Object>> {
 			tb.addButton(getDefaultEditToolbarButton());
 			
 			// 发起流程
-			tb.addButton(new ToolbarButton().setIcon("ui-icon-play")
+			/*tb.addButton(new ToolbarButton().setIcon("ui-icon-play")
 					.setText(getText("tempDriverWorkFlow.startFlow"))
-					.setClick("bs.tempDriverView.startFlow"));
-			//出租车协会查询
-			/*tb.addButton(new ToolbarButton().setIcon("ui-icon-check")
-					.setText(getText("tempDriver.gztaxixhDriverInfo"))
-					.setClick("bs.tempDriverView.gztaxixhDriverInfo"));*/
-
+					.setClick("bs.tempDriverView.startFlow"));*/
+			
+			// "更多"按钮
+			ToolbarMenuButton menuButton = new ToolbarMenuButton(
+					getText("label.operate"))
+					.setChange("bs.tempDriverView.selectMenuButtonItem");
+			tb.addButton(menuButton);
+			// --批量发起新司机入职处理流程
+			menuButton.addMenuItem(getText("tempDriver.workflow.carManEntry"),
+					"workflow.carManEntry");
+			// --批量发起司机服务资格证办理流程
+			menuButton.addMenuItem(getText("tempDriver.workflow.requestDerviceCertficate"),
+					"workflow.requestDerviceCertficate");
+			// --批量修改面试日期
+			menuButton.addMenuItem(getText("tempDriver.operate.interviewDate"),
+					"operate.interviewDate");
+			// --批量修改状态
+			menuButton.addMenuItem(getText("tempDriver.operate.status"),
+					"operate.status");
+			
 		}
 		
 		tb.addButton(Toolbar.getDefaultToolbarRadioGroup(
