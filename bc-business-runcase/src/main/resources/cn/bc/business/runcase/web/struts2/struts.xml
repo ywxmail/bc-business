@@ -55,6 +55,32 @@
 
 	</package>
 
+	<!-- 违法代码 -->
+	<package name="case4InfractCode" extends="bc-default"
+		namespace="/bc-business/case4InfractCode">
+		<action name="create" class="case4InfractCodeAction" method="create">
+			<result name="form">/bc-business/case4InfractCode/form.jsp</result>
+		</action>
+		<action name="open" class="case4InfractCodeAction" method="open">
+			<result name="formr">/bc-business/case4InfractCode/form.jsp</result>
+		</action>
+		<action name="edit" class="case4InfractCodeAction" method="edit">
+			<result name="form">/bc-business/case4InfractCode/form.jsp</result>
+		</action>
+		<action name="save" class="case4InfractCodeAction" method="save" />
+		<action name="delete" class="case4InfractCodeAction" method="delete" />
+		<!-- Ajax查询经营权信息 -->
+		<action name="find" class="findCase4InfractCodeAction" />
+
+	</package>
+
+	<!-- 导入数据 -->
+	<package name="importInfractCode" extends="bc-default"
+		namespace="/bc-business/case4InfractCode">
+		<action name="import" class="importInfractCodeAction" />
+	</package>
+
+
 	<!-- 事故理赔 -->
 	<package name="caseAccident" extends="bc-default" namespace="/bc-business">
 		<action name="caseAccident/selectCarMansInfo" class="caseAccidentAction"
