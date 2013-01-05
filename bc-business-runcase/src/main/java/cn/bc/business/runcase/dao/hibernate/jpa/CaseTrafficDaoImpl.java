@@ -17,8 +17,11 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 
+import cn.bc.BCConstants;
 import cn.bc.business.runcase.dao.CaseTrafficDao;
 import cn.bc.business.runcase.domain.Case4InfractTraffic;
+import cn.bc.identity.web.SystemContext;
+import cn.bc.identity.web.SystemContextHolder;
 import cn.bc.orm.hibernate.jpa.HibernateCrudJpaDao;
 import cn.bc.web.ui.json.Json;
 
@@ -122,6 +125,8 @@ public class CaseTrafficDaoImpl extends
 		sql.append("update bs_case_base");
 		// set
 		int i = 0;
+		// 状态是否为注销
+		boolean isLogout = false;
 		Object value;
 		for (String key : attributes.keySet()) {
 			value = attributes.get(key);
@@ -139,7 +144,26 @@ public class CaseTrafficDaoImpl extends
 				else
 					sql.append(" set " + key + "=null");
 			}
+
+			// 判断状态是否为注销
+			if (key.equals("status") || key.equals("status_")) {
+				if (value != null) {
+					if (value.equals(BCConstants.STATUS_DISABLED)) {
+						isLogout = true;
+					}
+				}
+			}
+
 			i++;
+		}
+
+		// 如果状态为注销就添加注销人和注销时间
+		if (isLogout) {
+			sql.append(",close_date=?,closer_id=?,closer_name=?");
+			args.add(Calendar.getInstance());
+			SystemContext context = SystemContextHolder.get();
+			args.add(context.getUserHistory().getId());
+			args.add(context.getUserHistory().getName());
 		}
 
 		// pks
