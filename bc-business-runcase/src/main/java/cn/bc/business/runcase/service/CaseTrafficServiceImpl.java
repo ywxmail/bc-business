@@ -312,6 +312,10 @@ public class CaseTrafficServiceImpl extends
 				case4InfractTraffic.getJeom());
 		variables.put("case4InfractTrafficr_penalty",
 				case4InfractTraffic.getPenalty());
+		// 司机Id
+		variables.put("case4InfractTrafficr_driverId", case4InfractTraffic
+				.getDriverId() != null ? case4InfractTraffic.getDriverId()
+				: null);
 
 		return variables;
 	}
