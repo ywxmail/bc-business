@@ -138,7 +138,7 @@ public class TempDriverAction extends FileEntityAction<Long, TempDriver> {
 		if (!td.isNew()) {
 			list_WorkflowModuleRelation = this.workflowModuleRelationService
 					.findList(td.getId(), TempDriver.WORKFLOW_MTYPE,
-							new String[] { "isPass", "isGiveUp" });
+							new String[] { "isPass", "isGiveUp" , "subject" });
 		}
 	}
 
