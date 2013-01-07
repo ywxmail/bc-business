@@ -8,6 +8,10 @@ drop sequence if exists DC_SEQUENCE;
 -- 数据转换记录
 drop table if exists DC_RECORD;
 
+-- 司机招聘
+DROP TABLE IF EXISTS BS_TEMP_DRIVER_WORKFLOW;
+DROP TABLE IF EXISTS BS_TEMP_DRIVER;
+
 -- 安全学习和回场检
 drop table if exists BS_ARRANGE_DRIVER;
 drop table if exists BS_ARRANGE_CAR;
