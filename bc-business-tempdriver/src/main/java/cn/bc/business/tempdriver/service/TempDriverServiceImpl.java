@@ -86,12 +86,11 @@ public class TempDriverServiceImpl extends DefaultCrudService<TempDriver> implem
 						desc+="未聘用";
 						break;
 				}
-				desc+="修改为审批中，";
+				desc+="修改为审批中";
 				//更新司机的状态为审批中
 				tempDriver.setStatus(TempDriver.STATUS_CHECK);
 				this.tempDriverDao.save(tempDriver);
 			}
-			desc+="同步姓名："+tempDriver.getName()+"、身份证号："+tempDriver.getCertIdentity()+"等数据。";
 			SystemContext sc=SystemContextHolder.get();
 			sc.setAttr(ExcutionLog.SYNC_INFO_FLAG,true);
 			sc.setAttr(ExcutionLog.SYNC_INFO_VALUE, desc);
