@@ -1579,9 +1579,13 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 		else if (s == CarByDriver.TYPE_FUBAN)
 			return "副班";
 		else if (s == CarByDriver.TYPE_DINGBAN)
-			return "顶班";
+			return "替班";
 		else if (s == CarByDriver.TYPE_ZHUGUA)
-			return "主挂";
+			return "替班(主挂)";
+		else if (s == CarByDriver.TYPE_GONGGONGDINGBAN)
+			return "公共替班";
+		else if (s == CarByDriver.TYPE_GONGGONGDINGBANZHUGUA)
+			return "公共替班(主挂)";
 		else
 			return "";
 	}
@@ -1606,7 +1610,7 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 		else if (s == CarByDriverHistory.MOVETYPE_ZCD)
 			return "转车队";
 		else if (s == CarByDriverHistory.MOVETYPE_DINGBAN)
-			return "顶班";
+			return "替班安排";
 		else if (s == CarByDriverHistory.MOVETYPE_JHZC)
 			return "交回后转车";
 		else if (s == CarByDriverHistory.MOVETYPE_WJZZX)

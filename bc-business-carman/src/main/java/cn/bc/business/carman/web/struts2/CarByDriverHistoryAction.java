@@ -437,6 +437,11 @@ public class CarByDriverHistoryAction extends
 		}
 	}
 
+	/**
+	 * 营运班次基本类型：正副班\正班\副班\替班(主挂)\替班\公共替班(主挂)\公共替班\未定义
+	 * 
+	 * @return
+	 */
 	private String getClassesDesc(int clazz) {
 		if (clazz == CarByDriver.TYPE_ZHENGBAN)
 			return getText("carByDriver.classes.zhengban");
@@ -446,6 +451,10 @@ public class CarByDriverHistoryAction extends
 			return getText("carByDriver.classes.dingban");
 		else if (clazz == CarByDriver.TYPE_ZHUGUA)
 			return getText("carByDriver.classes.zhugua");
+		else if (clazz == CarByDriver.TYPE_GONGGONGDINGBANZHUGUA)
+			return getText("carByDriver.classes.gonggongdingbanzhugua");
+		else if (clazz == CarByDriver.TYPE_GONGGONGDINGBAN)
+			return getText("carByDriver.classes.gonggongdingban");
 		else if (clazz == CarByDriver.TYPE_WEIDINGYI)
 			return getText("carByDriver.classes.weidingyi");
 		return "";
