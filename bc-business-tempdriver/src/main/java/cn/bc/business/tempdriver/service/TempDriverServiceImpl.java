@@ -20,6 +20,7 @@ import cn.bc.identity.web.SystemContext;
 import cn.bc.identity.web.SystemContextHolder;
 import cn.bc.template.domain.Template;
 import cn.bc.template.service.TemplateService;
+import cn.bc.workflow.domain.ExcutionLog;
 import cn.bc.workflow.domain.WorkflowModuleRelation;
 import cn.bc.workflow.service.WorkflowModuleRelationService;
 import cn.bc.workflow.service.WorkflowService;
@@ -38,7 +39,7 @@ public class TempDriverServiceImpl extends DefaultCrudService<TempDriver> implem
 	private TempDriverDao tempDriverDao;
 	private WorkflowService workflowService;
 	private WorkflowModuleRelationService workflowModuleRelationService;
-	
+
 	@Autowired
 	public void setWorkflowModuleRelationService(
 			WorkflowModuleRelationService workflowModuleRelationService) {
@@ -67,21 +68,43 @@ public class TempDriverServiceImpl extends DefaultCrudService<TempDriver> implem
 		//循环Id数组
 		for(Long id:ids){
 			tempDriver=this.tempDriverDao.load(id);
+			//记录同步的详细关键信息
+			String desc="";
+			if(flag_status){
+				desc+="将"+tempDriver.getName()+"的招聘信息状态从";
+				switch(tempDriver.getStatus()){
+					case TempDriver.STATUS_RESERVE:
+						desc+="待聘";
+						break;
+					case TempDriver.STATUS_CHECK:
+						desc+="审批中";
+						break;
+					case TempDriver.STATUS_PASS:
+						desc+="聘用";
+						break;
+					case TempDriver.STATUS_GIVEUP:
+						desc+="未聘用";
+						break;
+				}
+				desc+="修改为审批中";
+				//更新司机的状态为审批中
+				tempDriver.setStatus(TempDriver.STATUS_CHECK);
+				this.tempDriverDao.save(tempDriver);
+			}
+			SystemContext sc=SystemContextHolder.get();
+			sc.setAttr(ExcutionLog.SYNC_INFO_FLAG,true);
+			sc.setAttr(ExcutionLog.SYNC_INFO_VALUE, desc);
+			
 			variables=new HashMap<String, Object>();
 			//发起流程
 			String procInstId= this.workflowService.startFlowByKey(key, this.returnParam(tempDriver, variables));
 			procInstIds+=procInstId+",";
+			//增加流程关系
 			workflowModuleRelation=new WorkflowModuleRelation();
 			workflowModuleRelation.setMid(id);
 			workflowModuleRelation.setPid(procInstId);
 			workflowModuleRelation.setMtype(TempDriver.WORKFLOW_MTYPE);
 			this.workflowModuleRelationService.save(workflowModuleRelation);
-			if(flag_status){
-				//更新司机的状态为审批中
-				tempDriver.setStatus(TempDriver.STATUS_CHECK);
-				this.tempDriverDao.save(tempDriver);
-			}
-			
 		}
 		
 		return procInstIds;
@@ -128,7 +151,7 @@ public class TempDriverServiceImpl extends DefaultCrudService<TempDriver> implem
 		variables.put("crimeRecode", tempDriver.getCrimeRecode()!=null?tempDriver.getCrimeRecode():"");
 		variables.put("backGround", tempDriver.getBackGround()!=null?tempDriver.getBackGround():"");
 		variables.put("entryCar", tempDriver.getEntryCar()!=null?tempDriver.getEntryCar():"");
-		variables.put("applyAttr", tempDriver.getApplyAttr()!=null?tempDriver.getApplyAttr():"");
+		//variables.put("applyAttr", tempDriver.getApplyAttr()!=null?tempDriver.getApplyAttr():"");
 		variables.put("formerUnit", tempDriver.getFormerUnit()!=null?tempDriver.getFormerUnit():"");
 		variables.put("issue", tempDriver.getIssue()!=null?tempDriver.getIssue():"");
 		variables.put("isCrimeRecode", tempDriver.getIsCrimeRecode()!=null?tempDriver.getIsCrimeRecode()+"":"");
@@ -183,7 +206,19 @@ public class TempDriverServiceImpl extends DefaultCrudService<TempDriver> implem
 		Map<String, Object> params = new HashMap<String, Object>();
 		params=this.returnParam(tempDriver, params);
 		
+		//修改信誉档案的显示
+		String credit=params.get("credit").toString();
+		if(!"".equals(credit)){
+			credit=credit.replace("bc/attach/", SystemContextHolder.get().getAttr("htmlPageNamespace")+"/bc/attach/");
+			credit=credit.replaceAll("<font size=\"\\d\">", "");
+			credit=credit.replace("</font>", "");
+			credit=credit.replace("padding-right:8px;", "");
+			params.put("credit", credit);
+		}
+		
 		params.put("sex",tempDriver.getSex()==1?"男":"女");
+		
+		params.put("age",Calendar.getInstance().get(Calendar.YEAR)-tempDriver.getBirthdate().get(Calendar.YEAR));
 		
 		// 根据模板参数获取的替换值
 		Map<String, Object> mapFormatSql = new HashMap<String, Object>();

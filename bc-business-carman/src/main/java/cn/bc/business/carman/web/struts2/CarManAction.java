@@ -263,20 +263,17 @@ public class CarManAction extends FileEntityAction<Long, CarMan> {
 			PlaceOrigin po = pList.get(0);
 			String fullname = po.getFullname();
 			json.put("origin", fullname);
-			// 根据全名判断区域
-			String[] isFlag = fullname.split("广东省广州市");
-			if (isFlag.length >= 2) {
-				// 本市
-				json.put("area", "1");
-			} else {
-				isFlag = fullname.split("广东省");
-				if (isFlag.length >= 2) {
+			if(fullname.indexOf("广东省")>-1){
+				if(fullname.indexOf("广州市")>-1){
+					// 本市
+					json.put("area", "1");
+				}else{
 					// 本省
 					json.put("area", "2");
-				} else {
-					// 外省
-					json.put("area", "3");
 				}
+			}else{
+				// 外省
+				json.put("area", "3");
 			}
 
 		}
