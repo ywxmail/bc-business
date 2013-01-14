@@ -87,13 +87,12 @@ public class CarByDriverAction extends FileEntityAction<Long, CarByDriver> {
 	}
 
 	/**
-	 * 获取营运班次值转换列表
+	 * 营运班次基本类型：正副班\正班\副班\替班(主挂)\替班\公共替班(主挂)\公共替班\全部
 	 * 
 	 * @return
 	 */
 	protected Map<String, String> getType() {
 		Map<String, String> type = new HashMap<String, String>();
-		type = new HashMap<String, String>();
 		type.put(String.valueOf(CarByDriver.TYPE_WEIDINGYI),
 				getText("carByDriver.classes.weidingyi"));
 		type.put(String.valueOf(CarByDriver.TYPE_ZHENGBAN),
@@ -102,6 +101,12 @@ public class CarByDriverAction extends FileEntityAction<Long, CarByDriver> {
 				getText("carByDriver.classes.fuban"));
 		type.put(String.valueOf(CarByDriver.TYPE_DINGBAN),
 				getText("carByDriver.classes.dingban"));
+		type.put(String.valueOf(CarByDriver.TYPE_ZHUGUA),
+				getText("carByDriver.classes.zhugua"));
+		type.put(String.valueOf(CarByDriver.TYPE_GONGGONGDINGBANZHUGUA),
+				getText("carByDriver.classes.gonggongdingbanzhugua"));
+		type.put(String.valueOf(CarByDriver.TYPE_GONGGONGDINGBAN),
+				getText("carByDriver.classes.gonggongdingban"));
 		return type;
 	}
 

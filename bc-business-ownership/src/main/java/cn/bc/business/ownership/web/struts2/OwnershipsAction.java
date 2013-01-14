@@ -543,18 +543,24 @@ public class OwnershipsAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected FooterButton getGridFooterImportButton() {
-		// 获取默认的导入按钮设置
-		FooterButton fb = this.getDefaultGridFooterImportButton();
+		// 管理员才能导入
+		if (!this.isReadonly()) {
+			// 获取默认的导入按钮设置
+			FooterButton fb = this.getDefaultGridFooterImportButton();
 
-		// 配置特殊参数
-		JsonObject cfg = new JsonObject();
-		cfg.addProperty("tplCode", "IMPORT_OWNERSHIP");// 模板编码
-		cfg.addProperty("importAction", "bc-business/ownership/import");// 导入数据的action路径(使用相对路径)
-		cfg.addProperty("headerRowIndex", 0);// 列标题所在行的索引号(0-based)
-		fb.setAttr("data-cfg", cfg.toString());
+			// 配置特殊参数
+			JsonObject cfg = new JsonObject();
+			cfg.addProperty("tplCode", "IMPORT_OWNERSHIP");// 模板编码
+			cfg.addProperty("importAction", "bc-business/ownership/import");// 导入数据的action路径(使用相对路径)
+			cfg.addProperty("headerRowIndex", 0);// 列标题所在行的索引号(0-based)
+			fb.setAttr("data-cfg", cfg.toString());
 
-		// 返回导入按钮
-		return fb;
+			// 返回导入按钮
+			return fb;
+		} else {
+			return null;
+		}
+
 	}
 
 	// ==高级搜索代码开始==

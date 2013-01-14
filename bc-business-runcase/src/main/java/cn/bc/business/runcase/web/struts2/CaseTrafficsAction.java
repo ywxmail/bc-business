@@ -323,7 +323,8 @@ public class CaseTrafficsAction extends ViewAction<Map<String, Object>> {
 
 			// 编辑按钮
 			tb.addButton(getDefaultEditToolbarButton());
-
+			// 删除
+			tb.addButton(getDefaultDeleteToolbarButton());
 			// 发起流程
 			tb.addButton(new ToolbarButton().setIcon("ui-icon-play")
 					.setText(getText("runcase.startFlow"))

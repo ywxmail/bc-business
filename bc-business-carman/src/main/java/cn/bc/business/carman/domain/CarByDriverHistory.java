@@ -49,7 +49,7 @@ public class CarByDriverHistory extends FileEntityImpl {
 	public static final int MOVETYPE_XRZ = 5;
 	/** 迁移类型：转车队 */
 	public static final int MOVETYPE_ZCD = 6;
-	/** 迁移类型：顶班 ：处理顶班司机的迁移记录 */
+	/** 迁移类型：替班安排 ：处理替班司机的迁移记录 */
 	public static final int MOVETYPE_DINGBAN = 7;
 	/** 迁移类型：交回后转车 ：交证日期与转新车日期之间有大于一日间隔 */
 	public static final int MOVETYPE_JHZC = 8;
@@ -67,13 +67,13 @@ public class CarByDriverHistory extends FileEntityImpl {
 	private CarMan driver;// 营运的司机
 	private Car fromCar;// 原车辆
 	private Long fromMotorcadeId;// 原车队
-	private int fromClasses;// 原营运班次:如正班、副班、顶班
+	private int fromClasses;// 原营运班次:如正班、副班、替班(主挂)、公共替班(主挂)
 	private Car toCar;// 新车辆(或主挂车)
 	private Long toMotorcadeId;// 新车队
-	private int toClasses;// 新营运班次:如正班、副班、顶班
+	private int toClasses;// 新营运班次:如正班、副班、替班(主挂)、公共替班(主挂)
 
 	private Calendar moveDate;// 迁移时间(或顶班合同的开始日期)
-	private int moveType;// 迁移类型:1-公司到公司(已注销);2-注销未有去向;3-由外公司迁回;4-交回未注销;5-新入职;6-转车队;7-顶班;8-交回后转车;9-未交证注销
+	private int moveType;// 迁移类型:1-公司到公司(已注销);2-注销未有去向;3-由外公司迁回;4-交回未注销;5-新入职;6-转车队;7-替班安排;8-交回后转车;9-未交证注销
 	private String fromUnit;// 原单位
 	private String toUnit;// 新单位
 	private Calendar handPapersDate;// 交证日期

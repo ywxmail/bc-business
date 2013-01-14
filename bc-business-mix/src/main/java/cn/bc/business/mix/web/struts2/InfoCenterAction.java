@@ -70,7 +70,7 @@ public class InfoCenterAction extends ActionSupport {
 	public String execute() throws Exception {
 		// 初始化页面配置信息
 		this.pageOption = new PageOption().setMaximizable(true)
-				.setMinimizable(true).setMinWidth(760).setWidth(880)
+				.setMinimizable(true).setMinWidth(760).setWidth(950)
 				.setMinHeight(380).setHeight(500);
 		this.pageOption.setHelp("cheliangchaxun");// 添加帮助按钮
 		// this.pageOption.setPrint("bs/infoCenter");//添加打印按钮

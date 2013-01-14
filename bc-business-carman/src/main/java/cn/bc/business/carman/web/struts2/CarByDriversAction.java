@@ -244,7 +244,7 @@ public class CarByDriversAction extends ViewAction<Map<String, Object>> {
 	}
 
 	/**
-	 * 营运班次基本类型：正副班\正班\副班\顶班\全部
+	 * 营运班次基本类型：正副班\正班\副班\替班(主挂)\替班\公共替班(主挂)\公共替班\全部
 	 * 
 	 * @return
 	 */
@@ -257,10 +257,14 @@ public class CarByDriversAction extends ViewAction<Map<String, Object>> {
 				getText("carByDriver.classes.zhengban"));
 		type.put(String.valueOf(CarByDriver.TYPE_FUBAN),
 				getText("carByDriver.classes.fuban"));
-		type.put(String.valueOf(CarByDriver.TYPE_DINGBAN),
-				getText("carByDriver.classes.dingban"));
 		type.put(String.valueOf(CarByDriver.TYPE_ZHUGUA),
 				getText("carByDriver.classes.zhugua"));
+		type.put(String.valueOf(CarByDriver.TYPE_DINGBAN),
+				getText("carByDriver.classes.dingban"));
+		type.put(String.valueOf(CarByDriver.TYPE_GONGGONGDINGBANZHUGUA),
+				getText("carByDriver.classes.gonggongdingbanzhugua"));
+		type.put(String.valueOf(CarByDriver.TYPE_GONGGONGDINGBAN),
+				getText("carByDriver.classes.gonggongdingban"));
 		type.put("", getText("carByDriver.classes.quanbu"));
 		return type;
 	}
