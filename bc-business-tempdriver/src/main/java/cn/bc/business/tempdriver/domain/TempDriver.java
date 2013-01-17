@@ -70,7 +70,7 @@ public class TempDriver extends RichFileEntityImpl {
 	private String marry;// 婚姻状况
 	private String desc;// 备注
 	private String credit;// 信誉档案
-	private Calendar certDrivingFirstDate;//本市驾驶证初领日期
+	private Calendar certDrivingFirstDate;//驾驶证初领日期
 	private Integer cyStartYear;//本市出租车从业初始年份
 	private Calendar validStartDate;//身份证有效期开始日
 	private Calendar validEndDate;//身份证有效期结束日
@@ -85,6 +85,12 @@ public class TempDriver extends RichFileEntityImpl {
 	private String formerUnit;//入职原单位
 	private String issue;//签发机关
 	private Integer isCrimeRecode;//是否有犯罪记录
+	
+	private String model;// 准驾车型
+	private String certDriving;// 驾驶证号
+	private Calendar certDrivingStartDate;// 驾驶证起效日期
+	private Calendar certDrivingEndDate;// 驾驶证过期日期
+	private String certDrivingArchive;// 驾驶证档案号
 
 	public String getName() {
 		return name;
@@ -363,6 +369,51 @@ public class TempDriver extends RichFileEntityImpl {
 
 	public void setIsCrimeRecode(Integer isCrimeRecode) {
 		this.isCrimeRecode = isCrimeRecode;
+	}
+
+	@Column(name = "MODEL_")
+	public String getModel() {
+		return model;
+	}
+
+	public void setModel(String model) {
+		this.model = model;
+	}
+
+	@Column(name = "CERT_DRIVING")
+	public String getCertDriving() {
+		return certDriving;
+	}
+
+	public void setCertDriving(String certDriving) {
+		this.certDriving = certDriving;
+	}
+
+	@Column(name = "CERT_DRIVING_START_DATE")
+	public Calendar getCertDrivingStartDate() {
+		return certDrivingStartDate;
+	}
+
+	public void setCertDrivingStartDate(Calendar certDrivingStartDate) {
+		this.certDrivingStartDate = certDrivingStartDate;
+	}
+
+	@Column(name = "CERT_DRIVING_END_DATE")
+	public Calendar getCertDrivingEndDate() {
+		return certDrivingEndDate;
+	}
+
+	public void setCertDrivingEndDate(Calendar certDrivingEndDate) {
+		this.certDrivingEndDate = certDrivingEndDate;
+	}
+
+	@Column(name = "CERT_DRIVING_ARCHIVE")
+	public String getCertDrivingArchive() {
+		return certDrivingArchive;
+	}
+
+	public void setCertDrivingArchive(String certDrivingArchive) {
+		this.certDrivingArchive = certDrivingArchive;
 	}
 	
 	
