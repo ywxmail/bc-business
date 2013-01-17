@@ -96,8 +96,18 @@ public class TempDriverServiceImpl extends DefaultCrudService<TempDriver> implem
 			sc.setAttr(ExcutionLog.SYNC_INFO_VALUE, desc);
 			
 			variables=new HashMap<String, Object>();
+			
+			//入职审批流程加载全部信息
+			if("CarManEntry".equals(key)){
+				this.returnParam(tempDriver, variables);
+			}else{
+				variables.put("tempDriver_id", tempDriver.getId());
+				variables.put("name", tempDriver.getName());
+				variables.put("certIdentity", tempDriver.getCertIdentity());
+			}
+			
 			//发起流程
-			String procInstId= this.workflowService.startFlowByKey(key, this.returnParam(tempDriver, variables));
+			String procInstId= this.workflowService.startFlowByKey(key,variables);
 			procInstIds+=procInstId+",";
 			//增加流程关系
 			workflowModuleRelation=new WorkflowModuleRelation();
@@ -155,6 +165,24 @@ public class TempDriverServiceImpl extends DefaultCrudService<TempDriver> implem
 		variables.put("formerUnit", tempDriver.getFormerUnit()!=null?tempDriver.getFormerUnit():"");
 		variables.put("issue", tempDriver.getIssue()!=null?tempDriver.getIssue():"");
 		variables.put("isCrimeRecode", tempDriver.getIsCrimeRecode()!=null?tempDriver.getIsCrimeRecode()+"":"");
+		variables.put("model", tempDriver.getModel()!=null?tempDriver.getModel()+"":"");
+		variables.put("certDriving", tempDriver.getCertDriving()!=null?tempDriver.getCertDriving()+"":"");
+		variables.put("certDrivingStartDate", tempDriver.getCertDrivingStartDate()!=null?DateUtils.formatCalendar2Day(tempDriver.getCertDrivingStartDate()):"");
+		variables.put("certDrivingEndDate", tempDriver.getCertDrivingEndDate()!=null?DateUtils.formatCalendar2Day(tempDriver.getCertDrivingEndDate()):"");
+		variables.put("certDrivingArchive", tempDriver.getCertDrivingArchive()!=null?tempDriver.getCertDrivingArchive():"");
+		return variables;
+	}
+	
+	private Map<String,Object> date4key(String key,Calendar calendar,Map<String,Object> variables){
+		if(variables==null)
+			return null;
+		if(key==null||key.length()==0||calendar==null)
+			return variables;
+			
+		variables.put(key+"4yyyy", DateUtils.formatCalendar(calendar, "yyyy"));
+		variables.put(key+"4MM", DateUtils.formatCalendar(calendar, "MM"));
+		variables.put(key+"4dd", DateUtils.formatCalendar(calendar, "dd"));
+		
 		return variables;
 	}
 
@@ -218,7 +246,16 @@ public class TempDriverServiceImpl extends DefaultCrudService<TempDriver> implem
 		
 		params.put("sex",tempDriver.getSex()==1?"男":"女");
 		
-		params.put("age",Calendar.getInstance().get(Calendar.YEAR)-tempDriver.getBirthdate().get(Calendar.YEAR));
+		params.put("age",DateUtils.getAge(tempDriver.getBirthdate()));
+		
+		//出生日期格式化
+		date4key("birthdate",tempDriver.getBirthdate(), params);
+		//驾驶证初领日期
+		date4key("certDrivingFirstDate",tempDriver.getCertDrivingFirstDate(), params);
+		//驾驶证起效日期
+		date4key("certDrivingStartDate",tempDriver.getCertDrivingStartDate(), params);
+		//驾驶证无效日期
+		date4key("certDrivingEndDate",tempDriver.getCertDrivingEndDate(), params);
 		
 		// 根据模板参数获取的替换值
 		Map<String, Object> mapFormatSql = new HashMap<String, Object>();

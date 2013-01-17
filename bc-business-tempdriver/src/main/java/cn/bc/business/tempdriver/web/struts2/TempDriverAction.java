@@ -14,6 +14,7 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
+import cn.bc.business.OptionConstants;
 import cn.bc.business.tempdriver.domain.TempDriver;
 import cn.bc.business.tempdriver.service.TempDriverService;
 import cn.bc.business.web.struts2.FileEntityAction;
@@ -26,6 +27,8 @@ import cn.bc.core.util.StringUtils;
 import cn.bc.docs.domain.Attach;
 import cn.bc.docs.web.ui.html.AttachWidget;
 import cn.bc.identity.web.SystemContext;
+import cn.bc.option.domain.OptionItem;
+import cn.bc.option.service.OptionService;
 import cn.bc.web.ui.html.page.ButtonOption;
 import cn.bc.web.ui.html.page.PageOption;
 import cn.bc.web.ui.json.Json;
@@ -43,14 +46,21 @@ public class TempDriverAction extends FileEntityAction<Long, TempDriver> {
 	// private static Log logger = LogFactory.getLog(MotorcadeAction.class);
 	private static final long serialVersionUID = 1L;
 	private TempDriverService tempDriverService;
+	private OptionService optionService;
 	private WorkflowModuleRelationService workflowModuleRelationService;
 
 	public List<Map<String, String>> list_WorkExperience; // 工作经历集合
 	public List<Map<String, String>> list_Family; // 家庭成员集合
 	public List<Map<String, Object>> list_WorkflowModuleRelation; // 工作流程集合
+	public JSONArray companyNames; // 公司名称列表
 
 	public Integer creditStatus;// 信誉档案更新的状态 控制
 	public AttachWidget attachsUI;
+	
+	@Autowired
+	public void setOptionService(OptionService optionService) {
+		this.optionService = optionService;
+	}
 
 	@Autowired
 	public void setArrangeService(TempDriverService tempDriverService) {
@@ -140,6 +150,14 @@ public class TempDriverAction extends FileEntityAction<Long, TempDriver> {
 					.findList(td.getId(), TempDriver.WORKFLOW_MTYPE,
 							new String[] { "isPass", "isGiveUp" , "subject" });
 		}
+		
+		// 批量加载可选项列表
+		Map<String, List<Map<String, String>>> optionItems = optionService
+				.findOptionItemByGroupKeys(new String[] {OptionConstants.COMPANY_NAME });
+		
+		// 公司名称列表
+		companyNames = OptionItem.toLabelValues(optionItems
+						.get(OptionConstants.COMPANY_NAME));
 	}
 
 	// 解释json数组字符串为集合
