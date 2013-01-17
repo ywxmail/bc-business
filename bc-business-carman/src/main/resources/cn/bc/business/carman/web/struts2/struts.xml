@@ -154,4 +154,9 @@
 		<action name="findNewnestCarByDriver" class="selectNewnestCarByDriverAction"
 			method="findNewnestCarByDriver" />
 	</package>
+	
+	<!-- 导入司机人意险数据 -->
+	<package name="importCarManRisk" extends="bc-default" namespace="/bc-business/carManRisk">
+		<action name="import" class="importCarManRiskAction" />
+	</package>
 </struts>
