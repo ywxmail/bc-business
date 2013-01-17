@@ -123,7 +123,9 @@
 		<action name="caseAdvice/delete" class="caseAdviceAction"
 			method="delete" />
 		<action name="caseAdvice/save" class="caseAdviceAction" method="save" />
-
+		<!--发起驾驶员客管投诉处理流程 -->
+		<action name="caseAdvice/startFlow" class="caseAdviceAction"
+			method="startFlow" />
 	</package>
 
 	<!-- 投诉建议操作 -->

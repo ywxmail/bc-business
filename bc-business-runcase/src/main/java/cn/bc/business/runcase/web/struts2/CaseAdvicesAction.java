@@ -5,6 +5,7 @@ package cn.bc.business.runcase.web.struts2;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -45,6 +46,7 @@ import cn.bc.web.ui.html.grid.IdColumn4MapKey;
 import cn.bc.web.ui.html.grid.TextColumn4MapKey;
 import cn.bc.web.ui.html.page.PageOption;
 import cn.bc.web.ui.html.toolbar.Toolbar;
+import cn.bc.web.ui.html.toolbar.ToolbarButton;
 import cn.bc.web.ui.json.Json;
 
 /**
@@ -65,10 +67,10 @@ public class CaseAdvicesAction extends ViewAction<Map<String, Object>> {
 	@Override
 	public boolean isReadonly() {
 		SystemContext context = (SystemContext) this.getContext();
-		if(CaseBase.TYPE_COMPLAIN == Integer.valueOf(this.type)){ //客管投诉管理员和超级管理员
+		if (CaseBase.TYPE_COMPLAIN == Integer.valueOf(this.type)) { // 客管投诉管理员和超级管理员
 			return !context.hasAnyRole(getText("key.role.bs.advice.keguan"),
 					getText("key.role.bc.admin"));
-		}else{ //公司投诉管理员和超级管理员
+		} else { // 公司投诉管理员和超级管理员
 			return !context.hasAnyRole(getText("key.role.bs.advice.gongsi"),
 					getText("key.role.bc.admin"));
 		}
@@ -152,24 +154,25 @@ public class CaseAdvicesAction extends ViewAction<Map<String, Object>> {
 	protected List<Column> getGridColumns() {
 		List<Column> columns = new ArrayList<Column>();
 		columns.add(new IdColumn4MapKey("a.id", "id"));
-		if(type.length() > 0 && Integer.valueOf(type) == Case4Advice.TYPE_COMPLAIN){ //客管投诉
+		if (type.length() > 0
+				&& Integer.valueOf(type) == Case4Advice.TYPE_COMPLAIN) { // 客管投诉
 			columns.add(new TextColumn4MapKey("a.receive_code", "receive_code",
 					getText("runcase.receiveCode"), 100).setSortable(true)
 					.setUseTitleFromLabel(true));
-		}else{
+		} else {
 			columns.add(new TextColumn4MapKey("a.receive_code", "receive_code",
-					getText("runcase.company.receiveCode"), 100).setSortable(true)
-					.setUseTitleFromLabel(true));
+					getText("runcase.company.receiveCode"), 100).setSortable(
+					true).setUseTitleFromLabel(true));
 		}
 		columns.add(new TextColumn4MapKey("b.status_", "status_",
 				getText("runcase.status"), 40).setSortable(true)
 				.setValueFormater(new EntityStatusFormater(getBSStatuses2())));
-//		columns.add(new TextColumn4MapKey("a.advice_type", "advice_type",
-//				getText("runcase.adviceType"), 40).setSortable(true)
-//				.setValueFormater(new KeyValueFormater(getType())));
-//		columns.add(new TextColumn4MapKey("a.receive_date", "receive_date",
-//				getText("runcase.receiveDate3"), 130).setSortable(true)
-//				.setValueFormater(new CalendarFormater("yyyy-MM-dd HH:mm")));
+		// columns.add(new TextColumn4MapKey("a.advice_type", "advice_type",
+		// getText("runcase.adviceType"), 40).setSortable(true)
+		// .setValueFormater(new KeyValueFormater(getType())));
+		// columns.add(new TextColumn4MapKey("a.receive_date", "receive_date",
+		// getText("runcase.receiveDate3"), 130).setSortable(true)
+		// .setValueFormater(new CalendarFormater("yyyy-MM-dd HH:mm")));
 		columns.add(new TextColumn4MapKey("b.company", "company",
 				getText("runcase.company"), 60).setSortable(true));
 		columns.add(new TextColumn4MapKey("bia.name", "batch_company",
@@ -206,22 +209,22 @@ public class CaseAdvicesAction extends ViewAction<Map<String, Object>> {
 					}));
 		}
 		if (carManId == null) {
-		columns.add(new TextColumn4MapKey("b.driver_name", "driver_name",
-				getText("runcase.driverName"), 70).setSortable(true)
-				.setValueFormater(
-					new LinkFormater4Id(this.getContextPath()
-							+ "/bc-business/carMan/edit?id={0}",
-							"drivers") {
-						@SuppressWarnings("unchecked")
-						@Override
-						public String getIdValue(Object context,
-								Object value) {
-							return StringUtils
-									.toString(((Map<String, Object>) context)
-											.get("driverId"));
-						}
-					}));
-		
+			columns.add(new TextColumn4MapKey("b.driver_name", "driver_name",
+					getText("runcase.driverName"), 70).setSortable(true)
+					.setValueFormater(
+							new LinkFormater4Id(this.getContextPath()
+									+ "/bc-business/carMan/edit?id={0}",
+									"drivers") {
+								@SuppressWarnings("unchecked")
+								@Override
+								public String getIdValue(Object context,
+										Object value) {
+									return StringUtils
+											.toString(((Map<String, Object>) context)
+													.get("driverId"));
+								}
+							}));
+
 		}
 		columns.add(new TextColumn4MapKey("b.driver_cert", "driver_cert",
 				getText("runcase.FWZGCert"), 70).setSortable(true)
@@ -241,59 +244,61 @@ public class CaseAdvicesAction extends ViewAction<Map<String, Object>> {
 					@Override
 					public String format(Object context, Object value) {
 						Map<String, Object> advice = (Map<String, Object>) context;
-						if(advice.get("path_from").toString().length() == 0
-						   || advice.get("path_to").toString().length() == 0){
+						if (advice.get("path_from").toString().length() == 0
+								|| advice.get("path_to").toString().length() == 0) {
 							return "";
 						}
-						return "从"+ advice.get("path_from") + "到"
+						return "从" + advice.get("path_from") + "到"
 								+ advice.get("path_to");
 					}
-				})
-		);
+				}));
 		columns.add(new TextColumn4MapKey("a.charger", "charger",
 				getText("runcase.chargers"), 170).setUseTitleFromLabel(true)
-				.setValueFormater(new LinkFormater4ChargerInfo(this
-						.getContextPath()))
-		);
+				.setValueFormater(
+						new LinkFormater4ChargerInfo(this.getContextPath())));
 		columns.add(new TextColumn4MapKey("c.bs_type", "bs_type",
 				getText("runcase.businessType"), 80));
 		columns.add(new TextColumn4MapKey("man.origin", "origin",
 				getText("runcase.origin"), 150));
-//		columns.add(new TextColumn4MapKey("a.detail", "detail",
-//				getText("runcase.detail"), 150).setSortable(true)
-//				.setUseTitleFromLabel(true));
-//		columns.add(new TextColumn4MapKey("b.closer_name", "closer_name",
-//				getText("runcase.closerName"), 70));
-//		columns.add(new TextColumn4MapKey("b.close_date", "close_date",
-//				getText("runcase.closeDate"), 100).setSortable(true)
-//				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
-//		columns.add(new TextColumn4MapKey("a.advisor_name", "advisor_name",
-//				getText("runcase.advisorName"), 70).setSortable(true));
-//		columns.add(new TextColumn4MapKey("b.source", "source",
-//				getText("runcase.source"), 60).setSortable(true).setUseTitleFromLabel(true)
-//				.setValueFormater(new AbstractFormater<String>() {
-//					@Override
-//					public String format(Object context, Object value) {
-//						// 从上下文取出元素Map
-//						@SuppressWarnings("unchecked")
-//						Map<String, Object> obj = (Map<String, Object>) context;
-//						if(null != obj.get("from_") && obj.get("from_").toString().length() > 0){
-//							return getSourceStatuses().get(obj.get("source")+"") + " - " + obj.get("from_");
-//						}else if(null != obj.get("source") && obj.get("source").toString().length() > 0){
-//							return getSourceStatuses().get(obj.get("source")+"");
-//						}else{
-//							return "";
-//						}
-//					}
-//				}));
+		// columns.add(new TextColumn4MapKey("a.detail", "detail",
+		// getText("runcase.detail"), 150).setSortable(true)
+		// .setUseTitleFromLabel(true));
+		// columns.add(new TextColumn4MapKey("b.closer_name", "closer_name",
+		// getText("runcase.closerName"), 70));
+		// columns.add(new TextColumn4MapKey("b.close_date", "close_date",
+		// getText("runcase.closeDate"), 100).setSortable(true)
+		// .setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+		// columns.add(new TextColumn4MapKey("a.advisor_name", "advisor_name",
+		// getText("runcase.advisorName"), 70).setSortable(true));
+		// columns.add(new TextColumn4MapKey("b.source", "source",
+		// getText("runcase.source"),
+		// 60).setSortable(true).setUseTitleFromLabel(true)
+		// .setValueFormater(new AbstractFormater<String>() {
+		// @Override
+		// public String format(Object context, Object value) {
+		// // 从上下文取出元素Map
+		// @SuppressWarnings("unchecked")
+		// Map<String, Object> obj = (Map<String, Object>) context;
+		// if(null != obj.get("from_") && obj.get("from_").toString().length() >
+		// 0){
+		// return getSourceStatuses().get(obj.get("source")+"") + " - " +
+		// obj.get("from_");
+		// }else if(null != obj.get("source") &&
+		// obj.get("source").toString().length() > 0){
+		// return getSourceStatuses().get(obj.get("source")+"");
+		// }else{
+		// return "";
+		// }
+		// }
+		// }));
 
 		return columns;
 	}
 
 	@Override
 	protected String[] getGridSearchFields() {
-		return new String[] { "b.subject", "b.car_plate",
-				"a.receive_code", "b.driver_name", "b.driver_cert","c.code" };
+		return new String[] { "b.subject", "b.car_plate", "a.receive_code",
+				"b.driver_name", "b.driver_cert", "c.code" };
 	}
 
 	@Override
@@ -303,19 +308,19 @@ public class CaseAdvicesAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected String getHtmlPageTitle() {
-		if(Integer.valueOf(type) == CaseBase.TYPE_COMPLAIN){
+		if (Integer.valueOf(type) == CaseBase.TYPE_COMPLAIN) {
 			return this.getText("caseAdvice1.title");
-		}else{
+		} else {
 			return this.getText("caseAdvice2.title");
 		}
 	}
-	
+
 	@Override
 	protected PageOption getHtmlPageOption() {
 		return super.getHtmlPageOption().setWidth(900).setMinWidth(400)
 				.setHeight(400).setMinHeight(300);
 	}
-	
+
 	@Override
 	protected String getGridRowLabelExpression() {
 		return "['car_plate']+'\t 的投诉信息'";
@@ -324,9 +329,9 @@ public class CaseAdvicesAction extends ViewAction<Map<String, Object>> {
 	@Override
 	protected Condition getGridSpecalCondition() {
 		// 状态条件
-		Condition statusCondition = ConditionUtils.toConditionByComma4IntegerValue(this.status,
-				"b.status_");
-		
+		Condition statusCondition = ConditionUtils
+				.toConditionByComma4IntegerValue(this.status, "b.status_");
+
 		// carManId条件
 		Condition carManIdCondition = null;
 		if (carManId != null) {
@@ -337,14 +342,14 @@ public class CaseAdvicesAction extends ViewAction<Map<String, Object>> {
 		if (carId != null) {
 			carIdCondition = new EqualsCondition("b.car_id", carId);
 		}
-		
-		//投诉分类type(2:客管投诉,6:公司投诉)
-		Condition typeCondition = ConditionUtils.toConditionByComma4IntegerValue(this.type,
-				"b.type_");
-		
+
+		// 投诉分类type(2:客管投诉,6:公司投诉)
+		Condition typeCondition = ConditionUtils
+				.toConditionByComma4IntegerValue(this.type, "b.type_");
+
 		// 合并条件
-		return ConditionUtils.mix2AndCondition(statusCondition,carManIdCondition,
-				carIdCondition,typeCondition);
+		return ConditionUtils.mix2AndCondition(statusCondition,
+				carManIdCondition, carIdCondition, typeCondition);
 	}
 
 	@Override
@@ -371,18 +376,73 @@ public class CaseAdvicesAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected Toolbar getHtmlPageToolbar() {
-		return super.getHtmlPageToolbar().addButton(
-				Toolbar.getDefaultToolbarRadioGroup(
-						this.getBSStatuses2(), "status", 0,
-						getText("title.click2changeSearchStatus")));
+
+		Toolbar tb = new Toolbar();
+		if (this.isReadonly()) {
+			// 查看按钮
+			tb.addButton(getDefaultOpenToolbarButton());
+		} else {
+			// 新建按钮
+			tb.addButton(getDefaultCreateToolbarButton());
+
+			// 编辑按钮
+			tb.addButton(getDefaultEditToolbarButton());
+			// 删除
+			tb.addButton(getDefaultDeleteToolbarButton());
+			// 发起(客管)投诉流程
+			if (CaseBase.TYPE_COMPLAIN == Integer.valueOf(this.type)) {
+				tb.addButton(new ToolbarButton().setIcon("ui-icon-play")
+						.setText(getText("runcase.startFlow"))
+						.setClick("bs.caseAdviceView.startFlow"));
+			}
+
+		}
+		// 客管投诉添加“处理中”按钮
+		if (CaseBase.TYPE_COMPLAIN == Integer.valueOf(this.type)) {
+			tb.addButton(Toolbar.getDefaultToolbarRadioGroup(
+					this.getBSStatuses3(), "status", 0,
+					getText("title.click2changeSearchStatus")));
+		} else {
+			tb.addButton(Toolbar.getDefaultToolbarRadioGroup(
+					this.getBSStatuses2(), "status", 0,
+					getText("title.click2changeSearchStatus")));
+		}
+
+		// 搜索按钮
+		tb.addButton(getDefaultSearchToolbarButton());
+
+		return tb;
+
 	}
-	
+
+	@Override
+	protected String getHtmlPageJs() {
+		return this.getContextPath() + "/bc-business/caseAdvice/view.js";
+	}
+
+	/**
+	 * 状态值转换列表：在案|处理中|结案|全部
+	 * 
+	 * @return
+	 */
+	protected Map<String, String> getBSStatuses3() {
+		Map<String, String> statuses = new LinkedHashMap<String, String>();
+		statuses.put(String.valueOf(BCConstants.STATUS_ENABLED),
+				getText("bs.status.active"));
+		statuses.put(String.valueOf(CaseBase.STATUS_HANDLING),
+				getText("runcase.select.status.handling"));
+		statuses.put(String.valueOf(BCConstants.STATUS_DISABLED),
+				getText("bs.status.closed"));
+		statuses.put("", getText("bs.status.all"));
+		return statuses;
+	}
+
 	@Override
 	protected String getGridDblRowMethod() {
 		// 强制为只读表单
 		return "bc.page.open";
 	}
-	
+
 	@Override
 	protected Condition getGridSearchCondition4OneField(String field,
 			String value) {
@@ -393,7 +453,6 @@ public class CaseAdvicesAction extends ViewAction<Map<String, Object>> {
 			return super.getGridSearchCondition4OneField(field, value);
 		}
 	}
-
 
 	/**
 	 * 获取类型(表扬,投诉)分类值转换列表
@@ -410,7 +469,7 @@ public class CaseAdvicesAction extends ViewAction<Map<String, Object>> {
 
 		return type;
 	}
-	
+
 	/**
 	 * 获取Entity的来源转换列表
 	 * 
@@ -426,13 +485,12 @@ public class CaseAdvicesAction extends ViewAction<Map<String, Object>> {
 				getText("runcase.select.source.sync.auto"));
 		return statuses;
 	}
-	
+
 	// ==高级搜索代码开始==
 	@Override
 	protected boolean useAdvanceSearch() {
 		return true;
 	}
-
 
 	private MotorcadeService motorcadeService;
 	private ActorService actorService;
@@ -448,7 +506,7 @@ public class CaseAdvicesAction extends ViewAction<Map<String, Object>> {
 	public void setMotorcadeService(MotorcadeService motorcadeService) {
 		this.motorcadeService = motorcadeService;
 	}
-	
+
 	@Autowired
 	public void setOptionService(OptionService optionService) {
 		this.optionService = optionService;
@@ -468,13 +526,11 @@ public class CaseAdvicesAction extends ViewAction<Map<String, Object>> {
 		// 可选车队列表
 		motorcades = OptionItem.toLabelValues(this.motorcadeService
 				.find4Option(null));
-		
+
 		// 批量加载可选项列表
-				Map<String, List<Map<String, String>>> optionItems = this.optionService
-						.findOptionItemByGroupKeys(new String[] {
-							OptionConstants.CAR_BUSINESS_NATURE
-						});
-		
+		Map<String, List<Map<String, String>>> optionItems = this.optionService
+				.findOptionItemByGroupKeys(new String[] { OptionConstants.CAR_BUSINESS_NATURE });
+
 		// 营运性质列表
 		this.businessTypes = OptionItem.toLabelValues(
 				optionItems.get(OptionConstants.CAR_BUSINESS_NATURE), "value");
