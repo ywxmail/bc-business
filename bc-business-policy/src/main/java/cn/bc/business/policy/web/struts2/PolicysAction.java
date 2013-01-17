@@ -92,6 +92,13 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 		sql.append(",p.greenslip_no,p.greenslip_company,p.greenslip_start_date,p.greenslip_end_date,p.stop_date,p.main");
 		sql.append(",m.id as motorcade_id,p.liability_amount,p.commerial_amount,p.greenslip_amount,c.bs_type as bstype");
 		sql.append(",p.buy_plant");
+		//获取车辆最新在案的经济合同的结束日期（
+		sql.append(",(select cont.end_date");
+		sql.append(" from bs_contract cont");
+		sql.append(" inner join bs_car_contract carc on carc.contract_id=cont.id");
+		sql.append(" where cont.type_=2 and carc.car_id=p.car_id and cont.status_=0 limit 1");
+		sql.append(" ) as charge_end_date");
+		
 		sql.append(" from bs_car_policy p");
 		sql.append(" inner join bs_car c on c.id=p.car_id");
 		sql.append(" inner join bs_motorcade m on m.id=c.motorcade_id");
@@ -140,6 +147,7 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 				map.put("greenslip_amount", rs[i++]);// 强制险合计
 				map.put("bstype", rs[i++]);
 				map.put("buy_plant",rs[i++]);//承保险种
+				map.put("charge_end_date",rs[i++]);//经济合同结束日
 				return map;
 			}
 		});
@@ -285,6 +293,10 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 					.setSortable(true).setUseTitleFromLabel(true)
 					.setValueFormater(new NubmerFormater("###,###.00")));
 		}
+		// 经济合同结束日
+		columns.add(new TextColumn4MapKey("", "charge_end_date",
+				getText("policy.chargeEndDate"), 120).setSortable(true)
+				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
 		//承保险种
 		columns.add(new TextColumn4MapKey("p.buy_plant", "buy_plant",
 						getText("policy.insuranceType"),800).setUseTitleFromLabel(true));
@@ -292,6 +304,7 @@ public class PolicysAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("p.op_type", "op_type",
 				getText("policy.labour.optype")).setSortable(true)
 				.setValueFormater(new EntityStatusFormater(getEntityOpTypes())));
+		
 		
 		return columns;
 	}
