@@ -68,10 +68,11 @@ public class CarMan extends RichFileEntityImpl {
 
 	private Long mainCarId;// 主车辆Id
 	private String carInFo;// 营运车辆
-	private int moveType;// 迁移类型:1-公司到公司(已注销);2-注销未有去向;3-由外公司迁回;4-交回未注销;5-新入职;6-转车队;7-顶班;8-交回后转车
+	private int moveType;// 迁移类型:1-公司到公司(已注销);2-注销未有去向;3-由外公司迁回;4-交回未注销;5-新入职;6-转车队;7-替班安排;8-交回后转车
 	private Calendar moveDate;// 迁移日期
 	private Calendar shiftworkEndDate;// 顶班合同期结束日期
-	private int classes;// 营运班次：'营运班次:如0-""、1-正班、2-副班、3-顶班、4-主挂'
+	private int classes;// 营运班次：'营运班次:如0-""、1-正班、2-副班、3-替班(主挂)、4-替班
+						// 、5-公共替班(主挂)、6-公共替班'
 
 	// 历史遗留
 	private String model;// 准驾车型

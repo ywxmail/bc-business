@@ -82,6 +82,8 @@ public class ShiftworkByDriverAction extends
 		// 设置迁移类型为顶班
 		this.getE().setMoveType(CarByDriverHistory.MOVETYPE_DINGBAN);
 		this.getE().setStatus(BCConstants.STATUS_DRAFT);
+		// 顶班类型默认为顶班
+		this.getE().setToClasses(CarByDriver.TYPE_ZHUGUA);
 		// 状态列表
 		statusesValue = this.getBSStatuses3();
 
@@ -117,7 +119,7 @@ public class ShiftworkByDriverAction extends
 		this.beforeSave(this.getE());
 		this.getE().setFromCar(null);
 		// 设置迁往主挂车的信息
-		this.getE().setToClasses(CarByDriver.TYPE_ZHUGUA);
+		//this.getE().setToClasses(CarByDriver.TYPE_ZHUGUA);
 		Car toCar = new Car();
 		toCar = this.carService.load(this.getE().getToCar().getId());
 		this.getE().setToMotorcadeId(toCar.getMotorcade().getId());
