@@ -1307,11 +1307,11 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 		sql.append(" and m.status_ in (0,1) and c.status_ in (0,1)");
 		// 排除相同责任人的旧记录
 		sql.append(" and not exists (select 1 from bs_carman_contract mci");
-		sql.append(" 	inner join bs_contract ci on ci.id = mci.contract_id");
-		sql.append("	inner join bs_contract_charger cci on cci.id=ci.id");
-		sql.append("	inner join bs_car_contract carci on carci.contract_id=ci.id");
-		sql.append("	where carci.car_id = carc.car_id and mci.man_id=mc.man_id and ci.status_ in (0,1) and ci.start_date > c.start_date ");
-		sql.append("    or( cc.agreement_start_date < current_date and cc.quitter_id =mc.man_id))");
+		sql.append(" inner join bs_contract ci on ci.id = mci.contract_id");
+		sql.append(" inner join bs_contract_charger cci on cci.id=ci.id");
+		sql.append(" inner join bs_car_contract carci on carci.contract_id=ci.id");
+		sql.append(" where carci.car_id = carc.car_id and mci.man_id=mc.man_id and ci.status_ in (0,1) and ci.start_date > c.start_date ");
+		sql.append(" or( (cc.agreement_start_date < current_date or cc.agreement_start_date = current_date)and cc.quitter_id =mc.man_id))");
 		sql.append(" order by c.start_date desc");
 		if (logger.isDebugEnabled()) {
 			logger.debug("getMansFromContract4Charger:carId=" + carId + ";sql="
