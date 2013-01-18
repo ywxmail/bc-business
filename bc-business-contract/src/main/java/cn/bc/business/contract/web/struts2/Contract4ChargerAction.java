@@ -449,6 +449,11 @@ public class Contract4ChargerAction extends
 		if (e.getStatus() != BCConstants.STATUS_DRAFT) {
 			e.setOpType(Contract.OPTYPE_MAINTENANCE);
 		}
+		// 如果是草稿状态的合同表单需要获取上份合同的结束日期
+		if (e.getStatus() == BCConstants.STATUS_DRAFT) {
+			this.stopDate = e.getExt_str3();
+		}
+
 	}
 
 	@Override
