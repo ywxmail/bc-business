@@ -1,14 +1,17 @@
 package cn.bc.business.carman.web.struts2;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.poi.ss.usermodel.Cell;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
@@ -16,11 +19,9 @@ import org.springframework.stereotype.Controller;
 
 import cn.bc.business.car.service.CarService;
 import cn.bc.business.carman.domain.CarManRisk;
-import cn.bc.business.motorcade.service.MotorcadeService;
+import cn.bc.business.carman.service.CarManRiskService;
 import cn.bc.core.util.DateUtils;
 import cn.bc.docs.web.struts2.ImportDataAction;
-
-import com.google.gson.JsonObject;
 
 /**
  * 司机人意险数据的Action
@@ -35,30 +36,35 @@ public class ImportCarManRiskAction extends ImportDataAction {
 	private final static Log logger = LogFactory
 			.getLog(ImportCarManRiskAction.class);
 	public CarService carService;
-	private MotorcadeService motorcadeService;
+	private CarManRiskService carManRiskService;
+
+	@Autowired
+	public void setCarManRiskService(CarManRiskService carManRiskService) {
+		this.carManRiskService = carManRiskService;
+	}
 
 	@Autowired
 	public void setCarService(CarService carService) {
 		this.carService = carService;
 	}
 
-	@Autowired
-	public void setMotorcadeService(MotorcadeService motorcadeService) {
-		this.motorcadeService = motorcadeService;
-	}
-
 	@Override
-	protected void importData(List<Map<String, Object>> data, JsonObject json,
-			String fileType) {
-		DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+	protected void importData(List<Map<String, Object>> data, JSONObject json,
+			String fileType) throws JSONException {
 		Map<String, Object> map;
 		CarManRisk e;
 		int updateCount = 0;
-		int exceptionCount = 0;
 		String driverName, driverIdentity, buyType;
+		List<Map<String, Object>> error = new ArrayList<Map<String, Object>>();
+		Map<String, Object> driverInfo;
 		for (int i = 0; i < data.size(); i++) {
+			map = data.get(i);
+			if (logger.isDebugEnabled()) {
+				logger.debug("map:" + map);
+			}
+			driverName = (String) map.get("姓名");
+			driverIdentity = (String) map.get("身份证号");
 			try {
-				map = data.get(i);
 				e = new CarManRisk();
 				e.setCompany((String) map.get("保司"));
 				e.setCode((String) map.get("保险单号"));
@@ -66,8 +72,22 @@ public class ImportCarManRiskAction extends ImportDataAction {
 				e.setEndDate((Calendar) map.get("人意险到期日"));
 
 				// 查找司机信息
-				driverName = (String) map.get("姓名");
-				driverIdentity = (String) map.get("身份证号");
+				driverInfo = this.carManRiskService
+						.getCarManInfo(driverIdentity);// id,name
+				if (driverInfo == null) {
+					map.put("index", i);
+					map.put("msg", "找不到司机：" + driverName + "(" + driverIdentity
+							+ ")");
+					error.add(map);
+					continue;
+				} else if (!driverName.equals(driverInfo.get("name"))) {
+					map.put("index", i);
+					map.put("msg", "司机姓名与身份证不相符：" + driverName + "("
+							+ driverIdentity + ")");
+					error.add(map);
+					continue;
+				}
+				driverInfo.get("id");
 
 				// 确定购买方式
 				buyType = (String) map.get("是否跟公司购买");
@@ -82,18 +102,22 @@ public class ImportCarManRiskAction extends ImportDataAction {
 				// this.hcjtzService.save(e);
 			} catch (Exception e1) {
 				logger.warn(e1.getMessage(), e1);
-				exceptionCount++;
+				map.put("index", i);
+				map.put("msg", "未知异常：" + driverName + "(" + driverIdentity
+						+ ") - error=" + e1.getMessage());
+				error.add(map);
+				continue;
 			}
 		}
 		String msg;
-		if (exceptionCount > 0) {
+		if (!error.isEmpty()) {
 			if (updateCount > 0) {
-				msg = "成功导入" + (data.size() - updateCount - exceptionCount)
-						+ "条新数据，更新" + updateCount + "条现有数据，" + exceptionCount
+				msg = "成功导入" + (data.size() - updateCount - error.size())
+						+ "条新数据，更新" + updateCount + "条现有数据，" + error.size()
 						+ "条数据存在异常没有导入！";
 			} else {
-				msg = "成功导入" + (data.size() - exceptionCount) + "条新数据，"
-						+ exceptionCount + "条数据存在异常没有导入！";
+				msg = "成功导入" + (data.size() - error.size()) + "条新数据，"
+						+ error.size() + "条数据存在异常没有导入！";
 			}
 		} else {
 			if (updateCount > 0) {
@@ -103,7 +127,29 @@ public class ImportCarManRiskAction extends ImportDataAction {
 				msg = "成功导入" + data.size() + "条新数据！";
 			}
 		}
-		json.addProperty("msg", msg);
+
+		// 简短的处理结果描述信息
+		json.put("msg", msg);
+
+		// 记录详细的异常处理信息
+		if (!error.isEmpty()) {
+			JSONArray ejs = new JSONArray();
+			JSONObject ej;
+			for (Map<String, Object> m : error) {
+				ej = new JSONObject();
+				for (Entry<String, Object> entry : m.entrySet()) {
+					ej.put((String) entry.getKey(), entry.getValue());
+				}
+				ejs.put(ej);
+			}
+
+			json.put("detail", ejs);
+		}
+
+		if (logger.isDebugEnabled()) {
+			logger.debug("errorInfo:" + error);
+			logger.debug("msg:" + msg);
+		}
 	}
 
 	@Override
