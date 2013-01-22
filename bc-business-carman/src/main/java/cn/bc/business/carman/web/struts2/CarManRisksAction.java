@@ -366,6 +366,8 @@ public class CarManRisksAction extends ViewAction<Map<String, Object>> {
 		cfg.addProperty("tplCode", "IMPORT_CARMAN_RISK");// 模板编码
 		cfg.addProperty("importAction", "bc-business/carManRisk/import");// 导入数据的action路径(使用相对路径)
 		cfg.addProperty("headerRowIndex", 1);// 列标题所在行的索引号(0-based)
+		cfg.addProperty("ptype", "Import" + CarManRisk.KEY_UID);
+		cfg.addProperty("puid", CarManRisk.KEY_UID);
 		fb.setAttr("data-cfg", cfg.toString());
 
 		// 返回导入按钮

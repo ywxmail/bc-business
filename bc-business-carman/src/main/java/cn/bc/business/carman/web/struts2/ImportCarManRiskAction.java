@@ -4,12 +4,10 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.poi.ss.usermodel.Cell;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,16 +73,10 @@ public class ImportCarManRiskAction extends ImportDataAction {
 				driverInfo = this.carManRiskService
 						.getCarManInfo(driverIdentity);// id,name
 				if (driverInfo == null) {
-					map.put("index", i);
-					map.put("msg", "找不到司机：" + driverName + "(" + driverIdentity
-							+ ")");
-					error.add(map);
+					addErrorItem(error, map, i, "找不到身份证对应的司机");
 					continue;
 				} else if (!driverName.equals(driverInfo.get("name"))) {
-					map.put("index", i);
-					map.put("msg", "司机姓名与身份证不相符：" + driverName + "("
-							+ driverIdentity + ")");
-					error.add(map);
+					addErrorItem(error, map, i, "司机姓名与身份证不相符");
 					continue;
 				}
 				driverInfo.get("id");
@@ -102,10 +94,8 @@ public class ImportCarManRiskAction extends ImportDataAction {
 				// this.hcjtzService.save(e);
 			} catch (Exception e1) {
 				logger.warn(e1.getMessage(), e1);
-				map.put("index", i);
-				map.put("msg", "未知异常：" + driverName + "(" + driverIdentity
-						+ ") - error=" + e1.getMessage());
-				error.add(map);
+				addErrorItem(error, map, i, "未知异常：" + driverName + "("
+						+ driverIdentity + ") - error=" + e1.getMessage());
 				continue;
 			}
 		}
@@ -132,24 +122,7 @@ public class ImportCarManRiskAction extends ImportDataAction {
 		json.put("msg", msg);
 
 		// 记录详细的异常处理信息
-		if (!error.isEmpty()) {
-			JSONArray ejs = new JSONArray();
-			JSONObject ej;
-			for (Map<String, Object> m : error) {
-				ej = new JSONObject();
-				for (Entry<String, Object> entry : m.entrySet()) {
-					ej.put((String) entry.getKey(), entry.getValue());
-				}
-				ejs.put(ej);
-			}
-
-			json.put("detail", ejs);
-		}
-
-		if (logger.isDebugEnabled()) {
-			logger.debug("errorInfo:" + error);
-			logger.debug("msg:" + msg);
-		}
+		addErrorDetail(json, error);
 	}
 
 	@Override
@@ -170,5 +143,13 @@ public class ImportCarManRiskAction extends ImportDataAction {
 			return c;
 		}
 		return super.getCellValue(cell, columnName, fileType);
+	}
+
+	@Override
+	protected Object formatErrorItemValue(String key, Object value) {
+		if (key.equals("人意险起始日") || key.equals("人意险到期日")) {
+			return DateUtils.formatCalendar2Day((Calendar) value);
+		}
+		return super.formatErrorItemValue(key, value);
 	}
 }
