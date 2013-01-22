@@ -3,6 +3,7 @@
  */
 package cn.bc.business.carman.dao;
 
+import java.util.Calendar;
 import java.util.Map;
 
 import cn.bc.business.carman.domain.CarManRisk;
@@ -21,4 +22,23 @@ public interface CarManRiskDao extends CrudDao<CarManRisk> {
 	 * @return Keys:[id,name,identity]
 	 */
 	Map<String, Object> getCarManInfo(String identity);
+
+	/**
+	 * 通过保险单号查找保单
+	 * 
+	 * @param code
+	 * @return
+	 */
+	CarManRisk loadByCode(String code);
+
+	/**
+	 * 通过保险公司、有效期限查找保单
+	 * 
+	 * @param company
+	 * @param startDate
+	 * @param endDate
+	 * @return
+	 */
+	CarManRisk loadByCompanyAndDate(String company, Calendar startDate,
+			Calendar endDate);
 }

@@ -18,8 +18,6 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
-import com.google.gson.JsonObject;
-
 import cn.bc.business.carman.domain.CarByDriverHistory;
 import cn.bc.business.carman.domain.CarMan;
 import cn.bc.business.carman.domain.CarManRisk;
@@ -42,6 +40,7 @@ import cn.bc.identity.web.formater.SexFormater;
 import cn.bc.option.domain.OptionItem;
 import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.formater.EntityStatusFormater;
+import cn.bc.web.formater.KeyValueFormater;
 import cn.bc.web.ui.html.grid.Column;
 import cn.bc.web.ui.html.grid.FooterButton;
 import cn.bc.web.ui.html.grid.IdColumn4MapKey;
@@ -49,6 +48,8 @@ import cn.bc.web.ui.html.grid.TextColumn4MapKey;
 import cn.bc.web.ui.html.page.PageOption;
 import cn.bc.web.ui.html.toolbar.Toolbar;
 import cn.bc.web.ui.json.Json;
+
+import com.google.gson.JsonObject;
 
 /**
  * 司机人意险视图Action
@@ -83,8 +84,8 @@ public class CarManRisksAction extends ViewAction<Map<String, Object>> {
 
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer sql = new StringBuffer();
-		sql.append("select m.id as mid,m.status_ as mstatus,m.sex,m.name as mname,m.cert_fwzg,m.cert_identity,m.file_date");
-		sql.append(",r.id as rid,r.code,r.company as rcompany,r.holder,r.buy_type,r.start_date,r.end_date,r.file_date");
+		sql.append("select m.id as mid,m.status_ as mstatus,m.sex,m.name as mname,m.cert_fwzg,m.cert_identity,m.file_date as man_file_date");
+		sql.append(",r.id as rid,r.code,r.company as rcompany,r.holder,r.buy_type,r.start_date,r.end_date,r.file_date as risk_file_date");
 		sql.append(" from bs_carman_risk_insurant ri");
 		sql.append(" inner join bs_carman_risk r on r.id=ri.risk_id");
 		sql.append(" inner join bs_carman m on m.id=ri.man_id");
@@ -130,20 +131,20 @@ public class CarManRisksAction extends ViewAction<Map<String, Object>> {
 				getText("carManRisk.manFileDate"), 85).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
 		columns.add(new TextColumn4MapKey("m.name", "man_name",
-				getText("carManRisk.manName"), 60).setSortable(true));
-		columns.add(new TextColumn4MapKey("m.sex", "sex",
-				getText("carMan.sex"), 40).setSortable(true).setValueFormater(
+				getText("carManRisk.manName"), 50).setSortable(true));
+		columns.add(new TextColumn4MapKey("m.sex", "man_sex",
+				getText("carMan.sex"), 30).setSortable(true).setValueFormater(
 				new SexFormater()));
 		columns.add(new TextColumn4MapKey("m.cert_fwzg", "man_fwzg",
-				getText("carMan.cert4FWZG"), 80));
+				getText("carMan.cert4FWZG"), 65));
 		columns.add(new TextColumn4MapKey("m.cert_identity", "man_identity",
 				getText("carMan.cert4Indentity"), 150));
 		// =================
 		columns.add(new TextColumn4MapKey("r.code", "risk_code",
-				getText("carManRisk.code"), 80).setSortable(true)
+				getText("carManRisk.code"), 130).setSortable(true)
 				.setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("r.company", "risk_company",
-				getText("carManRisk.company"), 40).setSortable(true)
+				getText("carManRisk.company"), 50).setSortable(true)
 				.setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("r.start_date", "risk_start_date",
 				getText("carManRisk.startDate"), 85).setSortable(true)
@@ -151,23 +152,32 @@ public class CarManRisksAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("r.end_date", "risk_end_date",
 				getText("carManRisk.endDate"), 85).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+		columns.add(new TextColumn4MapKey("r.buyType", "risk_buyType",
+				getText("carManRisk.buyType"), 95).setSortable(true)
+				.setValueFormater(new KeyValueFormater(getBuyTypes())));
 		columns.add(new TextColumn4MapKey("r.holder", "risk_holder",
 				getText("carManRisk.holder"), 60).setSortable(true)
 				.setUseTitleFromLabel(true));
-		columns.add(new TextColumn4MapKey("r.buyType", "risk_buyType",
-				getText("carManRisk.buyType"), 95).setSortable(true));
 		columns.add(new TextColumn4MapKey("r.file_date", "risk_file_date",
 				getText("carManRisk.fileDate"), 120).setSortable(true)
-				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+				.setValueFormater(new CalendarFormater("yyyy-MM-dd HH:mm")));
 
 		return columns;
 	}
 
+	private Map<String, String> getBuyTypes() {
+		Map<String, String> type = new LinkedHashMap<String, String>();
+		type.put(String.valueOf(CarManRisk.BUY_TYPE_COMPANY),
+				getText("label.yes"));
+		type.put(String.valueOf(CarManRisk.BUY_TYPE_SELF), getText("label.no"));
+		type.put(String.valueOf(CarManRisk.BUY_TYPE_NONE), "");
+		return type;
+	}
+
 	@Override
 	protected String[] getGridSearchFields() {
-		return new String[] { "m.name", "m.origin", "m.cert_identity",
-				"m.cert_cyzg", "m.cert_fwzg", "m.phone", "c.company",
-				"bia.name", "mo.name", "m.carinfo", "c.code" };
+		return new String[] { "m.name", "m.cert_identity", "m.cert_fwzg",
+				"r.company", "r.code" };
 	}
 
 	@Override

@@ -3,6 +3,7 @@
  */
 package cn.bc.business.carman.dao.hibernate.jpa;
 
+import java.util.Calendar;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
@@ -13,6 +14,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 import cn.bc.business.carman.dao.CarManRiskDao;
 import cn.bc.business.carman.domain.CarManRisk;
+import cn.bc.core.query.condition.impl.AndCondition;
+import cn.bc.core.query.condition.impl.EqualsCondition;
 import cn.bc.orm.hibernate.jpa.HibernateCrudJpaDao;
 
 /**
@@ -41,5 +44,19 @@ public class CarManRiskDaoImpl extends HibernateCrudJpaDao<CarManRisk>
 		} catch (EmptyResultDataAccessException e) {
 			return null;
 		}
+	}
+
+	public CarManRisk loadByCode(String code) {
+		return this.createQuery().condition(new EqualsCondition("code", code))
+				.singleResult();
+	}
+
+	public CarManRisk loadByCompanyAndDate(String company, Calendar startDate,
+			Calendar endDate) {
+		AndCondition c = new AndCondition();
+		c.add(new EqualsCondition("company", company));
+		c.add(new EqualsCondition("startDate", startDate));
+		c.add(new EqualsCondition("endDate", endDate));
+		return this.createQuery().condition(c).singleResult();
 	}
 }
