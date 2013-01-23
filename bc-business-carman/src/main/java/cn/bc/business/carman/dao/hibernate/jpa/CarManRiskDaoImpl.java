@@ -4,6 +4,7 @@
 package cn.bc.business.carman.dao.hibernate.jpa;
 
 import java.util.Calendar;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
@@ -58,5 +59,13 @@ public class CarManRiskDaoImpl extends HibernateCrudJpaDao<CarManRisk>
 		c.add(new EqualsCondition("startDate", startDate));
 		c.add(new EqualsCondition("endDate", endDate));
 		return this.createQuery().condition(c).singleResult();
+	}
+
+	public List<String> findRiskCompanies() {
+		String sql = "select company from bs_carman_risk group by company order by company";
+		if (logger.isDebugEnabled()) {
+			logger.debug("sql=" + sql);
+		}
+		return this.jdbcTemplate.queryForList(sql, String.class);
 	}
 }

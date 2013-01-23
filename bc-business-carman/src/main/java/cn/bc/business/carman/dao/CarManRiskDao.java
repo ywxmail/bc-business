@@ -4,6 +4,7 @@
 package cn.bc.business.carman.dao;
 
 import java.util.Calendar;
+import java.util.List;
 import java.util.Map;
 
 import cn.bc.business.carman.domain.CarManRisk;
@@ -41,4 +42,11 @@ public interface CarManRiskDao extends CrudDao<CarManRisk> {
 	 */
 	CarManRisk loadByCompanyAndDate(String company, Calendar startDate,
 			Calendar endDate);
+
+	/**
+	 * 获取已有的保司名称列表
+	 * 
+	 * @return
+	 */
+	List<String> findRiskCompanies();
 }

@@ -4,6 +4,7 @@
 package cn.bc.business.carman.service;
 
 import java.util.Calendar;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,5 +40,9 @@ public class CarManRiskServiceImpl extends DefaultCrudService<CarManRisk>
 			Calendar endDate) {
 		return this.carManRiskDao.loadByCompanyAndDate(company, startDate,
 				endDate);
+	}
+
+	public List<String> findRiskCompanies() {
+		return this.carManRiskDao.findRiskCompanies();
 	}
 }

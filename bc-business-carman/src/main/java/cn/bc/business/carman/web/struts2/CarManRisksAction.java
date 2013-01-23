@@ -4,6 +4,8 @@
 package cn.bc.business.carman.web.struts2;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -21,6 +23,7 @@ import org.springframework.stereotype.Controller;
 import cn.bc.business.carman.domain.CarByDriverHistory;
 import cn.bc.business.carman.domain.CarMan;
 import cn.bc.business.carman.domain.CarManRisk;
+import cn.bc.business.carman.service.CarManRiskService;
 import cn.bc.business.motorcade.service.MotorcadeService;
 import cn.bc.business.web.struts2.ViewAction;
 import cn.bc.core.query.condition.Condition;
@@ -30,6 +33,7 @@ import cn.bc.core.query.condition.impl.EqualsCondition;
 import cn.bc.core.query.condition.impl.InCondition;
 import cn.bc.core.query.condition.impl.LikeCondition;
 import cn.bc.core.query.condition.impl.OrderCondition;
+import cn.bc.core.util.DateUtils;
 import cn.bc.core.util.StringUtils;
 import cn.bc.db.jdbc.RowMapper;
 import cn.bc.db.jdbc.SqlObject;
@@ -38,8 +42,8 @@ import cn.bc.identity.service.ActorService;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.identity.web.formater.SexFormater;
 import cn.bc.option.domain.OptionItem;
+import cn.bc.web.formater.AbstractFormater;
 import cn.bc.web.formater.CalendarFormater;
-import cn.bc.web.formater.EntityStatusFormater;
 import cn.bc.web.formater.KeyValueFormater;
 import cn.bc.web.ui.html.grid.Column;
 import cn.bc.web.ui.html.grid.FooterButton;
@@ -62,12 +66,18 @@ import com.google.gson.JsonObject;
 public class CarManRisksAction extends ViewAction<Map<String, Object>> {
 	private static final long serialVersionUID = 1L;
 	public String status = String.valueOf(CarManRisk.STATUS_ENABLED); // 状态，多个用逗号连接
+	private CarManRiskService carManRiskService;
+
+	@Autowired
+	public void setCarManRiskService(CarManRiskService carManRiskService) {
+		this.carManRiskService = carManRiskService;
+	}
 
 	@Override
 	public boolean isReadonly() {
 		// 司机人意险管理员或系统管理员
 		SystemContext context = (SystemContext) this.getContext();
-		return !context.hasAnyRole(getText("key.role.bs.driver.risk"),
+		return !context.hasAnyRole(getText("key.role.bs.carManRisk"),
 				getText("key.role.bc.admin"));
 	}
 
@@ -84,11 +94,17 @@ public class CarManRisksAction extends ViewAction<Map<String, Object>> {
 
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer sql = new StringBuffer();
-		sql.append("select m.id as mid,m.status_ as mstatus,m.sex,m.name as mname,m.cert_fwzg,m.cert_identity,m.file_date as man_file_date");
-		sql.append(",r.id as rid,r.code,r.company as rcompany,r.holder,r.buy_type,r.start_date,r.end_date,r.file_date as risk_file_date");
+		sql.append("select m.id as mid,m.status_ as mstatus,m.sex,m.name as mname");
+		sql.append(",m.cert_fwzg,m.cert_identity,m.file_date as man_file_date");
+		sql.append(",r.id as rid,r.code,r.company as rcompany,r.holder,r.buy_type");
+		sql.append(",r.start_date,r.end_date,r.file_date as risk_file_date");
+		sql.append(",c.company car_company,bia.name unit_name,mo.name motorcade_name");
 		sql.append(" from bs_carman_risk_insurant ri");
 		sql.append(" inner join bs_carman_risk r on r.id=ri.risk_id");
 		sql.append(" inner join bs_carman m on m.id=ri.man_id");
+		sql.append(" left join bs_car c on m.main_car_id=c.id");
+		sql.append(" left join bs_motorcade mo on c.motorcade_id=mo.id");
+		sql.append(" left join bc_identity_actor bia on bia.id=mo.unit_id");
 		sqlObject.setSql(sql.toString());
 
 		// 注入参数
@@ -114,6 +130,9 @@ public class CarManRisksAction extends ViewAction<Map<String, Object>> {
 				map.put("risk_start_date", rs[i++]);
 				map.put("risk_end_date", rs[i++]);
 				map.put("risk_file_date", rs[i++]);
+				map.put("car_company", rs[i++]);
+				map.put("unit_name", rs[i++]);
+				map.put("motorcade_name", rs[i++]);
 				return map;
 			}
 		});
@@ -124,37 +143,58 @@ public class CarManRisksAction extends ViewAction<Map<String, Object>> {
 	protected List<Column> getGridColumns() {
 		List<Column> columns = new ArrayList<Column>();
 		columns.add(new IdColumn4MapKey("r.id", "id"));
-		columns.add(new TextColumn4MapKey("m.status_", "man_status",
-				getText("carMan.status"), 40).setSortable(true)
-				.setValueFormater(new EntityStatusFormater(getBSStatuses3())));
-		columns.add(new TextColumn4MapKey("m.file_date", "man_file_date",
-				getText("carManRisk.manFileDate"), 85).setSortable(true)
-				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+		columns.add(new TextColumn4MapKey("r.start_date", "risk_start_date",
+				getText("carManRisk.status"), 40)
+				.setValueFormater(new AbstractFormater<String>() {
+					@Override
+					public String format(Object context, Object value) {
+						@SuppressWarnings("unchecked")
+						Map<String, Object> map = (Map<String, Object>) context;
+						Date now = Calendar.getInstance().getTime();
+						Date endDate = (Date) map.get("risk_end_date");
+						if(endDate == null){
+							return "长期";
+						}else if(now.before(endDate)){
+							return "正常";
+						}else if(now.after(endDate)){
+							return "已过期";
+						}
+						return null;
+					}
+				}));
+		columns.add(new TextColumn4MapKey("c.company", "car_company",
+				getText("carMan.company"), 40).setSortable(true));
+		columns.add(new TextColumn4MapKey("bia.name", "unit_name",
+				getText("carMan.unit_name"), 70).setSortable(true));
+		columns.add(new TextColumn4MapKey("mo.name", "motorcade_name",
+				getText("carMan.motorcade"), 70).setSortable(true));
 		columns.add(new TextColumn4MapKey("m.name", "man_name",
 				getText("carManRisk.manName"), 50).setSortable(true));
-		columns.add(new TextColumn4MapKey("m.sex", "man_sex",
-				getText("carMan.sex"), 30).setSortable(true).setValueFormater(
-				new SexFormater()));
-		columns.add(new TextColumn4MapKey("m.cert_fwzg", "man_fwzg",
-				getText("carMan.cert4FWZG"), 65));
 		columns.add(new TextColumn4MapKey("m.cert_identity", "man_identity",
 				getText("carMan.cert4Indentity"), 150));
-		// =================
-		columns.add(new TextColumn4MapKey("r.code", "risk_code",
-				getText("carManRisk.code"), 130).setSortable(true)
-				.setUseTitleFromLabel(true));
-		columns.add(new TextColumn4MapKey("r.company", "risk_company",
-				getText("carManRisk.company"), 50).setSortable(true)
-				.setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("r.start_date", "risk_start_date",
-				getText("carManRisk.startDate"), 85).setSortable(true)
+				getText("carManRisk.startDate"), 100).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
 		columns.add(new TextColumn4MapKey("r.end_date", "risk_end_date",
-				getText("carManRisk.endDate"), 85).setSortable(true)
+				getText("carManRisk.endDate"), 100).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+		columns.add(new TextColumn4MapKey("r.company", "risk_company",
+				getText("carManRisk.company"), 60).setSortable(true)
+				.setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("r.buyType", "risk_buyType",
 				getText("carManRisk.buyType"), 95).setSortable(true)
 				.setValueFormater(new KeyValueFormater(getBuyTypes())));
+		columns.add(new TextColumn4MapKey("r.code", "risk_code",
+				getText("carManRisk.code"), 135).setSortable(true)
+				.setUseTitleFromLabel(true));
+		columns.add(new TextColumn4MapKey("m.cert_fwzg", "man_fwzg",
+				getText("carMan.cert4FWZG"), 65));
+		columns.add(new TextColumn4MapKey("m.file_date", "man_file_date",
+				getText("carManRisk.manFileDate"), 85).setSortable(true)
+				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+		columns.add(new TextColumn4MapKey("m.sex", "man_sex",
+				getText("carMan.sex"), 30).setSortable(true).setValueFormater(
+				new SexFormater()));
 		columns.add(new TextColumn4MapKey("r.holder", "risk_holder",
 				getText("carManRisk.holder"), 60).setSortable(true)
 				.setUseTitleFromLabel(true));
@@ -289,21 +329,22 @@ public class CarManRisksAction extends ViewAction<Map<String, Object>> {
 	@Override
 	protected Toolbar getHtmlPageToolbar() {
 		Toolbar tb = new Toolbar();
+		tb.addButton(Toolbar.getDefaultEmptyToolbarButton());
 
 		if (this.isReadonly()) {
 			// 查看按钮
 			tb.addButton(this.getDefaultOpenToolbarButton());
 			// 新建按钮
-			tb.addButton(this.getDefaultCreateToolbarButton());
+			// tb.addButton(this.getDefaultCreateToolbarButton());
 		} else {
 			// 新建按钮
-			tb.addButton(this.getDefaultCreateToolbarButton());
+			// tb.addButton(this.getDefaultCreateToolbarButton());
 
 			// 编辑按钮
-			tb.addButton(this.getDefaultEditToolbarButton());
+			// tb.addButton(this.getDefaultEditToolbarButton());
 
 			// 删除按钮
-			tb.addButton(this.getDefaultDeleteToolbarButton());
+			// tb.addButton(this.getDefaultDeleteToolbarButton());
 		}
 
 		// 搜索按钮
@@ -333,6 +374,7 @@ public class CarManRisksAction extends ViewAction<Map<String, Object>> {
 	public JSONArray moveTypes;// 迁移类型
 	public JSONArray motorcades;// 车队的下拉列表信息
 	public JSONArray units;// 分公司的下拉列表信息
+	public JSONArray riskCompanies;// 保司列表
 
 	@Override
 	protected void initConditionsFrom() throws Exception {
@@ -360,6 +402,10 @@ public class CarManRisksAction extends ViewAction<Map<String, Object>> {
 		// 可选车队列表
 		motorcades = OptionItem.toLabelValues(this.motorcadeService
 				.find4Option(null));
+
+		// 可选保司列表
+		riskCompanies = new JSONArray(
+				this.carManRiskService.findRiskCompanies());
 	}
 
 	@Override
