@@ -126,6 +126,10 @@
 		<!--发起驾驶员客管投诉处理流程 -->
 		<action name="caseAdvice/startFlow" class="caseAdviceAction"
 			method="startFlow" />
+		<!--查找司机客管投诉事发日期前一年内的安全服务信息 -->
+		<action name="caseAdvice/getSecurityServiceInfoByCarManId"
+			class="caseAdviceAction" method="getSecurityServiceInfoByCarManId" />
+
 	</package>
 
 	<!-- 投诉建议操作 -->

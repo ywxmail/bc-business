@@ -48,4 +48,13 @@ public interface CaseAdviceService extends CrudService<Case4Advice> {
 	 * @return
 	 */
 	String doStartFlow(String key, Long[] ids);
+
+	/**
+	 * 根据司机ID和事发时间查找司机在事发日期向前推算一年内的安全服务信息
+	 * 
+	 * @param carManId司机id
+	 * @param happenDate事发日期
+	 * @return
+	 */
+	String getCaseTrafficInfoByCarManId(Long carManId, Calendar happenDate);
 }

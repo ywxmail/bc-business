@@ -33,6 +33,7 @@ import cn.bc.business.sync.service.JiaoWeiADVICEService;
 import cn.bc.business.web.struts2.FileEntityAction;
 import cn.bc.core.query.condition.Direction;
 import cn.bc.core.query.condition.impl.OrderCondition;
+import cn.bc.core.util.DateUtils;
 import cn.bc.core.util.StringUtils;
 import cn.bc.identity.domain.ActorDetail;
 import cn.bc.identity.web.SystemContext;
@@ -87,6 +88,7 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 	public Map<String, String> handlestatusesValue;
 	public Map<String, String> sourcesValue;
 	private Map<String, List<Map<String, String>>> allList;
+	public String happenDate;// 事发日期
 
 	public boolean isMultiple() {
 		return multiple;
@@ -813,7 +815,7 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 		// 去掉最后一个逗号
 		String[] _ids = tdIds.substring(0, tdIds.lastIndexOf(",")).split(",");
 		String count = this.caseAdviceService.doStartFlow(
-				getText("runcase.startFlow.key"),
+				getText("runcase.startFlow.key4ComplainHandle"),
 				StringUtils.stringArray2LongArray(_ids));
 		if (count.equals("0")) {
 			json.put("success", false);
@@ -825,6 +827,18 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 		}
 		this.json = json.toString();
 		return "json";
+	}
+
+	// --流程结束---
+
+	// 根据司机ID和事发时间查找司机在事发日期向前推算一年内的安全服务信息
+	public String getSecurityServiceInfoByCarManId() {
+		Calendar happenDate = DateUtils.getCalendar(this.happenDate);
+
+		this.json = this.caseAdviceService.getCaseTrafficInfoByCarManId(
+				carManId, happenDate);
+		return "json";
+
 	}
 
 }

@@ -12,12 +12,13 @@ import org.activiti.engine.task.Task;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import cn.bc.business.motorcade.dao.MotorcadeDao;
+import cn.bc.business.motorcade.domain.Motorcade;
 import cn.bc.business.runcase.dao.CaseAdviceDao;
 import cn.bc.business.runcase.domain.Case4Advice;
-import cn.bc.business.runcase.domain.Case4InfractTraffic;
 import cn.bc.business.runcase.domain.CaseBase;
 import cn.bc.core.exception.CoreException;
 import cn.bc.core.service.DefaultCrudService;
+import cn.bc.core.util.DateUtils;
 import cn.bc.sync.dao.SyncBaseDao;
 import cn.bc.sync.domain.SyncBase;
 import cn.bc.workflow.domain.WorkflowModuleRelation;
@@ -140,8 +141,7 @@ public class CaseAdviceServiceImpl extends DefaultCrudService<Case4Advice>
 			WorkflowModuleRelation workflowModuleRelation = new WorkflowModuleRelation();
 			workflowModuleRelation.setMid(id);
 			workflowModuleRelation.setPid(procInstId);
-			workflowModuleRelation.setMtype(Case4InfractTraffic.class
-					.getSimpleName());
+			workflowModuleRelation.setMtype(Case4Advice.class.getSimpleName());
 			this.workflowModuleRelationService.save(workflowModuleRelation);
 			// procInstIds += procInstId + ",";
 			// 将交通违法信息的状态更改为处理中
@@ -156,51 +156,92 @@ public class CaseAdviceServiceImpl extends DefaultCrudService<Case4Advice>
 	// 返回的全局参数
 	private Map<String, Object> returnParam(Case4Advice case4Advice,
 			Map<String, Object> variables) {
-		// variables.put("case4Advice_id", case4Advice.getId());
-		// variables.put("case4InfractTraffic_carPlate",
-		// case4InfractTraffic.getCarPlate());
-		// variables.put("case4InfractTraffic_carId",
-		// case4InfractTraffic.getCarId());
-		// variables.put("case4InfractTrafficr_motorcadeName",
-		// case4InfractTraffic.getMotorcadeName());
-		// variables.put("motorcadeId", case4InfractTraffic.getMotorcadeId());
-		// // 查找分公司Id
-		// if (case4Advice.getMotorcadeId() != null) {
-		// Motorcade m = this.motorcadeDao.load(case4InfractTraffic
-		// .getMotorcadeId());
-		// variables.put("filialeId", m.getUnit().getId());
-		// }
-		// variables.put("case4InfractTrafficr_from", case4InfractTraffic
-		// .getFrom() != null ? case4InfractTraffic.getFrom() : "");
-		// variables
-		// .put("case4InfractTraffic_happenDate",
-		// case4InfractTraffic.getHappenDate().getTime() != null ? DateUtils
-		// .formatCalendar(
-		// case4InfractTraffic.getHappenDate(),
-		// "yyyy-MM-dd HH:mm") : "");
-		// variables.put("case4InfractTrafficr_address",
-		// case4InfractTraffic.getAddress());
-		// variables.put("case4InfractTrafficr_subject", case4InfractTraffic
-		// .getSubject() != null ? case4InfractTraffic.getSubject() : "");
-		// // 组装主题
-		// variables
-		// .put("subject",
-		// case4InfractTraffic.getCarPlate()
-		// + "交通违法处理："
-		// + (case4InfractTraffic.getSubject() != null ? case4InfractTraffic
-		// .getSubject() : ""));
-		// variables.put("case4InfractTrafficr_infractCode",
-		// case4InfractTraffic.getInfractCode());
-		// variables.put("case4InfractTrafficr_jeom",
-		// case4InfractTraffic.getJeom());
-		// variables.put("case4InfractTrafficr_penalty",
-		// case4InfractTraffic.getPenalty());
-		// // 司机Id
-		// variables.put("case4InfractTrafficr_driverId", case4InfractTraffic
-		// .getDriverId() != null ? case4InfractTraffic.getDriverId()
-		// : null);
-		//
+		variables.put("case4Advice_id", case4Advice.getId());
+		// 受理号
+		variables.put("case4Advice_receiveCode", case4Advice.getReceiveCode());
+		// 投诉来源
+		variables.put("case4Advice_from",
+				case4Advice.getFrom() != null ? case4Advice.getFrom() : "");
+		// 站场
+		// 投诉人
+		variables.put("case4Advice_advisorName", case4Advice.getAdvisorName());
+
+		variables.put("motorcadeId", case4Advice.getMotorcadeId());
+		// 查找分公司Id
+		if (case4Advice.getMotorcadeId() != null) {
+			Motorcade m = this.motorcadeDao.load(case4Advice.getMotorcadeId());
+			variables.put("filialeId", m.getUnit().getId());
+		}
+		// 投诉电话
+		variables
+				.put("case4Advice_advisorPhone", case4Advice.getAdvisorPhone());
+		// 投诉人性别
+		variables.put("case4Advice_advisorSex", case4Advice.getAdvisorSex());
+		// 事发时间
+		variables.put(
+				"case4Advice_happenDate",
+				case4Advice.getHappenDate().getTime() != null ? DateUtils
+						.formatCalendar(case4Advice.getHappenDate(),
+								"yyyy-MM-dd HH:mm") : "");
+		// 乘车路线(从)
+		variables.put("case4Advice_pathFrom", case4Advice.getPathFrom());
+		// 乘车路线(到)
+		variables.put("case4Advice_pathTo", case4Advice.getPathTo());
+		// 乘车路线
+		variables.put("case4Advice_path", case4Advice.getPath());
+		// 车牌号码
+		variables.put("case4Advice_carPlate", case4Advice.getCarPlate());
+		// 车辆id
+		variables.put("case4Advice_carId", case4Advice.getCarId());
+		// 资格证号码
+		variables.put("case4Advice_driverCert", case4Advice.getDriverCert());
+		// 计价器显示
+		variables
+				.put("case4Advice_machinePrice", case4Advice.getMachinePrice());
+		// 实际收费
+		variables.put("case4Advice_charge", case4Advice.getCharge());
+		// 车色
+		variables.put("case4Advice_carColor", case4Advice.getCarColor());
+		// 乘车人数
+		variables
+				.put("case4Advice_number4Passenger",
+						"男："
+								+ (case4Advice.getPassengerManCount() != null ? case4Advice
+										.getPassengerManCount() : 0)
+								+ "女："
+								+ (case4Advice.getPassengerWomanCount() != null ? case4Advice
+										.getPassengerWomanCount() : 0)
+								+ "儿童："
+								+ (case4Advice.getPassengerChildCount() != null ? case4Advice
+										.getPassengerChildCount() : 0));
+		// 车票号码
+		variables.put("case4Advice_ticket", case4Advice.getTicket());
+		// 司机特征
+		variables.put("case4Advice_driverFeature",
+				case4Advice.getDriverFeature());
+		// 司机性别
+		variables.put("case4Advice_driverSex", case4Advice.getDriverSex());
+		// 投诉内容
+		variables.put("case4Advice_detail", case4Advice.getDetail());
+		// 组装主题
+		variables.put("subject", case4Advice.getCarPlate() + "客管投诉处理");
 		return variables;
+	}
+
+	public String getCaseTrafficInfoByCarManId(Long carManId,
+			Calendar happenDate) {
+		Calendar startDate = Calendar.getInstance();
+		// 开始日期为事发日期的前一年
+		startDate.set(Calendar.YEAR, happenDate.get(Calendar.YEAR) - 1);
+		startDate.set(Calendar.MONTH, happenDate.get(Calendar.MONTH));
+		startDate.set(Calendar.DAY_OF_MONTH,
+				happenDate.get(Calendar.DAY_OF_MONTH));
+		startDate.set(Calendar.HOUR_OF_DAY, 0);
+		startDate.set(Calendar.MINUTE, 0);
+		startDate.set(Calendar.SECOND, 0);
+
+		return this.caseAdviceDao.getCaseTrafficInfoByCarManId(carManId,
+				startDate, happenDate);
 	}
 
 }
