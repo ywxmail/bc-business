@@ -7,6 +7,8 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.poi.ss.usermodel.Cell;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
@@ -17,8 +19,6 @@ import cn.bc.business.runcase.service.Case4InfractCodeService;
 import cn.bc.docs.web.struts2.ImportDataAction;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.identity.web.SystemContextHolder;
-
-import com.google.gson.JsonObject;
 
 /**
  * 导入经营权数据的Action
@@ -41,8 +41,8 @@ public class ImportInfractCodeAction extends ImportDataAction {
 	}
 
 	@Override
-	protected void importData(List<Map<String, Object>> data, JsonObject json,
-			String fileType) {
+	protected void importData(List<Map<String, Object>> data, JSONObject json,
+			String fileType) throws JSONException {
 		Map<String, Object> map;
 		Case4InfractCode case4InfractCode;
 		int existeCode4Count = 0;// 数据库中已存在相同违法代码的数量
@@ -89,7 +89,7 @@ public class ImportInfractCodeAction extends ImportDataAction {
 				}
 			}
 		}
-		json.addProperty("msg", (existeCode4Count == 0 ? "成功导入" + data.size()
+		json.put("msg", (existeCode4Count == 0 ? "成功导入" + data.size()
 				+ "条数据！" : ((data.size() - existeCode4Count) == 0 ? "" : "成功导入"
 				+ (data.size() - existeCode4Count) + "条数据！")
 				+ "更新" + existeCode4Count + "条数据，其违法代码为：" + existeInfractCode));

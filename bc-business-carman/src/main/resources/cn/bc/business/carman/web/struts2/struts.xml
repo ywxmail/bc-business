@@ -154,4 +154,27 @@
 		<action name="findNewnestCarByDriver" class="selectNewnestCarByDriverAction"
 			method="findNewnestCarByDriver" />
 	</package>
+	
+	<!-- 司机人意险 -->
+	<package name="carManRisk" extends="bc-default" namespace="/bc-business/carManRisk">
+		<action name="create" class="carManRiskAction" method="create">
+			<result name="form">/bc-business/carMan/form.jsp</result>
+		</action>
+		<action name="open" class="carManRiskAction" method="open">
+			<result name="formr">/bc-business/carMan/form.jsp</result>
+		</action>
+		<action name="edit" class="carManRiskAction" method="edit">
+			<result name="form">/bc-business/carMan/form.jsp</result>
+		</action>
+		<action name="save" class="carManRiskAction" method="save" />
+		<action name="delete" class="carManRiskAction" method="delete" />
+		<action name="conditions" class="carManRiskAction" method="conditions">
+			<result name="success">/bc-business/carManRisk/conditions.jsp</result>
+		</action>
+	</package>
+	
+	<!-- 导入司机人意险数据 -->
+	<package name="importCarManRisk" extends="bc-default" namespace="/bc-business/carManRisk">
+		<action name="import" class="importCarManRiskAction" />
+	</package>
 </struts>
