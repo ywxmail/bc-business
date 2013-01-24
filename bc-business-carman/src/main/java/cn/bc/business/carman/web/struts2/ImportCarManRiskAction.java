@@ -1,6 +1,5 @@
 package cn.bc.business.carman.web.struts2;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -55,11 +54,9 @@ public class ImportCarManRiskAction extends ImportDataAction {
 			String fileType) throws JSONException {
 		Map<String, Object> map;
 		CarManRisk e;
-		int updateCount = 0;
 		String driverName, driverIdentity, buyType;
 		Integer driverId;
 		CarMan carMan;
-		List<Map<String, Object>> error = new ArrayList<Map<String, Object>>();
 		Map<String, Object> driverInfo;
 		for (int i = 0; i < data.size(); i++) {
 			map = data.get(i);
@@ -68,29 +65,29 @@ public class ImportCarManRiskAction extends ImportDataAction {
 			}
 			driverName = (String) map.get("姓名");
 			if (driverName == null || driverName.isEmpty()) {
-				addErrorItem(error, map, i, "姓名不能为空");
+				addErrorItem(map, i, "姓名不能为空");
 				continue;
 			}
 			driverIdentity = (String) map.get("身份证号");
 			if (driverIdentity == null || driverIdentity.isEmpty()) {
-				addErrorItem(error, map, i, "身份证不能为空");
+				addErrorItem(map, i, "身份证不能为空");
 				continue;
 			}
 			try {
 				String code = (String) map.get("保险单号");
 				String company = (String) map.get("保司");
 				if (company == null || company.isEmpty()) {
-					addErrorItem(error, map, i, "保司不能为空");
+					addErrorItem(map, i, "保司不能为空");
 					continue;
 				}
 				Calendar startDate = (Calendar) map.get("人意险起始日");
 				if (startDate == null) {
-					addErrorItem(error, map, i, "人意险起始日不能为空");
+					addErrorItem(map, i, "人意险起始日不能为空");
 					continue;
 				}
 				Calendar endDate = (Calendar) map.get("人意险到期日");
 				if (endDate == null) {
-					addErrorItem(error, map, i, "人意险到期日不能为空");
+					addErrorItem(map, i, "人意险到期日不能为空");
 					continue;
 				}
 
@@ -129,10 +126,10 @@ public class ImportCarManRiskAction extends ImportDataAction {
 				driverInfo = this.carManRiskService
 						.getCarManInfo(driverIdentity);// id,name
 				if (driverInfo == null) {
-					addErrorItem(error, map, i, "找不到身份证对应的司机");
+					addErrorItem(map, i, "找不到身份证对应的司机");
 					continue;
 				} else if (!driverName.equals(driverInfo.get("name"))) {
-					addErrorItem(error, map, i, "司机姓名与身份证不相符");
+					addErrorItem(map, i, "司机姓名与身份证不相符");
 					continue;
 				}
 				driverId = (Integer) driverInfo.get("id");
@@ -152,14 +149,14 @@ public class ImportCarManRiskAction extends ImportDataAction {
 					carMan = new CarMan();
 					carMan.setId(new Long(driverId));
 					insurants.add(carMan);
-				}else{
+				} else {
 					updateCount++;
 				}
 
 				// 确定购买方式
 				buyType = (String) map.get("是否跟公司购买");
 				if (buyType == null || buyType.isEmpty()) {
-					addErrorItem(error, map, i, "是否跟公司购买不能为空");
+					addErrorItem(map, i, "是否跟公司购买不能为空");
 					continue;
 				}
 				if ("是".equals(buyType))
@@ -173,35 +170,11 @@ public class ImportCarManRiskAction extends ImportDataAction {
 				this.carManRiskService.save(e);
 			} catch (Exception e1) {
 				logger.warn(e1.getMessage(), e1);
-				addErrorItem(error, map, i, "未知异常：" + driverName + "("
+				addErrorItem(map, i, "未知异常：" + driverName + "("
 						+ driverIdentity + ") - error=" + e1.getMessage());
 				continue;
 			}
 		}
-		String msg;
-		if (!error.isEmpty()) {
-			if (updateCount > 0) {
-				msg = "成功导入" + (data.size() - updateCount - error.size())
-						+ "条新数据，更新" + updateCount + "条现有数据，" + error.size()
-						+ "条数据存在异常没有导入！";
-			} else {
-				msg = "成功导入" + (data.size() - error.size()) + "条新数据，"
-						+ error.size() + "条数据存在异常没有导入！";
-			}
-		} else {
-			if (updateCount > 0) {
-				msg = "成功导入" + (data.size() - updateCount) + "条新数据，更新"
-						+ updateCount + "条现有数据！";
-			} else {
-				msg = "成功导入" + data.size() + "条新数据！";
-			}
-		}
-
-		// 简短的处理结果描述信息
-		json.put("msg", msg);
-
-		// 记录详细的异常处理信息
-		addErrorDetail(json, error);
 	}
 
 	@Override
