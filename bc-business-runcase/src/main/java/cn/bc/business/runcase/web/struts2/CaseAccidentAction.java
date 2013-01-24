@@ -152,7 +152,8 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 		attachsUI.addExtension(getText("app.attachs.extensions"))
 				.setMaxCount(Integer.parseInt(getText("app.attachs.maxCount")))
 				.setMaxSize(Integer.parseInt(getText("app.attachs.maxSize")));
-		attachsUI.setReadOnly(!this.getE().isNew());
+		// 状态为结案时显示只读状态
+		attachsUI.setReadOnly(this.getE().getStatus()==CaseBase.STATUS_CLOSED);
 		return attachsUI;
 	}
 
