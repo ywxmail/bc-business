@@ -110,7 +110,6 @@ public class ImportCarManRiskAction extends ImportDataAction {
 					e.setUid(this.idGeneratorService.next(CarManRisk.KEY_UID));
 				} else {// 已存在
 					code = e.getCode();
-					updateCount++;
 				}
 				e.setCompany(company);
 				e.setStartDate(startDate);
@@ -153,6 +152,8 @@ public class ImportCarManRiskAction extends ImportDataAction {
 					carMan = new CarMan();
 					carMan.setId(new Long(driverId));
 					insurants.add(carMan);
+				}else{
+					updateCount++;
 				}
 
 				// 确定购买方式
