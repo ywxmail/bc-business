@@ -244,7 +244,7 @@ public class CarManRisksAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected String getGridRowLabelExpression() {
-		return "['drvierName']";
+		return "['man_name']+'['+['risk_code']+']'";
 	}
 
 	@Override

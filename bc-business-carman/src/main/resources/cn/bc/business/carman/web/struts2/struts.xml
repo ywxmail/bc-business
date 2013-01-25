@@ -158,13 +158,13 @@
 	<!-- 司机人意险 -->
 	<package name="carManRisk" extends="bc-default" namespace="/bc-business/carManRisk">
 		<action name="create" class="carManRiskAction" method="create">
-			<result name="form">/bc-business/carMan/form.jsp</result>
+			<result name="form">/bc-business/carManRisk/form.jsp</result>
 		</action>
 		<action name="open" class="carManRiskAction" method="open">
-			<result name="formr">/bc-business/carMan/form.jsp</result>
+			<result name="formr">/bc-business/carManRisk/form.jsp</result>
 		</action>
 		<action name="edit" class="carManRiskAction" method="edit">
-			<result name="form">/bc-business/carMan/form.jsp</result>
+			<result name="form">/bc-business/carManRisk/form.jsp</result>
 		</action>
 		<action name="save" class="carManRiskAction" method="save" />
 		<action name="delete" class="carManRiskAction" method="delete" />

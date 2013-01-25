@@ -85,3 +85,6 @@ select m.status_,m.name,m.cert_fwzg,m.cert_identity
 	inner join bs_carman m on m.id=ri.man_id
 	order by m.status_ desc, m.file_date desc
 	
+delete from BS_CARMAN_RISK_INSURANT;
+delete from BS_CARMAN_RISK_ITEM;
+delete from BS_CARMAN_RISK;
