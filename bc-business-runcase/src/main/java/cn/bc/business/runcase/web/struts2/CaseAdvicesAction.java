@@ -96,6 +96,10 @@ public class CaseAdvicesAction extends ViewAction<Map<String, Object>> {
 		sql.append(",man.origin");
 		sql.append(",b.motorcade_id,b.car_id,b.driver_id");
 		sql.append(",bia.id batch_company_id,bia.name batch_company");
+		//最新参与流程信息
+		sql.append(",getnewprocessnameandtodotasknames4midmtyle(a.id,'");
+		sql.append(Case4Advice.class.getSimpleName());
+		sql.append("') as processInfo");
 		sql.append(" from BS_CASE_ADVICE a");
 		sql.append(" inner join BS_CASE_BASE b on b.id=a.id");
 		sql.append(" left join BS_CAR c on b.car_id = c.id");
@@ -143,6 +147,7 @@ public class CaseAdvicesAction extends ViewAction<Map<String, Object>> {
 				map.put("driverId", rs[i++]);
 				map.put("batch_company_id", rs[i++]);
 				map.put("batch_company", rs[i++]);
+				map.put("processInfo",rs[i++]);
 
 				return map;
 			}
@@ -234,6 +239,68 @@ public class CaseAdvicesAction extends ViewAction<Map<String, Object>> {
 				.setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("b.subject", "subject",
 				getText("runcase.subject2"), 180).setSortable(true));
+		if(!isReadonly()&&Integer.valueOf(type) == CaseBase.TYPE_COMPLAIN){
+			//最新参与流程信息
+			columns.add(new TextColumn4MapKey("", "processInfo",
+					getText("runcase.processInfo"), 350).setSortable(true)
+					.setUseTitleFromLabel(true)
+					.setValueFormater(new LinkFormater4Id(this.getContextPath()
+							+ "/bc-workflow/workspace/open?id={0}", "workspace") {
+						
+						@Override
+						public String getIdValue(Object context, Object value) {
+							@SuppressWarnings("unchecked")
+							String processInfo=StringUtils.toString(((Map<String, Object>) context).get("processInfo"));
+							if(processInfo==null||processInfo.length()==0)
+								return "";
+							
+							//获取流程id
+							return processInfo.split(";")[1];
+						}
+
+						@Override
+						public String getTaskbarTitle(Object context,
+								Object value) {
+							return "工作空间";
+						}
+
+						@Override
+						public String getLinkText(Object context, Object value) {
+							@SuppressWarnings("unchecked")
+							String processInfo=StringUtils.toString(((Map<String, Object>) context).get("processInfo"));
+							if(processInfo==null||processInfo.length()==0)
+								return "";
+							
+							String title="";
+							String[] processInfos=processInfo.split(";");
+							if(processInfos.length>2){
+								for(int i=2;i<processInfos.length;i++){
+									if(i+1==processInfos.length){
+										title+=processInfos[i];
+									}else{
+										title+=processInfos[i]+",";
+									}
+								}
+								title+="--";
+							}
+							return title+="["+processInfos[0]+"]";
+						}
+						
+						@Override
+						public String getWinId(Object context,
+								Object value) {
+							@SuppressWarnings("unchecked")
+							String processInfo=StringUtils.toString(((Map<String, Object>) context).get("processInfo"));
+							if(processInfo==null||processInfo.length()==0)
+								return "";
+							
+							//获取流程id
+							return this.moduleKey+"."+processInfo.split(";")[1];
+						}
+					}));
+		}
+		
+		
 		columns.add(new TextColumn4MapKey("b.happen_date", "happen_date",
 				getText("runcase.happenDate"), 125).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd HH:mm")));
@@ -297,8 +364,15 @@ public class CaseAdvicesAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected String[] getGridSearchFields() {
-		return new String[] { "b.subject", "b.car_plate", "a.receive_code",
-				"b.driver_name", "b.driver_cert", "c.code" };
+		
+		if (Integer.valueOf(type) == CaseBase.TYPE_COMPLAIN) {
+			return new String[] { "b.subject", "b.car_plate", "a.receive_code",
+					"b.driver_name", "b.driver_cert", "c.code"
+					,"getnewprocessnameandtodotasknames4midmtyle(a.id,'"+Case4Advice.class.getSimpleName()+"')" };
+		} else {
+			return new String[] { "b.subject", "b.car_plate", "a.receive_code",
+					"b.driver_name", "b.driver_cert", "c.code" };
+		}
 	}
 
 	@Override

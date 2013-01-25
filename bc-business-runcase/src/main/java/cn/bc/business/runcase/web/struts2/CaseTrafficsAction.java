@@ -19,6 +19,7 @@ import org.springframework.stereotype.Controller;
 import cn.bc.BCConstants;
 import cn.bc.business.OptionConstants;
 import cn.bc.business.motorcade.service.MotorcadeService;
+import cn.bc.business.runcase.domain.Case4InfractTraffic;
 import cn.bc.business.runcase.domain.CaseBase;
 import cn.bc.business.web.struts2.ViewAction;
 import cn.bc.core.query.condition.Condition;
@@ -86,6 +87,10 @@ public class CaseTrafficsAction extends ViewAction<Map<String, Object>> {
 		sql.append("select cit.id,b.status_,b.subject,b.motorcade_name,b.car_plate,b.driver_name,b.closer_name,b.happen_date");
 		sql.append(",b.close_date,b.address,b.from_,b.source,b.driver_cert,b.case_no,b.driver_id,b.car_id,b.company,c.code");
 		sql.append(",bia.id batch_company_id,bia.name batch_company,cit.infract_code,cit.penalty");
+		//最新参与流程信息
+		sql.append(",getnewprocessnameandtodotasknames4midmtyle(cit.id,'");
+		sql.append(Case4InfractTraffic.class.getSimpleName());
+		sql.append("') as processInfo");
 		sql.append(" from bs_case_infract_traffic cit inner join BS_CASE_BASE b on cit.id=b.id");
 		sql.append(" left join BS_CAR c on b.car_id = c.id");
 		sql.append(" left join BS_CARMAN man on b.driver_id=man.id");
@@ -124,6 +129,7 @@ public class CaseTrafficsAction extends ViewAction<Map<String, Object>> {
 				map.put("batch_company", rs[i++]);
 				map.put("infract_code", rs[i++]);
 				map.put("penalty", rs[i++]);
+				map.put("processInfo",rs[i++]);
 
 				return map;
 			}
@@ -202,6 +208,67 @@ public class CaseTrafficsAction extends ViewAction<Map<String, Object>> {
 				getText("runcase.address"), 120));
 		columns.add(new TextColumn4MapKey("b.case_no", "case_no",
 				getText("runcase.caseNo1"), 150).setUseTitleFromLabel(true));
+		if(!isReadonly()){
+			//最新参与流程信息
+			columns.add(new TextColumn4MapKey("", "processInfo",
+					getText("runcase.processInfo"), 350).setSortable(true)
+					.setUseTitleFromLabel(true)
+					.setValueFormater(new LinkFormater4Id(this.getContextPath()
+							+ "/bc-workflow/workspace/open?id={0}", "workspace") {
+						
+						@Override
+						public String getIdValue(Object context, Object value) {
+							@SuppressWarnings("unchecked")
+							String processInfo=StringUtils.toString(((Map<String, Object>) context).get("processInfo"));
+							if(processInfo==null||processInfo.length()==0)
+								return "";
+							
+							//获取流程id
+							return processInfo.split(";")[1];
+						}
+
+						@Override
+						public String getTaskbarTitle(Object context,
+								Object value) {
+							return "工作空间";
+						}
+
+						@Override
+						public String getLinkText(Object context, Object value) {
+							@SuppressWarnings("unchecked")
+							String processInfo=StringUtils.toString(((Map<String, Object>) context).get("processInfo"));
+							if(processInfo==null||processInfo.length()==0)
+								return "";
+							
+							String title="";
+							String[] processInfos=processInfo.split(";");
+							if(processInfos.length>2){
+								for(int i=2;i<processInfos.length;i++){
+									if(i+1==processInfos.length){
+										title+=processInfos[i];
+									}else{
+										title+=processInfos[i]+",";
+									}
+								}
+								title+="--";
+							}
+							return title+="["+processInfos[0]+"]";
+						}
+						
+						@Override
+						public String getWinId(Object context,
+								Object value) {
+							@SuppressWarnings("unchecked")
+							String processInfo=StringUtils.toString(((Map<String, Object>) context).get("processInfo"));
+							if(processInfo==null||processInfo.length()==0)
+								return "";
+							
+							//获取流程id
+							return this.moduleKey+"."+processInfo.split(";")[1];
+						}
+					}));
+		}
+		
 		columns.add(new TextColumn4MapKey("b.closer_name", "closer_name",
 				getText("runcase.closerName"), 70).setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("cit.infract_code", "infract_code",
@@ -220,7 +287,8 @@ public class CaseTrafficsAction extends ViewAction<Map<String, Object>> {
 	protected String[] getGridSearchFields() {
 		return new String[] { "b.case_no", "b.car_plate", "b.driver_name",
 				"b.motorcade_name", "b.closer_name", "b.subject",
-				"b.driver_cert", "c.code" };
+				"b.driver_cert", "c.code"
+				,"getnewprocessnameandtodotasknames4midmtyle(cit.id,'"+Case4InfractTraffic.class.getSimpleName()+"')"};
 	}
 
 	@Override
