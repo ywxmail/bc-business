@@ -163,6 +163,12 @@ public class CaseAdviceServiceImpl extends DefaultCrudService<Case4Advice>
 		variables.put("case4Advice_from",
 				case4Advice.getFrom() != null ? case4Advice.getFrom() : "");
 		// 站场
+		variables.put("case4Advice_yard", "");
+		// 转协查时间
+		variables.put("case4InfractTrafficr_turnInvestigationTime", "");
+		// 处理期限
+		variables.put("case4Advice_treatmentPeriod", "");
+
 		// 投诉人
 		variables.put("case4Advice_advisorName", case4Advice.getAdvisorName());
 
@@ -208,10 +214,10 @@ public class CaseAdviceServiceImpl extends DefaultCrudService<Case4Advice>
 						"男："
 								+ (case4Advice.getPassengerManCount() != null ? case4Advice
 										.getPassengerManCount() : 0)
-								+ "女："
+								+ "，女："
 								+ (case4Advice.getPassengerWomanCount() != null ? case4Advice
 										.getPassengerWomanCount() : 0)
-								+ "儿童："
+								+ "，儿童："
 								+ (case4Advice.getPassengerChildCount() != null ? case4Advice
 										.getPassengerChildCount() : 0));
 		// 车票号码
@@ -224,7 +230,8 @@ public class CaseAdviceServiceImpl extends DefaultCrudService<Case4Advice>
 		// 投诉内容
 		variables.put("case4Advice_detail", case4Advice.getDetail());
 		// 组装主题
-		variables.put("subject", case4Advice.getCarPlate() + "客管投诉处理");
+		variables.put("subject", "关于" + case4Advice.getCarPlate() + "客管投诉处理："
+				+ case4Advice.getSubject());
 		return variables;
 	}
 
@@ -242,6 +249,12 @@ public class CaseAdviceServiceImpl extends DefaultCrudService<Case4Advice>
 
 		return this.caseAdviceDao.getCaseTrafficInfoByCarManId(carManId,
 				startDate, happenDate);
+	}
+
+	public void updateCaseAdviceInfo4Flow(Long id,
+			Map<String, Object> attributes) {
+		this.caseAdviceDao.updateCaseAdviceInfo4Flow(id, attributes);
+
 	}
 
 }

@@ -166,7 +166,7 @@ public class CaseAdvicesAction extends ViewAction<Map<String, Object>> {
 		}
 		columns.add(new TextColumn4MapKey("b.status_", "status_",
 				getText("runcase.status"), 40).setSortable(true)
-				.setValueFormater(new EntityStatusFormater(getBSStatuses2())));
+				.setValueFormater(new EntityStatusFormater(getBSStatuses3())));
 		// columns.add(new TextColumn4MapKey("a.advice_type", "advice_type",
 		// getText("runcase.adviceType"), 40).setSortable(true)
 		// .setValueFormater(new KeyValueFormater(getType())));
