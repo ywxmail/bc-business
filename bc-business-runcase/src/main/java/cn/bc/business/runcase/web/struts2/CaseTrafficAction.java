@@ -463,7 +463,7 @@ public class CaseTrafficAction extends
 		// 去掉最后一个逗号
 		String[] _ids = tdIds.substring(0, tdIds.lastIndexOf(",")).split(",");
 		String count = this.caseTrafficService.doStartFlow(
-				getText("runcase.startFlow.key"),
+				getText("runcase.startFlow.key4CarTrafficHandle"),
 				StringUtils.stringArray2LongArray(_ids));
 		if (count.equals("0")) {
 			json.put("success", false);
