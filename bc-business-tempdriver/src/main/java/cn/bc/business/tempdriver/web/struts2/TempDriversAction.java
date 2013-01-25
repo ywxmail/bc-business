@@ -517,8 +517,8 @@ public class TempDriversAction extends ViewAction<Map<String, Object>> {
 			menuButton.addMenuItem(getText("tempDriver.workflow.carManEntry"),
 					"workflow.carManEntry");
 			// --批量发起司机服务资格证办理流程
-			menuButton.addMenuItem(getText("tempDriver.workflow.requestServiceCertificate"),
-					"workflow.requestServiceCertificate");
+			//menuButton.addMenuItem(getText("tempDriver.workflow.requestServiceCertificate"),
+					//"workflow.requestServiceCertificate");
 			// --批量修改面试日期
 			menuButton.addMenuItem(getText("tempDriver.operate.interviewDate"),
 					"operate.interviewDate");
