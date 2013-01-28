@@ -103,7 +103,6 @@ public class ImportCarManRiskAction extends ImportDataAction {
 					e = new CarManRisk();
 					e.setAuthor(SystemContextHolder.get().getUserHistory());
 					e.setFileDate(Calendar.getInstance());
-					e.setStatus(CarManRisk.STATUS_ENABLED);
 					e.setUid(this.idGeneratorService.next(CarManRisk.KEY_UID));
 				} else {// 已存在
 					code = e.getCode();

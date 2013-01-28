@@ -107,7 +107,7 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 		sql.append(",m.cert_cyzg,m.work_date,m.origin,m.former_unit,m.charger,m.cert_driving_first_date");
 		sql.append(",m.cert_driving,m.cert_driving_start_date,m.cert_driving_end_date,m.file_date,m.phone,m.phone1,m.sex,m.birthdate");
 		sql.append(",m.carinfo,m.move_type,mo.name motorcade,bia.name unit_name,m.classes,m.move_date,m.shiftwork_end_date,m.main_car_id");
-		sql.append(",c.company company,c.code,m.gz,m.model_,m.region_,m.modified_date,md.actor_name modifier");
+		sql.append(",c.company company,c.code,m.gz,m.model_,m.region_,getCarManRiskStatus(m.id) as risk,m.modified_date,md.actor_name modifier");
 		sql.append(",m.file_date,ad.actor_name author");
 		sql.append(" from BS_CARMAN m");
 		sql.append(" left join bs_car c on m.main_car_id=c.id");
@@ -164,6 +164,7 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 				map.put("gz", rs[i++]);
 				map.put("model_", rs[i++]);
 				map.put("region_", rs[i++]);
+				map.put("risk", rs[i++]);// 人意险购买情况
 				map.put("modified_date", rs[i++]);
 				map.put("modifier", rs[i++]);
 				map.put("file_date", rs[i++]);
@@ -300,6 +301,8 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("m.region_", "region_",
 				getText("carMan.region"), 60)
 				.setValueFormater(new KeyValueFormater(getRegion())));
+		columns.add(new TextColumn4MapKey("risk", "risk",
+				getText("carMan.risk"), 60));
 		columns.add(new TextColumn4MapKey("ad.actor_name", "author",
 				getText("carMan.author"), 80).setSortable(true));
 		columns.add(new TextColumn4MapKey("m.file_date", "file_date",

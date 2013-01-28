@@ -593,18 +593,28 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 			mans.addAll(toAdds);
 		}
 
-		// 获取司机对应的劳动合同的拼装信息
+		// 司机的id列表
 		Long[] ids = new Long[mans.size()];
 		for (int i = 0; i < mans.size(); i++) {
 			ids[i] = mans.get(i).getLong("id");
 		}
+		// 获取司机对应的劳动合同信息
 		Map<String, JSONObject> autoInfos = this
 				.getContract4Labours(carId, ids);
-		String id;
+		// 获取司机的人意险信息
+		Map<String, String> riskInfos = this.getCareManRisks(ids);
+		// 拼装自动获取的信息
+		String id, manId;
 		for (JSONObject _man : mans) {
-			id = carId + "." + _man.getString("id");
+			manId = _man.getString("id");
+			id = carId + "." + manId;
 			if (autoInfos.containsKey(id)) {
 				_man.put("autoInfo", autoInfos.get(id));
+			}
+			if (riskInfos.containsKey(manId)) {
+				_man.put("riskInfo", riskInfos.get(manId));
+			} else {
+				_man.put("riskInfo", "(未购买)");
 			}
 		}
 
@@ -612,6 +622,21 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 		Collections.sort(mans, new ManStatusComparator());
 
 		return new JSONArray(mans);
+	}
+
+	/**
+	 * 获取司机的人意险信息
+	 * <p>
+	 * 键为"司机ID",值为"人意险信息"
+	 * </p>
+	 * 
+	 * @param ids
+	 *            司机id列表
+	 * @return
+	 */
+	private Map<String, String> getCareManRisks(Long[] ids) {
+		// TODO
+		return new HashMap<String, String>();
 	}
 
 	private boolean exists(List<JSONObject> mans, long manId)
