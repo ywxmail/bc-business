@@ -139,7 +139,7 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 	@SuppressWarnings("static-access")
 	private AttachWidget buildAttachsUI(boolean isNew) {
 		// 构建附件控件
-		String ptype = "contractLabour.main";
+		String ptype = Case4Accident.ATTACH_TYPE;
 		AttachWidget attachsUI = new AttachWidget();
 		attachsUI.setFlashUpload(this.isFlashUpload());
 		attachsUI.addClazz("formAttachs");
@@ -281,7 +281,7 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 			}
 		}
 		this.getE().setUid(
-				this.getIdGeneratorService().next(this.getE().ATTACH_TYPE));
+				this.getIdGeneratorService().next(Case4Accident.ATTACH_TYPE));
 		// 事故编号自动生成为流水号
 		this.getE().setCode(
 				this.getIdGeneratorService().nextSN4Day(Case4Accident.KEY_CODE,
