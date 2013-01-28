@@ -83,7 +83,15 @@ select m.status_,m.name,m.cert_fwzg,m.cert_identity
 	from bs_carman_risk_insurant ri
 	inner join bs_carman_risk r on r.id=ri.risk_id
 	inner join bs_carman m on m.id=ri.man_id
-	order by m.status_ desc, m.file_date desc
+	order by m.status_ desc, m.file_date desc;
+	
+select m.status_,m.name,m.cert_fwzg,m.cert_identity
+	,r.code,r.company,r.holder,r.buy_type,r.start_date,r.end_date
+	from bs_carman m
+	left join bs_carman_risk_insurant ri on m.id=ri.man_id
+	left join bs_carman_risk r on r.id=ri.risk_id
+	where ri.man_id is null
+	order by m.status_ desc, m.file_date desc;
 	
 delete from BS_CARMAN_RISK_INSURANT;
 delete from BS_CARMAN_RISK_ITEM;
