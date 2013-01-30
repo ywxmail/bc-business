@@ -79,23 +79,4 @@ ALTER TABLE BS_CARMAN_RISK_ITEM ADD CONSTRAINT BCFK_CARMAN_RISK_ITEM_PID FOREIGN
 delete from BS_CARMAN_RISK_INSURANT;
 delete from BS_CARMAN_RISK_ITEM;
 delete from BS_CARMAN_RISK;
-
--- test
-select m.status_,m.name,m.cert_fwzg,m.cert_identity
-	,r.code,r.company,r.holder,r.buy_type,r.start_date,r.end_date
-	from bs_carman_risk_insurant ri
-	inner join bs_carman_risk r on r.id=ri.risk_id
-	inner join bs_carman m on m.id=ri.man_id
-	order by m.status_ desc, m.file_date desc;
-	
-select ri.man_id,r.id,r.end_date,case when r.end_date is null then '长期' 
-	when r.end_date >= current_date then '有效' 
-	else '已过期' end
-	from bs_carman_risk_insurant ri
-	inner join bs_carman_risk r on r.id=ri.risk_id
-	where ri.man_id in (102170,10146395,10094646,10061248)
-	order by r.end_date desc limit s;
-
-update bs_carman_risk set end_date = null where id=10413412;
-select current_date,current_time;
-select id from bs_carman where name='杨富国';
+select * from BS_CARMAN_RISK;

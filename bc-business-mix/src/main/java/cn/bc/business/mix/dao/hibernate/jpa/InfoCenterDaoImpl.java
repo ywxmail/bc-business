@@ -627,16 +627,73 @@ public class InfoCenterDaoImpl implements InfoCenterDao {
 	/**
 	 * 获取司机的人意险信息
 	 * <p>
-	 * 键为"司机ID",值为"人意险信息"
+	 * 键为"司机ID",值为"人意险信息"，格式为：2011-01-03～2013-01-02
 	 * </p>
 	 * 
 	 * @param ids
 	 *            司机id列表
 	 * @return
 	 */
-	private Map<String, String> getCareManRisks(Long[] ids) {
-		// TODO
-		return new HashMap<String, String>();
+	private Map<String, String> getCareManRisks(final Long[] ids) {
+		if (ids == null || ids.length == 0)
+			return new HashMap<String, String>();
+
+		final StringBuffer sql = new StringBuffer();
+		sql.append("select ri.man_id,r.start_date,r.end_date");
+		sql.append(" from bs_carman_risk_insurant ri");
+		sql.append(" inner join bs_carman_risk r on r.id=ri.risk_id");
+		if (ids.length == 1) {
+			sql.append(" where ri.man_id = ?");
+		} else {
+			sql.append(" where ri.man_id in(?");
+			for (int i = 1; i < ids.length; i++) {
+				sql.append(",?");
+			}
+			sql.append(")");
+		}
+		sql.append(" and not exists (");
+		sql.append("select 0 from bs_carman_risk_insurant ri1");
+		sql.append(" inner join bs_carman_risk r1 on r1.id=ri1.risk_id");
+		sql.append(" where ri1.man_id=ri.man_id and r1.end_date > r.end_date");
+		sql.append(")");
+
+		if (logger.isDebugEnabled()) {
+			logger.debug("ids=" + StringUtils.arrayToCommaDelimitedString(ids)
+					+ ";sql=" + sql);
+		}
+		return this.jpaTemplate.execute(new JpaCallback<Map<String, String>>() {
+			@SuppressWarnings("unchecked")
+			public Map<String, String> doInJpa(EntityManager em)
+					throws PersistenceException {
+				Query queryObject = em.createNativeQuery(sql.toString());
+				int i = 1;
+				for (Long id : ids) {
+					queryObject.setParameter(i, id);
+					i++;
+				}
+				Map<String, String> map = new HashMap<String, String>();
+				List<Object[]> list = (List<Object[]>) queryObject
+						.getResultList();
+				if (list == null || list.isEmpty())
+					return map;
+
+				String id, dateRange;
+				Date startDate, endDate;
+				for (Object[] m : list) {
+					id = m[0].toString();
+					startDate = (Date) m[1];
+					endDate = (Date) m[2];
+					dateRange = DateUtils.formatDate(startDate) + "～";
+					if (endDate == null) {
+						dateRange += "长期";
+					} else {
+						dateRange += DateUtils.formatDate(endDate);
+					}
+					map.put(id, dateRange);
+				}
+				return map;
+			}
+		});
 	}
 
 	private boolean exists(List<JSONObject> mans, long manId)
