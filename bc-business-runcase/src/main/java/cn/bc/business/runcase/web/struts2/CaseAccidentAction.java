@@ -150,7 +150,8 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 
 		// 上传附件的限制
 		attachsUI.addExtension(getText("app.attachs.extensions"))
-				.setMaxCount(Integer.parseInt(getText("app.attachs.maxCount")))
+				//最大数量30
+				.setMaxCount(30)
 				.setMaxSize(Integer.parseInt(getText("app.attachs.maxSize")));
 		// 状态为结案时显示只读状态
 		attachsUI.setReadOnly(this.getE().getStatus()==CaseBase.STATUS_CLOSED);
