@@ -339,7 +339,7 @@ public class BsSyncServiceImpl implements BsSyncService {
 	 * if(errorCount > 0){ strMsg.append(errorCount);//记录发生异常的数目 } return
 	 * news.size(); }
 	 */
-	
+
 	public int doSync4JiaoWeiYYWZ(ActorHistory syncer, Calendar fromDate,
 			Calendar toDate, StringBuffer strMsg) {
 		// 交委接口的宝城企业ID
@@ -361,8 +361,8 @@ public class BsSyncServiceImpl implements BsSyncService {
 		return count;
 	}
 
-	public int doSync4JiaoWeiYYWZ(String qyid,ActorHistory syncer, Calendar fromDate,
-			Calendar toDate, StringBuffer strMsg) {
+	public int doSync4JiaoWeiYYWZ(String qyid, ActorHistory syncer,
+			Calendar fromDate, Calendar toDate, StringBuffer strMsg) {
 		Date startTime = new Date();
 		// 交委接口的url
 		String jiaoWei_ws_uri = this.optionService.getItemValue("sync",
@@ -370,8 +370,8 @@ public class BsSyncServiceImpl implements BsSyncService {
 		String jiaoWei_ws_method = "GetMasterWZ";
 
 		// 从交委接口获取数据
-		DataSet dataSet = wsMiddle.findBreachOfBusiness(qyid,
-				fromDate, toDate, strMsg);
+		DataSet dataSet = wsMiddle.findBreachOfBusiness(qyid, fromDate, toDate,
+				strMsg);
 
 		// 发生异常就直接退出
 		if (strMsg.length() > 0)
@@ -517,8 +517,8 @@ public class BsSyncServiceImpl implements BsSyncService {
 	 * @param syncFrom
 	 * @param syncType
 	 */
-	public int doSync4JiaoWeiADVICE(String qyid,ActorHistory syncer, Calendar fromDate,
-			Calendar toDate, StringBuffer strMsg) {
+	public int doSync4JiaoWeiADVICE(String qyid, ActorHistory syncer,
+			Calendar fromDate, Calendar toDate, StringBuffer strMsg) {
 		Date startTime = new Date();
 
 		// 交委接口的url
@@ -527,8 +527,8 @@ public class BsSyncServiceImpl implements BsSyncService {
 		String jiaoWei_ws_method = "GetAccuseByQYID";
 
 		// 从交委接口获取数据
-		DataSet dataSet = wsMiddle.findAccuseAndAdvice(qyid,
-				fromDate, toDate, strMsg);
+		DataSet dataSet = wsMiddle.findAccuseAndAdvice(qyid, fromDate, toDate,
+				strMsg);
 
 		// 发生异常就直接退出
 		if (strMsg.length() > 0)
@@ -574,7 +574,7 @@ public class BsSyncServiceImpl implements BsSyncService {
 		domain.setSyncDate(createDate);
 		domain.setSyncType(syncType);
 		domain.setSyncFrom(syncFrom);
-//		domain.setcId(row.getCellStringValue("c_id"));
+		// domain.setcId(row.getCellStringValue("c_id"));
 		domain.setcId(row.getCellStringValue("c_id"));
 		domain.setSyncCode(row.getCellStringValue("tis_handle_no"));
 		domain.setReceiveCode(row.getCellStringValue("handle_no"));
@@ -601,6 +601,36 @@ public class BsSyncServiceImpl implements BsSyncService {
 		domain.setAdvisorCert(row.getCellStringValue("accuser_id"));
 		domain.setOldUnitName(row.getCellStringValue("taxi_dept"));
 		domain.setCarPlate(row.getCellStringValue("taxi_no"));
+		// 投诉来源
+		if (row.getCellStringValue("datafrom") != null
+				&& row.getCellStringValue("datafrom").length() > 0) {
+
+		}
+		// 乘车人数(男)
+		if (row.getCellStringValue("male_amount") != null
+				&& row.getCellStringValue("male_amount").length() > 0) {
+
+		}
+		// 乘车人数(女)
+		if (row.getCellStringValue("female_amount") != null
+				&& row.getCellStringValue("female_amount").length() > 0) {
+
+		}
+		// 乘车人数(童)
+		if (row.getCellStringValue("child_amount") != null
+				&& row.getCellStringValue("child_amount").length() > 0) {
+
+		}
+		// 转协查时间
+		if (row.getCellStringValue("child_amount") != null
+				&& row.getCellStringValue("child_amount").length() > 0) {
+
+		}
+		// 处理期限
+		if (row.getCellStringValue("待协查操作时限") != null
+				&& row.getCellStringValue("待协查操作时限").length() > 0) {
+
+		}
 
 		String plate = domain.getCarPlate();// 格式为粤A.XXXX
 		int index = plate.indexOf(".");
