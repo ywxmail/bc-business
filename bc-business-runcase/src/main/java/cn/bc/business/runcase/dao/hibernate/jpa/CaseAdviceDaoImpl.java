@@ -130,8 +130,14 @@ public class CaseAdviceDaoImpl extends HibernateCrudJpaDao<Case4Advice>
 		if (list4keguantousu.size() != 0) {
 			for (int i = 0; i < list4keguantousu.size(); i++) {
 				Map<String, Object> m = list4keguantousu.get(i);
-				keguantousuInfo += m.get("subject").toString()
-						+ m.get("count").toString() + "宗,";
+				if (i == 0) {
+					keguantousuInfo += m.get("subject").toString()
+							+ m.get("count").toString() + "宗";
+
+				} else {
+					keguantousuInfo += "," + m.get("subject").toString()
+							+ m.get("count").toString() + "宗";
+				}
 
 			}
 		}
