@@ -15,12 +15,15 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.util.StringUtils;
 
 import cn.bc.BCConstants;
 import cn.bc.business.runcase.dao.CaseAdviceDao;
 import cn.bc.business.runcase.domain.Case4Advice;
 import cn.bc.business.runcase.domain.CaseBase;
+import cn.bc.core.util.DateUtils;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.identity.web.SystemContextHolder;
 import cn.bc.orm.hibernate.jpa.HibernateCrudJpaDao;
@@ -75,24 +78,29 @@ public class CaseAdviceDaoImpl extends HibernateCrudJpaDao<Case4Advice>
 			Calendar startDate, Calendar endDate) {
 		StringBuffer hql = new StringBuffer();
 
+		String sql = "select subject,count(subject) from bs_case_base where (happen_date>to_date(?,'YYYY-MM-DD HH24:MI:SS') or happen_date=to_date(?,'YYYY-MM-DD HH24:MI:SS')) and (happen_date<to_date(?,'YYYY-MM-DD HH24:MI:SS') or happen_date=to_date(?,'YYYY-MM-DD HH24:MI:SS')) and driver_id=? and type_=? group by subject";
+
 		hql.append("select c.id from CaseBase c")
 				.append(" where ((c.happenDate>? or c.happenDate=?) and (c.happenDate<? or c.happenDate=?))")
 				.append(" and c.driverId=? and c.type=?");
-
-		logger.debug("carManId: "
-				+ carManId
-				+ " startDate:"
-				+ new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(startDate
-						.getTime())
-
-				+ " endDate:"
-				+ new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(endDate
-						.getTime()));
+		Object[] args = new Object[] { startDate, startDate, endDate, endDate,
+				carManId, CaseBase.TYPE_COMPLAIN };
+		if (logger.isDebugEnabled()) {
+			logger.debug("args="
+					+ StringUtils.arrayToCommaDelimitedString(args));
+			logger.debug("startDate="
+					+ DateUtils.formatCalendar2Second(startDate) + ",endDate="
+					+ DateUtils.formatCalendar2Second(endDate));
+			logger.debug("sql=" + sql);
+		}
 		// 客管投诉
-		List list4keguantousu = this.getJpaTemplate().find(
-				hql.toString(),
-				new Object[] { startDate, startDate, endDate, endDate,
-						carManId, CaseBase.TYPE_COMPLAIN });
+		List<Map<String, Object>> list4keguantousu = null;
+		try {
+			list4keguantousu = this.jdbcTemplate.queryForList(sql, args);
+
+		} catch (EmptyResultDataAccessException e) {
+			e.getStackTrace();
+		}
 
 		// 公司投诉
 		List list4gongsitousu = this.getJpaTemplate().find(
@@ -116,8 +124,28 @@ public class CaseAdviceDaoImpl extends HibernateCrudJpaDao<Case4Advice>
 				hql.toString(),
 				new Object[] { startDate, startDate, endDate, endDate,
 						carManId, CaseBase.TYPE_ACCIDENT });
+		// 组装客管投诉详细信息
+		String keguantousuInfo = "";
 
+		if (list4keguantousu.size() != 0) {
+			for (int i = 0; i < list4keguantousu.size(); i++) {
+				Map<String, Object> m = list4keguantousu.get(i);
+				if (i == 0) {
+					keguantousuInfo += m.get("subject").toString()
+							+ m.get("count").toString() + "宗";
+
+				} else {
+					keguantousuInfo += "," + m.get("subject").toString()
+							+ m.get("count").toString() + "宗";
+				}
+
+			}
+		}
 		Json json = new Json();
+		json.put("count4keguantousu", list4keguantousu.size());
+		if (keguantousuInfo.trim().length() != 0) {
+			json.put("keguantousuInfo", keguantousuInfo);
+		}
 		json.put("count4keguantousu", list4keguantousu.size());
 		json.put("count4gongsitousu", list4gongsitousu.size());
 		json.put("count4jiaotongweizhang", list4jiaotongweizhang.size());

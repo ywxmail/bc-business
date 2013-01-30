@@ -156,6 +156,13 @@ public class CaseAdviceServiceImpl extends DefaultCrudService<Case4Advice>
 	// 返回的全局参数
 	private Map<String, Object> returnParam(Case4Advice case4Advice,
 			Map<String, Object> variables) {
+		// 流转
+		variables.put("goTo", true);
+		// 服务督办员是否能办理任务
+		variables.put("isTransact4SupervisoryMember", false);
+		// 分公司经理是否能办理
+		variables.put("isTransact4BranchManager", false);
+
 		variables.put("case4Advice_id", case4Advice.getId());
 		// 受理号
 		variables.put("case4Advice_receiveCode", case4Advice.getReceiveCode());
@@ -177,7 +184,13 @@ public class CaseAdviceServiceImpl extends DefaultCrudService<Case4Advice>
 		if (case4Advice.getMotorcadeId() != null) {
 			Motorcade m = this.motorcadeDao.load(case4Advice.getMotorcadeId());
 			variables.put("filialeId", m.getUnit().getId());
+			variables.put("filiale", m.getUnit().getName());
+			variables.put("motorcade", m.getName());
+			// 车队长负责人
+			variables.put("principalName4motorcade", m.getPrincipalName());
+
 		}
+
 		// 投诉电话
 		variables
 				.put("case4Advice_advisorPhone", case4Advice.getAdvisorPhone());
@@ -232,6 +245,9 @@ public class CaseAdviceServiceImpl extends DefaultCrudService<Case4Advice>
 		// 组装主题
 		variables.put("subject", "关于" + case4Advice.getCarPlate() + "客管投诉处理："
 				+ case4Advice.getSubject());
+		// 投诉项目
+		variables
+				.put("case4Advice_complaintsProject", case4Advice.getSubject());
 		return variables;
 	}
 
