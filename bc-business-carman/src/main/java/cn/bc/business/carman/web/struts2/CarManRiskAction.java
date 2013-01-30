@@ -44,7 +44,6 @@ public class CarManRiskAction extends FileEntityAction<Long, CarManRisk> {
 	@Override
 	protected CarManRisk createEntity() {
 		CarManRisk carManRisk = super.createEntity();
-		carManRisk.setStatus(CarManRisk.STATUS_ENABLED);
 		carManRisk.setBuyType(CarManRisk.BUY_TYPE_NONE);
 		return carManRisk;
 	}

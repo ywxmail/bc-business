@@ -40,13 +40,6 @@ public class CarManRisk extends RichFileEntityImpl {
 	/** 购买类型：自买 */
 	public static final int BUY_TYPE_SELF = 2;
 
-	/** 状态：草稿 */
-	public static final int STATUS_DRAFT = -1;
-	/** 状态：正常 */
-	public static final int STATUS_ENABLED = 0;
-	/** 状态：禁用 */
-	public static final int STATUS_DISABLED = 1;
-
 	private String code;// 保单号
 	private String holder;// 投保人
 	private int buyType;// 购买类型：详见BUY_TYPE_XXX常数的定义

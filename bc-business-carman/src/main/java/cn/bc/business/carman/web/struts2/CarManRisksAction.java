@@ -7,34 +7,29 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.json.JSONArray;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
-import cn.bc.business.carman.domain.CarByDriverHistory;
-import cn.bc.business.carman.domain.CarMan;
 import cn.bc.business.carman.domain.CarManRisk;
 import cn.bc.business.carman.service.CarManRiskService;
 import cn.bc.business.motorcade.service.MotorcadeService;
 import cn.bc.business.web.struts2.ViewAction;
 import cn.bc.core.query.condition.Condition;
-import cn.bc.core.query.condition.ConditionUtils;
 import cn.bc.core.query.condition.Direction;
-import cn.bc.core.query.condition.impl.EqualsCondition;
-import cn.bc.core.query.condition.impl.InCondition;
+import cn.bc.core.query.condition.impl.GreaterThanOrEqualsCondition;
+import cn.bc.core.query.condition.impl.IsNullCondition;
+import cn.bc.core.query.condition.impl.LessThanCondition;
 import cn.bc.core.query.condition.impl.LikeCondition;
+import cn.bc.core.query.condition.impl.OrCondition;
 import cn.bc.core.query.condition.impl.OrderCondition;
-import cn.bc.core.util.DateUtils;
-import cn.bc.core.util.StringUtils;
 import cn.bc.db.jdbc.RowMapper;
 import cn.bc.db.jdbc.SqlObject;
 import cn.bc.identity.domain.Actor;
@@ -44,6 +39,7 @@ import cn.bc.identity.web.formater.SexFormater;
 import cn.bc.option.domain.OptionItem;
 import cn.bc.web.formater.AbstractFormater;
 import cn.bc.web.formater.CalendarFormater;
+import cn.bc.web.formater.EntityStatusFormater;
 import cn.bc.web.formater.KeyValueFormater;
 import cn.bc.web.ui.html.grid.Column;
 import cn.bc.web.ui.html.grid.FooterButton;
@@ -65,7 +61,15 @@ import com.google.gson.JsonObject;
 @Controller
 public class CarManRisksAction extends ViewAction<Map<String, Object>> {
 	private static final long serialVersionUID = 1L;
-	public String status = String.valueOf(CarManRisk.STATUS_ENABLED); // 状态，多个用逗号连接
+
+	/** 购买状态：有效 */
+	public static final int VIEW_STATUS_ENABLED = 0;
+	/** 购买状态：已过期 */
+	public static final int VIEW_STATUS_OVERDUE = 1;
+	/** 购买状态：全部 */
+	public static final int VIEW_STATUS_ALL = 9;
+	public int viewStatus = VIEW_STATUS_ENABLED;// 购买状态
+
 	private CarManRiskService carManRiskService;
 
 	@Autowired
@@ -85,7 +89,8 @@ public class CarManRisksAction extends ViewAction<Map<String, Object>> {
 	protected OrderCondition getGridDefaultOrderCondition() {
 		// 默认排序方向：状态|创建日期
 		return new OrderCondition("m.status_", Direction.Asc).add(
-				"m.file_date", Direction.Desc);
+				"m.file_date", Direction.Desc).add("r.start_date",
+				Direction.Desc);
 	}
 
 	@Override
@@ -93,19 +98,22 @@ public class CarManRisksAction extends ViewAction<Map<String, Object>> {
 		SqlObject<Map<String, Object>> sqlObject = new SqlObject<Map<String, Object>>();
 
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
-		StringBuffer sql = new StringBuffer();
-		sql.append("select m.id as mid,m.status_ as mstatus,m.sex,m.name as mname");
-		sql.append(",m.cert_fwzg,m.cert_identity,m.file_date as man_file_date");
-		sql.append(",r.id as rid,r.code,r.company as rcompany,r.holder,r.buy_type");
-		sql.append(",r.start_date,r.end_date,r.file_date as risk_file_date");
-		sql.append(",c.company car_company,bia.name unit_name,mo.name motorcade_name");
-		sql.append(" from bs_carman_risk_insurant ri");
-		sql.append(" inner join bs_carman_risk r on r.id=ri.risk_id");
-		sql.append(" inner join bs_carman m on m.id=ri.man_id");
-		sql.append(" left join bs_car c on m.main_car_id=c.id");
-		sql.append(" left join bs_motorcade mo on c.motorcade_id=mo.id");
-		sql.append(" left join bc_identity_actor bia on bia.id=mo.unit_id");
-		sqlObject.setSql(sql.toString());
+		StringBuffer select = new StringBuffer();
+		select.append("m.id as mid,m.status_ as mstatus,m.sex,m.name as mname");
+		select.append(",m.cert_fwzg,m.cert_identity,m.file_date as man_file_date");
+		select.append(",r.id as rid,r.code,r.company as rcompany,r.holder,r.buy_type");
+		select.append(",r.start_date,r.end_date,r.file_date as risk_file_date");
+		select.append(",c.company car_company,bia.name unit_name,mo.name motorcade_name");
+		sqlObject.setSelect(select.toString());
+
+		StringBuffer from = new StringBuffer();
+		from.append("bs_carman_risk_insurant ri");
+		from.append(" inner join bs_carman_risk r on r.id=ri.risk_id");
+		from.append(" inner join bs_carman m on m.id=ri.man_id");
+		from.append(" left join bs_car c on m.main_car_id=c.id");
+		from.append(" left join bs_motorcade mo on c.motorcade_id=mo.id");
+		from.append(" left join bc_identity_actor bia on bia.id=mo.unit_id");
+		sqlObject.setFrom(from.toString());
 
 		// 注入参数
 		sqlObject.setArgs(null);
@@ -144,7 +152,7 @@ public class CarManRisksAction extends ViewAction<Map<String, Object>> {
 		List<Column> columns = new ArrayList<Column>();
 		columns.add(new IdColumn4MapKey("r.id", "id"));
 		columns.add(new TextColumn4MapKey("r.start_date", "risk_start_date",
-				getText("carManRisk.status"), 40)
+				getText("carManRisk.status"), 55)
 				.setValueFormater(new AbstractFormater<String>() {
 					@Override
 					public String format(Object context, Object value) {
@@ -152,11 +160,11 @@ public class CarManRisksAction extends ViewAction<Map<String, Object>> {
 						Map<String, Object> map = (Map<String, Object>) context;
 						Date now = Calendar.getInstance().getTime();
 						Date endDate = (Date) map.get("risk_end_date");
-						if(endDate == null){
+						if (endDate == null) {
 							return "长期";
-						}else if(now.before(endDate)){
-							return "正常";
-						}else if(now.after(endDate)){
+						} else if (now.before(endDate)) {
+							return "有效";
+						} else if (now.after(endDate)) {
 							return "已过期";
 						}
 						return null;
@@ -169,7 +177,10 @@ public class CarManRisksAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("mo.name", "motorcade_name",
 				getText("carMan.motorcade"), 70).setSortable(true));
 		columns.add(new TextColumn4MapKey("m.name", "man_name",
-				getText("carManRisk.manName"), 50).setSortable(true));
+				getText("carManRisk.manName"), 55).setSortable(true));
+		columns.add(new TextColumn4MapKey("m.status_", "man_status",
+				getText("carManRisk.manStatus"), 55).setSortable(true)
+				.setValueFormater(new EntityStatusFormater(getBSStatuses3())));
 		columns.add(new TextColumn4MapKey("m.cert_identity", "man_identity",
 				getText("carMan.cert4Indentity"), 150));
 		columns.add(new TextColumn4MapKey("r.start_date", "risk_start_date",
@@ -238,98 +249,40 @@ public class CarManRisksAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected PageOption getHtmlPageOption() {
-		return super.getHtmlPageOption().setWidth(600).setMinWidth(300)
+		return super.getHtmlPageOption().setWidth(800).setMinWidth(300)
 				.setHeight(400).setMinHeight(300);
 	}
 
 	@Override
 	protected String getGridRowLabelExpression() {
-		return "['man_name']+'['+['risk_code']+']'";
+		return "'司机人意险保险单'+['risk_code']";
 	}
 
 	@Override
 	protected Condition getGridSpecalCondition() {
-		// 状态条件
-		Condition statusCondition = null;
-		if (status != null && status.length() > 0) {
-			String[] ss = status.split(",");
-			if (ss.length == 1) {
-				statusCondition = new EqualsCondition("m.status_", new Integer(
-						ss[0]));
-			} else {
-				statusCondition = new InCondition("m.status_",
-						StringUtils.stringArray2IntegerArray(ss));
-			}
-		} else {
-			return null;
+		// 保单状态
+		Condition viewStatusCondition = null;
+		if (this.viewStatus == VIEW_STATUS_ENABLED) {// 有效
+			Date now = Calendar.getInstance().getTime();
+			viewStatusCondition = new OrCondition().setAddBracket(true)
+					.add(new GreaterThanOrEqualsCondition("r.end_date", now))
+					.add(new IsNullCondition("r.end_date"));
+		} else if (this.viewStatus == VIEW_STATUS_OVERDUE) {// 已过期
+			Date now = Calendar.getInstance().getTime();
+			viewStatusCondition = new LessThanCondition("r.end_date", now);
 		}
-		// 合并条件
-		return ConditionUtils.mix2AndCondition(statusCondition);
-
+		return viewStatusCondition;
 	}
 
 	@Override
-	protected Json getGridExtrasData() {
-		if (this.status == null || this.status.length() == 0) {
-			return null;
-		} else {
-			Json json = new Json();
-			json.put("status", status);
-			return json;
-		}
-	}
-
-	/**
-	 * 获取司机分类值转换列表
-	 * 
-	 * @return
-	 */
-	protected Map<String, String> getType() {
-		Map<String, String> type = new LinkedHashMap<String, String>();
-		type.put(String.valueOf(CarMan.TYPE_DRIVER),
-				getText("carMan.type.driver"));
-		type.put(String.valueOf(CarMan.TYPE_CHARGER),
-				getText("carMan.type.charger"));
-		type.put(String.valueOf(CarMan.TYPE_DRIVER_AND_CHARGER),
-				getText("carMan.type.driverAndCharger"));
-		return type;
-	}
-
-	/**
-	 * 获取迁移类型值转换列表
-	 * 
-	 * @return
-	 */
-	protected Map<String, String> getMoveType() {
-		Map<String, String> type = new LinkedHashMap<String, String>();
-		type.put(String.valueOf(CarByDriverHistory.MOVETYPE_CLDCL),
-				getText("carByDriverHistory.moveType.cheliangdaocheliang"));
-		type.put(String.valueOf(CarByDriverHistory.MOVETYPE_GSDGSYZX),
-				getText("carByDriverHistory.moveType.gongsidaogongsiyizhuxiao"));
-		type.put(String.valueOf(CarByDriverHistory.MOVETYPE_ZXWYQX),
-				getText("carByDriverHistory.moveType.zhuxiaoweiyouquxiang"));
-		type.put(String.valueOf(CarByDriverHistory.MOVETYPE_YWGSQH),
-				getText("carByDriverHistory.moveType.youwaigongsiqianhui"));
-		type.put(String.valueOf(CarByDriverHistory.MOVETYPE_JHWZX),
-				getText("carByDriverHistory.moveType.jiaohuiweizhuxiao"));
-		type.put(String.valueOf(CarByDriverHistory.MOVETYPE_XRZ),
-				getText("carByDriverHistory.moveType.xinruzhi"));
-		type.put(String.valueOf(CarByDriverHistory.MOVETYPE_ZCD),
-				getText("carByDriverHistory.moveType.cheduidaochedui"));
-		type.put(String.valueOf(CarByDriverHistory.MOVETYPE_DINGBAN),
-				getText("carByDriverHistory.moveType.dingban"));
-		type.put(String.valueOf(CarByDriverHistory.MOVETYPE_JHZC),
-				getText("carByDriverHistory.moveType.jiaohuizhuanche"));
-		type.put(String.valueOf(CarByDriverHistory.MOVETYPE_WJZZX),
-				getText("carByDriverHistory.moveType.weijiaozhengzhuxiao"));
-		type.put(String.valueOf(CarByDriverHistory.MOVETYPE_NULL), "(无)");
-		return type;
+	protected void extendGridExtrasData(Json json) {
+		json.put("viewStatus", viewStatus);
 	}
 
 	@Override
 	protected Toolbar getHtmlPageToolbar() {
 		Toolbar tb = new Toolbar();
-		tb.addButton(Toolbar.getDefaultEmptyToolbarButton());
+		// tb.addButton(Toolbar.getDefaultEmptyToolbarButton());
 
 		if (this.isReadonly()) {
 			// 查看按钮
@@ -347,9 +300,25 @@ public class CarManRisksAction extends ViewAction<Map<String, Object>> {
 			// tb.addButton(this.getDefaultDeleteToolbarButton());
 		}
 
+		// 状态按钮组
+		tb.addButton(Toolbar.getDefaultToolbarRadioGroup(
+				this.getViewStatuses(), "viewStatus", 0,
+				getText("title.click2changeSearchStatus")));
+
 		// 搜索按钮
 		tb.addButton(this.getDefaultSearchToolbarButton());
 		return tb;
+	}
+
+	private Map<String, String> getViewStatuses() {
+		Map<String, String> vs = new LinkedHashMap<String, String>();
+		vs.put(String.valueOf(VIEW_STATUS_ENABLED),
+				getText("carManRisk.viewStatus.active"));// 有效
+		vs.put(String.valueOf(VIEW_STATUS_OVERDUE),
+				getText("carManRisk.viewStatus.overdue"));// 已过期
+		vs.put(String.valueOf(VIEW_STATUS_ALL),
+				getText("carManRisk.viewStatus.all"));// 全部
+		return vs;
 	}
 
 	@Override
@@ -371,29 +340,12 @@ public class CarManRisksAction extends ViewAction<Map<String, Object>> {
 		this.motorcadeService = motorcadeService;
 	}
 
-	public JSONArray moveTypes;// 迁移类型
 	public JSONArray motorcades;// 车队的下拉列表信息
 	public JSONArray units;// 分公司的下拉列表信息
 	public JSONArray riskCompanies;// 保司列表
 
 	@Override
 	protected void initConditionsFrom() throws Exception {
-		// 可选迁移类型列表
-		moveTypes = new JSONArray();
-		Map<String, String> mt = getMoveType();
-		if (mt != null) {
-			JSONObject json;
-			Iterator<String> iterator = mt.keySet().iterator();
-			String key;
-			while (iterator.hasNext()) {
-				key = iterator.next();
-				json = new JSONObject();
-				json.put("label", mt.get(key));
-				json.put("value", key);
-				moveTypes.put(json);
-			}
-		}
-
 		// 可选分公司列表
 		units = OptionItem.toLabelValues(this.actorService.find4option(
 				new Integer[] { Actor.TYPE_UNIT }, (Integer[]) null), "name",
