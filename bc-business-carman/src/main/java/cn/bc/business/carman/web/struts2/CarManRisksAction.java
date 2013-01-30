@@ -21,6 +21,7 @@ import org.springframework.stereotype.Controller;
 import cn.bc.business.carman.domain.CarManRisk;
 import cn.bc.business.carman.service.CarManRiskService;
 import cn.bc.business.motorcade.service.MotorcadeService;
+import cn.bc.business.web.struts2.LinkFormater4CarInfo;
 import cn.bc.business.web.struts2.ViewAction;
 import cn.bc.core.query.condition.Condition;
 import cn.bc.core.query.condition.Direction;
@@ -30,6 +31,7 @@ import cn.bc.core.query.condition.impl.LessThanCondition;
 import cn.bc.core.query.condition.impl.LikeCondition;
 import cn.bc.core.query.condition.impl.OrCondition;
 import cn.bc.core.query.condition.impl.OrderCondition;
+import cn.bc.core.util.StringUtils;
 import cn.bc.db.jdbc.RowMapper;
 import cn.bc.db.jdbc.SqlObject;
 import cn.bc.identity.domain.Actor;
@@ -41,6 +43,7 @@ import cn.bc.web.formater.AbstractFormater;
 import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.formater.EntityStatusFormater;
 import cn.bc.web.formater.KeyValueFormater;
+import cn.bc.web.formater.LinkFormater4Id;
 import cn.bc.web.ui.html.grid.Column;
 import cn.bc.web.ui.html.grid.FooterButton;
 import cn.bc.web.ui.html.grid.IdColumn4MapKey;
@@ -100,10 +103,11 @@ public class CarManRisksAction extends ViewAction<Map<String, Object>> {
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer select = new StringBuffer();
 		select.append("m.id as mid,m.status_ as mstatus,m.sex,m.name as mname");
-		select.append(",m.cert_fwzg,m.cert_identity,m.file_date as man_file_date");
+		select.append(",m.cert_fwzg,m.cert_identity,m.file_date as man_file_date,m.carinfo");
 		select.append(",r.id as rid,r.code,r.company as rcompany,r.holder,r.buy_type");
 		select.append(",r.start_date,r.end_date,r.file_date as risk_file_date");
-		select.append(",c.company car_company,bia.name unit_name,mo.name motorcade_name");
+		select.append(",c.id car_id,c.plate_type car_plate_type,c.plate_no car_plate_no,c.company car_company");
+		select.append(",c.manage_no,bia.name unit_name,mo.name motorcade_name");
 		sqlObject.setSelect(select.toString());
 
 		StringBuffer from = new StringBuffer();
@@ -130,6 +134,7 @@ public class CarManRisksAction extends ViewAction<Map<String, Object>> {
 				map.put("man_fwzg", rs[i++]);
 				map.put("man_identity", rs[i++]);
 				map.put("man_file_date", rs[i++]);
+				map.put("man_carinfo", rs[i++]);
 				map.put("id", rs[i++]);
 				map.put("risk_code", rs[i++]);
 				map.put("risk_company", rs[i++]);
@@ -138,7 +143,11 @@ public class CarManRisksAction extends ViewAction<Map<String, Object>> {
 				map.put("risk_start_date", rs[i++]);
 				map.put("risk_end_date", rs[i++]);
 				map.put("risk_file_date", rs[i++]);
+				map.put("car_id", rs[i++]);
+				map.put("car_plate_type", rs[i++]);
+				map.put("car_plate_no", rs[i++]);
 				map.put("car_company", rs[i++]);
+				map.put("car_manage_no", rs[i++]);
 				map.put("unit_name", rs[i++]);
 				map.put("motorcade_name", rs[i++]);
 				return map;
@@ -176,11 +185,32 @@ public class CarManRisksAction extends ViewAction<Map<String, Object>> {
 				getText("carMan.unit_name"), 70).setSortable(true));
 		columns.add(new TextColumn4MapKey("mo.name", "motorcade_name",
 				getText("carMan.motorcade"), 70).setSortable(true));
+		// 司机
 		columns.add(new TextColumn4MapKey("m.name", "man_name",
-				getText("carManRisk.manName"), 55).setSortable(true));
+				getText("carManRisk.manName"), 55).setSortable(true)
+				.setValueFormater(
+						new LinkFormater4Id(this.getContextPath()
+								+ "/bc-business/carMan/edit?id={0}", "carMan") {
+							@SuppressWarnings("unchecked")
+							@Override
+							public String getIdValue(Object context,
+									Object value) {
+								return StringUtils
+										.toString(((Map<String, Object>) context)
+												.get("man_id"));
+							}
+						}));
 		columns.add(new TextColumn4MapKey("m.status_", "man_status",
 				getText("carManRisk.manStatus"), 55).setSortable(true)
 				.setValueFormater(new EntityStatusFormater(getBSStatuses3())));
+		// 车辆
+		columns.add(new TextColumn4MapKey("m.carinfo", "man_carinfo",
+				getText("carMan.operationCar"), 110)
+				.setValueFormater(new LinkFormater4CarInfo(this
+						.getContextPath())));
+		columns.add(new TextColumn4MapKey("c.manage_no", "car_manage_no",
+				getText("carMan.carManageNo"), 70).setSortable(true));
+
 		columns.add(new TextColumn4MapKey("m.cert_identity", "man_identity",
 				getText("carMan.cert4Indentity"), 150));
 		columns.add(new TextColumn4MapKey("r.start_date", "risk_start_date",
@@ -207,7 +237,7 @@ public class CarManRisksAction extends ViewAction<Map<String, Object>> {
 				getText("carMan.sex"), 30).setSortable(true).setValueFormater(
 				new SexFormater()));
 		columns.add(new TextColumn4MapKey("r.holder", "risk_holder",
-				getText("carManRisk.holder"), 60).setSortable(true)
+				getText("carManRisk.holder"), 180).setSortable(true)
 				.setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("r.file_date", "risk_file_date",
 				getText("carManRisk.fileDate"), 120).setSortable(true)
