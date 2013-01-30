@@ -139,7 +139,7 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 	@SuppressWarnings("static-access")
 	private AttachWidget buildAttachsUI(boolean isNew) {
 		// 构建附件控件
-		String ptype = "contractLabour.main";
+		String ptype = Case4Accident.ATTACH_TYPE;
 		AttachWidget attachsUI = new AttachWidget();
 		attachsUI.setFlashUpload(this.isFlashUpload());
 		attachsUI.addClazz("formAttachs");
@@ -152,7 +152,8 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 		attachsUI.addExtension(getText("app.attachs.extensions"))
 				.setMaxCount(Integer.parseInt(getText("app.attachs.maxCount")))
 				.setMaxSize(Integer.parseInt(getText("app.attachs.maxSize")));
-		attachsUI.setReadOnly(!this.getE().isNew());
+		// 状态为结案时显示只读状态
+		attachsUI.setReadOnly(this.getE().getStatus()==CaseBase.STATUS_CLOSED);
 		return attachsUI;
 	}
 
@@ -280,7 +281,7 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 			}
 		}
 		this.getE().setUid(
-				this.getIdGeneratorService().next(this.getE().ATTACH_TYPE));
+				this.getIdGeneratorService().next(Case4Accident.ATTACH_TYPE));
 		// 事故编号自动生成为流水号
 		this.getE().setCode(
 				this.getIdGeneratorService().nextSN4Day(Case4Accident.KEY_CODE,

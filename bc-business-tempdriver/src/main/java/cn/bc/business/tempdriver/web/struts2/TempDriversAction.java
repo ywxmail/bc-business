@@ -30,6 +30,7 @@ import cn.bc.identity.web.SystemContext;
 import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.formater.DateRangeFormater;
 import cn.bc.web.formater.KeyValueFormater;
+import cn.bc.web.formater.LinkFormater4Id;
 import cn.bc.web.ui.html.grid.Column;
 import cn.bc.web.ui.html.grid.FooterButton;
 import cn.bc.web.ui.html.grid.IdColumn4MapKey;
@@ -78,24 +79,30 @@ public class TempDriversAction extends ViewAction<Map<String, Object>> {
 		SqlObject<Map<String, Object>> sqlObject = new SqlObject<Map<String, Object>>();
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer sql = new StringBuffer();
-		sql.append("SELECT t.id,t.name,t.sex,t.birthdate,t.origin,t.region_ as region,t.address,t.new_addr as newAddress,t.phone");
+		sql.append("select t.id,t.name,t.sex,t.birthdate,t.origin,t.region_ as region,t.address,t.new_addr as newAddress,t.phone");
 		sql.append(",t.cert_identity as certIdentity,t.cert_fwzg as fwzg,t.cert_cyzg as cyzg,t.education,t.nation");
 		sql.append(",t.marry,t.desc_ as desc,t.phone");
 		//sql.append(",w.offer_status as ostatus");
 		sql.append(",t.status_ as status,d.status_ as bstatus,t.valid_start_date as validStartDate ,t.valid_end_date as validEndDate");
 		sql.append(",t.file_date,u.actor_name as aname,t.modified_date,m.actor_name as mname");
-
 		sql.append(",t.interview_date as interviewDate,t.register_date as registerDate,t.credit_desc as creditDesc");
 		sql.append(",t.crime_recode as crimeRecode,t.back_ground as backGround,t.entry_car as entryCar");
 		sql.append(",t.apply_attribute as applyAttr,t.former_unit as formerUnit,t.issue,t.is_crime_recode");
-		sql.append(" FROM bs_temp_driver t");
-		sql.append(" INNER JOIN bc_identity_actor_history u on u.id=t.author_id");
-		//sql.append(" LEFT JOIN bs_temp_driver_workflow w on w.pid=t.id");
-		sql.append(" LEFT JOIN bs_carman d on d.cert_identity = t.cert_identity");
-		sql.append(" LEFT JOIN bc_identity_actor_history m on m.id=t.modifier_id");
+		sql.append(",t.model_ as model,t.cert_driving,t.cert_driving_start_date,t.cert_driving_end_date");
+		sql.append(",t.cert_driving_archive");
+
+		//最新参与流程信息
+		sql.append(",getnewprocessnameandtodotasknames4midmtyle(t.id,'");
+		sql.append(TempDriver.WORKFLOW_MTYPE);
+		sql.append("') as processInfo");
+		
+		sql.append(" from bs_temp_driver t");
+		sql.append(" inner join bc_identity_actor_history u on u.id=t.author_id");
+		sql.append(" left join bs_carman d on d.cert_identity = t.cert_identity");
+		sql.append(" left join bc_identity_actor_history m on m.id=t.modifier_id");
 
 		sqlObject.setSql(sql.toString());
-
+		
 		// 注入参数
 		sqlObject.setArgs(null);
 
@@ -140,6 +147,12 @@ public class TempDriversAction extends ViewAction<Map<String, Object>> {
 				map.put("formerUnit",rs[i++]);
 				map.put("issue",rs[i++]);
 				map.put("isCrimeRecode",rs[i++]);
+				map.put("model",rs[i++]);
+				map.put("certDriving",rs[i++]);
+				map.put("certDrivingStartDate",rs[i++]);
+				map.put("certDrivingEndDate",rs[i++]);
+				map.put("certDrivingArchive",rs[i++]);
+				map.put("processInfo",rs[i++]);
 				
 				return map;
 			}
@@ -228,32 +241,11 @@ public class TempDriversAction extends ViewAction<Map<String, Object>> {
 		s.put("","");
 		return s;
 	}
-	
-	/**
-	 * 录用状态值转换列表：0=审核中，1=录用，2=不录用
-	 * 
-	 * @return
-	 */
-	/*protected Map<String, String> getOfferStatusValues() {
-		Map<String, String> s = new LinkedHashMap<String, String>();
-		s.put(String.valueOf(TempDriverWorkFlow.OFFER_STATUS_CHECK),
-				getText("tempDriverWorkFlow.offerStatus.check"));
-		s.put(String.valueOf(TempDriverWorkFlow.OFFER_STATUS_PASS),
-				getText("tempDriverWorkFlow.offerStatus.pass"));
-		s.put(String.valueOf(TempDriverWorkFlow.OFFER_STATUS_NOPASS),
-				getText("tempDriverWorkFlow.offerStatus.noPass"));
-		s.put("","未参与");
-		return s;
-	}*/
 
 	@Override
 	protected List<Column> getGridColumns() {
 		List<Column> columns = new ArrayList<Column>();
 		columns.add(new IdColumn4MapKey("t.id", "id"));
-		//录用状态
-		/*columns.add(new TextColumn4MapKey("w.offer_status", "ostatus",
-				getText("tempDriverWorkFlow.newOfferStatus"), 80).setSortable(true)
-				.setValueFormater(new KeyValueFormater(getOfferStatusValues())));*/
 		//状态
 		columns.add(new TextColumn4MapKey("t.status_", "status",
 				getText("tempDriver.status"), 45).setSortable(true)
@@ -272,19 +264,79 @@ public class TempDriversAction extends ViewAction<Map<String, Object>> {
 				.setValueFormater(new KeyValueFormater(getSexValues())));
 		//出生日期
 		columns.add(new TextColumn4MapKey("t.birthdate", "birthdate",
-				getText("tempDriver.birthdate"), 80).setSortable(true)
+				getText("tempDriver.birthdate"), 90).setSortable(true)
 				.setUseTitleFromLabel(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
 		//面试日期
 		columns.add(new TextColumn4MapKey("t.interview_date", "interviewDate",
-				getText("tempDriver.interviewDate"), 80).setSortable(true)
+				getText("tempDriver.interviewDate"), 90).setSortable(true)
 				.setUseTitleFromLabel(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
 		//报名日期
 		columns.add(new TextColumn4MapKey("t.register_date", "registerDate",
-				getText("tempDriver.registerDate"), 80).setSortable(true)
+				getText("tempDriver.registerDate"), 90).setSortable(true)
 				.setUseTitleFromLabel(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+		if(!isReadonly()||isAdvancedRead()){
+			//最新参与流程信息
+			columns.add(new TextColumn4MapKey("", "processInfo",
+					getText("tempDriver.processInfo"), 350).setSortable(true)
+					.setUseTitleFromLabel(true)
+					.setValueFormater(new LinkFormater4Id(this.getContextPath()
+							+ "/bc-workflow/workspace/open?id={0}", "workspace") {
+						
+						@Override
+						public String getIdValue(Object context, Object value) {
+							@SuppressWarnings("unchecked")
+							String processInfo=StringUtils.toString(((Map<String, Object>) context).get("processInfo"));
+							if(processInfo==null||processInfo.length()==0)
+								return "";
+							
+							//获取流程id
+							return processInfo.split(";")[1];
+						}
+
+						@Override
+						public String getTaskbarTitle(Object context,
+								Object value) {
+							return "工作空间";
+						}
+
+						@Override
+						public String getLinkText(Object context, Object value) {
+							@SuppressWarnings("unchecked")
+							String processInfo=StringUtils.toString(((Map<String, Object>) context).get("processInfo"));
+							if(processInfo==null||processInfo.length()==0)
+								return "";
+							
+							String title="";
+							String[] processInfos=processInfo.split(";");
+							if(processInfos.length>2){
+								for(int i=2;i<processInfos.length;i++){
+									if(i+1==processInfos.length){
+										title+=processInfos[i];
+									}else{
+										title+=processInfos[i]+",";
+									}
+								}
+								title+="--";
+							}
+							return title+="["+processInfos[0]+"]";
+						}
+						
+						@Override
+						public String getWinId(Object context,
+								Object value) {
+							@SuppressWarnings("unchecked")
+							String processInfo=StringUtils.toString(((Map<String, Object>) context).get("processInfo"));
+							if(processInfo==null||processInfo.length()==0)
+								return "";
+							
+							//获取流程id
+							return this.moduleKey+"."+processInfo.split(";")[1];
+						}
+					}));
+		}
 		//籍贯
 		columns.add(new TextColumn4MapKey("t.origin", "origin",
 				getText("tempDriver.origin"),150).setSortable(true)
@@ -300,7 +352,7 @@ public class TempDriversAction extends ViewAction<Map<String, Object>> {
 		//身份证有效期
 		columns.add(new TextColumn4MapKey("t.valid_start_date",
 				"validStartDate", getText("tempDriver.validDate"),
-				180).setValueFormater(new DateRangeFormater("yyyy-MM-dd") {
+				200).setValueFormater(new DateRangeFormater("yyyy-MM-dd") {
 			@Override
 			public Date getToDate(Object context, Object value) {
 				@SuppressWarnings("rawtypes")
@@ -391,11 +443,13 @@ public class TempDriversAction extends ViewAction<Map<String, Object>> {
 				getText("label.authorName"), 80).setSortable(true));
 		columns.add(new TextColumn4MapKey("t.file_date", "file_date",
 				getText("label.fileDate"), 120).setSortable(true)
+				.setUseTitleFromLabel(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd HH:mm")));
 		columns.add(new TextColumn4MapKey("m.actor_name", "mname",
 				getText("tempDriver.modifier"), 80).setSortable(true));
 		columns.add(new TextColumn4MapKey("t.modified_date", "modified_date",
 				getText("tempDriver.modifiedDate"), 120).setSortable(true)
+				.setUseTitleFromLabel(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd HH:mm")));
 		return columns;
 	}
@@ -404,7 +458,8 @@ public class TempDriversAction extends ViewAction<Map<String, Object>> {
 	protected String[] getGridSearchFields() {
 		return new String[] { "t.name","t.origin","t.address","t.new_addr" ,"t.cert_identity"
 				,"t.cert_fwzg","t.cert_cyzg","t.education","t.nation", "t.marry","u.actor_name","m.actor_name"
-				,"t.back_ground","t.entry_car","t.apply_attribute","t.former_unit"};
+				,"t.back_ground","t.entry_car","t.apply_attribute","t.former_unit"
+				,"getnewprocessnameandtodotasknames4midmtyle(t.id,'"+TempDriver.WORKFLOW_MTYPE+"')"};
 	}
 
 	@Override
@@ -437,8 +492,6 @@ public class TempDriversAction extends ViewAction<Map<String, Object>> {
 			}
 		}
 		
-		//过滤旧的流程
-		//andCondition.add(new QlCondition("NOT EXISTS(select 1 from bs_temp_driver_workflow w2 where w2.pid=t.id and w.start_time>w2.start_time)"));
 		return andCondition.isEmpty()?null:andCondition;
 	}
 
@@ -455,11 +508,6 @@ public class TempDriversAction extends ViewAction<Map<String, Object>> {
 			// 编辑按钮
 			tb.addButton(getDefaultEditToolbarButton());
 			
-			// 发起流程
-			/*tb.addButton(new ToolbarButton().setIcon("ui-icon-play")
-					.setText(getText("tempDriverWorkFlow.startFlow"))
-					.setClick("bs.tempDriverView.startFlow"));*/
-			
 			// "更多"按钮
 			ToolbarMenuButton menuButton = new ToolbarMenuButton(
 					getText("label.operate"))
@@ -469,8 +517,8 @@ public class TempDriversAction extends ViewAction<Map<String, Object>> {
 			menuButton.addMenuItem(getText("tempDriver.workflow.carManEntry"),
 					"workflow.carManEntry");
 			// --批量发起司机服务资格证办理流程
-			menuButton.addMenuItem(getText("tempDriver.workflow.requestDerviceCertficate"),
-					"workflow.requestDerviceCertficate");
+			//menuButton.addMenuItem(getText("tempDriver.workflow.requestServiceCertificate"),
+					//"workflow.requestServiceCertificate");
 			// --批量修改面试日期
 			menuButton.addMenuItem(getText("tempDriver.operate.interviewDate"),
 					"operate.interviewDate");
@@ -505,6 +553,9 @@ public class TempDriversAction extends ViewAction<Map<String, Object>> {
 	
 	@Override
 	protected FooterButton getGridFooterImportButton() {
+		if(isReadonly())
+			return null;
+		
 		// 获取默认的导入按钮设置
 		FooterButton fb = this.getDefaultGridFooterImportButton();
 

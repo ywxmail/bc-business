@@ -10,6 +10,8 @@ import java.util.regex.Pattern;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.poi.ss.usermodel.Cell;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
@@ -25,8 +27,6 @@ import cn.bc.identity.web.SystemContext;
 import cn.bc.identity.web.SystemContextHolder;
 import cn.bc.placeorigin.domain.PlaceOrigin;
 import cn.bc.placeorigin.service.PlaceOriginService;
-
-import com.google.gson.JsonObject;
 
 /**
  * 导入司机招聘数据的Action
@@ -60,8 +60,8 @@ public class ImportTempDriverAction extends ImportDataAction {
 	}
 
 	@Override
-	protected void importData(List<Map<String, Object>> data, JsonObject json,
-			String fileType) {
+	protected void importData(List<Map<String, Object>> data, JSONObject json,
+			String fileType) throws JSONException {
 		
 		TempDriver entity;//司机招聘对象
 		int updateCount = 0;//更新的行数
@@ -167,7 +167,7 @@ public class ImportTempDriverAction extends ImportDataAction {
 		if(exceptionCount>0)
 			msg+=exceptionCount+"数据存在异常没被导入，"+(invalidCert.length()>0?"没被导入数据的身份证号为:"+invalidCert.substring(1):"");
 			
-		json.addProperty("msg",msg);
+		json.put("msg",msg);
 		
 	}
 	

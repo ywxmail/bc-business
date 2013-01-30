@@ -28,7 +28,7 @@ import cn.bc.identity.domain.RichFileEntityImpl;
  * @author dragon
  */
 @Entity
-@Table(name = "BS_CAR_POLICY ")
+@Table(name = "BS_CAR_POLICY")
 @Inheritance(strategy = InheritanceType.JOINED)
 public class Policy extends RichFileEntityImpl {
 	private static final long serialVersionUID = 1L;

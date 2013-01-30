@@ -45,6 +45,7 @@ import cn.bc.web.ui.html.page.ButtonOption;
 import cn.bc.web.ui.html.page.PageOption;
 import cn.bc.web.ui.json.Json;
 import cn.bc.web.ui.json.JsonArray;
+import cn.bc.workflow.service.WorkflowModuleRelationService;
 
 /**
  * 投诉建议Action
@@ -76,6 +77,7 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 	private SyncBaseService syncBaseService; // 平台同步基类Serivce
 	private JiaoWeiADVICEService jiaoWeiADVICEService; // 平台同步投诉与建议Service
 	private CaseBaseService caseBaseService;
+	private WorkflowModuleRelationService workflowModuleRelationService;
 	private String sourceStr;
 
 	public List<Map<String, String>> motorcadeList; // 可选车队列表
@@ -83,6 +85,7 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 	public List<Map<String, String>> degreeList; // 可选程度列表
 	public List<Map<String, String>> certList; // 可选没收证件列表
 	public List<Map<String, String>> sourceList; // 可选投诉建议来源
+	public List<Map<String, Object>> list_WorkflowModuleRelation; // 工作流程集合
 
 	public Map<String, String> statusesValue;
 	public Map<String, String> handlestatusesValue;
@@ -178,6 +181,12 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 	@Autowired
 	public void setCarService(CarService carService) {
 		this.carService = carService;
+	}
+	
+	@Autowired
+	public void setWorkflowModuleRelationService(
+			WorkflowModuleRelationService workflowModuleRelationService) {
+		this.workflowModuleRelationService = workflowModuleRelationService;
 	}
 
 	@Override
@@ -699,6 +708,13 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 		sourcesValue = this.getSourceStatuses();
 		// 表单可选项的加载
 		initSelects();
+		
+		if (!this.getE().isNew()) {
+			list_WorkflowModuleRelation = this.workflowModuleRelationService
+					.findList(this.getE().getId(), Case4Advice.class.getSimpleName(),
+							null);
+		}
+		
 	}
 
 	// 表单可选项的加载
