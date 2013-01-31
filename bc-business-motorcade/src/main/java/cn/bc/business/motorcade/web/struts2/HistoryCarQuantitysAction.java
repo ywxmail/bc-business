@@ -22,6 +22,7 @@ import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.db.jdbc.RowMapper;
 import cn.bc.db.jdbc.SqlObject;
 import cn.bc.identity.web.SystemContext;
+import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.ui.html.grid.Column;
 import cn.bc.web.ui.html.grid.IdColumn4MapKey;
 import cn.bc.web.ui.html.grid.TextColumn4MapKey;
@@ -102,16 +103,13 @@ public class HistoryCarQuantitysAction extends ViewAction<Map<String, Object>> {
 	protected List<Column> getGridColumns() {
 		List<Column> columns = new ArrayList<Column>();
 		columns.add(new IdColumn4MapKey("m.id", "id"));
-		if(motorcade_id == null){
-			columns.add(new TextColumn4MapKey("u.name", "unitName",
-					getText("motorcade.unit"), 85).setSortable(true)
-					.setUseTitleFromLabel(true));
-			//车队名称
-			columns.add(new TextColumn4MapKey("b.name", "mtname",
-					getText("motorcade.name"), 85).setSortable(true)
-					.setUseTitleFromLabel(true));
-		}
-		
+		columns.add(new TextColumn4MapKey("u.name", "unitName",
+				getText("motorcade.unit"), 85).setSortable(true)
+				.setUseTitleFromLabel(true));
+		//车队名称
+		columns.add(new TextColumn4MapKey("b.name", "mtname",
+				getText("motorcade.name"), 85).setSortable(true)
+				.setUseTitleFromLabel(true));
 		//日期
 		columns.add(new TextColumn4MapKey("", "date",
 				getText("historyCarQuantity.date"),100).setSortable(true)
@@ -125,7 +123,8 @@ public class HistoryCarQuantitysAction extends ViewAction<Map<String, Object>> {
 				getText("historyCarQuantity.modifier"), 80).setSortable(true));
 		//最后修改时间
 		columns.add(new TextColumn4MapKey("a.modified_date", "mdate",
-				getText("historyCarQuantity.modifierDate")).setSortable(true));
+				getText("historyCarQuantity.modifierDate")).setSortable(true)
+				.setValueFormater(new CalendarFormater("yyyy-MM-dd HH:mm")));
 		return columns;
 	}
 
@@ -169,12 +168,13 @@ public class HistoryCarQuantitysAction extends ViewAction<Map<String, Object>> {
 	protected Toolbar getHtmlPageToolbar() {
 		Toolbar tb = new Toolbar();
 
-		// 查看按钮
-		tb.addButton(this.getDefaultOpenToolbarButton());
-		
 		if(!isReadonly()){
 			tb.addButton(this.getDefaultCreateToolbarButton());
+			tb.addButton(this.getDefaultEditToolbarButton());
 			tb.addButton(this.getDefaultDeleteToolbarButton());
+		}else{
+			// 查看按钮
+			tb.addButton(this.getDefaultOpenToolbarButton());
 		}
 
 		// 搜索按钮
@@ -183,10 +183,6 @@ public class HistoryCarQuantitysAction extends ViewAction<Map<String, Object>> {
 		return tb;
 	}
 	
-	@Override
-	protected String getGridDblRowMethod() {
-		return "bc.page.open";
-	}
 	
 	// ==高级搜索代码开始==
 	@Override
