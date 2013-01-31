@@ -33,7 +33,6 @@ import cn.bc.business.web.struts2.FileEntityAction;
 import cn.bc.core.query.condition.Direction;
 import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.core.util.DateUtils;
-import cn.bc.docs.service.AttachService;
 import cn.bc.docs.web.ui.html.AttachWidget;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.option.domain.OptionItem;
@@ -68,7 +67,6 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 	private CaseAccidentService caseAccidentService;
 	private MotorcadeService motorcadeService;
 	private OptionService optionService;
-	private AttachService attachService;
 	public AttachWidget attachsUI;
 
 	public List<Map<String, String>> motorcadeList; // 可选车队列表
@@ -127,34 +125,20 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 	}
 
 	@Autowired
-	public void setAttachService(AttachService attachService) {
-		this.attachService = attachService;
-	}
-
-	@Autowired
 	public void setCarManService(CarManService carManService) {
 		this.carManService = carManService;
 	}
 
-	@SuppressWarnings("static-access")
-	private AttachWidget buildAttachsUI(boolean isNew) {
+	private AttachWidget buildAttachsUI() {
 		// 构建附件控件
 		String ptype = Case4Accident.ATTACH_TYPE;
-		AttachWidget attachsUI = new AttachWidget();
-		attachsUI.setFlashUpload(this.isFlashUpload());
-		attachsUI.addClazz("formAttachs");
-		if (!isNew)
-			attachsUI.addAttach(this.attachService.findByPtype(ptype, this
-					.getE().getUid()));
-		attachsUI.setPuid(this.getE().getUid()).setPtype(ptype);
-
-		// 上传附件的限制
-		attachsUI.addExtension(getText("app.attachs.extensions"))
-				//最大数量30
-				.setMaxCount(30)
-				.setMaxSize(Integer.parseInt(getText("app.attachs.maxSize")));
 		// 状态为结案时显示只读状态
-		attachsUI.setReadOnly(this.getE().getStatus()==CaseBase.STATUS_CLOSED);
+		AttachWidget attachsUI = this.buildAttachsUI(this.getE().isNew(), this
+				.getE().getStatus() == CaseBase.STATUS_CLOSED, ptype, this
+				.getE().getUid());
+
+		// 最大数量30
+		attachsUI.setMaxCount(30);
 		return attachsUI;
 	}
 
@@ -296,7 +280,7 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 		statusesValue = this.getBSStatuses2();
 
 		// 构建附件控件
-		attachsUI = buildAttachsUI(true);
+		attachsUI = buildAttachsUI();
 	}
 
 	@Override
@@ -309,15 +293,15 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 	protected void beforeSave(Case4Accident entity) {
 		super.beforeSave(entity);
 		Case4Accident e = entity;
-		if(!e.isNew()){
-			Case4Accident currentE = this.caseAccidentService.load(e.getId());		
+		if (!e.isNew()) {
+			Case4Accident currentE = this.caseAccidentService.load(e.getId());
 			// 没有司机受款管理权限时
 			if (!isPayManage() && isManage()) {
 				e.setPayMoney(currentE.getPayMoney());
 				e.setPayDesc(currentE.getPayDesc());
 				e.setPayMoneyTwo(currentE.getPayMoneyTwo());
 				e.setPayDescTwo(currentE.getPayDescTwo());
-			}else if (isPayManage() && !isManage()){
+			} else if (isPayManage() && !isManage()) {
 				currentE.setPayDriverId(e.getPayDriverId());
 				currentE.setPayDriver(e.getPayDriver());
 				currentE.setPayDate(e.getPayDate());
@@ -335,7 +319,7 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 				this.setE(currentE);
 			}
 		}
-		
+
 		// 设置结案信息
 		if (isClosed.length() > 0 && isClosed.equals("1")) {
 			SystemContext context = this.getSystyemContext();
@@ -350,7 +334,7 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 	protected void afterEdit(Case4Accident entity) {
 		super.afterEdit(entity);
 		// 构建附件控件
-		attachsUI = buildAttachsUI(true);
+		attachsUI = buildAttachsUI();
 	}
 
 	/**
