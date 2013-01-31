@@ -31,6 +31,8 @@ import cn.bc.business.sync.service.JinDunJTWFService;
 import cn.bc.business.web.struts2.FileEntityAction;
 import cn.bc.core.query.condition.Direction;
 import cn.bc.core.query.condition.impl.OrderCondition;
+import cn.bc.core.util.DateUtils;
+import cn.bc.core.util.StringUtils;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.option.domain.OptionItem;
 import cn.bc.option.service.OptionService;
@@ -40,6 +42,7 @@ import cn.bc.web.ui.html.page.ButtonOption;
 import cn.bc.web.ui.html.page.PageOption;
 import cn.bc.web.ui.json.Json;
 import cn.bc.web.ui.json.JsonArray;
+import cn.bc.workflow.service.WorkflowModuleRelationService;
 
 /**
  * 交通违章Action
@@ -53,6 +56,8 @@ public class CaseTrafficAction extends
 		FileEntityAction<Long, Case4InfractTraffic> {
 	// private static Log logger = LogFactory.getLog(CarAction.class);
 	private static final long serialVersionUID = 1L;
+	private WorkflowModuleRelationService workflowModuleRelationService;
+
 	private Long carId;
 	private Long carManId;
 	private Long syncId; // 同步ID
@@ -75,6 +80,7 @@ public class CaseTrafficAction extends
 	private JinDunJTWFService jinDunJTWFService; // 金盾Service
 	private String sourceStr;
 	private String chargers;
+	public String happenDate;// 违法日期
 
 	public List<Map<String, String>> motorcadeList; // 可选车队列表
 	public List<Map<String, String>> dutyList; // 可选责任列表
@@ -83,6 +89,7 @@ public class CaseTrafficAction extends
 	public Map<String, String> statusesValue;
 	public Map<String, String> sourcesValue;
 	private Map<String, List<Map<String, String>>> allList;
+	public List<Map<String, Object>> carTrafficHandleFlowList; // 交通违法流程集合
 
 	public Long getCarId() {
 		return carId;
@@ -122,6 +129,12 @@ public class CaseTrafficAction extends
 
 	public void setChargers(String chargers) {
 		this.chargers = chargers;
+	}
+
+	@Autowired
+	public void setWorkflowModuleRelationService(
+			WorkflowModuleRelationService workflowModuleRelationService) {
+		this.workflowModuleRelationService = workflowModuleRelationService;
 	}
 
 	@Autowired
@@ -415,6 +428,12 @@ public class CaseTrafficAction extends
 		sourcesValue = this.getSourceStatuses();
 		// 表单可选项的加载
 		initSelects();
+		Case4InfractTraffic c = this.getE();
+		if (!c.isNew()) {
+			carTrafficHandleFlowList = this.workflowModuleRelationService
+					.findList(c.getId(), Case4InfractTraffic.ATTACH_TYPE, null);
+		}
+
 	}
 
 	// ========批量生成交通违法代码开始========
@@ -434,6 +453,40 @@ public class CaseTrafficAction extends
 				+ traffics.size() + " 条交通违章信息");
 		this.json = json.toString();
 		return "json";
+	}
+
+	// ---发起流程---开始---
+	public String tdIds;
+
+	public String startFlow() {
+		Json json = new Json();
+		// 去掉最后一个逗号
+		String[] _ids = tdIds.substring(0, tdIds.lastIndexOf(",")).split(",");
+		String count = this.caseTrafficService.doStartFlow(
+				getText("runcase.startFlow.key4CarTrafficHandle"),
+				StringUtils.stringArray2LongArray(_ids));
+		if (count.equals("0")) {
+			json.put("success", false);
+			json.put("msg", getText("runcase.startFlow.success.false"));
+		} else {
+			json.put("success", true);
+			// json.put("msg", getText("runcase.startFlow.success.true"));
+			json.put("msg", getText("成功发起" + count + "条交通违法处理流程"));
+		}
+		this.json = json.toString();
+		return "json";
+	}
+
+	// ---发起流程结束---
+
+	// 根据司机ID和违法时间查找司机在该违法周期内所有的违法信息
+	public String getCaseTrafficInfoByCarManId() {
+		Calendar happenDate = DateUtils.getCalendar(this.happenDate);
+
+		this.json = this.caseTrafficService.getCaseTrafficInfoByCarManId(
+				carManId, happenDate);
+		return "json";
+
 	}
 
 	// ========批量生成交通违法代码结束========
@@ -510,6 +563,8 @@ public class CaseTrafficAction extends
 				getText("runcase.select.status.active"));
 		statuses.put(String.valueOf(CaseBase.STATUS_CLOSED),
 				getText("runcase.select.status.closed"));
+		statuses.put(String.valueOf(CaseBase.STATUS_HANDLING),
+				getText("runcase.select.status.handling"));
 		return statuses;
 	}
 

@@ -5,6 +5,7 @@ package cn.bc.business.runcase.web.struts2;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -15,8 +16,10 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
+import cn.bc.BCConstants;
 import cn.bc.business.OptionConstants;
 import cn.bc.business.motorcade.service.MotorcadeService;
+import cn.bc.business.runcase.domain.Case4InfractTraffic;
 import cn.bc.business.runcase.domain.CaseBase;
 import cn.bc.business.web.struts2.ViewAction;
 import cn.bc.core.query.condition.Condition;
@@ -37,11 +40,13 @@ import cn.bc.web.formater.AbstractFormater;
 import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.formater.EntityStatusFormater;
 import cn.bc.web.formater.LinkFormater4Id;
+import cn.bc.web.formater.NubmerFormater;
 import cn.bc.web.ui.html.grid.Column;
 import cn.bc.web.ui.html.grid.IdColumn4MapKey;
 import cn.bc.web.ui.html.grid.TextColumn4MapKey;
 import cn.bc.web.ui.html.page.PageOption;
 import cn.bc.web.ui.html.toolbar.Toolbar;
+import cn.bc.web.ui.html.toolbar.ToolbarButton;
 import cn.bc.web.ui.json.Json;
 
 /**
@@ -81,7 +86,11 @@ public class CaseTrafficsAction extends ViewAction<Map<String, Object>> {
 		StringBuffer sql = new StringBuffer();
 		sql.append("select cit.id,b.status_,b.subject,b.motorcade_name,b.car_plate,b.driver_name,b.closer_name,b.happen_date");
 		sql.append(",b.close_date,b.address,b.from_,b.source,b.driver_cert,b.case_no,b.driver_id,b.car_id,b.company,c.code");
-		sql.append(",bia.id batch_company_id,bia.name batch_company");
+		sql.append(",bia.id batch_company_id,bia.name batch_company,cit.infract_code,cit.penalty");
+		//最新参与流程信息
+		sql.append(",getnewprocessnameandtodotasknames4midmtyle(cit.id,'");
+		sql.append(Case4InfractTraffic.class.getSimpleName());
+		sql.append("') as processInfo");
 		sql.append(" from bs_case_infract_traffic cit inner join BS_CASE_BASE b on cit.id=b.id");
 		sql.append(" left join BS_CAR c on b.car_id = c.id");
 		sql.append(" left join BS_CARMAN man on b.driver_id=man.id");
@@ -118,6 +127,9 @@ public class CaseTrafficsAction extends ViewAction<Map<String, Object>> {
 				map.put("code", rs[i++]);
 				map.put("batch_company_id", rs[i++]);
 				map.put("batch_company", rs[i++]);
+				map.put("infract_code", rs[i++]);
+				map.put("penalty", rs[i++]);
+				map.put("processInfo",rs[i++]);
 
 				return map;
 			}
@@ -196,8 +208,74 @@ public class CaseTrafficsAction extends ViewAction<Map<String, Object>> {
 				getText("runcase.address"), 120));
 		columns.add(new TextColumn4MapKey("b.case_no", "case_no",
 				getText("runcase.caseNo1"), 150).setUseTitleFromLabel(true));
+		if(!isReadonly()){
+			//最新参与流程信息
+			columns.add(new TextColumn4MapKey("", "processInfo",
+					getText("runcase.processInfo"), 350).setSortable(true)
+					.setUseTitleFromLabel(true)
+					.setValueFormater(new LinkFormater4Id(this.getContextPath()
+							+ "/bc-workflow/workspace/open?id={0}", "workspace") {
+						
+						@Override
+						public String getIdValue(Object context, Object value) {
+							@SuppressWarnings("unchecked")
+							String processInfo=StringUtils.toString(((Map<String, Object>) context).get("processInfo"));
+							if(processInfo==null||processInfo.length()==0)
+								return "";
+							
+							//获取流程id
+							return processInfo.split(";")[1];
+						}
+
+						@Override
+						public String getTaskbarTitle(Object context,
+								Object value) {
+							return "工作空间";
+						}
+
+						@Override
+						public String getLinkText(Object context, Object value) {
+							@SuppressWarnings("unchecked")
+							String processInfo=StringUtils.toString(((Map<String, Object>) context).get("processInfo"));
+							if(processInfo==null||processInfo.length()==0)
+								return "";
+							
+							String title="";
+							String[] processInfos=processInfo.split(";");
+							if(processInfos.length>2){
+								for(int i=2;i<processInfos.length;i++){
+									if(i+1==processInfos.length){
+										title+=processInfos[i];
+									}else{
+										title+=processInfos[i]+",";
+									}
+								}
+								title+="--";
+							}
+							return title+="["+processInfos[0]+"]";
+						}
+						
+						@Override
+						public String getWinId(Object context,
+								Object value) {
+							@SuppressWarnings("unchecked")
+							String processInfo=StringUtils.toString(((Map<String, Object>) context).get("processInfo"));
+							if(processInfo==null||processInfo.length()==0)
+								return "";
+							
+							//获取流程id
+							return this.moduleKey+"."+processInfo.split(";")[1];
+						}
+					}));
+		}
+		
 		columns.add(new TextColumn4MapKey("b.closer_name", "closer_name",
 				getText("runcase.closerName"), 70).setUseTitleFromLabel(true));
+		columns.add(new TextColumn4MapKey("cit.infract_code", "infract_code",
+				getText("runcase.infractCode"), 70).setUseTitleFromLabel(true));
+		columns.add(new TextColumn4MapKey("cit.penalty", "penalty",
+				getText("runcase.penalty"), 120).setUseTitleFromLabel(true)
+				.setValueFormater(new NubmerFormater("###,###.##")));
 		columns.add(new TextColumn4MapKey("b.close_date", "close_date",
 				getText("runcase.closeDate"), 120).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
@@ -209,7 +287,8 @@ public class CaseTrafficsAction extends ViewAction<Map<String, Object>> {
 	protected String[] getGridSearchFields() {
 		return new String[] { "b.case_no", "b.car_plate", "b.driver_name",
 				"b.motorcade_name", "b.closer_name", "b.subject",
-				"b.driver_cert", "c.code" };
+				"b.driver_cert", "c.code"
+				,"getnewprocessnameandtodotasknames4midmtyle(cit.id,'"+Case4InfractTraffic.class.getSimpleName()+"')"};
 	}
 
 	@Override
@@ -279,6 +358,8 @@ public class CaseTrafficsAction extends ViewAction<Map<String, Object>> {
 				getText("runcase.select.status.active"));
 		statuses.put(String.valueOf(CaseBase.STATUS_CLOSED),
 				getText("runcase.select.status.closed"));
+		statuses.put(String.valueOf(CaseBase.STATUS_HANDLING),
+				getText("runcase.select.status.handling"));
 		return statuses;
 	}
 
@@ -300,11 +381,60 @@ public class CaseTrafficsAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected Toolbar getHtmlPageToolbar() {
-		return super.getHtmlPageToolbar()
-				.addButton(
-						Toolbar.getDefaultToolbarRadioGroup(
-								this.getBSStatuses2(), "status", 0,
-								getText("title.click2changeSearchStatus")));
+		Toolbar tb = new Toolbar();
+		if (this.isReadonly()) {
+			// 查看按钮
+			tb.addButton(getDefaultOpenToolbarButton());
+		} else {
+			// 新建按钮
+			tb.addButton(getDefaultCreateToolbarButton());
+
+			// 编辑按钮
+			tb.addButton(getDefaultEditToolbarButton());
+			// 删除
+			tb.addButton(getDefaultDeleteToolbarButton());
+			// 发起流程
+			tb.addButton(new ToolbarButton().setIcon("ui-icon-play")
+					.setText(getText("runcase.startFlow"))
+					.setClick("bs.caseTrafficView.startFlow"));
+			// 出租车协会查询
+			/*
+			 * tb.addButton(new ToolbarButton().setIcon("ui-icon-check")
+			 * .setText(getText("tempDriver.gztaxixhDriverInfo"))
+			 * .setClick("bs.tempDriverView.gztaxixhDriverInfo"));
+			 */
+
+		}
+
+		tb.addButton(Toolbar.getDefaultToolbarRadioGroup(this.getBSStatuses2(),
+				"status", 0, getText("title.click2changeSearchStatus")));
+
+		// 搜索按钮
+		tb.addButton(getDefaultSearchToolbarButton());
+
+		return tb;
+	}
+
+	/**
+	 * 状态值转换列表：在案|处理中|结案|全部
+	 * 
+	 * @return
+	 */
+	protected Map<String, String> getBSStatuses2() {
+		Map<String, String> statuses = new LinkedHashMap<String, String>();
+		statuses.put(String.valueOf(BCConstants.STATUS_ENABLED),
+				getText("bs.status.active"));
+		statuses.put(String.valueOf(CaseBase.STATUS_HANDLING),
+				getText("runcase.select.status.handling"));
+		statuses.put(String.valueOf(BCConstants.STATUS_DISABLED),
+				getText("bs.status.closed"));
+		statuses.put("", getText("bs.status.all"));
+		return statuses;
+	}
+
+	@Override
+	protected String getHtmlPageJs() {
+		return this.getContextPath() + "/bc-business/caseTraffic/view.js";
 	}
 
 	@Override

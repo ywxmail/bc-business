@@ -48,7 +48,7 @@ public class SelectCarAction extends
 		AbstractSelectPageAction<Map<String, Object>> {
 	private static final long serialVersionUID = 1L;
 	public String status = String.valueOf(BCConstants.STATUS_ENABLED); // 车辆的状态，多个用逗号连接
-	public String loadLevel;//选择视图上加载信息量登记，0或无代表默认，1~代表
+	public String loadLevel;// 选择视图上加载信息量登记，0或无代表默认，1~代表
 
 	@Override
 	protected OrderCondition getGridDefaultOrderCondition() {
@@ -76,26 +76,32 @@ public class SelectCarAction extends
 		StringBuffer sql = new StringBuffer();
 		sql.append(" c.id,c.status_,c.code,c.plate_type,c.plate_no,c.register_date");
 		sql.append(",c.scrap_date,c.motorcade_id,m.name,c.company,c.bs_type,c.charger");
-		if(loadLevel!=null&&loadLevel.length()>0&&loadLevel.equals("1")){
+		sql.append(",bia.name as unit_name,bia.id nuit_id");
+		if (loadLevel != null && loadLevel.length() > 0
+				&& loadLevel.equals("1")) {
 			sql.append(" ,a.name as unitCompany,a.id as unitCompanyId");
 			sql.append(" ,(select bc.end_date from bs_contract bc");
 			sql.append(" inner join bs_car_contract bcc on bcc.contract_id=bc.id");
-			sql.append(" where bc.type_=2 and bc.status_ ="+BCConstants.STATUS_ENABLED);
+			sql.append(" where bc.type_=2 and bc.status_ ="
+					+ BCConstants.STATUS_ENABLED);
 			sql.append(" and bcc.car_id=c.id");
 			sql.append(" ORDER BY bc.end_date DESC limit 1) as ccEndDate");
-			
+
 			sql.append(" ,(select bcp.commerial_end_date from bs_car_policy bcp");
-			sql.append(" where bcp.car_id=c.id and bcp.status_ ="+BCConstants.STATUS_ENABLED);
+			sql.append(" where bcp.car_id=c.id and bcp.status_ ="
+					+ BCConstants.STATUS_ENABLED);
 			sql.append(" ORDER BY bcp.commerial_end_date DESC limit 1) as commerialEndDate");
-			
+
 			sql.append(" ,to_char((select bcp.greenslip_start_date from bs_car_policy bcp");
-			sql.append(" where bcp.car_id=c.id and bcp.status_ ="+BCConstants.STATUS_ENABLED);
+			sql.append(" where bcp.car_id=c.id and bcp.status_ ="
+					+ BCConstants.STATUS_ENABLED);
 			sql.append(" ORDER BY bcp.greenslip_end_date DESC limit 1),'YYYY-MM-DD') as greenslipStartDate");
 
 			sql.append(" ,(select bcp.greenslip_end_date from bs_car_policy bcp");
-			sql.append(" where bcp.car_id=c.id and bcp.status_ ="+BCConstants.STATUS_ENABLED);
+			sql.append(" where bcp.car_id=c.id and bcp.status_ ="
+					+ BCConstants.STATUS_ENABLED);
 			sql.append(" ORDER BY bcp.greenslip_end_date DESC limit 1) as greenslipEndDate");
-			
+
 			sql.append(" ,c.factory_type as factoryType,c.engine_no as engineNo,c.vin");
 			sql.append(" ,c.access_count as accessCount,c.access_weight as accessWeight,c.displacement");
 			sql.append(",(select string_agg(oman.name,',') from (select man.name from bs_carman man");
@@ -104,14 +110,15 @@ public class SelectCarAction extends
 			sql.append(",(select string_agg(oman.cert_fwzg,',') from (select man.cert_fwzg from bs_carman man");
 			sql.append(" inner join bs_car_driver cd on man.id = cd.driver_id ");
 			sql.append(" where cd.car_id = c.id and cd.status_ = 0 ORDER BY man.id) oman) as driverFWZG");
-			
+
 		}
 		sqlObject.setSelect(sql.toString());
 		sql = new StringBuffer();
 		sql.append(" bs_car c");
 		sql.append(" inner join bs_motorcade m on m.id=c.motorcade_id");
 		sql.append(" inner join bc_identity_actor a on a.id = m.unit_id");
-		
+		sql.append(" inner join bc_identity_actor bia on bia.id=m.unit_id");
+
 		sqlObject.setFrom(sql.toString());
 
 		// 注入参数
@@ -134,7 +141,10 @@ public class SelectCarAction extends
 				map.put("company", rs[i++]);
 				map.put("bs_type", rs[i++]);
 				map.put("charger", rs[i++]);
-				if(loadLevel!=null&&loadLevel.length()>0&&loadLevel.equals("1")){
+				map.put("unit_name", rs[i++]);
+				map.put("nuit_id", rs[i++]);
+				if (loadLevel != null && loadLevel.length() > 0
+						&& loadLevel.equals("1")) {
 					map.put("unitCompany", rs[i++]);
 					map.put("unitCompanyId", rs[i++]);
 					map.put("ccEndDate", rs[i++]);
@@ -150,46 +160,47 @@ public class SelectCarAction extends
 					map.put("driverName", rs[i++]);
 					map.put("driverFWZG", rs[i++]);
 					String companyFullName = map.get("company").toString();
-					if(companyFullName.length() > 0 && companyFullName.equalsIgnoreCase("宝城")){
-						map.put("companyFullName","广州市宝城汽车出租有限公司");
-					}else if(companyFullName.length() > 0 && companyFullName.equalsIgnoreCase("广发")){
-						map.put("companyFullName","广州市广发出租汽车有限公司");
+					if (companyFullName.length() > 0
+							&& companyFullName.equalsIgnoreCase("宝城")) {
+						map.put("companyFullName", "广州市宝城汽车出租有限公司");
+					} else if (companyFullName.length() > 0
+							&& companyFullName.equalsIgnoreCase("广发")) {
+						map.put("companyFullName", "广州市广发出租汽车有限公司");
 					}
-					
-					
-					//计算预计交车日期
 
-					List<Timestamp> tempList=new ArrayList<Timestamp>();
-					
-					if(map.get("ccEndDate")!=null)
-						tempList.add((Timestamp)map.get("ccEndDate"));
-					
-					if(map.get("commerialEndDate")!=null)
-						tempList.add((Timestamp)map.get("commerialEndDate"));
-					
-					if(map.get("greenslipEndDate")!=null)
-						tempList.add((Timestamp)map.get("greenslipEndDate"));
-					
-					if(tempList.size()==0){
+					// 计算预计交车日期
+
+					List<Timestamp> tempList = new ArrayList<Timestamp>();
+
+					if (map.get("ccEndDate") != null)
+						tempList.add((Timestamp) map.get("ccEndDate"));
+
+					if (map.get("commerialEndDate") != null)
+						tempList.add((Timestamp) map.get("commerialEndDate"));
+
+					if (map.get("greenslipEndDate") != null)
+						tempList.add((Timestamp) map.get("greenslipEndDate"));
+
+					if (tempList.size() == 0) {
 						map.put("predictReturnDate", null);
-					}else if(tempList.size()==1){
-						map.put("predictReturnDate",tempList.get(0));
-					}else if(tempList.size()==2){
-						if(tempList.get(0).after(tempList.get(1))){
-							map.put("predictReturnDate",tempList.get(1));
-						}else
-							map.put("predictReturnDate",tempList.get(0));
-					}else{
-						//排序	
-						for(int j=0;j<tempList.size();j++){
-							for(int k=0;k+1<tempList.size();k++){
-								if(tempList.get(k).after(tempList.get(k+1))){
-									tempList.add(k, tempList.get(k+1));
-									tempList.remove(k+2);
+					} else if (tempList.size() == 1) {
+						map.put("predictReturnDate", tempList.get(0));
+					} else if (tempList.size() == 2) {
+						if (tempList.get(0).after(tempList.get(1))) {
+							map.put("predictReturnDate", tempList.get(1));
+						} else
+							map.put("predictReturnDate", tempList.get(0));
+					} else {
+						// 排序
+						for (int j = 0; j < tempList.size(); j++) {
+							for (int k = 0; k + 1 < tempList.size(); k++) {
+								if (tempList.get(k).after(tempList.get(k + 1))) {
+									tempList.add(k, tempList.get(k + 1));
+									tempList.remove(k + 2);
 								}
 							}
 						}
-						map.put("predictReturnDate",tempList.get(0));
+						map.put("predictReturnDate", tempList.get(0));
 					}
 				}
 				return map;
@@ -223,30 +234,38 @@ public class SelectCarAction extends
 				getText("car.scrapDate"), 100).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
 		columns.add(new TextColumn4MapKey("m.name", "motorcade_name",
-				getText("car.motorcade"),80).setSortable(true)
+				getText("car.motorcade"), 80).setSortable(true)
 				.setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("c.bs_type", "bs_type",
 				getText("car.businessType"), 60).setSortable(true)
 				.setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("c.charger", "charger",
 				getText("car.charger"), 120).setUseTitleFromLabel(true)
-				.setValueFormater(new LinkFormater4ChargerInfo(this
-						.getContextPath())));
+				.setValueFormater(
+						new LinkFormater4ChargerInfo(this.getContextPath())));
 		columns.add(new TextColumn4MapKey("c.company", "company",
 				getText("selectCar.company"), 60).setSortable(true)
 				.setUseTitleFromLabel(true));
 		columns.add(new HiddenColumn4MapKey("motorcadeId", "motorcade_id"));
 		columns.add(new HiddenColumn4MapKey("motorcadeName", "motorcade_name"));
-		
-		if(loadLevel!=null&&loadLevel.length()>0&&loadLevel.equals("1")){
+		columns.add(new HiddenColumn4MapKey("unitName", "unit_name"));
+		columns.add(new HiddenColumn4MapKey("unitId", "nuit_id"));
+
+		if (loadLevel != null && loadLevel.length() > 0
+				&& loadLevel.equals("1")) {
 			columns.add(new HiddenColumn4MapKey("unitCompany", "unitCompany"));
-			columns.add(new HiddenColumn4MapKey("unitCompanyId", "unitCompanyId"));
-			//预计交车日期
-			columns.add(new HiddenColumn4MapKey("predictReturnDate", "predictReturnDate"));
+			columns.add(new HiddenColumn4MapKey("unitCompanyId",
+					"unitCompanyId"));
+			// 预计交车日期
+			columns.add(new HiddenColumn4MapKey("predictReturnDate",
+					"predictReturnDate"));
 			columns.add(new HiddenColumn4MapKey("ccEndDate", "ccEndDate"));
-			columns.add(new HiddenColumn4MapKey("commerialEndDate", "commerialEndDate"));
-			columns.add(new HiddenColumn4MapKey("greenslipStartDate", "greenslipStartDate"));
-			columns.add(new HiddenColumn4MapKey("greenslipEndDate", "greenslipEndDate"));
+			columns.add(new HiddenColumn4MapKey("commerialEndDate",
+					"commerialEndDate"));
+			columns.add(new HiddenColumn4MapKey("greenslipStartDate",
+					"greenslipStartDate"));
+			columns.add(new HiddenColumn4MapKey("greenslipEndDate",
+					"greenslipEndDate"));
 			columns.add(new HiddenColumn4MapKey("factoryType", "factoryType"));
 			columns.add(new HiddenColumn4MapKey("engineNo", "engineNo"));
 			columns.add(new HiddenColumn4MapKey("vin", "vin"));
@@ -255,7 +274,8 @@ public class SelectCarAction extends
 			columns.add(new HiddenColumn4MapKey("displacement", "displacement"));
 			columns.add(new HiddenColumn4MapKey("driverName", "driverName"));
 			columns.add(new HiddenColumn4MapKey("bsType", "bs_type"));
-			columns.add(new HiddenColumn4MapKey("companyFullName", "companyFullName"));
+			columns.add(new HiddenColumn4MapKey("companyFullName",
+					"companyFullName"));
 			columns.add(new HiddenColumn4MapKey("driverFWZG", "driverFWZG"));
 		}
 		return columns;
@@ -310,12 +330,12 @@ public class SelectCarAction extends
 	@Override
 	protected Json getGridExtrasData() {
 		Json json = new Json();
-		if(status!=null&&status.length()>0)
+		if (status != null && status.length() > 0)
 			json.put("status", status);
-		if(loadLevel!=null&&loadLevel.length()>0)
+		if (loadLevel != null && loadLevel.length() > 0)
 			json.put("loadLevel", loadLevel);
 		return json;
-		
+
 	}
 
 	@Override

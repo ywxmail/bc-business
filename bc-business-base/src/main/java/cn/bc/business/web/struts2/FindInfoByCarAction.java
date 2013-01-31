@@ -101,6 +101,8 @@ public class FindInfoByCarAction extends ActionSupport {
 				driver.put("name", info.get("driverName"));
 				driver.put("sex", info.get("driverSex"));
 				driver.put("cert4FWZG", info.get("driverCert4FWZG"));
+				driver.put("certDrivingFirstDate",
+						getDateToString(info.get("certDrivingFirstDate")));
 				driver.put("cert4IDENTITY", info.get("driverCert4IDENTITY"));
 				driver.put("origin", info.get("driverOrigin"));
 				driver.put("houseType", info.get("driverHouseType"));
@@ -161,7 +163,7 @@ public class FindInfoByCarAction extends ActionSupport {
 		StringBuffer sql = new StringBuffer();
 		sql.append("select c.id carId,c.status_ carStatus,c.plate_type carPlateType,c.plate_no carPlateNo,c.register_date carRegisterDate,c.bs_type carBsType");
 		sql.append(",c.company carCompany,c.charger carCharger,c.motorcade_id motorcadeId,m.name motorcadeName");
-		sql.append(",cd.classes driverClasses,cd.driver_id driverId,d.name driverName,d.sex driverSex,d.cert_fwzg driverCert4FWZG");
+		sql.append(",cd.classes driverClasses,cd.driver_id driverId,d.name driverName,d.sex driverSex,d.cert_fwzg driverCert4FWZG,d.cert_driving_first_date certDrivingFirstDate");
 		sql.append(",d.cert_identity driverCert4IDENTITY,d.origin driverOrigin,d.house_type driverHouseType,d.birthdate driverBirthDate,d.work_date driverWorkDate");
 		sql.append(" from bs_car c");
 		sql.append(" inner join bs_motorcade m on m.id=c.motorcade_id");
@@ -192,6 +194,7 @@ public class FindInfoByCarAction extends ActionSupport {
 				map.put("driverName", rs[i++]);
 				map.put("driverSex", rs[i++]);
 				map.put("driverCert4FWZG", rs[i++]);
+				map.put("certDrivingFirstDate", rs[i++]);
 				map.put("driverCert4IDENTITY", rs[i++]);
 				map.put("driverOrigin", rs[i++]);
 				map.put("driverHouseType", rs[i++]);

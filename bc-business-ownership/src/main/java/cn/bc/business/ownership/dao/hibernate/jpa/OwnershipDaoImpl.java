@@ -5,6 +5,15 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.sql.DataSource;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+
+import cn.bc.BCConstants;
+import cn.bc.business.car.domain.Car;
 import cn.bc.business.ownership.dao.OwnershipDao;
 import cn.bc.business.ownership.domain.Ownership;
 import cn.bc.orm.hibernate.jpa.HibernateCrudJpaDao;
@@ -15,6 +24,13 @@ import cn.bc.orm.hibernate.jpa.HibernateCrudJpaDao;
  */
 public class OwnershipDaoImpl extends HibernateCrudJpaDao<Ownership> implements
 		OwnershipDao {
+	private JdbcTemplate jdbcTemplate;
+	private final static Log logger = LogFactory.getLog(OwnershipDaoImpl.class);
+
+	@Autowired
+	public void setDataSource(DataSource dataSource) {
+		this.jdbcTemplate = new JdbcTemplate(dataSource);
+	}
 
 	public Ownership getEntityByCarid(Long carId) {
 		Ownership os = null;
@@ -107,5 +123,47 @@ public class OwnershipDaoImpl extends HibernateCrudJpaDao<Ownership> implements
 		} else {
 			return ((ArrayList<Object>) updateCarIds);
 		}
+	}
+
+	public Ownership getOwershipByNumber(String number) {
+		Ownership os = null;
+		String hql = "select o from Ownership o where o.number=?";
+		List<?> list = this.getJpaTemplate().find(hql, new Object[] { number });
+		if (list.size() == 1) {
+			os = (Ownership) list.get(0);
+			return os;
+		} else if (list.size() == 0) {
+			return null;
+		} else {
+			os = (Ownership) list.get(0);
+		}
+		return os;
+	}
+
+	public void updateCar4OwnerByNumber(String owner, String number) {
+		String sql = "update bs_car car set owner_=? where car.cert_no2 =? and car.status_ in("
+				+ BCConstants.STATUS_DRAFT
+				+ ","
+				+ BCConstants.STATUS_ENABLED
+				+ ")";
+		logger.debug("sql: " + sql + " owner: " + owner + " number: " + number);
+		this.jdbcTemplate.update(sql, new Object[] { owner, number });
+	}
+
+	public Car getCarByNumber(String number) {
+		Car car = null;
+		String hql = "select c from Car c where c.certNo2=? and c.status="
+				+ BCConstants.STATUS_ENABLED;
+		logger.debug("hql: " + hql + " number: " + number);
+		List<?> list = this.getJpaTemplate().find(hql, new Object[] { number });
+		if (list.size() == 1) {
+			car = (Car) list.get(0);
+			return car;
+		} else if (list.size() == 0) {
+			return null;
+		} else {
+			car = (Car) list.get(0);
+		}
+		return car;
 	}
 }

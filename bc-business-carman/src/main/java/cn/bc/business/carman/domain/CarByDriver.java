@@ -32,20 +32,24 @@ public class CarByDriver extends FileEntityImpl {
 	public static final int TYPE_ZHENGBAN = 1;
 	/** 营运类型：副班 */
 	public static final int TYPE_FUBAN = 2;
-	/** 营运类型：顶班 */
+	/** 营运类型：替班 */
 	public static final int TYPE_DINGBAN = 4;
-	/** 营运类型：主挂 */
+	/** 营运类型：(替班)主挂 */
 	public static final int TYPE_ZHUGUA = 3;
-	
+	/** 营运类型：公共替班(主挂) */
+	public static final int TYPE_GONGGONGDINGBANZHUGUA = 5;
+	/** 营运类型：公共替班 */
+	public static final int TYPE_GONGGONGDINGBAN = 6;
+
 	private int status = BCConstants.STATUS_ENABLED;// 状态
 
-	private int classes;// 营运班次:如正班、副班、顶班
+	private int classes;// 营运班次:如正班、副班、替班、主挂、公共替班(主挂)、公共替班
 	// private Calendar startDate;// 开始时段
 	// private Calendar endDate;// 结束时段
 	private Car car;// 营运的车辆
 	private CarMan driver;// 营运的司机
 	private String description;// 备注
-	private Long pid;//顶班的迁移记录与营运班次的关系
+	private Long pid;// 顶班的迁移记录与营运班次的关系
 
 	@Column(name = "DESC_")
 	public String getDescription() {
@@ -100,5 +104,5 @@ public class CarByDriver extends FileEntityImpl {
 	public void setPid(Long pid) {
 		this.pid = pid;
 	}
-	
+
 }

@@ -29,6 +29,8 @@ public class CaseBase extends RichFileEntityImpl {
 	public static final int STATUS_ACTIVE = 0;
 	/** 事件状态：已结案 */
 	public static final int STATUS_CLOSED = 1;
+	/** 事件状态：处理中 */
+	public static final int STATUS_HANDLING = 2;
 
 	/** 事件类型：表扬 */
 	public static final int TYPE_PRAISE = 1;
@@ -51,7 +53,7 @@ public class CaseBase extends RichFileEntityImpl {
 	public static final int SOURCE_SYNC = 1;
 	/** 事件来源：生成 */
 	public static final int SOURCE_GENERATION = 2;
-	
+
 	private String subject;// 标题：事件的简要描述
 	private int type;// 事件类型：参考常数TYPE_XXXX的定义
 	private int source = SOURCE_SYS;// 来源：参考常数SOURCE_xxxx的定义
@@ -77,7 +79,6 @@ public class CaseBase extends RichFileEntityImpl {
 	private String syncUid;// 旧数据同步的UID
 	private Long syncId;// 数据同步ID
 
-	
 	public String getCompany() {
 		return company;
 	}
@@ -270,6 +271,5 @@ public class CaseBase extends RichFileEntityImpl {
 	public void setSyncUid(String syncUid) {
 		this.syncUid = syncUid;
 	}
-	
 
 }

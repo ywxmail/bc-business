@@ -15,51 +15,66 @@
 	<!-- 需要在主配置文件配置entityManagerFactory和transactionManager的实现 -->
 
 	<!-- caseBase -->
-	<bean id="caseBaseDao" class="cn.bc.business.runcase.dao.hibernate.jpa.CaseBaseDaoImpl"
+	<bean id="caseBaseDao"
+		class="cn.bc.business.runcase.dao.hibernate.jpa.CaseBaseDaoImpl"
 		p:entityManagerFactory-ref="entityManagerFactory" />
 	<bean id="caseBaseService" class="cn.bc.business.runcase.service.CaseBaseServiceImpl"
 		p:caseBaseDao-ref="caseBaseDao" />
-	
+
 	<!-- caseTraffic -->
-	<bean id="caseTrafficDao" class="cn.bc.business.runcase.dao.hibernate.jpa.CaseTrafficDaoImpl"
+	<bean id="caseTrafficDao"
+		class="cn.bc.business.runcase.dao.hibernate.jpa.CaseTrafficDaoImpl"
 		p:entityManagerFactory-ref="entityManagerFactory" />
 	<bean id="caseTrafficService" class="cn.bc.business.runcase.service.CaseTrafficServiceImpl"
 		p:caseTrafficDao-ref="caseTrafficDao" />
-		
+
 	<!-- syncBaseDao -->
 	<bean id="syncBaseDao" class="cn.bc.sync.dao.hibernate.jpa.SyncBaseDaoImpl"
 		p:entityManagerFactory-ref="entityManagerFactory" />
 	<bean id="syncBaseDaoService" class="cn.bc.sync.service.SyncBaseServiceImpl"
 		p:syncBaseDao-ref="syncBaseDao" />
-		
+
 	<!-- caseBusinessDao -->
-	<bean id="caseBusinessDao" class="cn.bc.business.runcase.dao.hibernate.jpa.CaseBusinessDaoImpl"
+	<bean id="caseBusinessDao"
+		class="cn.bc.business.runcase.dao.hibernate.jpa.CaseBusinessDaoImpl"
 		p:entityManagerFactory-ref="entityManagerFactory" />
 	<bean id="caseBusinessService" class="cn.bc.business.runcase.service.CaseBusinessServiceImpl"
-		p:caseBusinessDao-ref="caseBusinessDao" />	
-		
+		p:caseBusinessDao-ref="caseBusinessDao" />
+
 	<!-- caseAccidentDao -->
-	<bean id="caseAccidentDao" class="cn.bc.business.runcase.dao.hibernate.jpa.CaseAccidentDaoImpl"
+	<bean id="caseAccidentDao"
+		class="cn.bc.business.runcase.dao.hibernate.jpa.CaseAccidentDaoImpl"
 		p:entityManagerFactory-ref="entityManagerFactory" />
 	<bean id="caseAccidentService" class="cn.bc.business.runcase.service.CaseAccidentServiceImpl"
-		p:caseAccidentDao-ref="caseAccidentDao" />	
-		
+		p:caseAccidentDao-ref="caseAccidentDao" />
+
+	<!-- Case4InfractCodeDao -->
+	<bean id="case4InfractCodeDao"
+		class="cn.bc.business.runcase.dao.hibernate.jpa.Case4InfractCodeDaoImpl"
+		p:entityManagerFactory-ref="entityManagerFactory" />
+	<bean id="case4InfractCodeService"
+		class="cn.bc.business.runcase.service.Case4InfractCodeServiceImpl"
+		p:case4InfractCodeDao-ref="case4InfractCodeDao" />
+
 	<!-- caseAdviceDao -->
-	<bean id="caseAdviceDao" class="cn.bc.business.runcase.dao.hibernate.jpa.CaseAdviceDaoImpl"
+	<bean id="caseAdviceDao"
+		class="cn.bc.business.runcase.dao.hibernate.jpa.CaseAdviceDaoImpl"
 		p:entityManagerFactory-ref="entityManagerFactory" />
 	<bean id="caseAdviceService" class="cn.bc.business.runcase.service.CaseAdviceServiceImpl"
-		p:caseAdviceDao-ref="caseAdviceDao" />	
-		
+		p:caseAdviceDao-ref="caseAdviceDao" />
+
 	<!-- casePraiseDao -->
-	<bean id="casePraiseDao" class="cn.bc.business.runcase.dao.hibernate.jpa.CasePraiseDaoImpl"
+	<bean id="casePraiseDao"
+		class="cn.bc.business.runcase.dao.hibernate.jpa.CasePraiseDaoImpl"
 		p:entityManagerFactory-ref="entityManagerFactory" />
 	<bean id="casePraiseService" class="cn.bc.business.runcase.service.CasePraiseServiceImpl"
-		p:casePraiseDao-ref="casePraiseDao" />	
-	
+		p:casePraiseDao-ref="casePraiseDao" />
+
 	<!-- caseLostDao -->
-	<bean id="caseLostDao" class="cn.bc.business.runcase.dao.hibernate.jpa.CaseLostDaoImpl"
+	<bean id="caseLostDao"
+		class="cn.bc.business.runcase.dao.hibernate.jpa.CaseLostDaoImpl"
 		p:entityManagerFactory-ref="entityManagerFactory" />
 	<bean id="caseLostService" class="cn.bc.business.runcase.service.CaseLostServiceImpl"
-		p:caseLostDao-ref="caseLostDao" />	
-	
+		p:caseLostDao-ref="caseLostDao" />
+
 </beans>

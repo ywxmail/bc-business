@@ -3,40 +3,43 @@
     "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
     "http://struts.apache.org/dtds/struts-2.0.dtd">
 <struts>
-	<!-- 选择司机、责任人
-	<package name="selectCarManAction" extends="bc-default" namespace="/bc-business/carman/select">
-		<action name="select" class="selectCarManAction2" method="select"/>
-		<action name="select/search" class="selectCarManAction" method="search"/>
-	</package> -->
-	
+	<!-- 选择司机、责任人 <package name="selectCarManAction" extends="bc-default" namespace="/bc-business/carman/select"> 
+		<action name="select" class="selectCarManAction2" method="select"/> <action 
+		name="select/search" class="selectCarManAction" method="search"/> </package> -->
+
 	<package name="carMan" extends="bc-default" namespace="/bc-business/carMan">
 		<action name="create" class="carManAction" method="create">
 			<result name="form">/bc-business/carMan/form.jsp</result>
-		</action>		
+		</action>
 		<action name="open" class="carManAction" method="open">
 			<result name="formr">/bc-business/carMan/form.jsp</result>
 		</action>
 		<action name="edit" class="carManAction" method="edit">
 			<result name="form">/bc-business/carMan/form.jsp</result>
 		</action>
-		<action name="save" class="carManAction" method="save"/>
+		<action name="save" class="carManAction" method="save" />
 		<action name="delete" class="carManAction" method="delete" />
 		<action name="conditions" class="carManAction" method="conditions">
 			<result name="success">/bc-business/carMan/conditions.jsp</result>
 		</action>
-		<action name="checkCert4FWZGIsExists" class="carManAction" method="checkCert4FWZGIsExists"/>
-		<action name="autoLoadCarManIdentityInfo" class="carManAction" method="autoLoadCarManIdentityInfo"/>
+		<action name="checkCert4FWZGIsExists" class="carManAction"
+			method="checkCert4FWZGIsExists" />
+		<action name="autoLoadCarManIdentityInfo" class="carManAction"
+			method="autoLoadCarManIdentityInfo" />
 		<action name="updatePhonePage" class="carManAction" method="updatePhonePage">
 			<result name="success">/bc-business/carMan/updatePhone.jsp</result>
 			<result name="error">/bc-business/carMan/error.jsp</result>
 		</action>
 		<action name="updatePhone" class="carManAction" method="updatePhone">
 		</action>
+		<!-- Ajax查询司机信息 -->
+		<action name="find" class="findCarManAction" />
 	</package>
-	
+
 	<package name="driver4Cert" extends="bc-default" namespace="/bc-business/driver4cert">
 		<action name="create" class="driver4CertAction" method="create">
-			<result name="showdialog" >/bc-business/cert/driver4cert/select.jsp</result>
+			<result name="showdialog">/bc-business/cert/driver4cert/select.jsp
+			</result>
 		</action>
 		<!-- 分页视图 -->
 		<action name="paging" class="driver4CertAction" method="paging" />
@@ -45,71 +48,133 @@
 		<!-- 非分页视图 -->
 		<action name="list" class="driver4CertAction" method="list" />
 	</package>
-	<package name="selectMoreCarManWithCar" extends="bc-default" namespace="/bc-business/selectMoreCarManWithCar">
-		<action name="selectCarMans" class="selectMoreCarManWithCarAction" method="selectCarMans">
+	<package name="selectMoreCarManWithCar" extends="bc-default"
+		namespace="/bc-business/selectMoreCarManWithCar">
+		<action name="selectCarMans" class="selectMoreCarManWithCarAction"
+			method="selectCarMans">
 			<result>/bc-business/carMan/selectMoreCarMan/select.jsp</result>
 		</action>
 	</package>
 	<package name="selectMoveType" extends="bc-default" namespace="/bc-business">
 		<action name="selectMoveType" class="selectMoveTypeAction">
-			<result>/bc-business/carByDriverHistory/selectMoveType/select.jsp</result>
+			<result>/bc-business/carByDriverHistory/selectMoveType/select.jsp
+			</result>
 		</action>
 	</package>
-	<package name="shiftworkByDriver" extends="bc-default" namespace="/bc-business/shiftworkByDriver">
+	<package name="shiftworkByDriver" extends="bc-default"
+		namespace="/bc-business/shiftworkByDriver">
 		<action name="save" class="shiftworkByDriverAction" method="save" />
 		<action name="data" class="shiftworkByDriverAction" method="data" />
 		<action name="delete" class="shiftworkByDriverAction" method="delete" />
-		<action name="create" class="shiftworkByDriverAction" method="create" >
-		    <result name="form">/bc-business/carByDriverHistory/dingBanForm.jsp</result>
+		<action name="create" class="shiftworkByDriverAction" method="create">
+			<result name="form">/bc-business/carByDriverHistory/dingBanForm.jsp
+			</result>
 		</action>
-		<action name="edit" class="shiftworkByDriverAction" method="edit" >
-		    <result name="dingban">/bc-business/carByDriverHistory/dingBanForm.jsp</result>
+		<action name="edit" class="shiftworkByDriverAction" method="edit">
+			<result name="dingban">/bc-business/carByDriverHistory/dingBanForm.jsp
+			</result>
 		</action>
-		<action name="open" class="shiftworkByDriverAction" method="open" >
-			<result name="dingban">/bc-business/carByDriverHistory/dingBanForm.jsp</result>
+		<action name="open" class="shiftworkByDriverAction" method="open">
+			<result name="dingban">/bc-business/carByDriverHistory/dingBanForm.jsp
+			</result>
 		</action>
 	</package>
-	 <package name="carByDriverHistory" extends="bc-default" namespace="/bc-business/carByDriverHistory">
+	<package name="carByDriverHistory" extends="bc-default"
+		namespace="/bc-business/carByDriverHistory">
 		<action name="create" class="carByDriverHistoryAction" method="create">
-			<result name="zhuanChe" >/bc-business/carByDriverHistory/zhuanCheForm.jsp</result>
-			<result name="jiaohuizhuanche" >/bc-business/carByDriverHistory/jiaoHuiZhuanCheForm.jsp</result>
-			<result name="zhuanGongSi" >/bc-business/carByDriverHistory/zhuanGongSiForm.jsp</result>
-			<result name="zhuXiao" >/bc-business/carByDriverHistory/zhuXiaoForm.jsp</result>
-			<result name="qianHui" >/bc-business/carByDriverHistory/qianHuiForm.jsp</result>
-			<result name="jiaoHui" >/bc-business/carByDriverHistory/jiaoHuiForm.jsp</result>
-			<result name="xinRuZhi" >/bc-business/carByDriverHistory/xinRuZhiForm.jsp</result>
-			<result name="zhuanCheDui" >/bc-business/carByDriverHistory/zhuanCheDuiForm.jsp</result>
-			<result name="weijiaozhengzhuxiao" >/bc-business/carByDriverHistory/weiJiaoZhengZhuXiaoForm.jsp</result>
+			<result name="zhuanChe">/bc-business/carByDriverHistory/zhuanCheForm.jsp
+			</result>
+			<result name="jiaohuizhuanche">/bc-business/carByDriverHistory/jiaoHuiZhuanCheForm.jsp
+			</result>
+			<result name="zhuanGongSi">/bc-business/carByDriverHistory/zhuanGongSiForm.jsp
+			</result>
+			<result name="zhuXiao">/bc-business/carByDriverHistory/zhuXiaoForm.jsp
+			</result>
+			<result name="qianHui">/bc-business/carByDriverHistory/qianHuiForm.jsp
+			</result>
+			<result name="jiaoHui">/bc-business/carByDriverHistory/jiaoHuiForm.jsp
+			</result>
+			<result name="xinRuZhi">/bc-business/carByDriverHistory/xinRuZhiForm.jsp
+			</result>
+			<result name="zhuanCheDui">/bc-business/carByDriverHistory/zhuanCheDuiForm.jsp
+			</result>
+			<result name="weijiaozhengzhuxiao">/bc-business/carByDriverHistory/weiJiaoZhengZhuXiaoForm.jsp
+			</result>
 		</action>
 		<action name="save" class="carByDriverHistoryAction" method="save" />
 		<action name="data" class="carByDriverHistoryAction" method="data" />
 		<action name="delete" class="carByDriverHistoryAction" method="delete" />
-		<action name="open" class="carByDriverHistoryAction" method="open" >
-		    <result name="zhuanChe" >/bc-business/carByDriverHistory/zhuanCheForm.jsp</result>
-		    <result name="jiaohuizhuanche" >/bc-business/carByDriverHistory/jiaoHuiZhuanCheForm.jsp</result>
-			<result name="zhuanGongSi" >/bc-business/carByDriverHistory/zhuanGongSiForm.jsp</result>
-			<result name="zhuXiao" >/bc-business/carByDriverHistory/zhuXiaoForm.jsp</result>
-			<result name="qianHui" >/bc-business/carByDriverHistory/qianHuiForm.jsp</result>
-			<result name="jiaoHui" >/bc-business/carByDriverHistory/jiaoHuiForm.jsp</result>
-			<result name="xinRuZhi" >/bc-business/carByDriverHistory/xinRuZhiForm.jsp</result>
-			<result name="zhuanCheDui" >/bc-business/carByDriverHistory/zhuanCheDuiForm.jsp</result>
-			<result name="dingban">/bc-business/carByDriverHistory/dingBanForm.jsp</result>
-			<result name="weijiaozhengzhuxiao" >/bc-business/carByDriverHistory/weiJiaoZhengZhuXiaoForm.jsp</result>
+		<action name="open" class="carByDriverHistoryAction" method="open">
+			<result name="zhuanChe">/bc-business/carByDriverHistory/zhuanCheForm.jsp
+			</result>
+			<result name="jiaohuizhuanche">/bc-business/carByDriverHistory/jiaoHuiZhuanCheForm.jsp
+			</result>
+			<result name="zhuanGongSi">/bc-business/carByDriverHistory/zhuanGongSiForm.jsp
+			</result>
+			<result name="zhuXiao">/bc-business/carByDriverHistory/zhuXiaoForm.jsp
+			</result>
+			<result name="qianHui">/bc-business/carByDriverHistory/qianHuiForm.jsp
+			</result>
+			<result name="jiaoHui">/bc-business/carByDriverHistory/jiaoHuiForm.jsp
+			</result>
+			<result name="xinRuZhi">/bc-business/carByDriverHistory/xinRuZhiForm.jsp
+			</result>
+			<result name="zhuanCheDui">/bc-business/carByDriverHistory/zhuanCheDuiForm.jsp
+			</result>
+			<result name="dingban">/bc-business/carByDriverHistory/dingBanForm.jsp
+			</result>
+			<result name="weijiaozhengzhuxiao">/bc-business/carByDriverHistory/weiJiaoZhengZhuXiaoForm.jsp
+			</result>
 		</action>
-		<action name="edit" class="carByDriverHistoryAction" method="edit" >
-		    <result name="zhuanChe" >/bc-business/carByDriverHistory/zhuanCheForm.jsp</result>
-		    <result name="jiaohuizhuanche" >/bc-business/carByDriverHistory/jiaoHuiZhuanCheForm.jsp</result>
-			<result name="zhuanGongSi" >/bc-business/carByDriverHistory/zhuanGongSiForm.jsp</result>
-			<result name="zhuXiao" >/bc-business/carByDriverHistory/zhuXiaoForm.jsp</result>
-			<result name="qianHui" >/bc-business/carByDriverHistory/qianHuiForm.jsp</result>
-			<result name="jiaoHui" >/bc-business/carByDriverHistory/jiaoHuiForm.jsp</result>
-			<result name="xinRuZhi" >/bc-business/carByDriverHistory/xinRuZhiForm.jsp</result>
-			<result name="zhuanCheDui" >/bc-business/carByDriverHistory/zhuanCheDuiForm.jsp</result>
-			<result name="dingban">/bc-business/carByDriverHistory/dingBanForm.jsp</result>
-			<result name="weijiaozhengzhuxiao" >/bc-business/carByDriverHistory/weiJiaoZhengZhuXiaoForm.jsp</result>
+		<action name="edit" class="carByDriverHistoryAction" method="edit">
+			<result name="zhuanChe">/bc-business/carByDriverHistory/zhuanCheForm.jsp
+			</result>
+			<result name="jiaohuizhuanche">/bc-business/carByDriverHistory/jiaoHuiZhuanCheForm.jsp
+			</result>
+			<result name="zhuanGongSi">/bc-business/carByDriverHistory/zhuanGongSiForm.jsp
+			</result>
+			<result name="zhuXiao">/bc-business/carByDriverHistory/zhuXiaoForm.jsp
+			</result>
+			<result name="qianHui">/bc-business/carByDriverHistory/qianHuiForm.jsp
+			</result>
+			<result name="jiaoHui">/bc-business/carByDriverHistory/jiaoHuiForm.jsp
+			</result>
+			<result name="xinRuZhi">/bc-business/carByDriverHistory/xinRuZhiForm.jsp
+			</result>
+			<result name="zhuanCheDui">/bc-business/carByDriverHistory/zhuanCheDuiForm.jsp
+			</result>
+			<result name="dingban">/bc-business/carByDriverHistory/dingBanForm.jsp
+			</result>
+			<result name="weijiaozhengzhuxiao">/bc-business/carByDriverHistory/weiJiaoZhengZhuXiaoForm.jsp
+			</result>
 		</action>
 	</package>
-	<package name="selectNewnestCarByDriver" extends="bc-default" namespace="/bc-business/selectNewnestCarByDriver">
-		<action name="findNewnestCarByDriver" class="selectNewnestCarByDriverAction" method="findNewnestCarByDriver" />
+	<package name="selectNewnestCarByDriver" extends="bc-default"
+		namespace="/bc-business/selectNewnestCarByDriver">
+		<action name="findNewnestCarByDriver" class="selectNewnestCarByDriverAction"
+			method="findNewnestCarByDriver" />
+	</package>
+	
+	<!-- 司机人意险 -->
+	<package name="carManRisk" extends="bc-default" namespace="/bc-business/carManRisk">
+		<action name="create" class="carManRiskAction" method="create">
+			<result name="form">/bc-business/carManRisk/form.jsp</result>
+		</action>
+		<action name="open" class="carManRiskAction" method="open">
+			<result name="formr">/bc-business/carManRisk/form.jsp</result>
+		</action>
+		<action name="edit" class="carManRiskAction" method="edit">
+			<result name="form">/bc-business/carManRisk/form.jsp</result>
+		</action>
+		<action name="save" class="carManRiskAction" method="save" />
+		<action name="delete" class="carManRiskAction" method="delete" />
+		<action name="conditions" class="carManRiskAction" method="conditions">
+			<result name="success">/bc-business/carManRisk/conditions.jsp</result>
+		</action>
+	</package>
+	
+	<!-- 导入司机人意险数据 -->
+	<package name="importCarManRisk" extends="bc-default" namespace="/bc-business/carManRisk">
+		<action name="import" class="importCarManRiskAction" />
 	</package>
 </struts>

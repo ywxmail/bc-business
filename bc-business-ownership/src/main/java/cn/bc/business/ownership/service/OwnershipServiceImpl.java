@@ -90,30 +90,41 @@ public class OwnershipServiceImpl extends DefaultCrudService<Ownership>
 		if (allCarIds != null) {
 			if ((Long[]) allCarIds.toArray(new Long[0]) != null
 					|| ((Long[]) allCarIds.toArray(new Long[0])).length != 0) {
-				for (Long carId : (Long[]) allCarIds.toArray(new Long[0])) {
-					Ownership ow = new Ownership();
-					Car insertCar = this.carDao.load(carId);
-					ow.setCar(insertCar);
-					ow.setAuthor(author);
-					ow.setFileDate(fileDate);
-					ow.setModifier(modifier);
-					ow.setModifiedDate(modifiedDate);
-					if (nature != null) {
-						ow.setNature(nature);
-					}
-					if (situation != null) {
-						ow.setSituation(situation);
-					}
-					if (owner != null) {
-						ow.setOwner(owner);
-					}
-					if (description != null) {
-						ow.setDescription(description);
-					}
-					this.ownershipDao.save(ow);
+				// for (Long carId : (Long[]) allCarIds.toArray(new Long[0])) {
+				Ownership ow = new Ownership();
+				// Car insertCar = this.carDao.load(carId);
+				// ow.setCar(insertCar);
+				ow.setAuthor(author);
+				ow.setFileDate(fileDate);
+				ow.setModifier(modifier);
+				ow.setModifiedDate(modifiedDate);
+				if (nature != null) {
+					ow.setNature(nature);
 				}
+				if (situation != null) {
+					ow.setSituation(situation);
+				}
+				if (owner != null) {
+					// ow.setOwner(owner);
+				}
+				if (description != null) {
+					ow.setDescription(description);
+				}
+				this.ownershipDao.save(ow);
+				// }
 			}
 		}
 	}
 
+	public Ownership getOwershipByNumber(String number) {
+		return this.ownershipDao.getOwershipByNumber(number);
+	}
+
+	public void updateCar4OwnerByNumber(String owner, String number) {
+		this.ownershipDao.updateCar4OwnerByNumber(owner, number);
+	}
+
+	public Car getCarByNumber(String number) {
+		return this.ownershipDao.getCarByNumber(number);
+	}
 }

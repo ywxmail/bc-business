@@ -535,7 +535,15 @@ public class CarByDriverHistoryServiceImpl extends
 					car.setId(carId);
 					carByDriver.setDriver(driver);
 					carByDriver.setCar(car);
-					carByDriver.setClasses(CarByDriver.TYPE_DINGBAN);
+					// 根据司机为替班或公共替班填写相关的营运班次信息
+					if (entity.getToClasses() == CarByDriver.TYPE_ZHUGUA) {
+						// 如果是替班(主挂)顶班的营运班次就填写替班
+						carByDriver.setClasses(CarByDriver.TYPE_DINGBAN);
+					} else if (entity.getToClasses() == CarByDriver.TYPE_GONGGONGDINGBANZHUGUA) {
+						// 如果是公共替班(主挂)顶班的营运班次就填写公共替班
+						carByDriver
+								.setClasses(CarByDriver.TYPE_GONGGONGDINGBAN);
+					}
 					carByDriver.setAuthor(entity.getAuthor());
 					carByDriver.setFileDate(entity.getFileDate());
 					carByDriver.setModifier(entity.getModifier());
@@ -550,7 +558,7 @@ public class CarByDriverHistoryServiceImpl extends
 			CarByDriver zhugaCarByDriver = new CarByDriver();
 			zhugaCarByDriver.setDriver(driver);
 			zhugaCarByDriver.setCar(entity.getToCar());
-			zhugaCarByDriver.setClasses(CarByDriver.TYPE_ZHUGUA);
+			zhugaCarByDriver.setClasses(entity.getToClasses());
 			zhugaCarByDriver.setAuthor(entity.getAuthor());
 			zhugaCarByDriver.setFileDate(entity.getFileDate());
 			zhugaCarByDriver.setModifier(entity.getModifier());
@@ -742,7 +750,7 @@ public class CarByDriverHistoryServiceImpl extends
 		type.put(String.valueOf(CarByDriverHistory.MOVETYPE_JHWZX), "交回未注销");
 		type.put(String.valueOf(CarByDriverHistory.MOVETYPE_XRZ), "新入职");
 		type.put(String.valueOf(CarByDriverHistory.MOVETYPE_ZCD), "转车队");
-		type.put(String.valueOf(CarByDriverHistory.MOVETYPE_DINGBAN), "顶班");
+		type.put(String.valueOf(CarByDriverHistory.MOVETYPE_DINGBAN), "替班安排");
 		type.put(String.valueOf(CarByDriverHistory.MOVETYPE_JHZC), "交回后转车");
 		type.put(String.valueOf(CarByDriverHistory.MOVETYPE_WJZZX), "未交证注销");
 		type.put(String.valueOf(CarByDriverHistory.MOVETYPE_NULL), "(无)");

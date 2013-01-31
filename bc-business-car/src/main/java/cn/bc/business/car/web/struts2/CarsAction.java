@@ -80,6 +80,26 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 		return context.hasAnyRole(getText("key.role.bs.car.check"));
 	}
 
+	public boolean isCheckOwner() {
+		// 车辆产权查看
+		SystemContext context = (SystemContext) this.getContext();
+		return context.hasAnyRole(getText("key.role.bs.car.owner.check"),
+				getText("key.role.bs.ownership"),
+				getText("key.role.bs.ownership.check"),
+				getText("key.role.bs.ownership.check_advanced"));
+	}
+
+	public boolean isCheckOwnershipNumber() {
+		// 车辆经营权号查看
+		SystemContext context = (SystemContext) this.getContext();
+		return context.hasAnyRole(
+				getText("key.role.bs.car.ownershipNumber.check"),
+				getText("key.role.bs.ownership"),
+				getText("key.role.bs.ownership.check"),
+				getText("key.role.bs.ownership.check_advanced"),
+				getText("key.role.bs.car"), getText("key.role.bc.admin"));
+	}
+
 	private boolean isScrapTo() {
 		// 是否能读写经济合同残值归属管理角色
 		SystemContext context = (SystemContext) this.getContext();
@@ -112,7 +132,7 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 		sql.append(",m.id as motorcade_id,c.scrap_date,c.return_date,c.fuel_type");
 		sql.append(",getContract4ChargerScrapTo(c.id) scrapto,c.modified_date,md.actor_name modifier");
 		sql.append(",getContract4ChargerCarmaintain(c.id) carmaintain,c.file_date,ad.actor_name author");
-		sql.append(",c.manage_no,c.operate_date");
+		sql.append(",c.manage_no,c.operate_date,c.owner_");
 		sql.append(" from bs_car c");
 		sql.append(" inner join bs_motorcade m on m.id=c.motorcade_id");
 		sql.append(" inner join bc_identity_actor bia on bia.id=m.unit_id");
@@ -165,6 +185,7 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 				map.put("author", rs[i++]);
 				map.put("manage_no", rs[i++]);
 				map.put("operate_date", rs[i++]);
+				map.put("owner_", rs[i++]);// 产权
 
 				return map;
 			}
@@ -226,6 +247,12 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 								+ car.get("plate_no");
 					}
 				}));
+		// 产权
+		if (isCheckOwner()) {
+			columns.add(new TextColumn4MapKey("c.owner_", "owner_",
+					getText("car.owner"), 50).setSortable(true)
+					.setUseTitleFromLabel(true));
+		}
 		// 登记日期
 		columns.add(new TextColumn4MapKey("c.register_date", "register_date",
 				getText("car.registerDate"), 90).setSortable(true)
@@ -249,7 +276,7 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 				getText("car.originNo"), 55).setSortable(true)
 				.setUseTitleFromLabel(true));
 		// 经营权证:权限控制
-		if (!isReadonly()) {
+		if (isCheckOwnershipNumber()) {
 			columns.add(new TextColumn4MapKey("c.cert_no2", "cert_no2",
 					getText("car.certNo2"), 100).setUseTitleFromLabel(true));
 		}

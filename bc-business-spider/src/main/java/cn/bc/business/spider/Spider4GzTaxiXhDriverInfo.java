@@ -88,7 +88,7 @@ public class Spider4GzTaxiXhDriverInfo implements Spider<GzTaxiXhDriverInfo> {
 		if (logger.isDebugEnabled()) {
 			logger.debug("获取登录页面:html=" + html);
 		}
-		doc = Jsoup.parse(html);
+		doc = parseHtml(html);
 		viewState = doc.select("#" + KEY_VIEWSTATE).val();
 		eventValidation = doc.select("#" + KEY_EVENTVALIDATION).val();
 		if (logger.isInfoEnabled()) {
@@ -116,7 +116,7 @@ public class Spider4GzTaxiXhDriverInfo implements Spider<GzTaxiXhDriverInfo> {
 		if (logger.isDebugEnabled()) {
 			logger.debug("登录结果:html=" + html);
 		}
-		doc = Jsoup.parse(html);
+		doc = parseHtml(html);
 		boolean loginSuccess = "已登陆".equals(doc.select("#_ctl0_L1").text());
 		if (!loginSuccess) {
 			info.setMsg("使用帐号“" + this.userName
@@ -137,7 +137,7 @@ public class Spider4GzTaxiXhDriverInfo implements Spider<GzTaxiXhDriverInfo> {
 		if (logger.isDebugEnabled()) {
 			logger.debug("获取“驾驶员信誉档案”页面:html=" + html);
 		}
-		doc = Jsoup.parse(html);
+		doc = parseHtml(html);
 		viewState = doc.select("#" + KEY_VIEWSTATE).val();
 		eventValidation = doc.select("#" + KEY_EVENTVALIDATION).val();
 		if (logger.isInfoEnabled()) {
@@ -169,7 +169,7 @@ public class Spider4GzTaxiXhDriverInfo implements Spider<GzTaxiXhDriverInfo> {
 		if (logger.isDebugEnabled()) {
 			logger.debug("获取简单信息:html=" + html);
 		}
-		doc = Jsoup.parse(html);
+		doc = parseHtml(html);
 		viewState = doc.select("#" + KEY_VIEWSTATE).val();
 		eventValidation = doc.select("#" + KEY_EVENTVALIDATION).val();
 		if (logger.isInfoEnabled()) {
@@ -232,7 +232,7 @@ public class Spider4GzTaxiXhDriverInfo implements Spider<GzTaxiXhDriverInfo> {
 		if (logger.isDebugEnabled()) {
 			logger.debug("获取详细信息:html=" + html);
 		}
-		doc = Jsoup.parse(html);
+		doc = parseHtml(html);
 		table = doc.select("#Table3 table.ListTable");
 		if (logger.isDebugEnabled()) {
 			logger.debug("detail=" + table.outerHtml());
@@ -291,5 +291,15 @@ public class Spider4GzTaxiXhDriverInfo implements Spider<GzTaxiXhDriverInfo> {
 			}
 		}
 		return info;
+	}
+
+	/**
+	 * @param html
+	 * @return
+	 */
+	private Document parseHtml(String html) {
+		Document doc = Jsoup.parse(html);
+		doc.outputSettings().prettyPrint(false);// 无缩进格式
+		return doc;
 	}
 }

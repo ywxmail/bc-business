@@ -3,18 +3,28 @@
     "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
     "http://struts.apache.org/dtds/struts-2.0.dtd">
 <struts>
-	<package name="batchChange" extends="bc-default" namespace="/bc-business/batchChange">
-		<action name="save" class="batchChangeAction" method="save" />
-		<action name="data" class="batchChangeAction" method="data" />
-		<action name="delete" class="batchChangeAction" method="delete" />
-		<action name="create" class="batchChangeAction" method="create" >
-		    <result name="form">/bc-business/ownership/piliangXiuGaiForm.jsp</result>
+	<!-- 经营权管理 -->
+	<package name="ownership" extends="bc-default" namespace="/bc-business/ownership">
+		<action name="create" class="ownershipAction" method="create">
+			<result name="form">/bc-business/ownership/form.jsp</result>
 		</action>
-		<action name="edit" class="batchChangeAction" method="edit" >
-		    <result name="dingban">/bc-business/ownership/piliangXiuGaiForm.jsp</result>
+		<action name="open" class="ownershipAction" method="open">
+			<result name="formr">/bc-business/ownership/form.jsp</result>
 		</action>
-		<action name="open" class="batchChangeAction" method="open" >
-			<result name="dingban">/bc-business/ownership/piliangXiuGaiForm.jsp</result>
+		<action name="edit" class="ownershipAction" method="edit">
+			<result name="form">/bc-business/ownership/form.jsp</result>
 		</action>
+		<action name="save" class="ownershipAction" method="save" />
+		<action name="delete" class="ownershipAction" method="delete" />
+		<!-- Ajax查询经营权信息 -->
+		<action name="find" class="findOwnershipAction" />
+
 	</package>
+
+	<!-- 导入数据 -->
+	<package name="importOwnership" extends="bc-default"
+		namespace="/bc-business/ownership">
+		<action name="import" class="importOwnershipAction" />
+	</package>
+
 </struts>

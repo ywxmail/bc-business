@@ -406,6 +406,10 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 				getText("carByDriver.classes.dingban"));
 		type.put(String.valueOf(CarByDriver.TYPE_ZHUGUA),
 				getText("carByDriver.classes.zhugua"));
+		type.put(String.valueOf(CarByDriver.TYPE_GONGGONGDINGBANZHUGUA),
+				getText("carByDriver.classes.gonggongdingbanzhugua"));
+		type.put(String.valueOf(CarByDriver.TYPE_GONGGONGDINGBAN),
+				getText("carByDriver.classes.gonggongdingban"));
 		return type;
 	}
 
@@ -491,7 +495,7 @@ public class CarByDriverHistorysAction extends ViewAction<Map<String, Object>> {
 						.addButton(
 								new ToolbarButton()
 										.setIcon("ui-icon-document")
-										.setText("顶班处理")
+										.setText("替班处理")
 										.setClick(
 												"bc.business.chuLiDingBan.create"));
 

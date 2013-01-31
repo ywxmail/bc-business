@@ -107,7 +107,7 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 		sql.append(",m.cert_cyzg,m.work_date,m.origin,m.former_unit,m.charger,m.cert_driving_first_date");
 		sql.append(",m.cert_driving,m.cert_driving_start_date,m.cert_driving_end_date,m.file_date,m.phone,m.phone1,m.sex,m.birthdate");
 		sql.append(",m.carinfo,m.move_type,mo.name motorcade,bia.name unit_name,m.classes,m.move_date,m.shiftwork_end_date,m.main_car_id");
-		sql.append(",c.company company,c.code,m.gz,m.model_,m.region_,m.modified_date,md.actor_name modifier");
+		sql.append(",c.company company,c.code,c.manage_no,m.gz,m.model_,m.region_,getCarManRiskDateRange(m.id) as risk,m.modified_date,md.actor_name modifier");
 		sql.append(",m.file_date,ad.actor_name author");
 		sql.append(" from BS_CARMAN m");
 		sql.append(" left join bs_car c on m.main_car_id=c.id");
@@ -160,10 +160,12 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 				map.put("mainCarId", rs[i++]);
 				map.put("company", rs[i++]);
 				map.put("carCode", rs[i++]);
+				map.put("carManageNo", rs[i++]);
 				// ===========================
 				map.put("gz", rs[i++]);
 				map.put("model_", rs[i++]);
 				map.put("region_", rs[i++]);
+				map.put("risk", rs[i++]);// 人意险购买情况
 				map.put("modified_date", rs[i++]);
 				map.put("modifier", rs[i++]);
 				map.put("file_date", rs[i++]);
@@ -227,6 +229,8 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 						.getContextPath())));
 		columns.add(new TextColumn4MapKey("c.code", "carCode",
 				getText("carMan.carCode"), 70).setSortable(true));
+		columns.add(new TextColumn4MapKey("c.manage_no", "carManageNo",
+				getText("carMan.carManageNo"), 70).setSortable(true));
 		// =================
 		columns.add(new TextColumn4MapKey("m.birthdate", "birth_date",
 				getText("carMan.birthdate"), 85).setSortable(true)
@@ -300,16 +304,18 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("m.region_", "region_",
 				getText("carMan.region"), 60)
 				.setValueFormater(new KeyValueFormater(getRegion())));
+		columns.add(new TextColumn4MapKey("risk", "risk",
+				getText("carMan.risk"), 180));
 		columns.add(new TextColumn4MapKey("ad.actor_name", "author",
 				getText("carMan.author"), 80).setSortable(true));
 		columns.add(new TextColumn4MapKey("m.file_date", "file_date",
 				getText("carMan.fileDate"), 120).setSortable(true)
-				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+				.setValueFormater(new CalendarFormater("yyyy-MM-dd HH:mm")));
 		columns.add(new TextColumn4MapKey("md.actor_name", "modifier",
 				getText("carMan.modifier"), 80).setSortable(true));
 		columns.add(new TextColumn4MapKey("m.modified_date", "modified_date",
 				getText("carMan.modifiedDate"), 120).setSortable(true)
-				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+				.setValueFormater(new CalendarFormater("yyyy-MM-dd HH:mm")));
 
 		return columns;
 	}
@@ -428,7 +434,7 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 	}
 
 	/**
-	 * 特殊的营运班次(3，4都显示为顶班)
+	 * 特殊的营运班次：正班、副班、替班、公共替班
 	 * 
 	 * @return
 	 */
@@ -442,6 +448,8 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 				getText("carByDriver.classes.dingban"));
 		type.put(String.valueOf(CarByDriver.TYPE_ZHUGUA),
 				getText("carByDriver.classes.dingban"));
+		type.put(String.valueOf(CarByDriver.TYPE_GONGGONGDINGBANZHUGUA),
+				getText("carByDriver.classes.gonggongdingban"));
 		type.put(String.valueOf(CarByDriver.TYPE_WEIDINGYI),
 				getText("carByDriver.classes.weidingyi"));
 		return type;

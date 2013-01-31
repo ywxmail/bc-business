@@ -65,4 +65,9 @@ public class MotorcadeDaoImpl extends HibernateCrudJpaDao<Motorcade> implements
 					}
 				});
 	}
+
+	public Motorcade loadByName(String name) {
+		return this.createQuery().condition(new EqualsCondition("name", name))
+				.singleResult();
+	}
 }

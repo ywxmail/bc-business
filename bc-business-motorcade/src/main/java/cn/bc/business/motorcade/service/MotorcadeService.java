@@ -30,4 +30,12 @@ public interface MotorcadeService extends CrudService<Motorcade> {
 	 * @return 返回结果中的元素Map格式为：id -- Motorcade的id,name -- Motorcade的name
 	 */
 	List<Map<String, String>> find4Option(Integer[] statuses);
+
+	/**
+	 * 获取指定名称的车队
+	 * 
+	 * @param name
+	 * @return
+	 */
+	Motorcade loadByName(String name);
 }

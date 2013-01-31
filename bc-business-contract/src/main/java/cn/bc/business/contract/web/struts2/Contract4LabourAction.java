@@ -408,6 +408,11 @@ public class Contract4LabourAction extends
 			// 操作类型设置为维护
 			entity.setOpType(Contract.OPTYPE_MAINTENANCE);
 		}
+		// 如果是草稿状态的合同表单需要获取上份合同的结束日期
+		if (entity.getStatus() == BCConstants.STATUS_DRAFT) {
+			this.stopDate = entity.getExt_str3();
+		}
+
 	}
 
 	@Override

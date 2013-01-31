@@ -134,6 +134,17 @@ public class CarAction extends FileEntityAction<Long, Car> {
 		return context.hasAnyRole(getText("key.role.bs.car.entering"));
 	}
 
+	public boolean isCheckOwnershipNumber() {
+		// 车辆经营权号查看
+		SystemContext context = (SystemContext) this.getContext();
+		return context.hasAnyRole(
+				getText("key.role.bs.car.ownershipNumber.check"),
+				getText("key.role.bs.ownership"),
+				getText("key.role.bs.ownership.check"),
+				getText("key.role.bs.ownership.check_advanced"),
+				getText("key.role.bs.car"), getText("key.role.bc.admin"));
+	}
+
 	@Override
 	protected void buildFormPageButtons(PageOption pageOption, boolean editable) {
 		// 特殊处理的部分
@@ -220,7 +231,8 @@ public class CarAction extends FileEntityAction<Long, Car> {
 
 	@Override
 	protected void afterOpen(Car entity) {
-		if (isReadonly() && this.getE().getStatus() != BCConstants.STATUS_DRAFT) {
+		if (!this.isCheckOwnershipNumber()
+				&& this.getE().getStatus() != BCConstants.STATUS_DRAFT) {
 			this.getE().setCertNo2("******");
 		}
 	}
@@ -500,7 +512,7 @@ public class CarAction extends FileEntityAction<Long, Car> {
 	}
 
 	/**
-	 * 通过自编号是否被其他车辆使用过,并且将使用过此编号的车辆的车牌号生成到新车的原车号. 如果返回多辆车只取最新登记日期那辆车牌号.
+	 * 通过经营权号是否被其他车辆使用过,并且将使用过此编号的车辆的车牌号生成到新车的原车号. 如果返回多辆车只取最新登记日期那辆车牌号.
 	 */
 	public String autoSetOriginNo() {
 		Json json = new Json();

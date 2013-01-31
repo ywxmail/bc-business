@@ -1,4 +1,4 @@
--- bc营运管理子系统的 postgresql 删表脚本
+﻿-- bc营运管理子系统的 postgresql 删表脚本
 -- 运行此脚本之后再运行平台的删表脚本framework.db.postgresql.drop.sql
 
 -- 用于生成数据转换 id的序列
@@ -7,6 +7,15 @@ drop sequence if exists DC_SEQUENCE;
 
 -- 数据转换记录
 drop table if exists DC_RECORD;
+
+-- 司机人意险
+DROP TABLE IF EXISTS BS_CARMAN_RISK_INSURANT;
+DROP TABLE IF EXISTS BS_CARMAN_RISK_ITEM;
+DROP TABLE IF EXISTS BS_CARMAN_RISK;
+
+-- 司机招聘
+DROP TABLE IF EXISTS BS_TEMP_DRIVER_WORKFLOW;
+DROP TABLE IF EXISTS BS_TEMP_DRIVER;
 
 -- 安全学习和回场检
 drop table if exists BS_ARRANGE_DRIVER;
@@ -61,6 +70,7 @@ drop table if exists BS_CONTRACT_CHARGER;
 drop table if exists BS_CONTRACT;
 
 -- 营运事件
+DROP TABLE IF EXISTS BS_CASE_INFRACT_CODE;
 DROP TABLE IF EXISTS BS_CASE_LOST;
 DROP TABLE IF EXISTS BS_CASE_ADVICE;
 DROP TABLE IF EXISTS BS_CASE_PRAISE;

@@ -33,6 +33,8 @@ public class Case4InfractTraffic extends CaseBase {
 	private Calendar deliverDate;// 邮递时间
 	private boolean sign;// 是否签领
 	private Calendar signDate;// 签领时间
+	private String infractCode;// 违法代码
+	private Float penalty;// 罚款金额
 
 	public String getCharger() {
 		return charger;
@@ -110,4 +112,22 @@ public class Case4InfractTraffic extends CaseBase {
 	public void setSignDate(Calendar signDate) {
 		this.signDate = signDate;
 	}
+
+	@Column(name = "INFRACT_CODE")
+	public String getInfractCode() {
+		return infractCode;
+	}
+
+	public void setInfractCode(String infractCode) {
+		this.infractCode = infractCode;
+	}
+
+	public Float getPenalty() {
+		return penalty;
+	}
+
+	public void setPenalty(Float penalty) {
+		this.penalty = penalty;
+	}
+
 }

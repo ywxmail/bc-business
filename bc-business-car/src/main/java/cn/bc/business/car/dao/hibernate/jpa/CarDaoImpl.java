@@ -33,6 +33,7 @@ import cn.bc.business.cert.domain.Cert;
 import cn.bc.business.contract.domain.Contract;
 import cn.bc.core.Page;
 import cn.bc.core.query.condition.Condition;
+import cn.bc.core.query.condition.impl.EqualsCondition;
 import cn.bc.core.util.DateUtils;
 import cn.bc.db.jdbc.RowMapper;
 import cn.bc.orm.hibernate.jpa.HibernateCrudJpaDao;
@@ -596,7 +597,7 @@ public class CarDaoImpl extends HibernateCrudJpaDao<Car> implements CarDao {
 
 		// 现在
 		month.add(Calendar.YEAR, 8);
-		
+
 		// 半年后
 		month.add(Calendar.MONTH, 6);
 		Date halfAYearLaterLastDayOfMonth = month.getTime();
@@ -618,33 +619,21 @@ public class CarDaoImpl extends HibernateCrudJpaDao<Car> implements CarDao {
 		// 商业险
 		sql += " ((d.commerial_end_date>? and d.commerial_end_date<? and c.end_date>? and c.end_date<? ) or d.status_ is null)";
 		sql += " )";
-		
-		Object[] args = new Object[] { 
-				BCConstants.STATUS_ENABLED,
-				BCConstants.STATUS_ENABLED, 
-				BCConstants.STATUS_ENABLED,
-				BCConstants.STATUS_ENABLED, 
-				fistDayOfMonth,
-				lastDayOfMonth, 				
-				fiveYearsAgoFistDayOfMonth,
-				fiveYearsAgoLastDayOfMonth,	
-				eightYearsAgoFistDayOfMonth,
-				eightYearsAgoLastDayOfMonth, 
-				fistDayOfMonth,
-				lastDayOfMonth, 
-				fistDayOfMonth,
-				halfAYearLaterLastDayOfMonth, 
-				fistDayOfMonth,
-				lastDayOfMonth, 
-				fistDayOfMonth,
-				halfAYearLaterLastDayOfMonth };
-		if(logger.isDebugEnabled()){
+
+		Object[] args = new Object[] { BCConstants.STATUS_ENABLED,
+				BCConstants.STATUS_ENABLED, BCConstants.STATUS_ENABLED,
+				BCConstants.STATUS_ENABLED, fistDayOfMonth, lastDayOfMonth,
+				fiveYearsAgoFistDayOfMonth, fiveYearsAgoLastDayOfMonth,
+				eightYearsAgoFistDayOfMonth, eightYearsAgoLastDayOfMonth,
+				fistDayOfMonth, lastDayOfMonth, fistDayOfMonth,
+				halfAYearLaterLastDayOfMonth, fistDayOfMonth, lastDayOfMonth,
+				fistDayOfMonth, halfAYearLaterLastDayOfMonth };
+		if (logger.isDebugEnabled()) {
 			logger.debug("sql=" + sql);
 			logger.debug("args=" + args);
 		}
 		return HibernateJpaNativeQuery.executeNativeSql(getJpaTemplate(), sql,
-				args,
-				new RowMapper<Map<String, Object>>() {
+				args, new RowMapper<Map<String, Object>>() {
 					public Map<String, Object> mapRow(Object[] rs, int rowNum) {
 						Map<String, Object> oi = new HashMap<String, Object>();
 						int i = 0;
@@ -741,5 +730,11 @@ public class CarDaoImpl extends HibernateCrudJpaDao<Car> implements CarDao {
 			return new Long(list.get(0).get("id").toString());
 		else
 			return null;
+	}
+
+	public Car loadByPlateNo(String plateNo) {
+		return this.createQuery()
+				.condition(new EqualsCondition("plateNo", plateNo))
+				.singleResult();
 	}
 }
