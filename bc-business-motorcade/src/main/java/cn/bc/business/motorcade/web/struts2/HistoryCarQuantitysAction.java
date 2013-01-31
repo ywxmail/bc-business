@@ -191,7 +191,7 @@ public class HistoryCarQuantitysAction extends ViewAction<Map<String, Object>> {
 	// ==高级搜索代码开始==
 	@Override
 	protected boolean useAdvanceSearch() {
-		return true;
+		return false;
 	}
 
 
@@ -199,7 +199,7 @@ public class HistoryCarQuantitysAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected void initConditionsFrom() throws Exception {
-		//motorcadeList=OptionItem.toLabelValues(this.invoice4BuyService.findCompany4Option());
+		
 	}
 
 	@Override
