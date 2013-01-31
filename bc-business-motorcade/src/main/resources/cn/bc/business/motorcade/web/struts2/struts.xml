@@ -4,7 +4,20 @@
     "http://struts.apache.org/dtds/struts-2.0.dtd">
 <struts>
 	<package name="motorcade" extends="bc-default" namespace="/bc-businesss">
-		
-		
+	</package>
+	
+	<!-- 查看历史-->
+	<package name="historyCarQuantity" extends="bc-default" namespace="/bc-business/historyCarQuantity">
+		<action name="create" class="historyCarQuantityAction" method="create">
+			<result name="form">/bc-business/motorcade/historyCarQuantity/form.jsp</result>
+		</action>		
+		<action name="open" class="historyCarQuantityAction" method="open">
+			<result name="formr">/bc-business/motorcade/historyCarQuantity/form.jsp</result>
+		</action>
+		<action name="edit" class="historyCarQuantityAction" method="edit">
+			<result name="form">/bc-business/motorcade/historyCarQuantity/form.jsp</result>
+		</action>
+		<action name="save" class="historyCarQuantityAction" method="save"/>
+		<action name="delete" class="historyCarQuantityAction" method="delete"/>
 	</package>
 </struts>
