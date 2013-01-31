@@ -30,6 +30,7 @@ public class HistoryCarQuantityAction extends
 	private static final long serialVersionUID = 1L;
 	private HistoryCarQuantityService historyCarQuantityService;
 	private MotorcadeService motorcadeService;
+	public Long motorcade_id;
 	
 	public List<Map<String, String>> motorcadeList; // 可选车队列表
 	
@@ -55,29 +56,31 @@ public class HistoryCarQuantityAction extends
 	
 	@Override
 	protected PageOption buildFormPageOption(boolean editable) {
-		return super.buildFormPageOption(editable).setWidth(450)
-				.setMinWidth(250).setHeight(260).setMinHeight(250);
+		return super.buildFormPageOption(editable).setWidth(460)
+				.setMinWidth(250).setHeight(280).setMinHeight(250);
 	}
 	
 	@Override
 	protected void buildFormPageButtons(PageOption pageOption, boolean editable) {
 		if (!this.isReadonly()) {
-			if (editable) {// 可编辑时显示保存按钮
 				pageOption.addButton(getDefaultSaveButtonOption());
 				pageOption.addButton(new ButtonOption(
 						getText("historyCarQuantity.saveAndClose"), null,
 						"bs.historyCarQuantityForm.saveAndClose")
 						.setId("historyCarQuantitySaveAndClose"));
-			} else {// open时
-					// 维护
-					pageOption.addButton(new ButtonOption(
-							getText("historyCarQuantity.doMaintenance"), null,
-							"bs.historyCarQuantityForm.doMaintenance")
-							.setId("historyCarQuantityDoMaintenance"));
-				
-			}
+		
 		}
 	}
+	
+	
+	@Override
+	protected void afterCreate(HistoryCarQuantity entity) {
+		super.afterCreate(entity);
+		if(this.motorcade_id!=null){
+			entity.setMotorcade(this.motorcadeService.load(motorcade_id));
+		}
+	}
+	
 
 	@Override
 	protected void initForm(boolean editable) throws Exception {
