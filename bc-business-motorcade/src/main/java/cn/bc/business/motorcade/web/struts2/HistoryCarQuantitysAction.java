@@ -130,7 +130,7 @@ public class HistoryCarQuantitysAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected String[] getGridSearchFields() {
-		return new String[] { "b.name", "a.year_" , "a.month_", "a.day_","c.actor_name","u.name"};
+		return new String[] { "b.name","c.actor_name","u.name"};
 	}
 
 	@Override
