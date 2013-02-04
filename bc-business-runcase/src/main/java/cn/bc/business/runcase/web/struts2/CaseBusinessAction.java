@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.json.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
@@ -30,6 +31,7 @@ import cn.bc.business.sync.service.JiaoWeiYYWZService;
 import cn.bc.business.web.struts2.FileEntityAction;
 import cn.bc.core.query.condition.Direction;
 import cn.bc.core.query.condition.impl.OrderCondition;
+import cn.bc.core.util.StringUtils;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.option.domain.OptionItem;
 import cn.bc.option.service.OptionService;
@@ -39,6 +41,7 @@ import cn.bc.web.ui.html.page.ButtonOption;
 import cn.bc.web.ui.html.page.PageOption;
 import cn.bc.web.ui.json.Json;
 import cn.bc.web.ui.json.JsonArray;
+import cn.bc.workflow.service.WorkflowModuleRelationService;
 
 /**
  * 营运违章Action
@@ -82,6 +85,9 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 	public	Map<String,String>					sourcesValue;
 	public	Map<String,String>					categoryValue;
 	private Map<String, List<Map<String, String>>> 			allList;
+	
+	private WorkflowModuleRelationService 		workflowModuleRelationService;
+	public List<Map<String, Object>> 			list_WorkflowModuleRelation; // 工作流程集合
 
 	public Long getCarId() {
 		return carId;
@@ -154,6 +160,12 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 	@Autowired
 	public void setCaseBaseService(CaseBaseService caseBaseService) {
 		this.caseBaseService = caseBaseService;
+	}
+	
+	@Autowired
+	public void setWorkflowModuleRelationService(
+			WorkflowModuleRelationService workflowModuleRelationService) {
+		this.workflowModuleRelationService = workflowModuleRelationService;
 	}
 
 	@Override
@@ -523,6 +535,12 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 		categoryValue		 = 	this.getCategory();
 		// 表单可选项的加载
 		initSelects();
+		
+		if (!this.getE().isNew()) {
+			list_WorkflowModuleRelation = this.workflowModuleRelationService
+					.findList(this.getE().getId(), Case4InfractBusiness.class.getSimpleName(),
+							null);
+		}
 	}
 	
 /*	
@@ -674,5 +692,28 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 		}
 		return chargers;
 	}
+	
+	// ---发起流程---开始---
+	public String tdIds;
+
+	public String startFlow() throws Exception{
+		Json json = new Json();
+		// 去掉最后一个逗号
+		String[] _ids = tdIds.substring(0, tdIds.lastIndexOf(",")).split(",");
+		List<Map<String,String>> processValue = this.caseBusinessService.doStartFlow(
+				getText("runcase.startFlow.key4InfractBusinessHandle"),
+				StringUtils.stringArray2LongArray(_ids));
+		json.put("success", true);
+		json.put("msg", getText("runcase.startFlow.success.false"));
+		
+		JSONArray _processValue=OptionItem.toLabelValues(processValue);
+		
+		json.put("processInfo",_processValue);
+		
+		this.json = json.toString();
+		return "json";
+	}
+
+	// --流程结束---
 	
 }

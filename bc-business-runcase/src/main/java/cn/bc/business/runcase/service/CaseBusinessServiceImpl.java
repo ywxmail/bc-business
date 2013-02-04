@@ -3,7 +3,11 @@
  */
 package cn.bc.business.runcase.service;
 
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -16,6 +20,9 @@ import cn.bc.identity.web.SystemContext;
 import cn.bc.identity.web.SystemContextHolder;
 import cn.bc.sync.dao.SyncBaseDao;
 import cn.bc.sync.domain.SyncBase;
+import cn.bc.workflow.domain.WorkflowModuleRelation;
+import cn.bc.workflow.service.WorkflowModuleRelationService;
+import cn.bc.workflow.service.WorkflowService;
 
 /**
  * 营运事件营运违章Service的实现
@@ -27,6 +34,19 @@ public class CaseBusinessServiceImpl extends DefaultCrudService<Case4InfractBusi
 	private CaseBusinessDao caseBusinessDao;
 
 	private SyncBaseDao syncBaseDao;
+	private WorkflowService workflowService;
+	private WorkflowModuleRelationService workflowModuleRelationService;
+	
+	@Autowired
+	public void setWorkflowService(WorkflowService workflowService) {
+		this.workflowService = workflowService;
+	}
+	
+	@Autowired
+	public void setWorkflowModuleRelationService(
+			WorkflowModuleRelationService workflowModuleRelationService) {
+		this.workflowModuleRelationService = workflowModuleRelationService;
+	}
 	
 	public CaseBusinessDao getCaseBusinessDao() {
 		return caseBusinessDao;
@@ -85,5 +105,48 @@ public class CaseBusinessServiceImpl extends DefaultCrudService<Case4InfractBusi
 		business.setCloseDate(closeDate);
 		
 		return this.caseBusinessDao.save(business);
+	}
+	
+	public List<Map<String,String>> doStartFlow(String key, Long[] ids) throws Exception {
+		// 声明返回的信息
+		List<Map<String,String>> returnValue=new ArrayList<Map<String,String>>();
+		
+		Map<String,String> returnMap;
+		
+		// 循环Id数组
+		for (Long id : ids) {
+			returnMap=new HashMap<String,String>();
+			Case4InfractBusiness cib = this.caseBusinessDao.load(id);
+			// 声明变量
+			Map<String, Object> variables = new HashMap<String, Object>();
+			// 发起流程
+			String procInstId = this.workflowService.startFlowByKey(key,
+					this.returnParam(cib, variables));
+
+			// 保存流程与交通违法信息的关系
+			WorkflowModuleRelation workflowModuleRelation = new WorkflowModuleRelation();
+			workflowModuleRelation.setMid(id);
+			workflowModuleRelation.setPid(procInstId);
+			workflowModuleRelation.setMtype(Case4InfractBusiness.class.getSimpleName());
+			this.workflowModuleRelationService.save(workflowModuleRelation);
+			// procInstIds += procInstId + ",";
+			// 将状态更改为处理中
+			cib.setStatus(CaseBase.STATUS_HANDLING);
+			this.caseBusinessDao.save(cib);
+			
+			returnMap.put("moduleId", String.valueOf(id));
+			returnMap.put("procInstId", procInstId);
+			
+			returnValue.add(returnMap);
+		}
+		
+		return returnValue;
+	}
+	
+	private Map<String,Object> returnParam(Case4InfractBusiness cib,Map<String,Object> variables){
+		if(variables==null)return null;
+		if(cib==null)return null;
+		
+		return variables;
 	}
 }
