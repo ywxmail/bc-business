@@ -124,6 +124,11 @@ public class Car extends RichFileEntityImpl {
 	private String lpgInsuranceId;// LPG保单号
 	private Calendar lpgInsuranceStartDate;// LPG保单开始日期
 	private Calendar lpgInsuranceEndDate;// LPG保单结束日期
+	private String lpgGpIcCardNo;//lpg钢瓶IC卡号
+	private Calendar lpgGpIcCardGetDate;//lpg钢瓶IC卡领取日期
+	private String lpgGpIcCardPensioner;//lpg钢瓶IC卡领取人
+	private String lpgComputerCode;//lpg电脑编号
+	private String lpgGpSupportNo;//lpg钢瓶支架号
 
 	private String carTvScreen;// 车载电视屏
 	private String rentNo;//
@@ -833,5 +838,54 @@ public class Car extends RichFileEntityImpl {
 	public void setOwner(String owner) {
 		this.owner = owner;
 	}
+
+	@Column(name = "LPG_GP_IC_CARD_NO")
+	public String getLpgGpIcCardNo() {
+		return lpgGpIcCardNo;
+	}
+
+	public void setLpgGpIcCardNo(String lpgGpIcCardNo) {
+		this.lpgGpIcCardNo = lpgGpIcCardNo;
+	}
+
+	@Column(name = "LPG_GP_IC_CARD_GET_DATE")
+	public Calendar getLpgGpIcCardGetDate() {
+		return lpgGpIcCardGetDate;
+	}
+
+	public void setLpgGpIcCardGetDate(Calendar lpgGpIcCardGetDate) {
+		this.lpgGpIcCardGetDate = lpgGpIcCardGetDate;
+	}
+
+	@Column(name = "LPG_GP_IC_CARD_PENSIONER")
+	public String getLpgGpIcCardPensioner() {
+		return lpgGpIcCardPensioner;
+	}
+
+	public void setLpgGpIcCardPensioner(String lpgGpIcCardPensioner) {
+		this.lpgGpIcCardPensioner = lpgGpIcCardPensioner;
+	}
+
+	@Column(name = "LPG_COMPUTER_CODE")
+	public String getLpgComputerCode() {
+		return lpgComputerCode;
+	}
+
+	public void setLpgComputerCode(String lpgComputerCode) {
+		this.lpgComputerCode = lpgComputerCode;
+	}
+
+	@Column(name = "LPG_GP_SUPPORT_NO")
+	public String getLpgGpSupportNo() {
+		return lpgGpSupportNo;
+	}
+
+	public void setLpgGpSupportNo(String lpgGpSupportNo) {
+		this.lpgGpSupportNo = lpgGpSupportNo;
+	}
+
+	
+	
+	
 
 }
