@@ -1,6 +1,7 @@
 package cn.bc.business.motorcade.dao;
 
 import java.io.Serializable;
+import java.util.Calendar;
 
 import cn.bc.business.motorcade.domain.HistoryCarQuantity;
 import cn.bc.core.dao.CrudDao;
@@ -22,4 +23,15 @@ public interface HistoryCarQuantityDao extends CrudDao<HistoryCarQuantity> {
 	 * @return 插入的数据条目数
 	 */
 	int doRecordHistoryCarQuantity4Day();
+
+	/**
+	 * 获取指定车队指定日的车辆数
+	 * 
+	 * @param motorcadeId
+	 *            车队ID
+	 * @param date
+	 *            日期
+	 * @return
+	 */
+	HistoryCarQuantity loadByDate(Long motorcadeId, Calendar date);
 }
