@@ -76,11 +76,13 @@ public class MotorcadeAction extends FileEntityAction<Long, Motorcade> {
 		if (editable && !readonly) {
 			// 添加默认的保存按钮
 			pageOption.addButton(this.getDefaultSaveButtonOption());
-			if (!this.getE().isNew()) {
-				pageOption.addButton(new ButtonOption(
-						getText("motorcade.historicalInformation"), null,
-						"bc.business.motorcadeForm.check"));
-			}
+		}
+
+		// 查看历史车辆数按钮
+		if (!this.getE().isNew()) {
+			pageOption.addButton(new ButtonOption(
+					getText("motorcade.historicalInformation"), null,
+					"bc.business.motorcadeForm.check"));
 		}
 	}
 
@@ -98,7 +100,6 @@ public class MotorcadeAction extends FileEntityAction<Long, Motorcade> {
 		this.paymentDates = this.optionService
 				.findOptionItemByGroupKey(OptionConstants.MOTORCADE_PAYMENT_DATE);
 	}
-
 
 	@Override
 	protected void beforeSave(Motorcade entity) {
