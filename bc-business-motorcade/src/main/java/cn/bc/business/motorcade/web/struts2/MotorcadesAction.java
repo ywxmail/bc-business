@@ -175,14 +175,12 @@ public class MotorcadesAction extends ViewAction<Map<String, Object>> {
 	@Override
 	protected Toolbar getHtmlPageToolbar() {
 		Toolbar tb = getHtmlPageToolbar(true);
-		if(!isReadonly()){
-			tb.addButton(new ToolbarButton().setIcon("ui-icon-lightbulb")
-					.setText(getText("motorcade.viewHistoryCarQuantity"))
-					.setClick("bc.motorcadeList.viewHistoryCarQuantity"));
-		}
+		tb.addButton(new ToolbarButton().setIcon("ui-icon-lightbulb")
+				.setText(getText("motorcade.viewHistoryCarQuantity"))
+				.setClick("bc.motorcadeList.viewHistoryCarQuantity"));
 		return tb;
 	}
-	
+
 	@Override
 	protected String getHtmlPageJs() {
 		return this.getHtmlPageNamespace() + "/motorcade/list.js";

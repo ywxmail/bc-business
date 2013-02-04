@@ -24,11 +24,14 @@ import cn.bc.db.jdbc.SqlObject;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.ui.html.grid.Column;
+import cn.bc.web.ui.html.grid.FooterButton;
 import cn.bc.web.ui.html.grid.IdColumn4MapKey;
 import cn.bc.web.ui.html.grid.TextColumn4MapKey;
 import cn.bc.web.ui.html.page.PageOption;
 import cn.bc.web.ui.html.toolbar.Toolbar;
 import cn.bc.web.ui.json.Json;
+
+import com.google.gson.JsonObject;
 
 /**
  * 查看历史车辆数Action
@@ -53,7 +56,8 @@ public class HistoryCarQuantitysAction extends ViewAction<Map<String, Object>> {
 	@Override
 	protected OrderCondition getGridDefaultOrderCondition() {
 		// 默认排序方向：年 月 日
-		return new OrderCondition("a.year_", Direction.Desc).add("a.month_",Direction.Desc).add("a.day_",Direction.Desc);
+		return new OrderCondition("a.year_", Direction.Desc).add("a.month_",
+				Direction.Desc).add("a.day_", Direction.Desc);
 	}
 
 	@Override
@@ -87,11 +91,9 @@ public class HistoryCarQuantitysAction extends ViewAction<Map<String, Object>> {
 				map.put("mname", rs[i++]);
 				map.put("mdate", rs[i++]);
 				map.put("unitName", rs[i++]);
-				String date=map.get("year").toString()
-							+"-"
-							+map.get("month").toString()
-							+"-"
-							+map.get("day").toString();
+				String date = map.get("year").toString() + "-"
+						+ map.get("month").toString() + "-"
+						+ map.get("day").toString();
 				map.put("date", date);
 				return map;
 			}
@@ -106,22 +108,22 @@ public class HistoryCarQuantitysAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("u.name", "unitName",
 				getText("motorcade.unit"), 85).setSortable(true)
 				.setUseTitleFromLabel(true));
-		//车队名称
+		// 车队名称
 		columns.add(new TextColumn4MapKey("b.name", "mtname",
 				getText("motorcade.name"), 85).setSortable(true)
 				.setUseTitleFromLabel(true));
-		//日期
+		// 日期
 		columns.add(new TextColumn4MapKey("", "date",
-				getText("historyCarQuantity.date"),100).setSortable(true)
+				getText("historyCarQuantity.date"), 100).setSortable(true)
 				.setUseTitleFromLabel(true));
-		//车辆数
+		// 车辆数
 		columns.add(new TextColumn4MapKey("a.quantity", "quantity",
-				getText("historyCarQuantity.carquantity"), 80).setSortable(true)
-				.setUseTitleFromLabel(true));
-		//最后修改人
+				getText("historyCarQuantity.carquantity"), 80)
+				.setSortable(true).setUseTitleFromLabel(true));
+		// 最后修改人
 		columns.add(new TextColumn4MapKey("c.actor_name", "mname",
 				getText("historyCarQuantity.modifier"), 80).setSortable(true));
-		//最后修改时间
+		// 最后修改时间
 		columns.add(new TextColumn4MapKey("a.modified_date", "mdate",
 				getText("historyCarQuantity.modifierDate")).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd HH:mm")));
@@ -130,7 +132,7 @@ public class HistoryCarQuantitysAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected String[] getGridSearchFields() {
-		return new String[] { "b.name","c.actor_name","u.name"};
+		return new String[] { "b.name", "c.actor_name", "u.name" };
 	}
 
 	@Override
@@ -151,7 +153,7 @@ public class HistoryCarQuantitysAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected Condition getGridSpecalCondition() {
-		if(motorcade_id != null){
+		if (motorcade_id != null) {
 			return new EqualsCondition("a.motorcade_id", motorcade_id);
 		}
 		return null;
@@ -159,7 +161,7 @@ public class HistoryCarQuantitysAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected void extendGridExtrasData(Json json) {
-		if(motorcade_id != null){
+		if (motorcade_id != null) {
 			json.put("motorcade_id", motorcade_id);
 		}
 	}
@@ -168,11 +170,11 @@ public class HistoryCarQuantitysAction extends ViewAction<Map<String, Object>> {
 	protected Toolbar getHtmlPageToolbar() {
 		Toolbar tb = new Toolbar();
 
-		if(!isReadonly()){
+		if (!isReadonly()) {
 			tb.addButton(this.getDefaultCreateToolbarButton());
 			tb.addButton(this.getDefaultEditToolbarButton());
 			tb.addButton(this.getDefaultDeleteToolbarButton());
-		}else{
+		} else {
 			// 查看按钮
 			tb.addButton(this.getDefaultOpenToolbarButton());
 		}
@@ -182,26 +184,46 @@ public class HistoryCarQuantitysAction extends ViewAction<Map<String, Object>> {
 
 		return tb;
 	}
-	
-	
+
 	// ==高级搜索代码开始==
 	@Override
 	protected boolean useAdvanceSearch() {
 		return false;
 	}
 
-
 	public JSONArray motorcadeList;// 车队名称的下拉列
 
 	@Override
 	protected void initConditionsFrom() throws Exception {
-		
+
 	}
 
 	@Override
 	public String getAdvanceSearchConditionsJspPath() {
-		return  BSConstants.NAMESPACE + "/motorcade/historyCarQuantity";
+		return BSConstants.NAMESPACE + "/motorcade/historyCarQuantity";
 	}
-	
+
 	// ==高级搜索代码结束==
+
+	@Override
+	protected FooterButton getGridFooterImportButton() {
+		// 管理员才能导入
+		if (this.isReadonly())
+			return null;
+
+		// 获取默认的导入按钮设置
+		FooterButton fb = this.getDefaultGridFooterImportButton();
+
+		// 配置特殊参数
+		JsonObject cfg = new JsonObject();
+		cfg.addProperty("tplCode", "IMPORT_HISTORY_CAR_QUANTITY");// 模板编码
+		cfg.addProperty("importAction", "bc-business/historyCarQuantity/import");// 导入数据的action路径(使用相对路径)
+		cfg.addProperty("headerRowIndex", 1);// 列标题所在行的索引号(0-based)
+		cfg.addProperty("ptype", "Import.HistoryCarQuantity");
+		cfg.addProperty("puid", "Import.HistoryCarQuantity");
+		fb.setAttr("data-cfg", cfg.toString());
+
+		// 返回导入按钮
+		return fb;
+	}
 }
