@@ -4,12 +4,18 @@ import cn.bc.business.motorcade.dao.HistoryCarQuantityDao;
 import cn.bc.business.motorcade.domain.HistoryCarQuantity;
 import cn.bc.core.service.DefaultCrudService;
 
-public class HistoryCarQuantityServiceImpl extends DefaultCrudService<HistoryCarQuantity> implements HistoryCarQuantityService{
+public class HistoryCarQuantityServiceImpl extends
+		DefaultCrudService<HistoryCarQuantity> implements
+		HistoryCarQuantityService {
 	private HistoryCarQuantityDao historyCarQuantityDao;
 
-	public void setHistoryCarQuantityDao(HistoryCarQuantityDao historyCarQuantityDao) {
+	public void setHistoryCarQuantityDao(
+			HistoryCarQuantityDao historyCarQuantityDao) {
 		this.historyCarQuantityDao = historyCarQuantityDao;
 		this.setCrudDao(historyCarQuantityDao);
 	}
-	
+
+	public void doRecordHistoryCarQuantity4Day() {
+		this.historyCarQuantityDao.doRecordHistoryCarQuantity4Day();
+	}
 }
