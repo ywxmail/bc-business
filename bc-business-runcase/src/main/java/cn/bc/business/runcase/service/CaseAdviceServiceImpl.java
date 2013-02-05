@@ -178,7 +178,8 @@ public class CaseAdviceServiceImpl extends DefaultCrudService<Case4Advice>
 					if (f4Cid == 1) {
 						code4Cid = case4Advice.getReceiveCode();
 					} else {
-						code4Cid = "," + case4Advice.getReceiveCode();
+						code4Cid = code4Cid + ","
+								+ case4Advice.getReceiveCode();
 					}
 				} else {// 提示只有在案的才能发起
 					succeed = false;
@@ -186,7 +187,8 @@ public class CaseAdviceServiceImpl extends DefaultCrudService<Case4Advice>
 					if (f4Status == 1) {
 						code4Status = case4Advice.getReceiveCode();
 					} else {
-						code4Status = "," + case4Advice.getReceiveCode();
+						code4Status = code4Status + ","
+								+ case4Advice.getReceiveCode();
 					}
 				}
 
@@ -260,11 +262,14 @@ public class CaseAdviceServiceImpl extends DefaultCrudService<Case4Advice>
 								"yyyy-MM-dd HH:mm") : "");
 		// 接案时间（公司投诉）
 		if (case4Advice.getType() == CaseBase.TYPE_COMPANY_COMPLAIN) {
-			variables.put(
-					"case4Advice_receiveDate",
-					case4Advice.getReceiveDate().getTime() != null ? DateUtils
-							.formatCalendar(case4Advice.getReceiveDate(),
-									"yyyy-MM-dd HH:mm") : "");
+			if (case4Advice.getReceiveDate() != null) {
+				variables
+						.put("case4Advice_receiveDate",
+								case4Advice.getReceiveDate().getTime() != null ? DateUtils
+										.formatCalendar(
+												case4Advice.getReceiveDate(),
+												"yyyy-MM-dd HH:mm") : "");
+			}
 		}
 		// 乘车路线(从)
 		variables.put("case4Advice_pathFrom", case4Advice.getPathFrom());
