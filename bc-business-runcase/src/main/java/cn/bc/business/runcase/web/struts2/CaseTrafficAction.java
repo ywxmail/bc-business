@@ -219,7 +219,7 @@ public class CaseTrafficAction extends
 
 		if (editable && !readonly) {
 			// 特殊处理结案按钮
-			if (Case4InfractTraffic.STATUS_ACTIVE == getE().getStatus()
+			if (Case4InfractTraffic.STATUS_CLOSED != getE().getStatus()
 					&& !getE().isNew()) {
 				ButtonOption buttonOption = new ButtonOption(
 						getText("label.closefile"), null,
