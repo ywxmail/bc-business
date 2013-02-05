@@ -103,10 +103,15 @@ public class CaseAdviceDaoImpl extends HibernateCrudJpaDao<Case4Advice>
 		}
 
 		// 公司投诉
-		List list4gongsitousu = this.getJpaTemplate().find(
-				hql.toString(),
-				new Object[] { startDate, startDate, endDate, endDate,
-						carManId, CaseBase.TYPE_COMPANY_COMPLAIN });
+		List<Map<String, Object>> list4gongsitousu = null;
+		try {
+			list4gongsitousu = this.jdbcTemplate.queryForList(sql,
+					new Object[] { startDate, startDate, endDate, endDate,
+							carManId, CaseBase.TYPE_COMPANY_COMPLAIN });
+
+		} catch (EmptyResultDataAccessException e) {
+			e.getStackTrace();
+		}
 
 		// 交通违章
 		List list4jiaotongweizhang = this.getJpaTemplate().find(
@@ -126,7 +131,6 @@ public class CaseAdviceDaoImpl extends HibernateCrudJpaDao<Case4Advice>
 						carManId, CaseBase.TYPE_ACCIDENT });
 		// 组装客管投诉详细信息
 		String keguantousuInfo = "";
-
 		if (list4keguantousu.size() != 0) {
 			for (int i = 0; i < list4keguantousu.size(); i++) {
 				Map<String, Object> m = list4keguantousu.get(i);
@@ -141,10 +145,30 @@ public class CaseAdviceDaoImpl extends HibernateCrudJpaDao<Case4Advice>
 
 			}
 		}
+		// 组装公司投诉详细信息
+		String gongsitousuInfo = "";
+		if (list4gongsitousu.size() != 0) {
+			for (int i = 0; i < list4gongsitousu.size(); i++) {
+				Map<String, Object> m = list4gongsitousu.get(i);
+				if (i == 0) {
+					gongsitousuInfo += m.get("subject").toString()
+							+ m.get("count").toString() + "宗";
+
+				} else {
+					gongsitousuInfo += "," + m.get("subject").toString()
+							+ m.get("count").toString() + "宗";
+				}
+
+			}
+		}
+
 		Json json = new Json();
 		json.put("count4keguantousu", list4keguantousu.size());
 		if (keguantousuInfo.trim().length() != 0) {
 			json.put("keguantousuInfo", keguantousuInfo);
+		}
+		if (gongsitousuInfo.trim().length() != 0) {
+			json.put("gongsitousuInfo", gongsitousuInfo);
 		}
 		json.put("count4keguantousu", list4keguantousu.size());
 		json.put("count4gongsitousu", list4gongsitousu.size());

@@ -182,7 +182,7 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 	public void setCarService(CarService carService) {
 		this.carService = carService;
 	}
-	
+
 	@Autowired
 	public void setWorkflowModuleRelationService(
 			WorkflowModuleRelationService workflowModuleRelationService) {
@@ -226,47 +226,6 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 		}
 
 		boolean readonly = this.isReadonly();
-		// if (editable && !readonly) {
-		// if(!getE().isNew()){
-		// //生成通知单
-		// pageOption.addButton(new ButtonOption(
-		// "生成通知单", null,
-		// "bc.caseAdviceForm.doGenNotice"));
-		// //生成表格
-		// pageOption.addButton(new ButtonOption(
-		// "生成表格", null,
-		// "bc.caseAdviceForm.doGenForm"));
-		// }
-		// if(Case4Advice.STATUS_ACTIVE != getE().getStatus() &&
-		// !getE().isNew()){
-		// //维护按钮
-		// // pageOption.addButton(new ButtonOption(
-		// // getText("维护"), null,
-		// // "bc.caseAdviceForm.doMaintenance"));
-		//
-		// ButtonOption buttonOption = new
-		// ButtonOption("维护",null,"bc.caseAdviceForm.doMaintenance");
-		// buttonOption.put("id", "maintenance");
-		// pageOption.addButton(buttonOption);
-		// }
-		// //特殊处理结案按钮
-		// if(Case4Advice.STATUS_ACTIVE == getE().getStatus() &&
-		// !getE().isNew()){
-		// ButtonOption buttonOption = new
-		// ButtonOption(getText("label.closefile"),null,"bc.caseAdviceForm.closefile");
-		// buttonOption.put("id", "bcSaveDlgButton");
-		// pageOption.addButton(buttonOption);
-		// }
-		// if(CaseBase.TYPE_COMPANY_COMPLAIN == getE().getType()
-		// && Case4Advice.STATUS_ACTIVE == getE().getStatus()
-		// && Case4Advice.HANDLE_STATUS_NEW == getE().getHandleStatus()
-		// && !getE().isNew()){
-		// //核准按钮
-		// pageOption.addButton(new ButtonOption(
-		// "核准", null,
-		// "bc.caseAdviceForm.doManage"));
-		// }
-		// }
 
 		if (!readonly) {
 			if (editable) {
@@ -282,15 +241,15 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 					pageOption.addButton(buttonOption);
 				}
 			} else {
-				if (!getE().isNew()) {
-					// 生成通知单
-					pageOption.addButton(new ButtonOption("生成通知单", null,
-							"bc.caseAdviceForm.doGenNotice"));
-					// //生成表格
-					// pageOption.addButton(new ButtonOption(
-					// "生成表格", null,
-					// "bc.caseAdviceForm.doGenForm"));
-				}
+				// if (!getE().isNew()) {
+				// // 生成通知单
+				// pageOption.addButton(new ButtonOption("生成通知单", null,
+				// "bc.caseAdviceForm.doGenNotice"));
+				// // //生成表格
+				// // pageOption.addButton(new ButtonOption(
+				// // "生成表格", null,
+				// // "bc.caseAdviceForm.doGenForm"));
+				// }
 				if (!getE().isNew()) {
 					// 维护按钮
 					pageOption.addButton(new ButtonOption(getText("维护"), null,
@@ -305,7 +264,7 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 							"bc.caseAdviceForm.doManage"));
 				}
 				// 特殊处理结案按钮
-				if (Case4Advice.STATUS_ACTIVE == getE().getStatus()
+				if (Case4Advice.STATUS_CLOSED != getE().getStatus()
 						&& !getE().isNew()) {
 					ButtonOption buttonOption = new ButtonOption(
 							getText("label.closefile"), null,
@@ -651,31 +610,6 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 		return "saveSuccess";
 	}
 
-	/*
-	 * 业务变更注释 public Json json; public String closefile(){ SystemContext context
-	 * = this.getSystyemContext();
-	 * 
-	 * this.getE().setStatus(CaseBase.STATUS_CLOSED);
-	 * this.getE().setCloserId(context.getUserHistory().getId());
-	 * this.getE().setCloserName(context.getUserHistory().getName());
-	 * this.getE().setCloseDate(Calendar.getInstance(Locale.CHINA));
-	 * 
-	 * DateFormat df = new SimpleDateFormat("yyyy-MM-dd"); String closeDateStr =
-	 * df.format(this.getE().getCloseDate().getTime());
-	 * 
-	 * json = new Json(); json.put("status", this.getE().getStatus());
-	 * json.put("closeDate", closeDateStr); json.put("closeId",
-	 * this.getE().getCloserId()); json.put("closeName",
-	 * this.getE().getCloserName()); return "json"; }
-	 * 
-	 * public String getCarNManInfo(){ if(carId != null){
-	 * //从页面ajax请求carId参数不为空时通过carManId查找关联司机信息
-	 * this.caseBaseService.findCarManNameNCertCodeByCarId(carId); } if(carManId
-	 * != null){ //从页面ajax请求carManId参数不为空时通过carId查找关联车辆信息
-	 * this.caseBaseService.findCarPlateNCertCodeByCarManId(carManId); } return
-	 * "json"; }
-	 */
-
 	public String selectCarMansInfo() {
 		List<CarMan> drivers = this.carManService.selectAllCarManByCarId(carId);
 		JsonArray jsons = new JsonArray();
@@ -708,13 +642,13 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 		sourcesValue = this.getSourceStatuses();
 		// 表单可选项的加载
 		initSelects();
-		
+
 		if (!this.getE().isNew()) {
 			list_WorkflowModuleRelation = this.workflowModuleRelationService
-					.findList(this.getE().getId(), Case4Advice.class.getSimpleName(),
-							null);
+					.findList(this.getE().getId(),
+							Case4Advice.class.getSimpleName(), null);
 		}
-		
+
 	}
 
 	// 表单可选项的加载
@@ -827,21 +761,18 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 	public String tdIds;
 
 	public String startFlow() {
-		Json json = new Json();
 		// 去掉最后一个逗号
-		String[] _ids = tdIds.substring(0, tdIds.lastIndexOf(",")).split(",");
-		String count = this.caseAdviceService.doStartFlow(
-				getText("runcase.startFlow.key4ComplainHandle"),
-				StringUtils.stringArray2LongArray(_ids));
-		if (count.equals("0")) {
-			json.put("success", false);
-			json.put("msg", getText("runcase.startFlow.success.false"));
-		} else {
-			json.put("success", true);
-			// json.put("msg", getText("runcase.startFlow.success.true"));
-			json.put("msg", getText("成功发起" + count + "条交客管投诉处理流程"));
+		if (tdIds.length() != 0 || tdIds != null) {
+			String[] _ids = tdIds.substring(0, tdIds.lastIndexOf(",")).split(
+					",");
+			Long[] ids = StringUtils.stringArray2LongArray(_ids);
+			this.json = this.caseAdviceService
+					.doStartFlow(
+							getText("runcase.startFlow.key4ComplainHandle"),
+							getText("runcase.startFlow.key4CompanyComplainHandle"),
+							ids);
+
 		}
-		this.json = json.toString();
 		return "json";
 	}
 

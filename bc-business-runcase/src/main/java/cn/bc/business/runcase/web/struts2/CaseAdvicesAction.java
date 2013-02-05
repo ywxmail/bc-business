@@ -42,6 +42,7 @@ import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.formater.EntityStatusFormater;
 import cn.bc.web.formater.LinkFormater4Id;
 import cn.bc.web.ui.html.grid.Column;
+import cn.bc.web.ui.html.grid.HiddenColumn4MapKey;
 import cn.bc.web.ui.html.grid.IdColumn4MapKey;
 import cn.bc.web.ui.html.grid.TextColumn4MapKey;
 import cn.bc.web.ui.html.page.PageOption;
@@ -96,7 +97,7 @@ public class CaseAdvicesAction extends ViewAction<Map<String, Object>> {
 		sql.append(",man.origin");
 		sql.append(",b.motorcade_id,b.car_id,b.driver_id");
 		sql.append(",bia.id batch_company_id,bia.name batch_company");
-		//最新参与流程信息
+		// 最新参与流程信息
 		sql.append(",getnewprocessnameandtodotasknames4midmtyle(a.id,'");
 		sql.append(Case4Advice.class.getSimpleName());
 		sql.append("') as processInfo");
@@ -147,7 +148,7 @@ public class CaseAdvicesAction extends ViewAction<Map<String, Object>> {
 				map.put("driverId", rs[i++]);
 				map.put("batch_company_id", rs[i++]);
 				map.put("batch_company", rs[i++]);
-				map.put("processInfo",rs[i++]);
+				map.put("processInfo", rs[i++]);
 
 				return map;
 			}
@@ -239,68 +240,85 @@ public class CaseAdvicesAction extends ViewAction<Map<String, Object>> {
 				.setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("b.subject", "subject",
 				getText("runcase.subject2"), 180).setSortable(true));
-		if(!isReadonly()&&Integer.valueOf(type) == CaseBase.TYPE_COMPLAIN){
-			//最新参与流程信息
+		if (!isReadonly()
+				&& (Integer.valueOf(type) == CaseBase.TYPE_COMPLAIN || Integer
+						.valueOf(type) == CaseBase.TYPE_COMPANY_COMPLAIN)) {
+			// 最新参与流程信息
 			columns.add(new TextColumn4MapKey("", "processInfo",
-					getText("runcase.processInfo"), 350).setSortable(true)
+					getText("runcase.processInfo"), 350)
+					.setSortable(true)
 					.setUseTitleFromLabel(true)
-					.setValueFormater(new LinkFormater4Id(this.getContextPath()
-							+ "/bc-workflow/workspace/open?id={0}", "workspace") {
-						
-						@Override
-						public String getIdValue(Object context, Object value) {
-							@SuppressWarnings("unchecked")
-							String processInfo=StringUtils.toString(((Map<String, Object>) context).get("processInfo"));
-							if(processInfo==null||processInfo.length()==0)
-								return "";
-							
-							//获取流程id
-							return processInfo.split(";")[1];
-						}
+					.setValueFormater(
+							new LinkFormater4Id(this.getContextPath()
+									+ "/bc-workflow/workspace/open?id={0}",
+									"workspace") {
 
-						@Override
-						public String getTaskbarTitle(Object context,
-								Object value) {
-							return "工作空间";
-						}
+								@Override
+								public String getIdValue(Object context,
+										Object value) {
+									@SuppressWarnings("unchecked")
+									String processInfo = StringUtils
+											.toString(((Map<String, Object>) context)
+													.get("processInfo"));
+									if (processInfo == null
+											|| processInfo.length() == 0)
+										return "";
 
-						@Override
-						public String getLinkText(Object context, Object value) {
-							@SuppressWarnings("unchecked")
-							String processInfo=StringUtils.toString(((Map<String, Object>) context).get("processInfo"));
-							if(processInfo==null||processInfo.length()==0)
-								return "";
-							
-							String title="";
-							String[] processInfos=processInfo.split(";");
-							if(processInfos.length>2){
-								for(int i=2;i<processInfos.length;i++){
-									if(i+1==processInfos.length){
-										title+=processInfos[i];
-									}else{
-										title+=processInfos[i]+",";
-									}
+									// 获取流程id
+									return processInfo.split(";")[1];
 								}
-								title+="--";
-							}
-							return title+="["+processInfos[0]+"]";
-						}
-						
-						@Override
-						public String getWinId(Object context,
-								Object value) {
-							@SuppressWarnings("unchecked")
-							String processInfo=StringUtils.toString(((Map<String, Object>) context).get("processInfo"));
-							if(processInfo==null||processInfo.length()==0)
-								return "";
-							
-							//获取流程id
-							return this.moduleKey+"."+processInfo.split(";")[1];
-						}
-					}));
+
+								@Override
+								public String getTaskbarTitle(Object context,
+										Object value) {
+									return "工作空间";
+								}
+
+								@Override
+								public String getLinkText(Object context,
+										Object value) {
+									@SuppressWarnings("unchecked")
+									String processInfo = StringUtils
+											.toString(((Map<String, Object>) context)
+													.get("processInfo"));
+									if (processInfo == null
+											|| processInfo.length() == 0)
+										return "";
+
+									String title = "";
+									String[] processInfos = processInfo
+											.split(";");
+									if (processInfos.length > 2) {
+										for (int i = 2; i < processInfos.length; i++) {
+											if (i + 1 == processInfos.length) {
+												title += processInfos[i];
+											} else {
+												title += processInfos[i] + ",";
+											}
+										}
+										title += "--";
+									}
+									return title += "[" + processInfos[0] + "]";
+								}
+
+								@Override
+								public String getWinId(Object context,
+										Object value) {
+									@SuppressWarnings("unchecked")
+									String processInfo = StringUtils
+											.toString(((Map<String, Object>) context)
+													.get("processInfo"));
+									if (processInfo == null
+											|| processInfo.length() == 0)
+										return "";
+
+									// 获取流程id
+									return this.moduleKey + "."
+											+ processInfo.split(";")[1];
+								}
+							}));
 		}
-		
-		
+
 		columns.add(new TextColumn4MapKey("b.happen_date", "happen_date",
 				getText("runcase.happenDate"), 125).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd HH:mm")));
@@ -358,17 +376,24 @@ public class CaseAdvicesAction extends ViewAction<Map<String, Object>> {
 		// }
 		// }
 		// }));
+		columns.add(new HiddenColumn4MapKey("type", "type_"));
 
 		return columns;
 	}
 
 	@Override
 	protected String[] getGridSearchFields() {
-		
+
 		if (Integer.valueOf(type) == CaseBase.TYPE_COMPLAIN) {
-			return new String[] { "b.subject", "b.car_plate", "a.receive_code",
-					"b.driver_name", "b.driver_cert", "c.code"
-					,"getnewprocessnameandtodotasknames4midmtyle(a.id,'"+Case4Advice.class.getSimpleName()+"')" };
+			return new String[] {
+					"b.subject",
+					"b.car_plate",
+					"a.receive_code",
+					"b.driver_name",
+					"b.driver_cert",
+					"c.code",
+					"getnewprocessnameandtodotasknames4midmtyle(a.id,'"
+							+ Case4Advice.class.getSimpleName() + "')" };
 		} else {
 			return new String[] { "b.subject", "b.car_plate", "a.receive_code",
 					"b.driver_name", "b.driver_cert", "c.code" };
@@ -464,15 +489,16 @@ public class CaseAdvicesAction extends ViewAction<Map<String, Object>> {
 			// 删除
 			tb.addButton(getDefaultDeleteToolbarButton());
 			// 发起(客管)投诉流程
-			if (CaseBase.TYPE_COMPLAIN == Integer.valueOf(this.type)) {
-				tb.addButton(new ToolbarButton().setIcon("ui-icon-play")
-						.setText(getText("runcase.startFlow"))
-						.setClick("bs.caseAdviceView.startFlow"));
-			}
+			// if (CaseBase.TYPE_COMPLAIN == Integer.valueOf(this.type)) {
+			tb.addButton(new ToolbarButton().setIcon("ui-icon-play")
+					.setText(getText("runcase.startFlow"))
+					.setClick("bs.caseAdviceView.startFlow"));
+			// }
 
 		}
-		// 客管投诉添加“处理中”按钮
-		if (CaseBase.TYPE_COMPLAIN == Integer.valueOf(this.type)) {
+		// 公司、客管投诉添加“处理中”按钮
+		if (CaseBase.TYPE_COMPLAIN == Integer.valueOf(this.type)
+				|| CaseBase.TYPE_COMPANY_COMPLAIN == Integer.valueOf(this.type)) {
 			tb.addButton(Toolbar.getDefaultToolbarRadioGroup(
 					this.getBSStatuses3(), "status", 0,
 					getText("title.click2changeSearchStatus")));
