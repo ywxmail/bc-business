@@ -312,8 +312,14 @@ public class CaseAdviceServiceImpl extends DefaultCrudService<Case4Advice>
 		// 投诉内容
 		variables.put("case4Advice_detail", case4Advice.getDetail());
 		// 组装主题
-		variables.put("subject", "关于" + case4Advice.getCarPlate() + "客管投诉处理："
-				+ case4Advice.getSubject());
+		if (case4Advice.getType() == CaseBase.TYPE_COMPLAIN) {// 客管投诉
+			variables.put("subject", "关于" + case4Advice.getCarPlate()
+					+ "客管投诉处理：" + case4Advice.getSubject());
+
+		} else if (case4Advice.getType() == CaseBase.TYPE_COMPANY_COMPLAIN) {// 自接投诉
+			variables.put("subject", "关于" + case4Advice.getCarPlate()
+					+ "自接投诉处理：" + case4Advice.getSubject());
+		}
 		// 投诉项目
 		variables
 				.put("case4Advice_complaintsProject", case4Advice.getSubject());
