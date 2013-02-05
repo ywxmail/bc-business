@@ -133,9 +133,11 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 		// 构建附件控件
 		String ptype = Case4Accident.ATTACH_TYPE;
 		// 状态为结案时显示只读状态
-		AttachWidget attachsUI = this.buildAttachsUI(this.getE().isNew(), this
-				.getE().getStatus() == CaseBase.STATUS_CLOSED, ptype, this
-				.getE().getUid());
+		Case4Accident e = this.getE();
+		boolean readonly = this.isReadonly()
+				|| e.getStatus() == CaseBase.STATUS_CLOSED;
+		AttachWidget attachsUI = this.buildAttachsUI(e.isNew(), readonly,
+				ptype, e.getUid());
 
 		// 最大数量30
 		attachsUI.setMaxCount(30);
@@ -287,6 +289,8 @@ public class CaseAccidentAction extends FileEntityAction<Long, Case4Accident> {
 	protected void afterOpen(Case4Accident entity) {
 		super.afterOpen(entity);
 
+		// 构建附件控件
+		attachsUI = buildAttachsUI();
 	}
 
 	@Override

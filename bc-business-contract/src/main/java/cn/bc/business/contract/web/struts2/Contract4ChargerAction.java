@@ -128,6 +128,13 @@ public class Contract4ChargerAction extends
 		return context
 				.hasAnyRole(getText("key.role.bs.contract4charger.entering"));
 	}
+	
+	public boolean isFeeDetailRead() {
+		// 经济合同收费明细查询
+		SystemContext context = (SystemContext) this.getContext();
+		return context
+				.hasAnyRole(getText("key.role.bs.contract4charger.fee.detail"));
+	}
 
 	// 执行转车，续约，操作时需要的参数
 	public Long contractId; // 合同ID

@@ -21,6 +21,7 @@ import cn.bc.core.util.StringUtils;
 import cn.bc.db.jdbc.RowMapper;
 import cn.bc.db.jdbc.SqlObject;
 import cn.bc.identity.web.SystemContext;
+import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.formater.KeyValueFormater;
 import cn.bc.web.formater.LinkFormater4Id;
 import cn.bc.web.ui.html.grid.Column;
@@ -28,6 +29,7 @@ import cn.bc.web.ui.html.grid.IdColumn4MapKey;
 import cn.bc.web.ui.html.grid.TextColumn4MapKey;
 import cn.bc.web.ui.html.page.PageOption;
 import cn.bc.web.ui.html.toolbar.Toolbar;
+import cn.bc.web.ui.html.toolbar.ToolbarButton;
 import cn.bc.web.ui.json.Json;
 
 /**
@@ -105,7 +107,7 @@ public class MotorcadesAction extends ViewAction<Map<String, Object>> {
 				getText("motorcade.unit"), 85).setSortable(true)
 				.setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("m.name", "name",
-				getText("motorcade.name")).setSortable(true)
+				getText("motorcade.name"), 150).setSortable(true)
 				.setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("m.principal_name", "principalName",
 				getText("motorcade.principal"), 80)
@@ -128,7 +130,8 @@ public class MotorcadesAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("a.actor_name", "authorName",
 				getText("label.authorName"), 80).setSortable(true));
 		columns.add(new TextColumn4MapKey("m.file_date", "fileDate",
-				getText("label.fileDate"), 100).setSortable(true));
+				getText("label.fileDate")).setSortable(true).setValueFormater(
+				new CalendarFormater("yyyy-MM-dd HH:mm")));
 		return columns;
 	}
 
@@ -163,7 +166,6 @@ public class MotorcadesAction extends ViewAction<Map<String, Object>> {
 	@Override
 	protected void extendGridExtrasData(Json json) {
 		super.extendGridExtrasData(json);
-
 		// 状态条件
 		if (this.status != null && this.status.trim().length() > 0) {
 			json.put("status", status);
@@ -172,6 +174,15 @@ public class MotorcadesAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected Toolbar getHtmlPageToolbar() {
-		return getHtmlPageToolbar(true);
+		Toolbar tb = getHtmlPageToolbar(true);
+		tb.addButton(new ToolbarButton().setIcon("ui-icon-lightbulb")
+				.setText(getText("motorcade.viewHistoryCarQuantity"))
+				.setClick("bc.motorcadeList.viewHistoryCarQuantity"));
+		return tb;
+	}
+
+	@Override
+	protected String getHtmlPageJs() {
+		return this.getHtmlPageNamespace() + "/motorcade/list.js";
 	}
 }

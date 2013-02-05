@@ -21,6 +21,7 @@ public class HistoryCarQuantity extends FileEntityImpl {
 
 	private int year;// 年份
 	private int month;// 月份
+	private int day;// 日份
 	private int quantity;// 车辆数
 	private Motorcade motorcade;// 所属车队
 
@@ -40,6 +41,15 @@ public class HistoryCarQuantity extends FileEntityImpl {
 
 	public void setMonth(int month) {
 		this.month = month;
+	}
+	
+	@Column(name = "DAY_")
+	public int getDay() {
+		return day;
+	}
+
+	public void setDay(int day) {
+		this.day = day;
 	}
 
 	@Column(name = "QUANTITY")
