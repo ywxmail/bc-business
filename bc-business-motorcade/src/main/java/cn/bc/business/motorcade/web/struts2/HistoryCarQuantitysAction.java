@@ -55,9 +55,10 @@ public class HistoryCarQuantitysAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected OrderCondition getGridDefaultOrderCondition() {
-		// 默认排序方向：年 月 日
-		return new OrderCondition("a.year_", Direction.Desc).add("a.month_",
-				Direction.Desc).add("a.day_", Direction.Desc);
+		// 默认排序方向：年月日-车队
+		return new OrderCondition("a.year_", Direction.Desc)
+				.add("a.month_", Direction.Desc).add("a.day_", Direction.Desc)
+				.add("b.code", Direction.Asc);
 	}
 
 	@Override
