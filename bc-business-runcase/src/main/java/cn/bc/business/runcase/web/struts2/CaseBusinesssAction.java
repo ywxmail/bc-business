@@ -41,7 +41,7 @@ import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.formater.EntityStatusFormater;
 import cn.bc.web.formater.LinkFormater4Id;
 import cn.bc.web.ui.html.grid.Column;
-import cn.bc.web.ui.html.grid.HiddenColumn;
+import cn.bc.web.ui.html.grid.HiddenColumn4MapKey;
 import cn.bc.web.ui.html.grid.IdColumn4MapKey;
 import cn.bc.web.ui.html.grid.TextColumn4MapKey;
 import cn.bc.web.ui.html.page.PageOption;
@@ -293,7 +293,9 @@ public class CaseBusinesssAction extends ViewAction<Map<String, Object>> {
 					}));
 		}
 		
-		columns.add(new HiddenColumn("cit.category", "category"));
+		columns.add(new HiddenColumn4MapKey("category", "category"));
+		columns.add(new HiddenColumn4MapKey("carId", "carId"));
+		columns.add(new HiddenColumn4MapKey("carPlate", "car_plate"));
 		return columns;
 	}
 

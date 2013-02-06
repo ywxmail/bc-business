@@ -5,6 +5,7 @@ package cn.bc.business.runcase.web.struts2;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -87,7 +88,9 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 	private Map<String, List<Map<String, String>>> 			allList;
 	
 	private WorkflowModuleRelationService 		workflowModuleRelationService;
-	public List<Map<String, Object>> 			list_WorkflowModuleRelation; // 工作流程集合
+	public List<Map<String, Object>> 			list_WorkflowModuleRelation; 	// 工作流程集合
+	
+	public JSONArray							illegalActivityList;			// 违法行为集合列
 
 	public Long getCarId() {
 		return carId;
@@ -269,30 +272,12 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 			pageOption.addButton(this.getDefaultPrintButtonOption());
 		}
 		
-//		if (editable && !readonly) {
-//
-//			//特殊处理结案按钮
-//			if(CaseBase.STATUS_ACTIVE == getE().getStatus() && !getE().isNew()){
-//				ButtonOption buttonOption = new ButtonOption(getText("label.closefile"),null,"bc.caseBusinessForm.doCloseFile");
-//				buttonOption.put("id", "bcSaveDlgButton");
-//				pageOption.addButton(buttonOption);
-//			}
-//			if(CaseBase.STATUS_ACTIVE == getE().getStatus()){
-//				// 添加默认的保存按钮
-//				pageOption.addButton(this.getDefaultSaveButtonOption());
-//			}
-//		}
-		
 		if (!readonly) {
 			if(editable){
 				// 添加默认的保存按钮
 				pageOption.addButton(this.getDefaultSaveButtonOption());
 			}else{
 				if(!getE().isNew()){
-					//生成通知单
-					pageOption.addButton(new ButtonOption(
-							"生成通知单", null,
-							"bc.caseBusinessForm.doGenNotice"));
 					//维护按钮
 					pageOption.addButton(new ButtonOption(
 							getText("维护"), null,
@@ -494,19 +479,6 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 		
 		SystemContext context = this.getSystyemContext();
 		Case4InfractBusiness e = this.getE();
-		
-//		if(e != null && (e.getReceiverId() == null || e.getReceiverId() < 0)){
-//			e.setReceiverId(context.getUserHistory().getId());
-//			e.setReceiverName(context.getUserHistory().getName());
-//		}
-		
-//		//设置结案信息
-//		if(e.getStatus() == 1){
-//			e.setStatus(CaseBase.STATUS_CLOSED);
-//			e.setCloserId(context.getUserHistory().getId());
-//			e.setCloserName(context.getUserHistory().getName());
-//			e.setCloseDate(Calendar.getInstance(Locale.CHINA));
-//		}
 		//设置最后更新人的信息
 		e.setModifier(context.getUserHistory());
 		e.setModifiedDate(Calendar.getInstance());
@@ -539,32 +511,10 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 		if (!this.getE().isNew()) {
 			list_WorkflowModuleRelation = this.workflowModuleRelationService
 					.findList(this.getE().getId(), Case4InfractBusiness.class.getSimpleName(),
-							null);
+							new String[]{"subject"});
 		}
 	}
-	
-/*	
- *  业务变更注释
-  	public Json json;
-	public String closefile(){
-		SystemContext context = this.getSystyemContext();
-		
-		this.getE().setStatus(CaseBase.STATUS_CLOSED);
-		this.getE().setCloserId(context.getUserHistory().getId());
-		this.getE().setCloserName(context.getUserHistory().getName());
-		this.getE().setCloseDate(Calendar.getInstance(Locale.CHINA));
-		
-		DateFormat df = new SimpleDateFormat("yyyy-MM-dd");   
-		String closeDateStr = df.format(this.getE().getCloseDate().getTime());
-		
-		json = new Json();
-		json.put("status", this.getE().getStatus());
-		json.put("closeDate", closeDateStr);
-		json.put("closeId",   this.getE().getCloserId());
-		json.put("closeName", this.getE().getCloserName());
-		return "json";
-	}
-*/
+
 	
 	public String selectCarMansInfo() {
 		List<CarMan> drivers = this.carManService.selectAllCarManByCarId(carId);
@@ -587,7 +537,7 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 	}
 	
 	// 表单可选项的加载
-	public void initSelects(){
+	public void initSelects() throws Exception{
 		// 加载可选车队列表
 		this.motorcadeList = this.motorcadeService.findEnabled4Option();
 		if (this.getE().getMotorcadeId() != null)
@@ -600,7 +550,9 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 												OptionConstants.IT_PROPERITES,
 												OptionConstants.IT_DEGREE,
 												OptionConstants.BS_CERT,
-												OptionConstants.CA_DEPARTMENT
+												OptionConstants.CA_DEPARTMENT,
+												OptionConstants.CA_BS_ILLEGALACTIVITY,
+												OptionConstants.CA_SV_ILLEGALACTIVITY
 											});
 		// 加载可选责任列表
 		this.dutyList					=	this.allList.get(OptionConstants.IT_DUTY);
@@ -612,6 +564,12 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 		this.certList					=	this.allList.get(OptionConstants.BS_CERT);
 		// 加载可选执法机关列表
 		this.departmentList				=	this.allList.get(OptionConstants.CA_DEPARTMENT);
+		
+		//加载可选的违法行为
+		List<Map<String,String>> _illegalList=new ArrayList<Map<String,String>>();
+		_illegalList.addAll(this.allList.get(OptionConstants.CA_BS_ILLEGALACTIVITY));
+		_illegalList.addAll(this.allList.get(OptionConstants.CA_SV_ILLEGALACTIVITY));
+		this.illegalActivityList=OptionItem.toLabelValues(_illegalList);
 	}
 	
 	/**
@@ -704,7 +662,7 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 				getText("runcase.startFlow.key4InfractBusinessHandle"),
 				StringUtils.stringArray2LongArray(_ids));
 		json.put("success", true);
-		json.put("msg", getText("runcase.startFlow.success.false"));
+		json.put("msg", getText("runcase.startFlow.success.true"));
 		
 		JSONArray _processValue=OptionItem.toLabelValues(processValue);
 		

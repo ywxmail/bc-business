@@ -48,5 +48,15 @@ public interface CaseBusinessService extends CrudService<Case4InfractBusiness> {
 	 * 									,.....}
 	 */
 	List<Map<String,String>> doStartFlow(String key, Long[] ids) throws Exception;
+	
+	/**
+	 * 更新的信息
+	 * 
+	 * @param id
+	 *            
+	 * @param attributes
+	 *            更新的信息
+	 */
+	void updateCaseBusinessInfo4Flow(Long id, Map<String, Object> attributes);
 
 }
