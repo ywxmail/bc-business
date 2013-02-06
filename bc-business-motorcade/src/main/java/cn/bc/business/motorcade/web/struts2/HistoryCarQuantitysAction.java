@@ -259,4 +259,30 @@ public class HistoryCarQuantitysAction extends ViewAction<Map<String, Object>> {
 		// 返回导入按钮
 		return fb;
 	}
+
+	/**
+	 * 车队历史车辆数按月统计 高级搜索条件窗口
+	 * 
+	 * @return
+	 * @throws Exception
+	 */
+	public String conditions4month() throws Exception {
+		// 加载条件窗口的可选项列表信息
+		this.initConditionsFrom();
+
+		return SUCCESS;
+	}
+
+	/**
+	 * 车队历史车辆数按年统计 高级搜索条件窗口
+	 * 
+	 * @return
+	 * @throws Exception
+	 */
+	public String conditions4year() throws Exception {
+		// 加载条件窗口的可选项列表信息
+		this.initConditionsFrom();
+
+		return SUCCESS;
+	}
 }
