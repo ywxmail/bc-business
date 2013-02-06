@@ -646,7 +646,7 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 		if (!this.getE().isNew()) {
 			list_WorkflowModuleRelation = this.workflowModuleRelationService
 					.findList(this.getE().getId(),
-							Case4Advice.class.getSimpleName(), null);
+							Case4Advice.class.getSimpleName(), new String[]{"subject"});
 		}
 
 	}
