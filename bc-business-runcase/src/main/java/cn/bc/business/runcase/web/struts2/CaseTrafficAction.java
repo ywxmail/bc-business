@@ -431,7 +431,7 @@ public class CaseTrafficAction extends
 		Case4InfractTraffic c = this.getE();
 		if (!c.isNew()) {
 			carTrafficHandleFlowList = this.workflowModuleRelationService
-					.findList(c.getId(), Case4InfractTraffic.ATTACH_TYPE, null);
+					.findList(c.getId(), Case4InfractTraffic.ATTACH_TYPE, new String[]{"subject"});
 		}
 
 	}
