@@ -3,9 +3,6 @@
     "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
     "http://struts.apache.org/dtds/struts-2.0.dtd">
 <struts>
-	<package name="motorcade" extends="bc-default" namespace="/bc-businesss">
-	</package>
-	
 	<!-- 查看历史-->
 	<package name="historyCarQuantity" extends="bc-default" namespace="/bc-business/historyCarQuantity">
 		<action name="create" class="historyCarQuantityAction" method="create">
@@ -19,5 +16,20 @@
 		</action>
 		<action name="save" class="historyCarQuantityAction" method="save"/>
 		<action name="delete" class="historyCarQuantityAction" method="delete"/>
+	</package>
+	
+	<!-- 导入车队历史车辆数 -->
+	<package name="importHistoryCarQuantity" extends="bc-default" namespace="/bc-business/historyCarQuantity">
+		<action name="import" class="importHistoryCarQuantityAction" />
+	</package>
+	
+	<!-- 报表统计的高级搜索条件 -->
+	<package name="historyCarQuantityStat" extends="bc-default" namespace="/bc-business/historyCarQuantity/stat">
+		<action name="conditions4month" class="historyCarQuantitysAction" method="conditions4month">
+			<result>/bc-business/motorcade/historyCarQuantity/stat/conditions4month.jsp</result>
+		</action>
+		<action name="conditions4year" class="historyCarQuantitysAction" method="conditions4year">
+			<result>/bc-business/motorcade/historyCarQuantity/stat/conditions4year.jsp</result>
+		</action>
 	</package>
 </struts>

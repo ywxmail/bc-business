@@ -21,6 +21,7 @@ import cn.bc.core.service.DefaultCrudService;
 import cn.bc.core.util.DateUtils;
 import cn.bc.sync.dao.SyncBaseDao;
 import cn.bc.sync.domain.SyncBase;
+import cn.bc.web.ui.json.Json;
 import cn.bc.workflow.domain.WorkflowModuleRelation;
 import cn.bc.workflow.service.WorkflowModuleRelationService;
 import cn.bc.workflow.service.WorkflowService;
@@ -118,39 +119,96 @@ public class CaseAdviceServiceImpl extends DefaultCrudService<Case4Advice>
 		return this.caseAdviceDao.save(advice);
 	}
 
-	public String doStartFlow(String key, Long[] ids) {
+	public String doStartFlow(String key1, String key2, Long[] ids) {
+		Json json = new Json();
 
 		// 声明返回的流程实例id 多个逗号隔开
 		// String procInstIds = "";
 
 		// 循环Id数组
-		int i = 0;
+		int s = 0;// 成功发起的数量
+		int f4Cid = 0;// 失败(没有车辆Id)发起的数量
+		int f4Status = 0;// 失败(不是在案的)发起的数量
+		boolean succeed = true;// 标记是否全部发起成功
+		String code4Cid = "";// 未成功发起的受理号(没有车辆Id)
+		String code4Status = "";// 未成功发起的受理号(不是在案状态)
+		int type = 0;
 		for (Long id : ids) {
-
 			Case4Advice case4Advice = this.caseAdviceDao.load(id);
+			String procInstId = null;// 流程id
 			// 声明变量
 			Map<String, Object> variables = new HashMap<String, Object>();
-			// 发起流程
-			String procInstId = this.workflowService.startFlowByKey(key,
-					this.returnParam(case4Advice, variables));
-			// 完成第一步办理
-			Task task = this.taskService.createTaskQuery()
-					.processInstanceId(procInstId).singleResult();
-			this.workflowService.completeTask(task.getId());
-			// 保存流程与交通违法信息的关系
-			WorkflowModuleRelation workflowModuleRelation = new WorkflowModuleRelation();
-			workflowModuleRelation.setMid(id);
-			workflowModuleRelation.setPid(procInstId);
-			workflowModuleRelation.setMtype(Case4Advice.class.getSimpleName());
-			this.workflowModuleRelationService.save(workflowModuleRelation);
-			// procInstIds += procInstId + ",";
-			// 将交通违法信息的状态更改为处理中
-			case4Advice.setStatus(CaseBase.STATUS_HANDLING);
-			this.caseAdviceDao.save(case4Advice);
-			i++;
-		}
+			if (case4Advice.getStatus() == CaseBase.STATUS_ACTIVE
+					&& case4Advice.getCarId() != null) {
+				// 在案的并且车辆id不为空的信息才能发起
+				if (case4Advice.getType() == CaseBase.TYPE_COMPANY_COMPLAIN) {// 发起公司投诉处理流程
+					// 发起流程
+					procInstId = this.workflowService.startFlowByKey(key2,
+							this.returnParam(case4Advice, variables));
 
-		return String.valueOf(i);
+				} else if (case4Advice.getType() == CaseBase.TYPE_COMPLAIN) {// 发起客管投诉处理流程
+					// 发起流程
+					procInstId = this.workflowService.startFlowByKey(key1,
+							this.returnParam(case4Advice, variables));
+				}
+				if (procInstId != null) {
+					// 完成第一步办理
+					Task task = this.taskService.createTaskQuery()
+							.processInstanceId(procInstId).singleResult();
+					this.workflowService.completeTask(task.getId());
+					// 保存流程与交通违法信息的关系
+					WorkflowModuleRelation workflowModuleRelation = new WorkflowModuleRelation();
+					workflowModuleRelation.setMid(id);
+					workflowModuleRelation.setPid(procInstId);
+					workflowModuleRelation.setMtype(Case4Advice.class
+							.getSimpleName());
+					this.workflowModuleRelationService
+							.save(workflowModuleRelation);
+					// procInstIds += procInstId + ",";
+					// 将交通违法信息的状态更改为处理中
+					case4Advice.setStatus(CaseBase.STATUS_HANDLING);
+					this.caseAdviceDao.save(case4Advice);
+					s++;
+				}
+			} else {
+				// 如果车辆id为空的提示要确定车辆
+				if (case4Advice.getCarId() == null) {
+					succeed = false;
+					f4Cid++;
+					if (f4Cid == 1) {
+						code4Cid = case4Advice.getReceiveCode();
+					} else {
+						code4Cid = code4Cid + ","
+								+ case4Advice.getReceiveCode();
+					}
+				} else {// 提示只有在案的才能发起
+					succeed = false;
+					f4Status++;
+					if (f4Status == 1) {
+						code4Status = case4Advice.getReceiveCode();
+					} else {
+						code4Status = code4Status + ","
+								+ case4Advice.getReceiveCode();
+					}
+				}
+
+			}
+
+		}
+		if (succeed) {
+			json.put("msg", "成功发起" + s + "条"
+					+ (type == CaseBase.TYPE_COMPLAIN ? "客管投诉" : "自接投诉") + "信息");
+		} else {
+			json.put("msg", (s != 0 ? "成功发起" + s + "条"
+					+ (type == CaseBase.TYPE_COMPLAIN ? "客管投诉" : "自接投诉")
+					+ "信息,其中" : "")
+					+ (f4Status != 0 ? f4Status + "条因不是在案状态的投诉信息发起失败！受理号为："
+							+ code4Status : "")
+					+ (f4Cid != 0 ? f4Cid + "条因没有指定车辆的投诉信息发起失败！受理号为："
+							+ code4Cid : ""));
+		}
+		json.put("success", succeed);
+		return json.toString();
 	}
 
 	// 返回的全局参数
@@ -202,6 +260,17 @@ public class CaseAdviceServiceImpl extends DefaultCrudService<Case4Advice>
 				case4Advice.getHappenDate().getTime() != null ? DateUtils
 						.formatCalendar(case4Advice.getHappenDate(),
 								"yyyy-MM-dd HH:mm") : "");
+		// 接案时间（公司投诉）
+		if (case4Advice.getType() == CaseBase.TYPE_COMPANY_COMPLAIN) {
+			if (case4Advice.getReceiveDate() != null) {
+				variables
+						.put("case4Advice_receiveDate",
+								case4Advice.getReceiveDate().getTime() != null ? DateUtils
+										.formatCalendar(
+												case4Advice.getReceiveDate(),
+												"yyyy-MM-dd HH:mm") : "");
+			}
+		}
 		// 乘车路线(从)
 		variables.put("case4Advice_pathFrom", case4Advice.getPathFrom());
 		// 乘车路线(到)
@@ -243,8 +312,14 @@ public class CaseAdviceServiceImpl extends DefaultCrudService<Case4Advice>
 		// 投诉内容
 		variables.put("case4Advice_detail", case4Advice.getDetail());
 		// 组装主题
-		variables.put("subject", "关于" + case4Advice.getCarPlate() + "客管投诉处理："
-				+ case4Advice.getSubject());
+		if (case4Advice.getType() == CaseBase.TYPE_COMPLAIN) {// 客管投诉
+			variables.put("subject", "关于" + case4Advice.getCarPlate()
+					+ "客管投诉处理：" + case4Advice.getSubject());
+
+		} else if (case4Advice.getType() == CaseBase.TYPE_COMPANY_COMPLAIN) {// 自接投诉
+			variables.put("subject", "关于" + case4Advice.getCarPlate()
+					+ "自接投诉处理：" + case4Advice.getSubject());
+		}
 		// 投诉项目
 		variables
 				.put("case4Advice_complaintsProject", case4Advice.getSubject());

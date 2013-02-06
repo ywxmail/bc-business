@@ -42,13 +42,14 @@ public interface CaseAdviceService extends CrudService<Case4Advice> {
 	/**
 	 * 发起流程
 	 * 
-	 * @param key
-	 *            流程key值
+	 * @param key1客管投诉流程key值
+	 * @param key2公司投诉流程key值
+	 * 
 	 * @param ids
 	 *            客管投诉信息的ID
 	 * @return
 	 */
-	String doStartFlow(String key, Long[] ids);
+	String doStartFlow(String key1, String key2, Long[] ids);
 
 	/**
 	 * 根据司机ID和事发时间查找司机在事发日期向前推算一年内的安全服务信息
