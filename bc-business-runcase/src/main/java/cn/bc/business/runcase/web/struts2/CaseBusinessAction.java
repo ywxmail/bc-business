@@ -513,6 +513,15 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 					.findList(this.getE().getId(), Case4InfractBusiness.class.getSimpleName(),
 							new String[]{"subject"});
 		}
+		
+		//加载可选的违法行为
+		if(editable){
+			List<Map<String,String>> _illegalList=new ArrayList<Map<String,String>>();
+			_illegalList.addAll(this.allList.get(OptionConstants.CA_BS_ILLEGALACTIVITY));
+			_illegalList.addAll(this.allList.get(OptionConstants.CA_SV_ILLEGALACTIVITY));
+			this.illegalActivityList=OptionItem.toLabelValues(_illegalList);
+		}
+				
 	}
 
 	
@@ -565,11 +574,7 @@ public class CaseBusinessAction extends FileEntityAction<Long, Case4InfractBusin
 		// 加载可选执法机关列表
 		this.departmentList				=	this.allList.get(OptionConstants.CA_DEPARTMENT);
 		
-		//加载可选的违法行为
-		List<Map<String,String>> _illegalList=new ArrayList<Map<String,String>>();
-		_illegalList.addAll(this.allList.get(OptionConstants.CA_BS_ILLEGALACTIVITY));
-		_illegalList.addAll(this.allList.get(OptionConstants.CA_SV_ILLEGALACTIVITY));
-		this.illegalActivityList=OptionItem.toLabelValues(_illegalList);
+		
 	}
 	
 	/**
