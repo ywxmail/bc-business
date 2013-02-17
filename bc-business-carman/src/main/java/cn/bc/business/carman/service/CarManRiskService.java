@@ -49,4 +49,11 @@ public interface CarManRiskService extends CrudService<CarManRisk> {
 	 * @return
 	 */
 	List<String> findRiskCompanies();
+	
+	/**
+	 * 删除人意险中的司机信息
+	 * 
+	 * @param info
+	 */
+	void doDeleteCarMan(Map<Long,List<Long>> info);
 }
