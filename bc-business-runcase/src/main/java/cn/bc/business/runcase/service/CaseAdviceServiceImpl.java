@@ -225,14 +225,40 @@ public class CaseAdviceServiceImpl extends DefaultCrudService<Case4Advice>
 		// 受理号
 		variables.put("case4Advice_receiveCode", case4Advice.getReceiveCode());
 		// 投诉来源
-		variables.put("case4Advice_from",
-				case4Advice.getFrom() != null ? case4Advice.getFrom() : "");
+		if (case4Advice.getType() == CaseBase.TYPE_COMPLAIN) {// 客管投诉
+			// variables.put("case4Advice_from",
+			// case4Advice.getFrom() != null ? case4Advice.getFrom() : "");
+			variables.put("case4Advice_from", "客管投诉");
+
+		} else if (case4Advice.getType() == CaseBase.TYPE_COMPANY_COMPLAIN) {// 自接投诉
+			variables.put("case4Advice_from", "自接投诉");
+		}
 		// 站场
 		variables.put("case4Advice_yard", "");
 		// 转协查时间
 		variables.put("case4InfractTrafficr_turnInvestigationTime", "");
 		// 处理期限
-		variables.put("case4Advice_treatmentPeriod", "");
+		if (case4Advice.getType() == CaseBase.TYPE_COMPLAIN) {// 客管投诉
+			variables.put("case4Advice_treatmentPeriod", "");
+		} else if (case4Advice.getType() == CaseBase.TYPE_COMPANY_COMPLAIN) {// 自接投诉
+			variables.put("case4Advice_treatmentPeriod", "五个工作日");
+		}
+
+		// 乘车时间 (自接投诉)
+		if (case4Advice.getType() == CaseBase.TYPE_COMPANY_COMPLAIN) {
+			// ridingStartTime
+			variables
+					.put("case4Advice_ridingTime",
+							(case4Advice.getRidingStartTime() != null ? DateUtils
+									.formatCalendar(
+											case4Advice.getRidingStartTime(),
+											"yyyy-MM-dd HH:mm") : "")
+									+ "-"
+									+ (case4Advice.getRidingEndTime() != null ? DateUtils
+											.formatCalendar(case4Advice
+													.getRidingEndTime(),
+													"HH:mm") : ""));
+		}
 
 		// 投诉人
 		variables.put("case4Advice_advisorName", case4Advice.getAdvisorName());
@@ -262,12 +288,12 @@ public class CaseAdviceServiceImpl extends DefaultCrudService<Case4Advice>
 								"yyyy-MM-dd HH:mm") : "");
 		// 接案时间（公司投诉）
 		if (case4Advice.getType() == CaseBase.TYPE_COMPANY_COMPLAIN) {
-			if (case4Advice.getReceiveDate() != null) {
+			if (case4Advice.getHappenDate() != null) {
 				variables
 						.put("case4Advice_receiveDate",
-								case4Advice.getReceiveDate().getTime() != null ? DateUtils
+								case4Advice.getHappenDate().getTime() != null ? DateUtils
 										.formatCalendar(
-												case4Advice.getReceiveDate(),
+												case4Advice.getHappenDate(),
 												"yyyy-MM-dd HH:mm") : "");
 			}
 		}
