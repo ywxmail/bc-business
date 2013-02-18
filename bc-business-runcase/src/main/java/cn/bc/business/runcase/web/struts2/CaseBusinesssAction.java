@@ -5,6 +5,7 @@ package cn.bc.business.runcase.web.struts2;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -15,6 +16,7 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
+import cn.bc.BCConstants;
 import cn.bc.business.OptionConstants;
 import cn.bc.business.motorcade.service.MotorcadeService;
 import cn.bc.business.runcase.domain.Case4InfractBusiness;
@@ -39,10 +41,12 @@ import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.formater.EntityStatusFormater;
 import cn.bc.web.formater.LinkFormater4Id;
 import cn.bc.web.ui.html.grid.Column;
+import cn.bc.web.ui.html.grid.HiddenColumn4MapKey;
 import cn.bc.web.ui.html.grid.IdColumn4MapKey;
 import cn.bc.web.ui.html.grid.TextColumn4MapKey;
 import cn.bc.web.ui.html.page.PageOption;
 import cn.bc.web.ui.html.toolbar.Toolbar;
+import cn.bc.web.ui.html.toolbar.ToolbarButton;
 import cn.bc.web.ui.json.Json;
 
 /**
@@ -58,6 +62,7 @@ public class CaseBusinesssAction extends ViewAction<Map<String, Object>> {
 	public String status = String.valueOf(CaseBase.STATUS_ACTIVE); // 营运违章的状态，多个用逗号连接
 	public Long carManId;
 	public Long carId;
+	public String category;//违章类别
 
 	@Override
 	public boolean isReadonly() {
@@ -86,6 +91,10 @@ public class CaseBusinesssAction extends ViewAction<Map<String, Object>> {
 		sql.append(",b.company,c.bs_type,c.code");
 		sql.append(",man.origin");
 		sql.append(",bia.id batch_company_id,bia.name batch_company");
+		//最新参与流程信息
+		sql.append(",getnewprocessnameandtodotasknames4midmtyle(cit.id,'");
+		sql.append(Case4InfractBusiness.class.getSimpleName());
+		sql.append("') as processInfo");
 		sql.append(" from bs_case_infract_business cit");
 		sql.append(" inner join BS_CASE_BASE b on cit.id=b.id");
 		sql.append(" left join BS_CAR c on b.car_id = c.id");
@@ -128,7 +137,7 @@ public class CaseBusinesssAction extends ViewAction<Map<String, Object>> {
 				map.put("origin", rs[i++]);
 				map.put("batch_company_id", rs[i++]);
 				map.put("batch_company", rs[i++]);
-
+				map.put("processInfo",rs[i++]);
 				return map;
 			}
 		});
@@ -141,7 +150,10 @@ public class CaseBusinesssAction extends ViewAction<Map<String, Object>> {
 		columns.add(new IdColumn4MapKey("cit.id", "id"));
 		columns.add(new TextColumn4MapKey("b.status_", "status_",
 				getText("runcase.status"), 40).setSortable(true)
-				.setValueFormater(new EntityStatusFormater(getBSStatuses2())));
+				.setValueFormater(new EntityStatusFormater(getBSStatuses3())));
+		columns.add(new TextColumn4MapKey("cit.category", "category",
+				getText("runcase.category"), 70).setSortable(true)
+				.setValueFormater(new EntityStatusFormater(getCategory())));
 		columns.add(new TextColumn4MapKey("b.happen_date", "happen_date",
 				getText("runcase.happenDate2"), 125).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd HH:mm")));
@@ -209,9 +221,7 @@ public class CaseBusinesssAction extends ViewAction<Map<String, Object>> {
 				.setSortable(true));
 		columns.add(new TextColumn4MapKey("b.address", "address",
 				getText("runcase.address2"), 200).setUseTitleFromLabel(true));
-		columns.add(new TextColumn4MapKey("cit.category", "category",
-				getText("runcase.category"), 70).setSortable(true)
-				.setValueFormater(new EntityStatusFormater(getCategory())));
+		
 		columns.add(new TextColumn4MapKey("cit.charger", "charger",
 				getText("runcase.chargers"), 170).setUseTitleFromLabel(true)
 				.setValueFormater(
@@ -222,14 +232,85 @@ public class CaseBusinesssAction extends ViewAction<Map<String, Object>> {
 				getText("runcase.origin"), 150));
 		columns.add(new TextColumn4MapKey("b.case_no", "case_no",
 				getText("runcase.caseNo2"), 110));
+		if(!isReadonly()){
+			//最新参与流程信息
+			columns.add(new TextColumn4MapKey("", "processInfo",
+					getText("runcase.processInfo"), 350).setSortable(true)
+					.setUseTitleFromLabel(true)
+					.setValueFormater(new LinkFormater4Id(this.getContextPath()
+							+ "/bc-workflow/workspace/open?id={0}", "workspace") {
+						
+						@Override
+						public String getIdValue(Object context, Object value) {
+							@SuppressWarnings("unchecked")
+							String processInfo=StringUtils.toString(((Map<String, Object>) context).get("processInfo"));
+							if(processInfo==null||processInfo.length()==0)
+								return "";
+							
+							//获取流程id
+							return processInfo.split(";")[1];
+						}
 
+						@Override
+						public String getTaskbarTitle(Object context,
+								Object value) {
+							return "工作空间";
+						}
+
+						@Override
+						public String getLinkText(Object context, Object value) {
+							@SuppressWarnings("unchecked")
+							String processInfo=StringUtils.toString(((Map<String, Object>) context).get("processInfo"));
+							if(processInfo==null||processInfo.length()==0)
+								return "";
+							
+							String title="";
+							String[] processInfos=processInfo.split(";");
+							if(processInfos.length>2){
+								for(int i=2;i<processInfos.length;i++){
+									if(i+1==processInfos.length){
+										title+=processInfos[i];
+									}else{
+										title+=processInfos[i]+",";
+									}
+								}
+								title+="--";
+							}
+							return title+="["+processInfos[0]+"]";
+						}
+						
+						@Override
+						public String getWinId(Object context,
+								Object value) {
+							@SuppressWarnings("unchecked")
+							String processInfo=StringUtils.toString(((Map<String, Object>) context).get("processInfo"));
+							if(processInfo==null||processInfo.length()==0)
+								return "";
+							
+							//获取流程id
+							return this.moduleKey+"."+processInfo.split(";")[1];
+						}
+					}));
+		}
+		
+		columns.add(new HiddenColumn4MapKey("category", "category"));
+		columns.add(new HiddenColumn4MapKey("carId", "carId"));
+		columns.add(new HiddenColumn4MapKey("carPlate", "car_plate"));
 		return columns;
 	}
 
 	@Override
 	protected String[] getGridSearchFields() {
-		return new String[] { "b.case_no", "b.car_plate", "b.driver_name",
-				"b.driver_cert", "b.closer_name", "b.subject", "c.code" };
+		if(!isReadonly()){
+			return new String[] { "b.case_no", "b.car_plate", "b.driver_name",
+					"b.driver_cert", "b.closer_name", "b.subject", "c.code" };
+		}else{
+			return new String[] { "b.case_no", "b.car_plate", "b.driver_name",
+					"b.driver_cert", "b.closer_name", "b.subject", "c.code" 
+					,"getnewprocessnameandtodotasknames4midmtyle(cit.id,'"
+					+Case4InfractBusiness.class.getSimpleName()
+					+"')"};
+		}
 	}
 
 	@Override
@@ -265,9 +346,15 @@ public class CaseBusinesssAction extends ViewAction<Map<String, Object>> {
 		if (carId != null) {
 			carIdCondition = new EqualsCondition("b.car_id", carId);
 		}
+		
+		// 违章类别条件
+		Condition categoryCondition = null;
+		if(category != null && category.trim().length()>0)
+			categoryCondition =  ConditionUtils
+					.toConditionByComma4IntegerValue(category, "cit.category");
 
 		return ConditionUtils.mix2AndCondition(statusCondition,
-				carManIdCondition, carIdCondition);
+				carManIdCondition, carIdCondition,categoryCondition);
 	}
 
 	@Override
@@ -285,6 +372,10 @@ public class CaseBusinesssAction extends ViewAction<Map<String, Object>> {
 		// carId条件
 		if (carId != null) {
 			json.put("carId", carId);
+		}
+		
+		if (category != null && category.trim().length()>0) {
+			json.put("category", category);
 		}
 	}
 
@@ -324,23 +415,69 @@ public class CaseBusinesssAction extends ViewAction<Map<String, Object>> {
 	 * @return
 	 */
 	protected Map<String, String> getCategory() {
-		Map<String, String> statuses = new HashMap<String, String>();
+		Map<String, String> statuses = new LinkedHashMap<String, String>();
 		statuses.put(String.valueOf(Case4InfractBusiness.CATEGORY_BUSINESS),
 				getText("runcase.category.business"));
 		statuses.put(String.valueOf(Case4InfractBusiness.CATEGORY_STATION),
 				getText("runcase.category.station"));
 		statuses.put(String.valueOf(Case4InfractBusiness.CATEGORY_SERVICE),
 				getText("runcase.category.service"));
+		statuses.put("", getText("bs.status.all"));
+		return statuses;
+	}
+	
+	/**
+	 * 获取Entity的违章类别简明转换列表
+	 * 
+	 * @return
+	 */
+	protected Map<String, String> getCategory4Short() {
+		Map<String, String> statuses = new LinkedHashMap<String, String>();
+		statuses.put(String.valueOf(Case4InfractBusiness.CATEGORY_BUSINESS),
+				getText("runcase.category.short.business"));
+		statuses.put(String.valueOf(Case4InfractBusiness.CATEGORY_STATION),
+				getText("runcase.category.short.station"));
+		statuses.put(String.valueOf(Case4InfractBusiness.CATEGORY_SERVICE),
+				getText("runcase.category.short.service"));
+		statuses.put("", getText("bs.status.all"));
+		return statuses;
+	}
+	
+	/**
+	 * 状态值转换列表：在案|处理中|结案|全部
+	 * 
+	 * @return
+	 */
+	protected Map<String, String> getBSStatuses3() {
+		Map<String, String> statuses = new LinkedHashMap<String, String>();
+		statuses.put(String.valueOf(BCConstants.STATUS_ENABLED),
+				getText("bs.status.active"));
+		statuses.put(String.valueOf(CaseBase.STATUS_HANDLING),
+				getText("runcase.select.status.handling"));
+		statuses.put(String.valueOf(BCConstants.STATUS_DISABLED),
+				getText("bs.status.closed"));
+		statuses.put("", getText("bs.status.all"));
 		return statuses;
 	}
 
 	@Override
 	protected Toolbar getHtmlPageToolbar() {
-		return super.getHtmlPageToolbar()
-				.addButton(
-						Toolbar.getDefaultToolbarRadioGroup(
-								this.getBSStatuses2(), "status", 0,
-								getText("title.click2changeSearchStatus")));
+		Toolbar tb=super.getHtmlPageToolbar();
+		//发起流程按钮
+		if(!this.isReadonly()){
+			tb.addButton(new ToolbarButton().setIcon("ui-icon-play")
+					.setText(getText("runcase.startFlow"))
+					.setClick("bs.caseBusinessView.startFlow"));
+		}
+		
+		tb.addButton(Toolbar.getDefaultToolbarRadioGroup(
+				this.getBSStatuses3(), "status", 0,
+				getText("title.click2changeSearchStatus")));
+		tb.addButton(Toolbar.getDefaultToolbarRadioGroup(
+				this.getCategory4Short(), "category", 3,
+				getText("title.click2changeSearchStatus")));		
+		
+		return tb;
 	}
 
 	@Override
@@ -358,6 +495,11 @@ public class CaseBusinesssAction extends ViewAction<Map<String, Object>> {
 	protected String getGridDblRowMethod() {
 		// 强制为只读表单
 		return "bc.page.open";
+	}
+	
+	@Override
+	protected String getHtmlPageJs() {
+		return this.getContextPath() + "/bc-business/caseBusiness/view.js";
 	}
 
 	// ==高级搜索代码开始==

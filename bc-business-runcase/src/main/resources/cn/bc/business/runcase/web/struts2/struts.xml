@@ -52,7 +52,9 @@
 			<result name="form">/bc-business/caseBusiness/form.jsp
 			</result>
 		</action>
-
+		<!--发起驾驶员客管投诉处理流程 -->
+		<action name="caseBusiness/startFlow" class="caseBusinessAction"
+			method="startFlow" />
 	</package>
 
 	<!-- 违法代码 -->

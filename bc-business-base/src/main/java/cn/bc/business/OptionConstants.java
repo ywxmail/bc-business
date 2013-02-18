@@ -124,4 +124,8 @@ public class OptionConstants extends cn.bc.option.OptionConstants {
 	public final static String CULTURAL_DEGREE = "contract4Labour.cultural.degree";
 	/** 婚姻状况 */
 	public final static String MARITAL_STATUS = "contract4Labour.marital.status";
+	/** 营运事件营运违章违法行为 */
+	public final static String CA_BS_ILLEGALACTIVITY = "ca.bs.illegalActivity";
+	/** 营运事件服务违章违法行为 */
+	public final static String CA_SV_ILLEGALACTIVITY = "ca.sv.illegalActivity";
 }

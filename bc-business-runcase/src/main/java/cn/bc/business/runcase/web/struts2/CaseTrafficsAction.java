@@ -171,8 +171,8 @@ public class CaseTrafficsAction extends ViewAction<Map<String, Object>> {
 					}
 				}));
 		columns.add(new TextColumn4MapKey("b.happen_date", "happen_date",
-				getText("runcase.happenDate"), 90).setSortable(true)
-				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+				getText("runcase.happenDate"), 130).setSortable(true)
+				.setValueFormater(new CalendarFormater("yyyy-MM-dd HH:mm")));
 		columns.add(new TextColumn4MapKey("b.company", "company",
 				getText("runcase.company2"), 40).setSortable(true));
 		columns.add(new TextColumn4MapKey("bia.name", "batch_company",

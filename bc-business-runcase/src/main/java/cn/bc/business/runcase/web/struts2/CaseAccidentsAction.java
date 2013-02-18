@@ -208,7 +208,7 @@ public class CaseAccidentsAction extends ViewAction<Map<String, Object>> {
 		// 事发时间
 		columns.add(new TextColumn4MapKey("b.happen_date", "happen_date",
 				getText("runcase.happenDate"), 125).setSortable(true)
-				.setValueFormater(new CalendarFormater("yyyy-MM-dd hh:mm")));
+				.setValueFormater(new CalendarFormater("yyyy-MM-dd HH:mm")));
 		// 公司
 		columns.add(new TextColumn4MapKey("b.company", "company",
 				getText("runcase.company2"), 40).setSortable(true)

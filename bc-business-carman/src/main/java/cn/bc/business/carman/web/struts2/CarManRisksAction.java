@@ -46,10 +46,12 @@ import cn.bc.web.formater.KeyValueFormater;
 import cn.bc.web.formater.LinkFormater4Id;
 import cn.bc.web.ui.html.grid.Column;
 import cn.bc.web.ui.html.grid.FooterButton;
+import cn.bc.web.ui.html.grid.HiddenColumn4MapKey;
 import cn.bc.web.ui.html.grid.IdColumn4MapKey;
 import cn.bc.web.ui.html.grid.TextColumn4MapKey;
 import cn.bc.web.ui.html.page.PageOption;
 import cn.bc.web.ui.html.toolbar.Toolbar;
+import cn.bc.web.ui.html.toolbar.ToolbarButton;
 import cn.bc.web.ui.json.Json;
 
 import com.google.gson.JsonObject;
@@ -90,10 +92,8 @@ public class CarManRisksAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected OrderCondition getGridDefaultOrderCondition() {
-		// 默认排序方向：状态|创建日期
-		return new OrderCondition("m.status_", Direction.Asc).add(
-				"m.file_date", Direction.Desc).add("r.start_date",
-				Direction.Desc);
+		// 默认排序方向：创建日期|保险编号|司机创建日期
+		return new OrderCondition("r.file_date", Direction.Desc).add("r.code", Direction.Asc).add("m.file_date", Direction.Desc);
 	}
 
 	@Override
@@ -107,7 +107,7 @@ public class CarManRisksAction extends ViewAction<Map<String, Object>> {
 		select.append(",r.id as rid,r.code,r.company as rcompany,r.holder,r.buy_type");
 		select.append(",r.start_date,r.end_date,r.file_date as risk_file_date");
 		select.append(",c.id car_id,c.plate_type car_plate_type,c.plate_no car_plate_no,c.company car_company");
-		select.append(",c.manage_no,bia.name unit_name,mo.name motorcade_name");
+		select.append(",c.manage_no,bia.name unit_name,mo.name motorcade_name,c.code car_code");
 		sqlObject.setSelect(select.toString());
 
 		StringBuffer from = new StringBuffer();
@@ -150,6 +150,7 @@ public class CarManRisksAction extends ViewAction<Map<String, Object>> {
 				map.put("car_manage_no", rs[i++]);
 				map.put("unit_name", rs[i++]);
 				map.put("motorcade_name", rs[i++]);
+				map.put("car_code", rs[i++]);
 				return map;
 			}
 		});
@@ -208,6 +209,8 @@ public class CarManRisksAction extends ViewAction<Map<String, Object>> {
 				getText("carMan.operationCar"), 110)
 				.setValueFormater(new LinkFormater4CarInfo(this
 						.getContextPath())));
+		columns.add(new TextColumn4MapKey("c.code", "car_code",
+				getText("carMan.carCode"), 70).setSortable(true));
 		columns.add(new TextColumn4MapKey("c.manage_no", "car_manage_no",
 				getText("carMan.carManageNo"), 70).setSortable(true));
 
@@ -242,7 +245,10 @@ public class CarManRisksAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("r.file_date", "risk_file_date",
 				getText("carManRisk.fileDate"), 120).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd HH:mm")));
-
+		
+		columns.add(new HiddenColumn4MapKey("man_id", "man_id"));
+		columns.add(new HiddenColumn4MapKey("man_name", "man_name"));
+		
 		return columns;
 	}
 
@@ -312,22 +318,22 @@ public class CarManRisksAction extends ViewAction<Map<String, Object>> {
 	@Override
 	protected Toolbar getHtmlPageToolbar() {
 		Toolbar tb = new Toolbar();
-		// tb.addButton(Toolbar.getDefaultEmptyToolbarButton());
 
 		if (this.isReadonly()) {
 			// 查看按钮
 			tb.addButton(this.getDefaultOpenToolbarButton());
-			// 新建按钮
-			// tb.addButton(this.getDefaultCreateToolbarButton());
 		} else {
 			// 新建按钮
-			// tb.addButton(this.getDefaultCreateToolbarButton());
+			tb.addButton(this.getDefaultCreateToolbarButton());
 
 			// 编辑按钮
-			// tb.addButton(this.getDefaultEditToolbarButton());
+			tb.addButton(this.getDefaultEditToolbarButton());
 
 			// 删除按钮
-			// tb.addButton(this.getDefaultDeleteToolbarButton());
+			tb.addButton(new ToolbarButton()
+					.setIcon("ui-icon-cancel")
+					.setText(getText("label.delete"))
+					.setClick("bc.carManRishView.delete_"));
 		}
 
 		// 状态按钮组
@@ -410,5 +416,10 @@ public class CarManRisksAction extends ViewAction<Map<String, Object>> {
 
 		// 返回导入按钮
 		return fb;
+	}
+	
+	@Override
+	protected String getHtmlPageJs() {
+		return this.getContextPath() + "/bc-business/carManRisk/view.js";
 	}
 }
