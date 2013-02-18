@@ -107,7 +107,7 @@ public class CarManRisksAction extends ViewAction<Map<String, Object>> {
 		select.append(",r.id as rid,r.code,r.company as rcompany,r.holder,r.buy_type");
 		select.append(",r.start_date,r.end_date,r.file_date as risk_file_date");
 		select.append(",c.id car_id,c.plate_type car_plate_type,c.plate_no car_plate_no,c.company car_company");
-		select.append(",c.manage_no,bia.name unit_name,mo.name motorcade_name");
+		select.append(",c.manage_no,bia.name unit_name,mo.name motorcade_name,c.code car_code");
 		sqlObject.setSelect(select.toString());
 
 		StringBuffer from = new StringBuffer();
@@ -150,6 +150,7 @@ public class CarManRisksAction extends ViewAction<Map<String, Object>> {
 				map.put("car_manage_no", rs[i++]);
 				map.put("unit_name", rs[i++]);
 				map.put("motorcade_name", rs[i++]);
+				map.put("car_code", rs[i++]);
 				return map;
 			}
 		});
@@ -208,6 +209,8 @@ public class CarManRisksAction extends ViewAction<Map<String, Object>> {
 				getText("carMan.operationCar"), 110)
 				.setValueFormater(new LinkFormater4CarInfo(this
 						.getContextPath())));
+		columns.add(new TextColumn4MapKey("c.code", "car_code",
+				getText("carMan.carCode"), 70).setSortable(true));
 		columns.add(new TextColumn4MapKey("c.manage_no", "car_manage_no",
 				getText("carMan.carManageNo"), 70).setSortable(true));
 
