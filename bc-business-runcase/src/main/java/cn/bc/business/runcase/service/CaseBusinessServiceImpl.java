@@ -3,6 +3,9 @@
  */
 package cn.bc.business.runcase.service;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -11,7 +14,11 @@ import java.util.Map;
 
 import org.activiti.engine.TaskService;
 import org.activiti.engine.task.Task;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.FileCopyUtils;
+import org.springframework.util.StringUtils;
 
 import cn.bc.business.motorcade.domain.Motorcade;
 import cn.bc.business.motorcade.service.MotorcadeService;
@@ -21,11 +28,16 @@ import cn.bc.business.runcase.domain.CaseBase;
 import cn.bc.core.exception.CoreException;
 import cn.bc.core.service.DefaultCrudService;
 import cn.bc.core.util.DateUtils;
+import cn.bc.docs.domain.Attach;
+import cn.bc.docs.service.AttachService;
+import cn.bc.identity.service.IdGeneratorService;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.identity.web.SystemContextHolder;
 import cn.bc.sync.dao.SyncBaseDao;
 import cn.bc.sync.domain.SyncBase;
 import cn.bc.workflow.domain.WorkflowModuleRelation;
+import cn.bc.workflow.flowattach.domain.FlowAttach;
+import cn.bc.workflow.flowattach.service.FlowAttachService;
 import cn.bc.workflow.service.WorkflowModuleRelationService;
 import cn.bc.workflow.service.WorkflowService;
 
@@ -36,14 +48,34 @@ import cn.bc.workflow.service.WorkflowService;
  */
 public class CaseBusinessServiceImpl extends DefaultCrudService<Case4InfractBusiness> implements
 		CaseBusinessService {
+	private static final Log logger = LogFactory
+			.getLog(CaseBusinessServiceImpl.class);
+	
 	private CaseBusinessDao caseBusinessDao;
-
 	private SyncBaseDao syncBaseDao;
 	private WorkflowService workflowService;
 	private WorkflowModuleRelationService workflowModuleRelationService;
 	private TaskService taskService;
 	private MotorcadeService motorcadeService;
+	private AttachService attachService;
+	private FlowAttachService flowAttachService;
+	private IdGeneratorService idGeneratorService;
 	
+	@Autowired
+	public void setIdGeneratorService(IdGeneratorService idGeneratorService) {
+		this.idGeneratorService = idGeneratorService;
+	}
+
+	@Autowired
+	public void setFlowAttachService(FlowAttachService flowAttachService) {
+		this.flowAttachService = flowAttachService;
+	}
+
+	@Autowired
+	public void setAttachService(AttachService attachService) {
+		this.attachService = attachService;
+	}
+
 	@Autowired
 	public void setMotorcadeService(MotorcadeService motorcadeService) {
 		this.motorcadeService = motorcadeService;
@@ -143,11 +175,15 @@ public class CaseBusinessServiceImpl extends DefaultCrudService<Case4InfractBusi
 			// 发起流程
 			String procInstId = this.workflowService.startFlowByKey(key,
 					this.returnParam(cib, variables));
+			
 			// 完成第一步办理
 			Task task = this.taskService.createTaskQuery()
 					.processInstanceId(procInstId).singleResult();
 			this.workflowService.completeTask(task.getId());
-			// 保存流程与交通违法信息的关系
+			//同步附件到第一个任务
+			this.syscAttach(cib, procInstId,task.getId());
+			
+			// 保存流程与营运违章信息的关系
 			WorkflowModuleRelation workflowModuleRelation = new WorkflowModuleRelation();
 			workflowModuleRelation.setMid(id);
 			workflowModuleRelation.setPid(procInstId);
@@ -234,9 +270,82 @@ public class CaseBusinessServiceImpl extends DefaultCrudService<Case4InfractBusi
 		return variables;
 	}
 	
+	//同步附件
+	private void syscAttach(Case4InfractBusiness cib,String procInstId,String taskId){
+		if(cib==null||procInstId==null||procInstId.length()==0)return;
+		
+		List<Attach> attachs=attachService.findByPtype(Case4InfractBusiness.ATTACH_TYPE, cib.getUid());
+		if(attachs==null||attachs.size()==0)return;
+	
+		for(Attach attach:attachs){
+			// 复制附件到流程附件位置中----开始---
+			// 扩展名
+			String extension = StringUtils.getFilenameExtension(attach.getPath());
+			// 文件存储的相对路径（年月），避免超出目录内文件数的限制
+			String subFolder = DateUtils.formatCalendar(Calendar.getInstance(), "yyyyMM");
+			// 上传文件存储的绝对路径
+			String appRealDir = Attach.DATA_REAL_PATH + File.separator+ FlowAttach.DATA_SUB_PATH;
+			// 所保存文件所在的目录的绝对路径名
+			String realFileDir = appRealDir + File.separator + subFolder;
+			// 不含路径的文件名
+			String fileName = DateUtils.formatCalendar(Calendar.getInstance(), "yyyyMMddHHmmssSSSS")+ "." + extension;
+			// 所保存文件的绝对路径名
+			String realFilePath = realFileDir + File.separator + fileName;
+			// 构建文件要保存到的目录
+			File _fileDir = new File(realFileDir);
+			if (!_fileDir.exists()) {
+				if (logger.isFatalEnabled())
+					logger.fatal("mkdir=" + realFileDir);
+				_fileDir.mkdirs();
+			}
+			// 直接复制附件
+			if (logger.isInfoEnabled())
+				logger.info("pure copy file");
+			
+			// 附件路径
+			String path= Attach.DATA_REAL_PATH + File.separator +attach.getPath();
+			
+			// 从附件目录下的指定文件复制到attachment目录下
+			try {
+				FileCopyUtils.copy(new FileInputStream(new File(path)),
+						new FileOutputStream(realFilePath));
+			} catch (Exception ex) {
+				logger.error(ex.getMessage(), ex);
+			}
+			
+			// 复制附件到流程附件位置中----结束---
+			
+			// 插入流程附件记录信息
+			FlowAttach flowAttach = new FlowAttach();
+			flowAttach.setUid(idGeneratorService.next(FlowAttach.ATTACH_TYPE));
+			flowAttach.setType(FlowAttach.TYPE_ATTACHMENT); // 类型：1-附件，2-意见
+			flowAttach.setPid(procInstId); // 流程id
+			flowAttach.setPath(subFolder+ File.separator +fileName); // 附件路径，物理文件保存的相对路径
+			flowAttach.setExt(extension); // 扩展名
+			flowAttach.setSubject(attach.getSubject()); // 标题
+			flowAttach.setSize(attach.getSize());
+			flowAttach.setFormatted(false);// 附件是否需要格式化
+			
+			if(taskId==null){
+				flowAttach.setCommon(true); //公共附件
+			}else{
+				flowAttach.setCommon(false); //任务附件
+				flowAttach.setTid(taskId);
+			}
+			
+			// 创建人,最后修改人信息
+			SystemContext context = SystemContextHolder.get();
+			flowAttach.setAuthor(context.getUserHistory());
+			flowAttach.setModifier(context.getUserHistory());
+			flowAttach.setFileDate(Calendar.getInstance());
+			flowAttach.setModifiedDate(Calendar.getInstance());
+			this.flowAttachService.save(flowAttach);
+		}
+		
+	}
+	
 	public void updateCaseBusinessInfo4Flow(Long id,
 			Map<String, Object> attributes) {
 		this.caseBusinessDao.update4Flow(id, attributes);
-
 	}
 }
