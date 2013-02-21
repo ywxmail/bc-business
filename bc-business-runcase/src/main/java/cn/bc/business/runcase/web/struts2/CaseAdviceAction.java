@@ -93,7 +93,7 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 	public Map<String, String> sourcesValue;
 	private Map<String, List<Map<String, String>>> allList;
 	public String happenDate;// 事发日期
-	
+
 	public AttachWidget attachsUI;
 
 	public boolean isMultiple() {
@@ -400,6 +400,13 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 			this.getE().setSource(CaseBase.SOURCE_GENERATION);
 			// 设置syncId
 			this.getE().setSyncId(syncId);
+			// 设置乘车人数
+			this.getE().setPassengerManCount(
+					jiaoWeiADVICE.getPassengerManCount());
+			this.getE().setPassengerWomanCount(
+					jiaoWeiADVICE.getPassengerWomanCount());
+			this.getE().setPassengerChildCount(
+					jiaoWeiADVICE.getPassengerChildCount());
 
 		}
 
@@ -640,11 +647,13 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 		if (!this.getE().isNew()) {
 			list_WorkflowModuleRelation = this.workflowModuleRelationService
 					.findList(this.getE().getId(),
-							Case4Advice.class.getSimpleName(), new String[]{"subject"});
+							Case4Advice.class.getSimpleName(),
+							new String[] { "subject" });
 		}
 
-		this.attachsUI=this.buildAttachsUI(this.getE().isNew()
-				, this.isReadonly()||!editable, Case4Advice.ATTACH_TYPE, this.getE().getUid());
+		this.attachsUI = this.buildAttachsUI(this.getE().isNew(),
+				this.isReadonly() || !editable, Case4Advice.ATTACH_TYPE, this
+						.getE().getUid());
 	}
 
 	// 表单可选项的加载
@@ -783,9 +792,5 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 		return "json";
 
 	}
-
-
-	
-	
 
 }
