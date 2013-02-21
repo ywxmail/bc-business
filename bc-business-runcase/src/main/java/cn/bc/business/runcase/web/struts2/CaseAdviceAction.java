@@ -489,6 +489,13 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 				.setCode(
 						this.getIdGeneratorService().nextSN4Month(
 								Case4Advice.KEY_CODE));
+		// 自接投诉自动生成公司受理号
+		if (type != null
+				&& Integer.valueOf(type) == Case4Advice.TYPE_COMPANY_COMPLAIN) {
+			this.getE().setReceiveCode(
+					this.getIdGeneratorService().nextSN4Day(
+							Case4Advice.KEY_CODE, "000"));
+		}
 
 		// 来源
 		if (syncId == null) { // 不是同步过来的信息设为自建
