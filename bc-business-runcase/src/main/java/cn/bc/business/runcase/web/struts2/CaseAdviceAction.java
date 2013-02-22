@@ -35,6 +35,7 @@ import cn.bc.core.query.condition.Direction;
 import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.core.util.DateUtils;
 import cn.bc.core.util.StringUtils;
+import cn.bc.docs.web.ui.html.AttachWidget;
 import cn.bc.identity.domain.ActorDetail;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.option.domain.OptionItem;
@@ -68,7 +69,7 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 	public boolean isNullCar;
 	public boolean isNullCarMan;
 	private boolean multiple;
-	// public String isClosed;
+
 	private CaseAdviceService caseAdviceService;
 	private MotorcadeService motorcadeService;
 	private OptionService optionService;
@@ -92,6 +93,8 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 	public Map<String, String> sourcesValue;
 	private Map<String, List<Map<String, String>>> allList;
 	public String happenDate;// 事发日期
+
+	public AttachWidget attachsUI;
 
 	public boolean isMultiple() {
 		return multiple;
@@ -241,15 +244,6 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 					pageOption.addButton(buttonOption);
 				}
 			} else {
-				// if (!getE().isNew()) {
-				// // 生成通知单
-				// pageOption.addButton(new ButtonOption("生成通知单", null,
-				// "bc.caseAdviceForm.doGenNotice"));
-				// // //生成表格
-				// // pageOption.addButton(new ButtonOption(
-				// // "生成表格", null,
-				// // "bc.caseAdviceForm.doGenForm"));
-				// }
 				if (!getE().isNew()) {
 					// 维护按钮
 					pageOption.addButton(new ButtonOption(getText("维护"), null,
@@ -406,6 +400,13 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 			this.getE().setSource(CaseBase.SOURCE_GENERATION);
 			// 设置syncId
 			this.getE().setSyncId(syncId);
+			// 设置乘车人数
+			this.getE().setPassengerManCount(
+					jiaoWeiADVICE.getPassengerManCount());
+			this.getE().setPassengerWomanCount(
+					jiaoWeiADVICE.getPassengerWomanCount());
+			this.getE().setPassengerChildCount(
+					jiaoWeiADVICE.getPassengerChildCount());
 
 		}
 
@@ -488,6 +489,13 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 				.setCode(
 						this.getIdGeneratorService().nextSN4Month(
 								Case4Advice.KEY_CODE));
+		// 自接投诉自动生成公司受理号
+		if (type != null
+				&& Integer.valueOf(type) == Case4Advice.TYPE_COMPANY_COMPLAIN) {
+			this.getE().setReceiveCode(
+					this.getIdGeneratorService().nextSN4Day(
+							Case4Advice.KEY_CODE, "000"));
+		}
 
 		// 来源
 		if (syncId == null) { // 不是同步过来的信息设为自建
@@ -646,9 +654,13 @@ public class CaseAdviceAction extends FileEntityAction<Long, Case4Advice> {
 		if (!this.getE().isNew()) {
 			list_WorkflowModuleRelation = this.workflowModuleRelationService
 					.findList(this.getE().getId(),
-							Case4Advice.class.getSimpleName(), new String[]{"subject"});
+							Case4Advice.class.getSimpleName(),
+							new String[] { "subject" });
 		}
 
+		this.attachsUI = this.buildAttachsUI(this.getE().isNew(),
+				this.isReadonly() || !editable, Case4Advice.ATTACH_TYPE, this
+						.getE().getUid());
 	}
 
 	// 表单可选项的加载

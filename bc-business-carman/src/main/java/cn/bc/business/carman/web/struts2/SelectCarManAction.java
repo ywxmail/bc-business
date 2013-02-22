@@ -66,7 +66,7 @@ public class SelectCarManAction extends
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer sql = new StringBuffer();
 		sql.append("select c.id,c.name,c.cert_fwzg,c.work_date,c.classes");
-		sql.append(",c.cert_driving_first_date,c.work_date,c.type_ from BS_CARMAN c");
+		sql.append(",c.cert_driving_first_date,c.type_,c.status_,c.cert_identity from BS_CARMAN c");
 		sqlObject.setSql(sql.toString());
 
 		// 注入参数
@@ -84,6 +84,10 @@ public class SelectCarManAction extends
 				map.put("classes", rs[i++]);
 				map.put("cert_driving_first_date",
 						DateUtils.formatDate((Date) rs[i++]));
+				map.put("type", rs[i++]);
+				map.put("status", rs[i++]);
+				map.put("certIdentity", rs[i++]);
+				
 				return map;
 			}
 		});
@@ -106,7 +110,12 @@ public class SelectCarManAction extends
 				.setValueFormater(new KeyValueFormater(getDriverClasses())));
 		columns.add(new HiddenColumn4MapKey("certDriverFirstDate",
 				"cert_driving_first_date"));
-
+		columns.add(new HiddenColumn4MapKey("type",
+				"type"));
+		columns.add(new HiddenColumn4MapKey("status",
+				"status"));
+		columns.add(new HiddenColumn4MapKey("certIdentity",
+				"certIdentity"));
 		return columns;
 	}
 

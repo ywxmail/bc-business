@@ -160,25 +160,22 @@ public class CaseAdvicesAction extends ViewAction<Map<String, Object>> {
 	protected List<Column> getGridColumns() {
 		List<Column> columns = new ArrayList<Column>();
 		columns.add(new IdColumn4MapKey("a.id", "id"));
-		if (type.length() > 0
-				&& Integer.valueOf(type) == Case4Advice.TYPE_COMPLAIN) { // 客管投诉
-			columns.add(new TextColumn4MapKey("a.receive_code", "receive_code",
-					getText("runcase.receiveCode"), 100).setSortable(true)
-					.setUseTitleFromLabel(true));
-		} else {
-			columns.add(new TextColumn4MapKey("a.receive_code", "receive_code",
-					getText("runcase.company.receiveCode"), 100).setSortable(
-					true).setUseTitleFromLabel(true));
-		}
+		// if (type.length() > 0
+		// && Integer.valueOf(type) == Case4Advice.TYPE_COMPLAIN) { // 客管投诉
+		// columns.add(new TextColumn4MapKey("a.receive_code", "receive_code",
+		// getText("runcase.receiveCode"), 100).setSortable(true)
+		// .setUseTitleFromLabel(true));
+		// } else {
+		// columns.add(new TextColumn4MapKey("a.receive_code", "receive_code",
+		// getText("runcase.company.receiveCode"), 100).setSortable(
+		// true).setUseTitleFromLabel(true));
+		// }
+		columns.add(new TextColumn4MapKey("a.receive_code", "receive_code",
+				getText("runcase.receiveCode"), 100).setSortable(true)
+				.setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("b.status_", "status_",
 				getText("runcase.status"), 40).setSortable(true)
 				.setValueFormater(new EntityStatusFormater(getBSStatuses3())));
-		// columns.add(new TextColumn4MapKey("a.advice_type", "advice_type",
-		// getText("runcase.adviceType"), 40).setSortable(true)
-		// .setValueFormater(new KeyValueFormater(getType())));
-		// columns.add(new TextColumn4MapKey("a.receive_date", "receive_date",
-		// getText("runcase.receiveDate3"), 130).setSortable(true)
-		// .setValueFormater(new CalendarFormater("yyyy-MM-dd HH:mm")));
 		columns.add(new TextColumn4MapKey("b.company", "company",
 				getText("runcase.company"), 60).setSortable(true));
 		columns.add(new TextColumn4MapKey("bia.name", "batch_company",
@@ -319,9 +316,19 @@ public class CaseAdvicesAction extends ViewAction<Map<String, Object>> {
 							}));
 		}
 
-		columns.add(new TextColumn4MapKey("b.happen_date", "happen_date",
-				getText("runcase.happenDate"), 125).setSortable(true)
-				.setValueFormater(new CalendarFormater("yyyy-MM-dd HH:mm")));
+		if (this.type != null
+				&& this.type.equals(String
+						.valueOf(CaseBase.TYPE_COMPANY_COMPLAIN))) {
+			columns.add(new TextColumn4MapKey("b.happen_date", "happen_date",
+					getText("runcase.receive.happenDate"), 125).setSortable(
+					true).setValueFormater(
+					new CalendarFormater("yyyy-MM-dd HH:mm")));
+		} else {
+			columns.add(new TextColumn4MapKey("b.happen_date", "happen_date",
+					getText("runcase.happenDate"), 125).setSortable(true)
+					.setValueFormater(new CalendarFormater("yyyy-MM-dd HH:mm")));
+		}
+
 		columns.add(new TextColumn4MapKey("a.path_from", "path_from",
 				getText("runcase.address"), 200).setUseTitleFromLabel(true)
 				.setValueFormater(new AbstractFormater<String>() {
@@ -345,37 +352,7 @@ public class CaseAdvicesAction extends ViewAction<Map<String, Object>> {
 				getText("runcase.businessType"), 80));
 		columns.add(new TextColumn4MapKey("man.origin", "origin",
 				getText("runcase.origin"), 150));
-		// columns.add(new TextColumn4MapKey("a.detail", "detail",
-		// getText("runcase.detail"), 150).setSortable(true)
-		// .setUseTitleFromLabel(true));
-		// columns.add(new TextColumn4MapKey("b.closer_name", "closer_name",
-		// getText("runcase.closerName"), 70));
-		// columns.add(new TextColumn4MapKey("b.close_date", "close_date",
-		// getText("runcase.closeDate"), 100).setSortable(true)
-		// .setValueFormater(new CalendarFormater("yyyy-MM-dd")));
-		// columns.add(new TextColumn4MapKey("a.advisor_name", "advisor_name",
-		// getText("runcase.advisorName"), 70).setSortable(true));
-		// columns.add(new TextColumn4MapKey("b.source", "source",
-		// getText("runcase.source"),
-		// 60).setSortable(true).setUseTitleFromLabel(true)
-		// .setValueFormater(new AbstractFormater<String>() {
-		// @Override
-		// public String format(Object context, Object value) {
-		// // 从上下文取出元素Map
-		// @SuppressWarnings("unchecked")
-		// Map<String, Object> obj = (Map<String, Object>) context;
-		// if(null != obj.get("from_") && obj.get("from_").toString().length() >
-		// 0){
-		// return getSourceStatuses().get(obj.get("source")+"") + " - " +
-		// obj.get("from_");
-		// }else if(null != obj.get("source") &&
-		// obj.get("source").toString().length() > 0){
-		// return getSourceStatuses().get(obj.get("source")+"");
-		// }else{
-		// return "";
-		// }
-		// }
-		// }));
+
 		columns.add(new HiddenColumn4MapKey("type", "type_"));
 
 		return columns;

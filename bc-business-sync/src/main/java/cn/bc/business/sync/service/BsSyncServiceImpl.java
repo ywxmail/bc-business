@@ -609,17 +609,20 @@ public class BsSyncServiceImpl implements BsSyncService {
 		// 乘车人数(男)
 		if (row.getCellStringValue("male_amount") != null
 				&& row.getCellStringValue("male_amount").length() > 0) {
-
+			domain.setPassengerManCount(Integer.parseInt(row
+					.getCellStringValue("male_amount")));
 		}
 		// 乘车人数(女)
 		if (row.getCellStringValue("female_amount") != null
 				&& row.getCellStringValue("female_amount").length() > 0) {
-
+			domain.setPassengerWomanCount(Integer.parseInt(row
+					.getCellStringValue("female_amount")));
 		}
 		// 乘车人数(童)
 		if (row.getCellStringValue("child_amount") != null
 				&& row.getCellStringValue("child_amount").length() > 0) {
-
+			domain.setPassengerChildCount(Integer.parseInt(row
+					.getCellStringValue("child_amount")));
 		}
 		// 转协查时间
 		if (row.getCellStringValue("child_amount") != null

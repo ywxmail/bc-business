@@ -33,6 +33,7 @@ import cn.bc.core.query.condition.Direction;
 import cn.bc.core.query.condition.impl.OrderCondition;
 import cn.bc.core.util.DateUtils;
 import cn.bc.core.util.StringUtils;
+import cn.bc.docs.web.ui.html.AttachWidget;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.option.domain.OptionItem;
 import cn.bc.option.service.OptionService;
@@ -66,9 +67,6 @@ public class CaseTrafficAction extends
 	public boolean isMoreCarMan; // 是否存在多个司机
 	public boolean isNullCar; // 此司机现在没有驾驶任何车辆
 	public boolean isNullCarMan; // 此车辆现在没有任何司机驾驶
-	// public boolean isSync; //是否同步
-	// public boolean isExist; //判断生成的当前记录是否存在,存在发出提醒
-	// public String isClosed;
 	private CaseTrafficService caseTrafficService;
 	private CaseBaseService caseBaseService;
 	private MotorcadeService motorcadeService;
@@ -90,6 +88,8 @@ public class CaseTrafficAction extends
 	public Map<String, String> sourcesValue;
 	private Map<String, List<Map<String, String>>> allList;
 	public List<Map<String, Object>> carTrafficHandleFlowList; // 交通违法流程集合
+	
+	public AttachWidget attachsUI;
 
 	public Long getCarId() {
 		return carId;
@@ -285,9 +285,6 @@ public class CaseTrafficAction extends
 			this.getE().setSource(CaseBase.SOURCE_GENERATION);
 			// 设置syncId
 			this.getE().setSyncId(syncId);
-			// 判断生成的当前记录是否存在,存在发出提醒
-			// isExist = this.syncBaseService.hadGenerate("BS_CASE_BASE",
-			// syncId);
 		}
 
 		if (carManId != null) {
@@ -433,6 +430,10 @@ public class CaseTrafficAction extends
 			carTrafficHandleFlowList = this.workflowModuleRelationService
 					.findList(c.getId(), Case4InfractTraffic.ATTACH_TYPE, new String[]{"subject"});
 		}
+		
+		this.attachsUI=this.buildAttachsUI(this.getE().isNew()
+				, this.isReadonly()||!editable||this.getE().getStatus()==CaseBase.STATUS_CLOSED
+				, Case4InfractTraffic.ATTACH_TYPE, this.getE().getUid());
 
 	}
 
@@ -491,31 +492,6 @@ public class CaseTrafficAction extends
 
 	// ========批量生成交通违法代码结束========
 
-	/*
-	 * 业务变更注释 public Json json; public String closefile(){ SystemContext context
-	 * = this.getSystyemContext();
-	 * 
-	 * this.getE().setStatus(CaseBase.STATUS_CLOSED);
-	 * this.getE().setCloserId(context.getUserHistory().getId());
-	 * this.getE().setCloserName(context.getUserHistory().getName());
-	 * this.getE().setCloseDate(Calendar.getInstance(Locale.CHINA));
-	 * 
-	 * DateFormat df = new SimpleDateFormat("yyyy-MM-dd"); String closeDateStr =
-	 * df.format(this.getE().getCloseDate().getTime());
-	 * 
-	 * json = new Json(); json.put("status", this.getE().getStatus());
-	 * json.put("closeDate", closeDateStr); json.put("closeId",
-	 * this.getE().getCloserId()); json.put("closeName",
-	 * this.getE().getCloserName()); return "json"; }
-	 * 
-	 * public String getCarNManInfo(){ if(carId != null){
-	 * //从页面ajax请求carId参数不为空时通过carManId查找关联司机信息
-	 * this.caseBaseService.findCarManNameNCertCodeByCarId(carId); } if(carManId
-	 * != null){ //从页面ajax请求carManId参数不为空时通过carId查找关联车辆信息
-	 * this.caseBaseService.findCarPlateNCertCodeByCarManId(carManId); } return
-	 * "json"; }
-	 */
-
 	public String selectCarMansInfo() {
 		List<CarMan> drivers = this.carManService.selectAllCarManByCarId(carId);
 		JsonArray jsons = new JsonArray();
@@ -525,8 +501,6 @@ public class CaseTrafficAction extends
 			o.put("name", driver.getName());
 			o.put("id", driver.getId());
 			o.put("cert4FWZG", driver.getCert4FWZG());
-			// o.put("region", driver.getRegion());
-			// o.put("drivingStatus", driver.getDrivingStatus());
 			jsons.add(o);
 		}
 		json = jsons.toString();
