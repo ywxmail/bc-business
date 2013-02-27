@@ -74,7 +74,7 @@ public class SelectCarAction extends
 
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer sql = new StringBuffer();
-		sql.append(" c.id,c.status_,c.code,c.plate_type,c.plate_no,c.register_date");
+		sql.append(" c.id,c.status_,c.code,c.plate_type,c.plate_no,c.register_date,c.manage_no");
 		sql.append(",c.scrap_date,c.motorcade_id,m.name,c.company,c.bs_type,c.charger");
 		sql.append(",bia.name as unit_name,bia.id nuit_id");
 		if (loadLevel != null && loadLevel.length() > 0
@@ -135,6 +135,7 @@ public class SelectCarAction extends
 				map.put("plate_type", rs[i++]);
 				map.put("plate_no", rs[i++]);
 				map.put("register_date", rs[i++]);
+				map.put("manage_no", rs[i++]);
 				map.put("scrap_date", rs[i++]);
 				map.put("motorcade_id", rs[i++]);
 				map.put("motorcade_name", rs[i++]);
@@ -250,6 +251,7 @@ public class SelectCarAction extends
 		columns.add(new HiddenColumn4MapKey("motorcadeName", "motorcade_name"));
 		columns.add(new HiddenColumn4MapKey("unitName", "unit_name"));
 		columns.add(new HiddenColumn4MapKey("unitId", "nuit_id"));
+		columns.add(new HiddenColumn4MapKey("manageNo", "manage_no"));
 
 		if (loadLevel != null && loadLevel.length() > 0
 				&& loadLevel.equals("1")) {
