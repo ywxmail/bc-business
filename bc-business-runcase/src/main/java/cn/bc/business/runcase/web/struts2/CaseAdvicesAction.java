@@ -160,16 +160,19 @@ public class CaseAdvicesAction extends ViewAction<Map<String, Object>> {
 	protected List<Column> getGridColumns() {
 		List<Column> columns = new ArrayList<Column>();
 		columns.add(new IdColumn4MapKey("a.id", "id"));
-		if (type.length() > 0
-				&& Integer.valueOf(type) == Case4Advice.TYPE_COMPLAIN) { // 客管投诉
-			columns.add(new TextColumn4MapKey("a.receive_code", "receive_code",
-					getText("runcase.receiveCode"), 100).setSortable(true)
-					.setUseTitleFromLabel(true));
-		} else {
-			columns.add(new TextColumn4MapKey("a.receive_code", "receive_code",
-					getText("runcase.company.receiveCode"), 100).setSortable(
-					true).setUseTitleFromLabel(true));
-		}
+		// if (type.length() > 0
+		// && Integer.valueOf(type) == Case4Advice.TYPE_COMPLAIN) { // 客管投诉
+		// columns.add(new TextColumn4MapKey("a.receive_code", "receive_code",
+		// getText("runcase.receiveCode"), 100).setSortable(true)
+		// .setUseTitleFromLabel(true));
+		// } else {
+		// columns.add(new TextColumn4MapKey("a.receive_code", "receive_code",
+		// getText("runcase.company.receiveCode"), 100).setSortable(
+		// true).setUseTitleFromLabel(true));
+		// }
+		columns.add(new TextColumn4MapKey("a.receive_code", "receive_code",
+				getText("runcase.receiveCode"), 100).setSortable(true)
+				.setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("b.status_", "status_",
 				getText("runcase.status"), 40).setSortable(true)
 				.setValueFormater(new EntityStatusFormater(getBSStatuses3())));
@@ -313,16 +316,19 @@ public class CaseAdvicesAction extends ViewAction<Map<String, Object>> {
 							}));
 		}
 
-		if(this.type!=null&&this.type.equals(String.valueOf(CaseBase.TYPE_COMPANY_COMPLAIN))){
+		if (this.type != null
+				&& this.type.equals(String
+						.valueOf(CaseBase.TYPE_COMPANY_COMPLAIN))) {
 			columns.add(new TextColumn4MapKey("b.happen_date", "happen_date",
-					getText("runcase.receive.happenDate"), 125).setSortable(true)
-					.setValueFormater(new CalendarFormater("yyyy-MM-dd HH:mm")));
-		}else{
+					getText("runcase.receive.happenDate"), 125).setSortable(
+					true).setValueFormater(
+					new CalendarFormater("yyyy-MM-dd HH:mm")));
+		} else {
 			columns.add(new TextColumn4MapKey("b.happen_date", "happen_date",
 					getText("runcase.happenDate"), 125).setSortable(true)
 					.setValueFormater(new CalendarFormater("yyyy-MM-dd HH:mm")));
 		}
-		
+
 		columns.add(new TextColumn4MapKey("a.path_from", "path_from",
 				getText("runcase.address"), 200).setUseTitleFromLabel(true)
 				.setValueFormater(new AbstractFormater<String>() {
