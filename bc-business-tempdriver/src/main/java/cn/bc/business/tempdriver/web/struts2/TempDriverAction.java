@@ -1,5 +1,8 @@
 package cn.bc.business.tempdriver.web.struts2;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -8,11 +11,13 @@ import java.util.Map;
 
 import org.commontemplate.util.JSONUtils;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.FileCopyUtils;
 
 import cn.bc.business.OptionConstants;
 import cn.bc.business.tempdriver.domain.TempDriver;
@@ -27,12 +32,16 @@ import cn.bc.core.util.StringUtils;
 import cn.bc.docs.domain.Attach;
 import cn.bc.docs.web.ui.html.AttachWidget;
 import cn.bc.identity.web.SystemContext;
+import cn.bc.identity.web.SystemContextHolder;
 import cn.bc.option.domain.OptionItem;
 import cn.bc.option.service.OptionService;
 import cn.bc.web.ui.html.page.ButtonOption;
 import cn.bc.web.ui.html.page.PageOption;
 import cn.bc.web.ui.json.Json;
+import cn.bc.workflow.flowattach.domain.FlowAttach;
+import cn.bc.workflow.flowattach.service.FlowAttachService;
 import cn.bc.workflow.service.WorkflowModuleRelationService;
+import cn.bc.workflow.service.WorkspaceServiceImpl;
 
 /**
  * 司机招聘信息表单Action
@@ -48,6 +57,7 @@ public class TempDriverAction extends FileEntityAction<Long, TempDriver> {
 	private TempDriverService tempDriverService;
 	private OptionService optionService;
 	private WorkflowModuleRelationService workflowModuleRelationService;
+	private FlowAttachService flowAttachService;
 
 	public List<Map<String, String>> list_WorkExperience; // 工作经历集合
 	public List<Map<String, String>> list_Family; // 家庭成员集合
@@ -63,7 +73,7 @@ public class TempDriverAction extends FileEntityAction<Long, TempDriver> {
 	}
 
 	@Autowired
-	public void setArrangeService(TempDriverService tempDriverService) {
+	public void setTempDriverService(TempDriverService tempDriverService) {
 		this.tempDriverService = tempDriverService;
 		this.setCrudService(tempDriverService);
 	}
@@ -72,6 +82,11 @@ public class TempDriverAction extends FileEntityAction<Long, TempDriver> {
 	public void setWorkflowModuleRelationService(
 			WorkflowModuleRelationService workflowModuleRelationService) {
 		this.workflowModuleRelationService = workflowModuleRelationService;
+	}
+	
+	@Autowired
+	public void setFlowAttachService(FlowAttachService flowAttachService) {
+		this.flowAttachService = flowAttachService;
 	}
 
 	@Override
@@ -125,11 +140,6 @@ public class TempDriverAction extends FileEntityAction<Long, TempDriver> {
 		if (!this.isReadonly()) {
 			pageOption.addButton(new ButtonOption(getText("label.save"), null,
 					"bs.tempDriverForm.save").setId("tempDriverSave"));
-			/*
-			 * pageOption.addButton(new ButtonOption(
-			 * getText("invoice.saveAndClose"), null,
-			 * "bs.invoice4SellForm.saveAndClose") .setId("invoice4SellSave"));
-			 */
 		}
 	}
 
@@ -203,13 +213,21 @@ public class TempDriverAction extends FileEntityAction<Long, TempDriver> {
 		return "json";
 	}
 
-	// ---发起流程---开始---
+	// ---流程关联---开始---
 	public String tdIds;// 招聘司机ID
 	public String flowKey;// 流程编码
 	public Boolean flagStatus;// 是否更新司机状态为审批中的控制
 
 	public String startFlow() {
 		Json json = new Json();
+		
+		//服务资格证流程特殊的处理
+		if(this.flowKey.endsWith(getText("tempDriverWorkFlow.startFlow.key2"))){
+			this.startFlow4RequestServiceCertificate(json,getText("tempDriverWorkFlow.startFlow.key2"));
+			this.json = json.toString();
+			return "json";
+		}
+		
 		// 去掉最后一个逗号
 		String[] _ids = tdIds.substring(0, tdIds.lastIndexOf(",")).split(",");
 		String procInstIds = this.tempDriverService.doStartFlow(flowKey,
@@ -237,8 +255,276 @@ public class TempDriverAction extends FileEntityAction<Long, TempDriver> {
 		this.json = json.toString();
 		return "json";
 	}
+	
+	public String listDriver;
+	private void startFlow4RequestServiceCertificate(Json json,String key){
+		if(this.listDriver==null||this.listDriver.length()==0){
+			json.put("success", false);
+			json.put("msg", "listDrivers is null!");
+			return;
+		}
+		
+		String subject="";
+		String driverIds="";
+		try{
+			JSONArray jsons = new JSONArray(listDriver);		
+			for(int i=0;i<jsons.length();i++){
+				subject+=jsons.getJSONObject(i).getString("name");
+				driverIds+=jsons.getJSONObject(i).getString("id");
+				if(i+1<jsons.length()){
+					subject+="、";
+					driverIds+=",";
+				}
+			}
+		} catch (JSONException e) {
+			logger.error(e.getMessage(), e);
+			try {
+				throw e;
+			} catch (JSONException e1) {
+				e1.printStackTrace();
+			}
+		}
+		
+		subject+=getText("tempDriverWorkFlow.subject.rdc");
+		
+		json.put("pid", this.tempDriverService.doStartFlow(driverIds,key,subject, this.listDriver));
+		json.put("success", true);
+	}
+	
+	public Long driverId;
+	/*
+	        发起服务资格证流程的验证 
+	 */
+	public String requestServiceCertificateValidate(){
+		Json json = new Json();
+		if(this.driverId==null){
+			json.put("validate", false);
+			json.put("validate_lost_type", 0);
+			json.put("msg", "driverId is null!");
+			this.json=json.toString();
+			return "json";
+		}
+		
+		String carManEntryKey=getText("tempDriverWorkFlow.startFlow.key");
+		
+		//不存在流程关系
+		if(!this.workflowModuleRelationService.hasRelation4Key(driverId
+				,TempDriver.WORKFLOW_MTYPE,carManEntryKey)){
+			json.put("validate", false);
+			json.put("validate_lost_type", 1);
+			this.json=json.toString();
+			return "json";
+		}
+		
+		//获取最新的司机入职流程相关参数
+		Map<String,Object> wmr=
+				this.workflowModuleRelationService.findList(driverId, TempDriver.WORKFLOW_MTYPE
+				,carManEntryKey,new String[] {"isGiveUp","isPass","isPairDriver","pairDriverName","pairDriverNameId" }).get(0);
+		
+		//设置流程的信息
+		json.put("pid", wmr.get("pid").toString());
+		json.put("pname", wmr.get("name").toString());
+		
+		//流程状态非已结束
+		if(!(WorkspaceServiceImpl.COMPLETE==Integer.valueOf(wmr.get("status").toString()))){
+			json.put("validate", false);
+			json.put("validate_lost_type", 2);
+			this.json=json.toString();
+			return "json";
+		}
+		
+		//放弃入职审批
+		if("1".equals(wmr.get("isGiveUp").toString())){
+			json.put("validate", false);
+			json.put("validate_lost_type", 3);
+			this.json=json.toString();
+			return "json";
+		}
+		
+		//入职审批流程不通过
+		if("0".equals(wmr.get("isPass").toString())){
+			json.put("validate", false);
+			json.put("validate_lost_type", 4);
+			this.json=json.toString();
+			return "json";
+		}
+		
+		//入职通过，但没有对班
+		if("0".equals(wmr.get("isPairDriver").toString())){
+			json.put("validate", true);
+			json.put("isPairDriver", false);
+			this.json=json.toString();
+			return "json";
+		}
+		
+		//对班司机
+		Long pairDriverNameId = Long.valueOf(wmr.get("pairDriverNameId").toString());
+		
+		this.pairDriverValidate(json, pairDriverNameId, carManEntryKey);
+		this.json=json.toString();
+		
+		return "json";
+	}
+	
+	//对班司机的司机入职审批流程验证
+	private void pairDriverValidate(Json json,Long id,String carManEntryKey){
+		json.put("isPairDriver", true);
+		
+		//不存在流程关系
+		if(!this.workflowModuleRelationService.hasRelation4Key(id,TempDriver.WORKFLOW_MTYPE,carManEntryKey)){
+			json.put("validate", false);
+			json.put("validate_pair_lost_type", 1);//没有流程关系
+			return;
+		}
+		
+		TempDriver pairDriver=this.tempDriverService.load(id);
+			
+		//获取对班司机最新的司机入职流程相关参数
+		Map<String,Object> wmr4pair=this.workflowModuleRelationService.findList(id, TempDriver.WORKFLOW_MTYPE
+				,carManEntryKey,new String[] { "isGiveUp","isPass","isPairDriver","pairDriverName","pairDriverNameId"}).get(0);
+		
+		//设置对班司机信息和
+		json.put("pair_id", id.toString());
+		json.put("pair_name", pairDriver.getName());
+		json.put("pair_applyAttr", pairDriver.getApplyAttr());//申请属性
+		//设置对班司机最新参与的流程信息
+		json.put("pair_pid", wmr4pair.get("pid").toString());
+		json.put("pair_pname", wmr4pair.get("name").toString());
+		
+		
+		
+		//流程未结束
+		if(!(WorkspaceServiceImpl.COMPLETE==Integer.valueOf(wmr4pair.get("status").toString()))){
+			json.put("validate", false);
+			json.put("validate_pair_lost_type", 2);
+			return;
+		}
+		
+		//放弃入职审批
+		if("1".equals(wmr4pair.get("isGiveUp").toString())){
+			json.put("validate", false);
+			json.put("validate_pair_lost_type", 3);
+			return;
+		}
+		
+		//入职不通过
+		if("0".equals(wmr4pair.get("isPass").toString())){
+			json.put("validate", false);
+			json.put("validate_pair_lost_type", 4);
+			return;
+		}
+		
+		//对班司机的最新入职审批流程中 没有选择对班
+		if("0".equals(wmr4pair.get("isPairDriver").toString())){
+			json.put("validate", false);
+			json.put("validate_pair_lost_type", 5);
+			return;
+		}
+		
+		//对班司机的最新入职审批流程中 所选择对班 不是当前司机
+		if(!wmr4pair.get("pairDriverNameId").toString().endsWith(String.valueOf(this.driverId))){
+			json.put("validate", false);
+			json.put("validate_pair_lost_type", 6);
+			return;
+		}
 
-	// ---发起流程结束---
+		json.put("validate", true);
+		//设置对班司机的身份证很从业资格证
+		json.put("pair_certIdentity", pairDriver.getCertIdentity());
+		json.put("pair_certCYZG", pairDriver.getCertCYZG());
+		
+	}
+	
+	public String procinstId;//流程id
+	public String procinstTaskId;//任务id
+	public String templateCode;//模板编码
+	
+	//添加 添加服务资格证申领表 或 免摇珠申请书附件到流程
+	public String addWorkflowAttachFromTemplate() throws Exception{
+		Attach attach =this.tempDriverService.doGetAttachFromTemplate(this.driverId, this.templateCode);
+		TempDriver tempDriver=this.tempDriverService.load(this.driverId);
+		String attachPath=Attach.DATA_REAL_PATH + File.separator+attach.getPath();
+		// 模板文件扩展名
+		String extension = org.springframework.util.StringUtils.getFilenameExtension(attach.getPath());
+		// 声明当前日期时间
+		Calendar now = Calendar.getInstance();
+		// 文件存储的相对路径（年月），避免超出目录内文件数的限制
+		String subFolder = DateUtils.formatCalendar(now, "yyyyMM");
+		// 上传文件存储的绝对路径
+		String appRealDir = Attach.DATA_REAL_PATH + File.separator + FlowAttach.DATA_SUB_PATH;
+		// 所保存文件所在的目录的绝对路径名
+		String realFileDir = appRealDir +  File.separator + subFolder;
+		// 不含路径的文件名
+		String fileName = DateUtils.formatCalendar(now, "yyyyMMddHHmmssSSSS") + "." + extension;
+		// 所保存文件的绝对路径名
+		String realFilePath = realFileDir +  File.separator + fileName;
+		// 构建文件要保存到的目录
+		File _fileDir = new File(realFileDir);
+		if (!_fileDir.exists()) {
+			if (logger.isFatalEnabled())
+				logger.fatal("mkdir=" + realFileDir);
+			_fileDir.mkdirs();
+		}
+		// 直接复制附件
+		if (logger.isInfoEnabled())
+			logger.info("pure copy file");
+		try {
+			FileCopyUtils.copy(new FileInputStream(attachPath), new FileOutputStream(
+					realFilePath));
+		} catch (Exception ex) {
+			logger.error(ex.getMessage(), ex);
+		}
+
+		// 插入流程附件记录信息
+		FlowAttach flowAttach = new FlowAttach();
+		flowAttach.setUid(this.getIdGeneratorService().next(FlowAttach.ATTACH_TYPE));
+		flowAttach.setType(FlowAttach.TYPE_ATTACHMENT); // 类型：1-附件，2-意见
+		flowAttach.setPid(this.procinstId); // 流程id
+		String path = subFolder + "/" + fileName; // 文件夹加文件名路径
+		if (path.length() > 0) {
+			flowAttach.setPath(path); // 附件路径，物理文件保存的相对路径
+			flowAttach.setExt(extension); // 扩展名
+		}
+		flowAttach.setSubject(attach.getSubject()+"("+tempDriver.getName()+")"); // 标题
+		if(this.procinstTaskId==null){
+			flowAttach.setCommon(true); // 公共信息
+		}else{
+			flowAttach.setCommon(false);
+			flowAttach.setTid(this.procinstTaskId);
+		}
+		
+		flowAttach.setSize(attach.getSize());
+		flowAttach.setFormatted(false);// 附件是否需要格式化
+
+
+		// 创建人,最后修改人信息
+		SystemContext context = SystemContextHolder.get();
+		flowAttach.setAuthor(context.getUserHistory());
+		flowAttach.setModifier(context.getUserHistory());
+		flowAttach.setFileDate(Calendar.getInstance());
+		flowAttach.setModifiedDate(Calendar.getInstance());
+
+		this.flowAttachService.save(flowAttach);
+		
+		
+		Json json=new Json();
+
+		json.put("success", true);
+		json.put("id", flowAttach.getId());
+		json.put("size", flowAttach.getSize());
+		json.put("subject", flowAttach.getSubject());
+		json.put("ext",flowAttach.getExt());
+		json.put("path", flowAttach.getPath());
+		json.put("uid", flowAttach.getUid());
+		json.put("formatted", flowAttach.getFormatted());
+		json.put("author",context.getUserHistory().getName());
+		json.put("fileDate",DateUtils.formatCalendar2Second(Calendar.getInstance()));
+		json.put("msg", getText("tempDriverWorkFlow.flowAttach.success"));
+		this.json=json.toString();
+		return "json";
+	}
+
+	// ---流程关联--结束---
 
 	// 构建附件UI
 	private void buildAttachsUI() {

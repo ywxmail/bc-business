@@ -33,8 +33,7 @@ import cn.bc.workflow.service.WorkflowService;
  */
 public class TempDriverServiceImpl extends DefaultCrudService<TempDriver> implements
 		TempDriverService {
-	private static Log logger = LogFactory
-			.getLog(TempDriverServiceImpl.class);
+	private static Log logger = LogFactory.getLog(TempDriverServiceImpl.class);
 	
 	private TempDriverDao tempDriverDao;
 	private WorkflowService workflowService;
@@ -209,9 +208,57 @@ public class TempDriverServiceImpl extends DefaultCrudService<TempDriver> implem
 
 	public Attach doAddAttachFromTemplate(Long id, String templateCode)
 			throws IOException {
+		Attach attach = doGetAttachFromTemplate(id,templateCode);
+		this.attachService.save(attach);
+		return attach;
+	}
+
+	public void doSyncPortrait() throws Exception {
+		this.tempDriverDao.doSyncPortrait();
+	}
+
+	public void doUpdateStatus(Long[] ids, int status) {
+		Map<String,Object> attributes=new HashMap<String, Object>();
+		attributes.put("status", status);
+		attributes.put("modifiedDate",Calendar.getInstance());
+		attributes.put("modifier",SystemContextHolder.get().getUserHistory());
+		this.tempDriverDao.update(ids, attributes);
+	}
+
+	public void doUpdateInterviewDate(Long[] ids, Calendar interviewDate) {
+		Map<String,Object> attributes=new HashMap<String, Object>();
+		attributes.put("interviewDate", interviewDate);
+		attributes.put("modifiedDate",Calendar.getInstance());
+		attributes.put("modifier",SystemContextHolder.get().getUserHistory());
+		this.tempDriverDao.update(ids, attributes);
+	}
+
+	public String doStartFlow(String driverIds,String key,String subject,String listDriver){
+		//声明变量
+		Map<String,Object> variables=new HashMap<String, Object>();
+		variables.put("list_driver", listDriver);
+		variables.put("subject", subject);
+		String procInstId=this.workflowService.startFlowByKey(key,variables);
+		
+		//流程模块关系domain
+		WorkflowModuleRelation workflowModuleRelation;
+		for(String id:driverIds.split(",")){
+			//增加流程关系
+			workflowModuleRelation=new WorkflowModuleRelation();
+			workflowModuleRelation.setMid(Long.valueOf(id));
+			workflowModuleRelation.setPid(procInstId);
+			workflowModuleRelation.setMtype(TempDriver.WORKFLOW_MTYPE);
+			this.workflowModuleRelationService.save(workflowModuleRelation);
+		}
+		
+		//发起流程
+		return procInstId;
+	}
+
+	public Attach doGetAttachFromTemplate(Long id, String templateCode)
+			throws IOException {
 		TempDriver tempDriver=this.load(id);
 
-		
 		// 获取模板
 		Template template = this.templateService.loadByCode(templateCode);
 		if (template == null) {
@@ -269,27 +316,7 @@ public class TempDriverServiceImpl extends DefaultCrudService<TempDriver> implem
 		params.put(SystemContext.class.getSimpleName(),SystemContextHolder.get());
 		
 		Attach attach = template.format2Attach(params, ptype, puid);
-		this.attachService.save(attach);
 		return attach;
 	}
 
-	public void doSyncPortrait() throws Exception {
-		this.tempDriverDao.doSyncPortrait();
-	}
-
-	public void doUpdateStatus(Long[] ids, int status) {
-		Map<String,Object> attributes=new HashMap<String, Object>();
-		attributes.put("status", status);
-		attributes.put("modifiedDate",Calendar.getInstance());
-		attributes.put("modifier",SystemContextHolder.get().getUserHistory());
-		this.tempDriverDao.update(ids, attributes);
-	}
-
-	public void doUpdateInterviewDate(Long[] ids, Calendar interviewDate) {
-		Map<String,Object> attributes=new HashMap<String, Object>();
-		attributes.put("interviewDate", interviewDate);
-		attributes.put("modifiedDate",Calendar.getInstance());
-		attributes.put("modifier",SystemContextHolder.get().getUserHistory());
-		this.tempDriverDao.update(ids, attributes);
-	}
 }
