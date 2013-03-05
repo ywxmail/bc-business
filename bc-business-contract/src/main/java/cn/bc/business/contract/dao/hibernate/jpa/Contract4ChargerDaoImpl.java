@@ -682,7 +682,7 @@ public class Contract4ChargerDaoImpl extends
 		// 通过经营权证找原公司
 		hql += ",(select c.company from bs_car c where c.cert_no2 = b.cert_no2 and c.file_Date < b.file_Date ";
 		hql += "and c.status_ = 1 order by c.register_date Desc limit 1) as originCompany";
-		//车辆管理号
+		// 车辆管理号
 		hql += ",b.manage_no";
 		hql += " FROM bs_car_contract a";
 		hql += " inner join bs_car b on b.id=a.car_id";
@@ -811,7 +811,7 @@ public class Contract4ChargerDaoImpl extends
 		hql += " inner join bs_car_driver d on d.car_id=c.car_id";
 		hql += " inner join bs_carman b on b.id=d.driver_id";
 		hql += " where d.classes in (0,1,2) and d.status_ in (-1,0) and a.id=?";
-		//迁移类型非 1-公司到公司(已注销);2-注销未有去向;4-交回未注销;9-未交证注销 的司机
+		// 迁移类型非 1-公司到公司(已注销);2-注销未有去向;4-交回未注销;9-未交证注销 的司机
 		hql += " and d.driver_id not in(";
 		hql += " select h.driver_id ";
 		hql += " from bs_contract e ";
@@ -822,7 +822,7 @@ public class Contract4ChargerDaoImpl extends
 		hql += " and e.id =?";
 		hql += ")";
 		return HibernateJpaNativeQuery.executeNativeSql(getJpaTemplate(), hql,
-				new Object[] { contractId, contractId},
+				new Object[] { contractId, contractId },
 				new cn.bc.db.jdbc.RowMapper<Map<String, String>>() {
 					public Map<String, String> mapRow(Object[] rs, int rowNum) {
 						Map<String, String> oi = new HashMap<String, String>();
@@ -870,8 +870,9 @@ public class Contract4ChargerDaoImpl extends
 					}
 				});
 	}
-	
-	public List<Map<String, String>> findReturnDriverByContractId(Long contractId) {
+
+	public List<Map<String, String>> findReturnDriverByContractId(
+			Long contractId) {
 		String hql = "SELECT  b.name,b.address,b.address1,b.cert_identity,b.phone,b.phone1,b.cert_fwzg";
 		hql += " from bs_contract a";
 		hql += " inner join bs_car_contract c on c.contract_id=a.id";
@@ -885,12 +886,12 @@ public class Contract4ChargerDaoImpl extends
 		hql += " inner join bs_car_driver g on g.car_id=f.car_id";
 		hql += " inner join bs_car_driver_history h on h.id=g.pid";
 		hql += " where h.status_ = -1";
-		//迁移类型：1-公司到公司(已注销);2-注销未有去向;4-交回未注销;9-未交证注销
+		// 迁移类型：1-公司到公司(已注销);2-注销未有去向;4-交回未注销;9-未交证注销
 		hql += " and h.move_type not in (1,4,2,9)";
 		hql += " and e.id =?";
 		hql += ")";
 		return HibernateJpaNativeQuery.executeNativeSql(getJpaTemplate(), hql,
-				new Object[] { contractId, contractId},
+				new Object[] { contractId, contractId },
 				new cn.bc.db.jdbc.RowMapper<Map<String, String>>() {
 					public Map<String, String> mapRow(Object[] rs, int rowNum) {
 						Map<String, String> oi = new HashMap<String, String>();
@@ -1115,5 +1116,32 @@ public class Contract4ChargerDaoImpl extends
 		}
 
 		return queryMap;
+	}
+
+	public Long getNestContract4ChargerIdByCarId(final Long carId) {
+		String sql = "select c.id from bs_contract c inner join bs_car_contract cc on c.id=cc.contract_id"
+				+ " where cc.car_id=? order by c.file_date desc";
+
+		if (logger.isDebugEnabled()) {
+			logger.debug("sql: " + sql + "carId: " + carId);
+		}
+		List<Map<String, Object>> list = null;
+		try {
+			list = this.jdbcTemplate.queryForList(sql, carId);
+
+		} catch (EmptyResultDataAccessException e) {
+			e.getStackTrace();
+		}
+		if (list.size() == 0) {
+			return null;
+
+		} else {
+			if (logger.isDebugEnabled()) {
+				logger.debug("contractid: " + list.get(0).get("id"));
+			}
+			return Long.valueOf(list.get(0).get("id").toString());
+
+		}
+
 	}
 }

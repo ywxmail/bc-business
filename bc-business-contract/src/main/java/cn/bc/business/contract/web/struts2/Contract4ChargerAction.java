@@ -128,7 +128,7 @@ public class Contract4ChargerAction extends
 		return context
 				.hasAnyRole(getText("key.role.bs.contract4charger.entering"));
 	}
-	
+
 	public boolean isFeeDetailRead() {
 		// 经济合同收费明细查询
 		SystemContext context = (SystemContext) this.getContext();
@@ -897,4 +897,15 @@ public class Contract4ChargerAction extends
 		}
 		return "json";
 	}
+
+	// 出车处理流程“人力资源部主管审核收费通知”任务中获取车辆的收费通知
+	public String procInstId;// 流程id
+	public String taskId;// 任务id
+
+	public String copyFeeNotice() {
+		this.json = this.contract4ChargerService.copyFeeNotice(carId,
+				procInstId, taskId);
+		return "json";
+	}
+
 }
