@@ -3,6 +3,9 @@
  */
 package cn.bc.business.contract.service;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -22,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.util.Assert;
+import org.springframework.util.FileCopyUtils;
 
 import cn.bc.BCConstants;
 import cn.bc.business.contract.dao.Contract4ChargerDao;
@@ -49,6 +53,8 @@ import cn.bc.template.service.TemplateService;
 import cn.bc.template.util.DocxUtils;
 import cn.bc.web.formater.NubmerFormater;
 import cn.bc.web.ui.json.Json;
+import cn.bc.workflow.flowattach.domain.FlowAttach;
+import cn.bc.workflow.flowattach.service.FlowAttachService;
 
 /**
  * 责任人合同Service的实现
@@ -66,6 +72,7 @@ public class Contract4ChargerServiceImpl extends
 	private AttachService attachService;// 附件服务
 	private TemplateService templateService;// 模板服务
 	private ApplicationEventPublisher eventPublisher;
+	private FlowAttachService flowAttachService;
 
 	@Autowired
 	public void setTemplateService(TemplateService templateService) {
@@ -96,6 +103,11 @@ public class Contract4ChargerServiceImpl extends
 	public void setApplicationEventPublisher(
 			ApplicationEventPublisher applicationEventPublisher) {
 		this.eventPublisher = applicationEventPublisher;
+	}
+
+	@Autowired
+	public void setFlowAttachService(FlowAttachService flowAttachService) {
+		this.flowAttachService = flowAttachService;
 	}
 
 	public Contract4Charger save(Contract4Charger contract4Charger, Long carId,
@@ -899,9 +911,9 @@ public class Contract4ChargerServiceImpl extends
 						.getPaymentDate() : " ");
 		// 合同开始日期
 		Calendar startDate = Calendar.getInstance();
-		startDate.set(c.getStartDate().get(Calendar.YEAR), 
-						c.getStartDate().get(Calendar.MONTH), 
-							c.getStartDate().get(Calendar.DAY_OF_MONTH));
+		startDate.set(c.getStartDate().get(Calendar.YEAR), c.getStartDate()
+				.get(Calendar.MONTH),
+				c.getStartDate().get(Calendar.DAY_OF_MONTH));
 		// 合同结束日期
 		Calendar endDate = c.getEndDate();
 		// 合同期限内的总月份的数量
@@ -1086,9 +1098,11 @@ public class Contract4ChargerServiceImpl extends
 						if (!(lastDayOfMonth.get(Calendar.DAY_OF_MONTH) == cfd
 								.getStartDate().get(Calendar.DAY_OF_MONTH))) {
 							Calendar nextDay = Calendar.getInstance();
-							nextDay.set(cfd.getStartDate().get(Calendar.YEAR)
-									, cfd.getStartDate().get(Calendar.MONTH)
-									, cfd.getStartDate().get(Calendar.DAY_OF_MONTH));
+							nextDay.set(
+									cfd.getStartDate().get(Calendar.YEAR),
+									cfd.getStartDate().get(Calendar.MONTH),
+									cfd.getStartDate().get(
+											Calendar.DAY_OF_MONTH));
 							// 加一天
 							nextDay.add(Calendar.DAY_OF_MONTH, 1);
 							date += DateUtils.formatCalendar(nextDay,
@@ -1099,12 +1113,12 @@ public class Contract4ChargerServiceImpl extends
 						} else
 							isAddFeeDetail = false;
 
-						isFirstMYCBK = false;						
-					//对第一条且有日期的维修费进行处理
-					}else if(isFirstWXF && !jo.isNull("isWXF")
+						isFirstMYCBK = false;
+						// 对第一条且有日期的维修费进行处理
+					} else if (isFirstWXF && !jo.isNull("isWXF")
 							&& jo.getBoolean("isWXF")
 							&& cfd.getStartDate() != null
-							&& cfd.getEndDate() != null){
+							&& cfd.getEndDate() != null) {
 						date += params.get("informStartYear").toString();
 						date += "年";
 						date += params.get("informStartMonth").toString();
@@ -1114,7 +1128,7 @@ public class Contract4ChargerServiceImpl extends
 						date += "至";
 						date += DateUtils.formatCalendar(cfd.getEndDate(),
 								"yyyy年MM月dd日");
-						isFirstWXF=false;						
+						isFirstWXF = false;
 					} else if (cfd.getStartDate() != null
 							&& cfd.getEndDate() != null) {
 						date += DateUtils.formatCalendar(cfd.getStartDate(),
@@ -1145,11 +1159,11 @@ public class Contract4ChargerServiceImpl extends
 					// 每月承包款
 					if (!jo.isNull("isMYCBK") && jo.getBoolean("isMYCBK"))
 						cfdList.add(cfd);
-					
+
 					// 预交承包款
 					if (!jo.isNull("isYJCBK") && jo.getBoolean("isYJCBK"))
 						yjcfdList.add(cfd);
-					
+
 					// 维修费
 					if (!jo.isNull("isWXF") && jo.getBoolean("isWXF"))
 						wxfcfdList.add(cfd);
@@ -1161,12 +1175,12 @@ public class Contract4ChargerServiceImpl extends
 					throw e;
 				} catch (JSONException e1) {
 					e1.printStackTrace();
-					e.printStackTrace();			
+					e.printStackTrace();
 				}
 			}
-			
+
 		}
-		
+
 		// word-docx文档上的特殊处理，处理每月承包费的生成
 		if (cfdList.size() > 0) {
 			for (int i = 1; i < cfdList.size() + 1; i++) {
@@ -1203,7 +1217,7 @@ public class Contract4ChargerServiceImpl extends
 				}
 			}
 		}
-	
+
 		// 处理预交承包款
 		if (yjcfdList.size() == 1) {
 			ContractFeeDetail cfd = yjcfdList.get(0);
@@ -1401,7 +1415,7 @@ public class Contract4ChargerServiceImpl extends
 			if (driverMap.get("houseType") != null
 					&& driverMap.get("houseType").length() > 0) {
 				// 收费通知单社保项目
-				Float unit = this.SocialSecurityRuleService 
+				Float unit = this.SocialSecurityRuleService
 						.countNowUnit4GZ(driverMap.get("houseType"));
 				Float personal = this.SocialSecurityRuleService
 						.countNowPersonal4GZ(driverMap.get("houseType"));
@@ -1507,14 +1521,14 @@ public class Contract4ChargerServiceImpl extends
 		params.put("returnCarDrivers", returnCardrivers);
 
 		// ----------交车司机的信息----------结束
-		
+
 		// ----------需要交车车辆对应的正副班司机的信息----------开始
 		List<Map<String, String>> returnDriverList = this.contract4ChargerDao
 				.findReturnDriverByContractId(c.getId());
 		// 循环变量
 		int tempCount = 1;
 		String returnDrivers = "";
-		for (Map<String, String> driverMap: returnDriverList) {	
+		for (Map<String, String> driverMap : returnDriverList) {
 			if (tempCount == 1) {
 				returnDrivers = driverMap.get("name");
 				params.put("rdriver", driverMap.get("name"));
@@ -1547,8 +1561,7 @@ public class Contract4ChargerServiceImpl extends
 		params.put("rdrivers", returnDrivers);
 
 		// ----------需要交车车辆对应的正副班司机的信息----------结束
-				
-				
+
 		// word 2007 文档处理
 		if (template.getTemplateType().getCode().equals("word-docx")) {
 			// 获取文件中的${XXXX}占位标记的键名列表
@@ -1869,5 +1882,149 @@ public class Contract4ChargerServiceImpl extends
 			Long contractId) {
 		return this.contract4ChargerDao.getContractFeeInfoMapByEndDate(
 				stopDate, contractId);
+	}
+
+	public String copyFeeNotice(Long carId, String procInstId, String taskId) {
+		JSONObject json = new JSONObject();
+		try {
+			// 获取车辆的经济合同
+			Contract4Charger contract4Charger = null;
+			Long contractId = this.getNestContract4ChargerIdByCarId(carId);
+			if (contractId != null) {
+				contract4Charger = this.contract4ChargerDao.load(contractId);
+			}
+			if (contract4Charger != null) {
+
+				List<Attach> attachs = attachService
+						.findByPtype(Contract4Charger.ATTACH_TYPE,
+								contract4Charger.getUid());
+				if (attachs == null || attachs.size() == 0) {
+					// 没有附件
+					json.put("msg", "该车辆的经济合同没有附件！");
+					json.put("success", false);
+				} else {
+					for (Attach attach : attachs) {
+						if (attach.getSubject().equals("收费通知")) {
+							// 复制附件到流程附件位置中----开始---
+							// 扩展名
+							String extension = this.getFilenameExtension(attach
+									.getPath());
+							// 文件存储的相对路径（年月），避免超出目录内文件数的限制
+							String subFolder = DateUtils.formatCalendar(
+									Calendar.getInstance(), "yyyyMM");
+							// 上传文件存储的绝对路径
+							String appRealDir = Attach.DATA_REAL_PATH
+									+ File.separator + FlowAttach.DATA_SUB_PATH;
+							// 所保存文件所在的目录的绝对路径名
+							String realFileDir = appRealDir + File.separator
+									+ subFolder;
+							// 不含路径的文件名
+							String fileName = DateUtils.formatCalendar(
+									Calendar.getInstance(),
+									"yyyyMMddHHmmssSSSS") + "." + extension;
+							// 所保存文件的绝对路径名
+							String realFilePath = realFileDir + File.separator
+									+ fileName;
+							// 构建文件要保存到的目录
+							File _fileDir = new File(realFileDir);
+							if (!_fileDir.exists()) {
+								if (logger.isFatalEnabled())
+									logger.fatal("mkdir=" + realFileDir);
+								_fileDir.mkdirs();
+							}
+							// 直接复制附件
+							if (logger.isInfoEnabled())
+								logger.info("pure copy file");
+
+							// 附件路径
+							String path = Attach.DATA_REAL_PATH
+									+ File.separator + attach.getPath();
+
+							// 从附件目录下的指定文件复制到attachment目录下
+							try {
+								FileCopyUtils.copy(new FileInputStream(
+										new File(path)), new FileOutputStream(
+										realFilePath));
+							} catch (Exception ex) {
+								logger.error(ex.getMessage(), ex);
+							}
+
+							// 复制附件到流程附件位置中----结束---
+
+							// 插入流程附件记录信息
+							FlowAttach flowAttach = new FlowAttach();
+							flowAttach.setUid(idGeneratorService
+									.next(FlowAttach.ATTACH_TYPE));
+							flowAttach.setType(FlowAttach.TYPE_ATTACHMENT); // 类型：1-附件，2-意见
+							flowAttach.setPid(procInstId); // 流程id
+							flowAttach.setPath(subFolder + File.separator
+									+ fileName); // 附件路径，物理文件保存的相对路径
+							flowAttach.setExt(extension); // 扩展名
+							flowAttach.setSubject(attach.getSubject()); // 标题
+							flowAttach.setSize(attach.getSize());
+							flowAttach.setFormatted(false);// 附件是否需要格式化
+
+							if (taskId == null) {
+								flowAttach.setCommon(true); // 公共附件
+							} else {
+								flowAttach.setCommon(false); // 任务附件
+								flowAttach.setTid(taskId);
+							}
+
+							// 创建人,最后修改人信息
+							SystemContext context = SystemContextHolder.get();
+							flowAttach.setAuthor(context.getUserHistory());
+							flowAttach.setModifier(context.getUserHistory());
+							flowAttach.setFileDate(Calendar.getInstance());
+							flowAttach.setModifiedDate(Calendar.getInstance());
+							flowAttach = this.flowAttachService
+									.save(flowAttach);
+							// 返回收费通知附件的信息
+							json.put("success", true);
+							json.put("msg", "添加成功！");
+							json.put("author", flowAttach.getAuthor().getName());
+							json.put("ext", flowAttach.getExt());
+							json.put("fileDate", DateUtils
+									.formatCalendar2Second(flowAttach
+											.getFileDate()));
+							json.put("formatted", false);
+							json.put("size", flowAttach.getSize());
+							json.put("path", flowAttach.getPath());
+							json.put("id", flowAttach.getId());
+							json.put("subject", flowAttach.getSubject() + "."
+									+ flowAttach.getExt());
+							break;
+						} else {
+							// 没有收费通知
+							json.put("msg", "该车辆的经济合同没有收费通知附件！");
+							json.put("success", false);
+						}
+					}
+
+				}
+
+			} else {
+				// 没有经济合同
+				json.put("msg", "该车辆没有经济合同！");
+				json.put("success", false);
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+
+		return json.toString();
+	}
+
+	private String getFilenameExtension(String path) {
+		if (path == null) {
+			return null;
+		}
+		int sepIndex = path.lastIndexOf('.');
+		return (sepIndex != -1 ? path.substring(sepIndex + 1) : null);
+	}
+
+	public Long getNestContract4ChargerIdByCarId(Long carId) {
+
+		return this.contract4ChargerDao.getNestContract4ChargerIdByCarId(carId);
 	}
 }

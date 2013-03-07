@@ -1,9 +1,11 @@
 package cn.bc.business.tempdriver.service;
 
+import java.io.IOException;
 import java.util.Calendar;
 
 import cn.bc.business.tempdriver.domain.TempDriver;
 import cn.bc.core.service.CrudService;
+import cn.bc.docs.domain.Attach;
 import cn.bc.template.service.AddAttachFromTemplateService;
 
 /**
@@ -59,4 +61,25 @@ public interface TempDriverService extends CrudService<TempDriver>,AddAttachFrom
 	 * @param status
 	 */
 	void doUpdateInterviewDate(Long[] ids,Calendar interviewDate);
+	
+	/**
+	 * 发起流程
+	 * @param listDriver 多个司机的JSON字符串信息
+	 * @param key 流程编码
+	 * @return 流程id
+	 */
+	String doStartFlow(String driverIds,String key,String subject,String listDriver);
+	
+	/**
+	 * 从模版中返回附件
+	 * 
+	 * @param id
+	 *            
+	 * @param templateCode
+	 *            模板编码
+	 * @return 返回生成的附件信息
+	 */
+	Attach doGetAttachFromTemplate(Long id, String templateCode)
+			throws IOException;
+
 }

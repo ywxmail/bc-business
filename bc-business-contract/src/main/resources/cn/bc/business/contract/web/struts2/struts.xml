@@ -5,48 +5,59 @@
 <struts>
 	<package name="contract" extends="bc-default" namespace="/bc-business">
 		<action name="contract/create" class="contractAction" method="create">
-			<result name="showdialog" >/bc-business/contract/select.jsp</result>
+			<result name="showdialog">/bc-business/contract/select.jsp
+			</result>
 		</action>
 	</package>
-	
+
 	<!-- 劳动合同 -->
-	<package name="contract4Labour" extends="bc-default" namespace="/bc-business/contract4Labour">
+	<package name="contract4Labour" extends="bc-default"
+		namespace="/bc-business/contract4Labour">
 		<action name="create" class="contract4LabourAction" method="create">
 			<result name="form">/bc-business/contract4Labour/form.jsp</result>
-		</action>		
+		</action>
 		<action name="open" class="contract4LabourAction" method="open">
 			<result name="formr">/bc-business/contract4Labour/form.jsp</result>
 		</action>
 		<action name="edit" class="contract4LabourAction" method="edit">
 			<result name="form">/bc-business/contract4Labour/form.jsp</result>
 		</action>
-		<action name="save" class="contract4LabourAction" method="save"/>
+		<action name="save" class="contract4LabourAction" method="save" />
 		<action name="delete" class="contract4LabourAction" method="delete" />
 		<action name="certInfo" class="contract4LabourAction" method="certInfo">
 		</action>
 		<action name="carManInfo" class="contract4LabourAction" method="carManInfo">
 		</action>
-		<action name="isExistContract" class="contract4LabourAction" method="isExistContract">
+		<action name="isExistContract" class="contract4LabourAction"
+			method="isExistContract">
 		</action>
-		<action name="warehousing" class="contract4LabourAction" method="warehousing" />
-		<action name="checkInsurCodeIsExist" class="contract4LabourAction" method="checkInsurCodeIsExist" />
-		<action name="addAttachFromTemplate" class="contract4LabourAction" method="addAttachFromTemplate" />
+		<action name="warehousing" class="contract4LabourAction"
+			method="warehousing" />
+		<action name="checkInsurCodeIsExist" class="contract4LabourAction"
+			method="checkInsurCodeIsExist" />
+		<action name="addAttachFromTemplate" class="contract4LabourAction"
+			method="addAttachFromTemplate" />
 	</package>
-	
+
 	<!-- 劳动合同的版本管理 -->
-	<package name="contract4LabourOperate" extends="bc-default" namespace="/bc-business/contract4LabourOperate">
+	<package name="contract4LabourOperate" extends="bc-default"
+		namespace="/bc-business/contract4LabourOperate">
 		<!-- 续签 -->
-		<action name="doRenew" class="contract4LabourOperateAction" method="doRenew"/>
+		<action name="doRenew" class="contract4LabourOperateAction"
+			method="doRenew" />
 		<!-- 转车 -->
-		<action name="doChangeCar" class="contract4LabourOperateAction" method="doChangeCar">
+		<action name="doChangeCar" class="contract4LabourOperateAction"
+			method="doChangeCar">
 			<result name="form">/bc-business/contract4Labour/form.jsp</result>
 		</action>
 		<!-- 离职 -->
-		<action name="doResign" class="contract4LabourOperateAction" method="doResign"/>
+		<action name="doResign" class="contract4LabourOperateAction"
+			method="doResign" />
 	</package>
-	
+
 	<!-- 经济合同 -->
-	<package name="contract4Charger" extends="bc-default" namespace="/bc-business/contract4Charger">
+	<package name="contract4Charger" extends="bc-default"
+		namespace="/bc-business/contract4Charger">
 		<action name="create" class="contract4ChargerAction" method="create">
 			<result name="form">/bc-business/contract4Charger/form.jsp</result>
 		</action>
@@ -57,64 +68,91 @@
 			<result name="form">/bc-business/contract4Charger/form.jsp</result>
 		</action>
 		<action name="delete" class="contract4ChargerAction" method="delete" />
-		<action name="save" class="contract4ChargerAction" method="save"/>
-		<action name="isExistContract" class="contract4ChargerAction" method="isExistContract" />
-		<action name="warehousing" class="contract4ChargerAction" method="warehousing" />
-		<action name="getDriverAmount" class="contract4ChargerAction" method="getDriverAmount" />
-		<action name="checkCodeIsExist" class="contract4ChargerAction" method="checkCodeIsExist" />
-		<action name="addAttachFromTemplate" class="contract4ChargerAction" method="addAttachFromTemplate" />
-		<action name="checkDriverOrCarStatus" class="contract4ChargerAction" method="checkDriverOrCarStatus" />
-		<action name="getContractFeeInfoByEndDate" class="contract4ChargerAction" method="getContractFeeInfoByEndDate" />
-		
+		<action name="save" class="contract4ChargerAction" method="save" />
+		<action name="isExistContract" class="contract4ChargerAction"
+			method="isExistContract" />
+		<action name="warehousing" class="contract4ChargerAction"
+			method="warehousing" />
+		<action name="getDriverAmount" class="contract4ChargerAction"
+			method="getDriverAmount" />
+		<action name="checkCodeIsExist" class="contract4ChargerAction"
+			method="checkCodeIsExist" />
+		<action name="addAttachFromTemplate" class="contract4ChargerAction"
+			method="addAttachFromTemplate" />
+		<action name="checkDriverOrCarStatus" class="contract4ChargerAction"
+			method="checkDriverOrCarStatus" />
+		<action name="getContractFeeInfoByEndDate" class="contract4ChargerAction"
+			method="getContractFeeInfoByEndDate" />
+		<!--出车处理流程“人力资源部主管审核收费通知”任务中获取车辆的收费通知 -->
+		<action name="copyFeeNotice" class="contract4ChargerAction"
+			method="copyFeeNotice" />
+
 	</package>
-	
+
 	<!-- 经济合同的版本管理 -->
-	<package name="contract4ChargerOperate" extends="bc-default" namespace="/bc-business/contract4ChargerOperate">
+	<package name="contract4ChargerOperate" extends="bc-default"
+		namespace="/bc-business/contract4ChargerOperate">
 		<!-- 续约 -->
-		<action name="doRenew" class="contract4ChargerOperateAction" method="doRenew"/>
-		<!-- 过户-->
-		<action name="doChangeCharger" class="contract4ChargerOperateAction" method="doChangeCharger"/>
-		<!-- 重发包-->
-		<action name="doChangeCharger2" class="contract4ChargerOperateAction" method="doChangeCharger2"/>
+		<action name="doRenew" class="contract4ChargerOperateAction"
+			method="doRenew" />
+		<!-- 过户 -->
+		<action name="doChangeCharger" class="contract4ChargerOperateAction"
+			method="doChangeCharger" />
+		<!-- 重发包 -->
+		<action name="doChangeCharger2" class="contract4ChargerOperateAction"
+			method="doChangeCharger2" />
 		<!-- 注销 -->
-		<action name="doLogout" class="contract4ChargerOperateAction" method="doLogout"/>
+		<action name="doLogout" class="contract4ChargerOperateAction"
+			method="doLogout" />
 	</package>
-	
+
 	<!-- 经济合同的版本管理集成 -->
-	<package name="Contract4ChargerOperate2Action" extends="bc-default" namespace="/bc-business/contract4ChargerOperate2">
-		<!-- 续约,过户,重发包  新建-->
-		<action name="create" class="contract4ChargerOperate2Action" method="create">
-			<result name="form">/bc-business/contract4Charger/formOperate.jsp</result>
+	<package name="Contract4ChargerOperate2Action" extends="bc-default"
+		namespace="/bc-business/contract4ChargerOperate2">
+		<!-- 续约,过户,重发包 新建 -->
+		<action name="create" class="contract4ChargerOperate2Action"
+			method="create">
+			<result name="form">/bc-business/contract4Charger/formOperate.jsp
+			</result>
 		</action>
-		<!-- 续约,过户,重发包  保存-->
-		<action name="save" class="contract4ChargerOperate2Action" method="save" />
+		<!-- 续约,过户,重发包 保存 -->
+		<action name="save" class="contract4ChargerOperate2Action"
+			method="save" />
 	</package>
-	
+
 	<!-- 经济合同 选择 -->
-	<package name="selectDateAndCharger" extends="bc-default" namespace="/bc-business/selectDateAndCharger">
+	<package name="selectDateAndCharger" extends="bc-default"
+		namespace="/bc-business/selectDateAndCharger">
 		<!-- 过户选择 -->
-		<action name="select" class="selectDateAndChargerAction" >
-			<result name="success">/bc-business/contract4Charger/selectDateAndCharger.jsp</result>
+		<action name="select" class="selectDateAndChargerAction">
+			<result name="success">/bc-business/contract4Charger/selectDateAndCharger.jsp
+			</result>
 		</action>
 		<!-- 续约选择 -->
-		<action name="select2" class="selectDateRangeAndCodeAction" >
-			<result name="success">/bc-business/contract4Charger/selectDateRange.jsp</result>
+		<action name="select2" class="selectDateRangeAndCodeAction">
+			<result name="success">/bc-business/contract4Charger/selectDateRange.jsp
+			</result>
 		</action>
 	</package>
-	
+
 	<!-- 劳动合同 选择 -->
-	<package name="selectTwoDate" extends="bc-default" namespace="/bc-business/selectTwoDate">
+	<package name="selectTwoDate" extends="bc-default"
+		namespace="/bc-business/selectTwoDate">
 		<!-- 离职选择 -->
-		<action name="select" class="selectTwoDateAction" >
-			<result name="success">/bc-business/contract4Labour/selectTwoDate.jsp</result>
+		<action name="select" class="selectTwoDateAction">
+			<result name="success">/bc-business/contract4Labour/selectTwoDate.jsp
+			</result>
 		</action>
 	</package>
-	
+
 	<!-- 用工备案报表高级搜索 -->
-	<package name="contract4Labours" extends="bc-default" namespace="/bc-business">
+	<package name="contract4Labours" extends="bc-default"
+		namespace="/bc-business">
 		<!-- 高级搜索条件窗口 -->
-		<action name="contract4Labours/conditions2" class="contract4LaboursAction" method="conditions">
-			<result name="success">/bc-business/contract4Labour/conditions2.jsp</result>
+		<action name="contract4Labours/conditions2" class="contract4LaboursAction"
+			method="conditions">
+			<result name="success">/bc-business/contract4Labour/conditions2.jsp
+			</result>
 		</action>
 	</package>
 </struts>

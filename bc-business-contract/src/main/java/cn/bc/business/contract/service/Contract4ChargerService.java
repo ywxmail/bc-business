@@ -317,4 +317,22 @@ public interface Contract4ChargerService extends CrudService<Contract4Charger>,
 	 */
 	Map<String, Object> getContractFeeInfoMapByEndDate(String stopDate,
 			Long contractId);
+
+	/**
+	 * 出车处理流程“人力资源部主管审核收费通知”任务中获取车辆的收费通知
+	 * 
+	 * @param carId车辆id
+	 * @param procInstId流程id
+	 * @param taskId任务id
+	 * @return
+	 */
+	String copyFeeNotice(Long carId, String procInstId, String taskId);
+
+	/**
+	 * 根据车辆ID获取最新经济合同Id
+	 * 
+	 * @param carId车辆Id
+	 * @return
+	 */
+	Long getNestContract4ChargerIdByCarId(Long carId);
 }

@@ -238,9 +238,18 @@ public class CaseAdviceServiceImpl extends DefaultCrudService<Case4Advice>
 		// 转协查时间
 		variables.put("case4InfractTrafficr_turnInvestigationTime", "");
 		// 处理期限
-		if (case4Advice.getType() == CaseBase.TYPE_COMPLAIN) {// 客管投诉
-			variables.put("case4Advice_treatmentPeriod", "");
-		} else if (case4Advice.getType() == CaseBase.TYPE_COMPANY_COMPLAIN) {// 自接投诉
+		if (case4Advice.getType() == CaseBase.TYPE_COMPLAIN) {// 客管投诉[发起日加四个自然日]
+			// 当前时间
+			Calendar startDate = Calendar.getInstance();
+			// 处理期限的结束时间
+			Calendar endtDate = Calendar.getInstance();
+			endtDate.set(Calendar.DAY_OF_MONTH,
+					startDate.get(Calendar.DAY_OF_MONTH) + 4);
+
+			variables.put("case4Advice_treatmentPeriod",
+					DateUtils.formatCalendar(startDate, "yyyy-MM-dd") + "~"
+							+ DateUtils.formatCalendar(endtDate, "yyyy-MM-dd"));
+		} else if (case4Advice.getType() == CaseBase.TYPE_COMPANY_COMPLAIN) {// 自接投诉[五个工作日]
 			variables.put("case4Advice_treatmentPeriod", "五个工作日");
 		}
 

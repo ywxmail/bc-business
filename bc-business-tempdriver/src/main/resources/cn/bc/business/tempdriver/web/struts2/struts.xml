@@ -19,6 +19,8 @@
 		<action name="addAttachFromTemplate" class="tempDriverAction" method="addAttachFromTemplate" />
 		<action name="updateStatus" class="tempDriverAction" method="updateStatus"/>
 		<action name="updateInterviewDate" class="tempDriverAction" method="updateInterviewDate"/>
+		<action name="requestServiceCertificateValidate" class="tempDriverAction" method="requestServiceCertificateValidate"/>
+		<action name="addWorkflowAttachFromTemplate" class="tempDriverAction" method="addWorkflowAttachFromTemplate"/>
 	</package>
 	
 	<!-- 导入数据 -->
