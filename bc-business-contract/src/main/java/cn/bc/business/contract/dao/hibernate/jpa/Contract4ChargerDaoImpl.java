@@ -1120,7 +1120,7 @@ public class Contract4ChargerDaoImpl extends
 
 	public Long getNestContract4ChargerIdByCarId(final Long carId) {
 		String sql = "select c.id from bs_contract c inner join bs_car_contract cc on c.id=cc.contract_id"
-				+ " where cc.car_id=? order by c.file_date desc";
+				+ " where cc.car_id=? and c.status_ in(-1,0) and c.type_=2 order by c.sign_date desc";
 
 		if (logger.isDebugEnabled()) {
 			logger.debug("sql: " + sql + "carId: " + carId);

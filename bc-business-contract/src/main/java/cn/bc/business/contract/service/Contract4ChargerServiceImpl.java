@@ -1991,8 +1991,9 @@ public class Contract4ChargerServiceImpl extends
 							json.put("size", flowAttach.getSize());
 							json.put("path", flowAttach.getPath());
 							json.put("id", flowAttach.getId());
-							json.put("subject", flowAttach.getSubject());
-
+							json.put("subject", flowAttach.getSubject() + "."
+									+ flowAttach.getExt());
+							break;
 						} else {
 							// 没有收费通知
 							json.put("msg", "该车辆的经济合同没有收费通知附件！");
