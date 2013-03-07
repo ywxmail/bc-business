@@ -33,6 +33,7 @@ import cn.bc.web.formater.KeyValueFormater;
 import cn.bc.web.formater.LinkFormater4Id;
 import cn.bc.web.ui.html.grid.Column;
 import cn.bc.web.ui.html.grid.FooterButton;
+import cn.bc.web.ui.html.grid.HiddenColumn4MapKey;
 import cn.bc.web.ui.html.grid.IdColumn4MapKey;
 import cn.bc.web.ui.html.grid.TextColumn4MapKey;
 import cn.bc.web.ui.html.page.PageOption;
@@ -432,8 +433,7 @@ public class TempDriversAction extends ViewAction<Map<String, Object>> {
 		//民族
 		columns.add(new TextColumn4MapKey("t.nation", "nation",
 				getText("tempDriver.nation"),100).setSortable(true)
-				.setUseTitleFromLabel(true));
-				
+				.setUseTitleFromLabel(true));		
 		//备注
 		columns.add(new TextColumn4MapKey("t.desc_", "desc",
 				getText("tempDriver.desc")).setSortable(true)
@@ -451,6 +451,11 @@ public class TempDriversAction extends ViewAction<Map<String, Object>> {
 				getText("tempDriver.modifiedDate"), 120).setSortable(true)
 				.setUseTitleFromLabel(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd HH:mm")));
+		
+		columns.add(new HiddenColumn4MapKey("name", "name"));
+		columns.add(new HiddenColumn4MapKey("certIdentity", "certIdentity"));
+		columns.add(new HiddenColumn4MapKey("certCYZG", "cyzg"));
+		columns.add(new HiddenColumn4MapKey("applyAttr", "applyAttr"));
 		return columns;
 	}
 
@@ -516,9 +521,9 @@ public class TempDriversAction extends ViewAction<Map<String, Object>> {
 			// --批量发起新司机入职处理流程
 			menuButton.addMenuItem(getText("tempDriver.workflow.carManEntry"),
 					"workflow.carManEntry");
-			// --批量发起司机服务资格证办理流程
-			//menuButton.addMenuItem(getText("tempDriver.workflow.requestServiceCertificate"),
-					//"workflow.requestServiceCertificate");
+			// --发起司机服务资格证办理流程
+			menuButton.addMenuItem(getText("tempDriver.workflow.requestServiceCertificate"),
+					"workflow.requestServiceCertificate");
 			// --批量修改面试日期
 			menuButton.addMenuItem(getText("tempDriver.operate.interviewDate"),
 					"operate.interviewDate");
