@@ -252,6 +252,7 @@ public class SelectCarAction extends
 		columns.add(new HiddenColumn4MapKey("unitName", "unit_name"));
 		columns.add(new HiddenColumn4MapKey("unitId", "nuit_id"));
 		columns.add(new HiddenColumn4MapKey("manageNo", "manage_no"));
+		columns.add(new HiddenColumn4MapKey("status", "status_"));
 
 		if (loadLevel != null && loadLevel.length() > 0
 				&& loadLevel.equals("1")) {
