@@ -109,6 +109,7 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 		sql.append(",m.carinfo,m.move_type,mo.name motorcade,bia.name unit_name,m.classes,m.move_date,m.shiftwork_end_date,m.main_car_id");
 		sql.append(",c.company company,c.code,c.manage_no,m.gz,m.model_,m.region_,getCarManRiskDateRange(m.id) as risk,m.modified_date,md.actor_name modifier");
 		sql.append(",m.file_date,ad.actor_name author");
+		sql.append(",m.cert_driving_archive");
 		sql.append(" from BS_CARMAN m");
 		sql.append(" left join bs_car c on m.main_car_id=c.id");
 		sql.append(" left join bs_motorcade mo on c.motorcade_id=mo.id");
@@ -170,6 +171,7 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 				map.put("modifier", rs[i++]);
 				map.put("file_date", rs[i++]);
 				map.put("author", rs[i++]);
+				map.put("certDrivingArchive", rs[i++]);//驾驶证档案号
 
 				return map;
 			}
@@ -297,6 +299,8 @@ public class CarMansAction extends ViewAction<Map<String, Object>> {
 						return (Date) contract.get("cert_driving_end_date");
 					}
 				}));
+		columns.add(new TextColumn4MapKey("m.cert_driving_archive", "certDrivingArchive",
+				getText("carMan.cert4DrivingArchive"), 110).setSortable(true));
 		columns.add(new TextColumn4MapKey("m.model_", "model_",
 				getText("carMan.model"), 60).setSortable(true));
 		columns.add(new TextColumn4MapKey("m.gz", "gz", getText("carMan.gz"),
