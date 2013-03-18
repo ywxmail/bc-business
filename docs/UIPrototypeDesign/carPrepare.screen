@@ -1,0 +1,349 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model:Screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:model="http://wireframesketcher.com/1.0/model.ecore">
+  <widgets xsi:type="model:WidgetGroup" id="6" x="8" y="8" measuredWidth="681" measuredHeight="161">
+    <widgets xsi:type="model:Window" id="1" width="681" height="161" text="【车辆更新】视图" measuredWidth="681" measuredHeight="161" minimizeButton="true" maximizeButton="true"/>
+    <widgets xsi:type="model:ButtonBar" id="3" x="5" y="24" text="新建, 编辑, 删除" measuredWidth="134" measuredHeight="30" selection="0">
+      <font/>
+      <items x="0" y="0" width="45" height="30" text="新建"/>
+      <items x="45" y="0" width="44" height="30" text="编辑"/>
+      <items x="89" y="0" width="45" height="30" text="删除"/>
+    </widgets>
+    <widgets xsi:type="model:Table" id="5" y="57" width="681" text="(w:30). !,(w:30).状态,(w:30).经营权号,(w:30).预计交车日期,(w:30).更新进度,(w:30).旧车车牌,(w:30).原公司,(w:30).原车队,(w:30).车辆登记日期,(w:30).合同到期日&#xA;1,更新中,06511786,2013-01-08,二手车行提车&lt;-交车,粤A.5017V,宝城,二分公司,2008-01-09,2013-01-08&#xA;" measuredWidth="681" measuredHeight="50" alternative="#eeeeee">
+      <font/>
+    </widgets>
+    <widgets xsi:type="model:ButtonBar" id="250" x="144" y="24" width="209" text="待更新,更新中,已完成,全部" measuredWidth="209" measuredHeight="30" selection="0">
+      <font/>
+      <items x="0" y="0" width="57" height="30" text="待更新"/>
+      <items x="57" y="0" width="56" height="30" text="更新中"/>
+      <items x="113" y="0" width="56" height="30" text="已完成"/>
+      <items x="169" y="0" width="40" height="30" text="全部"/>
+    </widgets>
+    <widgets xsi:type="model:Table" id="251" y="112" width="681" height="49" text="(w:30).强制险到期日,(w:30).商业险到期日,(w:30).合同性质,(w:30).残值归属,(w:30).新车指标编号,(w:30).新车车牌,(w:30).新公司,(w:30).新分公司,(w:30).新车队&#xA;2017-10-20,2017-10-20,承包合同,公司,CZ2012002059,粤A.12345,宝城,二分公司,二分一队&#xA;&#xA;" measuredWidth="681" measuredHeight="49" alternative="#eeeeee">
+      <font/>
+    </widgets>
+    <widgets xsi:type="model:WidgetGroup" id="372" x="491" y="27" measuredWidth="183" measuredHeight="24">
+      <widgets xsi:type="model:SearchField" id="373" width="183" measuredWidth="183" measuredHeight="24"/>
+      <widgets xsi:type="model:Icon" id="374" x="156" y="7" height="14" measuredWidth="16" measuredHeight="14" icon="desc (small)"/>
+    </widgets>
+  </widgets>
+  <widgets xsi:type="model:WidgetGroup" id="7" x="8" y="176" measuredWidth="537" measuredHeight="729">
+    <widgets xsi:type="model:Window" id="8" width="537" height="729" text="【车辆更新】表单" measuredWidth="537" measuredHeight="729" minimizeButton="true" maximizeButton="true"/>
+    <widgets xsi:type="model:Button" id="44" x="490" y="698" width="41" text="保存" measuredWidth="41" measuredHeight="27">
+      <font/>
+    </widgets>
+    <widgets xsi:type="model:WidgetGroup" id="49" y="19" measuredWidth="537" measuredHeight="225">
+      <widgets xsi:type="model:Accordion" id="50" width="537" height="225" text="旧车信息" measuredWidth="537" measuredHeight="225" selection="0">
+        <items x="0" y="2" width="537" height="27" text="旧车信息"/>
+      </widgets>
+      <widgets xsi:type="model:Icon" id="76" x="515" y="7" measuredWidth="16" measuredHeight="16" icon="desc (small)"/>
+      <widgets xsi:type="model:Label" id="80" x="21" y="32" text="*车牌号码：" measuredWidth="70" measuredHeight="25" textAlignment="Right">
+        <font/>
+      </widgets>
+      <widgets xsi:type="model:Label" id="81" x="21" y="116" text="*所属公司：" measuredWidth="70" measuredHeight="25" textAlignment="Right">
+        <font bold="false"/>
+      </widgets>
+      <widgets xsi:type="model:WidgetGroup" id="83" x="84" y="32" measuredWidth="180" measuredHeight="25">
+        <widgets xsi:type="model:TextField" id="84" width="45" text="粤A" measuredWidth="45" measuredHeight="25" textAlignment="Right">
+          <font/>
+        </widgets>
+        <widgets xsi:type="model:TextField" id="85" x="43" width="137" text="5017V" measuredWidth="137" measuredHeight="25">
+          <font/>
+        </widgets>
+        <widgets xsi:type="model:Icon" id="89" x="159" y="4" measuredWidth="16" measuredHeight="16" icon="circled-plus (small)"/>
+      </widgets>
+      <widgets xsi:type="model:Label" id="93" x="270" y="88" text="车辆登记日期：" measuredWidth="89" measuredHeight="25" textAlignment="Right">
+        <font bold="false"/>
+      </widgets>
+      <widgets xsi:type="model:TextField" id="94" x="352" y="88" width="180" text="2012-10-24" measuredWidth="180" measuredHeight="25">
+        <font/>
+      </widgets>
+      <widgets xsi:type="model:Label" id="95" x="270" y="172" text="商业险到期日：" measuredWidth="89" measuredHeight="25" textAlignment="Right">
+        <font bold="false"/>
+      </widgets>
+      <widgets xsi:type="model:TextField" id="96" x="352" y="172" width="180" text="2017-10-20" measuredWidth="180" measuredHeight="25">
+        <font/>
+      </widgets>
+      <widgets xsi:type="model:Label" id="97" x="270" y="144" text="强制险到期日：" measuredWidth="89" measuredHeight="25" textAlignment="Right">
+        <font bold="false"/>
+      </widgets>
+      <widgets xsi:type="model:TextField" id="98" x="352" y="144" width="180" text="2013-10-23" measuredWidth="180" measuredHeight="25">
+        <font/>
+      </widgets>
+      <widgets xsi:type="model:Icon" id="99" x="496" y="7" measuredWidth="16" measuredHeight="16" icon="refresh (small)"/>
+      <widgets xsi:type="model:TextField" id="101" x="352" y="116" width="180" text="2017-10-20" measuredWidth="180" measuredHeight="25">
+        <font/>
+      </widgets>
+      <widgets xsi:type="model:Label" id="110" x="26" y="144" text="所属车队：" measuredWidth="65" measuredHeight="25" textAlignment="Right">
+        <font bold="false"/>
+      </widgets>
+      <widgets xsi:type="model:Label" id="112" x="294" y="60" text="残值归属：" measuredWidth="65" measuredHeight="25" textAlignment="Right">
+        <font bold="false"/>
+      </widgets>
+      <widgets xsi:type="model:Label" id="189" x="294" y="32" text="合同性质：" measuredWidth="65" measuredHeight="25" textAlignment="Right">
+        <font bold="false"/>
+      </widgets>
+      <widgets xsi:type="model:Label" id="192" x="282" y="116" text="合同到期日：" measuredWidth="77" measuredHeight="25" textAlignment="Right">
+        <font bold="false"/>
+      </widgets>
+      <widgets xsi:type="model:Label" id="193" x="21" y="60" text="*经营权号：" measuredWidth="70" measuredHeight="25" textAlignment="Right">
+        <font bold="false"/>
+      </widgets>
+      <widgets xsi:type="model:WidgetGroup" id="237" x="84" y="60" measuredWidth="180" measuredHeight="25">
+        <widgets xsi:type="model:TextField" id="194" width="180" text="03003706" measuredWidth="180" measuredHeight="25">
+          <font/>
+        </widgets>
+      </widgets>
+      <widgets xsi:type="model:Label" id="195" x="9" y="88" text="*预计交车日：" measuredWidth="82" measuredHeight="25" textAlignment="Right">
+        <font bold="false"/>
+      </widgets>
+      <widgets xsi:type="model:TextField" id="196" x="84" y="88" width="180" text="2017-02-03" measuredWidth="180" measuredHeight="25">
+        <font/>
+      </widgets>
+      <widgets xsi:type="model:Label" id="197" x="153" y="200" text="创建：张三(2012-10-01 14:08)，最后修改：张三(2012-10-02 14:12)" measuredWidth="379" measuredHeight="25" textAlignment="Right" foreground="#999999">
+        <font/>
+      </widgets>
+      <widgets xsi:type="model:Combo" id="233" x="84" y="144" width="180" text="一分一队" measuredWidth="180" measuredHeight="25">
+        <font/>
+      </widgets>
+      <widgets xsi:type="model:Combo" id="234" x="352" y="32" width="180" text="承包合同" measuredWidth="180" measuredHeight="25">
+        <font/>
+      </widgets>
+      <widgets xsi:type="model:Combo" id="235" x="352" y="60" width="180" text="公司" measuredWidth="180" measuredHeight="25">
+        <font/>
+      </widgets>
+      <widgets xsi:type="model:Icon" id="236" x="243" y="64" measuredWidth="16" measuredHeight="16" icon="circled-plus (small)"/>
+      <widgets xsi:type="model:Combo" id="238" x="84" y="116" width="180" text="宝城" measuredWidth="180" measuredHeight="25">
+        <font/>
+      </widgets>
+      <widgets xsi:type="model:Label" id="252" x="50" y="172" text="状态：" measuredWidth="41" measuredHeight="25" textAlignment="Right">
+        <font bold="false"/>
+      </widgets>
+      <widgets xsi:type="model:RadioButton" id="253" x="84" y="172" text="待更新" measuredWidth="56" measuredHeight="25">
+        <font/>
+      </widgets>
+      <widgets xsi:type="model:RadioButton" id="254" x="141" y="172" text="更新中" measuredWidth="56" measuredHeight="25" selected="true">
+        <font/>
+      </widgets>
+      <widgets xsi:type="model:RadioButton" id="255" x="198" y="172" text="已完成" measuredWidth="56" measuredHeight="25">
+        <font/>
+      </widgets>
+    </widgets>
+    <widgets xsi:type="model:WidgetGroup" id="151" y="358" measuredWidth="537" measuredHeight="238">
+      <widgets xsi:type="model:Accordion" id="152" width="537" height="201" text="更新进度信息" measuredWidth="537" measuredHeight="201" selection="0">
+        <items x="0" y="2" width="537" height="27" text="更新进度信息"/>
+      </widgets>
+      <widgets xsi:type="model:Icon" id="153" x="515" y="7" measuredWidth="16" measuredHeight="16" icon="desc (small)"/>
+      <widgets xsi:type="model:Icon" id="169" x="497" y="7" measuredWidth="16" measuredHeight="16" icon="circled-mul (small)"/>
+      <widgets xsi:type="model:Table" id="182" y="27" width="537" text="(w:30). ,(w:180).项目,(w:100)(align:right).更新日期,(w:30).状态,备注&#xA;1,交车,2017-02-03 {calendar},{unselected} 未完成 {selected} 已完成&#xA;2,二手车行提车,2017-02-05 {calendar},{unselected} 未完成 {selected} 已完成&#xA;3,报停计价器,2017-02-10 {calendar},{selected} 未完成 {unselected} 已完成&#xA;4,回收转蓝、报废资料, {calendar},{selected} 未完成 {unselected} 已完成&#xA;5,报停车, {calendar},{selected} 未完成 {unselected} 已完成&#xA;6,办新车指标, {calendar},{selected} 未完成 {unselected} 已完成&#xA;7,新车上牌, {calendar},{selected} 未完成 {unselected} 已完成&#xA;8,出车, {calendar},{selected} 未完成 {unselected} 已完成" measuredWidth="537" measuredHeight="211" alternative="#eeeeee">
+        <font/>
+      </widgets>
+      <widgets xsi:type="model:Icon" id="183" x="478" y="7" measuredWidth="16" measuredHeight="16" icon="circled-plus (small)"/>
+      <widgets xsi:type="model:Icon" id="184" x="460" y="7" measuredWidth="16" measuredHeight="16" icon="arrow-down (small)"/>
+      <widgets xsi:type="model:Icon" id="185" x="442" y="7" measuredWidth="16" measuredHeight="16" icon="arrow-up (small)"/>
+    </widgets>
+    <widgets xsi:type="model:WidgetGroup" id="198" y="242" measuredWidth="537" measuredHeight="118">
+      <widgets xsi:type="model:Accordion" id="199" width="537" height="118" text="新车安排" measuredWidth="537" measuredHeight="118" selection="0">
+        <items x="0" y="2" width="537" height="27" text="新车安排"/>
+      </widgets>
+      <widgets xsi:type="model:Icon" id="200" x="515" y="7" measuredWidth="16" measuredHeight="16" icon="desc (small)"/>
+      <widgets xsi:type="model:Label" id="201" x="26" y="60" text="车牌号码：" measuredWidth="65" measuredHeight="25" textAlignment="Right">
+        <font/>
+      </widgets>
+      <widgets xsi:type="model:Label" id="202" x="293" y="32" text="所属公司：" measuredWidth="65" measuredHeight="25" textAlignment="Right">
+        <font bold="false"/>
+      </widgets>
+      <widgets xsi:type="model:WidgetGroup" id="204" x="84" y="60" measuredWidth="180" measuredHeight="25">
+        <widgets xsi:type="model:TextField" id="205" width="45" text="粤A" measuredWidth="45" measuredHeight="25" textAlignment="Right">
+          <font/>
+        </widgets>
+        <widgets xsi:type="model:TextField" id="206" x="43" width="137" text="12345" measuredWidth="137" measuredHeight="25">
+          <font/>
+        </widgets>
+        <widgets xsi:type="model:Icon" id="207" x="159" y="4" measuredWidth="16" measuredHeight="16" icon="circled-plus (small)"/>
+      </widgets>
+      <widgets xsi:type="model:Label" id="208" x="281" y="60" text="所属分公司：" measuredWidth="77" measuredHeight="25" textAlignment="Right">
+        <font bold="false"/>
+      </widgets>
+      <widgets xsi:type="model:Label" id="217" x="293" y="88" text="所属车队：" measuredWidth="65" measuredHeight="25" textAlignment="Right">
+        <font bold="false"/>
+      </widgets>
+      <widgets xsi:type="model:Combo" id="230" x="351" y="60" width="180" text="一分公司" measuredWidth="180" measuredHeight="25">
+        <font/>
+      </widgets>
+      <widgets xsi:type="model:Combo" id="231" x="351" y="88" width="180" text="一分一队" measuredWidth="180" measuredHeight="25">
+        <font/>
+      </widgets>
+      <widgets xsi:type="model:Combo" id="239" x="351" y="32" width="180" text="宝城" measuredWidth="180" measuredHeight="25">
+        <font/>
+      </widgets>
+      <widgets xsi:type="model:Label" id="240" x="8" y="32" text="新车指标编号：" measuredWidth="82" measuredHeight="24" textAlignment="Right">
+        <font size="8" bold="false"/>
+      </widgets>
+      <widgets xsi:type="model:TextField" id="241" x="84" y="32" width="180" text="CZ2012002059" measuredWidth="180" measuredHeight="25">
+        <font/>
+      </widgets>
+    </widgets>
+    <widgets xsi:type="model:WidgetGroup" id="242" y="594" measuredWidth="537" measuredHeight="100">
+      <widgets xsi:type="model:Accordion" id="243" width="537" height="100" text="相关流程信息" measuredWidth="537" measuredHeight="100" selection="0">
+        <items x="0" y="2" width="537" height="27" text="相关流程信息"/>
+      </widgets>
+      <widgets xsi:type="model:Icon" id="244" x="515" y="7" measuredWidth="16" measuredHeight="16" icon="desc (small)"/>
+      <widgets xsi:type="model:Table" id="246" y="27" width="537" text="(w:30).流程名称,主题,(w:110).发起时间,(w:110).结束时间,(w:30).流程状态&#xA;[车辆交车处理流程],粤A.5017V交车处理...,2013-02-08 15:07,2013-02-08 17:25,已结束&#xA;[驾驶员出车处理流程],粤A.12345出车处理...,2013-02-18 09:00,,流转中" measuredWidth="537" measuredHeight="73" alternative="#eeeeee">
+        <font/>
+      </widgets>
+    </widgets>
+  </widgets>
+  <widgets xsi:type="model:Note" id="188" x="784" y="552" width="249" height="353" text="附加说明：&#xD;&#xA;1）视图提供导入功能&#xD;&#xA;2）视图中能自动从现有数据中生成更新计划&#xD;&#xA;3）状态：&#xD;&#xA;待更新 - 交车前&#xD;&#xA;更新中 - 交车后 (已完成&quot;交车&quot;项目)&#xD;&#xA;已完成 - 出车后 (已完成&quot;出车&quot;项目)&#xD;&#xA;4）&quot;相关流程信息&quot;自动根据旧车和新车的车号从流程库中获取&#xD;&#xA;5）新建就默认创建固定的8个更新进度信息&#xD;&#xA;6）当车辆的交车流程完成流转后，如果车辆更新模块中还没有响应的记录就自动创建一条车辆更新信息，并将&quot;交车&quot;项目的状态设置为&quot;已完成&quot;；如果已经有相应的车辆更新记录，则只更新&quot;交车&quot;项目的状态置为&quot;已完成&quot;；另外须同时将整条记录的状态设置为&quot;更新中&quot;&#xD;&#xA;7）当车辆的出车流程完成流转后，更新&quot;出车&quot;项目的状态为&quot;已完成&quot;，整条记录的状态设置为&quot;已完成&quot;" measuredWidth="249" measuredHeight="353" annotation="true" textAlignment="Left">
+    <font bold="false"/>
+  </widgets>
+  <widgets xsi:type="model:WidgetGroup" id="271" x="552" y="552" measuredWidth="225" measuredHeight="293">
+    <widgets xsi:type="model:Note" id="256" width="225" height="293" text="车辆更新的生命周期：" measuredWidth="225" measuredHeight="293" annotation="true" textAlignment="Left">
+      <font bold="false"/>
+    </widgets>
+    <widgets xsi:type="model:Callout" id="257" x="168" y="148" text="更新中" measuredWidth="46" measuredHeight="46" annotation="true">
+      <font bold="true"/>
+    </widgets>
+    <widgets xsi:type="model:Callout" id="258" x="168" y="60" text="待更新" measuredWidth="46" measuredHeight="46" annotation="true">
+      <font bold="true"/>
+    </widgets>
+    <widgets xsi:type="model:Callout" id="259" x="168" y="236" text="已完成" measuredWidth="46" measuredHeight="46" annotation="true">
+      <font bold="true"/>
+    </widgets>
+    <widgets xsi:type="model:Rectangle" id="262" x="8" y="115" width="113" height="38" text="车辆完成交车处理" measuredWidth="113" measuredHeight="38" border="solid-rounded">
+      <font/>
+    </widgets>
+    <widgets xsi:type="model:Arrow" id="264" x="120" y="145" width="49" height="25" measuredWidth="49" measuredHeight="25" annotation="true" left="false" right="true"/>
+    <widgets xsi:type="model:Arrow" id="265" x="184" y="193" width="14" height="44" measuredWidth="14" measuredHeight="44" annotation="true" left="false" right="true"/>
+    <widgets xsi:type="model:Arrow" id="266" x="184" y="105" width="14" height="44" measuredWidth="14" measuredHeight="44" annotation="true" left="false" right="true"/>
+    <widgets xsi:type="model:Rectangle" id="267" x="8" y="30" width="113" height="38" text="车辆更新计划" measuredWidth="113" measuredHeight="38" border="solid-rounded">
+      <font/>
+    </widgets>
+    <widgets xsi:type="model:Arrow" id="268" x="120" y="60" width="49" height="25" measuredWidth="49" measuredHeight="25" annotation="true" left="false" right="true"/>
+    <widgets xsi:type="model:Rectangle" id="269" x="8" y="206" width="113" height="38" text="车辆完成出车处理" measuredWidth="113" measuredHeight="38" border="solid-rounded">
+      <font/>
+    </widgets>
+    <widgets xsi:type="model:Arrow" id="270" x="120" y="236" width="49" height="25" measuredWidth="49" measuredHeight="25" annotation="true" left="false" right="true"/>
+  </widgets>
+  <widgets xsi:type="model:WidgetGroup" id="272" x="552" y="176" measuredWidth="289" measuredHeight="369">
+    <widgets xsi:type="model:Panel" id="273" y="24" width="289" height="345" measuredWidth="289" measuredHeight="345"/>
+    <widgets xsi:type="model:Button" id="274" x="10" y="336" text="{find} 查询" measuredWidth="64" measuredHeight="27">
+      <font/>
+    </widgets>
+    <widgets xsi:type="model:Label" id="275" x="6" text="高级查询：" measuredWidth="65" measuredHeight="25">
+      <font bold="true"/>
+    </widgets>
+    <widgets xsi:type="model:Icon" id="276" x="273" y="26" width="13" measuredWidth="13" measuredHeight="16" icon="delete (small)"/>
+    <widgets xsi:type="model:WidgetGroup" id="338" x="6" y="35" measuredWidth="277" measuredHeight="169">
+      <widgets xsi:type="model:Group" id="337" width="277" height="169" text="旧车" measuredWidth="277" measuredHeight="169">
+        <font/>
+      </widgets>
+      <widgets xsi:type="model:Label" id="277" x="4" y="65" text="所属公司：" measuredWidth="65" measuredHeight="25">
+        <font/>
+      </widgets>
+      <widgets xsi:type="model:WidgetGroup" id="280" x="4" y="85" measuredWidth="127" measuredHeight="25">
+        <widgets xsi:type="model:TextField" id="281" width="127" measuredWidth="127" measuredHeight="25">
+          <font/>
+        </widgets>
+        <widgets xsi:type="model:Icon" id="282" x="106" y="5" measuredWidth="16" measuredHeight="16" icon="delete (small)"/>
+        <widgets xsi:type="model:Icon" id="283" x="86" y="5" measuredWidth="16" measuredHeight="16" icon="desc (small)"/>
+      </widgets>
+      <widgets xsi:type="model:Label" id="292" x="146" y="65" text="所属分公司：" measuredWidth="77" measuredHeight="25">
+        <font/>
+      </widgets>
+      <widgets xsi:type="model:WidgetGroup" id="293" x="146" y="85" measuredWidth="127" measuredHeight="25">
+        <widgets xsi:type="model:TextField" id="294" width="127" measuredWidth="127" measuredHeight="25">
+          <font/>
+        </widgets>
+        <widgets xsi:type="model:Icon" id="295" x="106" y="5" measuredWidth="16" measuredHeight="16" icon="delete (small)"/>
+        <widgets xsi:type="model:Icon" id="296" x="86" y="5" measuredWidth="16" measuredHeight="16" icon="desc (small)"/>
+      </widgets>
+      <widgets xsi:type="model:Label" id="297" x="4" y="114" text="所属车队：" measuredWidth="65" measuredHeight="25">
+        <font/>
+      </widgets>
+      <widgets xsi:type="model:WidgetGroup" id="298" x="4" y="134" measuredWidth="127" measuredHeight="25">
+        <widgets xsi:type="model:TextField" id="299" width="127" measuredWidth="127" measuredHeight="25">
+          <font/>
+        </widgets>
+        <widgets xsi:type="model:Icon" id="300" x="106" y="5" measuredWidth="16" measuredHeight="16" icon="delete (small)"/>
+        <widgets xsi:type="model:Icon" id="301" x="86" y="5" measuredWidth="16" measuredHeight="16" icon="desc (small)"/>
+      </widgets>
+      <widgets xsi:type="model:Label" id="302" x="146" y="114" text="营运性质：" measuredWidth="65" measuredHeight="25">
+        <font/>
+      </widgets>
+      <widgets xsi:type="model:WidgetGroup" id="303" x="146" y="134" measuredWidth="127" measuredHeight="25">
+        <widgets xsi:type="model:TextField" id="304" width="127" measuredWidth="127" measuredHeight="25">
+          <font/>
+        </widgets>
+        <widgets xsi:type="model:Icon" id="305" x="106" y="5" measuredWidth="16" measuredHeight="16" icon="delete (small)"/>
+        <widgets xsi:type="model:Icon" id="306" x="86" y="5" measuredWidth="16" measuredHeight="16" icon="desc (small)"/>
+      </widgets>
+      <widgets xsi:type="model:Label" id="361" x="4" y="14" text="预计交车日：" measuredWidth="77" measuredHeight="25">
+        <font/>
+      </widgets>
+      <widgets xsi:type="model:Label" id="362" x="130" y="36" text="～" measuredWidth="17" measuredHeight="25" textAlignment="Center">
+        <font/>
+      </widgets>
+      <widgets xsi:type="model:WidgetGroup" id="363" x="146" y="36" measuredWidth="127" measuredHeight="25">
+        <widgets xsi:type="model:TextField" id="364" width="127" text="2012-01-31" measuredWidth="127" measuredHeight="25">
+          <font/>
+        </widgets>
+        <widgets xsi:type="model:Icon" id="365" x="108" y="5" measuredWidth="16" measuredHeight="16" icon="delete (small)"/>
+        <widgets xsi:type="model:Icon" id="366" x="88" y="5" measuredWidth="16" measuredHeight="16" icon="calendar (small)"/>
+      </widgets>
+      <widgets xsi:type="model:WidgetGroup" id="367" x="4" y="36" measuredWidth="127" measuredHeight="25">
+        <widgets xsi:type="model:TextField" id="368" width="127" text="2012-01-01" measuredWidth="127" measuredHeight="25">
+          <font/>
+        </widgets>
+        <widgets xsi:type="model:Icon" id="369" x="106" y="5" measuredWidth="16" measuredHeight="16" icon="delete (small)"/>
+        <widgets xsi:type="model:Icon" id="370" x="86" y="5" measuredWidth="16" measuredHeight="16" icon="calendar (small)"/>
+      </widgets>
+    </widgets>
+    <widgets xsi:type="model:WidgetGroup" id="339" x="6" y="211" measuredWidth="277" measuredHeight="118">
+      <widgets xsi:type="model:Group" id="340" width="277" height="118" text="新车" measuredWidth="277" measuredHeight="118">
+        <font/>
+      </widgets>
+      <widgets xsi:type="model:Label" id="341" x="4" y="17" text="所属公司：" measuredWidth="65" measuredHeight="25">
+        <font/>
+      </widgets>
+      <widgets xsi:type="model:WidgetGroup" id="342" x="4" y="37" measuredWidth="127" measuredHeight="25">
+        <widgets xsi:type="model:TextField" id="343" width="127" measuredWidth="127" measuredHeight="25">
+          <font/>
+        </widgets>
+        <widgets xsi:type="model:Icon" id="344" x="106" y="5" measuredWidth="16" measuredHeight="16" icon="delete (small)"/>
+        <widgets xsi:type="model:Icon" id="345" x="86" y="5" measuredWidth="16" measuredHeight="16" icon="desc (small)"/>
+      </widgets>
+      <widgets xsi:type="model:Label" id="346" x="146" y="17" text="所属分公司：" measuredWidth="77" measuredHeight="25">
+        <font/>
+      </widgets>
+      <widgets xsi:type="model:WidgetGroup" id="347" x="146" y="37" measuredWidth="127" measuredHeight="25">
+        <widgets xsi:type="model:TextField" id="348" width="127" measuredWidth="127" measuredHeight="25">
+          <font/>
+        </widgets>
+        <widgets xsi:type="model:Icon" id="349" x="106" y="5" measuredWidth="16" measuredHeight="16" icon="delete (small)"/>
+        <widgets xsi:type="model:Icon" id="350" x="86" y="5" measuredWidth="16" measuredHeight="16" icon="desc (small)"/>
+      </widgets>
+      <widgets xsi:type="model:Label" id="351" x="4" y="66" text="所属车队：" measuredWidth="65" measuredHeight="25">
+        <font/>
+      </widgets>
+      <widgets xsi:type="model:WidgetGroup" id="352" x="4" y="86" measuredWidth="127" measuredHeight="25">
+        <widgets xsi:type="model:TextField" id="353" width="127" measuredWidth="127" measuredHeight="25">
+          <font/>
+        </widgets>
+        <widgets xsi:type="model:Icon" id="354" x="106" y="5" measuredWidth="16" measuredHeight="16" icon="delete (small)"/>
+        <widgets xsi:type="model:Icon" id="355" x="86" y="5" measuredWidth="16" measuredHeight="16" icon="desc (small)"/>
+      </widgets>
+      <widgets xsi:type="model:Label" id="356" x="146" y="66" text="指标编号：" measuredWidth="65" measuredHeight="25">
+        <font/>
+      </widgets>
+      <widgets xsi:type="model:TextField" id="358" x="146" y="86" width="127" measuredWidth="127" measuredHeight="25">
+        <font/>
+      </widgets>
+    </widgets>
+    <widgets xsi:type="model:Button" id="371" x="80" y="336" text="{delete} 清空" measuredWidth="64" measuredHeight="27">
+      <font/>
+    </widgets>
+  </widgets>
+  <hRuler/>
+  <vRuler/>
+  <font/>
+</model:Screen>
