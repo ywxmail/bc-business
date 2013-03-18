@@ -39,6 +39,7 @@
 		<module>bc-business-socialSecurityRule</module>
 		<module>bc-business-info</module>
 		<module>bc-business-tempdriver</module>
+		<module>bc-business-carPrepare</module>
 	</modules>
 	<scm>
 		<connection>scm:git:git@192.168.0.222:bc-business.git</connection>
