@@ -236,7 +236,9 @@ public class OwnershipsAction extends ViewAction<Map<String, Object>> {
 						// 经营权创建时间
 						Date createDate = (Date) car.get("file_date");
 
-						// 如果新车的投产日期和旧车的交车日期不为空就返回更新天数
+						//如果新车的投产日期和旧车的交车日期不为空就返回更新天数=新车投产日期-旧车交车日期
+						//如果新车的投产日期不为空，旧车交车日期为空时返回更新天数=新车投产日期-经营权创建时间
+						//其他返回为空
 						if (operateDate != null && oreturnDate != null) {
 							return String.valueOf((operateDate.getTime() - oreturnDate
 									.getTime()) / (1000 * 60 * 60 * 24));
@@ -265,9 +267,9 @@ public class OwnershipsAction extends ViewAction<Map<String, Object>> {
 						// 经营权创建时间
 						Date createDate = (Date) car.get("file_date");
 
-						// 如果新车的投产日期和旧车的交车日期不为空就返回更新天数
+						// 如果新车的投产日期为空，旧车的交车日期不为空就返回交车天数=经营权创建时间-旧车交车日期
+						// 如果新车的投产日期和旧车的交车日期都为空就返回交车天数=当前时间-经营权创建时间
 						if (operateDate == null && oreturnDate != null) {
-
 							return String.valueOf((Calendar.getInstance()
 									.getTime().getTime() - oreturnDate
 									.getTime()) / (1000 * 60 * 60 * 24));
