@@ -107,6 +107,8 @@ public class OwnershipsAction extends ViewAction<Map<String, Object>> {
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer sql = new StringBuffer();
 		sql.append("select o.id,o.status_,o.number_,o.nature,o.situation,o.source,c.owner_,o.ownership,o.whither");
+		sql.append(",(case when (c.operate_date is not null and oc.return_date is not null)then date(to_char(c.operate_date,'yyyy-mm-dd')) - date(to_char(oc.return_date,'yyyy-mm-dd')) when(c.operate_date is not null and oc.return_date is null) then date(to_char(c.operate_date,'yyyy-mm-dd')) - date(to_char(o.file_date,'yyyy-mm-dd')) else '0' end) updateDays");
+		sql.append(",(case when (c.operate_date is null and oc.return_date is not null)then date(to_char(now(),'yyyy-mm-dd')) - date(to_char(oc.return_date,'yyyy-mm-dd')) when(c.operate_date is null and oc.return_date is null) then date(to_char(now(),'yyyy-mm-dd')) - date(to_char(o.file_date,'yyyy-mm-dd')) else '0' end) returnCarDays");
 		sql.append(",o.file_date,ac.actor_name author,o.modified_date,md.actor_name modifier");
 		sql.append(",c.plate_type,c.plate_no,c.register_date,c.operate_date,getDisabledCarByOwnerNumber(o.number_) carInfo");
 		sql.append(",c.company,bia.name as unit_name,c.bs_type nbs_type,c.factory_type,c.factory_model,c.origin_no");
@@ -140,6 +142,8 @@ public class OwnershipsAction extends ViewAction<Map<String, Object>> {
 				map.put("owner_", rs[i++]);
 				map.put("ownership", rs[i++]);
 				map.put("whither", rs[i++]);
+				map.put("updateDays", rs[i++]);
+				map.put("returnCarDays", rs[i++]);
 				map.put("file_date", rs[i++]);
 				map.put("author", rs[i++]);
 				map.put("modified_date", rs[i++]);
@@ -216,8 +220,9 @@ public class OwnershipsAction extends ViewAction<Map<String, Object>> {
 				getText("ownership.owner"), 80).setSortable(true)
 				.setUseTitleFromLabel(true));
 		// 更新天数
-		columns.add(new TextColumn4MapKey("c.operate_date", "operate_date",
+		columns.add(new TextColumn4MapKey("updateDays", "updateDays",
 				getText("ownership.updateDays"), 80).setUseTitleFromLabel(true)
+				.setSortable(true)
 				.setValueFormater(new AbstractFormater<String>() {
 					@SuppressWarnings("unchecked")
 					@Override
@@ -244,36 +249,37 @@ public class OwnershipsAction extends ViewAction<Map<String, Object>> {
 					}
 				}));
 		// 交车天数
-		columns.add(new TextColumn4MapKey("c.operate_date", "operate_date",
-				getText("ownership.returnCarDays"), 80).setUseTitleFromLabel(
-				true).setValueFormater(new AbstractFormater<String>() {
-			@SuppressWarnings("unchecked")
-			@Override
-			public String format(Object context, Object value) {
-				Map<String, Object> car = (Map<String, Object>) context;
-				// 新车投产日期
-				Date operateDate = (Date) car.get("operate_date");
+		columns.add(new TextColumn4MapKey("returnCarDays", "returnCarDays",
+				getText("ownership.returnCarDays"), 80)
+				.setUseTitleFromLabel(true).setSortable(true)
+				.setValueFormater(new AbstractFormater<String>() {
+					@SuppressWarnings("unchecked")
+					@Override
+					public String format(Object context, Object value) {
+						Map<String, Object> car = (Map<String, Object>) context;
+						// 新车投产日期
+						Date operateDate = (Date) car.get("operate_date");
 
-				// 旧车交车日期
-				Date oreturnDate = (Date) car.get("oreturn_date");
-				// 经营权创建时间
-				Date createDate = (Date) car.get("file_date");
+						// 旧车交车日期
+						Date oreturnDate = (Date) car.get("oreturn_date");
+						// 经营权创建时间
+						Date createDate = (Date) car.get("file_date");
 
-				// 如果新车的投产日期和旧车的交车日期不为空就返回更新天数
-				if (operateDate == null && oreturnDate != null) {
+						// 如果新车的投产日期和旧车的交车日期不为空就返回更新天数
+						if (operateDate == null && oreturnDate != null) {
 
-					return String.valueOf((Calendar.getInstance().getTime()
-							.getTime() - oreturnDate.getTime())
-							/ (1000 * 60 * 60 * 24));
-				} else if (operateDate == null && oreturnDate == null) {
-					return String.valueOf((Calendar.getInstance().getTime()
-							.getTime() - createDate.getTime())
-							/ (1000 * 60 * 60 * 24));
-				} else {
-					return "";
-				}
-			}
-		}));
+							return String.valueOf((Calendar.getInstance()
+									.getTime().getTime() - oreturnDate
+									.getTime()) / (1000 * 60 * 60 * 24));
+						} else if (operateDate == null && oreturnDate == null) {
+							return String.valueOf((Calendar.getInstance()
+									.getTime().getTime() - createDate.getTime())
+									/ (1000 * 60 * 60 * 24));
+						} else {
+							return "";
+						}
+					}
+				}));
 		// 公司
 		columns.add(new TextColumn4MapKey("c.company", "company",
 				getText("ownership.company"), 40).setSortable(true)
