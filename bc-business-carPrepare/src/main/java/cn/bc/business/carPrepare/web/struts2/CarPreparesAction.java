@@ -33,6 +33,7 @@ import cn.bc.identity.domain.Actor;
 import cn.bc.identity.service.ActorService;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.option.domain.OptionItem;
+import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.formater.EntityStatusFormater;
 import cn.bc.web.formater.LinkFormater4Id;
 import cn.bc.web.ui.html.grid.Column;
@@ -78,7 +79,7 @@ public class CarPreparesAction extends ViewAction<Map<String, Object>> {
 
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer sql = new StringBuffer();
-		sql.append("select p.id,p.status_,p.c1_plate_type,p.c1_plate_no from bs_car_prepare p");
+		sql.append("select p.id,p.status_,p.code,p.plan_date,p.c1_plate_type,p.c1_plate_no from bs_car_prepare p");
 		sqlObject.setSql(sql.toString());
 
 		// 注入参数
@@ -91,6 +92,8 @@ public class CarPreparesAction extends ViewAction<Map<String, Object>> {
 				int i = 0;
 				map.put("id", rs[i++]);
 				map.put("status_", rs[i++]);
+				map.put("code", rs[i++]);
+				map.put("plan_date", rs[i++]);
 				map.put("c1_plate_type", rs[i++]);
 				map.put("c1_plate_no", rs[i++]);
 				map.put("plate", map.get("c1_plate_type").toString() + "."
@@ -107,9 +110,16 @@ public class CarPreparesAction extends ViewAction<Map<String, Object>> {
 		columns.add(new IdColumn4MapKey("p.id", "id"));
 		// 状态
 		columns.add(new TextColumn4MapKey("p.status_", "status_",
-				getText("carPrepare.status"), 40)
-				.setSortable(true)
-				.setValueFormater(new EntityStatusFormater(getPolicyStatuses())));
+				getText("carPrepare.status"), 40).setSortable(true)
+				.setValueFormater(
+						new EntityStatusFormater(this.getCarPrepareStatuses())));
+		columns.add(new TextColumn4MapKey("p.code", "code",
+				getText("carPrepare.code"), 75).setSortable(true)
+				.setUseTitleFromLabel(true));
+		columns.add(new TextColumn4MapKey("p.plan_date", "plan_date",
+				getText("carPrepare.planDate"), 100).setSortable(true)
+				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+
 		// // 公司
 		// columns.add(new TextColumn4MapKey("c.company", "company",
 		// getText("car.company"), 40).setSortable(true)
@@ -143,7 +153,7 @@ public class CarPreparesAction extends ViewAction<Map<String, Object>> {
 		// 车号
 		if (carId == null) {// 车辆页签时不需显示车牌号码
 			columns.add(new TextColumn4MapKey("p.plate_no", "plate",
-					getText("policy.carId"), 80)
+					getText("carPrepare.C1Plate"), 80)
 					.setValueFormater(new LinkFormater4Id(this.getContextPath()
 							+ "/bc-business/car/edit?id={0}", "car") {
 						@SuppressWarnings("unchecked")
@@ -237,14 +247,14 @@ public class CarPreparesAction extends ViewAction<Map<String, Object>> {
 	 * 
 	 * @return
 	 */
-	protected Map<String, String> getPolicyStatuses() {
+	protected Map<String, String> getCarPrepareStatuses() {
 		Map<String, String> statuses = new LinkedHashMap<String, String>();
 		statuses.put(String.valueOf(CarPrepare.STATUS_STAYUPDATED),
-				getText("policy.status.stayUpdated"));
+				getText("carPrepare.status.stayUpdate"));
 		statuses.put(String.valueOf(CarPrepare.STATUS_INTHEUPDATE),
-				getText("policy.status.inTheUpdate"));
+				getText("carPrepare.status.intheUpdate"));
 		statuses.put(String.valueOf(CarPrepare.STATUS_COMPLETED),
-				getText("policy.status.completed"));
+				getText("carPrepare.status.completed"));
 		statuses.put("", getText("bs.status.all"));
 		return statuses;
 	}
@@ -260,6 +270,8 @@ public class CarPreparesAction extends ViewAction<Map<String, Object>> {
 			tb.addButton(this.getDefaultCreateToolbarButton());
 			// 查看按钮
 			tb.addButton(this.getDefaultOpenToolbarButton());
+			// 编辑按钮
+			tb.addButton(this.getDefaultEditToolbarButton());
 			// 删除按钮
 			tb.addButton(this.getDefaultDeleteToolbarButton());
 		}
@@ -267,7 +279,7 @@ public class CarPreparesAction extends ViewAction<Map<String, Object>> {
 		tb.addButton(this.getDefaultSearchToolbarButton());
 
 		return tb.addButton(Toolbar.getDefaultToolbarRadioGroup(
-				getPolicyStatuses(), "status", 0,
+				getCarPrepareStatuses(), "status", 0,
 				getText("title.click2changeSearchClasses")));
 	}
 
