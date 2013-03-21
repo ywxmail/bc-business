@@ -237,84 +237,82 @@ public class CaseAdvicesAction extends ViewAction<Map<String, Object>> {
 				.setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("b.subject", "subject",
 				getText("runcase.subject2"), 180).setSortable(true));
-		if (!isReadonly()
-				&& (Integer.valueOf(type) == CaseBase.TYPE_COMPLAIN || Integer
-						.valueOf(type) == CaseBase.TYPE_COMPANY_COMPLAIN)) {
-			// 最新参与流程信息
-			columns.add(new TextColumn4MapKey("", "processInfo",
-					getText("runcase.processInfo"), 350)
-					.setSortable(true)
-					.setUseTitleFromLabel(true)
-					.setValueFormater(
-							new LinkFormater4Id(this.getContextPath()
-									+ "/bc-workflow/workspace/open?id={0}",
-									"workspace") {
+		// if (!isReadonly()
+		// && (Integer.valueOf(type) == CaseBase.TYPE_COMPLAIN || Integer
+		// .valueOf(type) == CaseBase.TYPE_COMPANY_COMPLAIN)) {
+		// 最新参与流程信息
+		columns.add(new TextColumn4MapKey("", "processInfo",
+				getText("runcase.processInfo"), 350)
+				.setSortable(true)
+				.setUseTitleFromLabel(true)
+				.setValueFormater(
+						new LinkFormater4Id(this.getContextPath()
+								+ "/bc-workflow/workspace/open?id={0}",
+								"workspace") {
 
-								@Override
-								public String getIdValue(Object context,
-										Object value) {
-									@SuppressWarnings("unchecked")
-									String processInfo = StringUtils
-											.toString(((Map<String, Object>) context)
-													.get("processInfo"));
-									if (processInfo == null
-											|| processInfo.length() == 0)
-										return "";
+							@Override
+							public String getIdValue(Object context,
+									Object value) {
+								@SuppressWarnings("unchecked")
+								String processInfo = StringUtils
+										.toString(((Map<String, Object>) context)
+												.get("processInfo"));
+								if (processInfo == null
+										|| processInfo.length() == 0)
+									return "";
 
-									// 获取流程id
-									return processInfo.split(";")[1];
-								}
+								// 获取流程id
+								return processInfo.split(";")[1];
+							}
 
-								@Override
-								public String getTaskbarTitle(Object context,
-										Object value) {
-									return "工作空间";
-								}
+							@Override
+							public String getTaskbarTitle(Object context,
+									Object value) {
+								return "工作空间";
+							}
 
-								@Override
-								public String getLinkText(Object context,
-										Object value) {
-									@SuppressWarnings("unchecked")
-									String processInfo = StringUtils
-											.toString(((Map<String, Object>) context)
-													.get("processInfo"));
-									if (processInfo == null
-											|| processInfo.length() == 0)
-										return "";
+							@Override
+							public String getLinkText(Object context,
+									Object value) {
+								@SuppressWarnings("unchecked")
+								String processInfo = StringUtils
+										.toString(((Map<String, Object>) context)
+												.get("processInfo"));
+								if (processInfo == null
+										|| processInfo.length() == 0)
+									return "";
 
-									String title = "";
-									String[] processInfos = processInfo
-											.split(";");
-									if (processInfos.length > 2) {
-										for (int i = 2; i < processInfos.length; i++) {
-											if (i + 1 == processInfos.length) {
-												title += processInfos[i];
-											} else {
-												title += processInfos[i] + ",";
-											}
+								String title = "";
+								String[] processInfos = processInfo.split(";");
+								if (processInfos.length > 2) {
+									for (int i = 2; i < processInfos.length; i++) {
+										if (i + 1 == processInfos.length) {
+											title += processInfos[i];
+										} else {
+											title += processInfos[i] + ",";
 										}
-										title += "--";
 									}
-									return title += "[" + processInfos[0] + "]";
+									title += "--";
 								}
+								return title += "[" + processInfos[0] + "]";
+							}
 
-								@Override
-								public String getWinId(Object context,
-										Object value) {
-									@SuppressWarnings("unchecked")
-									String processInfo = StringUtils
-											.toString(((Map<String, Object>) context)
-													.get("processInfo"));
-									if (processInfo == null
-											|| processInfo.length() == 0)
-										return "";
+							@Override
+							public String getWinId(Object context, Object value) {
+								@SuppressWarnings("unchecked")
+								String processInfo = StringUtils
+										.toString(((Map<String, Object>) context)
+												.get("processInfo"));
+								if (processInfo == null
+										|| processInfo.length() == 0)
+									return "";
 
-									// 获取流程id
-									return this.moduleKey + "."
-											+ processInfo.split(";")[1];
-								}
-							}));
-		}
+								// 获取流程id
+								return this.moduleKey + "."
+										+ processInfo.split(";")[1];
+							}
+						}));
+		// }
 
 		if (this.type != null
 				&& this.type.equals(String
