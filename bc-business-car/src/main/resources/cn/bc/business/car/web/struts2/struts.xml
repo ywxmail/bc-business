@@ -4,10 +4,11 @@
     "http://struts.apache.org/dtds/struts-2.0.dtd">
 <struts>
 
-	
+
 	<package name="car4Cert" extends="bc-default" namespace="/bc-business/car4cert">
 		<action name="create" class="car4CertAction" method="create">
-			<result name="showdialog" >/bc-business/cert/car4cert/select.jsp</result>
+			<result name="showdialog">/bc-business/cert/car4cert/select.jsp
+			</result>
 		</action>
 		<!-- 分页视图 -->
 		<action name="paging" class="car4CertAction" method="paging" />
@@ -16,22 +17,24 @@
 		<!-- 非分页视图 -->
 		<action name="list" class="car4CertAction" method="list" />
 	</package>
-	<package name="selectMoreCarWithCarMan" extends="bc-default" namespace="/bc-business/selectMoreCarWithCarMan">
-		<action name="selectCars" class="selectMoreCarWithCarManAction" method="selectCars">
+	<package name="selectMoreCarWithCarMan" extends="bc-default"
+		namespace="/bc-business/selectMoreCarWithCarMan">
+		<action name="selectCars" class="selectMoreCarWithCarManAction"
+			method="selectCars">
 			<result>/bc-business/car/selectMoreCar/select.jsp</result>
 		</action>
 	</package>
 	<package name="car" extends="bc-default" namespace="/bc-business/car">
 		<action name="create" class="carAction" method="create">
 			<result name="form">/bc-business/car/form.jsp</result>
-		</action>		
+		</action>
 		<action name="open" class="carAction" method="open">
 			<result name="formr">/bc-business/car/form.jsp</result>
 		</action>
 		<action name="edit" class="carAction" method="edit">
 			<result name="form">/bc-business/car/form.jsp</result>
 		</action>
-		<action name="save" class="carAction" method="save"/>
+		<action name="save" class="carAction" method="save" />
 		<action name="delete" class="carAction" method="delete" />
 		<action name="conditions" class="carAction" method="conditions">
 			<result name="success">/bc-business/car/conditions.jsp</result>
@@ -42,15 +45,19 @@
 		</action>
 		<action name="autoSetOriginNo" class="carAction" method="autoSetOriginNo">
 		</action>
-		<action name="checkPlateIsExists" class="carAction" method="checkPlateIsExists"/>
-		<action name="checkCodeIsExists" class="carAction" method="checkCodeIsExists"/>
-		<action name="checkManageNoIsExists" class="carAction" method="checkManageNoIsExists"/>
-		<action name="findRetiredCarsOfNextMonth" class="carAction" method="findRetiredCarsOfNextMonth"/>
-		
+		<action name="checkPlateIsExists" class="carAction" method="checkPlateIsExists" />
+		<action name="checkCodeIsExists" class="carAction" method="checkCodeIsExists" />
+		<action name="checkManageNoIsExists" class="carAction"
+			method="checkManageNoIsExists" />
+		<action name="findRetiredCarsOfNextMonth" class="carAction"
+			method="findRetiredCarsOfNextMonth" />
+		<action name="getCarRelevantInfoByPlateNo" class="carAction"
+			method="getCarRelevantInfoByPlateNo" />
+
 		<!-- Ajax查询车辆信息 -->
-		<action name="find" class="findCarAction"/>
+		<action name="find" class="findCarAction" />
 	</package>
-	
+
 	<!-- 车辆资料报表高级搜索 -->
 	<package name="cars" extends="bc-default" namespace="/bc-business">
 		<!-- 高级搜索条件窗口 -->

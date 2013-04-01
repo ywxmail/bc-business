@@ -244,7 +244,7 @@ public class CarServiceImpl extends DefaultCrudService<Car> implements
 
 	public List<Map<String, Object>> findRetiredCarsOfMonth(Calendar month,
 			Long unitId) {
-		return this.carDao.findRetiredCarsOfMonth(month, unitId);
+		return this.carDao.findRetiredCarsOfMonth(month, unitId, null);
 	}
 
 	public Long checkManageNoIsExists(Long carId, Long manageNo) {
@@ -253,5 +253,10 @@ public class CarServiceImpl extends DefaultCrudService<Car> implements
 
 	public Car loadByPlateNo(String carNo) {
 		return this.carDao.loadByPlateNo(carNo);
+	}
+
+	public String getCarRelevantInfoByPlateNo(String plateNo) {
+
+		return this.carDao.getCarRelevantInfoByPlateNo(plateNo);
 	}
 }

@@ -85,6 +85,7 @@ public class CarAction extends FileEntityAction<Long, Car> {
 	public String vinSuffix;// 车架号后缀
 	public Long carId;// 车辆Id
 	public Long manageNo;// 管理号
+	public String plateNo;// 车牌号码
 
 	@Autowired
 	public void setCarService(CarService carService) {
@@ -576,7 +577,6 @@ public class CarAction extends FileEntityAction<Long, Car> {
 
 	// ========判断车牌号唯一性代码开始========
 	public String plateType;
-	public String plateNo;
 
 	public String checkPlateIsExists() {
 		Json json = new Json();
@@ -627,6 +627,14 @@ public class CarAction extends FileEntityAction<Long, Car> {
 		this.json = jsonArray.toString();
 		return "json";
 	}
+
 	// ============查找下一个月需要交车的车辆信息===结束=========
 
+	// ==根据车牌号码查找车辆的合同性质、经营权号、残值归属、报废日期、车辆登记日期、所属公司、所属车队
+	// 合同到期日、强制险到期日，商业险到期日
+	public String getCarRelevantInfoByPlateNo() {
+		this.json = this.carService.getCarRelevantInfoByPlateNo(plateNo);
+
+		return "json";
+	}
 }

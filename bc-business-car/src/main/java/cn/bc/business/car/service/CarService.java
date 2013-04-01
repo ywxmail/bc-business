@@ -136,4 +136,12 @@ public interface CarService extends CrudService<Car> {
 	 * @return
 	 */
 	Car loadByPlateNo(String carNo);
+
+	/**
+	 * 根据车牌号码查找车辆的相关信息
+	 * 
+	 * @param plateNo车牌号码
+	 * @return
+	 */
+	String getCarRelevantInfoByPlateNo(String plateNo);
 }

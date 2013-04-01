@@ -131,9 +131,12 @@ public interface CarDao extends CrudDao<Car> {
 	 *            指定月份 Calendar类型
 	 * @param unitId
 	 *            分公司id，null默认全部
+	 * @param year
+	 *            指定年份 Calendar类型
 	 * @return
 	 */
-	List<Map<String, Object>> findRetiredCarsOfMonth(Calendar month, Long unitId);
+	List<Map<String, Object>> findRetiredCarsOfMonth(Calendar month,
+			Long unitId, Calendar year);
 
 	/**
 	 * 判断车辆管理号唯一
@@ -153,4 +156,12 @@ public interface CarDao extends CrudDao<Car> {
 	 * @return
 	 */
 	Car loadByPlateNo(String plateNo);
+
+	/**
+	 * 根据车牌号码查找车辆的相关信息
+	 * 
+	 * @param plateNo车牌号码
+	 * @return
+	 */
+	String getCarRelevantInfoByPlateNo(String plateNo);
 }

@@ -3,6 +3,7 @@
  */
 package cn.bc.business.car.dao.hibernate.jpa;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -38,6 +39,7 @@ import cn.bc.core.util.DateUtils;
 import cn.bc.db.jdbc.RowMapper;
 import cn.bc.orm.hibernate.jpa.HibernateCrudJpaDao;
 import cn.bc.orm.hibernate.jpa.HibernateJpaNativeQuery;
+import cn.bc.web.ui.json.Json;
 
 /**
  * 车辆Dao的hibernate jpa实现
@@ -555,10 +557,17 @@ public class CarDaoImpl extends HibernateCrudJpaDao<Car> implements CarDao {
 		return this.getJpaTemplate().find(hql, status);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * cn.bc.business.car.dao.CarDao#findRetiredCarsOfMonth(java.util.Calendar,
+	 * java.lang.Long, java.util.Calendar)
+	 */
 	public List<Map<String, Object>> findRetiredCarsOfMonth(Calendar month,
-			Long unitId) {
-		String sql = "select a.id,a.status_,a.code,a.plate_type as plateType,a.plate_no as plateNo,to_char(a.register_date,'YYYY-MM-DD') as registerDate";
-		sql += ",to_char(a.scrap_date,'YYYY-MM-DD') as scrapDate,a.motorcade_id as motorcadeId,e.name,a.company,a.bs_type as bsType,a.charger";
+			Long unitId, Calendar year) {
+		String sql = "select a.id,a.status_,a.cert_no2,a.code,a.plate_type as plateType,a.plate_no as plateNo,to_char(a.register_date,'YYYY-MM-DD') as registerDate";
+		sql += ",getContract4ChargerScrapTo(a.id) scrapto,to_char(a.scrap_date,'YYYY-MM-DD') as scrapDate,a.motorcade_id as motorcadeId,e.name,a.company,a.bs_type as bsType,a.charger";
 		sql += ",f.name as unitCompany,f.id as unitCompanyId,to_char(c.end_date,'YYYY-MM-DD') as ccEndDate";
 		sql += ",to_char(d.commerial_end_date,'YYYY-MM-DD') as commerialEndDate,to_char(d.greenslip_end_date,'YYYY-MM-DD') as greenslipEndDate";
 		sql += ",a.factory_type,to_char(d.greenslip_Start_Date,'YYYY-MM-DD') as greenslipStartDate,a.engine_no,a.vin,a.access_count,a.access_weight,a.displacement";
@@ -576,32 +585,107 @@ public class CarDaoImpl extends HibernateCrudJpaDao<Car> implements CarDao {
 		if (unitId != null) {
 			sql += " and e.unit_id=" + unitId;
 		}
-		// 设置指定月第一日
-		DateUtils.setToFirstDayOfMonth(month);
-		Date fistDayOfMonth = month.getTime();
-		// 设置指定月最后日
-		DateUtils.setToLastDayOfMonth(month);
-		Date lastDayOfMonth = month.getTime();
+		Date fistDayOfMonth = null;// 设置指定月第一日
+		Date lastDayOfMonth = null;// 设置指定月最后日
+		Date fiveYearsAgoLastDayOfMonth = null;// 5年前指定月第一日
+		Date fiveYearsAgoFistDayOfMonth = null;// 5年前指定月最后日
+		Date eightYearsAgoFistDayOfMonth = null;// 8年前指定月第一日
+		Date eightYearsAgoLastDayOfMonth = null;// 8年前指定月最后日
+		Date halfAYearLaterLastDayOfMonth = null;// 半年后
+		// 指定月交车
+		if (year == null && month != null) {
+			// 设置指定月第一日
+			DateUtils.setToFirstDayOfMonth(month);
+			fistDayOfMonth = month.getTime();
+			// 设置指定月最后日
+			DateUtils.setToLastDayOfMonth(month);
+			lastDayOfMonth = month.getTime();
 
-		// 5年前
-		month.add(Calendar.YEAR, -5);
-		Date fiveYearsAgoLastDayOfMonth = month.getTime();
-		DateUtils.setToFirstDayOfMonth(month);
-		Date fiveYearsAgoFistDayOfMonth = month.getTime();
+			// 5年前
+			month.add(Calendar.YEAR, -5);
+			fiveYearsAgoLastDayOfMonth = month.getTime();
+			DateUtils.setToFirstDayOfMonth(month);
+			fiveYearsAgoFistDayOfMonth = month.getTime();
 
-		// 8年前
-		month.add(Calendar.YEAR, -3);
-		Date eightYearsAgoFistDayOfMonth = month.getTime();
-		DateUtils.setToLastDayOfMonth(month);
-		Date eightYearsAgoLastDayOfMonth = month.getTime();
+			// 8年前
+			month.add(Calendar.YEAR, -3);
+			eightYearsAgoFistDayOfMonth = month.getTime();
+			DateUtils.setToLastDayOfMonth(month);
+			eightYearsAgoLastDayOfMonth = month.getTime();
 
-		// 现在
-		month.add(Calendar.YEAR, 8);
+			// 现在
+			month.add(Calendar.YEAR, 8);
 
-		// 半年后
-		month.add(Calendar.MONTH, 6);
-		Date halfAYearLaterLastDayOfMonth = month.getTime();
+			// 半年后
+			month.add(Calendar.MONTH, 6);
+			halfAYearLaterLastDayOfMonth = month.getTime();
+		} else if (year != null && month != null) {// 指定年月
+			// 设置年份
+			month.set(Calendar.YEAR, year.get(Calendar.YEAR));
+			// 设置指定月第一日
+			DateUtils.setToFirstDayOfMonth(month);
+			fistDayOfMonth = month.getTime();
+			// 设置指定月最后日
+			DateUtils.setToLastDayOfMonth(month);
+			lastDayOfMonth = month.getTime();
 
+			// 5年前
+			month.add(Calendar.YEAR, -5);
+			fiveYearsAgoLastDayOfMonth = month.getTime();
+			DateUtils.setToFirstDayOfMonth(month);
+			fiveYearsAgoFistDayOfMonth = month.getTime();
+
+			// 8年前
+			month.add(Calendar.YEAR, -3);
+			eightYearsAgoFistDayOfMonth = month.getTime();
+			DateUtils.setToLastDayOfMonth(month);
+			eightYearsAgoLastDayOfMonth = month.getTime();
+
+			// 现在
+			month.add(Calendar.YEAR, 8);
+
+			// 半年后
+			month.add(Calendar.MONTH, 6);
+			halfAYearLaterLastDayOfMonth = month.getTime();
+
+		} else if (year != null && month == null) {// 指定年
+			// 设置年的开始月为一月
+			year.set(Calendar.MONTH, 0);
+			// 设置指定月第一日
+			DateUtils.setToFirstDayOfMonth(year);
+			fistDayOfMonth = year.getTime();
+			// 设置指定月最后日
+			// 设置年的最后月为十二月
+			year.set(Calendar.MONTH, 11);
+			DateUtils.setToLastDayOfMonth(year);
+			lastDayOfMonth = year.getTime();
+
+			// 5年前
+			year.add(Calendar.YEAR, -5);
+			// 最后日
+			fiveYearsAgoLastDayOfMonth = year.getTime();
+			// 开始日
+			year.set(Calendar.MONTH, 0);
+			DateUtils.setToFirstDayOfMonth(year);
+			fiveYearsAgoFistDayOfMonth = year.getTime();
+
+			// 8年前
+			year.add(Calendar.YEAR, -3);
+			// 开始日
+			eightYearsAgoFistDayOfMonth = year.getTime();
+			// 最后一日
+			year.set(Calendar.MONTH, 11);
+			DateUtils.setToLastDayOfMonth(year);
+			eightYearsAgoLastDayOfMonth = year.getTime();
+
+			// 现在（十二月的最后一日）
+			year.add(Calendar.YEAR, 8);
+
+			// 半年后
+			year.add(Calendar.MONTH, 6);
+			halfAYearLaterLastDayOfMonth = year.getTime();
+
+		}
 		sql += " and (";
 		// 1指定月经济合同到期车辆
 		sql += " (c.end_date>?  and c.end_date<?)";
@@ -618,7 +702,7 @@ public class CarDaoImpl extends HibernateCrudJpaDao<Car> implements CarDao {
 		sql += " or";
 		// 商业险
 		sql += " ((d.commerial_end_date>? and d.commerial_end_date<? and c.end_date>? and c.end_date<? ) or d.status_ is null)";
-		sql += " )";
+		sql += " ) order by a.scrap_date asc";
 
 		Object[] args = new Object[] { BCConstants.STATUS_ENABLED,
 				BCConstants.STATUS_ENABLED, BCConstants.STATUS_ENABLED,
@@ -630,7 +714,28 @@ public class CarDaoImpl extends HibernateCrudJpaDao<Car> implements CarDao {
 				fistDayOfMonth, halfAYearLaterLastDayOfMonth };
 		if (logger.isDebugEnabled()) {
 			logger.debug("sql=" + sql);
-			logger.debug("args=" + args);
+			logger.debug("args="
+					+ StringUtils.arrayToCommaDelimitedString(args));
+			logger.debug("fistDayOfMonth="
+					+ DateUtils.formatDateTime2Minute(fistDayOfMonth)
+					+ ",lastDayOfMonth="
+					+ DateUtils.formatDateTime2Minute(lastDayOfMonth)
+					+ ",fiveYearsAgoFistDayOfMonth="
+					+ DateUtils
+							.formatDateTime2Minute(fiveYearsAgoFistDayOfMonth)
+					+ ",fiveYearsAgoLastDayOfMonth="
+					+ DateUtils
+							.formatDateTime2Minute(fiveYearsAgoLastDayOfMonth)
+					+ ",eightYearsAgoFistDayOfMonth="
+					+ DateUtils
+							.formatDateTime2Minute(eightYearsAgoFistDayOfMonth)
+					+ ",eightYearsAgoLastDayOfMonth="
+					+ DateUtils
+							.formatDateTime2Minute(eightYearsAgoLastDayOfMonth)
+					+ ",halfAYearLaterLastDayOfMonth="
+					+ DateUtils
+							.formatDateTime2Minute(halfAYearLaterLastDayOfMonth));
+
 		}
 		return HibernateJpaNativeQuery.executeNativeSql(getJpaTemplate(), sql,
 				args, new RowMapper<Map<String, Object>>() {
@@ -639,10 +744,12 @@ public class CarDaoImpl extends HibernateCrudJpaDao<Car> implements CarDao {
 						int i = 0;
 						oi.put("id", rs[i++]);
 						oi.put("status_", rs[i++]);
+						oi.put("certNo2", rs[i++]);
 						oi.put("code", rs[i++]);
 						oi.put("plateType", rs[i++]);
 						oi.put("plateNo", rs[i++]);
 						oi.put("registerDate", rs[i++]);
+						oi.put("scrapto", rs[i++]);
 						oi.put("scrapDate", rs[i++]);
 						oi.put("motorcadeId", rs[i++]);
 						oi.put("motorcadeName", rs[i++]);
@@ -736,5 +843,59 @@ public class CarDaoImpl extends HibernateCrudJpaDao<Car> implements CarDao {
 		return this.createQuery()
 				.condition(new EqualsCondition("plateNo", plateNo))
 				.singleResult();
+	}
+
+	public String getCarRelevantInfoByPlateNo(String plateNo) {
+		Object[] args;
+		String sql = "select c.bs_type,c.cert_no2,getContract4ChargerScrapTo(c.id) scrapto,c.scrap_date,c.register_date,bc.end_date contractEndDate,c.company,c.motorcade_id "
+				+ ",p.commerial_end_date,(case when (p.greenslip_same_date=true) then p.commerial_end_date else p.greenslip_end_date end)greenslip_end_date "
+				+ "from bs_car c "
+				+ "left join bs_car_policy p on p.car_id = c.id "
+				+ "left join bs_car_contract bcc on bcc.car_id = c.id "
+				+ "left join bs_contract bc on bc.id = bcc.contract_id "
+				+ "where c.plate_no=? and p.status_ =? and bc.status_ =? and bc.type_=?";
+		args = new Object[] { plateNo, BCConstants.STATUS_ENABLED,
+				BCConstants.STATUS_ENABLED, Contract.TYPE_CHARGER };
+		if (logger.isDebugEnabled()) {
+			logger.debug("sql=" + sql);
+			logger.debug("args="
+					+ StringUtils.arrayToCommaDelimitedString(args));
+
+		}
+		// 车辆信息
+		Map<String, Object> carInfo = null;
+		try {
+			carInfo = this.jdbcTemplate.queryForMap(sql, args);
+		} catch (EmptyResultDataAccessException e) {
+			e.getStackTrace();
+		}
+
+		Json json = new Json();
+		if (carInfo != null && carInfo.size() != 0) {
+
+			json.put("success", true);
+			json.put("msg", "粤语A." + plateNo + "的相关信息已更新！");
+			json.put("bsType", carInfo.get("bs_type"));
+			json.put("certNo2", carInfo.get("cert_no2"));
+			json.put("scrapto", carInfo.get("scrapto"));
+			json.put("scrapDate", new SimpleDateFormat("yyyy-MM-dd")
+					.format(carInfo.get("scrap_date")));
+			json.put("registerDate", new SimpleDateFormat("yyyy-MM-dd")
+					.format(carInfo.get("register_date")));
+			json.put("contractEndDate", new SimpleDateFormat("yyyy-MM-dd")
+					.format(carInfo.get("contractEndDate")));
+			json.put("company", carInfo.get("company"));
+			json.put("motorcadeId", carInfo.get("motorcade_id"));
+			json.put("commerialEndDate", new SimpleDateFormat("yyyy-MM-dd")
+					.format(carInfo.get("commerial_end_date")));
+			json.put("greenslipEndDate", new SimpleDateFormat("yyyy-MM-dd")
+					.format(carInfo.get("greenslip_end_date")));
+
+		} else {
+			json.put("success", false);
+			json.put("msg", "没有找到粤语A." + plateNo + "的相关信息！");
+		}
+
+		return json.toString();
 	}
 }
