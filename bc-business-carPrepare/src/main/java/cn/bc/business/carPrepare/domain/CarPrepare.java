@@ -28,7 +28,7 @@ import cn.bc.identity.domain.RichFileEntityImpl;
 @Inheritance(strategy = InheritanceType.JOINED)
 public class CarPrepare extends RichFileEntityImpl {
 	private static final long serialVersionUID = 1L;
-	public static final String KEY_CODE = "policy.code";
+	public static final String KEY_CODE = "carPrepare.code";
 	public static final String KEY_UID = CarPrepare.class.getSimpleName();
 
 	/** 状态：待更新 */
@@ -43,7 +43,7 @@ public class CarPrepare extends RichFileEntityImpl {
 	private String C1PlateType;// 旧车车牌归属 : 如粤A
 	private String C1PlateNo;// 旧车车牌号 : 如471G7
 	private String C1Company;// 旧车所属公司
-	private int C1Motorcade;// 旧车所属车队
+	private Integer C1Motorcade;// 旧车所属车队
 	private String C1BsType;// 旧车合同性质
 	private String C1Scrapto;// 旧车残值归属
 	private Calendar C1RegisterDate;// 旧车登记日期
@@ -54,8 +54,8 @@ public class CarPrepare extends RichFileEntityImpl {
 	private String C2PlateType;// 新车车牌归属
 	private String C2PlateNo;// 新车车牌号
 	private String C2Company;// 新车所属公司
-	private String C2Branch;// 新车所属分公司
-	private int C2Motorcade;// 新车所属车队
+	private Integer C2Branch;// 新车所属分公司
+	private Integer C2Motorcade;// 新车所属车队
 	private Set<CarPrepareItem> carPrepareItem;// 车辆更新项目
 
 	public String getCode() {
@@ -103,11 +103,11 @@ public class CarPrepare extends RichFileEntityImpl {
 	}
 
 	@Column(name = "C1_MOTORCADE")
-	public int getC1Motorcade() {
+	public Integer getC1Motorcade() {
 		return C1Motorcade;
 	}
 
-	public void setC1Motorcade(int c1Motorcade) {
+	public void setC1Motorcade(Integer c1Motorcade) {
 		C1Motorcade = c1Motorcade;
 	}
 
@@ -202,20 +202,20 @@ public class CarPrepare extends RichFileEntityImpl {
 	}
 
 	@Column(name = "C2_BRANCH")
-	public String getC2Branch() {
+	public Integer getC2Branch() {
 		return C2Branch;
 	}
 
-	public void setC2Branch(String c2Branch) {
+	public void setC2Branch(Integer c2Branch) {
 		C2Branch = c2Branch;
 	}
 
 	@Column(name = "C2_MOTORCADE")
-	public int getC2Motorcade() {
+	public Integer getC2Motorcade() {
 		return C2Motorcade;
 	}
 
-	public void setC2Motorcade(int c2Motorcade) {
+	public void setC2Motorcade(Integer c2Motorcade) {
 		C2Motorcade = c2Motorcade;
 	}
 

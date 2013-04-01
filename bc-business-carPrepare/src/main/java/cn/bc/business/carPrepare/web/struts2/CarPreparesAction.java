@@ -17,6 +17,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
 import cn.bc.BCConstants;
+import cn.bc.business.OptionConstants;
 import cn.bc.business.carPrepare.domain.CarPrepare;
 import cn.bc.business.motorcade.service.MotorcadeService;
 import cn.bc.business.web.struts2.ViewAction;
@@ -33,6 +34,7 @@ import cn.bc.identity.domain.Actor;
 import cn.bc.identity.service.ActorService;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.option.domain.OptionItem;
+import cn.bc.option.service.OptionService;
 import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.formater.EntityStatusFormater;
 import cn.bc.web.formater.LinkFormater4Id;
@@ -41,6 +43,7 @@ import cn.bc.web.ui.html.grid.IdColumn4MapKey;
 import cn.bc.web.ui.html.grid.TextColumn4MapKey;
 import cn.bc.web.ui.html.page.PageOption;
 import cn.bc.web.ui.html.toolbar.Toolbar;
+import cn.bc.web.ui.html.toolbar.ToolbarButton;
 import cn.bc.web.ui.json.Json;
 
 /**
@@ -79,7 +82,14 @@ public class CarPreparesAction extends ViewAction<Map<String, Object>> {
 
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer sql = new StringBuffer();
-		sql.append("select p.id,p.status_,p.code,p.plan_date,p.c1_plate_type,p.c1_plate_no from bs_car_prepare p");
+		sql.append("select p.id,p.status_,p.code,p.plan_date,p.c1_plate_type,p.c1_plate_no,p.c1_company,m1.name c1Motorcade,p.c1_register_date");
+		sql.append(",getUpdateTheProgress(p.id) updateTheProgress");
+		sql.append(",p.c1_contract_end_date,p.c1_greenslip_end_date,p.c1_commerial_end_date,p.c1_bs_type,p.c1_scrapto,p.c2_indicator");
+		sql.append(",p.c2_plate_type,p.c2_plate_no,p.c2_company,bia.name c2Brach,m2.name c2Motorcade,p.c1_motorcade,p.c2_motorcade");
+		sql.append(" from bs_car_prepare p");
+		sql.append(" left join bs_motorcade m1 on m1.id=p.c1_motorcade");
+		sql.append(" left join bs_motorcade m2 on m2.id=p.c2_motorcade");
+		sql.append(" left join bc_identity_actor bia on bia.id=p.c2_branch");
 		sqlObject.setSql(sql.toString());
 
 		// 注入参数
@@ -96,8 +106,32 @@ public class CarPreparesAction extends ViewAction<Map<String, Object>> {
 				map.put("plan_date", rs[i++]);
 				map.put("c1_plate_type", rs[i++]);
 				map.put("c1_plate_no", rs[i++]);
-				map.put("plate", map.get("c1_plate_type").toString() + "."
-						+ map.get("c1_plate_no").toString());
+				map.put("c1Plate",
+						(map.get("c1_plate_no").toString().length() != 0 ? map
+								.get("c1_plate_type").toString()
+								+ "."
+								+ map.get("c1_plate_no").toString() : ""));
+				map.put("c1_company", rs[i++]);
+				map.put("c1Motorcade", rs[i++]);
+				map.put("c1_register_date", rs[i++]);
+				map.put("updateTheProgress", rs[i++]);
+				map.put("c1_contract_end_date", rs[i++]);
+				map.put("c1_greenslip_end_date", rs[i++]);
+				map.put("c1_commerial_end_date", rs[i++]);
+				map.put("c1_bs_type", rs[i++]);
+				map.put("c1_scrapto", rs[i++]);
+				map.put("c2_indicator", rs[i++]);
+				map.put("c2_plate_type", rs[i++]);
+				map.put("c2_plate_no", rs[i++]);
+				map.put("c2Plate",
+						(map.get("c2_plate_no") != null ? map.get(
+								"c2_plate_type").toString()
+								+ "." + map.get("c2_plate_no").toString() : ""));
+				map.put("c2_company", rs[i++]);
+				map.put("c2Brach", rs[i++]);
+				map.put("c2Motorcade", rs[i++]);
+				map.put("c1_motorcade", rs[i++]);
+				map.put("c2_motorcade", rs[i++]);
 				return map;
 			}
 		});
@@ -119,65 +153,126 @@ public class CarPreparesAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("p.plan_date", "plan_date",
 				getText("carPrepare.planDate"), 100).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
-
-		// // 公司
-		// columns.add(new TextColumn4MapKey("c.company", "company",
-		// getText("car.company"), 40).setSortable(true)
-		// .setUseTitleFromLabel(true));
-		// // 分公司
-		// columns.add(new TextColumn4MapKey("unit_name", "unit_name",
-		// getText("car.unitname"), 65).setSortable(true)
-		// .setUseTitleFromLabel(true));
-		// // 车队
-		// columns.add(new TextColumn4MapKey("m.name", "motorcade_name",
-		// getText("car.motorcade"), 65)
-		// .setSortable(true)
-		// .setUseTitleFromLabel(true)
-		// .setValueFormater(
-		// new LinkFormater4Id(this.getContextPath()
-		// + "/bc-business/motorcade/edit?id={0}",
-		// "motorcade") {
-		// @SuppressWarnings("unchecked")
-		// @Override
-		// public String getIdValue(Object context,
-		// Object value) {
-		// return StringUtils
-		// .toString(((Map<String, Object>) context)
-		// .get("motorcade_id"));
-		// }
-		// }));
-		// // 自编号
-		// columns.add(new TextColumn4MapKey("c.code", "code",
-		// getText("car.code"), 75).setSortable(true)
-		// .setUseTitleFromLabel(true));
+		columns.add(new TextColumn4MapKey("p.code", "updateTheProgress",
+				getText("carPrepare.updateTheProgress"), 115).setSortable(true)
+				.setUseTitleFromLabel(true));
 		// 车号
-		if (carId == null) {// 车辆页签时不需显示车牌号码
-			columns.add(new TextColumn4MapKey("p.plate_no", "plate",
-					getText("carPrepare.C1Plate"), 80)
-					.setValueFormater(new LinkFormater4Id(this.getContextPath()
-							+ "/bc-business/car/edit?id={0}", "car") {
+		columns.add(new TextColumn4MapKey("p.c1_plate_no", "c1Plate",
+				getText("carPrepare.C1Plate"), 80)
+				.setValueFormater(new LinkFormater4Id(this.getContextPath()
+						+ "/bc-business/car/edit?id={0}", "car") {
+					@SuppressWarnings("unchecked")
+					@Override
+					public String getIdValue(Object context, Object value) {
+						return StringUtils
+								.toString(((Map<String, Object>) context)
+										.get("carId"));
+					}
+
+					@Override
+					public String getTaskbarTitle(Object context, Object value) {
 						@SuppressWarnings("unchecked")
-						@Override
-						public String getIdValue(Object context, Object value) {
-							return StringUtils
-									.toString(((Map<String, Object>) context)
-											.get("carId"));
-						}
+						Map<String, Object> map = (Map<String, Object>) context;
+						return getText("car") + " - " + map.get("plate");
 
-						@Override
-						public String getTaskbarTitle(Object context,
-								Object value) {
+					}
+				}));
+		// 公司
+		columns.add(new TextColumn4MapKey("p.c1_company", "c1_company",
+				getText("carPrepare.C1Company"), 40).setSortable(true)
+				.setUseTitleFromLabel(true));
+		// 车队
+		columns.add(new TextColumn4MapKey("m1.name", "c1Motorcade",
+				getText("carPrepare.C1Motorcade"), 65)
+				.setSortable(true)
+				.setUseTitleFromLabel(true)
+				.setValueFormater(
+						new LinkFormater4Id(this.getContextPath()
+								+ "/bc-business/motorcade/edit?id={0}",
+								"motorcade") {
 							@SuppressWarnings("unchecked")
-							Map<String, Object> map = (Map<String, Object>) context;
-							return getText("car") + " - " + map.get("plate");
+							@Override
+							public String getIdValue(Object context,
+									Object value) {
+								return StringUtils
+										.toString(((Map<String, Object>) context)
+												.get("c1_motorcade"));
+							}
+						}));
+		// 车辆登记日期
+		columns.add(new TextColumn4MapKey("p.c1_register_date",
+				"c1_register_date", getText("carPrepare.C1RegisterDate"), 100)
+				.setSortable(true).setValueFormater(
+						new CalendarFormater("yyyy-MM-dd")));
+		columns.add(new TextColumn4MapKey("p.c1_contract_end_date",
+				"c1_contract_end_date",
+				getText("carPrepare.C1ContractEndDate"), 100).setSortable(true)
+				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+		columns.add(new TextColumn4MapKey("p.c1_greenslip_end_date",
+				"c1_greenslip_end_date",
+				getText("carPrepare.C1GreenslipEndDate"), 100)
+				.setSortable(true).setValueFormater(
+						new CalendarFormater("yyyy-MM-dd")));
+		columns.add(new TextColumn4MapKey("p.c1_commerial_end_date",
+				"c1_commerial_end_date",
+				getText("carPrepare.C1CommeriaEndDate"), 100).setSortable(true)
+				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+		columns.add(new TextColumn4MapKey("p.c1_bs_type", "c1_bs_type",
+				getText("carPrepare.C1BsType"), 75).setSortable(true)
+				.setUseTitleFromLabel(true));
+		columns.add(new TextColumn4MapKey("p.c1_scrapto", "c1_scrapto",
+				getText("carPrepare.C1Scrapto"), 75).setSortable(true)
+				.setUseTitleFromLabel(true));
+		columns.add(new TextColumn4MapKey("p.c2_indicator", "c2_indicator",
+				getText("carPrepare.C2Indicator"), 100).setSortable(true)
+				.setUseTitleFromLabel(true));
+		// 车号
+		columns.add(new TextColumn4MapKey("p.c2_plate_no", "c2Plate",
+				getText("carPrepare.C2Plate"), 80)
+				.setValueFormater(new LinkFormater4Id(this.getContextPath()
+						+ "/bc-business/car/edit?id={0}", "car") {
+					@SuppressWarnings("unchecked")
+					@Override
+					public String getIdValue(Object context, Object value) {
+						return StringUtils
+								.toString(((Map<String, Object>) context)
+										.get("carId"));
+					}
 
-						}
-					}));
-		}
-		// // 车辆登记日期
-		// columns.add(new TextColumn4MapKey("c.register_date", "registeDate",
-		// getText("policy.carRegisteDate"), 100).setSortable(true)
-		// .setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+					@Override
+					public String getTaskbarTitle(Object context, Object value) {
+						@SuppressWarnings("unchecked")
+						Map<String, Object> map = (Map<String, Object>) context;
+						return getText("car") + " - " + map.get("plate");
+
+					}
+				}));
+		// 公司
+		columns.add(new TextColumn4MapKey("p.c2_company", "c2_company",
+				getText("carPrepare.C2Company"), 40).setSortable(true)
+				.setUseTitleFromLabel(true));
+		// 分公司
+		columns.add(new TextColumn4MapKey("p.c2_branch", "c2Brach",
+				getText("carPrepare.C2Branch"), 65).setSortable(true)
+				.setUseTitleFromLabel(true));
+		// 车队
+		columns.add(new TextColumn4MapKey("m2.name", "c2Motorcade",
+				getText("carPrepare.C1Motorcade"), 65)
+				.setSortable(true)
+				.setUseTitleFromLabel(true)
+				.setValueFormater(
+						new LinkFormater4Id(this.getContextPath()
+								+ "/bc-business/motorcade/edit?id={0}",
+								"motorcade") {
+							@SuppressWarnings("unchecked")
+							@Override
+							public String getIdValue(Object context,
+									Object value) {
+								return StringUtils
+										.toString(((Map<String, Object>) context)
+												.get("c2_motorcade"));
+							}
+						}));
 
 		return columns;
 	}
@@ -200,7 +295,7 @@ public class CarPreparesAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected String getGridRowLabelExpression() {
-		return "['plate']";
+		return "['c2Plate']";
 	}
 
 	@Override
@@ -274,6 +369,11 @@ public class CarPreparesAction extends ViewAction<Map<String, Object>> {
 			tb.addButton(this.getDefaultEditToolbarButton());
 			// 删除按钮
 			tb.addButton(this.getDefaultDeleteToolbarButton());
+			// 生成年度计划
+			tb.addButton(new ToolbarButton().setIcon("ui-icon-document")
+					.setText("生成更新计划")
+					.setClick("bs.carPrepareView.createPlanDateDialog"));
+
 		}
 		// 搜索按钮
 		tb.addButton(this.getDefaultSearchToolbarButton());
@@ -283,9 +383,8 @@ public class CarPreparesAction extends ViewAction<Map<String, Object>> {
 				getText("title.click2changeSearchClasses")));
 	}
 
-	@Override
-	protected String getGridDblRowMethod() {
-		return "bc.page.open";
+	protected String getHtmlPageJs() {
+		return this.getContextPath() + "/bc-business/carPrepare/view.js";
 	}
 
 	// ==高级搜索代码开始==
@@ -296,6 +395,12 @@ public class CarPreparesAction extends ViewAction<Map<String, Object>> {
 
 	private MotorcadeService motorcadeService;
 	private ActorService actorService;
+	private OptionService optionService;
+
+	@Autowired
+	public void setOptionService(OptionService optionService) {
+		this.optionService = optionService;
+	}
 
 	@Autowired
 	public void setActorService(
@@ -310,6 +415,7 @@ public class CarPreparesAction extends ViewAction<Map<String, Object>> {
 
 	public JSONArray motorcades;// 车队的下拉列表信息
 	public JSONArray units;// 分公司的下拉列表信息
+	public JSONArray businessTypes;// 营运性质列表
 
 	@Override
 	protected void initConditionsFrom() throws Exception {
@@ -321,6 +427,13 @@ public class CarPreparesAction extends ViewAction<Map<String, Object>> {
 		// 可选车队列表
 		motorcades = OptionItem.toLabelValues(this.motorcadeService
 				.find4Option(null));
+		// 批量加载可选项列表
+		Map<String, List<Map<String, String>>> optionItems = this.optionService
+				.findOptionItemByGroupKeys(new String[] { OptionConstants.CAR_BUSINESS_NATURE });
+		// 营运性质列表
+		this.businessTypes = OptionItem.toLabelValues(
+				optionItems.get(OptionConstants.CAR_BUSINESS_NATURE), "value");
+
 	}
 
 	// ==高级搜索代码结束==

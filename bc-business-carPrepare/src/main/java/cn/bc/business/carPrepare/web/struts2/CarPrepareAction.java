@@ -3,10 +3,16 @@
  */
 package cn.bc.business.carPrepare.web.struts2;
 
+import java.util.Calendar;
 import java.util.Date;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -17,6 +23,7 @@ import cn.bc.BCConstants;
 import cn.bc.business.OptionConstants;
 import cn.bc.business.car.service.CarService;
 import cn.bc.business.carPrepare.domain.CarPrepare;
+import cn.bc.business.carPrepare.domain.CarPrepareItem;
 import cn.bc.business.carPrepare.service.CarPrepareService;
 import cn.bc.business.motorcade.service.MotorcadeService;
 import cn.bc.business.web.struts2.FileEntityAction;
@@ -60,9 +67,10 @@ public class CarPrepareAction extends FileEntityAction<Long, CarPrepare> {
 	public List<Map<String, String>> motorcadeList; // 可选车队列表
 	public List<Map<String, String>> unitsList; // 可选分公司列表
 	public List<Map<String, String>> scrapToList; // 残值归属
-
-	public String buyPlants;// 所买险种的json字符串
-	public boolean canCopy;
+	public JSONArray companyNames; // 公司名称列表
+	public String carPrepareItems;// 车辆更新进度项目
+	public String plan4Year;// 根据年度来生成车辆更新计划
+	public String plan4Month;// 根据月度来生成车辆更新计划
 
 	@Autowired
 	public void setActorService(
@@ -96,69 +104,118 @@ public class CarPrepareAction extends FileEntityAction<Long, CarPrepare> {
 		this.attachService = attachService;
 	}
 
+	@Override
 	public boolean isReadonly() {
-		// 车辆保单管理员或系统管理员
+		// 出车准备管理员或系统管理员
 		SystemContext context = (SystemContext) this.getContext();
-		return !context.hasAnyRole(getText("key.role.bs.policy"),
+		return !context.hasAnyRole(getText("key.role.bs.carPrepare"),
 				getText("key.role.bc.admin"));
-
 	}
 
-	// @Override
-	// protected void beforeSave(Policy entity) {
-	// super.beforeSave(entity);
-	// // 插入险种值
-	// try {
-	// Set<BuyPlant> buyPlants = null;
-	// // 保存险种字符串如 :车辆(ZB) 第三者(ZB)
-	// String buyPlantStr = "";
-	// if (this.buyPlants != null && this.buyPlants.length() > 0) {
-	// buyPlants = new LinkedHashSet<BuyPlant>();
-	// BuyPlant resource;
-	// JSONArray jsons = new JSONArray(this.buyPlants);
-	// JSONObject json;
-	// for (int i = 0; i < jsons.length(); i++) {
-	// json = jsons.getJSONObject(i);
-	// resource = new BuyPlant();
-	// if (json.has("id"))
-	// resource.setId(json.getLong("id"));
-	// resource.setOrderNo(i);
-	// resource.setPolicy(this.getE());
-	// resource.setName(json.getString("name"));
-	// buyPlantStr += "[";
-	// buyPlantStr += json.getString("name");
-	// buyPlantStr += ":";
-	// resource.setCoverage(json.getString("coverage"));
-	// buyPlantStr += json.getString("coverage");
-	// // 只要备注不为空，也显示备注
-	// if (json.getString("description") != null
-	// && json.getString("description").length() > 0) {
-	// buyPlantStr += ":";
-	// buyPlantStr += json.getString("description");
-	// }
-	// buyPlantStr += "]";
-	// buyPlantStr += "  ";
-	// resource.setDescription(json.getString("description"));
-	// buyPlants.add(resource);
-	// }
-	// }
-	// if (this.getE().getBuyPlants() != null) {
-	// this.getE().getBuyPlants().clear();
-	// this.getE().getBuyPlants().addAll(buyPlants);
-	// this.getE().setBuyPlantStr(buyPlantStr);
-	// } else {
-	// this.getE().setBuyPlants(buyPlants);
-	// this.getE().setBuyPlantStr(buyPlantStr);
-	// }
-	// } catch (JSONException e) {
-	// logger.error(e.getMessage(), e);
-	// try {
-	// throw e;
-	// } catch (JSONException e1) {
-	// e1.printStackTrace();
-	// }
-	// }
-	// }
+	/**
+	 * 创建生成年度计划输入年份与月份的对话框
+	 * 
+	 * @return
+	 */
+	public String createPlanDateDialog() {
+		return "success";
+	}
+
+	/**
+	 * 生成年度车辆更新计划
+	 * 
+	 * @return
+	 */
+	public String createAnnualPlan() {
+		// 判断月度计划是否为空
+		if (plan4Month != null && plan4Month.length() != 0) {
+			this.json = this.carPrepareService.doAnnualPlan(plan4Year,
+					plan4Month);
+		} else {
+			this.json = this.carPrepareService.doAnnualPlan(plan4Year, null);
+		}
+		this.json = json.toString();
+		return "json";
+	}
+
+	@Override
+	protected void beforeSave(CarPrepare entity) {
+		super.beforeSave(entity);
+		// 插入进度项目
+		try {
+			Set<CarPrepareItem> carPrepareItems = null;
+			String CarPrepareItemStr = "";
+			if (this.carPrepareItems != null
+					&& this.carPrepareItems.length() > 0) {
+				carPrepareItems = new LinkedHashSet<CarPrepareItem>();
+				CarPrepareItem resource;
+				JSONArray jsons = new JSONArray(this.carPrepareItems);
+				JSONObject json;
+				for (int i = 0; i < jsons.length(); i++) {
+					json = jsons.getJSONObject(i);
+					resource = new CarPrepareItem();
+					if (json.has("id"))
+						resource.setId(json.getLong("id"));
+					resource.setOrder(i);
+					resource.setCarPrepare(entity);
+					resource.setName(json.getString("name"));
+					if (json.getString("date") != null
+							&& json.getString("date").length() > 0) {
+						Calendar date = DateUtils.getCalendar(json
+								.getString("date"));
+						if (date != null) {
+							resource.setDate(date);
+
+						}
+					}
+					resource.setStatus(json.getInt("status"));
+					resource.setDesc(json.getString("desc"));
+					carPrepareItems.add(resource);
+				}
+			}
+			if (this.getE().getCarPrepareItem() != null) {
+				this.getE().getCarPrepareItem().clear();
+				this.getE().getCarPrepareItem().addAll(carPrepareItems);
+				this.getE().setCarPrepareItem(carPrepareItems);
+			} else {
+				this.getE().setCarPrepareItem(carPrepareItems);
+			}
+		} catch (JSONException e) {
+			logger.error(e.getMessage(), e);
+			try {
+				throw e;
+			} catch (JSONException e1) {
+				e1.printStackTrace();
+			}
+		}
+	}
+
+	@Override
+	protected void afterCreate(CarPrepare entity) {
+		super.afterCreate(entity);
+		// 设置车牌类型
+		entity.setC1PlateType(getText("carPrepare.plate.type"));
+		entity.setC2PlateType(getText("carPrepare.plate.type"));
+		// 新建时初始化更新进度
+		Set<CarPrepareItem> carPrepareItems = new LinkedHashSet<CarPrepareItem>();
+		this.carPrepareService.initializeCarPrepareItemInfo(entity,
+				carPrepareItems, "交车", 1);
+		this.carPrepareService.initializeCarPrepareItemInfo(entity,
+				carPrepareItems, "二手车行提车", 2);
+		this.carPrepareService.initializeCarPrepareItemInfo(entity,
+				carPrepareItems, "报停计价器", 3);
+		this.carPrepareService.initializeCarPrepareItemInfo(entity,
+				carPrepareItems, "收转篮报废凭证", 4);
+		this.carPrepareService.initializeCarPrepareItemInfo(entity,
+				carPrepareItems, "报停车", 5);
+		this.carPrepareService.initializeCarPrepareItemInfo(entity,
+				carPrepareItems, "办新车提示", 6);
+		this.carPrepareService.initializeCarPrepareItemInfo(entity,
+				carPrepareItems, "新车上牌", 7);
+		this.carPrepareService.initializeCarPrepareItemInfo(entity,
+				carPrepareItems, "出车", 8);
+		entity.setCarPrepareItem(carPrepareItems);
+	}
 
 	@Override
 	protected void initForm(boolean editable) throws Exception {
@@ -170,6 +227,7 @@ public class CarPrepareAction extends FileEntityAction<Long, CarPrepare> {
 				.findOptionItemByGroupKeys(new String[] {
 						OptionConstants.CAR_BUSINESS_NATURE,
 						OptionConstants.CAR_COMPANY,
+						OptionConstants.COMPANY_NAME,
 						OptionConstants.CONTRACT4CHARGER_SCRAPTO });
 		// 加载可选车队列表
 		this.motorcadeList = this.motorcadeService.findEnabled4Option();
@@ -177,6 +235,10 @@ public class CarPrepareAction extends FileEntityAction<Long, CarPrepare> {
 		// 加载可选合同性质列表
 		this.businessTypeList = optionItems
 				.get(OptionConstants.CAR_BUSINESS_NATURE);
+		// 公司名称列表
+		this.companyNames = OptionItem.toLabelValues(optionItems
+				.get(OptionConstants.COMPANY_NAME));
+
 		// 分公司
 		unitsList = this.actorService.find4option(
 				new Integer[] { Actor.TYPE_UNIT },
@@ -195,15 +257,23 @@ public class CarPrepareAction extends FileEntityAction<Long, CarPrepare> {
 	@Override
 	protected PageOption buildFormPageOption(boolean editable) {
 
-		if (editable && !this.isReadonly()) {
-			canCopy = false;
-
-		} else {
-			canCopy = true;
-		}
-
-		return super.buildFormPageOption(editable).setWidth(730)
+		return super.buildFormPageOption(editable).setWidth(705)
 				.setMinWidth(300).setHeight(540).setMinHeight(300);
+	}
+
+	protected void buildFormPageButtons(PageOption pageOption, boolean editable) {
+		boolean readonly = this.isReadonly();
+
+		// if (this.useFormPrint()) {
+		// // 添加打印按钮
+		// pageOption.addButton(this.getDefaultPrintButtonOption());
+		// }
+		//
+		// if (editable && !readonly) {
+		// 添加默认的保存按钮
+		pageOption.addButton(new ButtonOption(getText("label.save"), null,
+				"bc.carPrepareForm.save"));
+		// }
 	}
 
 }
