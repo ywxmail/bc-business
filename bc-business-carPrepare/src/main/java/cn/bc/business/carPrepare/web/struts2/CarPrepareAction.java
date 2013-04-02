@@ -3,6 +3,7 @@
  */
 package cn.bc.business.carPrepare.web.struts2;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedHashSet;
@@ -37,6 +38,7 @@ import cn.bc.option.domain.OptionItem;
 import cn.bc.option.service.OptionService;
 import cn.bc.web.ui.html.page.ButtonOption;
 import cn.bc.web.ui.html.page.PageOption;
+import cn.bc.workflow.service.WorkflowModuleRelationService;
 
 /**
  * 出车准备Action
@@ -54,7 +56,7 @@ public class CarPrepareAction extends FileEntityAction<Long, CarPrepare> {
 	public CarPrepareService carPrepareService;
 	private MotorcadeService motorcadeService;
 	private ActorService actorService;
-
+	private WorkflowModuleRelationService workflowModuleRelationService;
 	private AttachService attachService;
 	public CarService carService;
 	public AttachWidget attachsUI;
@@ -71,6 +73,7 @@ public class CarPrepareAction extends FileEntityAction<Long, CarPrepare> {
 	public String carPrepareItems;// 车辆更新进度项目
 	public String plan4Year;// 根据年度来生成车辆更新计划
 	public String plan4Month;// 根据月度来生成车辆更新计划
+	public List<Map<String, Object>> workflowModuleRelations; // 工作流程集合
 
 	@Autowired
 	public void setActorService(
@@ -102,6 +105,12 @@ public class CarPrepareAction extends FileEntityAction<Long, CarPrepare> {
 	@Autowired
 	public void setAttachService(AttachService attachService) {
 		this.attachService = attachService;
+	}
+
+	@Autowired
+	public void setWorkflowModuleRelationService(
+			WorkflowModuleRelationService workflowModuleRelationService) {
+		this.workflowModuleRelationService = workflowModuleRelationService;
 	}
 
 	@Override
@@ -252,6 +261,27 @@ public class CarPrepareAction extends FileEntityAction<Long, CarPrepare> {
 		// OptionItem.insertIfNotExist(companyList, null,
 		// getE().getC1Company());
 
+		// 与模块相关的流程
+		if (!this.getE().isNew()) {
+			// 车牌号码
+			List<String> plate = new ArrayList<String>();
+			CarPrepare e = this.getE();
+			// 旧车牌号码
+			if (e.getC1PlateNo() != null && e.getC1PlateNo().length() != 0) {
+				plate.add(e.getC1PlateType() + "." + e.getC1PlateNo());
+			}
+			// 新车牌号码
+			if (e.getC2PlateNo() != null && e.getC2PlateNo().length() != 0) {
+				plate.add(e.getC2PlateType() + "." + e.getC2PlateNo());
+			}
+
+			workflowModuleRelations = this.workflowModuleRelationService
+					.findList(new String[] { "CarRetired", "CarActive" },
+							new String[] { "plate", "plate_gl" },
+							plate.toArray(new String[plate.size()]),
+							new String[] { "subject" });
+		}
+
 	}
 
 	@Override
@@ -264,12 +294,6 @@ public class CarPrepareAction extends FileEntityAction<Long, CarPrepare> {
 	protected void buildFormPageButtons(PageOption pageOption, boolean editable) {
 		boolean readonly = this.isReadonly();
 
-		// if (this.useFormPrint()) {
-		// // 添加打印按钮
-		// pageOption.addButton(this.getDefaultPrintButtonOption());
-		// }
-		//
-		// if (editable && !readonly) {
 		// 添加默认的保存按钮
 		pageOption.addButton(new ButtonOption(getText("label.save"), null,
 				"bc.carPrepareForm.save"));

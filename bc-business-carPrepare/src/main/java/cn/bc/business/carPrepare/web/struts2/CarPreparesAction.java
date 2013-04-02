@@ -279,7 +279,18 @@ public class CarPreparesAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected String[] getGridSearchFields() {
-		return new String[] { "p.c1_plate_no" };
+		return new String[] { "p.c1_plate_no", "p.c2_plate_no", "p.code" };
+	}
+
+	@Override
+	protected Condition getGridSearchCondition4OneField(String field,
+			String value) {
+		if (field.endsWith(".c1_plate_no") || field.endsWith(".c2_plate_no")) {// 车牌号
+			return buildDefaultLikeCondition(field,
+					value != null ? value.toUpperCase() : value);
+		} else {
+			return super.getGridSearchCondition4OneField(field, value);
+		}
 	}
 
 	@Override
@@ -295,7 +306,7 @@ public class CarPreparesAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected String getGridRowLabelExpression() {
-		return "['c2Plate']";
+		return "['c1Plate']";
 	}
 
 	@Override
