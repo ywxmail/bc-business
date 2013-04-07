@@ -18,6 +18,7 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
+import cn.bc.business.carman.domain.CarByDriverHistory;
 import cn.bc.business.carman.domain.CarManRisk;
 import cn.bc.business.carman.service.CarManRiskService;
 import cn.bc.business.motorcade.service.MotorcadeService;
@@ -41,6 +42,7 @@ import cn.bc.identity.web.formater.SexFormater;
 import cn.bc.option.domain.OptionItem;
 import cn.bc.web.formater.AbstractFormater;
 import cn.bc.web.formater.CalendarFormater;
+import cn.bc.web.formater.DateRangeFormater;
 import cn.bc.web.formater.EntityStatusFormater;
 import cn.bc.web.formater.KeyValueFormater;
 import cn.bc.web.formater.LinkFormater4Id;
@@ -104,10 +106,12 @@ public class CarManRisksAction extends ViewAction<Map<String, Object>> {
 		StringBuffer select = new StringBuffer();
 		select.append("m.id as mid,m.status_ as mstatus,m.sex,m.name as mname");
 		select.append(",m.cert_fwzg,m.cert_identity,m.file_date as man_file_date,m.carinfo");
+		select.append(",m.move_type,m.move_date,m.shiftwork_end_date");
 		select.append(",r.id as rid,r.code,r.company as rcompany,r.holder,r.buy_type");
 		select.append(",r.start_date,r.end_date,r.file_date as risk_file_date");
 		select.append(",c.id car_id,c.plate_type car_plate_type,c.plate_no car_plate_no,c.company car_company");
 		select.append(",c.manage_no,bia.name unit_name,mo.name motorcade_name,c.code car_code");
+		select.append(",c.register_date");
 		sqlObject.setSelect(select.toString());
 
 		StringBuffer from = new StringBuffer();
@@ -135,6 +139,9 @@ public class CarManRisksAction extends ViewAction<Map<String, Object>> {
 				map.put("man_identity", rs[i++]);
 				map.put("man_file_date", rs[i++]);
 				map.put("man_carinfo", rs[i++]);
+				map.put("man_move_type", rs[i++]);
+				map.put("man_move_date", rs[i++]);
+				map.put("man_shiftwork_end_date", rs[i++]);
 				map.put("id", rs[i++]);
 				map.put("risk_code", rs[i++]);
 				map.put("risk_company", rs[i++]);
@@ -151,6 +158,7 @@ public class CarManRisksAction extends ViewAction<Map<String, Object>> {
 				map.put("unit_name", rs[i++]);
 				map.put("motorcade_name", rs[i++]);
 				map.put("car_code", rs[i++]);
+				map.put("car_register_date", rs[i++]);
 				return map;
 			}
 		});
@@ -213,7 +221,9 @@ public class CarManRisksAction extends ViewAction<Map<String, Object>> {
 				getText("carMan.carCode"), 70).setSortable(true));
 		columns.add(new TextColumn4MapKey("c.manage_no", "car_manage_no",
 				getText("carMan.carManageNo"), 70).setSortable(true));
-
+		columns.add(new TextColumn4MapKey("c.register_date", "car_register_date",
+				getText("car.registerDate"), 90).setSortable(true)
+				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
 		columns.add(new TextColumn4MapKey("m.cert_identity", "man_identity",
 				getText("carMan.cert4Indentity"), 150));
 		columns.add(new TextColumn4MapKey("r.start_date", "risk_start_date",
@@ -242,6 +252,19 @@ public class CarManRisksAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("r.holder", "risk_holder",
 				getText("carManRisk.holder"), 180).setSortable(true)
 				.setUseTitleFromLabel(true));
+		columns.add(new TextColumn4MapKey("m.move_type", "man_move_type",
+				getText("carMan.move_type"), 140)
+				.setValueFormater(new KeyValueFormater(getMoveType())));
+		columns.add(new TextColumn4MapKey("m.move_date", "man_move_date",
+				getText("carMan.moveDate"), 180)
+				.setValueFormater(new DateRangeFormater("yyyy-MM-dd") {
+					@Override
+					public Date getToDate(Object context, Object value) {
+						@SuppressWarnings("rawtypes")
+						Map contract = (Map) context;
+						return (Date) contract.get("man_shiftwork_end_date");
+					}
+				}.setUseEmptySymbol(true)));
 		columns.add(new TextColumn4MapKey("r.file_date", "risk_file_date",
 				getText("carManRisk.fileDate"), 120).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd HH:mm")));
@@ -258,6 +281,37 @@ public class CarManRisksAction extends ViewAction<Map<String, Object>> {
 				getText("label.yes"));
 		type.put(String.valueOf(CarManRisk.BUY_TYPE_SELF), getText("label.no"));
 		type.put(String.valueOf(CarManRisk.BUY_TYPE_NONE), "");
+		return type;
+	}
+	
+	/**
+	 * 获取迁移类型值转换列表
+	 * 
+	 * @return
+	 */
+	protected Map<String, String> getMoveType() {
+		Map<String, String> type = new LinkedHashMap<String, String>();
+		type.put(String.valueOf(CarByDriverHistory.MOVETYPE_CLDCL),
+				getText("carByDriverHistory.moveType.cheliangdaocheliang"));
+		type.put(String.valueOf(CarByDriverHistory.MOVETYPE_GSDGSYZX),
+				getText("carByDriverHistory.moveType.gongsidaogongsiyizhuxiao"));
+		type.put(String.valueOf(CarByDriverHistory.MOVETYPE_ZXWYQX),
+				getText("carByDriverHistory.moveType.zhuxiaoweiyouquxiang"));
+		type.put(String.valueOf(CarByDriverHistory.MOVETYPE_YWGSQH),
+				getText("carByDriverHistory.moveType.youwaigongsiqianhui"));
+		type.put(String.valueOf(CarByDriverHistory.MOVETYPE_JHWZX),
+				getText("carByDriverHistory.moveType.jiaohuiweizhuxiao"));
+		type.put(String.valueOf(CarByDriverHistory.MOVETYPE_XRZ),
+				getText("carByDriverHistory.moveType.xinruzhi"));
+		type.put(String.valueOf(CarByDriverHistory.MOVETYPE_ZCD),
+				getText("carByDriverHistory.moveType.cheduidaochedui"));
+		type.put(String.valueOf(CarByDriverHistory.MOVETYPE_DINGBAN),
+				getText("carByDriverHistory.moveType.dingban"));
+		type.put(String.valueOf(CarByDriverHistory.MOVETYPE_JHZC),
+				getText("carByDriverHistory.moveType.jiaohuizhuanche"));
+		type.put(String.valueOf(CarByDriverHistory.MOVETYPE_WJZZX),
+				getText("carByDriverHistory.moveType.weijiaozhengzhuxiao"));
+		type.put(String.valueOf(CarByDriverHistory.MOVETYPE_NULL), "(无)");
 		return type;
 	}
 
