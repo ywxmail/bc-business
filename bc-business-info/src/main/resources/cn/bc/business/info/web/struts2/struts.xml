@@ -135,6 +135,68 @@
 			<param name="customRole">BS_REGULATION_MANAGE</param>
 		</action>
 	</package>
+	
+	<!-- 政府文件：表单 -->
+	<package name="government" extends="bc-default" namespace="/bc-business/info/government">
+		<action name="create" class="infoAction" method="create">
+			<result name="form">/bc-business/info/form.jsp</result>
+			<param name="customType">4</param>
+			<param name="customRole">BS_GOVERNMENT_MANAGE</param>
+		</action>
+		<action name="edit" class="infoAction" method="edit">
+			<result name="form">/bc-business/info/form.jsp</result>
+			<param name="customType">1</param>
+			<param name="customRole">BS_GOVERNMENT_MANAGE</param>
+		</action>
+	</package>
+	<!-- 政府文件：普通用户视图 -->
+	<package name="governments" extends="bc-default" namespace="/bc-business/info/governments">
+		<!-- 分页视图 -->
+		<action name="paging" class="infosAction" method="paging">
+			<param name="viewType">0</param>
+			<param name="customName">government</param>
+			<param name="customType">4</param>
+			<param name="customRole">BS_GOVERNMENT_MANAGE</param>
+		</action>
+		<!-- 分页数据 -->
+		<action name="data" class="infosAction" method="data">
+			<param name="viewType">0</param>
+			<param name="customName">government</param>
+			<param name="customType">4</param>
+			<param name="customRole">BS_GOVERNMENT_MANAGE</param>
+		</action>
+		<!-- 导出 视图数据-->
+		<action name="export" class="infosAction" method="export">
+			<param name="viewType">0</param>
+			<param name="customName">government</param>
+			<param name="customType">4</param>
+			<param name="customRole">BS_GOVERNMENT_MANAGE</param>
+		</action>
+	</package>
+	<!-- 政府文件：管理端视图 -->
+	<package name="governmentsManage" extends="bc-default" namespace="/bc-business/info/governmentsManage">
+		<!-- 分页视图 -->
+		<action name="paging" class="infosAction" method="paging" >
+			<param name="viewType">1</param>
+			<param name="customName">government</param>
+			<param name="customType">4</param>
+			<param name="customRole">BS_GOVERNMENT_MANAGE</param>
+		</action>
+		<!-- 分页数据 -->
+		<action name="data" class="infosAction" method="data" >
+			<param name="viewType">1</param>
+			<param name="customName">government</param>
+			<param name="customType">4</param>
+			<param name="customRole">BS_GOVERNMENT_MANAGE</param>
+		</action>
+		<!-- 导出 视图数据-->
+		<action name="export" class="infosAction" method="export" >
+			<param name="viewType">1</param>
+			<param name="customName">government</param>
+			<param name="customType">4</param>
+			<param name="customRole">BS_GOVERNMENT_MANAGE</param>
+		</action>
+	</package>
 		
 	<!-- 通知：表单 -->
 	<package name="notice" extends="bc-default" namespace="/bc-business/info/notice">
