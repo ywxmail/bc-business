@@ -5,6 +5,7 @@ package cn.bc.business.car.web.struts2;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -16,6 +17,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
 import cn.bc.BCConstants;
+import cn.bc.business.car.domain.Car;
 import cn.bc.business.motorcade.service.MotorcadeService;
 import cn.bc.business.web.struts2.LinkFormater4ChargerInfo;
 import cn.bc.business.web.struts2.LinkFormater4DriverInfo;
@@ -134,8 +136,8 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 		sql.append(",getContract4ChargerCarmaintain(c.id) carmaintain,c.file_date,ad.actor_name author");
 		sql.append(",c.manage_no,c.operate_date,c.owner_");
 		sql.append(" from bs_car c");
-		sql.append(" inner join bs_motorcade m on m.id=c.motorcade_id");
-		sql.append(" inner join bc_identity_actor bia on bia.id=m.unit_id");
+		sql.append(" left join bs_motorcade m on m.id=c.motorcade_id");
+		sql.append(" left join bc_identity_actor bia on bia.id=m.unit_id");
 		sql.append(" left join BC_IDENTITY_ACTOR_HISTORY md on md.id=c.modifier_id");
 		sql.append(" left join BC_IDENTITY_ACTOR_HISTORY ad on ad.id=c.author_id");
 		sqlObject.setSql(sql.toString());
@@ -200,7 +202,7 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 		// 状态
 		columns.add(new TextColumn4MapKey("c.status_", "status_",
 				getText("car.status"), 40).setSortable(true).setValueFormater(
-				new EntityStatusFormater(getBSStatuses3())));
+				new EntityStatusFormater(getCarStatuses())));
 		// 公司
 		columns.add(new TextColumn4MapKey("c.company", "company",
 				getText("label.carCompany"), 40).setSortable(true)
@@ -439,7 +441,7 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 			tb.addButton(this.getDefaultEditToolbarButton());
 			// 删除按钮
 			tb.addButton(new ToolbarButton().setIcon("ui-icon-trash")
-					.setText("删除草稿").setAction("delete"));
+					.setText("删除").setAction("delete"));
 			//
 		}
 
@@ -450,7 +452,7 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 		// 如果有权限的用户可以看到草稿状态的车
 		if (!isReadonly() || this.isEntering() || this.isCheck()) {
 			tb.addButton(Toolbar.getDefaultToolbarRadioGroup(
-					this.getBSStatuses3(), "status", 0,
+					this.getCarStatuses(), "status", 0,
 					getText("title.click2changeSearchStatus")));
 
 		} else {
@@ -464,6 +466,25 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 				.addMenuItem("金盾网交通违法查询：抓取", "jinDun-jiaoTongWeiFa-spider")
 				.setChange("bs.carView.selectMenuButtonItem"));
 		return tb;
+	}
+
+	/**
+	 * 状态值转换列表：在案|注销|草稿|新购|全部
+	 * 
+	 * @return
+	 */
+	protected Map<String, String> getCarStatuses() {
+		Map<String, String> statuses = new LinkedHashMap<String, String>();
+		statuses.put(String.valueOf(Car.CAR_STAUTS_NORMAL),
+				getText("bs.status.active"));
+		statuses.put(String.valueOf(Car.CAR_STAUTS_LOGOUT),
+				getText("bs.status.logout"));
+		statuses.put(String.valueOf(BCConstants.STATUS_DRAFT),
+				getText("bc.status.draft"));
+		statuses.put(String.valueOf(Car.CAR_STAUTS_NEWBUY),
+				getText("bc.status.newBuy"));
+		statuses.put("-2,-1,0,1", getText("bs.status.all"));
+		return statuses;
 	}
 
 	@Override

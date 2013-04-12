@@ -36,6 +36,8 @@ public class Car extends RichFileEntityImpl {
 
 	public static final int CAR_STAUTS_NORMAL = 0;
 	public static final int CAR_STAUTS_LOGOUT = 1;
+	/** 车辆状态：新购(新购买的车辆) */
+	public static final int CAR_STAUTS_NEWBUY = -2;
 
 	private Motorcade motorcade;// 所属车队
 	private String driver; // 司机信息：[司机1姓名],[司机1班次],[司机1id];[司机2姓名],[司机2班次],[司机2id];...
@@ -124,16 +126,16 @@ public class Car extends RichFileEntityImpl {
 	private String lpgInsuranceId;// LPG保单号
 	private Calendar lpgInsuranceStartDate;// LPG保单开始日期
 	private Calendar lpgInsuranceEndDate;// LPG保单结束日期
-	private String lpgGpIcCardNo;//lpg钢瓶IC卡号
-	private Calendar lpgGpIcCardGetDate;//lpg钢瓶IC卡领取日期
-	private String lpgGpIcCardPensioner;//lpg钢瓶IC卡领取人
-	private String lpgComputerCode;//lpg电脑编号
-	private String lpgGpSupportNo;//lpg钢瓶支架号
+	private String lpgGpIcCardNo;// lpg钢瓶IC卡号
+	private Calendar lpgGpIcCardGetDate;// lpg钢瓶IC卡领取日期
+	private String lpgGpIcCardPensioner;// lpg钢瓶IC卡领取人
+	private String lpgComputerCode;// lpg电脑编号
+	private String lpgGpSupportNo;// lpg钢瓶支架号
 
 	private String carTvScreen;// 车载电视屏
 	private String rentNo;//
 
-	@ManyToOne(fetch = FetchType.EAGER, optional = false)
+	@ManyToOne(fetch = FetchType.EAGER, optional = true)
 	@JoinColumn(name = "MOTORCADE_ID", referencedColumnName = "ID")
 	public Motorcade getMotorcade() {
 		return motorcade;
@@ -883,9 +885,5 @@ public class Car extends RichFileEntityImpl {
 	public void setLpgGpSupportNo(String lpgGpSupportNo) {
 		this.lpgGpSupportNo = lpgGpSupportNo;
 	}
-
-	
-	
-	
 
 }

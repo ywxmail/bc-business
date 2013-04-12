@@ -154,7 +154,9 @@ public class CarAction extends FileEntityAction<Long, Car> {
 	protected void buildFormPageButtons(PageOption pageOption, boolean editable) {
 		// 特殊处理的部分
 		if (!this.isReadonly()) {// 有权限
-			if (editable && this.getE().getStatus() != BCConstants.STATUS_DRAFT) {// 编辑状态显示保存按钮
+			if (editable
+					&& (this.getE().getStatus() != BCConstants.STATUS_DRAFT && this
+							.getE().getStatus() != Car.CAR_STAUTS_NEWBUY)) {// 编辑状态显示保存按钮
 				pageOption.addButton(new ButtonOption(getText("label.save"),
 						null, "bc.carForm.save"));
 				pageOption.addButton(new ButtonOption(
@@ -172,9 +174,14 @@ public class CarAction extends FileEntityAction<Long, Car> {
 		}
 		// 如果有录入权限的就有保存按钮
 		if ((this.isEntering() || !isReadonly())
-				&& this.getE().getStatus() == BCConstants.STATUS_DRAFT) {
+				&& (this.getE().getStatus() == BCConstants.STATUS_DRAFT || this
+						.getE().getStatus() == Car.CAR_STAUTS_NEWBUY)) {
+			// 保存为草稿
 			pageOption.addButton(new ButtonOption(getText("label.save4Draft"),
 					null, "bc.carForm.save"));
+			// 保存为新购[新购买的车辆]
+			pageOption.addButton(new ButtonOption(getText("label.save4NewBuy"),
+					null, "bc.carForm.save4NewBuy"));
 		}
 	}
 
@@ -234,7 +241,7 @@ public class CarAction extends FileEntityAction<Long, Car> {
 				if (motorcade != null && motorcade.length() != 0) {
 					dreftCar.setMotorcade(this.motorcadeService.load(Long
 							.valueOf(motorcade)));
-				}else{
+				} else {
 					dreftCar.setMotorcade(null);
 				}
 				// 设置发动机号码
@@ -297,6 +304,12 @@ public class CarAction extends FileEntityAction<Long, Car> {
 	@Override
 	protected void beforeSave(Car entity) {
 		super.beforeSave(entity);
+		// 录入新购车辆时车队可以为空
+		if (entity.getMotorcade() != null
+				&& entity.getMotorcade().getId() == null) {
+			entity.setMotorcade(null);
+		}
+
 		if (entity.isLogout()) {
 			entity.setStatus(Car.CAR_STAUTS_LOGOUT);
 			entity.setScrapDate(entity.getReturnDate());
@@ -319,7 +332,7 @@ public class CarAction extends FileEntityAction<Long, Car> {
 		Car e = this.getE();
 		Long existsId = null;
 		// 保存之前检测车牌号是否唯一:仅在新建时检测
-		if (e.getId() == null) {
+		if (e.getId() == null && e.getStatus() != Car.CAR_STAUTS_NEWBUY) {
 			existsId = this.carService.checkPlateIsExists(e.getId(),
 					e.getPlateType(), e.getPlateNo());
 		}
@@ -455,7 +468,7 @@ public class CarAction extends FileEntityAction<Long, Car> {
 	}
 
 	/**
-	 * 状态值转换列表：在案|注销|草稿|全部
+	 * 状态值转换列表：在案|注销|草稿|新购|全部
 	 * 
 	 * @return
 	 */
@@ -467,6 +480,8 @@ public class CarAction extends FileEntityAction<Long, Car> {
 				getText("bs.status.logout"));
 		statuses.put(String.valueOf(BCConstants.STATUS_DRAFT),
 				getText("bc.status.draft"));
+		statuses.put(String.valueOf(Car.CAR_STAUTS_NEWBUY),
+				getText("bc.status.newBuy"));
 		statuses.put(" ", getText("bs.status.all"));
 		return statuses;
 	}
