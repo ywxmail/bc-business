@@ -853,7 +853,7 @@ public class CarDaoImpl extends HibernateCrudJpaDao<Car> implements CarDao {
 				+ "left join bs_car_policy p on p.car_id = c.id "
 				+ "left join bs_car_contract bcc on bcc.car_id = c.id "
 				+ "left join bs_contract bc on bc.id = bcc.contract_id "
-				+ "where c.plate_no=? and p.status_ =? and bc.status_ =? and bc.type_=?";
+				+ "where c.plate_no=? and (p.status_ =? or p.id is null) and (bc.status_ =? or bc.id is null) and bc.type_=?";
 		args = new Object[] { plateNo, BCConstants.STATUS_ENABLED,
 				BCConstants.STATUS_ENABLED, Contract.TYPE_CHARGER };
 		if (logger.isDebugEnabled()) {
@@ -878,18 +878,32 @@ public class CarDaoImpl extends HibernateCrudJpaDao<Car> implements CarDao {
 			json.put("bsType", carInfo.get("bs_type"));
 			json.put("certNo2", carInfo.get("cert_no2"));
 			json.put("scrapto", carInfo.get("scrapto"));
-			json.put("scrapDate", new SimpleDateFormat("yyyy-MM-dd")
-					.format(carInfo.get("scrap_date")));
-			json.put("registerDate", new SimpleDateFormat("yyyy-MM-dd")
-					.format(carInfo.get("register_date")));
-			json.put("contractEndDate", new SimpleDateFormat("yyyy-MM-dd")
-					.format(carInfo.get("contractEndDate")));
+			json.put("scrapDate",
+					(carInfo.get("scrap_date") != null ? new SimpleDateFormat(
+							"yyyy-MM-dd").format(carInfo.get("scrap_date"))
+							: null));
+			json.put(
+					"registerDate",
+					(carInfo.get("register_date") != null ? new SimpleDateFormat(
+							"yyyy-MM-dd").format(carInfo.get("register_date"))
+							: null));
+			json.put(
+					"contractEndDate",
+					(carInfo.get("contractEndDate") != null ? new SimpleDateFormat(
+							"yyyy-MM-dd").format(carInfo.get("contractEndDate"))
+							: null));
 			json.put("company", carInfo.get("company"));
 			json.put("motorcadeId", carInfo.get("motorcade_id"));
-			json.put("commerialEndDate", new SimpleDateFormat("yyyy-MM-dd")
-					.format(carInfo.get("commerial_end_date")));
-			json.put("greenslipEndDate", new SimpleDateFormat("yyyy-MM-dd")
-					.format(carInfo.get("greenslip_end_date")));
+			json.put(
+					"commerialEndDate",
+					(carInfo.get("commerial_end_date") != null ? new SimpleDateFormat(
+							"yyyy-MM-dd").format(carInfo
+							.get("commerial_end_date")) : null));
+			json.put(
+					"greenslipEndDate",
+					(carInfo.get("greenslip_end_date") != null ? new SimpleDateFormat(
+							"yyyy-MM-dd").format(carInfo
+							.get("greenslip_end_date")) : null));
 
 		} else {
 			json.put("success", false);

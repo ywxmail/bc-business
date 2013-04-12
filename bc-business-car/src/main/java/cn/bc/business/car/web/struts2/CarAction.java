@@ -86,6 +86,10 @@ public class CarAction extends FileEntityAction<Long, Car> {
 	public Long carId;// 车辆Id
 	public Long manageNo;// 管理号
 	public String plateNo;// 车牌号码
+	public String company;// 公司
+	// public String branch;// 分公司
+	public String motorcade;// 车队
+	public String engineNo;// 发动机号码
 
 	@Autowired
 	public void setCarService(CarService carService) {
@@ -198,6 +202,58 @@ public class CarAction extends FileEntityAction<Long, Car> {
 		buildFormPageButtons(pageOption, editable);
 
 		return pageOption;
+	}
+
+	// 车辆更新模块新建草稿车
+	public String createDraftCar() {
+		Json json = new Json();
+		// 判断是否已经存在需要新建的草稿车辆
+		if (plateNo != null && plateNo.length() != 0) {
+			Long carId4PlateNo = this.carService.findcarIdByCarPlateNo(plateNo);
+			// 如果不存在就新建
+			if (carId4PlateNo == null) {
+				Car dreftCar = new Car();
+				SystemContext context = this.getSystyemContext();
+
+				// 设置创建人信息
+				dreftCar.setAuthor(context.getUserHistory());
+				dreftCar.setFileDate(Calendar.getInstance());
+				dreftCar.setModifiedDate(Calendar.getInstance());
+				dreftCar.setModifier(context.getUserHistory());
+				dreftCar.setUid(Car.KEY_UID);
+				// 设置状态为草稿
+				dreftCar.setStatus(BCConstants.STATUS_DRAFT);
+				// 设置车牌号码
+				dreftCar.setPlateType(getText("car.plate.yue.A"));
+				dreftCar.setPlateNo(plateNo);
+				// 设置公司
+				if (company != null && company.length() != 0) {
+					dreftCar.setCompany(company);
+				}
+				// 设置车队
+				if (motorcade != null && motorcade.length() != 0) {
+					dreftCar.setMotorcade(this.motorcadeService.load(Long
+							.valueOf(motorcade)));
+				}else{
+					dreftCar.setMotorcade(null);
+				}
+				// 设置发动机号码
+				if (engineNo != null && engineNo.length() != 0) {
+					dreftCar.setEngineNo(engineNo);
+				}
+
+				this.carService.save(dreftCar);
+				json.put("success", true);
+				json.put("msg", "已成功新建草稿粤A." + plateNo + "的车辆信息！");
+
+			} else {// 如果存在就提示
+				json.put("success", false);
+				json.put("msg", "已经存在粤A." + plateNo + "的车辆信息！");
+			}
+			this.json = json.toString();
+		}
+
+		return "json";
 	}
 
 	@Override

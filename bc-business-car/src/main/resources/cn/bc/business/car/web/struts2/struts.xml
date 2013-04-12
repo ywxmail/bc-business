@@ -53,6 +53,7 @@
 			method="findRetiredCarsOfNextMonth" />
 		<action name="getCarRelevantInfoByPlateNo" class="carAction"
 			method="getCarRelevantInfoByPlateNo" />
+		<action name="createDraftCar" class="carAction" method="createDraftCar" />
 
 		<!-- Ajax查询车辆信息 -->
 		<action name="find" class="findCarAction" />

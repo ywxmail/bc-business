@@ -18,6 +18,7 @@ import cn.bc.BCConstants;
 import cn.bc.business.car.dao.CarDao;
 import cn.bc.business.car.domain.Car;
 import cn.bc.business.car.event.BeforeSave4CarEvent;
+import cn.bc.business.car.event.LogoutCarEvent;
 import cn.bc.business.motorcade.domain.Motorcade;
 import cn.bc.core.Page;
 import cn.bc.core.exception.PermissionDeniedException;
@@ -154,7 +155,11 @@ public class CarServiceImpl extends DefaultCrudService<Car> implements
 	public Car save(Car entity) {
 		boolean isNew = entity.isNew();
 		Long oldCarId = entity.getId();
+		// 执行注销操作前车辆的状态
+		Integer oldCarSatus = null;// 新建时默认为空
 		if (!isNew) {
+			// 获取旧车辆的状态
+			oldCarSatus = this.carDao.load(oldCarId).getStatus();
 			// ==重新获取车辆的沉余字段信息[司机信息,责任人信息,所属公司,车队]==
 
 			// 获取司机信息
@@ -225,6 +230,15 @@ public class CarServiceImpl extends DefaultCrudService<Car> implements
 
 		}
 
+		// 注销成功后发布注销车辆事件(状态从“在案”-->“注销”)非新建
+		if (!isNew && oldCarSatus == BCConstants.STATUS_ENABLED
+				&& entity.getStatus() == BCConstants.STATUS_DISABLED) {
+			LogoutCarEvent logoutCarEvent = new LogoutCarEvent(entity.getId(),
+					entity.getPlateType(), entity.getPlateNo(),
+					entity.getReturnDate());
+			this.eventPublisher.publishEvent(logoutCarEvent);
+
+		}
 		return entity;
 	}
 
