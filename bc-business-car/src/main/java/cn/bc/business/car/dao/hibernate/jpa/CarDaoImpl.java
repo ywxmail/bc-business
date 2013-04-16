@@ -912,4 +912,65 @@ public class CarDaoImpl extends HibernateCrudJpaDao<Car> implements CarDao {
 
 		return json.toString();
 	}
+
+	public List<Map<String, String>> findCarVin4Option(Integer[] statuses,
+			String company, Boolean isOccupy) {
+		List<Object> args = new ArrayList<Object>();
+		String sql = "select c.id,c.vin from bs_car c";
+		if (statuses != null && statuses.length > 0) {
+			if (statuses.length == 1) {
+				sql += " where c.status_ = ?";
+				args.add(statuses[0]);
+			} else {
+				sql += " where c.status_ in (";
+				for (int i = 0; i < statuses.length; i++) {
+					sql += (i == 0 ? "?" : ",?");
+					args.add(statuses[i]);
+				}
+				sql += ")";
+			}
+			// 查指定公司的
+			if (company != null && company.length() != 0) {
+				sql += " and c.company=?";
+				args.add(company);
+			}
+			// 排除车辆更新模块已占用的车架号
+			if (isOccupy != null && isOccupy == true) {
+				sql += " and c.id not in(select c2_car_id from bs_car_prepare where c2_car_id is not null)";
+			}
+		} else {
+			// 查指定公司的
+			if (company != null && company.length() != 0) {
+				sql += " where c.company=?";
+				args.add(company);
+				// 排除车辆更新模块已占用的车架号
+				if (isOccupy != null && isOccupy == true) {
+					sql += " and c.id not in(select c2_car_id from bs_car_prepare where c2_car_id is not null)";
+				}
+			} else {
+				// 排除车辆更新模块已占用的车架号
+				if (isOccupy != null && isOccupy == true) {
+					sql += " where c.id not in(select c2_car_id from bs_car_prepare where c2_car_id is not null)";
+				}
+			}
+
+		}
+		sql += " order by c.file_date desc";
+		if (logger.isDebugEnabled()) {
+			logger.debug("sql=" + sql);
+			logger.debug("args:="
+					+ StringUtils.collectionToCommaDelimitedString(args));
+
+		}
+		return HibernateJpaNativeQuery.executeNativeSql(getJpaTemplate(), sql,
+				args.toArray(), new RowMapper<Map<String, String>>() {
+					public Map<String, String> mapRow(Object[] rs, int rowNum) {
+						Map<String, String> oi = new HashMap<String, String>();
+						int i = 0;
+						oi.put("key", rs[i++].toString());
+						oi.put("value", rs[i++].toString());
+						return oi;
+					}
+				});
+	}
 }

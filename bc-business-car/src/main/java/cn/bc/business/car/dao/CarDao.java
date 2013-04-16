@@ -164,4 +164,18 @@ public interface CarDao extends CrudDao<Car> {
 	 * @return
 	 */
 	String getCarRelevantInfoByPlateNo(String plateNo);
+
+	/**
+	 * 获取车架号下拉列表信息：为空则获取所有状态
+	 * 
+	 * @param statuses
+	 *            车辆状态
+	 * @param company
+	 *            车辆所属公司
+	 * @param isOccupy
+	 *            是否排除被更新模块信息占用的
+	 * @return
+	 */
+	List<Map<String, String>> findCarVin4Option(Integer[] statuses,
+			String company, Boolean isOccupy);
 }

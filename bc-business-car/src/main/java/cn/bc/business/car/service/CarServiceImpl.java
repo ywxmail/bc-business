@@ -273,4 +273,9 @@ public class CarServiceImpl extends DefaultCrudService<Car> implements
 
 		return this.carDao.getCarRelevantInfoByPlateNo(plateNo);
 	}
+
+	public List<Map<String, String>> findCarVin4Option(Integer[] statuses,
+			String company, Boolean isOccupy) {
+		return this.carDao.findCarVin4Option(statuses, company, isOccupy);
+	}
 }
