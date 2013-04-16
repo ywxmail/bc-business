@@ -6,6 +6,7 @@ package cn.bc.business.carPrepare.web.struts2;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +23,7 @@ import org.springframework.stereotype.Controller;
 
 import cn.bc.BCConstants;
 import cn.bc.business.OptionConstants;
+import cn.bc.business.car.domain.Car;
 import cn.bc.business.car.service.CarService;
 import cn.bc.business.carPrepare.domain.CarPrepare;
 import cn.bc.business.carPrepare.domain.CarPrepareItem;
@@ -38,6 +40,7 @@ import cn.bc.option.domain.OptionItem;
 import cn.bc.option.service.OptionService;
 import cn.bc.web.ui.html.page.ButtonOption;
 import cn.bc.web.ui.html.page.PageOption;
+import cn.bc.web.ui.json.Json;
 import cn.bc.workflow.service.WorkflowModuleRelationService;
 
 /**
@@ -69,10 +72,12 @@ public class CarPrepareAction extends FileEntityAction<Long, CarPrepare> {
 	public List<Map<String, String>> motorcadeList; // 可选车队列表
 	public List<Map<String, String>> unitsList; // 可选分公司列表
 	public List<Map<String, String>> scrapToList; // 残值归属
+	public List<Map<String, String>> carVinList; // 车架号列表
 	public JSONArray companyNames; // 公司名称列表
 	public String carPrepareItems;// 车辆更新进度项目
 	public String plan4Year;// 根据年度来生成车辆更新计划
 	public String plan4Month;// 根据月度来生成车辆更新计划
+	public String company;// 所属公司
 	public List<Map<String, Object>> workflowModuleRelations; // 工作流程集合
 
 	@Autowired
@@ -208,21 +213,29 @@ public class CarPrepareAction extends FileEntityAction<Long, CarPrepare> {
 		// 新建时初始化更新进度
 		Set<CarPrepareItem> carPrepareItems = new LinkedHashSet<CarPrepareItem>();
 		this.carPrepareService.initializeCarPrepareItemInfo(entity,
-				carPrepareItems, "交车", 1);
+				carPrepareItems, "交车", null, CarPrepareItem.STATUS_UNFINISHED,
+				1);
 		this.carPrepareService.initializeCarPrepareItemInfo(entity,
-				carPrepareItems, "二手车行提车", 2);
+				carPrepareItems, "二手车行提车", null,
+				CarPrepareItem.STATUS_UNFINISHED, 2);
 		this.carPrepareService.initializeCarPrepareItemInfo(entity,
-				carPrepareItems, "报停计价器", 3);
+				carPrepareItems, "报停计价器", null,
+				CarPrepareItem.STATUS_UNFINISHED, 3);
 		this.carPrepareService.initializeCarPrepareItemInfo(entity,
-				carPrepareItems, "收转篮报废凭证", 4);
+				carPrepareItems, "收转篮报废凭证", null,
+				CarPrepareItem.STATUS_UNFINISHED, 4);
 		this.carPrepareService.initializeCarPrepareItemInfo(entity,
-				carPrepareItems, "报停车", 5);
+				carPrepareItems, "报停车", null, CarPrepareItem.STATUS_UNFINISHED,
+				5);
 		this.carPrepareService.initializeCarPrepareItemInfo(entity,
-				carPrepareItems, "办新车提示", 6);
+				carPrepareItems, "办新车指标", null,
+				CarPrepareItem.STATUS_UNFINISHED, 6);
 		this.carPrepareService.initializeCarPrepareItemInfo(entity,
-				carPrepareItems, "新车上牌", 7);
+				carPrepareItems, "新车上牌", null,
+				CarPrepareItem.STATUS_UNFINISHED, 7);
 		this.carPrepareService.initializeCarPrepareItemInfo(entity,
-				carPrepareItems, "出车", 8);
+				carPrepareItems, "出车", null, CarPrepareItem.STATUS_UNFINISHED,
+				8);
 		entity.setCarPrepareItem(carPrepareItems);
 	}
 
@@ -260,7 +273,16 @@ public class CarPrepareAction extends FileEntityAction<Long, CarPrepare> {
 		this.companyList = optionItems.get(OptionConstants.CAR_COMPANY);
 		// OptionItem.insertIfNotExist(companyList, null,
 		// getE().getC1Company());
-
+		// 车架号列表
+		this.carVinList = carService.findCarVin4Option(
+				new Integer[] { Car.CAR_STAUTS_NEWBUY }, null, true);
+		if (this.getE().getC2Vin() != null) {
+			Map<String, String> map = new HashMap<String, String>();
+			String vinValue = this.getE().getC2Vin();
+			map.put("key", String.valueOf(this.getE().getC2CarId()));
+			map.put("value", vinValue);
+			carVinList.add(map);
+		}
 		// 与模块相关的流程
 		if (!this.getE().isNew()) {
 			// 车牌号码
@@ -284,6 +306,26 @@ public class CarPrepareAction extends FileEntityAction<Long, CarPrepare> {
 
 	}
 
+	// 根据公司获取可用的车架号
+	public String getVinByCompany() {
+		JSONObject json = new JSONObject();
+		// 车架号列表
+		this.carVinList = carService.findCarVin4Option(
+				new Integer[] { Car.CAR_STAUTS_NEWBUY }, this.company, true);
+		try {
+			if (carVinList != null && carVinList.size() != 0) {
+				json.put("success", true);
+				json.put("carVinList", new JSONArray(this.carVinList));
+			} else {
+				json.put("success", false);
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		this.json = json.toString();
+		return "json";
+	}
+
 	@Override
 	protected PageOption buildFormPageOption(boolean editable) {
 
@@ -296,8 +338,31 @@ public class CarPrepareAction extends FileEntityAction<Long, CarPrepare> {
 
 		// 添加默认的保存按钮
 		pageOption.addButton(new ButtonOption(getText("label.save"), null,
-				"bc.carPrepareForm.save"));
+				"bs.carPrepareForm.save"));
 		// }
 	}
+
+	// ---发起流程---开始---
+	public String tdIds;
+
+	public String startFlow() {
+		Json json = new Json();
+		CarPrepare e = this.getE();
+		this.beforeSave(e);
+		String procInstId = this.carPrepareService.doStartFlow(
+				getText("carPrepare.startFlow.carActive"), e.getId(), e);
+		if (procInstId != null && procInstId.length() != 0) {
+			json.put("success", true);
+			json.put("msg", getText("成功发起驾驶员出车处理流程！"));
+
+		} else {
+			json.put("success", false);
+			json.put("msg", getText("驾驶员出车处理流程发起失败！"));
+		}
+		this.json = json.toString();
+		return "json";
+	}
+
+	// ---发起流程结束---
 
 }

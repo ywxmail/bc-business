@@ -15,7 +15,7 @@ import cn.bc.business.motorcade.service.MotorcadeService;
 /**
  * 保存车辆前处理事件的监听器：获取迁移类型为转车队的迁移记录信息的公司和车队写入车辆信息的冗余字段中
  * 
- * @author dragon
+ * @author zxr
  * 
  */
 public class SetCarByDriverHistoryInfo4Car implements

@@ -22,5 +22,9 @@
 			<result name="success">/bc-business/carPrepare/planDateDialog.jsp
 			</result>
 		</action>
+		<!-- 发起出车流程 -->
+		<action name="startFlow" class="carPrepareAction" method="startFlow" />
+		<!-- 根据公司获取可用的车架号 -->
+		<action name="getVinByCompany" class="carPrepareAction" method="getVinByCompany" />
 	</package>
 </struts>

@@ -53,9 +53,24 @@ public class CarPrepare extends RichFileEntityImpl {
 	private String C2Indicator;// 新车指标编号
 	private String C2PlateType;// 新车车牌归属
 	private String C2PlateNo;// 新车车牌号
+	private Long C2CarId;// 新车ID
+	private String C2BsType;// 新车营运性质
+	private String C2CarActiveType;// 新车出车性质
+	private Long C2ManageNo;// 新车管理号
+	private String C2Vin;// 新车车架号
+	private String C2CarCode;// 新车自编号
 	private String C2Company;// 新车所属公司
-	private Integer C2Branch;// 新车所属分公司
-	private Integer C2Motorcade;// 新车所属车队
+	private Long C2Branch;// 新车所属分公司
+	private Long C2Motorcade;// 新车所属车队
+	private Long C2Driver1Id;// 新车迁入司机1Id
+	private String C2Driver1;// 新车迁入司机1
+	private String C2CertFWZG4Driver1;// 新车迁入司机1的服务资格证
+	private String C2Nature4Driver1;// 新车迁入司机1的驾驶员性质
+	private Long C2Driver2Id;// 新车迁入司机1Id
+	private String C2Driver2;// 新车迁入司机1
+	private String C2CertFWZG4Driver2;// 新车迁入司机2的服务资格证
+	private String C2Nature4Driver2;// 新车迁入司机2的驾驶员性质
+
 	private Set<CarPrepareItem> carPrepareItem;// 车辆更新项目
 
 	public String getCode() {
@@ -202,20 +217,20 @@ public class CarPrepare extends RichFileEntityImpl {
 	}
 
 	@Column(name = "C2_BRANCH")
-	public Integer getC2Branch() {
+	public Long getC2Branch() {
 		return C2Branch;
 	}
 
-	public void setC2Branch(Integer c2Branch) {
+	public void setC2Branch(Long c2Branch) {
 		C2Branch = c2Branch;
 	}
 
 	@Column(name = "C2_MOTORCADE")
-	public Integer getC2Motorcade() {
+	public Long getC2Motorcade() {
 		return C2Motorcade;
 	}
 
-	public void setC2Motorcade(Integer c2Motorcade) {
+	public void setC2Motorcade(Long c2Motorcade) {
 		C2Motorcade = c2Motorcade;
 	}
 
@@ -227,6 +242,132 @@ public class CarPrepare extends RichFileEntityImpl {
 
 	public void setCarPrepareItem(Set<CarPrepareItem> carPrepareItem) {
 		this.carPrepareItem = carPrepareItem;
+	}
+
+	@Column(name = "C2_CAR_ID")
+	public Long getC2CarId() {
+		return C2CarId;
+	}
+
+	public void setC2CarId(Long c2CarId) {
+		C2CarId = c2CarId;
+	}
+
+	@Column(name = "C2_BS_TYPE")
+	public String getC2BsType() {
+		return C2BsType;
+	}
+
+	public void setC2BsType(String c2BsType) {
+		C2BsType = c2BsType;
+	}
+
+	@Column(name = "C2_CARACTIVE_TYPE")
+	public String getC2CarActiveType() {
+		return C2CarActiveType;
+	}
+
+	public void setC2CarActiveType(String c2CarActiveType) {
+		C2CarActiveType = c2CarActiveType;
+	}
+
+	@Column(name = "C2_MANAGE_NO")
+	public Long getC2ManageNo() {
+		return C2ManageNo;
+	}
+
+	public void setC2ManageNo(Long c2ManageNo) {
+		C2ManageNo = c2ManageNo;
+	}
+
+	@Column(name = "C2_VIN")
+	public String getC2Vin() {
+		return C2Vin;
+	}
+
+	public void setC2Vin(String c2Vin) {
+		C2Vin = c2Vin;
+	}
+
+	@Column(name = "C2_CAR_CODE")
+	public String getC2CarCode() {
+		return C2CarCode;
+	}
+
+	public void setC2CarCode(String c2CarCode) {
+		C2CarCode = c2CarCode;
+	}
+
+	@Column(name = "C2_DRIVER1_ID")
+	public Long getC2Driver1Id() {
+		return C2Driver1Id;
+	}
+
+	public void setC2Driver1Id(Long c2Driver1Id) {
+		C2Driver1Id = c2Driver1Id;
+	}
+
+	@Column(name = "C2_DRIVER1")
+	public String getC2Driver1() {
+		return C2Driver1;
+	}
+
+	public void setC2Driver1(String c2Driver1) {
+		C2Driver1 = c2Driver1;
+	}
+
+	@Column(name = "C2_DRIVER2_ID")
+	public Long getC2Driver2Id() {
+		return C2Driver2Id;
+	}
+
+	public void setC2Driver2Id(Long c2Driver2Id) {
+		C2Driver2Id = c2Driver2Id;
+	}
+
+	@Column(name = "C2_DRIVER2")
+	public String getC2Driver2() {
+		return C2Driver2;
+	}
+
+	public void setC2Driver2(String c2Driver2) {
+		C2Driver2 = c2Driver2;
+	}
+
+	@Column(name = "C2_CERT_FWZG_DRIVER1")
+	public String getC2CertFWZG4Driver1() {
+		return C2CertFWZG4Driver1;
+	}
+
+	public void setC2CertFWZG4Driver1(String c2CertFWZG4Driver1) {
+		C2CertFWZG4Driver1 = c2CertFWZG4Driver1;
+	}
+
+	@Column(name = "C2_NATURE_DRIVER1")
+	public String getC2Nature4Driver1() {
+		return C2Nature4Driver1;
+	}
+
+	public void setC2Nature4Driver1(String c2Nature4Driver1) {
+		C2Nature4Driver1 = c2Nature4Driver1;
+	}
+
+	@Column(name = "C2_CERT_FWZG_DRIVER2")
+	public String getC2CertFWZG4Driver2() {
+		return C2CertFWZG4Driver2;
+	}
+
+	public void setC2CertFWZG4Driver2(String c2CertFWZG4Driver2) {
+		C2CertFWZG4Driver2 = c2CertFWZG4Driver2;
+	}
+
+	@Column(name = "C2_NATURE_DRIVER2")
+	public String getC2Nature4Driver2() {
+		return C2Nature4Driver2;
+	}
+
+	public void setC2Nature4Driver2(String c2Nature4Driver2) {
+		C2Nature4Driver2 = c2Nature4Driver2;
 	}
 
 }

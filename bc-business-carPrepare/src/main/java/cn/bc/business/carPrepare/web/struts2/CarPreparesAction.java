@@ -4,6 +4,7 @@
 package cn.bc.business.carPrepare.web.struts2;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -24,9 +25,13 @@ import cn.bc.business.web.struts2.ViewAction;
 import cn.bc.core.query.condition.Condition;
 import cn.bc.core.query.condition.ConditionUtils;
 import cn.bc.core.query.condition.Direction;
+import cn.bc.core.query.condition.impl.AndCondition;
 import cn.bc.core.query.condition.impl.EqualsCondition;
 import cn.bc.core.query.condition.impl.InCondition;
+import cn.bc.core.query.condition.impl.MixCondition;
 import cn.bc.core.query.condition.impl.OrderCondition;
+import cn.bc.core.query.condition.impl.QlCondition;
+import cn.bc.core.util.DateUtils;
 import cn.bc.core.util.StringUtils;
 import cn.bc.db.jdbc.RowMapper;
 import cn.bc.db.jdbc.SqlObject;
@@ -60,6 +65,8 @@ public class CarPreparesAction extends ViewAction<Map<String, Object>> {
 	public Long carId;
 	public Long main;// 主体： 0-当前版本,1-历史版本
 	public Long policyId;// 合同ID
+	public String startPlanDate = null;// 计划的开始日期
+	public String endPlanDate = null;// 计划的结束日期
 
 	@Override
 	public boolean isReadonly() {
@@ -73,17 +80,29 @@ public class CarPreparesAction extends ViewAction<Map<String, Object>> {
 	protected OrderCondition getGridDefaultOrderCondition() {
 		// 默认排序方向：状态|创建日期
 		return new OrderCondition("p.status_", Direction.Asc).add(
-				"p.file_date", Direction.Desc);
+				"p.plan_date", Direction.Asc);
 	}
 
 	@Override
 	protected SqlObject<Map<String, Object>> getSqlObject() {
 		SqlObject<Map<String, Object>> sqlObject = new SqlObject<Map<String, Object>>();
-
+		startPlanDate = (this
+				.getGridSearchCondition4AdvanceValue("startPlanDate") != null ? DateUtils
+				.formatDate((Date) this
+						.getGridSearchCondition4AdvanceValue("startPlanDate"))
+				: null);
+		endPlanDate = (this.getGridSearchCondition4AdvanceValue("endPlanDate") != null ? DateUtils
+				.formatDate((Date) this
+						.getGridSearchCondition4AdvanceValue("endPlanDate"))
+				: null);
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer sql = new StringBuffer();
 		sql.append("select p.id,p.status_,p.code,p.plan_date,p.c1_plate_type,p.c1_plate_no,p.c1_company,m1.name c1Motorcade,p.c1_register_date");
-		sql.append(",getUpdateTheProgress(p.id) updateTheProgress");
+		sql.append(",getUpdateTheProgress(p.id) updateTheProgress,getUnFinishedProgress(p.id) unFinishedProgress,getUnFinishedPlanProgress(p.id,'"
+				+ startPlanDate
+				+ "','"
+				+ endPlanDate
+				+ "') unFinishedPlanProgress,getReturnCarDate4CarPrepare(p.id) returnCarDate");
 		sql.append(",p.c1_contract_end_date,p.c1_greenslip_end_date,p.c1_commerial_end_date,p.c1_bs_type,p.c1_scrapto,p.c2_indicator");
 		sql.append(",p.c2_plate_type,p.c2_plate_no,p.c2_company,bia.name c2Brach,m2.name c2Motorcade,p.c1_motorcade,p.c2_motorcade");
 		sql.append(" from bs_car_prepare p");
@@ -115,6 +134,9 @@ public class CarPreparesAction extends ViewAction<Map<String, Object>> {
 				map.put("c1Motorcade", rs[i++]);
 				map.put("c1_register_date", rs[i++]);
 				map.put("updateTheProgress", rs[i++]);
+				map.put("unFinishedProgress", rs[i++]);
+				map.put("unFinishedPlanProgress", rs[i++]);
+				map.put("returnCarDate", rs[i++]);
 				map.put("c1_contract_end_date", rs[i++]);
 				map.put("c1_greenslip_end_date", rs[i++]);
 				map.put("c1_commerial_end_date", rs[i++]);
@@ -150,12 +172,21 @@ public class CarPreparesAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("p.code", "code",
 				getText("carPrepare.code"), 75).setSortable(true)
 				.setUseTitleFromLabel(true));
-		columns.add(new TextColumn4MapKey("p.plan_date", "plan_date",
-				getText("carPrepare.planDate"), 100).setSortable(true)
-				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
-		columns.add(new TextColumn4MapKey("p.code", "updateTheProgress",
-				getText("carPrepare.updateTheProgress"), 115).setSortable(true)
+		columns.add(new TextColumn4MapKey("p.plan_date", "returnCarDate",
+				getText("carPrepare.returnCarDate"), 100).setSortable(true)
 				.setUseTitleFromLabel(true));
+		columns.add(new TextColumn4MapKey("p.code", "updateTheProgress",
+				getText("carPrepare.updateTheProgress"), 195).setSortable(true)
+				.setUseTitleFromLabel(true));
+		columns.add(new TextColumn4MapKey("p.code", "unFinishedProgress",
+				getText("carPrepare.unFinishedProgress"), 195)
+				.setSortable(true).setUseTitleFromLabel(true));
+		if (!isReadonly()) {
+			columns.add(new TextColumn4MapKey("p.code",
+					"unFinishedPlanProgress",
+					getText("carPrepare.unFinishedPlanProgress"), 115)
+					.setSortable(true).setUseTitleFromLabel(true));
+		}
 		// 车号
 		columns.add(new TextColumn4MapKey("p.c1_plate_no", "c1Plate",
 				getText("carPrepare.C1Plate"), 80)
@@ -199,6 +230,9 @@ public class CarPreparesAction extends ViewAction<Map<String, Object>> {
 												.get("c1_motorcade"));
 							}
 						}));
+		columns.add(new TextColumn4MapKey("p.plan_date", "plan_date",
+				getText("carPrepare.planDate"), 100).setSortable(true)
+				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
 		// 车辆登记日期
 		columns.add(new TextColumn4MapKey("p.c1_register_date",
 				"c1_register_date", getText("carPrepare.C1RegisterDate"), 100)
@@ -257,7 +291,7 @@ public class CarPreparesAction extends ViewAction<Map<String, Object>> {
 				.setUseTitleFromLabel(true));
 		// 车队
 		columns.add(new TextColumn4MapKey("m2.name", "c2Motorcade",
-				getText("carPrepare.C1Motorcade"), 65)
+				getText("carPrepare.C2Motorcade"), 65)
 				.setSortable(true)
 				.setUseTitleFromLabel(true)
 				.setValueFormater(
@@ -291,6 +325,77 @@ public class CarPreparesAction extends ViewAction<Map<String, Object>> {
 		} else {
 			return super.getGridSearchCondition4OneField(field, value);
 		}
+	}
+
+	@Override
+	protected MixCondition getGridSearchCondition4Advance() {
+		AndCondition and = (AndCondition) super
+				.getGridSearchCondition4Advance();
+
+		// startPlanDate endPlanDate 未完成的计划项目日期查询
+		Object[] args = null;
+		String ql = null;
+		Date startPlanDate = (Date) this
+				.getGridSearchCondition4AdvanceValue("startPlanDate");
+		Date endPlanDate = (Date) this
+				.getGridSearchCondition4AdvanceValue("endPlanDate");
+		// 如果startPlanDate endPlanDate不为空
+		if (startPlanDate != null && endPlanDate != null) {
+			ql = "p.id in(select pid from bs_car_prepare_item where date_>=? and date_<=?and status_=0)";
+			args = new Object[] { startPlanDate, endPlanDate };
+		} else if (startPlanDate != null && endPlanDate == null) {
+			// 如果startPlanDate 不为空 endPlanDate为空
+			ql = "p.id in(select pid from bs_car_prepare_item where date_>=? and status_=0)";
+			args = new Object[] { startPlanDate };
+		} else if (startPlanDate == null && endPlanDate != null) {
+			// 如果startPlanDate 不为空 endPlanDate为空
+			ql = "p.id in(select pid from bs_car_prepare_item where date_<=? and status_=0)";
+			args = new Object[] { endPlanDate };
+		}
+
+		if (ql != null) {
+			QlCondition qlc = new QlCondition(ql, args);
+			and.add(qlc);
+		}
+		// startReturnCarDate endReturnCarDate实际交车日期查询
+		Object[] returnCarArgs = null;
+		String returnCaQl = null;
+		Date startReturnCarDate = (Date) this
+				.getGridSearchCondition4AdvanceValue("startReturnCarDate");
+		Date endReturnCarDate = (Date) this
+				.getGridSearchCondition4AdvanceValue("endReturnCarDate");
+		// 如果startReturnCarDate endReturnCarDate不为空
+		if (startReturnCarDate != null && endReturnCarDate != null) {
+			returnCaQl = "p.id in(select pid from bs_car_prepare_item where date_>=? and date_<=?and status_=1)";
+			returnCarArgs = new Object[] { startReturnCarDate, endReturnCarDate };
+		} else if (startReturnCarDate != null && endReturnCarDate == null) {
+			// 如果startReturnCarDate 不为空 endPlanDate为空
+			returnCaQl = "p.id in(select pid from bs_car_prepare_item where date_>=? and status_=1)";
+			returnCarArgs = new Object[] { startReturnCarDate };
+		} else if (startReturnCarDate == null && endReturnCarDate != null) {
+			// 如果startReturnCarDate 不为空 endPlanDate为空
+			returnCaQl = "p.id in(select pid from bs_car_prepare_item where date_<=? and status_=1)";
+			returnCarArgs = new Object[] { endReturnCarDate };
+		}
+
+		if (returnCaQl != null) {
+			QlCondition returnCarQlc = new QlCondition(returnCaQl,
+					returnCarArgs);
+			and.add(returnCarQlc);
+		}
+
+		return and;
+	}
+
+	@Override
+	protected boolean isIncludeCondition4AdvanceSearch(String name) {
+		// 忽略高级查询中进度计划的日期和实际交车日的日期条件
+		if ("startPlanDate".equals(name) || "endPlanDate".equals(name)
+				|| "startReturnCarDate".equals(name)
+				|| "endReturnCarDate".equals(name))
+			return false;
+		else
+			return true;
 	}
 
 	@Override
@@ -374,8 +479,8 @@ public class CarPreparesAction extends ViewAction<Map<String, Object>> {
 		} else {
 			// 新建按钮
 			tb.addButton(this.getDefaultCreateToolbarButton());
-			// 查看按钮
-			tb.addButton(this.getDefaultOpenToolbarButton());
+			// // 查看按钮
+			// tb.addButton(this.getDefaultOpenToolbarButton());
 			// 编辑按钮
 			tb.addButton(this.getDefaultEditToolbarButton());
 			// 删除按钮
@@ -444,7 +549,6 @@ public class CarPreparesAction extends ViewAction<Map<String, Object>> {
 		// 营运性质列表
 		this.businessTypes = OptionItem.toLabelValues(
 				optionItems.get(OptionConstants.CAR_BUSINESS_NATURE), "value");
-
 	}
 
 	// ==高级搜索代码结束==

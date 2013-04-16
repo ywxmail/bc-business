@@ -3,6 +3,7 @@
  */
 package cn.bc.business.carPrepare.service;
 
+import java.util.Calendar;
 import java.util.Set;
 
 import cn.bc.business.carPrepare.domain.CarPrepare;
@@ -34,11 +35,14 @@ public interface CarPrepareService extends CrudService<CarPrepare> {
 	 *            车辆更新项目Set集合
 	 * @param name
 	 *            项目名称
+	 * @param date更新日期
+	 * @param staus状态
 	 * @param order
 	 *            排序号
 	 */
 	void initializeCarPrepareItemInfo(CarPrepare entity,
-			Set<CarPrepareItem> carPrepareItems, String name, int order);
+			Set<CarPrepareItem> carPrepareItems, String name, Calendar date,
+			int staus, int order);
 
 	/**
 	 * 根据车牌类型和车牌号码查找车辆更新计划信息
@@ -51,4 +55,17 @@ public interface CarPrepareService extends CrudService<CarPrepare> {
 	 */
 	CarPrepare getCarPrepareByPlateTypeAndPlateNo(String plateType,
 			String plateNo);
+
+	/**
+	 * 发起流程
+	 * 
+	 * @param key
+	 *            流程key值
+	 * @param id
+	 *            车辆更新信息的ID
+	 * @param e
+	 *            车辆更新对象
+	 * @return
+	 */
+	String doStartFlow(String key, Long carPrepartId, CarPrepare e);
 }

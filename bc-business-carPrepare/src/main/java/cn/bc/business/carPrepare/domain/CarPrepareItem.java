@@ -20,6 +20,10 @@ import cn.bc.core.EntityImpl;
 @Table(name = "BS_CAR_PREPARE_ITEM")
 public class CarPrepareItem extends EntityImpl {
 	private static final long serialVersionUID = 1L;
+	/** 状态：未完成 */
+	public static final int STATUS_UNFINISHED = 0;
+	/** 状态：已完成 */
+	public static final int STATUS_FINISHED = 1;
 
 	private String name;// 名称
 	private int order;// 排序号

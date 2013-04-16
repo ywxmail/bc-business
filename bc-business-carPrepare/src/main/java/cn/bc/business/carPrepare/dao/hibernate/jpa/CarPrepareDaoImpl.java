@@ -7,7 +7,6 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.util.StringUtils;
 
 import cn.bc.business.carPrepare.dao.CarPrepareDao;
 import cn.bc.business.carPrepare.domain.CarPrepare;
