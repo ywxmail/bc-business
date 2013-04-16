@@ -335,9 +335,7 @@ public class CaseTrafficsAction extends ViewAction<Map<String, Object>> {
 				"b.closer_name",
 				"b.subject",
 				"b.driver_cert",
-				"c.code",
-				"getnewprocessnameandtodotasknames4midmtyle(cit.id,'"
-						+ Case4InfractTraffic.class.getSimpleName() + "')" };
+				"c.code"};
 	}
 
 	@Override
