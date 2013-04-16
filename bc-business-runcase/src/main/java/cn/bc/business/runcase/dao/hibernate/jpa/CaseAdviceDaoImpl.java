@@ -22,6 +22,7 @@ import org.springframework.util.StringUtils;
 import cn.bc.BCConstants;
 import cn.bc.business.runcase.dao.CaseAdviceDao;
 import cn.bc.business.runcase.domain.Case4Advice;
+import cn.bc.business.runcase.domain.Case4InfractBusiness;
 import cn.bc.business.runcase.domain.CaseBase;
 import cn.bc.core.util.DateUtils;
 import cn.bc.identity.web.SystemContext;
@@ -118,12 +119,12 @@ public class CaseAdviceDaoImpl extends HibernateCrudJpaDao<Case4Advice>
 				hql.toString(),
 				new Object[] { startDate, startDate, endDate, endDate,
 						carManId, CaseBase.TYPE_INFRACT_TRAFFIC });
-
 		// 营运违章
 		List list4yingyunweizhang = this.getJpaTemplate().find(
 				hql.toString(),
 				new Object[] { startDate, startDate, endDate, endDate,
 						carManId, CaseBase.TYPE_INFRACT_BUSINESS });
+		
 		// 事故理赔
 		List list4shigulipei = this.getJpaTemplate().find(
 				hql.toString(),
@@ -161,6 +162,27 @@ public class CaseAdviceDaoImpl extends HibernateCrudJpaDao<Case4Advice>
 
 			}
 		}
+		
+		String business_hql="select c.id from Case4InfractBusiness c"
+				+" where ((c.happenDate>? or c.happenDate=?) and (c.happenDate<? or c.happenDate=?))"
+				+"and c.driverId=? and c.type=? and c.category=?";
+		
+		// 营运违章-营运违章
+		List listbusiness4yingyunweizhang = this.getJpaTemplate().find(
+				business_hql,
+				new Object[] { startDate, startDate, endDate, endDate,
+						carManId, CaseBase.TYPE_INFRACT_BUSINESS ,Case4InfractBusiness.CATEGORY_BUSINESS});
+		// 营运违章-站台违章
+		List listbusiness4zhantaiweizhang = this.getJpaTemplate().find(
+				business_hql,
+				new Object[] { startDate, startDate, endDate, endDate,
+						carManId, CaseBase.TYPE_INFRACT_BUSINESS ,Case4InfractBusiness.CATEGORY_STATION});
+		
+		// 营运违章-服务违章
+		List listbusiness4fuwuweizhang = this.getJpaTemplate().find(
+				business_hql,
+				new Object[] { startDate, startDate, endDate, endDate,
+						carManId, CaseBase.TYPE_INFRACT_BUSINESS ,Case4InfractBusiness.CATEGORY_STATION});
 
 		Json json = new Json();
 		json.put("count4keguantousu", list4keguantousu.size());
@@ -174,6 +196,9 @@ public class CaseAdviceDaoImpl extends HibernateCrudJpaDao<Case4Advice>
 		json.put("count4gongsitousu", list4gongsitousu.size());
 		json.put("count4jiaotongweizhang", list4jiaotongweizhang.size());
 		json.put("count4yingyunweizhang", list4yingyunweizhang.size());
+		json.put("countbusiness4yingyunweizhang", listbusiness4yingyunweizhang.size());
+		json.put("countbusiness4zhantaiweizhang", listbusiness4zhantaiweizhang.size());
+		json.put("countbusiness4fuwuweizhang", listbusiness4fuwuweizhang.size());
 		json.put("count4shigulipei", list4shigulipei.size());
 		json.put("startDate",
 				new SimpleDateFormat("yyyy-MM-dd").format(startDate.getTime()));

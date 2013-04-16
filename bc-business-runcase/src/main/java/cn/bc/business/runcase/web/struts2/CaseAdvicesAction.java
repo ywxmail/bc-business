@@ -309,7 +309,7 @@ public class CaseAdvicesAction extends ViewAction<Map<String, Object>> {
 									return "";
 
 								// 获取流程id
-								return this.moduleKey + "."
+								return this.moduleKey + "::"
 										+ processInfo.split(";")[1];
 							}
 						}));
