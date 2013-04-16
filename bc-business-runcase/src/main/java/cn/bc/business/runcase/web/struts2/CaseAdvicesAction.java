@@ -91,7 +91,7 @@ public class CaseAdvicesAction extends ViewAction<Map<String, Object>> {
 		// 构建查询语句,where和order by不要包含在sql中(要统一放到condition中)
 		StringBuffer sql = new StringBuffer();
 		sql.append("select a.id,b.status_,b.type_,a.advice_type,b.subject,b.motorcade_name,b.car_plate,b.driver_name");
-		sql.append(",b.closer_name,b.close_date,a.advisor_name,b.happen_date,a.path_from,a.path_to,a.detail,a.charger");
+		sql.append(",b.closer_name,b.close_date,a.advisor_name,a.advisor_phone,b.happen_date,a.path_from,a.path_to,a.detail,a.charger");
 		sql.append(",b.from_,b.source,b.driver_cert,a.receive_code,a.receive_date ");
 		sql.append(",b.company,c.bs_type,c.code");
 		sql.append(",man.origin");
@@ -129,6 +129,7 @@ public class CaseAdvicesAction extends ViewAction<Map<String, Object>> {
 				map.put("closer_name", rs[i++]);
 				map.put("close_date", rs[i++]);
 				map.put("advisor_name", rs[i++]);
+				map.put("advisor_phone", rs[i++]);
 				map.put("happen_date", rs[i++]);
 				map.put("path_from", rs[i++]);
 				map.put("path_to", rs[i++]);
@@ -308,7 +309,7 @@ public class CaseAdvicesAction extends ViewAction<Map<String, Object>> {
 									return "";
 
 								// 获取流程id
-								return this.moduleKey + "."
+								return this.moduleKey + "::"
 										+ processInfo.split(";")[1];
 							}
 						}));
@@ -350,6 +351,13 @@ public class CaseAdvicesAction extends ViewAction<Map<String, Object>> {
 				getText("runcase.businessType"), 80));
 		columns.add(new TextColumn4MapKey("man.origin", "origin",
 				getText("runcase.origin"), 150));
+		
+		columns.add(new TextColumn4MapKey("a.advisor_name", "advisor_name",
+				getText("runcase.advisorName"), 70));
+		columns.add(new TextColumn4MapKey("a.advisor_phone", "advisor_phone",
+				getText("runcase.advisorPhone"), 100));
+		columns.add(new TextColumn4MapKey("a.detail", "detail",
+				getText("runcase.detail"), 150).setUseTitleFromLabel(true));
 
 		columns.add(new HiddenColumn4MapKey("type", "type_"));
 

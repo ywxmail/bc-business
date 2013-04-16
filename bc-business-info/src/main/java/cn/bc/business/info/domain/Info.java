@@ -35,6 +35,8 @@ public class Info extends RichFileEntityImpl {
 	public static final int TYPE_NOTICE = 2;
 	/** 类型：督查分数文件 */
 	public static final int TYPE_INSPECTIONFILE = 3;
+	/** 类型：政府文件 */
+	public static final int TYPE_GOVERNMENT = 4;
 	/** 类型：邮件 */
 	public static final int TYPE_EMAIL = 9;
 

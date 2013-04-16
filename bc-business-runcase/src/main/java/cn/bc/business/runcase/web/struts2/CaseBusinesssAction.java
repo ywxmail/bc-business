@@ -288,7 +288,7 @@ public class CaseBusinesssAction extends ViewAction<Map<String, Object>> {
 								return "";
 							
 							//获取流程id
-							return this.moduleKey+"."+processInfo.split(";")[1];
+							return this.moduleKey+"::"+processInfo.split(";")[1];
 						}
 					}));
 		}

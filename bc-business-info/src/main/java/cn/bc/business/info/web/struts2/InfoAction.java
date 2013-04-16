@@ -174,6 +174,7 @@ public class InfoAction extends FileEntityAction<Long, Info> implements
 		types.put(String.valueOf(Info.TYPE_INSPECTIONFILE),
 				getText("inspectionFile"));
 		types.put(String.valueOf(Info.TYPE_NOTICE), getText("notice"));
+		types.put(String.valueOf(Info.TYPE_GOVERNMENT), getText("government"));
 		return types;
 	}
 
