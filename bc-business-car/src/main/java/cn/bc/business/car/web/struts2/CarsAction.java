@@ -76,6 +76,12 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 		return context.hasAnyRole(getText("key.role.bs.car.entering"));
 	}
 
+	public boolean isNewBuyEntering() {
+		// 新购车辆信息录入
+		SystemContext context = (SystemContext) this.getContext();
+		return context.hasAnyRole(getText("key.role.bs.car.newBuy.entering"));
+	}
+
 	public boolean isCheck() {
 		// 车辆草稿信息查看
 		SystemContext context = (SystemContext) this.getContext();
@@ -202,7 +208,7 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 		// 状态
 		columns.add(new TextColumn4MapKey("c.status_", "status_",
 				getText("car.status"), 40).setSortable(true).setValueFormater(
-				new EntityStatusFormater(getCarStatuses())));
+				new EntityStatusFormater(getCarStatuses4All())));
 		// 公司
 		columns.add(new TextColumn4MapKey("c.company", "company",
 				getText("label.carCompany"), 40).setSortable(true)
@@ -450,12 +456,26 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 
 		// 状态单选按钮组
 		// 如果有权限的用户可以看到草稿状态的车
-		if (!isReadonly() || this.isEntering() || this.isCheck()) {
+		if ((!isReadonly() || this.isEntering() || this.isCheck())
+				&& !isNewBuyEntering()) {
 			tb.addButton(Toolbar.getDefaultToolbarRadioGroup(
-					this.getCarStatuses(), "status", 0,
+					this.getCarStatuses4Draft(), "status", 0,
 					getText("title.click2changeSearchStatus")));
 
+		} else if (isNewBuyEntering()
+				&& !(!isReadonly() || this.isEntering() || this.isCheck())) {
+			// 拥有新购车辆录入权限
+			tb.addButton(Toolbar.getDefaultToolbarRadioGroup(
+					this.getCarStatuses4NewBuy(), "status", 0,
+					getText("title.click2changeSearchStatus")));
+		} else if (isNewBuyEntering()
+				&& (!isReadonly() || this.isEntering() || this.isCheck())) {
+			// 查看全部
+			tb.addButton(Toolbar.getDefaultToolbarRadioGroup(
+					this.getCarStatuses4All(), "status", 0,
+					getText("title.click2changeSearchStatus")));
 		} else {
+			// 无权限
 			tb.addButton(Toolbar.getDefaultToolbarRadioGroup(
 					this.getBSStatuses1(), "status", 0,
 					getText("title.click2changeSearchStatus")));
@@ -469,11 +489,45 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 	}
 
 	/**
+	 * 状态值转换列表：在案|注销|新购|全部
+	 * 
+	 * @return
+	 */
+	protected Map<String, String> getCarStatuses4NewBuy() {
+		Map<String, String> statuses = new LinkedHashMap<String, String>();
+		statuses.put(String.valueOf(Car.CAR_STAUTS_NORMAL),
+				getText("bs.status.active"));
+		statuses.put(String.valueOf(Car.CAR_STAUTS_LOGOUT),
+				getText("bs.status.logout"));
+		statuses.put(String.valueOf(Car.CAR_STAUTS_NEWBUY),
+				getText("bc.status.newBuy"));
+		statuses.put("-2,0,1", getText("bs.status.all"));
+		return statuses;
+	}
+
+	/**
+	 * 状态值转换列表：在案|注销|草稿|全部
+	 * 
+	 * @return
+	 */
+	protected Map<String, String> getCarStatuses4Draft() {
+		Map<String, String> statuses = new LinkedHashMap<String, String>();
+		statuses.put(String.valueOf(Car.CAR_STAUTS_NORMAL),
+				getText("bs.status.active"));
+		statuses.put(String.valueOf(Car.CAR_STAUTS_LOGOUT),
+				getText("bs.status.logout"));
+		statuses.put(String.valueOf(BCConstants.STATUS_DRAFT),
+				getText("bc.status.draft"));
+		statuses.put("-1,0,1", getText("bs.status.all"));
+		return statuses;
+	}
+
+	/**
 	 * 状态值转换列表：在案|注销|草稿|新购|全部
 	 * 
 	 * @return
 	 */
-	protected Map<String, String> getCarStatuses() {
+	protected Map<String, String> getCarStatuses4All() {
 		Map<String, String> statuses = new LinkedHashMap<String, String>();
 		statuses.put(String.valueOf(Car.CAR_STAUTS_NORMAL),
 				getText("bs.status.active"));

@@ -139,6 +139,12 @@ public class CarAction extends FileEntityAction<Long, Car> {
 		return context.hasAnyRole(getText("key.role.bs.car.entering"));
 	}
 
+	public boolean isNewBuyEntering() {
+		// 新购车辆信息录入
+		SystemContext context = (SystemContext) this.getContext();
+		return context.hasAnyRole(getText("key.role.bs.car.newBuy.entering"));
+	}
+
 	public boolean isCheckOwnershipNumber() {
 		// 车辆经营权号查看
 		SystemContext context = (SystemContext) this.getContext();
@@ -179,10 +185,16 @@ public class CarAction extends FileEntityAction<Long, Car> {
 			// 保存为草稿
 			pageOption.addButton(new ButtonOption(getText("label.save4Draft"),
 					null, "bc.carForm.save"));
+		}
+		// 如果有新购车辆录入权限的就有保存为新购车辆按钮
+		if (isNewBuyEntering()
+				&& (this.getE().getStatus() == BCConstants.STATUS_DRAFT || this
+						.getE().getStatus() == Car.CAR_STAUTS_NEWBUY)) {
 			// 保存为新购[新购买的车辆]
 			pageOption.addButton(new ButtonOption(getText("label.save4NewBuy"),
 					null, "bc.carForm.save4NewBuy"));
 		}
+
 	}
 
 	@Override
