@@ -63,9 +63,6 @@ public class CarPrepareAction extends FileEntityAction<Long, CarPrepare> {
 	private AttachService attachService;
 	public CarService carService;
 	public AttachWidget attachsUI;
-	public Long carId;
-	public Long unitId;
-	public Long motorcadeId;
 	public Map<String, String> statusesValue;
 	public List<Map<String, String>> businessTypeList; // 合同性质列表
 	public List<Map<String, String>> companyList; // 所属公司列表（宝城、广发）
@@ -78,6 +75,9 @@ public class CarPrepareAction extends FileEntityAction<Long, CarPrepare> {
 	public String plan4Year;// 根据年度来生成车辆更新计划
 	public String plan4Month;// 根据月度来生成车辆更新计划
 	public String company;// 所属公司
+	public String plateType;// 车牌类型
+	public String plateNo;// 车牌号码
+
 	public List<Map<String, Object>> workflowModuleRelations; // 工作流程集合
 
 	@Autowired
@@ -179,7 +179,6 @@ public class CarPrepareAction extends FileEntityAction<Long, CarPrepare> {
 								.getString("date"));
 						if (date != null) {
 							resource.setDate(date);
-
 						}
 					}
 					resource.setStatus(json.getInt("status"));
@@ -216,8 +215,8 @@ public class CarPrepareAction extends FileEntityAction<Long, CarPrepare> {
 				carPrepareItems, "交车", null, CarPrepareItem.STATUS_UNFINISHED,
 				1);
 		this.carPrepareService.initializeCarPrepareItemInfo(entity,
-				carPrepareItems, "二手车行提车", null,
-				CarPrepareItem.STATUS_UNFINISHED, 2);
+				carPrepareItems, "提车", null, CarPrepareItem.STATUS_UNFINISHED,
+				2);
 		this.carPrepareService.initializeCarPrepareItemInfo(entity,
 				carPrepareItems, "报停计价器", null,
 				CarPrepareItem.STATUS_UNFINISHED, 3);
@@ -228,14 +227,17 @@ public class CarPrepareAction extends FileEntityAction<Long, CarPrepare> {
 				carPrepareItems, "报停车", null, CarPrepareItem.STATUS_UNFINISHED,
 				5);
 		this.carPrepareService.initializeCarPrepareItemInfo(entity,
-				carPrepareItems, "办新车指标", null,
-				CarPrepareItem.STATUS_UNFINISHED, 6);
+				carPrepareItems, "办指标", null, CarPrepareItem.STATUS_UNFINISHED,
+				6);
+		this.carPrepareService.initializeCarPrepareItemInfo(entity,
+				carPrepareItems, "回指标", null, CarPrepareItem.STATUS_UNFINISHED,
+				7);
 		this.carPrepareService.initializeCarPrepareItemInfo(entity,
 				carPrepareItems, "新车上牌", null,
-				CarPrepareItem.STATUS_UNFINISHED, 7);
+				CarPrepareItem.STATUS_UNFINISHED, 8);
 		this.carPrepareService.initializeCarPrepareItemInfo(entity,
 				carPrepareItems, "出车", null, CarPrepareItem.STATUS_UNFINISHED,
-				8);
+				9);
 		entity.setCarPrepareItem(carPrepareItems);
 	}
 
@@ -274,8 +276,15 @@ public class CarPrepareAction extends FileEntityAction<Long, CarPrepare> {
 		// OptionItem.insertIfNotExist(companyList, null,
 		// getE().getC1Company());
 		// 车架号列表
-		this.carVinList = carService.findCarVin4Option(
-				new Integer[] { Car.CAR_STAUTS_NEWBUY }, null, true);
+		if (this.getE().getC2Company() != null
+				&& this.getE().getC2Company().length() != 0) {
+			this.carVinList = carService.findCarVin4Option(
+					new Integer[] { Car.CAR_STAUTS_NEWBUY }, this.getE()
+							.getC2Company(), true);
+		} else {
+			this.carVinList = carService.findCarVin4Option(
+					new Integer[] { Car.CAR_STAUTS_NEWBUY }, null, true);
+		}
 		if (this.getE().getC2Vin() != null) {
 			Map<String, String> map = new HashMap<String, String>();
 			String vinValue = this.getE().getC2Vin();
@@ -326,6 +335,42 @@ public class CarPrepareAction extends FileEntityAction<Long, CarPrepare> {
 		return "json";
 	}
 
+	// 根据根据根据车牌号码检查是否已存在更新记录
+	public String isExistingCarPrepare() {
+		JSONObject json = new JSONObject();
+		try {
+			if (plateType != null && plateNo != null) {
+				CarPrepare c = this.carPrepareService
+						.getCarPrepareByPlateTypeAndPlateNo(plateType, plateNo);
+				if (c != null) {
+					if (this.getId() == null) {
+						json.put("success", false);
+						json.put("msg", "已经存在" + plateType + "." + plateNo
+								+ "的车辆更新信息，不能再创建！");
+					} else {
+						if (this.getId().equals(c.getId())) {
+							json.put("success", true);
+						} else {
+							json.put("success", false);
+							json.put("msg", "已经存在" + plateType + "." + plateNo
+									+ "的车辆更新信息，不能再新建！");
+						}
+					}
+				} else {
+					json.put("success", true);
+				}
+			} else {
+				json.put("success", false);
+				json.put("msg", "旧车车牌信息不全！");
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+
+		this.json = json.toString();
+		return "json";
+	}
+
 	@Override
 	protected PageOption buildFormPageOption(boolean editable) {
 
@@ -339,7 +384,8 @@ public class CarPrepareAction extends FileEntityAction<Long, CarPrepare> {
 		// 添加默认的保存按钮
 		pageOption.addButton(new ButtonOption(getText("label.save"), null,
 				"bs.carPrepareForm.save"));
-		// }
+		pageOption.addButton(new ButtonOption(getText("label.saveAndClose"),
+				null, "bs.carPrepareForm.saveAndClose"));
 	}
 
 	// ---发起流程---开始---

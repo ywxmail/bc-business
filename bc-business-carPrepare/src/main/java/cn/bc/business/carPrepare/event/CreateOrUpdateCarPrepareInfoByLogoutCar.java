@@ -156,7 +156,7 @@ public class CreateOrUpdateCarPrepareInfoByLogoutCar implements
 						carPrepareItems, "交车", returnDate,
 						CarPrepareItem.STATUS_FINISHED, 1);
 				carPrepareService.initializeCarPrepareItemInfo(newCarPrepare,
-						carPrepareItems, "二手车行提车", null,
+						carPrepareItems, "提车", null,
 						CarPrepareItem.STATUS_UNFINISHED, 2);
 				carPrepareService.initializeCarPrepareItemInfo(newCarPrepare,
 						carPrepareItems, "报停计价器", null,
@@ -168,14 +168,17 @@ public class CreateOrUpdateCarPrepareInfoByLogoutCar implements
 						carPrepareItems, "报停车", null,
 						CarPrepareItem.STATUS_UNFINISHED, 5);
 				carPrepareService.initializeCarPrepareItemInfo(newCarPrepare,
-						carPrepareItems, "办新车指标", null,
+						carPrepareItems, "办指标", null,
 						CarPrepareItem.STATUS_UNFINISHED, 6);
 				carPrepareService.initializeCarPrepareItemInfo(newCarPrepare,
-						carPrepareItems, "新车上牌", null,
+						carPrepareItems, "回指标", null,
 						CarPrepareItem.STATUS_UNFINISHED, 7);
 				carPrepareService.initializeCarPrepareItemInfo(newCarPrepare,
-						carPrepareItems, "出车", null,
+						carPrepareItems, "新车上牌", null,
 						CarPrepareItem.STATUS_UNFINISHED, 8);
+				carPrepareService.initializeCarPrepareItemInfo(newCarPrepare,
+						carPrepareItems, "出车", null,
+						CarPrepareItem.STATUS_UNFINISHED, 9);
 				newCarPrepare.setCarPrepareItem(carPrepareItems);
 				carPrepareService.save(newCarPrepare);
 			}

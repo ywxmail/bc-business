@@ -4,6 +4,7 @@
 package cn.bc.business.carPrepare.web.struts2;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -17,7 +18,6 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
-import cn.bc.BCConstants;
 import cn.bc.business.OptionConstants;
 import cn.bc.business.carPrepare.domain.CarPrepare;
 import cn.bc.business.motorcade.service.MotorcadeService;
@@ -40,6 +40,7 @@ import cn.bc.identity.service.ActorService;
 import cn.bc.identity.web.SystemContext;
 import cn.bc.option.domain.OptionItem;
 import cn.bc.option.service.OptionService;
+import cn.bc.web.formater.AbstractFormater;
 import cn.bc.web.formater.CalendarFormater;
 import cn.bc.web.formater.EntityStatusFormater;
 import cn.bc.web.formater.LinkFormater4Id;
@@ -61,10 +62,8 @@ import cn.bc.web.ui.json.Json;
 @Controller
 public class CarPreparesAction extends ViewAction<Map<String, Object>> {
 	private static final long serialVersionUID = 1L;
-	public String status = String.valueOf(BCConstants.STATUS_ENABLED); // 车辆保单的状态，多个用逗号连接
+	public String status = String.valueOf(CarPrepare.STATUS_INTHEUPDATE);// 打开视图时默认为更新中状态
 	public Long carId;
-	public Long main;// 主体： 0-当前版本,1-历史版本
-	public Long policyId;// 合同ID
 	public String startPlanDate = null;// 计划的开始日期
 	public String endPlanDate = null;// 计划的结束日期
 
@@ -102,7 +101,7 @@ public class CarPreparesAction extends ViewAction<Map<String, Object>> {
 				+ startPlanDate
 				+ "','"
 				+ endPlanDate
-				+ "') unFinishedPlanProgress,getReturnCarDate4CarPrepare(p.id) returnCarDate");
+				+ "') unFinishedPlanProgress,getReturnCarDate4CarPrepare(p.id) returnCarDate,getCarActiveDate4CarPrepare(p.id) carActiveDate");
 		sql.append(",p.c1_contract_end_date,p.c1_greenslip_end_date,p.c1_commerial_end_date,p.c1_bs_type,p.c1_scrapto,p.c2_indicator");
 		sql.append(",p.c2_plate_type,p.c2_plate_no,p.c2_company,bia.name c2Brach,m2.name c2Motorcade,p.c1_motorcade,p.c2_motorcade");
 		sql.append(" from bs_car_prepare p");
@@ -137,6 +136,7 @@ public class CarPreparesAction extends ViewAction<Map<String, Object>> {
 				map.put("unFinishedProgress", rs[i++]);
 				map.put("unFinishedPlanProgress", rs[i++]);
 				map.put("returnCarDate", rs[i++]);
+				map.put("carActiveDate", rs[i++]);
 				map.put("c1_contract_end_date", rs[i++]);
 				map.put("c1_greenslip_end_date", rs[i++]);
 				map.put("c1_commerial_end_date", rs[i++]);
@@ -166,15 +166,53 @@ public class CarPreparesAction extends ViewAction<Map<String, Object>> {
 		columns.add(new IdColumn4MapKey("p.id", "id"));
 		// 状态
 		columns.add(new TextColumn4MapKey("p.status_", "status_",
-				getText("carPrepare.status"), 40).setSortable(true)
+				getText("carPrepare.status"), 45).setSortable(true)
 				.setValueFormater(
 						new EntityStatusFormater(this.getCarPrepareStatuses())));
-		columns.add(new TextColumn4MapKey("p.code", "code",
-				getText("carPrepare.code"), 75).setSortable(true)
-				.setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("p.plan_date", "returnCarDate",
-				getText("carPrepare.returnCarDate"), 100).setSortable(true)
+				getText("carPrepare.returnCarDate"), 90).setSortable(true)
 				.setUseTitleFromLabel(true));
+		columns.add(new TextColumn4MapKey("p.plan_date", "carActiveDate",
+				getText("carPrepare.carActiveDate"), 90).setSortable(true)
+				.setUseTitleFromLabel(true));
+		// 更新天数
+		columns.add(new TextColumn4MapKey("carActiveDate", "carActiveDate",
+				getText("carPrepare.updateDays"), 30)
+				.setUseTitleFromLabel(true).setSortable(true)
+				.setValueFormater(new AbstractFormater<String>() {
+					@SuppressWarnings("unchecked")
+					@Override
+					public String format(Object context, Object value) {
+						Map<String, Object> carPrepare = (Map<String, Object>) context;
+						// 更新天数为出车日期减去交车日期
+						// 或当前日期减去交车日期(未有出车日期但有交车日期时)
+						if (carPrepare.get("returnCarDate") != null) {
+							// 交车日期
+							Calendar returnCarDate = DateUtils
+									.getCalendar(carPrepare
+											.get("returnCarDate").toString());
+							// 当前日期
+							Calendar nowDate = Calendar.getInstance();
+							// 出车日期
+							if (carPrepare.get("carActiveDate") != null) {
+								Calendar carActiveDate = DateUtils
+										.getCalendar(carPrepare.get(
+												"carActiveDate").toString());
+								return String.valueOf((carActiveDate.getTime()
+										.getTime() - returnCarDate.getTime()
+										.getTime())
+										/ (1000 * 60 * 60 * 24));
+							} else {
+								return String.valueOf((nowDate.getTime()
+										.getTime() - returnCarDate.getTime()
+										.getTime())
+										/ (1000 * 60 * 60 * 24));
+							}
+						} else {
+							return "";
+						}
+					}
+				}));
 		columns.add(new TextColumn4MapKey("p.code", "updateTheProgress",
 				getText("carPrepare.updateTheProgress"), 195).setSortable(true)
 				.setUseTitleFromLabel(true));
@@ -184,7 +222,7 @@ public class CarPreparesAction extends ViewAction<Map<String, Object>> {
 		if (!isReadonly()) {
 			columns.add(new TextColumn4MapKey("p.code",
 					"unFinishedPlanProgress",
-					getText("carPrepare.unFinishedPlanProgress"), 115)
+					getText("carPrepare.unFinishedPlanProgress"), 195)
 					.setSortable(true).setUseTitleFromLabel(true));
 		}
 		// 车号
@@ -233,23 +271,26 @@ public class CarPreparesAction extends ViewAction<Map<String, Object>> {
 		columns.add(new TextColumn4MapKey("p.plan_date", "plan_date",
 				getText("carPrepare.planDate"), 100).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
+		columns.add(new TextColumn4MapKey("p.code", "code",
+				getText("carPrepare.code"), 65).setSortable(true)
+				.setUseTitleFromLabel(true));
 		// 车辆登记日期
 		columns.add(new TextColumn4MapKey("p.c1_register_date",
-				"c1_register_date", getText("carPrepare.C1RegisterDate"), 100)
+				"c1_register_date", getText("carPrepare.C1RegisterDate"), 90)
 				.setSortable(true).setValueFormater(
 						new CalendarFormater("yyyy-MM-dd")));
 		columns.add(new TextColumn4MapKey("p.c1_contract_end_date",
 				"c1_contract_end_date",
-				getText("carPrepare.C1ContractEndDate"), 100).setSortable(true)
+				getText("carPrepare.C1ContractEndDate"), 90).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
 		columns.add(new TextColumn4MapKey("p.c1_greenslip_end_date",
 				"c1_greenslip_end_date",
-				getText("carPrepare.C1GreenslipEndDate"), 100)
+				getText("carPrepare.C1GreenslipEndDate"), 90)
 				.setSortable(true).setValueFormater(
 						new CalendarFormater("yyyy-MM-dd")));
 		columns.add(new TextColumn4MapKey("p.c1_commerial_end_date",
 				"c1_commerial_end_date",
-				getText("carPrepare.C1CommeriaEndDate"), 100).setSortable(true)
+				getText("carPrepare.C1CommeriaEndDate"), 90).setSortable(true)
 				.setValueFormater(new CalendarFormater("yyyy-MM-dd")));
 		columns.add(new TextColumn4MapKey("p.c1_bs_type", "c1_bs_type",
 				getText("carPrepare.C1BsType"), 75).setSortable(true)
@@ -405,7 +446,7 @@ public class CarPreparesAction extends ViewAction<Map<String, Object>> {
 
 	@Override
 	protected PageOption getHtmlPageOption() {
-		return super.getHtmlPageOption().setWidth(900).setMinWidth(400)
+		return super.getHtmlPageOption().setWidth(1250).setMinWidth(400)
 				.setHeight(400).setMinHeight(300);
 	}
 
@@ -495,8 +536,8 @@ public class CarPreparesAction extends ViewAction<Map<String, Object>> {
 		tb.addButton(this.getDefaultSearchToolbarButton());
 
 		return tb.addButton(Toolbar.getDefaultToolbarRadioGroup(
-				getCarPrepareStatuses(), "status", 0,
-				getText("title.click2changeSearchClasses")));
+				getCarPrepareStatuses(), "status", 1,
+				getText("title.click2changeSearchStatus")));
 	}
 
 	protected String getHtmlPageJs() {

@@ -6,6 +6,7 @@ package cn.bc.business.carPrepare.service;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -201,7 +202,7 @@ public class CarPrepareServiceImpl extends DefaultCrudService<CarPrepare>
 								carPrepareItems, "交车", null,
 								CarPrepareItem.STATUS_UNFINISHED, 1);
 						initializeCarPrepareItemInfo(carPrepare,
-								carPrepareItems, "二手车行提车", null,
+								carPrepareItems, "提车", null,
 								CarPrepareItem.STATUS_UNFINISHED, 2);
 						initializeCarPrepareItemInfo(carPrepare,
 								carPrepareItems, "报停计价器", null,
@@ -213,14 +214,17 @@ public class CarPrepareServiceImpl extends DefaultCrudService<CarPrepare>
 								carPrepareItems, "报停车", null,
 								CarPrepareItem.STATUS_UNFINISHED, 5);
 						initializeCarPrepareItemInfo(carPrepare,
-								carPrepareItems, "办新车指标", null,
+								carPrepareItems, "办指标", null,
 								CarPrepareItem.STATUS_UNFINISHED, 6);
 						initializeCarPrepareItemInfo(carPrepare,
-								carPrepareItems, "新车上牌", null,
+								carPrepareItems, "回指标", null,
 								CarPrepareItem.STATUS_UNFINISHED, 7);
 						initializeCarPrepareItemInfo(carPrepare,
-								carPrepareItems, "出车", null,
+								carPrepareItems, "新车上牌", null,
 								CarPrepareItem.STATUS_UNFINISHED, 8);
+						initializeCarPrepareItemInfo(carPrepare,
+								carPrepareItems, "出车", null,
+								CarPrepareItem.STATUS_UNFINISHED, 9);
 						carPrepare.setCarPrepareItem(carPrepareItems);
 						this.carPrepareDao.save(carPrepare);
 					} else {
@@ -298,6 +302,8 @@ public class CarPrepareServiceImpl extends DefaultCrudService<CarPrepare>
 		car.setCode(carPrepare.getC2CarCode());
 		car.setStatus(BCConstants.STATUS_DRAFT);
 		car.setManageNo(carPrepare.getC2ManageNo());
+		car.setOriginNo(carPrepare.getC1PlateNo());
+		car.setCertNo2(carPrepare.getCode());
 		car = this.carDao.save(car);
 		// 发起流程
 		String procInstId = this.workflowService.startFlowByKey(key,
@@ -341,7 +347,21 @@ public class CarPrepareServiceImpl extends DefaultCrudService<CarPrepare>
 				.put("certFwzg4Driver2_gl", carPrepare.getC2CertFWZG4Driver2());
 		variables.put("charger4driver2", carPrepare.getC2Nature4Driver2());
 		// 管理号
-		variables.put("manageNo_gl", carPrepare.getC2ManageNo());
+		variables
+				.put("manageNo_gl", String.valueOf(carPrepare.getC2ManageNo()));
+		// 出车日期
+		Set<CarPrepareItem> carPrepareItems = carPrepare.getCarPrepareItem();
+		if (!carPrepareItems.isEmpty()) {
+			Iterator<CarPrepareItem> n = carPrepareItems.iterator();
+			while (n.hasNext()) {
+				CarPrepareItem cp = n.next();
+				if (cp.getName().equals("出车") || cp.getName().equals("迁入")) {
+					variables.put("carActiveDate_gl", DateUtils.formatCalendar(
+							cp.getDate(), "yyyy-MM-dd"));
+				}
+			}
+		}
+
 		// 分公司 //车队
 		if (carPrepare.getC2Motorcade() != null) {
 			Motorcade motorcade = this.motorcadeDao.load(carPrepare

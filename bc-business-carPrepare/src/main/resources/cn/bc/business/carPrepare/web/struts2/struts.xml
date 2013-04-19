@@ -26,5 +26,8 @@
 		<action name="startFlow" class="carPrepareAction" method="startFlow" />
 		<!-- 根据公司获取可用的车架号 -->
 		<action name="getVinByCompany" class="carPrepareAction" method="getVinByCompany" />
+		<!-- 根据根据车牌号码检查是否已存在更新记录 -->
+		<action name="isExistingCarPrepare" class="carPrepareAction"
+			method="isExistingCarPrepare" />
 	</package>
 </struts>
