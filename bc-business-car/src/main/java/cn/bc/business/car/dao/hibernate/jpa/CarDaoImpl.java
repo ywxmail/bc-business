@@ -847,15 +847,16 @@ public class CarDaoImpl extends HibernateCrudJpaDao<Car> implements CarDao {
 
 	public String getCarRelevantInfoByPlateNo(String plateNo) {
 		Object[] args;
-		String sql = "select c.bs_type,c.cert_no2,getContract4ChargerScrapTo(c.id) scrapto,c.scrap_date,c.register_date,bc.end_date contractEndDate,c.company,c.motorcade_id "
+		String sql = "with t (car_id,contract_id,end_date,status_) as ( "
+				+ "select c1.car_id,c1.contract_id,c2.end_date,c2.status_ from bs_car_contract c1 inner join bs_contract c2 on c2.id=c1.contract_id "
+				+ "inner join bs_contract_charger c3 on c3.id=c2.id) "
+				+ "select c.bs_type,c.cert_no2,getContract4ChargerScrapTo(c.id) scrapto,c.scrap_date,c.register_date,t.end_date contractEndDate,c.company,c.motorcade_id "
 				+ ",p.commerial_end_date,(case when (p.greenslip_same_date=true) then p.commerial_end_date else p.greenslip_end_date end)greenslip_end_date "
-				+ "from bs_car c "
-				+ "left join bs_car_policy p on p.car_id = c.id "
-				+ "left join bs_car_contract bcc on bcc.car_id = c.id "
-				+ "left join bs_contract bc on bc.id = bcc.contract_id "
-				+ "where c.plate_no=? and (p.status_ =? or p.id is null) and (bc.status_ =? or bc.id is null) and bc.type_=?";
-		args = new Object[] { plateNo, BCConstants.STATUS_ENABLED,
-				BCConstants.STATUS_ENABLED, Contract.TYPE_CHARGER };
+				+ "from bs_car c left join bs_car_policy p on (p.car_id = c.id and (p.status_ =? or p.id is null)) "
+				+ "left join t t on t.car_id = c.id and t.status_ =? where c.plate_no=?";
+		// , Contract.TYPE_CHARGER
+		args = new Object[] { BCConstants.STATUS_ENABLED,
+				BCConstants.STATUS_ENABLED, plateNo };
 		if (logger.isDebugEnabled()) {
 			logger.debug("sql=" + sql);
 			logger.debug("args="
@@ -871,6 +872,7 @@ public class CarDaoImpl extends HibernateCrudJpaDao<Car> implements CarDao {
 		}
 
 		Json json = new Json();
+
 		if (carInfo != null && carInfo.size() != 0) {
 
 			json.put("success", true);
