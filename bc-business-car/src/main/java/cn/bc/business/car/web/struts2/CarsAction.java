@@ -299,7 +299,7 @@ public class CarsAction extends ViewAction<Map<String, Object>> {
 				getText("car.certNo3"), 70).setUseTitleFromLabel(true));
 		// 车架号
 		columns.add(new TextColumn4MapKey("c.vin", "vin", getText("car.vin"),
-				150).setUseTitleFromLabel(true));
+				160).setUseTitleFromLabel(true));
 		// 发动机号
 		columns.add(new TextColumn4MapKey("c.engine_no", "engine_no",
 				getText("car.engineNo"), 70).setUseTitleFromLabel(true));
