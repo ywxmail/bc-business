@@ -299,7 +299,7 @@ public class CarPreparesAction extends ViewAction<Map<String, Object>> {
 				getText("carPrepare.C1Scrapto"), 75).setSortable(true)
 				.setUseTitleFromLabel(true));
 		columns.add(new TextColumn4MapKey("p.c2_indicator", "c2_indicator",
-				getText("carPrepare.C2Indicator"), 100).setSortable(true)
+				getText("carPrepare.C2Indicator"), 110).setSortable(true)
 				.setUseTitleFromLabel(true));
 		// 车号
 		columns.add(new TextColumn4MapKey("p.c2_plate_no", "c2Plate",
