@@ -41,7 +41,6 @@ import cn.bc.web.ui.json.Json;
 import cn.bc.workflow.flowattach.domain.FlowAttach;
 import cn.bc.workflow.flowattach.service.FlowAttachService;
 import cn.bc.workflow.service.WorkflowModuleRelationService;
-import cn.bc.workflow.service.WorkspaceServiceImpl;
 
 /**
  * 司机招聘信息表单Action
@@ -295,176 +294,32 @@ public class TempDriverAction extends FileEntityAction<Long, TempDriver> {
 	/*
 	        发起服务资格证流程的验证 
 	 */
-	public String requestServiceCertificateValidate(){
+	public String requestServiceCertificateValidate() throws Exception{
 		Json json = new Json();
-		if(this.driverId==null){
+		if(this.getId()==null){
 			json.put("validate", false);
-			json.put("validate_lost_type", 0);
-			json.put("msg", "driverId is null!");
+			json.put("msg", "id is null!");
 			this.json=json.toString();
 			return "json";
 		}
 		
 		String carManEntryKey=getText("tempDriverWorkFlow.startFlow.key");
-		
-		//不存在流程关系
-		if(!this.workflowModuleRelationService.hasRelation4Key(driverId
-				,TempDriver.WORKFLOW_MTYPE,carManEntryKey)){
-			json.put("validate", false);
-			json.put("validate_lost_type", 1);
-			this.json=json.toString();
-			return "json";
-		}
-		
-		//获取最新的司机入职流程相关参数
-		Map<String,Object> wmr=
-				this.workflowModuleRelationService.findList(driverId, TempDriver.WORKFLOW_MTYPE
-				,carManEntryKey,new String[] {"isGiveUp","isPass","isPairDriver","pairDriverName","pairDriverNameId" }).get(0);
-		
-		//设置流程的信息
-		json.put("pid", wmr.get("pid").toString());
-		json.put("pname", wmr.get("name").toString());
-		
-		//流程状态非已结束
-		if(!(WorkspaceServiceImpl.COMPLETE==Integer.valueOf(wmr.get("status").toString()))){
-			json.put("validate", false);
-			json.put("validate_lost_type", 2);
-			this.json=json.toString();
-			return "json";
-		}
-		
-		//放弃入职审批
-		if("1".equals(wmr.get("isGiveUp").toString())){
-			json.put("validate", false);
-			json.put("validate_lost_type", 3);
-			this.json=json.toString();
-			return "json";
-		}
-		
-		//入职审批流程不通过
-		if("0".equals(wmr.get("isPass").toString())){
-			json.put("validate", false);
-			json.put("validate_lost_type", 4);
-			this.json=json.toString();
-			return "json";
-		}
-		
-		//入职通过，但没有对班
-		if("0".equals(wmr.get("isPairDriver").toString())){
-			json.put("validate", true);
-			json.put("isPairDriver", false);
-			this.json=json.toString();
-			return "json";
-		}
-		
-		//对班司机
-		Long pairDriverNameId = Long.valueOf(wmr.get("pairDriverNameId").toString());
-		
-		this.pairDriverValidate(json, pairDriverNameId, carManEntryKey);
-		this.json=json.toString();
-		
-		return "json";
-	}
-	
-	//对班司机的司机入职审批流程验证
-	private void pairDriverValidate(Json json,Long id,String carManEntryKey){
-		json.put("isPairDriver", true);
-		TempDriver pairDriver=this.tempDriverService.load(id);
-		//设置对班司机信息
-		json.put("pair_id", id.toString());
-		json.put("pair_name", pairDriver.getName());
-		json.put("pair_applyAttr", pairDriver.getApplyAttr());//申请属性
-		//设置对班司机的身份证很从业资格证
-		json.put("pair_certIdentity", pairDriver.getCertIdentity());
-		json.put("pair_certCYZG", pairDriver.getCertCYZG());
-		
-		boolean validate=true;
-		
-		//不存在流程关系
-		if(!this.workflowModuleRelationService.hasRelation4Key(id,TempDriver.WORKFLOW_MTYPE,carManEntryKey)){
-			validate=false;
-			json.put("validate", validate);
-			json.put("validate_pair_lost_type", 1);//没有流程关系
-		}else{
-			//获取对班司机最新的司机入职流程相关参数
-			Map<String,Object> wmr4pair=this.workflowModuleRelationService.findList(id, TempDriver.WORKFLOW_MTYPE
-					,carManEntryKey,new String[] { "isGiveUp","isPass","isPairDriver","pairDriverName","pairDriverNameId"}).get(0);
-		
-			//设置对班司机最新参与的流程信息
-			json.put("pair_pid", wmr4pair.get("pid").toString());
-			json.put("pair_pname", wmr4pair.get("name").toString());
-			
-			
-			//流程未结束
-			if(!(WorkspaceServiceImpl.COMPLETE==Integer.valueOf(wmr4pair.get("status").toString()))){
-				validate=false;
-				json.put("validate", validate);
-				json.put("validate_pair_lost_type", 2);
-			}
-			
-			//放弃入职审批
-			if("1".equals(wmr4pair.get("isGiveUp").toString())){
-				validate=false;
-				json.put("validate", validate);
-				json.put("validate_pair_lost_type", 3);
-			}
-			
-			//入职不通过
-			if("0".equals(wmr4pair.get("isPass").toString())){
-				validate=false;
-				json.put("validate", validate);
-				json.put("validate_pair_lost_type", 4);
-			}
-			
-			json.put("validate", validate);
-		}
+		boolean validate=this.tempDriverService.requestServiceCertificateValidate(this.getId(), carManEntryKey, json);
 		
 		if(!validate){
-			//查找其他司机的入职审批流程与当前司机的关联性
-			this.findOtherRelation(json, carManEntryKey);
+			json = new Json();
+			json.put("msg", getText("tempDriver.msg.lose1"));
 		}
-	}
-	
-	//查找其他司机的入职审批流程与当前司机的关联性
-	private void findOtherRelation(Json json,String carManEntryKey){
-		//查找其他司机的入职审批流程
-		List<Map<String,Object>> others=this.workflowModuleRelationService.findList(null, TempDriver.WORKFLOW_MTYPE
-				,carManEntryKey,new String[] { "isGiveUp","isPass","isPairDriver","pairDriverName","pairDriverNameId","tempDriver_id"});
-		for(Map<String,Object> wmr:others){
-				if("1".equals(wmr.get("isPairDriver").toString())//有选择对班
-						&&wmr.get("pairDriverNameId").toString().equals(String.valueOf(this.driverId))
-						&&wmr.get("status").toString().equals(String.valueOf(WorkspaceServiceImpl.COMPLETE))
-						&&"0".equals(wmr.get("isGiveUp").toString())
-						&&"1".equals(wmr.get("isPass").toString())){
-					//新的对班司机
-					TempDriver pairDriver=this.tempDriverService.load(Long.valueOf(wmr.get("tempDriver_id").toString()));
-					//设置新的对班司机信息
-					json.put("pair_id", pairDriver.getId().toString());
-					json.put("pair_name", pairDriver.getName());
-					json.put("pair_applyAttr", pairDriver.getApplyAttr());//申请属性
-					//设置对班司机的身份证很从业资格证
-					json.put("pair_certIdentity", pairDriver.getCertIdentity());
-					json.put("pair_certCYZG", pairDriver.getCertCYZG());
-					
-					//设置流程信息
-					json.put("pair_pid", wmr.get("pid").toString());
-					json.put("pair_pname", wmr.get("name").toString());
-					
-					json.put("validate", true);
-					json.put("validate_pair_lost_type", 0);
-					//跳出循环
-					break;
-				}
-			
-		}
-		
+		json.put("validate", validate);
+		this.json=json.toString();
+		return "json";
 	}
 	
 	public String procinstId;//流程id
 	public String procinstTaskId;//任务id
 	public String templateCode;//模板编码
 	
-	//添加 添加服务资格证申领表 或 免摇珠申请书附件到流程
+	//添加服务资格证申领表 或 免摇珠申请书附件到流程
 	public String addWorkflowAttachFromTemplate() throws Exception{
 		Attach attach =this.tempDriverService.doGetAttachFromTemplate(this.driverId, this.templateCode);
 		TempDriver tempDriver=this.tempDriverService.load(this.driverId);
