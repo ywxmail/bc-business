@@ -3,10 +3,13 @@ package cn.bc.business.tempdriver.service;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import org.activiti.engine.impl.persistence.entity.SuspensionState;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.Assert;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import cn.bc.business.tempdriver.dao.TempDriverDao;
@@ -20,10 +23,12 @@ import cn.bc.identity.web.SystemContext;
 import cn.bc.identity.web.SystemContextHolder;
 import cn.bc.template.domain.Template;
 import cn.bc.template.service.TemplateService;
+import cn.bc.web.ui.json.Json;
 import cn.bc.workflow.domain.ExcutionLog;
 import cn.bc.workflow.domain.WorkflowModuleRelation;
 import cn.bc.workflow.service.WorkflowModuleRelationService;
 import cn.bc.workflow.service.WorkflowService;
+import cn.bc.workflow.service.WorkspaceServiceImpl;
 
 /**
  * 司机招聘Service的实现
@@ -317,6 +322,169 @@ public class TempDriverServiceImpl extends DefaultCrudService<TempDriver> implem
 		
 		Attach attach = template.format2Attach(params, ptype, puid);
 		return attach;
+	}
+
+	public boolean requestServiceCertificateValidate(Long id,
+			String carManEntryKey,Json json){
+		Assert.assertNotNull(id);
+		Assert.assertNotNull(carManEntryKey);
+		Assert.assertNotNull(json);
+		
+		
+		TempDriver driver=this.tempDriverDao.load(id);
+		
+		//不存在流程关系
+		if(!this.workflowModuleRelationService.hasRelation4Key(id,TempDriver.WORKFLOW_MTYPE,carManEntryKey))
+			return false;
+		//声明变量
+		String _true="1";
+		
+		//设置需要获取的变量
+		String[] args=new String[] {"isGiveUp","isPass","isPairDriver","pairDriverName","pairDriverNameId" };
+		//复试组组长任务key
+		String taskKey = "t100RetestHeadCheck";
+		//本地变量
+		String localKey = "isPass_lc";
+		
+		//获取最新的司机入职流程相关参数
+		Map<String,Object> driver_wf=
+				this.workflowModuleRelationService.findList(id, TempDriver.WORKFLOW_MTYPE,carManEntryKey,args).get(0);
+		//流程id
+		String pid = driver_wf.get("pid").toString();
+		//司机放弃入职变量
+		boolean isGiveUp = _true.equals(driver_wf.get("isGiveUp").toString());
+		//司机通过入职变量
+		boolean isPass = _true.equals(driver_wf.get("isPass").toString());
+		//是否有对班司机编辑
+		boolean isPair= _true.equals(driver_wf.get("isPairDriver").toString());
+		//流程状态
+		int pStatus=Integer.valueOf(driver_wf.get("status").toString());
+		//查找复试组长是否选择通过变量
+		Object pass_lc=this.workflowService.findLocalValue(pid,taskKey,localKey);
+		//复试组长 选项                                流程未到复试组长组长审批                 选择不通过
+		boolean isPass_lc = pass_lc == null || !_true.equals(pass_lc.toString())?false:true;
+		
+		//无论是否有对班司机 ，不具备发起的条件
+		//流程结束，司机选择放弃
+		if(WorkspaceServiceImpl.COMPLETE==pStatus && isGiveUp)
+			return false;
+		//流程结束，司机不通过
+		if(WorkspaceServiceImpl.COMPLETE==pStatus && !isPass)
+			return false;
+		//流程未结束，复试组组长的任务未完成或复试组组长选择不通过
+		if(SuspensionState.ACTIVE.getStateCode()==pStatus && !isPass_lc)
+			return false;
+		
+		
+		//设置司机信息
+		json.put("id", id.toString());
+		json.put("name", driver.getName());
+		json.put("applyAttr", driver.getApplyAttr());//申请属性
+		//设置对班司机的身份证很从业资格证
+		json.put("certIdentity", driver.getCertIdentity());
+		json.put("certCYZG", driver.getCertCYZG());
+		json.put("pid", pid);
+		json.put("pname",driver_wf.get("name").toString());
+		//设置是否有对班 默认没有
+		json.put("isPairDriver",false);
+		
+		//没有对班，司机具备发起服务资格证流程条件
+		//流程结束  &&没有放弃 &&入职通过  
+		if(!isPair && WorkspaceServiceImpl.COMPLETE==pStatus && !isGiveUp && isPass )
+			return true;
+		//流程未结束 && 复试组组长选择通过
+		if(!isPair && SuspensionState.ACTIVE.getStateCode()==pStatus && isPass_lc)
+			return true;
+		
+		//对班id
+		Long pDriverId = Long.valueOf(driver_wf.get("pairDriverNameId").toString());
+		TempDriver pDriver=this.tempDriverDao.load(pDriverId);
+		json.put("isPairDriver",true);
+		
+		//对班存在入职流程
+		if(this.workflowModuleRelationService.hasRelation4Key(pDriverId,TempDriver.WORKFLOW_MTYPE,carManEntryKey)){
+			//获取对班司机最新的司机入职流程相关参数
+			Map<String,Object> pDriver_wf=this.workflowModuleRelationService.findList(pDriverId, TempDriver.WORKFLOW_MTYPE
+					,carManEntryKey,args).get(0);
+			//流程id
+			String pDriver_pid = driver_wf.get("pid").toString();
+			//司机放弃入职变量
+			boolean pDriver_isGiveUp = _true.equals(pDriver_wf.get("isGiveUp").toString());
+			//司机通过入职变量
+			boolean pDriver_isPass = _true.equals(pDriver_wf.get("isPass").toString());
+			//是否有对班司机编辑
+			boolean pDriver_isPair = _true.equals(pDriver_wf.get("isPairDriver").toString());
+			//流程状态
+			int pDriver_pStatus = Integer.valueOf(pDriver_wf.get("status").toString());
+			//查找复试组长是否选择通过变量
+			Object pDriver_pass_lc=this.workflowService.findLocalValue(pDriver_pid,taskKey,localKey);
+			//复试组长 选项                                                              流程未到复试组长组长审批                                             选择不通过
+			boolean pDriver_isPass_lc = pDriver_pass_lc == null || !_true.equals(pDriver_pass_lc.toString())?false:true;
+			    
+			//司机和对班都具备发起服务资格证流程的条件
+			if(//条件1)流程结束  &&没有放弃 &&入职通过  && 有对班
+				(WorkspaceServiceImpl.COMPLETE==pDriver_pStatus && !pDriver_isGiveUp && pDriver_isPass && pDriver_isPair)
+				//条件2)流程未结束 && 复试组组长选择通过 && 有对班
+				||(SuspensionState.ACTIVE.getStateCode()==pDriver_pStatus && pDriver_isPass_lc && pDriver_isPair)){
+				//设置对班司机信息
+				json.put("pair_id", pDriverId.toString());
+				json.put("pair_name", pDriver.getName());
+				json.put("pair_applyAttr", pDriver.getApplyAttr());//申请属性
+				//设置对班司机的身份证很从业资格证
+				json.put("pair_certIdentity", pDriver.getCertIdentity());
+				json.put("pair_certCYZG", pDriver.getCertCYZG());
+				json.put("pair_pid", pDriver_pid);
+				json.put("pair_pname",pDriver_wf.get("name").toString());
+				return true;
+			}
+				
+		}
+			
+		//查找对班但未符合发起的条件，入职通过的司机再找另外一个对班司机的情况
+		List<Map<String,Object>> others=this.workflowModuleRelationService.findList(null, TempDriver.WORKFLOW_MTYPE
+				,carManEntryKey,args);
+		
+		for(Map<String,Object> wmr:others){
+			if("1".equals(wmr.get("isPairDriver").toString())//有选择对班
+					//选择原通过的司机
+					&&wmr.get("pairDriverNameId").toString().equals(String.valueOf(id))){
+				//流程id
+				String new_pid = wmr.get("pid").toString();
+				//司机放弃入职变量
+				boolean new_isGiveUp = _true.equals(wmr.get("isGiveUp").toString());
+				//司机通过入职变量
+				boolean new_isPass = _true.equals(wmr.get("isPass").toString());
+				//流程状态
+				int new_pStatus= Integer.valueOf(wmr.get("status").toString());
+				
+				//查找复试组长是否选择通过变量
+				Object new_pass_lc=this.workflowService.findLocalValue(new_pid,taskKey,localKey);
+				//复试组长 选项                                                   流程未到复试组长组长审批                          选择不通过
+				boolean new_isPass_lc = new_pass_lc == null || !_true.equals(new_pass_lc.toString()) ? false:true;
+				
+				//新的对班司机
+				TempDriver newPairDriver=this.tempDriverDao.load(Long.valueOf(wmr.get("tempDriver_id").toString()));
+				
+				//司机和新的对班都具备发起服务资格证流程的条件
+				if(//条件1)流程结束  &&没有放弃 &&入职通过
+					(WorkspaceServiceImpl.COMPLETE==new_pStatus && !new_isGiveUp && new_isPass)
+					//条件2)流程未结束 && 复试组组长选择通过 
+					||(SuspensionState.ACTIVE.getStateCode()==new_pStatus && new_isPass_lc)){
+					//设置对班司机信息
+					json.put("pair_id", newPairDriver.getId().toString());
+					json.put("pair_name", newPairDriver.getName());
+					json.put("pair_applyAttr", newPairDriver.getApplyAttr());//申请属性
+					//设置对班司机的身份证很从业资格证
+					json.put("pair_certIdentity", newPairDriver.getCertIdentity());
+					json.put("pair_certCYZG", newPairDriver.getCertCYZG());
+					json.put("pair_pid", new_pid);
+					json.put("pair_pname",wmr.get("name").toString());
+					return true;
+				}
+			}
+		}
+
+		return false;
 	}
 
 }

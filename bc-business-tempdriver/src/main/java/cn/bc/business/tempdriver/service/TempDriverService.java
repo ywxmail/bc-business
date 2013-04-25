@@ -7,6 +7,7 @@ import cn.bc.business.tempdriver.domain.TempDriver;
 import cn.bc.core.service.CrudService;
 import cn.bc.docs.domain.Attach;
 import cn.bc.template.service.AddAttachFromTemplateService;
+import cn.bc.web.ui.json.Json;
 
 /**
  * 司机招聘Service
@@ -41,6 +42,17 @@ public interface TempDriverService extends CrudService<TempDriver>,AddAttachFrom
 	 * @return
 	 */
 	String doStartFlow(String key,Long[] ids,boolean flagStatus);
+	
+	/**
+	 * 发起服务资格证流程的验证 
+	 * 
+	 * @param id 招聘司机id
+	 * @param carManEntryKey 司机入职流程key
+	 * @param json 
+	 * @return
+	 * @throws Exception
+	 */
+	boolean requestServiceCertificateValidate(Long id,String carManEntryKey,Json json);
 	
 	
 	/**
