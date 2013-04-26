@@ -184,12 +184,11 @@ public class CarAction extends FileEntityAction<Long, Car> {
 						.getE().getStatus() == Car.CAR_STAUTS_NEWBUY)) {
 			// 保存为草稿
 			pageOption.addButton(new ButtonOption(getText("label.save4Draft"),
-					null, "bc.carForm.save"));
+					null, "bc.carForm.save4Draft"));
 		}
 		// 如果有新购车辆录入权限的就有保存为新购车辆按钮
 		if (isNewBuyEntering()
-				&& (this.getE().getStatus() == BCConstants.STATUS_DRAFT || this
-						.getE().getStatus() == Car.CAR_STAUTS_NEWBUY)) {
+				&& (this.getE().getStatus() == Car.CAR_STAUTS_NEWBUY)) {
 			// 保存为新购[新购买的车辆]
 			pageOption.addButton(new ButtonOption(getText("label.save4NewBuy"),
 					null, "bc.carForm.save4NewBuy"));
@@ -278,7 +277,8 @@ public class CarAction extends FileEntityAction<Long, Car> {
 	@Override
 	protected Car createEntity() {
 		Car car = super.createEntity();
-		car.setStatus(BCConstants.STATUS_DRAFT);
+		car.setStatus(isNewBuyEntering() ? Car.CAR_STAUTS_NEWBUY
+				: BCConstants.STATUS_DRAFT);
 		return car;
 	}
 
