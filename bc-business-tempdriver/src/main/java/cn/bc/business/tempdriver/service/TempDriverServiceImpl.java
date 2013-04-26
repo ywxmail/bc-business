@@ -329,8 +329,7 @@ public class TempDriverServiceImpl extends DefaultCrudService<TempDriver> implem
 		Assert.assertNotNull(id);
 		Assert.assertNotNull(carManEntryKey);
 		Assert.assertNotNull(json);
-		
-		
+	
 		TempDriver driver=this.tempDriverDao.load(id);
 		
 		//不存在流程关系
@@ -351,30 +350,28 @@ public class TempDriverServiceImpl extends DefaultCrudService<TempDriver> implem
 				this.workflowModuleRelationService.findList(id, TempDriver.WORKFLOW_MTYPE,carManEntryKey,args).get(0);
 		//流程id
 		String pid = driver_wf.get("pid").toString();
-		//司机放弃入职变量
-		boolean isGiveUp = _true.equals(driver_wf.get("isGiveUp").toString());
-		//司机通过入职变量
-		boolean isPass = _true.equals(driver_wf.get("isPass").toString());
-		//是否有对班司机编辑
-		boolean isPair= _true.equals(driver_wf.get("isPairDriver").toString());
 		//流程状态
 		int pStatus=Integer.valueOf(driver_wf.get("status").toString());
 		//查找复试组长是否选择通过变量
 		Object pass_lc=this.workflowService.findLocalValue(pid,taskKey,localKey);
 		//复试组长 选项                                流程未到复试组长组长审批                 选择不通过
-		boolean isPass_lc = pass_lc == null || !_true.equals(pass_lc.toString())?false:true;
+		boolean isPass_lc = _true.equals(pass_lc);
+		//不具备发起的条件
+		//流程未结束，(流程未到复试组长组长审批或复试组组长选择不通过)
+		if(SuspensionState.ACTIVE.getStateCode()==pStatus && !isPass_lc)return false;
 		
-		//无论是否有对班司机 ，不具备发起的条件
+		//司机放弃入职变量
+		boolean isGiveUp = _true.equals(driver_wf.get("isGiveUp"));
+		//司机通过入职变量
+		boolean isPass = _true.equals(driver_wf.get("isPass"));
+		//是否有对班司机编辑
+		boolean isPair= _true.equals(driver_wf.get("isPairDriver"));
+		
+		//无论是否有对班司机 ，都不具备发起的条件
 		//流程结束，司机选择放弃
-		if(WorkspaceServiceImpl.COMPLETE==pStatus && isGiveUp)
-			return false;
+		if(WorkspaceServiceImpl.COMPLETE==pStatus && isGiveUp)return false;
 		//流程结束，司机不通过
-		if(WorkspaceServiceImpl.COMPLETE==pStatus && !isPass)
-			return false;
-		//流程未结束，复试组组长的任务未完成或复试组组长选择不通过
-		if(SuspensionState.ACTIVE.getStateCode()==pStatus && !isPass_lc)
-			return false;
-		
+		if(WorkspaceServiceImpl.COMPLETE==pStatus && !isPass)return false;
 		
 		//设置司机信息
 		json.put("id", id.toString());
@@ -390,12 +387,11 @@ public class TempDriverServiceImpl extends DefaultCrudService<TempDriver> implem
 		
 		//没有对班，司机具备发起服务资格证流程条件
 		//流程结束  &&没有放弃 &&入职通过  
-		if(!isPair && WorkspaceServiceImpl.COMPLETE==pStatus && !isGiveUp && isPass )
-			return true;
+		if(!isPair && WorkspaceServiceImpl.COMPLETE==pStatus && !isGiveUp && isPass)return true;
 		//流程未结束 && 复试组组长选择通过
-		if(!isPair && SuspensionState.ACTIVE.getStateCode()==pStatus && isPass_lc)
-			return true;
+		if(!isPair && SuspensionState.ACTIVE.getStateCode() == pStatus && isPass_lc)return true;
 		
+		//******存在对班 查找对班的入职情况***开始****
 		//对班id
 		Long pDriverId = Long.valueOf(driver_wf.get("pairDriverNameId").toString());
 		TempDriver pDriver=this.tempDriverDao.load(pDriverId);
@@ -409,17 +405,17 @@ public class TempDriverServiceImpl extends DefaultCrudService<TempDriver> implem
 			//流程id
 			String pDriver_pid = driver_wf.get("pid").toString();
 			//司机放弃入职变量
-			boolean pDriver_isGiveUp = _true.equals(pDriver_wf.get("isGiveUp").toString());
+			boolean pDriver_isGiveUp =_true.equals(pDriver_wf.get("isGiveUp"));
 			//司机通过入职变量
-			boolean pDriver_isPass = _true.equals(pDriver_wf.get("isPass").toString());
+			boolean pDriver_isPass = _true.equals(pDriver_wf.get("isPass"));
 			//是否有对班司机编辑
-			boolean pDriver_isPair = _true.equals(pDriver_wf.get("isPairDriver").toString());
+			boolean pDriver_isPair = _true.equals(pDriver_wf.get("isPairDriver"));
 			//流程状态
 			int pDriver_pStatus = Integer.valueOf(pDriver_wf.get("status").toString());
 			//查找复试组长是否选择通过变量
 			Object pDriver_pass_lc=this.workflowService.findLocalValue(pDriver_pid,taskKey,localKey);
 			//复试组长 选项                                                              流程未到复试组长组长审批                                             选择不通过
-			boolean pDriver_isPass_lc = pDriver_pass_lc == null || !_true.equals(pDriver_pass_lc.toString())?false:true;
+			boolean pDriver_isPass_lc =_true.equals(pDriver_pass_lc);
 			    
 			//司机和对班都具备发起服务资格证流程的条件
 			if(//条件1)流程结束  &&没有放弃 &&入职通过  && 有对班
@@ -437,30 +433,30 @@ public class TempDriverServiceImpl extends DefaultCrudService<TempDriver> implem
 				json.put("pair_pname",pDriver_wf.get("name").toString());
 				return true;
 			}
-				
 		}
+		//******存在对班 查找对班的入职情况***结束****
 			
-		//查找对班但未符合发起的条件，入职通过的司机再找另外一个对班司机的情况
+		//****查找对班但未符合发起的条件，入职通过的司机再找另外一个对班司机的情况****开始*****
 		List<Map<String,Object>> others=this.workflowModuleRelationService.findList(null, TempDriver.WORKFLOW_MTYPE
-				,carManEntryKey,args);
+				,carManEntryKey,new String[] {"isGiveUp","isPass","isPairDriver","pairDriverName","pairDriverNameId","tempDriver_id"});
 		
 		for(Map<String,Object> wmr:others){
-			if("1".equals(wmr.get("isPairDriver").toString())//有选择对班
+			if(_true.equals(wmr.get("isPairDriver"))//有选择对班
 					//选择原通过的司机
-					&&wmr.get("pairDriverNameId").toString().equals(String.valueOf(id))){
+					&&String.valueOf(id).equals(wmr.get("pairDriverNameId"))){
 				//流程id
 				String new_pid = wmr.get("pid").toString();
 				//司机放弃入职变量
-				boolean new_isGiveUp = _true.equals(wmr.get("isGiveUp").toString());
+				boolean new_isGiveUp = _true.equals(wmr.get("isGiveUp"));
 				//司机通过入职变量
-				boolean new_isPass = _true.equals(wmr.get("isPass").toString());
+				boolean new_isPass = _true.equals(wmr.get("isPass"));
 				//流程状态
 				int new_pStatus= Integer.valueOf(wmr.get("status").toString());
 				
 				//查找复试组长是否选择通过变量
 				Object new_pass_lc=this.workflowService.findLocalValue(new_pid,taskKey,localKey);
 				//复试组长 选项                                                   流程未到复试组长组长审批                          选择不通过
-				boolean new_isPass_lc = new_pass_lc == null || !_true.equals(new_pass_lc.toString()) ? false:true;
+				boolean new_isPass_lc = _true.equals(new_pass_lc);
 				
 				//新的对班司机
 				TempDriver newPairDriver=this.tempDriverDao.load(Long.valueOf(wmr.get("tempDriver_id").toString()));
@@ -483,8 +479,8 @@ public class TempDriverServiceImpl extends DefaultCrudService<TempDriver> implem
 				}
 			}
 		}
+		//****查找对班但未符合发起的条件，入职通过的司机再找另外一个对班司机的情况****结束*****
 
 		return false;
 	}
-
 }
