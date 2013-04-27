@@ -403,7 +403,7 @@ public class TempDriverServiceImpl extends DefaultCrudService<TempDriver> implem
 			Map<String,Object> pDriver_wf=this.workflowModuleRelationService.findList(pDriverId, TempDriver.WORKFLOW_MTYPE
 					,carManEntryKey,args).get(0);
 			//流程id
-			String pDriver_pid = driver_wf.get("pid").toString();
+			String pDriver_pid = pDriver_wf.get("pid").toString();
 			//司机放弃入职变量
 			boolean pDriver_isGiveUp =_true.equals(pDriver_wf.get("isGiveUp"));
 			//司机通过入职变量
@@ -414,7 +414,7 @@ public class TempDriverServiceImpl extends DefaultCrudService<TempDriver> implem
 			int pDriver_pStatus = Integer.valueOf(pDriver_wf.get("status").toString());
 			//查找复试组长是否选择通过变量
 			Object pDriver_pass_lc=this.workflowService.findLocalValue(pDriver_pid,taskKey,localKey);
-			//复试组长 选项                                                              流程未到复试组长组长审批                                             选择不通过
+			//复试组长 选项                                                              流程未到复试组长组长审批           选择不通过
 			boolean pDriver_isPass_lc =_true.equals(pDriver_pass_lc);
 			    
 			//司机和对班都具备发起服务资格证流程的条件
