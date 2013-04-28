@@ -1,5 +1,7 @@
 package cn.bc.spider;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -12,6 +14,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -39,8 +42,6 @@ public class HttpClientCallable<V> implements Callable<Result<V>> {
 	private String method;// 请求方法：get|post
 	private String url;// 登录密码
 	private String id;// 该次请求的标识
-	private String html;// 请求的响应文本
-	private Document document;// 请求的响应文本对应的jsop文档对象
 	private String encoding = "UTF-8";// 请求的编码
 	private static ExpressionParser parser = new SpelExpressionParser();
 	private String successExpression;// 用于判断请求是否成功的spel表达式：表达式上下文中含有document、html、this对象可以使用
@@ -48,6 +49,11 @@ public class HttpClientCallable<V> implements Callable<Result<V>> {
 	private String userAgent;// 请求时使用的用户代理
 	private Map<String, String> formData;// 表单参数
 	private Map<String, String> httpParams;// http参数
+	private boolean stream;// 响应的实体是否是流:如下载文件等为true
+
+	protected HttpEntity entity;// 响应的实体信息
+	protected Object content;// 响应的内容：文本或流
+	protected Document document;// 请求的响应文本对应的jsop文档对象
 
 	public HttpClientCallable() {
 	}
@@ -95,17 +101,56 @@ public class HttpClientCallable<V> implements Callable<Result<V>> {
 
 		// 提交请求
 		HttpResponse response = getHttpClient().execute(request);
-		this.html = EntityUtils.toString(response.getEntity());
-		if (logger.isDebugEnabled()) {
-			logger.debug("html=" + this.html);
+		this.entity = response.getEntity();
+		if (HttpStatus.SC_OK == response.getStatusLine().getStatusCode()) {// 请求成功
+			// 解析响应的结果
+			parseContent();
+
+			// 返回结果
+			return getResult();
+		} else {// 请求失败
+			Result<V> r = new Result<V>(false, null, this.isStream());
+			// 记录失败的状态
+			r.setContent(response.getStatusLine().getStatusCode() + ":"
+					+ response.getStatusLine().getReasonPhrase());
+			return r;
 		}
-		// System.out.println("html=" + this.html);
+	}
 
-		// 解析相应
-		parseHtml();
+	/**
+	 * 解析响应
+	 * 
+	 * @throws IOException
+	 */
+	protected void parseContent() throws Exception {
+		if (this.isStream()) {
+			parseStream(this.entity.getContent());
+		} else {
+			parseHtml();
+		}
+	}
 
-		// 返回结果
-		return getResult();
+	/**
+	 * 解析响应为文件流
+	 */
+	protected void parseStream(InputStream stream) throws Exception {
+
+	}
+
+	/**
+	 * 解析响应为文本
+	 * 
+	 * @throws IOException
+	 */
+	protected void parseHtml() throws IOException {
+		this.content = EntityUtils.toString(this.entity);
+		if (logger.isDebugEnabled()) {
+			logger.debug("html=" + this.content);
+		}
+		System.out.println("html=" + this.content);
+
+		// 解析DOM
+		parseDocument();
 	}
 
 	public String getId() {
@@ -115,6 +160,14 @@ public class HttpClientCallable<V> implements Callable<Result<V>> {
 	public HttpClientCallable<V> setId(String id) {
 		this.id = id;
 		return this;
+	}
+
+	public boolean isStream() {
+		return stream;
+	}
+
+	public void setStream(boolean stream) {
+		this.stream = stream;
 	}
 
 	public String getUrl() {
@@ -156,12 +209,8 @@ public class HttpClientCallable<V> implements Callable<Result<V>> {
 		this.resultExpression = resultExpression;
 	}
 
-	public String getHtml() {
-		return html;
-	}
-
-	public Document getDocument() {
-		return document;
+	public Object getContent() {
+		return content;
 	}
 
 	public String getUserAgent() {
@@ -177,8 +226,8 @@ public class HttpClientCallable<V> implements Callable<Result<V>> {
 	 * 
 	 * @return
 	 */
-	public void parseHtml() {
-		document = Jsoup.parse(this.html);
+	public void parseDocument() {
+		document = Jsoup.parse(this.content.toString());
 
 		// 无缩进格式
 		// document.outputSettings().prettyPrint(false);
@@ -195,6 +244,10 @@ public class HttpClientCallable<V> implements Callable<Result<V>> {
 
 	public void setEncoding(String encoding) {
 		this.encoding = encoding;
+	}
+
+	public Document getDocument() {
+		return document;
 	}
 
 	/**
@@ -279,7 +332,6 @@ public class HttpClientCallable<V> implements Callable<Result<V>> {
 			return exp.getValue(this, clazz);
 		} catch (EvaluationException e) {
 			logger.warn(e.getMessage(), e);
-			// Integer.parseInt(s);
 			return null;
 		}
 	}
@@ -291,8 +343,9 @@ public class HttpClientCallable<V> implements Callable<Result<V>> {
 	 */
 	public Result<V> getResult() {
 		Boolean success = isSuccess();
-		Result<V> r = new Result<V>(success, success ? parseData() : null);
-		r.setHtml(html);
+		Result<V> r = new Result<V>(success, success ? parseData() : null,
+				this.stream);
+		r.setContent(content);
 		return r;
 	}
 
@@ -321,7 +374,10 @@ public class HttpClientCallable<V> implements Callable<Result<V>> {
 	 * @return
 	 */
 	public Boolean isSuccess() {
-		return getExpressionValue(this.successExpression, Boolean.class);
+		if (this.successExpression != null)
+			return getExpressionValue(this.successExpression, Boolean.class);
+		else
+			return true;
 	}
 
 	public String getMethod() {

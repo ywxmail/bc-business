@@ -13,23 +13,15 @@ import cn.bc.spider.SimpleLoginCallable;
 public class LoginCallable extends SimpleLoginCallable {
 	private String captcha;// 验证码
 
-	/** 验证码图片的url */
-	public static String URL4CAPTCHA = "http://www.gzjd.gov.cn/cgs/captcha.jpg";
-	/** 获取数据的url */
-	public static String URL4EXEC = "http://www.gzjd.gov.cn/cgs/service/getUserInfo";
-
 	public LoginCallable(String userName, String password, String captcha) {
-		this.setKey4userName("username");
-		this.setKey4password("password");
+		this.setKey4userName("j_username");
+		this.setKey4password("j_password");
 		this.setUserName(userName);
 		this.setPassword(password);
 		this.captcha = captcha;
 
-		this.setId("gzjd.cgs");
-		this.setUrl(LoginCallable.URL4EXEC);
-
-		this.setSuccessExpression("new Integer(document.select(\"#__ROWCOUNT\").val()) > 0");
-		this.setResultExpression("document.select(\"#tabDataGrid\").get(0)");
+		this.setId("wscgs");
+		this.setUrl("http://www.gzjd.gov.cn/cgs/j_ajax_security_check");
 	}
 
 	@Override
@@ -41,5 +33,15 @@ public class LoginCallable extends SimpleLoginCallable {
 			formData.put("captchaId", captcha);
 
 		return formData;
+	}
+
+	@Override
+	public void parseDocument() {
+		// Do nothing：因请求返回的是json格式，没有dom结构
+	}
+
+	@Override
+	public Boolean isSuccess() {
+		return "\"1\"".equals(this.content) || "1".equals(this.content);
 	}
 }

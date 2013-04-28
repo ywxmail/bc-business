@@ -15,6 +15,6 @@ public class LoginCallableTest {
 		Assert.assertTrue(result.isSuccess());
 
 		// 打印响应的html内容
-		System.out.println(result.getHtml());
+		System.out.println(result.getContent());
 	}
 }
